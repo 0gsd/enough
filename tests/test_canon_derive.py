@@ -253,7 +253,7 @@ def test_rules_emf_lints_clean_and_is_grounded(feed, notes, tmp_path):
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
     assert list(doc)[:9] == ["oes", "macrocosm", "flavour", "id", "name", "source", "derived", "atem", "nodes"]
-    assert doc["macrocosm"] == macrocosm.MACROCOSM_VERSION == "0.5.4" and doc["id"] == "fabula/notes-md"
+    assert doc["macrocosm"] == macrocosm.MACROCOSM_VERSION == "0.6.0" and doc["id"] == "fabula/notes-md"
     assert doc["flavour"] == "fabulan"
     assert doc["name"] == "The Hollins Lane orchard, autumn notes"
     assert doc["source"] == {"path": "notes.md", **stat}

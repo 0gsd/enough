@@ -1,6 +1,6 @@
 # Comprise OES
 
-*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://comprise.cosmoes.org/*
+*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://comprise.cosmoes.org/*
 
 *This edition describes the `comprise/1` MiniCOSM: a catalog declaring `oes: comprise/1`, with P files headed
 `cosm: 0.3`, the isotype `comprise-isotype/0`, the outside chart `comprise-paratype/0`, the backup `comprise-bundle/0`,
@@ -1632,7 +1632,7 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
 
-**Edition 0.6.0 · 2026-11-05.**
+**Edition 0.6.0 · 2026-11-06.**
 
 1. **Where Comprise OES stands.** The lead says there are two MiniCOSMs, Comprise OES and Ascribe, both written in
    MacroCOSM OES, an OES: the shared grammar and its core, which holds the formats built into every reader, the

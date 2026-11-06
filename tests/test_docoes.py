@@ -354,16 +354,16 @@ def test_the_spec_terms_and_decisions(built):
     assert vol.item("T:term/stance") is None or vol.item("T:term/stance").data["defined_in"].startswith("S:section/")
     assert "T:term/kind" in vol.item("S:section/7.4").data["mentions"]
     # The decisions come from the "Changes" section — every item of every edition's list, numbered through the
-    # section, each carrying its edition and date: 14 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
+    # section, each carrying its edition and date: 15 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
     decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
-    assert len(decisions) == 52
+    assert len(decisions) == 53
     assert decisions[-1].data["name"] == "All rights reserved for the specification and the manifests;"
-    assert decisions[26].data["name"] == "A document is enumerated in its own grammar"
-    assert Counter(d.data.get("edition") for d in decisions) == {"0.6.0": 14, "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
+    assert decisions[27].data["name"] == "A document is enumerated in its own grammar"
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.6.0": 15, "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first["edition"], first["dated"]) == \
-        ("S:decision/1", "The taxonomy", "0.6.0", "2026-11-05")
-    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 53)]
+        ("S:decision/1", "The taxonomy", "0.6.0", "2026-11-06")
+    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 54)]
     assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/21"           # 0.6: Changes is 21
 
 
@@ -570,16 +570,16 @@ def test_the_five_documents():
     assert D.DOCUMENTS["macrocosm-oes"].xref == {"§": "", "README §": "", "P.": ""}
     assert D.DOCUMENTS["comprise-oes"].own_p and D.DOCUMENTS["comprise-oes"].xref == {"§": ""}
     # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
-    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.5.4"
+    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.6.0"
     assert str(mc.default_registry().get("thym").version) == "1"
 
 
 def test_the_three_minicosm_specifications_enumerate(built):
-    """The counts of the 0.6.0 editions (the decisions are the Changes sections' items: 21 + 7 + 18, 10 + 1 + 11,
+    """The counts of the 0.6.0 editions (the decisions are the Changes sections' items: 22 + 7 + 18, 10 + 1 + 11,
     7 + 2 + 20),
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
-    for slug, counts in (("thym", {"section": 111, "term": 20, "example": 1, "decision": 46}),
+    for slug, counts in (("thym", {"section": 111, "term": 20, "example": 1, "decision": 47}),
                          ("ascribe", {"section": 45, "term": 15, "example": 1, "decision": 22}),
                          ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 29})):
         vol = built["vols"][(slug, "en")]
@@ -600,7 +600,7 @@ def test_the_three_minicosm_specifications_enumerate(built):
         assert rows and all(r["inventory"] == slug and r["version"] == edition for r in rows)
         decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
         assert decisions and all(d.data.get("edition") for d in decisions), slug
-        assert decisions[0].data["edition"] == "0.6.0" and decisions[0].data["dated"] == "2026-11-05", slug
+        assert decisions[0].data["edition"] == "0.6.0" and decisions[0].data["dated"] == "2026-11-06", slug
 
 
 # ---------------------------------------------------------------------------

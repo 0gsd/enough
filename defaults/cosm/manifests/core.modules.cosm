@@ -20,7 +20,7 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 modules-of: core
-macrocosm: 0.5.4
+macrocosm: 0.6.0
 
 modules:
   D:

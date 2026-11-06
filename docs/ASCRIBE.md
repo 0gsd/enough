@@ -1,6 +1,6 @@
 # Ascribe
 
-*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://ascribe.cosmoes.org/*
+*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://ascribe.cosmoes.org/*
 
 *This edition describes the `ascribe/1` MiniCOSM: the declaration every holograph carries.*
 
@@ -947,7 +947,7 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 ## 17. Changes
 
 <!-- atem: what each edition changed, newest first, one line each -->
-**Edition 0.6.0 · 2026-11-05.** Ascribe built out: what happens to a holograph after it is written is specified.
+**Edition 0.6.0 · 2026-11-06.** Ascribe built out: what happens to a holograph after it is written is specified.
 
 1. **The taxonomy.** Ascribe is one of the two MiniCOSMs; MacroCOSM OES is the OES with a core; Thym is the
    transcognition language that connects OESes. The stewardship sentence joins section 1.
@@ -967,7 +967,9 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 9. **Projections** (section 14, was "Projections, by reference"): the isograph's fixed schema
    (`ascribe-isograph/0`), everything `stated` and `verified` reserved for a registry; the cryptograph; match tokens for
    a person (`ascribe-tokens/0`); morphs beside the holograph, with the catalog key `morphs`. The registry, an index of
-   isographs, serving tokens and the bridge to Comprise stay reserved.
+   isographs, serving tokens and the bridge to Comprise stay reserved. In this edition an isograph is made by a Thym
+   program its holder runs, and names that run; a cryptograph, an isomorph and match tokens are made by the
+   implementation at the holder's act, and Thym moves for them are reserved for a later edition (section 14).
 10. **Conformance** (section 16, new). The command line moves to section 15, Changes to 17, Withdrawn to 18.
 
 No `ascribe/1` holograph changes meaning, and every one that was valid stays valid.

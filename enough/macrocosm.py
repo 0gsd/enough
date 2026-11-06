@@ -69,12 +69,13 @@ from typing import Any, Iterator
 
 import yaml
 
-MACROCOSM_VERSION = "0.5.4"                 # the grammar version enough writes (0.5.4: the Studio 54 editions; the grammar
-#                                             itself unchanged since 0.0.1). 0.0.2 (0.5.0) added the ascribe and thym
-#                                             MiniCOSMs, the `moves:` block and sidecars.
+MACROCOSM_VERSION = "0.6.0"                 # the grammar version enough writes (0.6.0: the fabula round: the core
+#                                             and its built-ins, old spellings, module D, addresses; additive, so every
+#                                             earlier version reads unchanged). 0.0.2 (0.5.0) added the ascribe and thym
+#                                             formats, the `moves:` block and sidecars.
 # Every grammar version this reader reads unchanged: a catalog or manifest carrying one of these in its reserved
 # `macrocosm:` key is read as it is; any other value is a `macrocosm-version` note (never a refusal).
-MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4")
+MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4", "0.6.0")
 MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"

@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.5.4)
+# enough — Agent Guide (v0.6.0)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -86,7 +86,7 @@ Three locations that matter:
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/canon/` | The machine-global **Canon** store (0.4.3; `~/enough/cacheawl/` before, renamed in place on first use — see "Canon"): root-level folders are *volumes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink), each carrying a backend-owned `canon.cosm` catalog and a hidden `.canon.json`. Global wiki saves land in the `wiki/` volume; the dissolved infoworld folders became the `personal`/`public`/`wiki` volumes. Seam **`ENOUGH_CANON_ROOT`** (the legacy `ENOUGH_CACHEAWL_ROOT` fallback was removed in 0.6). Hidden from every project's file tree. | Managed via Canon mode + the readvisors' `canon_*` tools; `canon.cosm` and `.canon.json` are backend-owned. |
 | `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
-| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec with the reference generated from the manifests), `thym.en`, `ascribe.en` and `comprise-oes.en` (the four OES specifications, 0.5.4: the bundled editions, or the copies synced from cosmoes.org) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
+| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec with the reference generated from the manifests), `thym.en`, `ascribe.en` and `comprise-oes.en` (the four OES specifications, at edition 0.6.0: the bundled editions, or the copies synced from cosmoes.org) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
 | `~/enough/thym/` | Thym's state root (0.5.0), seam **`ENOUGH_THYM_ROOT`** (read by `thym_host.host_root()` and `thym.trace.runs_dir`): `runs/<run-id>/` per run — `<run-id>.plan.cosm`, `<run-id>.trace.cosm`, `candidates/` (every coprocessor answer, `<node>[-<k>].<attempt>.cosm`, and every engine call, `<node>-e<k>.1.cosm`), `inputs/<name>.folder.cosm` (0.6: a snapshot of every `folder` input, taken when the run starts, so a replay needs no folder on disk), `stage/` while it runs, `outputs/<gives>.<ext>` (a `folder` output as `outputs/<name>/`) once every node has passed. **Never created by asking**: `GET /api/thym/runs` answers `[]` when it is absent; the first run makes it. Install-wide; records, not precious (a run is replayable from its folder). See "Thym". | Only the runtime writes it (`thym.run.run`, from `POST /api/thym/run`, `/api/canon/package`, `/api/canon/read`, `thym_run` and the CLI; since 0.6 also every stage of a fabulac build and compile, a fabula's settle and an isograph). **Every Thym CLI run and every scratch server exports the seam** — `python -m enough.thym run` without it writes into the real `~/enough/thym/`. |
 | `~/enough/specs/` | The specifications synced from cosmoes.org (0.5.4), seam **`ENOUGH_SPECS_ROOT`** (`docoes.specs_root()`): the vendored client's folder — `<slug>/source.md` for `macrocosm-oes`, `thym`, `ascribe` and `comprise-oes`, `manifest.json` (the last manifest fetched, verbatim) and `state.json` (each document's name, edition, revised date, host and the source's sha256). Written only by the launch check (`enough/specs.py`: once per server start, a daemon thread, when the `specs_sync` preference is on and `ENOUGH_SPECS_SYNC` is not `0`); read by `docoes.spec_source()`, which uses a copy only while state.json's sha256 matches the file and reads the bundled text otherwise. Never created by asking; disposable (the bundled texts are the floor). See "DocOES" → "The specifications from cosmoes.org". | Only the client writes it (temp file + `os.replace`, state.json last). **Every test and scratch rig exports the seam, `ENOUGH_SPECS_SYNC=0` and `ENOUGH_COSMOES_BASE` (a dead loopback port)** — nothing in the suite may reach cosmoes.org. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). 0.4.3 adds **`rness/canon.cosm`**, the project's catalog (backend-owned, write-refused, written lazily — see "Canon"). | Edit to affect just this project (never `rness/canon.cosm`). |
@@ -2947,7 +2947,7 @@ then `canon.cosm` is written, because a missing catalog always regenerates.
 **Volume catalogs.** `regenerate_catalog(name)` writes `canon.cosm` (the
 pure text is `build_catalog(name)`) with `macrocosm.dump`, tmp +
 `os.replace`, **only when the bytes differ**, under a module lock. Keys:
-`oes: canon/1`, `macrocosm: 0.5.4`, `id: canon/<slug(name)>`, `name`,
+`oes: canon/1`, `macrocosm: 0.6.0`, `id: canon/<slug(name)>`, `name`,
 `scope: volume`, `origin` (None fields dropped), `status`, `created`,
 `updated`, `counts {folders, files, articles, twins, atems}` (`twins` =
 files with a fabula twin, `atems` = files carrying an atem), `nodes`.
@@ -3300,26 +3300,27 @@ Exit 0 ok, 1 errors / refused / nothing there, 2 an unknown lens.
 | `fabula.manifest.cosm` (0.6; replaced `emf.manifest.cosm`) | `oes: fabula/1`, `old: [emf/1]`; a catalog `id: emf/<slug>` is read as it is (`catalog.id-old`) | one file, identified by its declaration: `<text>.fabulan.cosm`, `<text>.fabulap.cosm`, `<folder>.fabulac.cosm`, a standalone `<name>.fabulan.cosm` …, and the old `<text>.cosm`; catalog keys in order `oes, macrocosm, flavour, id, name, source, derived, atem, shorts, catems, nodes`; ten modules I L E K N C R P T X (the reader adds D), each kind's flavours noted; a `dialectic:` block of banks, one per flavour; `moves:` (derive, tell, atem, expand, and in `thym 1` survey and history); `core: true` | written in enough; own checks in `enough/fabula.py` |
 | `doc.manifest.cosm` (0.4.4) | `oes: doc/1` | one file per telling, `<doc>.<lang>.doc.cosm`, built by enough into `ENOUGH_DOCS_ROOT`; modules S T R B | written in enough (see "DocOES") |
 | `ascribe.manifest.cosm` (0.5.0) | `oes: ascribe/1` | a holograph: a folder, catalog `holograph.cosm` (the self: `id: ascribe/<hid>`, `handle`, `pseudonyms`, `sample`, no name), module folders A B C E I O Q S U Y (one kind each) and F (form, polyform, relation), and D for the dialectic; `links.starter`, not a closed `links.rels`; catalog `releases:` and `morphs:` (0.6); `dialectic:` (the 44 questions, read as the bank `ascribe`), `filter:`, `public-projection:` blocks; `moves:` (`propose`, and the `project` extension that adds `as isograph`) | written in enough; spec [docs/ASCRIBE.md](ASCRIBE.md); own checks in `enough/ascribe.py` (see "Ascribe's module") |
-| `thym.manifest.cosm` (0.5.0) | `oes: thym/1` | one file of six kinds (`catalog.kind`: program, morph, context, plan, trace, package; a run's folder snapshot, `inputs/<name>.folder.cosm`, says `kind: folder`, which the manifest does not list yet, so the generic lint reports it as an error); modules P M C R K; a `moves:` block (the editing moves and the dialectic's three since 0.6); `core: true` | written in enough; spec [docs/THYM.md](THYM.md) §17 (see "Thym") |
+| `thym.manifest.cosm` (0.5.0) | `oes: thym/1` | one file of six kinds (`catalog.kind`: program, morph, context, plan, trace, package; a run's folder snapshot, `inputs/<name>.folder.cosm`, says `kind: folder`, which the manifest lists since 0.6, so lint is silent on one); modules P M C R K; a `moves:` block (the editing moves and the dialectic's three since 0.6); `core: true` | written in enough; spec [docs/THYM.md](THYM.md) §17 (see "Thym") |
 | `core.modules.cosm` (0.6) | `modules-of: core` | **not a manifest**: the core's module D (`question`, `session`) and their closed lists keyed by kind; the registry gives D to every format that does not declare it | written in enough |
 | `comprise.moves.cosm` (0.5.0) | `moves-of: comprise/1` | **a sidecar, not a manifest**: Comprise's Thym moves (`project`, `band`, `mark`, `withhold`), since its manifest is a byte copy; the registry glob passes it by and `thym.declarations` reads it | written in enough |
 
-The six written here carry a comment header, `macrocosm: 0.5.4`, a `spec:`
+The six written here carry a comment header, `macrocosm: 0.6.0`, a `spec:`
 naming the text's cosmoes.org home (`https://macro.cosmoes.org/`,
 `https://thym.cosmoes.org/`, `https://ascribe.cosmoes.org/`; the bundled path
 in the comment beside it) and the © line, and no round language ("a later
 round", "built in 0.5.0" — 0.5.4 removed it; a gap is "reserved for a later
 edition"). Since 0.5.0 a manifest may end in a `moves:` list (THYM.md §17.6;
 spec §13.4): the generic reader keeps it as an unknown key and the Thym compiler
-reads it. **The grammar version (0.5.4):** `MACROCOSM_VERSION = "0.5.4"` is what
+reads it. **The grammar version (0.6.0):** `MACROCOSM_VERSION = "0.6.0"` is what
 enough writes into every catalog it makes (`canon.py`, `canon_derive.py`,
-`docoes.py`); `MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4")` is what the
-reader reads unchanged — the grammar has not changed since 0.0.1, so every
-volume in people's Canon written under 0.0.2 opens as it did. A catalog's or a
-manifest's `macrocosm:` outside the set is a `macrocosm-version` **note**
-(`_version_note` in both loaders, `Registry.notes` for a manifest), never a
-refusal. The texts' editions (0.5.4 for all four, in `docs/specs.json`) are a
-separate field, not the grammar version: `docoes` no longer reads
+`docoes.py`); `MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4", "0.6.0")` is
+what the reader reads unchanged. 0.6.0's changes are additive (the core and its
+built-ins, old spellings such as `emf/1`, module D in every format, references
+by address), so every volume in people's Canon written under 0.0.1, 0.0.2 or
+0.5.4 opens as it did. A catalog's or a manifest's `macrocosm:` outside the set
+is a `macrocosm-version` **note** (`_version_note` in both loaders,
+`Registry.notes` for a manifest), never a refusal. The texts' editions (0.6.0
+for all four, in `docs/specs.json`) are a separate field, not the grammar version: `docoes` no longer reads
 `MACROCOSM_VERSION` for a document's version. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
 `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
 `checks.severity`, `module-file.items`, a kind's own `required`, and
@@ -3450,9 +3451,9 @@ manual tellings). Spec: MacroCOSM OES §18.5 (`docs/MACROCOSM_OES.md`); plan:
   other documents). English only, no chapters, every plain use a mention;
   **names carry no number** — a document's `version` is its **edition**
   (`document_version()`: the synced `state.json`'s when a synced copy is in
-  use, else `docs/specs.json`'s; 0.5.4 for all four), never `MACROCOSM_VERSION`
-  (that is the grammar's). 0.5.4 counts: 110 / 41 / 8 / 38 (sections, terms,
-  examples, decisions), 83 / 12 / 1 / 25, 27 / 2 / 1 / 12, 99 / 15 / 0 / 21.
+  use, else `docs/specs.json`'s; 0.6.0 for all four), never `MACROCOSM_VERSION`
+  (that is the grammar's). 0.6.0 counts: 125 / 56 / 11 / 53 (sections, terms,
+  examples, decisions), 111 / 20 / 1 / 47, 45 / 15 / 1 / 22, 99 / 15 / 0 / 29.
   Then `help-center` — six tellings, `docs/HELP_CENTER.md` /
   `static/i18n/<lang>/help-center.md` with `static/help-docs.md` /
   `static/i18n/<lang>/help-docs.md`, `voice: rosa`, mentions counted
@@ -3503,12 +3504,12 @@ manual tellings). Spec: MacroCOSM OES §18.5 (`docs/MACROCOSM_OES.md`); plan:
   `atem-shape` (2–15 words, CJK 2–45 characters, a phrase, no final period, no
   ids or markup), `numbering`, `term-defined-once`, `unlinked-mentions` (a
   note), `empty-section`, `stale-provenance-hash`, `xref-unresolved`. The four
-  specifications lint **0 errors / 0 warnings** at 0.5.4 (notes only); the
+  specifications lint **0 errors / 0 warnings** at 0.6.0 (notes only); the
   manual has 4 known `term-defined-once` warnings (AGENT.md, MOTIVATION.md,
   council, input/) in every telling.
 - **Bubbles about another document**: `BUBBLE_DOCUMENT = {"docs":
   "macrocosm-oes"}` — the docs viewer's bubble names the spec's section 2,
-  so its "section N" become `xrefs` (`macrocosm-oes@0.5.4:section:2`, the
+  so its "section N" become `xrefs` (`macrocosm-oes@0.6.0:section:2`, the
   edition in the reference), never `see` links into the manual.
 - **The CLI rule.** `python -m enough.docoes build|lint|compile|inventory|
   status <doc> [--lang L] [--chapter SLUG] [--force] [--json]
@@ -3699,7 +3700,7 @@ as fact, dependencies). Those definitions are the owner's, word for word, in
 the spec (§18.3.5), the prompts (test-asserted), the skill and the UI
 tooltips — change one, change all four.
 
-**The catalog**, in order: `oes: fabula/1`, `macrocosm: 0.5.4`, `flavour`,
+**The catalog**, in order: `oes: fabula/1`, `macrocosm: 0.6.0`, `flavour`,
 `id: fabula/<slug>` (the text's path in its project or volume, by Canon's
 slug rule: `guides/close.md` → `fabula/guides--close-md`; an old
 `emf/<slug>` is read as it is), `name` (the text's first heading, else its
@@ -5315,10 +5316,12 @@ User-facing: HELP_CENTER §13.8. A holograph opens the same `#dialectic-modal`
 ## The dictionary (FEED)
 
 **FEED**, the **first-party enough english dictionary** (0.4.1): 116,911
-headwords (209,823 words with their forms) as synced for the 0.6 round —
+headwords (209,829 words with their forms) as shipped in 0.6.0 —
 pack 042 added the MacroCOSM/Comprise terms of art (atem, cosm, minicosm,
-syuzhet …) and 19 OES senses of existing words, and pack 044 the fabula
-round's terms (fabulac, fabulan, fabulap, cshort, catem …). The count is
+syuzhet …) and 19 OES senses of existing words, pack 044 the fabula
+round's terms (fabulac, fabulan, fabulap, cshort, catem …), and pack 045
+the five file-name words the 0.6.0 texts use (pyi, pyproject, toml, readme,
+utf) with five inflections demoted to the forms they already were. The count is
 **held there** by a rule called one in, one out: no growth packs for their
 own sake, and an addition a specification needs names an equal number of
 removals. `reflib/dict/manifest.json`'s `headwords` / `words` are the live
@@ -6347,7 +6350,7 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   English only, so a translated UI gets `requested_lang` and the note
   `docs.note.specEnglish`; the toolbar says `docs.title.spec`; the badge is
   `<title> · edition <document.version>` (`docs.badge.edition`: "Thym ·
-  edition 0.5.4" — names carry no number, the edition is a field, no "v")
+  edition 0.6.0" — names carry no number, the edition is a field, no "v")
   with a title saying where the text came from (`docs.badge.fromCosmoes` /
   `docs.badge.bundled`, from the head's `document.source` and `.revised`);
   the mode stack's icon title is the entry's

@@ -1,8 +1,8 @@
 # MacroCOSM OES
 
-*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://macro.cosmoes.org/*
+*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://macro.cosmoes.org/*
 
-*This edition describes grammar version 0.5.4; files written under 0.0.2 are read unchanged.*
+*This edition describes grammar version 0.6.0; files written under 0.5.4, 0.0.2 and 0.0.1 are read unchanged.*
 
 MacroCOSM OES is an OES: a shared grammar and the core built into it. The grammar says how a domain is enumerated as
 plain-text `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is
@@ -95,6 +95,7 @@ one learned.
 | MacroCOSM OES 0.0.1 | 2026-10-22 | this document: the grammar Comprise mapped, written down apart from any one domain, with a reader that loads any MiniCOSM from its manifest | `oes: <minicosm>/<major>`, `macrocosm: 0.0.1` (reserved) |
 | MacroCOSM OES 0.0.2 | 2026-11-02 | two MiniCOSMs more, `ascribe/1` (a self with no name, section 19.2) and `thym/1` (programs, morphs, contexts, plans, traces and packages, section 18.7); the `moves:` block of a manifest and the `<name>.moves.cosm` sidecar (section 13.4); the grammar unchanged | `macrocosm: 0.0.2` (reserved) |
 | MacroCOSM OES 0.5.4 | 2026-11-03 | the canonical edition, published at https://macro.cosmoes.org/ with the MiniCOSM specifications at their own homes; the grammar unchanged, and files written under 0.0.2 read unchanged | `macrocosm: 0.5.4` (reserved) |
+| MacroCOSM OES 0.6.0 | 2026-11-06 | an OES with a core: five built-ins (`cosm`, `canon`, `fabula`, `doc`, `thym`) and two MiniCOSMs, `comprise/1` and `ascribe/1` (sections 18 and 19); the fabula, in three flavours, in place of EMF, whose `emf/1` is read as an old spelling; the dialectic, module D, which every format inherits (section 18.6); in the grammar, `minicosm` is `format`, a declaration may have old spellings, and a reference may be an address; files written under 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.6.0` (reserved), `oes: fabula/1`, `core: true` |
 
 The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES is
 published at https://comprise.cosmoes.org/, and the map of the family, which named the three scales, is the front page
@@ -409,7 +410,7 @@ A legacy key and an old spelling are never errors. A reader keeps them.
 
 ### 5.6 The reserved key `macrocosm:`
 
-A catalog or a manifest may carry `macrocosm: 0.5.4` (or an earlier `0.0.2` or `0.0.1`), after its declaration.
+A catalog or a manifest may carry `macrocosm: 0.6.0` (or an earlier `0.5.4`, `0.0.2` or `0.0.1`), after its declaration.
 Readers keep the key and ignore it. It is reserved for the day the grammar itself needs a version test; until then no
 reader refuses a file for what it says, and no writer is required to write it.
 
@@ -1261,7 +1262,7 @@ Saving and signing are Comprise's; the generic reader does neither, and treats a
 outside the model.
 
 Three other things carry versions, and none of them is a saved version: a format carries its major in the
-declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.5.4, in the
+declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.6.0, in the
 reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (section 11.3).
 
 ---
@@ -4250,7 +4251,7 @@ disagreement stands as a rule of its own.
 Each entry records what changed in the text or the grammar, newest first. Where an implementation and this text
 disagreed and one was corrected, the entry says which.
 
-**Edition 0.6.0 · 2026-11-05.** MacroCOSM is an OES with a core.
+**Edition 0.6.0 · 2026-11-06.** MacroCOSM is an OES with a core.
 
 1. **The taxonomy.** MacroCOSM OES is an OES: the grammar and the core built into it. The core holds five built-ins,
    `cosm/0` the product tree, `canon/1` Canon, `fabula/1` the fabula, `doc/1` documents and `thym/1` Thym's volumes,
@@ -4275,10 +4276,16 @@ disagreed and one was corrected, the entry says which.
    and closed lists are unchanged, so every older twin is a valid fabulan: I Inspiration, N Intent, C Construction and
    R Production. A fabulac is compiled into a cshort and told as a catem; a fabula records the model, route and
    provider of every run that wrote into it, a settle run included, while `derived`'s single keys describe the run that
-   derived it (sections 18.1 and 18.4).
+   derived it (sections 18.1 and 18.4). A fabulap gives each line, its metre and its rhymes items of their own, and lets
+   readings of one line stand side by side (section 18.4.6). A fabulac is the specification of a program, enough to
+   write the program again from it alone; its source folder is fingerprinted by the tree digest; a cshort is a folder of
+   rebuilt source with its `CSHORT.md` and a packaging file written by rules, never by a model, checked without
+   executing anything; and no conforming implementation runs, imports or installs a program to decompile it or a
+   cshort to show it (section 18.4.7). The fabula's own checks are listed in section 18.4.8.
 6. **The dialectic.** One primitive of the core asks a person what a source means and records the answer: module D,
    with the kinds `question` and `session`, which every format inherits; the opening questions as banks under a
-   manifest's `dialectic:` key; and Thym's moves `question`, `record` and `settle`. A session lists the questions it
+   manifest's `dialectic:` key; an entry may bound itself, `only-with: <field>` and `at-most: <n>` (section 18.6.6);
+   and Thym's moves `question`, `record` and `settle`. A session lists the questions it
    asked, or, where a format asks from a bank without writing question items, the addresses it asked; a MiniCOSM's own
    text says where its volumes keep the items; a settled question whose answer removed its item is closed, not an
    error. An item records what an answer filled in `provenance.answered`, and what its subject declined in
@@ -4304,6 +4311,8 @@ disagreed and one was corrected, the entry says which.
 13. **Conformance.** A reader reads every old spelling and inherits module D; a writer writes `fabula/1` and never
     `emf/1`; the corpus gains the fabula's examples (section 20).
 14. **Stewardship.** One sentence, the same in all five texts of the family (section 1.3).
+15. **The grammar version is 0.6.0,** in the reserved `macrocosm:` key (sections 5.6 and 15); files written under
+    0.5.4, 0.0.2 and 0.0.1 read unchanged.
 
 **Edition 0.5.4 · 2026-11-03.** The canonical edition, published at https://macro.cosmoes.org/.
 

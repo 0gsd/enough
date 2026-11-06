@@ -163,7 +163,7 @@ fi
 # 1. Platform check
 # ---------------------------------------------------------------------------
 platform_darwin() {
-  note "enough v0.5.4 runs on macOS (the platform it grew up on) and Linux."
+  note "enough v0.6.0 runs on macOS (the platform it grew up on) and Linux."
   ok "macOS detected ($(sw_vers -productVersion))"
 }
 

@@ -1,6 +1,6 @@
 # Thym
 
-*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://thym.cosmoes.org/*
+*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://thym.cosmoes.org/*
 
 *This edition describes the `thym/1` built-in and defines the language in two grammars; a program's version line, `thym 0` or `thym 1`, names the grammar it is written in.*
 
@@ -2501,7 +2501,7 @@ section it touched.
 
 <!-- atem: what each edition changed, newest first -->
 
-**Edition 0.6.0 · 2026-11-05.** The language gains a second grammar, and the text follows MacroCOSM's new taxonomy.
+**Edition 0.6.0 · 2026-11-06.** The language gains a second grammar, and the text follows MacroCOSM's new taxonomy.
 
 1. **`thym 1`, the second grammar, is a superset of `thym 0`'s syntax** (section 4.9). A `thym 0` program compiles and
    runs unchanged, against the `thym 0` view of every declaration; new syntax, or a move only `thym 1` sees, under a
@@ -2553,6 +2553,11 @@ section it touched.
     declares the kinds it projects, in a `moves:` entry that `extends` the move (sections 4.5, 6.2, 6.3, 17.6 and 18).
 21. **The grammar's `call` may have no operand**, as `fabula of p` and every accessor have always been written
     (section 4.8).
+22. **A `moves:` entry may choose by its call** (sections 6.4 and 17.6): `gives-when`, `contract-when` and
+    `scaffold-when` choose what a call gives, the contract it keeps and its scaffold by its `as` word or its first
+    operand's type, and a rule that says `scaffold: none` makes a rules run refuse the call when the run is planned. A
+    run's snapshot of a folder it took is a `thym/1` volume of kind `folder` (section 17.1). A move that asks more than
+    once may name under `repair.failed` what it could not take, and a request asked again says why (section 12.2).
 
 **Edition 0.5.4 · 2026-11-03.** The canonical edition at cosmoes.org (https://thym.cosmoes.org/).
 
