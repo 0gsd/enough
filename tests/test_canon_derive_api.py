@@ -290,7 +290,7 @@ def test_derive_refusals(client: TestClient, project: Path, path: str, status: i
 
 def test_derive_refuses_an_unknown_what(client: TestClient):
     r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "summary"})
-    assert r.status_code == 400 and "emf or atem" in r.json()["detail"]
+    assert r.status_code == 400 and "fabula or atem" in r.json()["detail"]
 
 
 # ---------------------------------------------------------------------------
@@ -470,9 +470,9 @@ def test_compile_shares_the_texts_claim(client: TestClient, project: Path):
 
 @pytest.mark.parametrize("path,status,words", [
     ("nope.cosm", 404, "no such file"),
-    ("notes.md", 400, "not an EMF"),
+    ("notes.md", 400, "not a fabula"),
     ("rness/canon.cosm", 400, "declares canon/1"),
-    ("meadow/holotype.cosm", 400, "not an EMF"),
+    ("meadow/holotype.cosm", 400, "not a fabula"),
     ("", 400, "missing path"),
 ])
 def test_compile_refusals(client: TestClient, path: str, status: int, words: str):
@@ -641,7 +641,7 @@ def test_home_mode_has_no_derivation_routes(project: Path):
 
 def test_emf_route_404s_without_a_twin(client: TestClient):
     r = client.get("/api/canon/emf", params={"path": "hello.md"})
-    assert r.status_code == 404 and "no EMF twin" in r.json()["detail"]
+    assert r.status_code == 404 and "has no fabula yet" in r.json()["detail"]
     assert client.get("/api/canon/emf", params={"path": "nope.md"}).status_code == 404
     assert client.get("/api/canon/emf", params={"path": "other.md"}).status_code == 404
 

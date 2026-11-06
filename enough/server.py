@@ -52,6 +52,7 @@ from . import canon_tools as _canon_tools
 from . import canon_jobs as _canon_jobs
 from . import fabula_names as _fabula_names
 from . import model_route as _model_route
+from . import retired_names as _retired_names
 from . import convert as _convert
 from . import docoes as _docoes
 from . import macrocosm as _macrocosm
@@ -4304,7 +4305,15 @@ def create_app(
         path = (body.get("path") or "").strip() if isinstance(body, dict) else ""
 
         def _build() -> dict[str, Any]:
-            report = _macrocosm.lint(_cosm_volume(path)).to_dict()
+            # a fabula's own checks (enough/fabula.py), a holograph's Ascribe's, any other volume the generic ones:
+            # the same choice the viewer's payload makes
+            from . import fabula as _fabula
+            vol = _cosm_volume(path)
+            if vol.manifest is not None and vol.minicosm == "ascribe":
+                from . import ascribe as _ascribe
+                report = _ascribe.report_dict(_ascribe.lint_holograph(vol))
+            else:
+                report = (_fabula.lint(vol) if _fabula.is_fabula(vol) else _macrocosm.lint(vol)).to_dict()
             report["path"] = path
             return report
 
@@ -5165,7 +5174,7 @@ def create_app(
                       and _model_route.holds_generation_lock(route or "local") else None),
                 message=_canon_start_message(mode, why, doing), reason=reason,
                 extra=({"route": _job_route(mode, route), "flavour": flavour}
-                       if kind in ("emf", "atem", "compile") else None))   # Thym's runs: their lane's
+                       if kind in ("emf", "atem", "compile", "fabulac", "dialectic") else None))   # Thym's runs: their lane's
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
         return {"job": snap}
@@ -5183,10 +5192,11 @@ def create_app(
         model_complete=_model_complete, cosm_payload=_cosm_payload,
     ))
 
-    @app.post("/api/canon/derive")
+    @app.post("/api/fabula/derive")
     async def api_canon_derive(request: Request) -> dict[str, Any]:
-        """Derive a text's twin, its fabula (`what: emf`, the internal name),
-        or its file atem (`what: atem`) as a background job: `{path, what,
+        """Derive a text's twin, its fabula (`what: fabula`; `emf`, the old
+        word, still reads), or its file atem (`what: atem`) as a background
+        job (the old path `/api/canon/derive` answers too, through 0.6): `{path, what,
         force?, flavour?, route?}` → `{job, flavour, suggested}`. `flavour` is
         `fabulan` or `fabulap` (absent: the twin's own, else the suggestion;
         `fabulac` is refused for a text); `route` is `local` or `cloud`
@@ -5195,9 +5205,11 @@ def create_app(
         `force`), or a job for the file is queued or running. Model or rules is
         decided here, once."""
         body = await _json_body(request)
-        what = str(body.get("what") or "emf").strip().lower()
-        if what not in ("emf", "atem"):
-            raise HTTPException(400, "what must be emf or atem")
+        what = str(body.get("what") or "fabula").strip().lower()
+        what = _retired_names.WORDS["what"].get(what, what)
+        if what not in ("fabula", "atem"):
+            raise HTTPException(400, "what must be fabula or atem")
+        what = "emf" if what == "fabula" else what            # the job's kind keeps its 0.4 name for the page
         route = _body_route(body)
         t = await asyncio.to_thread(_text_target, str(body.get("path") or ""), body.get("flavour"))
         t["copyable"] = body.get("copyable") is True          # a fabulap's lines keep their words (18.4.6)
@@ -5207,7 +5219,7 @@ def create_app(
                                      "pass force to derive it again")
         mode, why = await _canon_mode(route)
         work = _emf_work(t, mode, why, route) if what == "emf" else _file_atem_work(t, mode, route)
-        doing = (f"deriving the EMF twin of {t['target'].name}" if what == "emf"
+        doing = (f"deriving the fabula of {t['target'].name}" if what == "emf"
                  else f"writing the atem of {t['target'].name}")
         out = _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
                                key=t["key"], doing=doing, route=route, flavour=t["flavour"])
@@ -5297,9 +5309,10 @@ def create_app(
                                  message=f"pinned {item_id} to {t['twin'].name}")
         return {"twin_path": t["twin_rel"], "item_id": item_id, "job": snap}
 
-    @app.get("/api/canon/emf")
+    @app.get("/api/fabula/twin")
     async def api_canon_emf(path: str = Query(...), flavour: str | None = Query(None)) -> dict[str, Any]:
-        """A text's twin for the reader and the viewer: `{twin_path, state:
+        """A text's twin for the reader and the viewer (the old path
+        `/api/canon/emf` answers too, through 0.6): `{twin_path, state:
         fresh|stale, flavour, twins: {flavour: {path, state}}, suggested, cosm:
         <the /api/cosm payload>}`; 404 when the text has none. Takes the text
         (or a twin itself, `.fabulan.cosm`, `.fabulap.cosm` or the old `.cosm`;
@@ -5329,7 +5342,7 @@ def create_app(
                 text, head = target, text_rel[: len(text_rel) - len(target.name)]
                 twin = _fabula_names.find_twin(target, asked)
             if twin is None or not _canon.is_emf_twin(twin):
-                raise HTTPException(404, f"{rel} has no EMF twin yet")
+                raise HTTPException(404, f"{rel} has no fabula yet")
             twins = _fabula_names.text_twins(text)
             fl = next((f for f, p in twins.items() if p == twin), _fabula_names.flavour_of_twin(twin))
             twin_rel = head + twin.name
@@ -5346,9 +5359,9 @@ def create_app(
 
         return await asyncio.to_thread(_build)
 
-    @app.post("/api/canon/compile")
-    async def api_canon_compile(request: Request) -> dict[str, Any]:
-        """Compile an EMF (`emf/1` file) into a SHORT as a job (plan §15):
+    async def _compile_short(body: dict[str, Any]) -> dict[str, Any]:
+        """Compile a text's fabula (`fabula/1`, or `emf/1`) into a SHORT as a job (plan §15);
+        `POST /api/fabula/compile` (enough/fabulac_job.py) hands it every fabula that is not a fabulac:
         `{path, order?}` → `{job}`, result `{written, emf_path, mode, order,
         model, recorded}`. `order` is `told` (the author's order, by span) or
         `weight` (by salience); absent, `told` when the EMF names a source
@@ -5358,7 +5371,6 @@ def create_app(
         short in its `shorts:` list (`record_short`, byte-stable otherwise).
         A twin's compile holds its text's claim, the one a decompile of that
         text holds, so the two never write the twin at once."""
-        body = await _json_body(request)
         route = _body_route(body)
         order = body.get("order")
         if order is not None and not isinstance(order, str):
@@ -5375,10 +5387,10 @@ def create_app(
             if not target.exists():
                 raise HTTPException(404, f"no such file: {rel}")
             if target.is_dir() or not target.name.endswith(".cosm"):
-                raise HTTPException(400, f"{target.name} is not an EMF; compile reads an emf/1 .cosm file")
+                raise HTTPException(400, f"{target.name} is not a fabula; compile reads a fabula's .cosm file")
             said = _macrocosm.sniff_declaration(target)
             if said not in _canon_derive.FABULA_DECLARATIONS:
-                raise HTTPException(400, f"{target.name} is not an EMF (it declares {said or 'nothing'}); "
+                raise HTTPException(400, f"{target.name} is not a fabula (it declares {said or 'nothing'}); "
                                          "compile reads a fabula (fabula/1, or its old spelling emf/1)")
             vol = _macrocosm.load_volume(target)
             if vol.refused is not None:
@@ -5430,12 +5442,57 @@ def create_app(
                 recorded = False
                 log.warning("canon: wrote %s but could not record it in %s (%s)", out.name, target.name, e)
             _canon_catalog_after(rel)
-            return {"written": _rel_beside(rel, out.name), "emf_path": rel, "mode": info["mode"],
+            return {"written": _rel_beside(rel, out.name), "fabula_path": rel, "emf_path": rel, "mode": info["mode"],
                     "order": info["order"], "model": info["model"], "route": short_route, "recorded": recorded,
                     "message": f"wrote {out.name}"}
 
         return _start_canon_job(kind="compile", path=rel, mode=mode, why=why, work=work,
                                 key=key, doing=f"compiling {target.name}", route=route)
+
+    # ---------- The fabula round (0.6): a folder's fabulac, its compiles, and the dialectic ----------
+    #
+    # Two routers, as for Thym: `enough/fabulac_job.py` (`/api/fabula/build|resume|cancel|compile|compiled|cshort|
+    # catem`; a build is a CanonJob of kind `fabulac`, a compile of kind `compile`) and `enough/dialectic_api.py`
+    # (`/api/dialectic/questions|check|answers|raise|ask-again|settle`; a settle is a CanonJob of kind `dialectic`).
+    from . import dialectic_api as _dialectic_api
+    from . import fabulac_job as _fabulac_job
+    _fabula_router = _fabulac_job.build_router(
+        project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
+        start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
+        compile_short=_compile_short,
+    )
+    app.include_router(_fabula_router)
+    _dialectic_router = _dialectic_api.build_router(
+        project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
+        start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
+    )
+    app.include_router(_dialectic_router)
+
+    # The names retired in 0.6 (`enough/retired_names.py`): each old path is served by its new path's handler,
+    # through 0.6 only; nothing documents them. The table and this loop go a release later.
+    for _method, _old, _new in _retired_names.ROUTES:
+        _hit = next((r for r in app.router.routes
+                     if getattr(r, "path", None) == _new and _method in (getattr(r, "methods", None) or ())), None)
+        if _hit is not None:
+            app.add_api_route(_old, _hit.endpoint, methods=[_method], include_in_schema=False)
+
+    # The agent's fabula tools start a build or a compile as a job from the chat turn's worker thread: they hand
+    # the start to the event loop and come back with its first snapshot (a local job then waits for the lock the
+    # turn holds, `queued`, and runs when the turn ends).
+    def _start_from_tool(fn: Callable[[], Any]) -> Any:
+        loop = _loop.get("loop")
+        if loop is None:
+            raise RuntimeError("the app is not running, so no job can start")
+
+        async def _go() -> Any:
+            return await fn()
+        return asyncio.run_coroutine_threadsafe(_go(), loop).result(timeout=30)
+
+    if not home:
+        from . import fabula_tools as _fabula_tools
+        _fabula_tools.configure(project_dir=project_dir, start=_start_from_tool,
+                                build=_fabula_router.start_build, compile=_fabula_router.start_compile,
+                                settle=_dialectic_router.start_settle, jobs=canon_jobs)
 
     @app.get("/api/canon/job/{job_id}")
     async def api_canon_job(job_id: str) -> dict[str, Any]:

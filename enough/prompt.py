@@ -656,7 +656,7 @@ Paths are project-relative or `canon:<volume>/...`.
 <path>notes.md</path>
 </tool>
 
-<tool name="emf_derive">
+<tool name="fabula_derive">
 <path>notes.md</path>
 </tool>
 
@@ -679,11 +679,40 @@ Paths are project-relative or `canon:<volume>/...`.
 <path>meadow</path>
 </tool>
 
-`cosm_read` shows the tree or one `<item>`. `emf_derive` makes a text's
-fabula, only when asked. `atem` writes line, focus, push and pull into the twin;
+`cosm_read` shows the tree or one `<item>`. `fabula_derive` makes a
+text's fabula when asked. `atem` writes line, focus, push, pull into the twin;
 `<text>` for a passage, kept nowhere. `doc_lookup` explains a spec or manual
 term. `thym_check` checks a Thym program, `thym_run` runs one, `thym_moves` lists
 moves (macrocosm-oes skill on). Without it, read `cosm_guide` before you derive.
+"""
+
+
+#: The fabula round's two tools (0.6), with the macrocosm-oes skill on (their guide, as for Thym's): a fresh
+#: project pays nothing for them. Capped like the MacroCOSM block (`tests/test_fabula_tools.py`).
+FABULA_TOOL_INSTRUCTIONS = """\
+## Dialectic and fabulacs
+
+<tool name="dialectic">
+<path>notes.md</path>
+<question>D:question/occasion</question>
+<says>their words</says>
+</tool>
+
+<tool name="fabulac">
+<path>tool</path>
+<do>build</do>
+</tool>
+
+`dialectic` with a `<path>` alone shows the next open questions: put one
+or two to the person, then record their words (or `<state>` unknown,
+declined, skip). Never answer for them; `<do>settle</do>` folds answers
+in. `fabulac` `<do>`: build, status, compile (`<what>` code or a depth),
+cancel; `<model>cloud` only when asked.
+"""
+
+#: With the skill off: the two names, and where they come from (as the wiki tools are named without an archive).
+FABULA_ABSENT_INSTRUCTIONS = """\
+`dialectic` and `fabulac` come with the macrocosm-oes skill.
 """
 
 
@@ -1055,6 +1084,8 @@ def tool_instructions(project_dir: Path, *, pal: bool = False, lean: bool = Fals
         parts.append(DICTIONARY_TOOL_INSTRUCTIONS)
     if _macrocosm_available():
         parts.append(CANON_TOOL_INSTRUCTIONS)
+        parts.append(FABULA_TOOL_INSTRUCTIONS if _skill_enabled(rness, "macrocosm-oes")
+                     else FABULA_ABSENT_INSTRUCTIONS)
     if pal:
         parts.append(PAL_TOOL_INSTRUCTIONS)
     return "\n".join(p.rstrip() + "\n" for p in parts)

@@ -218,7 +218,8 @@ def isograph(ctx: Any, h: Value, **mods: Any) -> Value:
     stage = getattr(ctx, "stage", None)
     if stage is not None:
         write_atomic(stage / "isograph.json", res["json"].encode("utf-8"))
-    return Value("volume", doc)
+    # the ids that left ride in the value's origin, for the release the host records once the run has landed
+    return Value("volume", doc, origin={"items": list(res.get("items") or [])})
 
 
 # ---------------------------------------------------------------------------

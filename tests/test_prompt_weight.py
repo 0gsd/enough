@@ -289,16 +289,22 @@ def test_the_canon_block_rides_on_the_install_not_the_skill(
     assert ("macrocosm-oes", False) in [(n, on) for n, on, _t in prompt.list_skills(project / "rness")]
     off_skill = prompt.tool_instructions(project)
     assert "## MacroCOSM" in off_skill
-    for name in ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup", "thym_check",
+    for name in ("cosm_read", "cosm_lint", "fabula_derive", "atem", "cosm_guide", "doc_lookup", "thym_check",
                  "thym_run"):
         assert f'<tool name="{name}">' in off_skill, name
+    # 0.6: the dialectic's and the fabulac's tools are named with the skill off, documented with it on (their guide)
+    assert prompt.FABULA_ABSENT_INSTRUCTIONS in off_skill and '<tool name="dialectic">' not in off_skill
     enable_skill(project, "macrocosm-oes")
-    assert prompt.tool_instructions(project) == off_skill
+    on_skill = prompt.tool_instructions(project)
+    assert on_skill == off_skill.replace(prompt.FABULA_ABSENT_INSTRUCTIONS, prompt.FABULA_TOOL_INSTRUCTIONS)
+    assert '<tool name="dialectic">' in on_skill and '<tool name="fabulac">' in on_skill
+    off_skill = on_skill
     monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
     gone = prompt.tool_instructions(project)
     assert "## MacroCOSM" not in gone and "cosm_read" not in gone and "cosm_guide" not in gone
     assert "doc_lookup" not in gone and "thym_check" not in gone and "thym_run" not in gone
-    assert len(off_skill) - len(gone) == len(prompt.CANON_TOOL_INSTRUCTIONS) + 1
+    assert "dialectic" not in gone and "fabulac" not in gone
+    assert len(off_skill) - len(gone) == len(prompt.CANON_TOOL_INSTRUCTIONS) + 1 + len(prompt.FABULA_TOOL_INSTRUCTIONS) + 1
 
 
 def test_the_default_prompt_grows_by_at_most_the_canon_block(project: Path):
@@ -363,10 +369,10 @@ def test_a_project_using_neither_pays_only_the_core(
     assert prompt.tool_instructions(project).strip() == (
         plain + "\n\n"
         + prompt.DICTIONARY_TOOL_INSTRUCTIONS.rstrip() + "\n\n"
-        + prompt.CANON_TOOL_INSTRUCTIONS).strip()
+        + prompt.CANON_TOOL_INSTRUCTIONS.rstrip() + "\n\n" + prompt.FABULA_ABSENT_INSTRUCTIONS).strip()
     no_feed(monkeypatch, tmp_path)
     assert prompt.tool_instructions(project).strip() == (
-        plain + "\n\n" + prompt.CANON_TOOL_INSTRUCTIONS).strip()
+        plain + "\n\n" + prompt.CANON_TOOL_INSTRUCTIONS.rstrip() + "\n\n" + prompt.FABULA_ABSENT_INSTRUCTIONS).strip()
     monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
     assert prompt.tool_instructions(project).strip() == plain.strip()
 

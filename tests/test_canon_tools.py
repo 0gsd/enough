@@ -146,7 +146,7 @@ def test_every_documented_example_runs(project: Path):
     Thym examples (0.5.0) run in tests/test_thym_tools.py, behind the macrocosm-oes skill."""
     examples = re.findall(r'<tool name="[a-z_]+">.*?</tool>', prompt.CANON_TOOL_INSTRUCTIONS, re.DOTALL)
     assert [T.parse_tool_calls(e)[0].name for e in examples] == [
-        "cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup", "thym_check", "thym_run"]
+        "cosm_read", "cosm_lint", "fabula_derive", "atem", "cosm_guide", "doc_lookup", "thym_check", "thym_run"]
     read, lint, derive, atem, guide, lookup, _check, _run = examples
     r = run(project, lookup)
     # 0.4.4 (D3's spec pass): the spec defines `stance` as a term; its answer still carries the closed list's words.
@@ -260,11 +260,11 @@ def test_read_an_emf_twin_a_legacy_tree_and_a_text_through_its_twin(project: Pat
     assert "declared: fabula/1 (`oes: emf/1`, an old spelling, read as fabula/1)" in r.body, r.body
     assert "P:claim/" in r.body
     r = run(project, tool("cosm_read", path="notes.md"))
-    assert r.ok and "(reading notes.md.cosm, the EMF twin of notes.md)" in r.body, r.body
+    assert r.ok and "(reading notes.md.cosm, the fabula of notes.md)" in r.body, r.body
     r = run(project, tool("cosm_read", path="tree"))
     assert r.ok and "legacy `cosm: 0.2`, read as cosm/0" in r.body, r.body
     r = run(project, tool("cosm_read", path="hello.md"))
-    assert not r.ok and "no EMF twin yet" in r.body
+    assert not r.ok and "no fabula yet; fabula_derive makes one" in r.body
 
 
 def test_read_the_canon_store_and_the_project_catalog(project: Path):
@@ -299,7 +299,8 @@ def test_lint_a_bad_volume(project: Path):
     assert r.ok, r.body
     assert "bad.cosm — fabula/1, 1 items: 1 errors · 0 warnings · 0 notes · 0 open questions" in r.body
     assert "errors:\n- ref-unresolved K:concept/x (bad.cosm): defined-by -> L:term/missing does not exist" in r.body
-    assert "not run: 8 checks the fabula format keeps to its own tools" in r.body    # enough/fabula.py's (0.6)
+    # 0.6: cosm_lint runs a fabula's own checks (enough/fabula.py), as the viewer does: none is left "not run"
+    assert "(25 checks run)" in r.body and "not run" not in r.body
 
 
 def test_lint_a_holotype_names_what_comprise_keeps_in_one_line(project: Path):

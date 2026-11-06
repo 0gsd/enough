@@ -1788,7 +1788,7 @@ from . import dictionary_tools as _dictionary_tools  # noqa: E402
 _dictionary_tools.register()
 
 # MacroCOSM's six (0.4.3, `doc_lookup` in 0.4.4): `cosm_read`, `cosm_lint`,
-# `emf_derive`, `atem`, `cosm_guide`, `doc_lookup`. Reads and project writes are ungated; a write into the Canon
+# `fabula_derive` (`emf_derive` before 0.6), `atem`, `cosm_guide`, `doc_lookup`. Reads and project writes are ungated; a write into the Canon
 # store answers to `canon_enabled` inside the runners. Documented in every
 # project (like FEED's); the guide is the `macrocosm-oes` skill, off by
 # default and one `cosm_guide` away. The module imports the engine lazily.
@@ -1800,6 +1800,12 @@ _canon_tools.register()
 # writes only under the Thym root. The module imports the runtime lazily.
 from . import thym_tools as _thym_tools  # noqa: E402
 _thym_tools.register()
+
+# The fabula round's two (0.6): `dialectic` (a readvisor puts one or two questions at a time and records the
+# person's words) and `fabulac` (a folder's build, its status, its compiles). Documented in their own block beside
+# the MacroCOSM one; a build or a compile starts a job through the app (`fabula_tools.configure`).
+from . import fabula_tools as _fabula_tools  # noqa: E402
+_fabula_tools.register()
 
 # `show_intro` (0.4.1): the brief introduction, on screen without a model
 # writing it. Always on and documented in the core.
@@ -1834,6 +1840,10 @@ def execute(project_dir: Path, call: ToolCall) -> ToolResult:
         return ToolResult(call.name, call.path or call.command or "", False, "error: " + agent_free.detail(
             "tools run only for a readvisor, and none runs while agent-free is on"))
     fn = _DISPATCH.get(call.name)
+    if fn is None:
+        # a name retired in 0.6 still runs its new name's runner, through 0.6 (enough/retired_names.py)
+        from . import retired_names as _retired
+        fn = _DISPATCH.get(_retired.tool(call.name))
     if fn is None:
         return ToolResult(
             call.name, "", False,

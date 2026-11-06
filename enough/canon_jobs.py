@@ -33,7 +33,8 @@ from .canon_derive import DeriveCancelled
 log = logging.getLogger(__name__)
 
 EVENT = "canon"
-KINDS = ("emf", "atem", "compile", "pin", "thym", "read")    # thym: a program's run; read: a reading (0.5.0)
+# thym: a program's run; read: a reading (0.5.0); fabulac: a folder's build, stage by stage; dialectic: a settle (0.6)
+KINDS = ("emf", "atem", "compile", "pin", "thym", "read", "fabulac", "dialectic")
 ACTIVE = ("queued", "running")
 # Finished jobs kept for polling; the oldest go first past this many.
 KEEP_FINISHED = 200
@@ -257,7 +258,11 @@ class CanonJobs:
         ctx = JobContext(self, job_id)
         try:
             result = await asyncio.to_thread(work, ctx)
-        except DeriveCancelled:
+        except DeriveCancelled as e:
+            said = str(e)                       # a job of several writes says what stayed (a fabulac's build, 0.6)
+            if said:
+                self._finish(job_id, "cancelled", message=said)
+                return
             snap = self._snaps.get(job_id, {})
             where = (f" after passage {snap.get('chunk')} of {snap.get('chunks')}"
                      if snap.get("chunks") and snap.get("chunk") else "")
