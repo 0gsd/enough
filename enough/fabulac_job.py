@@ -934,8 +934,15 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             return model_complete
         return _host.route_complete(route, model=model, llm_url=llm_url, project_dir=project_dir)
 
-    def job_kw(route: str, mode: str) -> dict:
-        return {"route": route} if _host._accepts(start_job, {"route": route}) else {}
+    def job_kw(route: str | None, mode: str, **more: Any) -> dict:
+        """What the job's record says beside its kind: `route`, and (0.6, S2) a compile's `flavour` and `what`, a
+        build's first `progress` (so a queued build says the stage it starts with); each passed only to a starter
+        that takes it (a test's stand-in may not)."""
+        kw = {"route": route} if _host._accepts(start_job, {"route": route}) else {}
+        for k, v in more.items():
+            if v is not None and _host._accepts(start_job, {k: v}):
+                kw[k] = v
+        return kw
 
     async def start_build(body: dict, *, resume_only: bool = False) -> dict:
         route, model, calls = route_of(body)
@@ -962,7 +969,10 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         snap = start_job(kind=JOB_KIND, path=rel, mode=mode, why=why if not scaffolds else "", work=work,
                          key=str(folder.resolve()), doing=from_words + (" on the cloud" if mode == "model"
                                                                         and route == "cloud" else ""),
-                         **job_kw(route if mode == "model" else None, mode))
+                         **job_kw(route if mode == "model" else None, mode,
+                                  extra={"progress": _progress(STAGES[first], first, {}, None,
+                                                               route if mode == "model" and first >= RULES_STAGES
+                                                               else None, state)}))
         return {**snap, "state": state, "from": STAGES[first]}
 
     @router.post("/api/fabula/build")
@@ -1045,7 +1055,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         return start_job(kind="compile", path=rel_of(project_dir, fab), mode=mode, why=why if not scaffolds else "",
                          work=work, key=key, doing=doing + (" on the cloud" if mode == "model" and route == "cloud"
                                                            else ""),
-                         **job_kw(route if mode == "model" else None, mode))
+                         **job_kw(route if mode == "model" else None, mode, flavour="fabulac", what=what))
 
     # what the agent's tools start through (enough/fabula_tools.py), the same code as the routes
     router.start_build = start_build            # type: ignore[attr-defined]

@@ -384,13 +384,14 @@ def model(route: str | None = None, project_dir: Path | None = None) -> tuple[Co
     the routes; a model that stops answering mid-call fails the call in words
     and nothing is written.
 
-    `route`: None is today's way (the session's model, `llm.complete`);
+    `route`: None is `local` (0.6, S2, pins P6: a call no one chose the cloud for never asks it);
     `local` asks llama-server even when the chat runs on the cloud slot;
     `cloud` asks the cloud model through `model_route` (cached and journalled
     in `project_dir`), and raises `RouteError` with the gate's own words when
     the gate is shut. Agent-free is rules, whatever the route."""
     from . import llm as _llm
     from . import agent_free as _agent_free
+    route = route or "local"
     if route == "cloud":
         from . import cloud as _cloud
         from . import model_route as _model_route
@@ -436,13 +437,10 @@ def model(route: str | None = None, project_dir: Path | None = None) -> tuple[Co
 
 def _said_route(route: str | None, complete: Any) -> str | None:
     """The route a write records when the answers' meta does not say: none by rules; the one asked; else
-    today's (`cloud` while the chat runs on the cloud slot, else `local`)."""
+    `local` (0.6, S2: no route is the local route)."""
     if complete is None:
         return None
-    if route:
-        return route
-    from . import llm as _llm
-    return "cloud" if _llm._current_slot() == "opro-api" else "local"
+    return route or "local"
 
 
 def _wrap(inner: CompleteFn) -> CompleteFn:

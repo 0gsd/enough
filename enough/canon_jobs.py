@@ -35,6 +35,10 @@ log = logging.getLogger(__name__)
 EVENT = "canon"
 # thym: a program's run; read: a reading (0.5.0); fabulac: a folder's build, stage by stage; dialectic: a settle (0.6)
 KINDS = ("emf", "atem", "compile", "pin", "thym", "read", "fabulac", "dialectic")
+#: The kinds whose `result` keeps its `message` (the snapshot's `message` says it too): a fabulac's build and a
+#: settle (0.6), and a fabulac's compile (kind `compile`, `flavour: fabulac`). Every other kind's result loses it to
+#: the snapshot, as before.
+KEEPS_MESSAGE = ("fabulac", "dialectic")
 ACTIVE = ("queued", "running")
 # Finished jobs kept for polling; the oldest go first past this many.
 KEEP_FINISHED = 200
@@ -273,5 +277,10 @@ class CanonJobs:
             self._finish(job_id, "failed", error=str(e) or e.__class__.__name__,
                          message=str(e) or e.__class__.__name__)
             return
-        done_msg = result.pop("message", None) if isinstance(result, dict) else None
+        # The done message is the snapshot's; a job of several stages keeps it in its result too (0.6, S2: a build
+        # that stops at the outline says what landed and what waits in `result.message`, beside `refusal`).
+        snap = self._snaps.get(job_id, {})
+        keeps = snap.get("kind") in KEEPS_MESSAGE or (snap.get("kind") == "compile" and snap.get("flavour") == "fabulac")
+        done_msg = ((result.get("message") if keeps else result.pop("message", None))
+                    if isinstance(result, dict) else None)
         self._finish(job_id, "done", result=result, message=done_msg or "done")

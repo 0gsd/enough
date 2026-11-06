@@ -566,6 +566,12 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             emf_path = str(n["emf"].get("path", "")).replace('"', "&quot;")
             conv_attr += (f' data-emf="{emf_path}"'
                           f' data-emf-state="{n["emf"].get("state", "")}"')
+        if isinstance(n.get("old_twin"), dict):
+            # An old-named twin kept beside the flavour-named one that superseded
+            # it (0.6, S2): the row says which twin replaced it and of which text.
+            new_twin = str(n["old_twin"].get("twin", "")).replace('"', "&quot;")
+            of_text = str(n["old_twin"].get("of", "")).replace('"', "&quot;")
+            conv_attr += f' data-old-twin="{new_twin}" data-old-twin-of="{of_text}"'
 
         # `data-path` + `data-name` on the row's <li> are read by the
         # tree context menu (option-click) so the JS can identify the
@@ -4962,11 +4968,12 @@ def create_app(
         derived = hdr.get("derived") if isinstance(hdr.get("derived"), dict) else {}
         return derived.get("completeness") == "full"
 
-    def _body_route(body: dict[str, Any]) -> str | None:
-        """The request's `route` (`local` | `cloud`), or None when it says none
-        (400 for anything else). The page's control for it is a later lane's."""
+    def _body_route(body: dict[str, Any]) -> str:
+        """The request's `route` (`local` | `cloud`); `local` when it says none
+        (pins P6: nothing reaches a cloud model that the person did not choose
+        for that job, whatever slot the chat is on); 400 for anything else."""
         try:
-            return _canon_tools.check_route(body.get("route"))
+            return _canon_tools.check_route(body.get("route")) or "local"
         except ValueError as e:
             raise HTTPException(400, str(e)) from None
 
@@ -4982,11 +4989,12 @@ def create_app(
         """Model or rules, decided once, before the job starts (plan §3.8).
         Agent-free mode is rules with `why == "agent-free"` (`llm.reachable`).
 
-        `route` (pins P6): None is today's way (`llm.reachable`: the session's
-        model, llama-server unless the chat runs on the cloud slot); `local`
-        asks llama-server even then; `cloud` asks the broker's gate and, when
-        it is shut, refuses the request (403) in the gate's own words — never
-        a silent fall back to a scaffold or to the local model."""
+        `route` (pins P6): None is `local` (0.6, S2: a job no one chose the
+        cloud for never asks it); `local` asks llama-server whatever slot the
+        chat is on; `cloud` asks the broker's gate and, when it is shut,
+        refuses the request (403) in the gate's own words — never a silent
+        fall back to a scaffold or to the local model."""
+        route = route or "local"
         if route == "cloud":
             if _agent_free.enabled():
                 return "rules", _agent_free.REASON
@@ -4997,7 +5005,7 @@ def create_app(
             if not gate.get("open"):
                 raise HTTPException(403, gate.get("denial") or gate.get("reason") or "the cloud gate is shut")
             return "model", f"cloud ({gate.get('model_id') or 'openrouter'})"
-        if route == "local" and _llm._current_slot() == "opro-api":
+        if _llm._current_slot() == "opro-api":
             ok, why = await asyncio.to_thread(_local_reachable)
             return ("model", why) if ok else ("rules", why)
         ok, why = await asyncio.to_thread(_llm.reachable, session.llm_url)
@@ -5025,9 +5033,16 @@ def create_app(
         (looked up at call time, so tests can stand in for it), with the
         engine's own `max_tokens` when it gives one (EMF passages: 4,096,
         bounded by the model's window). A model that stops answering mid-job
-        fails the job in words; the engine never falls back to rules halfway."""
+        fails the job in words; the engine never falls back to rules halfway.
+
+        Always this machine's model (0.6, S2, pins P6): while the chat runs on
+        the cloud slot it is llama-server through `model_route`'s local route,
+        never `llm.complete`'s cloud path (Thym's reading takes this too)."""
         kw = {k: v for k, v in kw.items() if k == "max_tokens"}
         try:
+            if _llm._current_slot() == "opro-api":
+                return _model_route.make_complete("local", llm_url=session.llm_url or _llm.DEFAULT_LLM_URL)(
+                    messages, **kw)
             return _llm.complete(messages, llm_url=session.llm_url, **kw)
         except _llm.LLMUnavailable as e:
             raise RuntimeError(f"the model became unavailable ({e}); nothing was written, run it again") from e
@@ -5036,13 +5051,14 @@ def create_app(
 
     def _job_complete(route: str | None, source: str) -> Callable[..., tuple[str, dict[str, Any]]]:
         """The `complete` one job uses, by its route (pins P6, `model_route`):
-        None, or `local` while the chat is local, is `_model_complete` (today's
-        path: `llm.complete`, whose meta says `route: local`); `local` while the
-        chat runs on the cloud slot is llama-server through the factory;
-        `cloud` is the factory's cloud route (gate, cache with `source`, the
-        broker's journal). A refusal (agent-free, a gate shut mid-job) fails
-        the job in the refusal's own words; nothing is written."""
-        if route is None or (route == "local" and _llm._current_slot() != "opro-api"):
+        None is `local` (0.6, S2); `local` while the chat is local is
+        `_model_complete` (`llm.complete`, whose meta says `route: local`);
+        `local` while the chat runs on the cloud slot is llama-server through
+        the factory; `cloud` is the factory's cloud route (gate, cache with
+        `source`, the broker's journal). A refusal (agent-free, a gate shut
+        mid-job) fails the job in the refusal's own words; nothing is written."""
+        route = route or "local"
+        if route == "local" and _llm._current_slot() != "opro-api":
             return _model_complete
         inner = _model_route.make_complete(route, llm_url=session.llm_url, project_dir=project_dir,
                                            source=source)
@@ -5145,18 +5161,22 @@ def create_app(
 
     def _job_route(mode: str, route: str | None) -> str | None:
         """The route a job's record says: none in rules mode; the one asked; else
-        today's (`cloud` while the chat runs on the cloud slot, else `local`)."""
+        `local` (0.6, S2: no route is the local route)."""
         if mode != "model":
             return None
-        return route or ("cloud" if _llm._current_slot() == "opro-api" else "local")
+        return route or "local"
 
     def _start_canon_job(*, kind: str, path: str | None, mode: str, why: str, work: Any,
                          key: str | None, doing: str, route: str | None = None,
-                         flavour: str | None = None) -> dict[str, Any]:
+                         flavour: str | None = None, what: str | None = None,
+                         extra: dict[str, Any] | None = None) -> dict[str, Any]:
         """Start one job. A model-mode job holds the generation lock (llama-server's
         one slot) unless it runs on the cloud route (`model_route.holds_generation_lock`);
-        a job with no route asked keeps today's rule (it holds the lock). The
-        record says the job's `route` (model mode) and `flavour` (a decompile)."""
+        a job with no route asked is local (it holds the lock). The
+        record says the job's `route` (model mode) and `flavour` (a decompile,
+        a compile), and for a compile `what` (`code`, `line`, `overview`,
+        `manual`, `short`: 0.6, S2); `extra` adds fields of the caller's (a
+        build's first `progress`), each said only when known."""
         reason = _agent_free_reason(mode, why)
         if reason:
             # The result says why too, beside its `mode: rules`.
@@ -5173,7 +5193,7 @@ def create_app(
                 lock=(session.generation_lock if mode == "model"
                       and _model_route.holds_generation_lock(route or "local") else None),
                 message=_canon_start_message(mode, why, doing), reason=reason,
-                extra=({"route": _job_route(mode, route), "flavour": flavour}
+                extra=({"route": _job_route(mode, route), "flavour": flavour, "what": what, **(extra or {})}
                        if kind in ("emf", "atem", "compile", "fabulac", "dialectic") else None))   # Thym's runs: their lane's
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
@@ -5200,8 +5220,9 @@ def create_app(
         force?, flavour?, route?}` → `{job, flavour, suggested}`. `flavour` is
         `fabulan` or `fabulap` (absent: the twin's own, else the suggestion;
         `fabulac` is refused for a text); `route` is `local` or `cloud`
-        (absent: today's model; `cloud` only with the broker's gate open, else
-        403 in the gate's words). 409 when the twin is already fresh (pass
+        (absent: `local`, this machine's model whatever slot the chat is on;
+        `cloud` only with the broker's gate open, else 403 in the gate's
+        words). 409 when the twin is already fresh (pass
         `force`), or a job for the file is queued or running. Model or rules is
         decided here, once."""
         body = await _json_body(request)
@@ -5359,6 +5380,81 @@ def create_app(
 
         return await asyncio.to_thread(_build)
 
+    @app.get("/api/fabula/suggest")
+    async def api_fabula_suggest(path: str = Query(...)) -> dict[str, Any]:
+        """The flavour suggested for a text (0.6, S2), twin or none: `{path,
+        suggested: fabulan | fabulap, why}` by the one rule
+        (`fabula_names.suggest_flavour`). The text is the one the twin route
+        reads (a twin's path reads its text; a converted original its
+        markdown twin). Refusals as the twin route's for a bad path (400
+        missing or invalid, 404 no such file), and 400 for a folder or a file
+        that is not text."""
+
+        def _build() -> dict[str, Any]:
+            rel = _canon_rel(path)
+            if not rel or rel in STORE_PREFIXES:
+                raise HTTPException(400, "missing path")
+            target = _resolve_project_path(rel)
+            of_twin = _fabula_names.text_of_twin(target) if target.name.endswith(".cosm") else None
+            if of_twin is not None:
+                target = of_twin
+            if not target.exists():
+                raise HTTPException(404, f"no such file: {rel}")
+            if target.is_dir():
+                raise HTTPException(400, f"{rel} is a folder; a flavour is suggested for a text")
+            if (target.suffix.lower() not in _canon_derive.TEXT_SUFFIXES
+                    and _convert.is_convertible(target) and _convert.twin_path(target).is_file()):
+                target = _convert.twin_path(target)
+            try:
+                raw = target.read_bytes().decode("utf-8-sig")
+            except (OSError, UnicodeDecodeError):
+                raise HTTPException(400, f"{rel} could not be read as text") from None
+            suggested = _fabula_names.suggest_flavour(raw)
+            why = ("it reads as verse: short lines in stanzas, with no heading, code fence or table"
+                   if suggested == "fabulap" else "it reads as prose")
+            return {"path": rel, "suggested": suggested, "why": why}
+
+        return await asyncio.to_thread(_build)
+
+    @app.get("/api/fabula/models")
+    async def api_fabula_models() -> dict[str, Any]:
+        """The model line's facts in one call (0.6, S2), read as
+        `thym_host.route_info` reads them: `{agent_free, local: {running,
+        model, window}, cloud: {open, model, window, reason}}`. Agent-free
+        reads nothing (no gate, no llama-server). The cloud gate is read once;
+        its model and window are said only while it is open. Never a key or
+        a secret; a model that is down is a fact here, not an error."""
+        from . import thym_host as _host
+
+        def _build() -> dict[str, Any]:
+            if _agent_free.enabled():
+                return {"agent_free": True,
+                        "local": {"running": False, "model": None, "window": None},
+                        "cloud": {"open": False, "model": None, "window": None,
+                                  "reason": "agent-free mode is on"}}
+            running, _why = _local_reachable()
+            local = _host.route_info("local", llm_url=session.llm_url) if running else {}
+            if not running:
+                slot = _host.current_model()
+                local = {"model": slot} if slot not in ("none", "opro-api") else {}
+            cloud = _host.route_info("cloud")
+            gate = cloud.get("gate") or {}
+            is_open = bool(gate.get("open"))
+            reason = None if is_open else _plain_gate_reason(gate.get("reason"))
+            return {"agent_free": False,
+                    "local": {"running": bool(running), "model": local.get("model"),
+                              "window": local.get("window")},
+                    "cloud": {"open": is_open, "model": cloud.get("model") if is_open else None,
+                              "window": cloud.get("window") if is_open else None, "reason": reason}}
+
+        return await asyncio.to_thread(_build)
+
+    def _plain_gate_reason(reason: Any) -> str:
+        """The gate's short clause, with no provider named (a reply's prose names no vendor)."""
+        import re
+        said = str(reason or "the cloud is shut")
+        return re.sub(r"\bno \S+ key is configured\b", "no cloud key is configured", said)
+
     async def _compile_short(body: dict[str, Any]) -> dict[str, Any]:
         """Compile a text's fabula (`fabula/1`, or `emf/1`) into a SHORT as a job (plan §15);
         `POST /api/fabula/compile` (enough/fabulac_job.py) hands it every fabula that is not a fabulac:
@@ -5383,7 +5479,7 @@ def create_app(
             raise HTTPException(400, "missing path")
         target = _resolve_project_path(rel)
 
-        def _vet() -> tuple[Path | None, str]:
+        def _vet() -> tuple[Path | None, str, str]:
             if not target.exists():
                 raise HTTPException(404, f"no such file: {rel}")
             if target.is_dir() or not target.name.endswith(".cosm"):
@@ -5403,9 +5499,11 @@ def create_app(
                     readable = True
                 except OSError:
                     readable = False
-            return (text if readable else None), _canon_derive.default_order(vol, source_readable=readable)
+            fl = _canon.twin_header(target).get("flavour")
+            fl = fl if fl in _fabula_names.TEXT_FLAVOURS else "fabulan"      # emf/1, or a fabula that says none
+            return (text if readable else None), _canon_derive.default_order(vol, source_readable=readable), fl
 
-        text_path, default = await asyncio.to_thread(_vet)
+        text_path, default, flavour = await asyncio.to_thread(_vet)
         order = order or default
         mode, why = await _canon_mode(route)
         complete = _job_complete(route, "compile") if mode == "model" else None
@@ -5447,7 +5545,8 @@ def create_app(
                     "message": f"wrote {out.name}"}
 
         return _start_canon_job(kind="compile", path=rel, mode=mode, why=why, work=work,
-                                key=key, doing=f"compiling {target.name}", route=route)
+                                key=key, doing=f"compiling {target.name}", route=route,
+                                flavour=flavour, what="short")
 
     # ---------- The fabula round (0.6): a folder's fabulac, its compiles, and the dialectic ----------
     #
