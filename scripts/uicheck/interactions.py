@@ -41,7 +41,8 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY,
                       FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
-                      THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG, thym_moves_stub_js)
+                      THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
+                      THYM_LIST, THYM_HARVEST, THYM_SAME)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -4078,9 +4079,10 @@ def scenario_thym_run_roundtrip(d: Driver) -> list[str]:
                      + str(d.js("document.getElementById('thym-list').innerText")))
         _reset(d)
         return fails
-    order = d.js("Array.from(document.querySelectorAll('#thym-list .thym-opt input')).map((i) => i.value)") or []
-    shipped = [i for i, v in enumerate(order) if "/" not in v]
-    if shipped and any("/" in v for v in order[shipped[0]:]):
+    # Each radio says its place (U1d: a project file at the top may share a shipped program's bare name).
+    order = d.js("Array.from(document.querySelectorAll('#thym-list .thym-opt input')).map((i) => [i.value, i.dataset.where || ''])") or []
+    places = [w for _v, w in order]
+    if "shipped" in places and any(w != "shipped" for w in places[places.index("shipped"):]):
         fails.append(f"shipped programs should come after the project's: {order}")
     d.click(radio)
     if not _wait_js(d, "!!document.querySelector('#thym-plan .thym-fits') && !document.getElementById('thym-go').disabled"):
@@ -4568,7 +4570,6 @@ def scenario_thym_moves_put(d: Driver) -> list[str]:
     the strip checks again. Esc closes the dialog and gives focus back to the button that opened it."""
     fails: list[str] = []
     _reset(d)
-    d.js_await(thym_moves_stub_js())
     d.js_await("(async () => { await openReadEdit(%s, {size: 'full', face: 'edit'}); return true; })()" % json.dumps(THYM_TWO))
     if not _wait_js(d, "!!document.querySelector('#thym-ed.clean')"):
         fails.append(f"{THYM_TWO} did not compile clean in the strip: {_ed_text(d)!r}")
@@ -4751,6 +4752,226 @@ def scenario_thym_settle_from_dialectic(d: Driver) -> list[str]:
     return fails
 
 
+#: Every request from now on is written down with its body (`window.__u1dWire`: `[{url, body}]`), to say what the
+#: page sent the routes (a list as a JSON array; `where`).
+_WIRE_BODIES_ON = ("(() => { window.__u1dWire = []; if (!window.__u1dWireOn) { const real = window.fetch; window.__u1dWireOn = true;"
+                   " window.fetch = (u, o) => { let b = null; try { b = o && typeof o.body === 'string' ? JSON.parse(o.body) : null; }"
+                   " catch (e) { b = null; } (window.__u1dWire = window.__u1dWire || []).push({url: String(u), body: b});"
+                   " return real(u, o); }; } return true; })()")
+
+
+def _wire(d: Driver, pattern: str) -> list[dict]:
+    """The requests written down since `_WIRE_BODIES_ON` whose URL matches `pattern` (a regex), in order."""
+    rows = d.js("window.__u1dWire || []") or []
+    return [r for r in rows if re.search(pattern, str(r.get("url", "")))]
+
+
+def scenario_thym_run_list(d: Driver) -> list[str]:
+    """Run with… a program that takes a list (0.6, U1d), by keyboard: one member field, focused, offering only
+    what fits a member (shorts) → typed + Tab reaches "add another" → Enter adds a second field, focused → typed +
+    Enter plans with both members sent as a JSON array in that order → the plan reads them in order, its loop at
+    most two passes, and each output's path from the plan's `writes` → run lands both outputs, the notes joined
+    in the order given → reopened, both members remembered in order → "remove" on the first leaves the second,
+    focus in the list, planned on it alone."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(_WIRE_BODIES_ON)
+    d.js_await("(async () => { localStorage.removeItem('enough.thym.inputs'); await thymRunOpen({program: %s});"
+               " return true; })()" % json.dumps(THYM_LIST))
+    if not _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-member]').length === 1"
+                       " && document.activeElement && document.activeElement.dataset.member === '0'"):
+        fails.append("the card did not show one member field, focused: "
+                     + str(d.js("(document.getElementById('thym-inputs') || {}).innerText")))
+        _reset(d)
+        return fails
+    if d.js("document.querySelector('#thym-inputs .thym-in-list').getAttribute('role')") != "group":
+        fails.append("the list input is not a labelled group")
+    offered = d.js("Array.from(document.querySelectorAll('#thym-in-0-dl option')).map((o) => o.value)") or []
+    if THYM_LONG not in offered or any(v.endswith("/") or v.endswith(".cosm") for v in offered):
+        fails.append(f"a member of a list of shorts is offered what does not fit: {offered[:8]}")
+    d.type_text(THYM_LONG)
+    d.key("Tab")
+    if d.js("(document.activeElement || {}).dataset && document.activeElement.dataset.tinAdd") != "notes":
+        fails.append("Tab from the member did not reach \"add another\": "
+                     + str(d.js("document.activeElement && document.activeElement.outerHTML.slice(0, 120)")))
+        d.focus("[data-tin-add='notes']")
+    d.key("Enter")
+    if not _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-member]').length === 2"
+                       " && document.activeElement && document.activeElement.dataset.member === '1'", 4000):
+        fails.append("\"add another\" did not add a second member field with focus in it")
+        _reset(d)
+        return fails
+    d.type_text(THYM_HARVEST)
+    d.key("Enter")
+    if not _wait_js(d, "document.querySelectorAll('#thym-plan ol.thym-plan-members li').length === 2"
+                       " && !document.getElementById('thym-go').disabled", 60000):
+        fails.append("the plan did not come with two members: " + str(d.js("(document.getElementById('thym-plan') || {}).innerText")))
+        _reset(d)
+        return fails
+    sent = [r.get("body") or {} for r in _wire(d, r"/api/thym/plan$")]
+    last = sent[-1].get("inputs", {}).get("notes") if sent else None
+    if last != [THYM_LONG, THYM_HARVEST]:
+        fails.append(f"the list was not sent as a JSON array in its order: {last!r}")
+    shown = d.js("Array.from(document.querySelectorAll('#thym-plan ol.thym-plan-members li')).map((l) => l.textContent)") or []
+    if shown != [THYM_LONG, THYM_HARVEST]:
+        fails.append(f"what it reads does not show the members in order: {shown}")
+    most = d.js("(() => { const p = THYM_PICK.plan && THYM_PICK.plan.plan; const n = p && (p.nodes || []).find((x) => x.members);"
+                " return n ? n.members.at_most : null; })()")
+    if most != 2:
+        fails.append(f"the plan's loop is not at most two passes: {most!r}")
+    paths = d.js("Array.from(document.querySelectorAll('#thym-plan ul.thym-plan-io > li > .thym-plan-path')).map((x) => x.textContent)") or []
+    want = [w.get("rel") for w in (d.js("(THYM_PICK.plan && THYM_PICK.plan.writes) || []") or [])]
+    if not want or paths != want or not all(str(p).endswith(".md") for p in paths):
+        fails.append(f"what it will write is not the plan's writes, extension included: shown {paths}, writes {want}")
+    d.focus("#thym-go")
+    d.key("Enter")
+    if not _wait_js(d, "document.querySelectorAll('#thym-status [data-topen]').length === 2", 90000):
+        fails.append("a landed run did not list its two outputs: "
+                     + str(d.js("(document.getElementById('thym-status') || {}).innerText")))
+        _reset(d)
+        return fails
+    landed = d.js("(THYM_PICK.result && THYM_PICK.result.outputs || []).map((o) => o.rel)") or []
+    if landed != want:
+        fails.append(f"the run landed {landed}; its plan said {want}")
+    allp = next((p for p in landed if p and ".all." in p), None)
+    text = _raw(d, allp) if allp else None
+    long_at = (text or "").find("A short line.")
+    harvest_at = (text or "").find("The harvest list")
+    if text is None or long_at < 0 or harvest_at < 0 or long_at > harvest_at:
+        fails.append(f"{allp} does not hold the notes joined in the order given: {(text or '')[:80]!r}")
+    d.key("Escape")
+    _wait_js(d, "document.getElementById('thym-modal').classList.contains('hidden')")
+    d.js(_WIRE_BODIES_ON)
+    d.js_await("(async () => { await thymRunOpen({program: %s}); return true; })()" % json.dumps(THYM_LIST))
+    _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-member]').length === 2")
+    kept = d.js("Array.from(document.querySelectorAll('#thym-inputs input[data-member]')).map((i) => i.value)") or []
+    if kept != [THYM_LONG, THYM_HARVEST]:
+        fails.append(f"opened again, the list was not remembered in its order: {kept}")
+    if d.js("document.querySelectorAll('#thym-inputs [data-tin-remove]').length") != 2:
+        fails.append("each of two members does not have its remove")
+    d.focus("[data-tin-remove='notes'][data-member='0']")
+    d.key("Enter")
+    if not _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-member]').length === 1"
+                       " && document.activeElement && document.activeElement.dataset.member === '0'", 4000):
+        fails.append("remove did not leave one member with focus in it")
+    if not _wait_js(d, "(window.__u1dWire || []).some((r) => /\\/api\\/thym\\/plan$/.test(r.url) && r.body && r.body.inputs"
+                       " && JSON.stringify(r.body.inputs.notes) === %s)" % json.dumps(json.dumps([THYM_HARVEST])), 20000):
+        fails.append("after remove the plan was not asked on the one member left: "
+                     + str([r.get("body") for r in _wire(d, r"/api/thym/plan$")]))
+    _reset(d)
+    return fails
+
+
+def scenario_thym_moves_route(d: Driver) -> list[str]:
+    """The moves come from the server (0.6, U1d; S4's GET /api/thym/moves), no stand-in: Thym at hand lists every
+    move the route lists for thym 1, grouped in its owners' order; a move another format extends (`project`, which
+    Ascribe extends with `as isograph`) says what that format adds; switched to thym 0, the count is the route's
+    for thym 0 and the extension is gone."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(_WIRE_BODIES_ON)
+    route = d.js_await("(async () => { const o = {}; for (const v of [0, 1]) { const r = await fetch('/api/thym/moves?version=' + v);"
+                       " if (!r.ok) return {error: r.status}; o[v] = (await r.json()).moves; } return o; })()") or {}
+    if "error" in route or not route.get("1"):
+        fails.append(f"GET /api/thym/moves does not answer: {route}")
+        return fails
+    d.js("(() => { THYM_REF.moves.clear(); thymRefOpen('moves'); return true; })()")
+    if not _wait_js(d, "document.querySelectorAll('#thym-ref-list article.tref-move').length > 0"):
+        fails.append("the moves tab listed nothing: " + str(d.js("(document.getElementById('thym-ref-body') || {}).innerText")))
+        _reset(d)
+        return fails
+    if not _wire(d, r"/api/thym/moves\?version=1$"):
+        fails.append("the page did not ask the server for the moves")
+    if d.js("!!window.__thymMovesStub"):
+        fails.append("a stand-in answered for the moves")
+    names = d.js("Array.from(document.querySelectorAll('#thym-ref-list article.tref-move')).map((a) => a.dataset.move)") or []
+    if names != [m["name"] for m in route["1"]]:
+        fails.append(f"the page does not list the route's thym 1 moves in its order ({len(names)} of {len(route['1'])})")
+    ext = d.js("(() => { const a = document.querySelector('#thym-ref-list article.tref-move[data-move=\"project\"]');"
+               " const p = a && a.querySelector('p.tref-ext'); return p ? p.textContent : null; })()")
+    if not ext or "isograph" not in ext or "project" not in ext:
+        fails.append(f"project in thym 1 does not say what Ascribe adds to it: {ext!r}")
+    d.click("input[name='thym-ref-v'][value='0']")
+    if not _wait_js(d, "document.querySelectorAll('#thym-ref-list article.tref-move').length === %d" % len(route.get("0") or [])):
+        fails.append(f"thym 0 does not list the route's {len(route.get('0') or [])} moves")
+    if d.js("!!document.querySelector('#thym-ref-list article.tref-move[data-move=\"project\"] p.tref-ext')"):
+        fails.append("project in thym 0 still says an extension the thym 0 view does not have")
+    _reset(d)
+    return fails
+
+
+def scenario_thym_same_name(d: Driver) -> list[str]:
+    """A shipped program and a project file of one name (0.6, U1d; S4's `where`): run with… lists both, each
+    saying where it is from → choosing the shipped one reads, asks for and plans the shipped one's input (a
+    volume), `where: shipped` on the wire → choosing the project's reads its own input (a short), `where:
+    project` → the program page of each shows its own why: and its own acts (copy for the shipped, edit for the
+    project's) → copy into this project copies the shipped source byte for byte to programs/."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(_WIRE_BODIES_ON)
+    d.js_await("(async () => { localStorage.removeItem('enough.thym.inputs'); await thymRunOpen({input: %s});"
+               " return true; })()" % json.dumps(THYM_LONG))
+    sel = "#thym-list input[name='thym-opt'][value=%s]" % json.dumps(THYM_SAME)
+    if not _wait_js(d, "document.querySelectorAll(%s).length === 2" % json.dumps(sel)):
+        fails.append("run with… does not list both programs named " + THYM_SAME + ": "
+                     + str(d.js("Array.from(document.querySelectorAll('#thym-list input')).map((i) => i.value + '@' + (i.dataset.where || ''))")))
+        _reset(d)
+        return fails
+    wheres = d.js("Array.from(document.querySelectorAll(%s)).map((i) => [i.dataset.where,"
+                  " i.closest('label').querySelector('.thym-where').textContent])" % json.dumps(sel)) or []
+    if sorted(w[0] for w in wheres) != ["project", "shipped"] or wheres[0][1] == wheres[1][1]:
+        fails.append(f"the two are not each said to be from their place: {wheres}")
+    d.click(sel + "[data-where='shipped']")
+    if not _wait_js(d, "THYM_PICK.where === 'shipped' && !!document.querySelector('#thym-inputs input[data-take=\"h\"]')", 12000):
+        fails.append("choosing the shipped one did not ask for its input h: "
+                     + str(d.js("(document.getElementById('thym-inputs') || {}).innerText")))
+    if not _wire(d, r"/api/thym/program\?path=open-house\.thym&where=shipped$"):
+        fails.append("the shipped one's source was not read with where=shipped: " + str([r["url"] for r in _wire(d, r"/api/thym/")]))
+    d.focus("#thym-inputs input[data-take='h']")
+    d.type_text(HOLOTYPE)
+    d.key("Enter")
+    if not _wait_js(d, "(window.__u1dWire || []).some((r) => /\\/api\\/thym\\/plan$/.test(r.url) && r.body"
+                       " && r.body.where === 'shipped' && r.body.inputs && r.body.inputs.h === %s)" % json.dumps(HOLOTYPE), 20000):
+        fails.append("the shipped one was not planned with where: shipped: " + str([r.get("body") for r in _wire(d, r"/api/thym/plan$")]))
+    if d.js("document.querySelectorAll(%s).length" % json.dumps(sel + ":checked")) != 1:
+        fails.append("both radios of one name show as chosen")
+    d.click(sel + "[data-where='project']")
+    if not _wait_js(d, "THYM_PICK.where === 'project' && (document.querySelector('#thym-inputs input[data-take=\"s\"]') || {}).value === %s"
+                       % json.dumps(THYM_LONG), 12000):
+        fails.append("choosing the project's did not ask for its own input s, given the text: "
+                     + str(d.js("(document.getElementById('thym-inputs') || {}).innerText")))
+    if not _wait_js(d, "(window.__u1dWire || []).some((r) => /\\/api\\/thym\\/plan$/.test(r.url) && r.body"
+                       " && r.body.where === 'project' && r.body.inputs && r.body.inputs.s === %s)" % json.dumps(THYM_LONG), 20000):
+        fails.append("the project's was not planned with where: project")
+    d.key("Escape")
+    _wait_js(d, "document.getElementById('thym-modal').classList.contains('hidden')")
+    for where, why, act in (("project", "project's own", "edit-program"), ("shipped", "what the house sells", "copy-program")):
+        d.js_await("(async () => { await enterProgramDoc(%s, {where: %s, density: 'atem'}); return true; })()"
+                   % (json.dumps(THYM_SAME), json.dumps(where)))
+        if not _wait_js(d, "!!document.querySelector('#docs-body .thym-doc-acts')", 12000):
+            fails.append(f"the {where} program's page did not open")
+            continue
+        body = d.js("document.getElementById('docs-body').innerText") or ""
+        if why not in body:
+            fails.append(f"the {where} program's page is not the {where} one: {body[:120]!r}")
+        if not d.js("!!document.querySelector('#docs-body .thym-doc-acts [data-tact=%s]')" % json.dumps(act)):
+            fails.append(f"the {where} program's page does not offer {act}")
+        if d.js("(document.querySelector('#docs-body .thym-doc-acts [data-tact=\"run-program\"]') || {dataset: {}}).dataset.where") != where:
+            fails.append(f"the {where} program's run with… does not name its place")
+    before = d.js_await("(async () => (await (await fetch('/api/thym/program?path=open-house.thym&where=shipped')).json()).source)()")
+    # The shipped one's page is open: its "copy into this project to change it".
+    if d.js("!!document.querySelector('#docs-body .thym-doc-acts [data-tact=\"copy-program\"]')"):
+        d.click("#docs-body .thym-doc-acts [data-tact='copy-program']")
+    if not _wait_js(d, "typeof RE_PATH === 'string' && /^programs\\/open-house(-\\d+)?\\.thym$/.test(RE_PATH) && RE_FACE === 'edit'", 12000):
+        fails.append("the copy did not open in the editor: " + str(d.js("({path: RE_PATH, face: RE_FACE})")))
+    else:
+        copy = d.js("RE_PATH")
+        if _raw(d, copy) != before:
+            fails.append(f"{copy} is not the shipped open-house byte for byte")
+    _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -4836,6 +5057,9 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.6: writing and running Thym (U1c) ---
     "thym-editor-checks": scenario_thym_editor_checks,
     "thym-moves-put": scenario_thym_moves_put,
+    "thym-moves-route": scenario_thym_moves_route,
+    "thym-run-list": scenario_thym_run_list,
+    "thym-same-name": scenario_thym_same_name,
     "thym-run-folder-outputs": scenario_thym_run_folder_outputs,
     "thym-shipped-copy": scenario_thym_shipped_copy,
     "thym-settle-from-dialectic": scenario_thym_settle_from_dialectic,

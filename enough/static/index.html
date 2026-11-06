@@ -8888,6 +8888,39 @@
       display: none;
     }
 
+    /* 0.6 (U1d): a list input, one field per member in the program's order. */
+    #thym-modal .thym-in-h {
+      font-size: 12px;
+      color: var(--fg);
+      overflow-wrap: anywhere;
+    }
+
+    #thym-modal ol.thym-in-members {
+      margin: 0;
+      padding-left: 1.8em;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+    }
+
+    #thym-modal li.thym-in-member {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    #thym-modal li.thym-in-member input {
+      flex: 1 1 auto;
+    }
+
+    #thym-modal ol.thym-plan-members {
+      margin: 2px 0 0;
+      padding-left: 1.8em;
+    }
+
     /* The plan, readable: each step at its line, what it keeps and how it loops. */
     :is(#thym-modal, #thym-ref-modal) ol.thym-plan-read {
       margin: 4px 0 0;
@@ -9104,13 +9137,15 @@
 
     #thym-ref-modal p.tref-says,
     #thym-ref-modal p.tref-meta,
+    #thym-ref-modal p.tref-ext,
     #thym-ref-modal p.tref-ex {
       margin: 3px 0;
       font-size: 12px;
       overflow-wrap: anywhere;
     }
 
-    #thym-ref-modal p.tref-meta {
+    #thym-ref-modal p.tref-meta,
+    #thym-ref-modal p.tref-ext {
       color: var(--fg-muted);
     }
 
@@ -23200,7 +23235,7 @@
     // short payload carries everything the atem one does, so an atem asked
     // for after a short is served from it.
     async function docsLoad(doc, lang, density, seq) {
-      if (doc === 'program') return thymProgLoad(DOCS.prog, seq);
+      if (doc === 'program') return thymProgLoad(DOCS.prog, seq, DOCS.progWhere);
       const key = doc + '|' + lang + '|' + density;
       if (DOCS.cache.has(key)) return DOCS.cache.get(key);
       if (density === 'atem' && DOCS.cache.has(doc + '|' + lang + '|short')) {
@@ -23314,8 +23349,10 @@
       let doc = DOCS_DOCS[opts.doc] ? opts.doc : 'help-center';
       // A program needs its file; one the viewer is not showing yet is loaded afresh.
       if (doc === 'program' && !(opts.path && window.__thymReady)) doc = 'help-center';
-      const progChanged = doc === 'program' && DOCS.prog !== opts.path;
-      if (doc === 'program') DOCS.prog = opts.path;
+      // 0.6 (U1d): `where` (shipped, project, canon) tells a shipped program
+      // from a project file of the same name (S4); left out, as before.
+      const progChanged = doc === 'program' && (DOCS.prog !== opts.path || (DOCS.progWhere || null) !== (opts.where || null));
+      if (doc === 'program') { DOCS.prog = opts.path; DOCS.progWhere = opts.where || null; }
       const lang = opts.lang || I18N.lang || 'en';
       const density = opts.density && DOCS_DENSITIES[opts.density] ? opts.density : docsDensityFor(doc);
       const root = docsEl('docs-mode');
@@ -23465,11 +23502,11 @@
     // Load (seq-guarded) and draw one document at one density, then land.
     async function docsShow(doc, lang, density, anchor) {
       const seq = ++DOCS.seq;
-      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog);
+      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog + '|' + (DOCS.progWhere || ''));
       DOCS.doc = doc;
       DOCS.lang = lang;
       DOCS.density = density;
-      if (doc === 'program') DOCS.progShown = DOCS.prog;
+      if (doc === 'program') DOCS.progShown = DOCS.prog + '|' + (DOCS.progWhere || '');
       if (docChanged) { DOCS.data = null; DOCS.ix = null; DOCS.at = null; DOCS.back = null; DOCS_FAB.page = null; }
       DOCS_FIND.close({ quiet: true });
       refBackHide(DOCS_CTX);
@@ -35026,7 +35063,8 @@
 
     function thymProgramActs(it, data, host) {
       return '<div class="thym-acts"><button type="button" class="thym-btn" data-tact="run-program" data-program="'
-        + cosmEsc(thymProgramRef(it, data, host)) + '" data-name="' + cosmEsc(String(it.name || '')) + '" title="'
+        + cosmEsc(thymProgramRef(it, data, host)) + '" data-name="' + cosmEsc(String(it.name || '')) + '"'
+        + (host && host.progWhere ? ' data-where="' + cosmEsc(host.progWhere) + '"' : '') + ' title="'
         + cosmEsc(t('thym.runWith.program.title', 'run this program on a text: see its plan and what it costs first'))
         + '">' + cosmEsc(t('thym.runWith', 'run with…')) + '</button>'
         + '<span class="mode-help-anchor" data-help="thym"></span></div>';
@@ -35478,7 +35516,7 @@
     // A click on one of the controls above, in any host.
     function thymAct(el, host) {
       const act = el.dataset.tact;
-      if (act === 'run-program') { thymRunOpen({ program: el.dataset.program, name: el.dataset.name }); return; }
+      if (act === 'run-program') { thymRunOpen({ program: el.dataset.program, name: el.dataset.name, where: el.dataset.where || null }); return; }
       if (act === 'run-text') { thymRunOpen({ input: el.dataset.path }); return; }
       if (act === 'read') { thymReadOpen(el.dataset.path); return; }
       if (act === 'package') { thymPackOpen(el.dataset.path); return; }
@@ -35492,7 +35530,7 @@
         void thymEditProgram(el.dataset.program).then(() => { if (line) thymEdGo(line); });
         return;
       }
-      if (act === 'copy-program') { void thymCopyProgram(el.dataset.program); return; }
+      if (act === 'copy-program') { void thymCopyProgram(el.dataset.program, el.dataset.where || null); return; }
       if (act === 'moves') { thymRefOpen('moves'); return; }
       if (act === 'programs') { thymRefOpen('programs'); }
     }
@@ -35551,7 +35589,7 @@
     // as it is (GET /api/file/raw) with the enumeration beside it
     // (`<name>.thym.cosm`, which `python -m enough.thym enumerate` writes).
     const DOCS_PROG = {
-      path: null, data: null, ix: null, shown: new Map(), progRef: null,
+      path: null, data: null, ix: null, shown: new Map(), progRef: null, progWhere: null,
       viewer: false, unwrap: false,
       body: () => document.getElementById('docs-body'),
       rail: () => document.getElementById('docs-toc'),
@@ -35560,21 +35598,27 @@
       set railWant(v) { DOCS_CTX.want = v; },
     };
 
+    // 0.6 (U1d): GET /api/thym/program for a program in one place, when the
+    // page knows it (`where`: shipped, project or canon; S4 4).
+    function thymProgramURL(ref, where = null) {
+      return '/api/thym/program?path=' + encodeURIComponent(ref) + (where ? '&where=' + encodeURIComponent(where) : '');
+    }
+
     function enterProgramDoc(path, opts = {}) {
       if (!path) return Promise.resolve();
-      return enterDocsMode({ doc: 'program', path, density: opts.density, anchor: opts.anchor });
+      return enterDocsMode({ doc: 'program', path, where: opts.where || null, density: opts.density, anchor: opts.anchor });
     }
     window.enterProgramDoc = enterProgramDoc;
 
-    async function thymProgLoad(path, seq) {
-      const key = 'program|' + path;
+    async function thymProgLoad(path, seq, where = null) {
+      const key = 'program|' + (where || '') + '|' + path;
       if (DOCS.cache.has(key)) return DOCS.cache.get(key);
-      const out = { doc: 'program', lang: I18N.lang || 'en', path, rel: path, name: null, why: null, source: null,
+      const out = { doc: 'program', lang: I18N.lang || 'en', path, rel: path, where, name: null, why: null, source: null,
         volume: null, notes: [] };
-      const r = await canonJSON('/api/thym/program?path=' + encodeURIComponent(path));
+      const r = await canonJSON(thymProgramURL(path, where));
       if (seq !== DOCS.seq) return null;
       if (r.ok && r.data) {
-        Object.assign(out, { rel: r.data.rel || path, name: r.data.name || null, why: r.data.why || null,
+        Object.assign(out, { rel: r.data.rel || path, where: r.data.where || where, name: r.data.name || null, why: r.data.why || null,
           source: typeof r.data.source === 'string' ? r.data.source : null,
           volume: cosmIsMap(r.data.volume) ? r.data.volume : null });
       } else {
@@ -35649,13 +35693,19 @@
       const ref = String(data.rel || data.path || '');
       // 0.6 (U1c): a project's program is edited where it is; a shipped or a
       // Canon one is copied into the project first, never changed in place.
-      const mine = !/^canon:/.test(ref) && !!document.querySelector('#tree li.file[data-path="' + CSS.escape(ref) + '"]');
+      // U1d: the page's `where` (the route's answer) says which it is, and
+      // every act sends it, so a shipped program and a project file of the
+      // same name are never taken for each other.
+      const where = data.where || null;
+      const mine = where ? where === 'project'
+        : !/^canon:/.test(ref) && !!document.querySelector('#tree li.file[data-path="' + CSS.escape(ref) + '"]');
+      const w = where ? ' data-where="' + cosmEsc(where) + '"' : '';
       return '<div class="thym-acts thym-doc-acts"><button type="button" class="thym-btn" data-tact="run-program" data-program="'
-        + cosmEsc(ref) + '" data-name="' + cosmEsc(data.name || '') + '">'
+        + cosmEsc(ref) + '"' + w + ' data-name="' + cosmEsc(data.name || '') + '">'
         + cosmEsc(t('thym.runWith', 'run with…')) + '</button>'
         + (mine ? '<button type="button" class="thym-btn" data-tact="edit-program" data-program="' + cosmEsc(ref) + '">'
           + cosmEsc(t('thym.ed.edit', 'edit')) + '</button>'
-          : '<button type="button" class="thym-btn" data-tact="copy-program" data-program="' + cosmEsc(ref) + '">'
+          : '<button type="button" class="thym-btn" data-tact="copy-program" data-program="' + cosmEsc(ref) + '"' + w + '>'
           + cosmEsc(t('thym.ref.copy', 'copy into this project to change it')) + '</button>')
         + '<button type="button" class="thym-btn" data-tact="moves">' + cosmEsc(t('thym.ed.moves', 'the moves…')) + '</button>'
         + '<span class="mode-help-anchor" data-help="thym"></span></div>';
@@ -35713,7 +35763,7 @@
           return;
         }
         Object.assign(DOCS_PROG, { path: data.rel || data.path, data: vol, ix: cosmIndex(vol), shown: new Map(),
-          progRef: data.rel || data.path });
+          progRef: data.rel || data.path, progWhere: data.where || null });
         // The rail: the volume's own (catalog, modules, checks) with the
         // program's steps, in order, before the checks.
         const steps = (data.steps || []).filter((s) => s.key);
@@ -35872,18 +35922,19 @@
 
     function thymPickReset(face) {
       THYM_PICK.seq++;
-      Object.assign(THYM_PICK, { face, input: null, program: null, programName: '', fixed: false, programs: null,
+      Object.assign(THYM_PICK, { face, input: null, program: null, where: null, programName: '', fixed: false, programs: null,
         plan: null, morphs: null, morph: null, job: null, snap: null, result: null, error: null,
         inputs: {}, takes: null, outputs: null, source: null, preset: null, told: null });
     }
 
     // "run with…": from a text (`input`), or from a program (`program`); 0.6
     // (U1c): `inputs` names what the opener knows ({f, said} for a settle).
-    async function thymRunOpen({ input = null, program = null, name = '', inputs = null } = {}) {
+    // U1d: `where` names the place of `program` when the opener knows it.
+    async function thymRunOpen({ input = null, program = null, name = '', inputs = null, where = null } = {}) {
       if (IS_HOME) return;
       if (THYM_PICK.open) thymPickClose();
       thymPickReset('run');
-      Object.assign(THYM_PICK, { input, program, programName: name || (program ? canonBase(program).replace(/\.thym$/i, '') : ''),
+      Object.assign(THYM_PICK, { input, program, where, programName: name || (program ? canonBase(program).replace(/\.thym$/i, '') : ''),
         fixed: !!program, preset: cosmIsMap(inputs) ? Object.assign({}, inputs) : null });
       thymPickSkeleton();
       thymPickOpenModal();
@@ -35900,7 +35951,7 @@
         if (first) first.focus({ preventScroll: true });
       } else {
         const chosen = THYM_PICK.program;
-        await thymProgramChosen(chosen, THYM_PICK.programName);
+        await thymProgramChosen(chosen, THYM_PICK.programName, THYM_PICK.where);
         if (!THYM_PICK.open || THYM_PICK.program !== chosen) return;
         const want = thymEl('thym-inputs')?.querySelector('input:not([disabled])');
         if (want) want.focus({ preventScroll: true });
@@ -36050,8 +36101,9 @@
         meta = bits.join(' · ');
       }
       return '<label class="thym-opt' + (p.problem ? ' problem' : '') + '"><input type="radio" name="thym-opt" value="'
-        + cosmEsc(ref) + '" data-name="' + cosmEsc(String(p.name || ref)) + '"' + (p.problem ? ' disabled' : '')
-        + (ref === P.program ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">'
+        + cosmEsc(ref) + '" data-name="' + cosmEsc(String(p.name || ref)) + '"'
+        + (p.where ? ' data-where="' + cosmEsc(String(p.where)) + '"' : '') + (p.problem ? ' disabled' : '')
+        + (ref === P.program && (!P.where || !p.where || p.where === P.where) ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">'
         + cosmEsc(String(p.name || canonBase(ref))) + '</span><span class="thym-where">' + cosmEsc(where) + '</span></span>'
         + (p.problem ? '<span class="thym-opt-problem">' + cosmEsc(String(p.problem)) + '</span>'
           : '<span class="thym-opt-meta">' + cosmEsc(meta) + '</span>'
@@ -36068,6 +36120,7 @@
       P.plan = { loading: true };
       thymPickPaint();
       const body = { program: P.program, inputs: thymInputsBody() };
+      if (P.where) body.where = P.where;
       if (window.__fabReady) fabRouteBody('thym', body);
       const r = await canonPost('/api/thym/plan', body);
       if (seq !== P.seq) return;
@@ -36089,7 +36142,7 @@
       }
       if (!pl || pl.loading) { el.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.pick.planning', 'planning…')) + '</p>'; return; }
       if (pl.error) { el.innerHTML = '<p class="' + (pl.missing ? 'thym-unavail' : 'thym-refusal') + '">' + cosmEsc(pl.error) + '</p>'; return; }
-      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: thymProgramWhere(P.program) });
+      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: P.where || thymProgramWhere(P.program) });
     }
 
     // 0.6 (U1c): a plan a person can read before it runs (THYM.md 11, 12,
@@ -36129,6 +36182,13 @@
           + ins.map((i) => {
             let li = '<li><code>' + cosmEsc(String(i.name || '')) + '</code> ' + cosmEsc(String(i.rel || '')) + ' <span class="thym-meta-i">'
               + cosmEsc(String(i.accepts || i.type || '')) + '</span>';
+            // 0.6 (U1d): a list input says its members, in the order it reads them.
+            const mem = Array.isArray(i.members) ? i.members.filter(cosmIsMap) : [];
+            if (mem.length) {
+              li += '<span class="thym-plan-sub">' + cosmEsc((mem.length === 1 ? t('thym.plan.membersOne', 'one member')
+                : t('thym.plan.members', '{n} members, read in this order')).replace('{n}', String(mem.length))) + '</span>'
+                + '<ol class="thym-plan-members">' + mem.map((m) => '<li class="thym-plan-path">' + cosmEsc(String(m.rel || m.path || '')) + '</li>').join('') + '</ol>';
+            }
             if (i.type === 'folder') {
               li += '<span class="thym-plan-sub">' + cosmEsc(t('thym.plan.folder', '{files} files, {bytes} bytes, read as they are when the run starts: the plan holds the folder’s digest, and a change after planning refuses the run')
                 .replace('{files}', String(i.files == null ? '?' : i.files)).replace('{bytes}', String(i.bytes == null ? '?' : i.bytes))) + '</span>';
@@ -36138,10 +36198,23 @@
       }
       const outs = Array.isArray(pl.outputs) ? pl.outputs.filter(cosmIsMap) : [];
       if (outs.length) {
-        const first = ins.length ? String(ins[0].rel || '') : '';
+        // 0.6 (U1d): where each output lands is the plan's own `writes`
+        // (S4 3: the run's naming, its extension included); the page never
+        // works a name out for itself. A list input's outputs land beside
+        // its first member.
+        const in0 = ins[0];
+        const m0 = in0 && Array.isArray(in0.members) && cosmIsMap(in0.members[0]) ? in0.members[0] : null;
+        const writes = Array.isArray(pl.writes) ? pl.writes.filter(cosmIsMap) : [];
+        const landsAt = (o) => {
+          const w = writes.find((x) => x.name === o.name);
+          if (!w || !w.rel) return '';
+          const rel = String(w.rel) + (o.type === 'folder' && !/\/$/.test(String(w.rel)) ? '/' : '');
+          return w.folder ? rel + ', ' + String(w.folder).replace(/\/?$/, '/') : rel;
+        };
+        const first = writes.some((w) => w.rel) && in0 ? String(in0.rel || (m0 && (m0.rel || m0.path)) || '') : '';
         h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.plan.writes', 'what it will write')) + '</div><ul class="thym-plan-io">'
-          + outs.map((o) => '<li><code>' + cosmEsc(String(o.name || '')) + '</code> <span class="thym-meta-i">' + cosmEsc(String(o.type || ''))
-            + '</span>' + (first ? ' → <span class="thym-plan-path">' + cosmEsc(thymLandsAs(first, o)) + '</span>' : '') + '</li>').join('')
+          + outs.map((o) => { const at = landsAt(o); return '<li><code>' + cosmEsc(String(o.name || '')) + '</code> <span class="thym-meta-i">' + cosmEsc(String(o.type || ''))
+            + '</span>' + (at ? ' → <span class="thym-plan-path">' + cosmEsc(at) + '</span>' : '') + '</li>'; }).join('')
           + '</ul><p class="thym-meta">' + cosmEsc(first
             ? (outs.length > 1 ? t('thym.plan.landAll', 'beside {first}, all of them at once or none; the run’s record (its trace) is kept with enough’s runs')
               : t('thym.plan.landOne', 'beside {first}; the run’s record (its trace) is kept with enough’s runs')).replace('{first}', () => first)
@@ -36187,32 +36260,6 @@
           + '" data-line="' + cosmEsc(String(line)) + '">' + cosmEsc(t('thym.ed.editAt', 'edit it at line {n}').replace('{n}', String(line))) + '</button></div>';
       }
       return h;
-    }
-
-    // Where an output lands beside the first input (thym_api.land_beside):
-    // `<stem>.<output>.<ext>`, a folder as `<stem>.<output>/`, a package as
-    // `<stem>.package.cosm` with its folder `<stem>.thym/`. The extension is
-    // the value's, known when it lands.
-    function thymLandsAs(first, o) {
-      const i = first.lastIndexOf('/');
-      const dir = i === -1 ? '' : first.slice(0, i + 1);
-      let name = first.slice(i + 1).replace(/\/$/, '');
-      let stem;
-      const pkg = /^(.+?)(\.package\.cosm|\.thym\.enc|\.thym)$/i.exec(name);
-      if (pkg) stem = pkg[1];
-      else {
-        const twin = /^(.+?)\.(?:[^.]+\.)?fabula[npc]?(?:\.answers-[^.]+)?\.cosm$/i.exec(name);
-        if (twin) stem = twin[1];
-        else {
-          if (/\.cosm$/i.test(name) && name.length > 5) name = name.slice(0, -5);
-          const dot = name.lastIndexOf('.');
-          stem = dot > 0 ? name.slice(0, dot) : name;
-        }
-      }
-      const out = String(o.name || '');
-      if (o.type === 'folder') return dir + stem + '.' + out + '/';
-      if (o.type === 'package') return dir + stem + '.package.cosm, ' + dir + stem + '.thym/';
-      return dir + stem + '.' + out + '.…';
     }
 
     function thymCanGo() {
@@ -36290,6 +36337,7 @@
       P.error = null;
       if (P.face === 'run') {
         const body = { program: P.program, inputs: thymInputsBody() };
+        if (P.where) body.where = P.where;
         if (P.plan && (P.plan.mode === 'rules' || P.plan.mode === 'model')) body.mode = P.plan.mode;
         if (window.__fabReady) fabRouteBody('thym', body);
         const seq = P.seq;
@@ -36298,7 +36346,8 @@
         const r = await canonPost('/api/thym/run', body);
         if (seq !== P.seq) return;
         if (!r.ok || !r.data || !r.data.job) { P.job = null; P.error = thymErr(r); thymPickPaint(); return; }
-        const firstIn = (P.takes && P.takes[0] && P.inputs[P.takes[0].name]) || P.input || '';
+        const given = P.takes && P.takes[0] ? P.inputs[P.takes[0].name] : null;
+        const firstIn = (Array.isArray(given) ? given.find((x) => String(x || '').trim()) : given) || P.input || '';
         const label = (P.programName || canonBase(P.program)) + ' · ' + canonBase(firstIn);
         P.job = r.data.job.id;
         canonTrack(r.data.job, { want: 'thym', label, writes: false });
@@ -36395,7 +36444,7 @@
       const r = e.target.closest('input[name="thym-opt"]');
       if (r) {
         if (P.face === 'run') {
-          void thymProgramChosen(r.value, r.dataset.name || canonBase(r.value));
+          void thymProgramChosen(r.value, r.dataset.name || canonBase(r.value), r.dataset.where || null);
         } else {
           P.morph = r.value;
           thymFootPaint();
@@ -36403,13 +36452,23 @@
         return;
       }
       const inp = e.target.closest('input[data-take]');
-      if (inp) thymInputSet(inp.dataset.take, inp.value);
+      if (inp) thymInputFrom(inp);
     });
+    // A field of the inputs: a single input, or one member of a list.
+    function thymInputFrom(inp) {
+      if (inp.dataset.member != null) thymMemberSet(inp.dataset.take, Number(inp.dataset.member), inp.value);
+      else thymInputSet(inp.dataset.take, inp.value);
+    }
     // 0.6 (U1c): what a landed run made opens by its name; a refusal's
     // statement opens in the editor at its line.
     thymEl('thym-body').addEventListener('click', (e) => {
       const o = e.target.closest('[data-topen]');
       if (o) { e.preventDefault(); thymOpenOutput(o.dataset.topen, o.dataset.tkind || ''); return; }
+      // 0.6 (U1d): a list input's members, added and removed.
+      const add = e.target.closest('[data-tin-add]');
+      if (add) { e.preventDefault(); thymMemberAdd(add.dataset.tinAdd); return; }
+      const rm = e.target.closest('[data-tin-remove]');
+      if (rm) { e.preventDefault(); thymMemberRemove(rm.dataset.tinRemove, Number(rm.dataset.member)); return; }
       const a = e.target.closest('[data-tact]');
       if (a) { e.preventDefault(); thymAct(a, null); }
     });
@@ -36436,7 +36495,7 @@
       const inp = e.target.closest && e.target.closest('input[data-take]');
       if (e.key === 'Enter' && inp) {
         e.preventDefault();
-        thymInputSet(inp.dataset.take, inp.value);
+        thymInputFrom(inp);
       }
     });
     // The switch flipped while the card is open: what it offers changes.
@@ -36910,7 +36969,7 @@
     // The run card takes every input by its type; the editor checks a
     // program as the person pauses (POST /api/thym/compile, the compiler's
     // own words, never a model, never a run); the reference lists the moves
-    // (GET /api/thym/moves, when the server has it) and the shipped
+    // (GET /api/thym/moves, the compiler's own declarations) and the shipped
     // programs, any of which is copied into the project to be changed.
 
     // ---- the inputs of a run, each by its type ----
@@ -36999,19 +37058,37 @@
     }
 
     function thymIsList(type) { return /^list\b/i.test(String(type || '')); }
+    // 0.6 (U1d): what each member of a `list of T` input is (T).
+    function thymMemberType(type) { return String(type || '').replace(/^list\s+of\s+/i, '').trim(); }
+    // A list input's members as given so far (blank fields kept while being typed).
+    function thymMembers(name) {
+      const v = THYM_PICK.inputs[name];
+      return Array.isArray(v) ? v.map((x) => String(x == null ? '' : x)) : (v ? [String(v)] : []);
+    }
+    function thymMembersGiven(name) { return thymMembers(name).map((x) => x.trim()).filter(Boolean); }
 
     // A program was chosen: what it takes and gives, its source, the inputs
     // it had last time (or what the card was opened on), then its plan.
-    async function thymProgramChosen(ref, name) {
+    // U1d: `where` (shipped, project, canon) is sent wherever the program is
+    // named, so a shipped program and a project file of the same name are
+    // never taken for each other; when the opener did not say, the program
+    // list's row that the server would find first says it.
+    async function thymProgramChosen(ref, name, where = null) {
       const P = THYM_PICK;
-      Object.assign(P, { program: ref, programName: name || canonBase(ref).replace(/\.thym$/i, ''), result: null, told: null,
+      const rows = Array.isArray(P.programs) ? P.programs : [];
+      const rank = { project: 0, canon: 1, shipped: 2 };
+      const named = rows.filter((p) => p && (p.rel === ref || p.name === ref))
+        .sort((a, b) => (rank[a.where] ?? 1) - (rank[b.where] ?? 1));
+      let row = (where && named.find((p) => p.where === where)) || named[0] || null;
+      Object.assign(P, { program: ref, where: where || (row && row.where) || null,
+        programName: name || canonBase(ref).replace(/\.thym$/i, ''), result: null, told: null,
         plan: null, takes: null, outputs: null, source: null, inputs: {} });
       const seq = ++P.seq;
       thymPickPaint();
-      const rows = Array.isArray(P.programs) ? P.programs : [];
-      let row = rows.find((p) => p && (p.rel === ref || p.name === ref));
       if (!row || !Array.isArray(row.takes)) {
-        const r = await canonPost('/api/thym/compile', { path: ref });
+        const body = { path: ref };
+        if (P.where) body.where = P.where;
+        const r = await canonPost('/api/thym/compile', body);
         if (seq !== P.seq) return;
         row = r.ok && r.data ? { takes: r.data.takes, outputs: r.data.outputs, problem: r.data.ok ? null
           : (r.data.refusal && r.data.refusal.message) } : { takes: null, problem: thymErr(r) };
@@ -37021,69 +37098,181 @@
       // What the person gave it before, where it is still there; then what
       // the opener named; then the text the card was opened on, in the
       // first input that takes it (and a fabula input takes that text's twin).
+      // A list input keeps its members in the order they were given.
       const T = thymTreePaths();
       const there = (p) => { const q = String(p || '').replace(/\/$/, ''); return T.files.includes(q) || T.dirs.includes(q) || T.twins.includes(q); };
-      const was = thymInRemembered(ref);
+      const was = thymInRemembered(thymInKey(ref, P.where));
       for (const tk of P.takes) {
-        if (was[tk.name] && there(was[tk.name])) P.inputs[tk.name] = was[tk.name];
+        const v = was[tk.name];
+        if (thymIsList(tk.type)) {
+          const kept = (Array.isArray(v) ? v : (v ? [v] : [])).map(String).filter(there);
+          if (kept.length) P.inputs[tk.name] = kept;
+        } else if (typeof v === 'string' && there(v)) P.inputs[tk.name] = v;
       }
-      if (P.preset) for (const [k, v] of Object.entries(P.preset)) if (P.takes.some((x) => x.name === k)) P.inputs[k] = String(v);
+      if (P.preset) {
+        for (const [k, v] of Object.entries(P.preset)) {
+          const tk = P.takes.find((x) => x.name === k);
+          if (!tk) continue;
+          if (thymIsList(tk.type)) P.inputs[k] = (Array.isArray(v) ? v : [v]).map(String);
+          else P.inputs[k] = String(Array.isArray(v) ? (v[0] ?? '') : v);
+        }
+      }
       if (P.input) {
-        const tk = P.takes.find((x) => thymFits(P.input, x.type) && !(P.preset && P.preset[x.name]));
-        if (tk) P.inputs[tk.name] = thymFits(P.input, 'folder') && !/\/$/.test(P.input) ? P.input + '/' : P.input;
+        const fits = (x) => thymFits(P.input, thymIsList(x.type) ? thymMemberType(x.type) : x.type);
+        const tk = P.takes.find((x) => fits(x) && !(P.preset && P.preset[x.name]));
+        if (tk) {
+          const v = thymFits(P.input, 'folder') && !/\/$/.test(P.input) ? P.input + '/' : P.input;
+          if (thymIsList(tk.type)) {
+            const had = thymMembersGiven(tk.name).filter((x) => x !== v);
+            P.inputs[tk.name] = [v].concat(had);
+          } else P.inputs[tk.name] = v;
+        }
         const li = document.querySelector('#tree li.file[data-path="' + CSS.escape(String(P.input)) + '"]');
         const fab = P.takes.find((x) => x.type === 'fabula' && !P.inputs[x.name]);
         if (fab && li && li.dataset.emf) P.inputs[fab.name] = li.dataset.emf;
       }
       thymPickPaint();
-      const src = await canonJSON('/api/thym/program?path=' + encodeURIComponent(ref));
+      const src = await canonJSON(thymProgramURL(ref, P.where));
       if (seq !== P.seq) return;
       P.source = src.ok && src.data && typeof src.data.source === 'string' ? src.data.source : null;
       void thymPlanLoad();
     }
 
+    // Remembered per program, and per place when it is not the project's.
+    function thymInKey(ref, where) { return (where && where !== 'project' ? where + ':' : '') + String(ref || ''); }
+
     function thymInputsMissing() {
       const P = THYM_PICK;
       if (!Array.isArray(P.takes)) return [];
-      return P.takes.filter((x) => !String(P.inputs[x.name] || '').trim()).map((x) => x.name);
+      return P.takes.filter((x) => (thymIsList(x.type) ? !thymMembersGiven(x.name).length
+        : !String(P.inputs[x.name] || '').trim())).map((x) => x.name);
     }
+    // Ready when every input is given; a list with at least one member.
     function thymInputsReady() {
       const P = THYM_PICK;
-      return Array.isArray(P.takes) && !P.takes.some((x) => thymIsList(x.type)) && !thymInputsMissing().length;
+      return Array.isArray(P.takes) && !thymInputsMissing().length;
     }
+    // `{name: path}`, and a list input as a JSON array of its members in order.
     function thymInputsBody() {
       const out = {};
-      for (const x of THYM_PICK.takes || []) out[x.name] = String(THYM_PICK.inputs[x.name] || '').trim().replace(/\/$/, '');
+      const clean = (v) => String(v || '').trim().replace(/\/$/, '');
+      for (const x of THYM_PICK.takes || []) {
+        out[x.name] = thymIsList(x.type) ? thymMembersGiven(x.name).map(clean) : clean(THYM_PICK.inputs[x.name]);
+      }
       return out;
+    }
+    function thymInRememberNow() {
+      const P = THYM_PICK;
+      if (!P.program) return;
+      const keep = {};
+      for (const [k, v] of Object.entries(P.inputs)) {
+        if (Array.isArray(v)) { const m = v.map((x) => String(x).trim()).filter(Boolean); if (m.length) keep[k] = m; }
+        else if (String(v || '').trim()) keep[k] = v;
+      }
+      thymInRemember(thymInKey(P.program, P.where), keep);
+    }
+    function thymInputsChanged() {
+      const P = THYM_PICK;
+      thymInRememberNow();
+      P.result = null;
+      P.told = null;
+      void thymPlanLoad();
     }
     function thymInputSet(name, value) {
       const P = THYM_PICK;
       const v = String(value || '').trim();
       if ((P.inputs[name] || '') === v) return;
       if (v) P.inputs[name] = v; else delete P.inputs[name];
-      if (P.program) thymInRemember(P.program, P.inputs);
-      P.result = null;
-      P.told = null;
-      void thymPlanLoad();
+      thymInputsChanged();
+    }
+    // One member of a list input typed or picked; the plan is asked again
+    // only when the members given changed.
+    function thymMemberSet(name, i, value) {
+      const P = THYM_PICK;
+      const before = JSON.stringify(thymMembersGiven(name));
+      const all = thymMembers(name);
+      while (all.length <= i) all.push('');
+      all[i] = String(value || '').trim();
+      P.inputs[name] = all;
+      if (JSON.stringify(thymMembersGiven(name)) !== before) thymInputsChanged();
+    }
+    // "add another": a new empty member at the end, focused.
+    function thymMemberAdd(name) {
+      const all = thymMembers(name);
+      if (!all.length) all.push('');
+      all.push('');
+      THYM_PICK.inputs[name] = all;
+      const at = thymListPaint(name);
+      const f = at && at.querySelectorAll('input[data-member]')[all.length - 1];
+      if (f) f.focus({ preventScroll: false });
+    }
+    // "remove": that member goes, the rest keep their order; focus stays in
+    // the list (the member now in its place, else the last one).
+    function thymMemberRemove(name, i) {
+      const P = THYM_PICK;
+      const before = JSON.stringify(thymMembersGiven(name));
+      const all = thymMembers(name);
+      all.splice(i, 1);
+      P.inputs[name] = all.length ? all : [''];
+      const at = thymListPaint(name);
+      const fs = at ? at.querySelectorAll('input[data-member]') : [];
+      const f = fs[Math.min(i, fs.length - 1)];
+      if (f) f.focus({ preventScroll: true });
+      if (JSON.stringify(thymMembersGiven(name)) !== before) thymInputsChanged();
+    }
+
+    // A list input's members, one field each, in order: each with what fits
+    // its member type offered, and a remove when there is more than one.
+    function thymListMembersHTML(x, id) {
+      const name = String(x.name);
+      const all = thymMembers(name);
+      const shown = all.length ? all : [''];
+      const many = shown.length > 1;
+      return shown.map((v, k) => '<li class="thym-in-member"><input type="text" id="' + id + '-' + k + '" data-take="' + cosmEsc(name)
+        + '" data-member="' + k + '" list="' + id + '-dl" spellcheck="false" autocomplete="off" aria-describedby="' + id + '-n"'
+        + ' aria-label="' + cosmEsc(t('thym.in.member.aria', '{name}, member {n}').replace('{name}', () => name).replace('{n}', String(k + 1)))
+        + '" value="' + cosmEsc(v) + '">'
+        + (many ? '<button type="button" class="thym-btn" data-tin-remove="' + cosmEsc(name) + '" data-member="' + k + '" aria-label="'
+          + cosmEsc(t('thym.in.remove.aria', 'remove member {n} of {name}').replace('{name}', () => name).replace('{n}', String(k + 1))) + '">'
+          + cosmEsc(t('thym.in.remove', 'remove')) + '</button>' : '')
+        + '</li>').join('');
+    }
+    // Repaint one list input's members (after add or remove); its box.
+    function thymListPaint(name) {
+      const P = THYM_PICK;
+      const i = (P.takes || []).findIndex((x) => x.name === name);
+      if (i === -1) return null;
+      const box = thymEl('thym-in-' + i + '-m');
+      if (!box) return null;
+      box.innerHTML = thymListMembersHTML(P.takes[i], 'thym-in-' + i);
+      return box;
     }
 
     // One row per input: its name, what it takes, a field with what fits
     // offered (a datalist, typed or picked), and for a folder what a run
     // reads of it. Rebuilt only when the program changes, so focus and what
-    // is being typed survive a repaint.
+    // is being typed survive a repaint. U1d: a `list of …` input is a group
+    // of member fields in the program's order, with "add another".
     function thymInputsPaint() {
       const P = THYM_PICK;
       const box = thymEl('thym-inputs');
       const head = thymEl('thym-inputs-h');
       if (!box) return;
-      const key = String(P.program || '') + '|' + JSON.stringify(P.takes);
+      const key = String(P.where || '') + '|' + String(P.program || '') + '|' + JSON.stringify(P.takes);
       const show = !!P.program;
       box.hidden = !show;
       if (head) head.hidden = !show;
       if (!show) { box.innerHTML = ''; box._key = null; return; }
       if (box._key === key) {
+        (P.takes || []).forEach((x) => {
+          if (!thymIsList(x.type)) return;
+          const m = box.querySelectorAll('input[data-take="' + CSS.escape(String(x.name)) + '"]');
+          const want = Math.max(1, thymMembers(x.name).length);
+          if (m.length !== want && !Array.from(m).includes(document.activeElement)) thymListPaint(x.name);
+        });
         box.querySelectorAll('input[data-take]').forEach((inp) => {
-          const v = P.inputs[inp.dataset.take] || '';
+          const v = inp.dataset.member != null ? (thymMembers(inp.dataset.take)[Number(inp.dataset.member)] || '')
+            : (P.inputs[inp.dataset.take] || '');
           if (document.activeElement !== inp && inp.value !== v) inp.value = v;
         });
         return;
@@ -37100,11 +37289,24 @@
       box.innerHTML = P.takes.map((x, i) => {
         const id = 'thym-in-' + i;
         const typ = String(x.type || '');
+        if (thymIsList(typ)) {
+          const cands = thymCandidates(thymMemberType(typ));
+          const name = String(x.name);
+          return '<div class="thym-in thym-in-list" role="group" aria-labelledby="' + id + '-h">'
+            + '<span class="thym-in-h" id="' + id + '-h"><code>' + cosmEsc(name) + '</code> <span class="thym-in-what">'
+            + cosmEsc(String(x.accepts || typ)) + '</span></span>'
+            + '<ol class="thym-in-members" id="' + id + '-m">' + thymListMembersHTML(x, id) + '</ol>'
+            + '<datalist id="' + id + '-dl">' + cands.map((c) => '<option value="' + cosmEsc(c.value) + '"'
+              + (c.label ? ' label="' + cosmEsc(c.label) + '"' : '') + '>').join('') + '</datalist>'
+            + '<div class="fab-row"><button type="button" class="thym-btn" data-tin-add="' + cosmEsc(name) + '" aria-label="'
+            + cosmEsc(t('thym.in.add.aria', 'add another member to {name}').replace('{name}', () => name)) + '">'
+            + cosmEsc(t('thym.in.add', 'add another')) + '</button></div>'
+            + '<span class="thym-in-note" id="' + id + '-n">' + cosmEsc((cands.length
+              ? t('thym.in.listPick', 'one or more, read in the order given here; type or pick: {n} in this project fit').replace('{n}', String(cands.length))
+              : t('thym.in.listNone', 'one or more, read in the order given here; nothing in this project fits yet'))) + '</span></div>';
+        }
         let h = '<div class="thym-in"><label for="' + id + '"><code>' + cosmEsc(String(x.name)) + '</code> <span class="thym-in-what">'
           + cosmEsc(String(x.accepts || typ)) + '</span></label>';
-        if (thymIsList(typ)) {
-          return h + '<p class="thym-note" id="' + id + '">' + cosmEsc(t('thym.in.list', 'a list cannot be given from here yet: each input takes one file or folder of the project')) + '</p></div>';
-        }
         const cands = thymCandidates(typ);
         h += '<input type="text" id="' + id + '" data-take="' + cosmEsc(String(x.name)) + '" list="' + id + '-dl" spellcheck="false" autocomplete="off"'
           + ' aria-describedby="' + id + '-n" value="' + cosmEsc(P.inputs[x.name] || '') + '" placeholder="'
@@ -37389,11 +37591,13 @@
 
     // ---- Thym at hand: the moves, and the programs to start from ----
     // `#thym-ref-modal`, two tabs. The moves come from GET /api/thym/moves
-    // ({version, moves: [{name, owner, format, since, versions, signature,
-    // takes, of, modifiers, gives, asks, scaffold, contract, says}]}, the
-    // shape of the `thym_moves` tool's listing; see docs/fabula-landed-U1c.md);
-    // a server without that route says so and points at the text's 6.3.
-    // The programs are GET /api/thym/programs' shipped rows.
+    // ({version, moves: [{name, owner, format, source, since, versions,
+    // signature, takes, of, modifiers, gives, asks, scaffold, contract, says,
+    // extended}]}, the `thym_moves` tool's listing in the text's order:
+    // docs/fabula-landed-S4.md 1); a reply that fails says its words and
+    // points at the text. `extended` is what another format adds to a move
+    // ([{owner, as: [kinds]}], U1d). The programs are GET /api/thym/programs'
+    // shipped rows.
     const THYM_REF = { open: false, tab: 'moves', version: 1, q: '', moves: new Map(), programs: null, seq: 0, copied: null };
     const THYM_REF_OWNERS = ['thym', 'fabula', 'doc', 'comprise', 'ascribe'];
 
@@ -37458,7 +37662,7 @@
         const r = await canonJSON('/api/thym/moves?version=' + R.version);
         if (seq !== R.seq) return;
         R.moves.set(R.version, r.ok && r.data && Array.isArray(r.data.moves) ? r.data.moves.filter(cosmIsMap)
-          : { error: thymErr(r), missing: thymMissing(r) || r.status === 404 });
+          : { error: thymErr(r) });
       } else if (R.tab === 'programs' && !Array.isArray(R.programs)) {
         const r = await canonJSON('/api/thym/programs');
         if (seq !== R.seq) return;
@@ -37482,14 +37686,14 @@
         return;
       }
       if (!Array.isArray(all)) {
-        list.innerHTML = '<p class="thym-unavail">' + cosmEsc(all.missing ? t('thym.ref.noRoute', 'this server does not list the moves yet: the text of Thym lists them in its section 6.3')
-          : all.error) + '</p><div class="fab-row"><button type="button" class="thym-btn" data-tref="spec">'
+        list.innerHTML = '<p class="thym-unavail">' + cosmEsc(all.error) + '</p><div class="fab-row"><button type="button" class="thym-btn" data-tref="spec">'
           + cosmEsc(t('thym.ref.spec', 'open the text of Thym')) + '</button></div>';
         if (count) count.textContent = '';
         return;
       }
       const q = R.q.trim().toLowerCase();
-      const hit = (m) => !q || [m.name, m.says, m.signature, m.owner, m.format, (m.contract || []).join(' '), m.scaffold]
+      const hit = (m) => !q || [m.name, m.says, m.signature, m.owner, m.format, (m.contract || []).join(' '), m.scaffold,
+        thymRefExtended(m).map((x) => x.owner + ' ' + x.call).join(' ')]
         .some((x) => String(x || '').toLowerCase().includes(q));
       const shown = all.filter(hit);
       if (count) {
@@ -37500,7 +37704,7 @@
       const owners = THYM_REF_OWNERS.concat(Array.from(new Set(shown.map((m) => String(m.owner || '')))).filter((o) => !THYM_REF_OWNERS.includes(o)));
       let h = '';
       for (const o of owners) {
-        const ms = shown.filter((m) => String(m.owner || '') === o).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        const ms = shown.filter((m) => String(m.owner || '') === o);      // the route's order: each manifest's own
         if (!ms.length) continue;
         const fmt = String(ms[0].format || (o + '/1'));
         h += '<section class="thym-ref-group"><h4><code>' + cosmEsc(fmt) + '</code> <span class="thym-meta-i">'
@@ -37519,6 +37723,19 @@
       return [m.name].concat(takes.length ? [takes.map(first).join(', ')] : []).join(' ');
     }
 
+    // A move's `extended` rows as calls: `[{owner, format, call: "project … as isograph"}]`.
+    function thymRefExtended(m) {
+      const rows = Array.isArray(m.extended) ? m.extended.filter(cosmIsMap) : [];
+      const all = THYM_REF.moves.get(THYM_REF.version);
+      return rows.map((x) => {
+        const owner = String(x.owner || '');
+        const fm = Array.isArray(all) ? all.find((y) => String(y.owner || '') === owner && y.format) : null;
+        const words = Object.entries(x).filter(([k, v]) => k !== 'owner' && Array.isArray(v) && v.length)
+          .map(([k, v]) => k + ' ' + v.map(String).join(' | '));
+        return { owner, format: String((fm && fm.format) || (owner + '/1')), call: [String(m.name), '…'].concat(words).join(' ') };
+      }).filter((x) => x.owner);
+    }
+
     function thymRefMoveHTML(m) {
       const vs = Array.isArray(m.versions) ? m.versions.map(Number) : (Number(m.since) >= 1 ? [1] : [0, 1]);
       const tags = [m.asks ? thymAsksBadge()
@@ -37530,6 +37747,12 @@
         + cosmEsc(String(m.name)) + '</code>' + tags.join('') + '</div>'
         + '<pre class="tref-sig">' + cosmEsc(String(m.signature || call)) + '</pre>';
       if (m.says) h += '<p class="tref-says">' + cosmEsc(String(m.says)) + '</p>';
+      // U1d: what a second format adds to the move's kinds (`project … as
+      // isograph`, Ascribe's), by the format that adds it.
+      for (const x of thymRefExtended(m)) {
+        h += '<p class="tref-ext">' + cosmEsc(t('thym.ref.extended', '{format} adds').replace('{format}', () => x.format))
+          + ' <code>' + cosmEsc(x.call) + '</code></p>';
+      }
       const meta = [];
       meta.push(contract.length ? t('thym.ref.keeps', 'its contract: {checks}').replace('{checks}', () => contract.join(', '))
         : t('thym.ref.noContract', 'no contract'));
@@ -37601,9 +37824,11 @@
     // taken (a folder, so that its path never reads as a shipped file's bare
     // name; a run by the program's name finds the project's first); then it
     // opens in the editor, saying where it came from.
-    async function thymCopyProgram(ref) {
+    // U1d: `where` says which program is copied when a shipped one and a
+    // project file share its name (S4 4); the copy still goes to `programs/`.
+    async function thymCopyProgram(ref, where = null) {
       if (IS_HOME || !ref) return;
-      const src = await canonJSON('/api/thym/program?path=' + encodeURIComponent(ref));
+      const src = await canonJSON(thymProgramURL(ref, where));
       const fail = (msg) => {
         THYM_REF.copied = { ref, error: msg };
         if (THYM_REF.open) thymRefPaint(); else alert(msg);
@@ -37631,7 +37856,8 @@
 
     function thymProgramWhere(ref) {
       const rows = Array.isArray(THYM_PICK.programs) ? THYM_PICK.programs : [];
-      const row = rows.find((p) => p && p.rel === ref);
+      const rank = { project: 0, canon: 1, shipped: 2 };
+      const row = rows.filter((p) => p && p.rel === ref).sort((a, b) => (rank[a.where] ?? 1) - (rank[b.where] ?? 1))[0];
       if (row) return row.where;
       return document.querySelector('#tree li.file[data-path="' + CSS.escape(String(ref || '')) + '"]') ? 'project' : null;
     }
@@ -37641,8 +37867,8 @@
       let b;
       if ((b = c('[data-tref-tab]'))) { thymRefTab(b.dataset.trefTab); return; }
       if ((b = c('[data-tref-put]'))) { thymRefPut(b.dataset.trefPut); return; }
-      if ((b = c('[data-tref-read]'))) { const p = b.dataset.trefRead; thymRefClose(); void enterProgramDoc(p); return; }
-      if ((b = c('[data-tref-copy]'))) { void thymCopyProgram(b.dataset.trefCopy); return; }
+      if ((b = c('[data-tref-read]'))) { const p = b.dataset.trefRead; thymRefClose(); void enterProgramDoc(p, { where: 'shipped' }); return; }
+      if ((b = c('[data-tref-copy]'))) { void thymCopyProgram(b.dataset.trefCopy, 'shipped'); return; }
       if ((b = c('[data-tref="spec"]'))) { thymRefClose(); void enterDocsMode({ doc: 'thym' }); return; }
       if (c('#thym-ref-close')) thymRefClose();
     });
@@ -38850,7 +39076,10 @@
       const sp = cosmIsMap(cd.span) ? (cd.span.lines != null ? cd.span.lines : null)
         : (Array.isArray(cd.span) ? cd.span.join('-') : cd.span);
       if (sp != null && String(sp).trim()) {
-        bits.push(/^\s*\d+\s*$/.test(String(sp)) ? t('cosm.span.one', 'line {n}').replace('{n}', String(sp).trim())
+        // U1d: one line is said in the singular in every language ("3",
+        // "3-3" and [3, 3] alike), a span of several in the plural.
+        const one = /^\s*(\d+)\s*(?:[-–]\s*(\d+)\s*)?$/.exec(String(sp));
+        bits.push(one && (one[2] == null || one[2] === one[1]) ? t('dlg.cand.span.one', 'line {span}').replace('{span}', () => one[1])
           : t('dlg.cand.span', 'lines {span}').replace('{span}', () => String(sp)));
       }
       if (typeof cd.confidence === 'number') bits.push(t('dlg.cand.sure', '{pct} % sure').replace('{pct}', String(Math.round(cd.confidence * 100))));
@@ -39415,7 +39644,7 @@
         const f = DLG.data && DLG.data.path;
         const said = b.dataset.dlgPath;
         dlgClose();
-        void thymRunOpen({ program: 'settle.thym', inputs: { f, said } });
+        void thymRunOpen({ program: 'settle.thym', where: 'shipped', inputs: { f, said } });
         return;
       }
       if (act === 'again') { void dlgAgain(b.dataset.dlgKey); return; }

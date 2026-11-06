@@ -234,6 +234,22 @@ program two-outs
 end
 """
 THYM_REPO = "little-repo"
+# A list as an input (0.6, U1d): the suite's join-the-notes (`takes notes: list of short`), copied beside the
+# orchard notes; and a project program named as a shipped one is (`open-house.thym` at the project's top, a
+# program of its own that takes a short), so a run card lists both and `where` tells them apart.
+THYM_LIST = "join-the-notes.thym"
+THYM_SAME = "open-house.thym"
+FIXTURE_SAME = """thym 0
+
+program open-house
+  why: the project's own open-house, named as the shipped one is: the words of a short, counted by rule.
+
+  takes s: short
+  gives n: number
+
+  give words s
+end
+"""
 FIXTURE_REPO = {"tool.py": "def tool():\n    return 1\n", "lib/util.py": "X = 2\n", "README.md": "# little repo\n"}
 THYM_LONG = "long-lines.md"
 FIXTURE_LONG = ("A short line.\n\nThis line runs on for far longer than thirty words, so that the shipped tighten "
@@ -558,6 +574,8 @@ def _seed_thym(orchard: Path) -> None:
     shutil.copyfile(THYM_FIXTURES / "replay" / "tighten" / THYM_TRIES_RUN / f"{THYM_TRIES_RUN}.trace.cosm",
                     orchard / f"{THYM_TRIES_RUN}.trace.cosm")
     (orchard / THYM_TWO).write_text(FIXTURE_TWO, encoding="utf-8")
+    shutil.copyfile(THYM_FIXTURES / "programs" / THYM_LIST, orchard / THYM_LIST)
+    (orchard.parent / THYM_SAME).write_text(FIXTURE_SAME, encoding="utf-8")
     (orchard / THYM_LONG).write_text(FIXTURE_LONG, encoding="utf-8")
     for rel, text in FIXTURE_REPO.items():
         f = orchard / THYM_REPO / rel
@@ -565,30 +583,6 @@ def _seed_thym(orchard: Path) -> None:
         f.write_text(text, encoding="utf-8")
     shutil.copyfile(THYM_REPLAY / "outputs" / "notes.thym" / "morph.cosm", orchard / THYM_MORPH)
     _seed_sealed(orchard)
-
-
-def thym_moves_payload(version: int) -> dict[str, Any]:
-    """What `GET /api/thym/moves?version=<0|1>` answers (docs/fabula-landed-U1c.md: the route the page codes
-    against and the server does not have yet): every move a program of that grammar may call, from the
-    declarations a compile reads (the bundled manifests), in the shape of the `thym_moves` tool's lines. The
-    moves reference in the page reads this; the check hands it to the page when the server cannot."""
-    from enough import thym_tools as _tt
-    from enough.thym import declarations as _decls
-    full = _decls.load()
-    seen = full.view(version)
-    views = {v: full.view(v) for v in (0, 1)}
-    moves = []
-    for name in sorted(seen):
-        d = seen[name]
-        mods = {k: list(v) for k, v in dict(d.modifiers or {}).items()}
-        of = mods.pop("of", None) if not d.takes else None
-        moves.append({"name": name, "owner": d.owner, "format": f"{d.owner}/1",
-                      "source": Path(d.source).name if d.source else None, "since": d.since,
-                      "versions": [v for v in (0, 1) if name in views[v]],
-                      "signature": _tt.move_signature(d), "takes": [list(t) for t in d.takes], "of": of,
-                      "modifiers": mods, "gives": list(d.gives), "asks": bool(d.asks), "scaffold": d.scaffold,
-                      "contract": list(d.contract), "says": " ".join(str(d.says or "").split())})
-    return {"version": version, "moves": moves}
 
 
 def _seed_sealed(orchard: Path) -> None:

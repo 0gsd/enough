@@ -292,6 +292,24 @@ def test_the_thym_round_has_its_screens_and_scenarios():
     assert screens.THYM_READING.endswith(server.THYM_READING)
 
 
+def test_the_last_page_lane_has_its_screens_scenarios_and_seeds():
+    """0.6 (U1d): a list as an input, the moves from the server and a shipped program beside a project file of
+    its name each have their screens and scenarios; the seeds name what they open; the moves have no stand-in, so
+    the check measures the server's own route."""
+    from uicheck import server
+    from uicheck.interactions import SCENARIOS
+
+    names = {s.name for s in screens.ALL_SCREENS if s.mode == "project"}
+    assert {"thym-run-list", "thym-run-same-name", "thym-moves"} <= names
+    assert {"thym-run-list", "thym-moves-route", "thym-same-name"} <= set(SCENARIOS)
+    assert (server.THYM_FIXTURES / "programs" / server.THYM_LIST).is_file()
+    assert screens.THYM_LIST == f"{server.EMF_DIR}/{server.THYM_LIST}"
+    assert screens.THYM_HARVEST == f"{server.EMF_DIR}/{server.HARVEST}"
+    assert screens.THYM_SAME == server.THYM_SAME
+    assert (server.REPO / "defaults" / "thym" / server.THYM_SAME).is_file(), "the project's file must share a shipped program's name"
+    assert not hasattr(server, "thym_moves_payload") and not hasattr(screens, "thym_moves_stub_js")
+
+
 def test_the_package_cards_have_their_screens_scenario_and_sealed_seed(tmp_path):
     """0.5.0 (U2): the package card, its key shown once and the unpack card
     each have a screen, the round trip has its scenario, and the seed puts a

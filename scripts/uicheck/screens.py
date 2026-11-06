@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from typing import Any
 
 # The fixture file names seeded by server.seed_project().
 DOC = "notes.md"
@@ -82,6 +83,11 @@ THYM_TWO = "orchard/two-outs.thym"               # thym 1: a folder and a short 
 THYM_REPO = "orchard/little-repo/"
 THYM_LONG = "orchard/long-lines.md"              # a short with a line `tighten` (shipped, asks a model) would reword
 THYM_TRIES = "orchard/2026-11-05-1956-ae6e.trace.cosm"
+# A list as an input, and a shipped program with a project file of its name (0.6, U1d): seeded by
+# server._seed_thym() / seed_project().
+THYM_LIST = "orchard/join-the-notes.thym"        # thym 1: takes notes: list of short, gives all and sizes
+THYM_HARVEST = "orchard/harvest.md"              # a short, the list's second member
+THYM_SAME = "open-house.thym"                    # the project's own, beside the shipped open-house of that name
 # The fabula round (0.6, U1a), seeded by server._seed_fabula() in works/: a
 # Python tool with its finished fabulac, the cshort and the catem it compiled
 # into, a folder of Python with no fabulac yet, a poem with no twin and a
@@ -279,21 +285,6 @@ THYM_UNPACK_READY: Step = ("eval_await", """(async () => {
 THYM_PACK_CLOSE: Step = ("eval", "(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
 
 
-def thym_moves_stub_js() -> str:
-    """JS that hands the page `GET /api/thym/moves`' answer when the server has no such route yet (U1c asked for
-    it): the same shape, built by the harness from the declarations a compile reads (server.thym_moves_payload).
-    When the route answers, nothing is stubbed and the page reads the server."""
-    from . import server as _server
-    payload = json.dumps({str(v): _server.thym_moves_payload(v) for v in (0, 1)})
-    return ("(async () => { try { const r = await fetch('/api/thym/moves?version=1'); if (r.ok) return true; } catch (e) {}"
-            " if (window.__thymMovesStub) return true; const data = " + payload + ";"
-            " const real = window.fetch; window.__thymMovesStub = true;"
-            " window.fetch = (u, o) => { const m = /^\\/api\\/thym\\/moves\\?version=(\\d)/.exec(String(u));"
-            " if (m && data[m[1]]) return Promise.resolve(new Response(JSON.stringify(data[m[1]]),"
-            " {status: 200, headers: {'Content-Type': 'application/json'}})); return real(u, o); };"
-            " return true; })()")
-
-
 def _thym_edit(path: str, size: str = "full") -> Step:
     """A program open in the editor, its check strip drawn (clean or refused)."""
     root = "#thym-ed" if size == "full" else "#thym-ed-mini"
@@ -315,10 +306,13 @@ THYM_PLAN_READY: Step = ("eval_await", """(async () => {
   return true; })()""")
 
 
-def _thym_run_on(program: str, inputs: dict[str, str] | None = None, text: str | None = None) -> Step:
-    """"run with…" opened from a program, its inputs given (as the dialectic card gives them), planned."""
-    return ("eval_await", "(async () => { await thymRunOpen({program: %s, inputs: %s, input: %s});"
-                          " return true; })()" % (json.dumps(program), json.dumps(inputs), json.dumps(text)))
+def _thym_run_on(program: str, inputs: dict[str, Any] | None = None, text: str | None = None,
+                 where: str | None = None) -> Step:
+    """"run with…" opened from a program, its inputs given (as the dialectic card gives them; a list input as a
+    list of paths), planned; `where` names the program's place (shipped, project) as the program page does."""
+    return ("eval_await", "(async () => { await thymRunOpen({program: %s, inputs: %s, input: %s, where: %s});"
+                          " return true; })()" % (json.dumps(program), json.dumps(inputs), json.dumps(text),
+                                                  json.dumps(where)))
 
 
 THYM_REF_CLOSE: Step = ("eval", "(() => { try { thymRefClose(); } catch (e) {} return true; })()")
@@ -1191,7 +1185,7 @@ PROJECT_SCREENS: list[Screen] = [
                 "version line, what it takes and gives, its steps"),
 
     Screen("thym-moves", "project",
-           setup=(("eval_await", thym_moves_stub_js()), _thym_edit(THYM_TWO), ("wait_for", "#thym-ed.clean"),
+           setup=(_thym_edit(THYM_TWO), ("wait_for", "#thym-ed.clean"),
                   ("eval", "(() => { thymRefOpen('moves'); return true; })()"),
                   ("wait_for", "#thym-ref-modal:not(.hidden) article.tref-move"), ("wait_idle", "")),
            teardown=(THYM_REF_CLOSE, THYM_EDIT_CLEAN) + EXIT_ALL_MODES,
@@ -1214,6 +1208,23 @@ PROJECT_SCREENS: list[Screen] = [
                 "it takes and what a folder's run reads, the plan's steps at their lines with the loop said "
                 "with its passes, what it reads (the folder's files and bytes) and what it will write, two "
                 "outputs, beside the folder"),
+
+    Screen("thym-run-list", "project",
+           setup=(_thym_run_on(THYM_LIST, {"notes": [THYM_LONG, THYM_HARVEST]}),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY, ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="run with… a program that takes a list of shorts, two members given: a field per member in "
+                "the program's order, each with remove, add another, the note; the plan's loop at most two "
+                "passes, what it reads with the two members in order, what it will write with each output's "
+                "path as the plan names it (extension included)"),
+
+    Screen("thym-run-same-name", "project",
+           setup=(_thym_run_on(THYM_SAME, {"h": HOLOTYPE}, None, "shipped"),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY, ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="the shipped open-house chosen where the project has an open-house.thym of its own: run with… "
+                "reads, plans and asks for the inputs of the shipped one (a Holotype volume, given), not the "
+                "project file's (a short)"),
 
     Screen("thym-run-asks", "project",
            setup=(_thym_run_on("tighten.thym", None, THYM_LONG),
