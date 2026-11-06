@@ -1966,7 +1966,7 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `R:phase` | `began`, `ended` *date*; `changes` *refs* `R:change` |
 | `R:release` | `version`; `at` *date*; `tag`; `venue` *text*, where it appeared; `changes` *refs* `R:change` |
 | `R:means` | `what` *text*; `used-for` *text*; `version` |
-| `R:licence` | `identifier`, the licence's standard short identifier (`MIT`) or plain words (`public domain`); `file`, a path; `holder`; `year`; `first-line` |
+| `R:licence` | `identifier`, the licence's standard short identifier (`MIT`) or plain words (`public domain`); `file`, a path; `holder`; `year` *text*, as the source writes it (`'1794'`); `first-line` |
 | `P:reading` | **`of`** *refs* (the `C:line`, `L:term`, E item, `C:part` or `P:claim` it reads); **`whose`** `{by: [author expert critic model reader], name, work, session, model}`; `grounds`, a list of `{of, because}`, what in the text supports it; `intended` *bool*, whether the author meant it, absent until asked (section 18.4.6) |
 | `P:case` | **`of`** *refs* (`C:interface`, `C:behaviour`, `N:requirement`, `N:use`); **`given`**, a mapping of `calls`, `arguments`, `input`, `env`, `file`, `files`; **`expect`**, a mapping of `value`, `output`, `error-output`, `exit`, `files`, `raises` |
 
@@ -2121,6 +2121,10 @@ order given, a compile tells `told` when the fabula names a source text that can
 fabula. Without a model a short is the ordered outline itself, said in the items' own sentences; with one, a model
 writes the outline as prose and is told which order it is in. A third order, the events first in the order they
 happened, is reserved for a later edition.
+
+A short of a fabulap (section 18.4.6) is told stanza by stanza: how the poem is built, then each stanza's lines with
+their stresses and rhymes (their words only where the fabulap holds them), its devices and its readings, each reading
+said as whose it is. Told by weight, it ends with how the poem can be read.
 
 **The file.** A short is written beside its text as `<text-stem>.short-<YYYY-MM-DD-HHMM>.md`, in local time:
 `notes.md` gives `notes.short-2026-10-23-1042.md`. The stem is the text's, whatever the twin is called: the twins
@@ -2445,7 +2449,8 @@ counted over the whole poem, its stanza, its stresses and its place in the rhyme
 items, `C:metre` and `C:rhyme`, each naming the lines it governs and, for a metre, where a line departs from it. Its
 devices, its voice and its divisions are the prose kinds `C:device`, `C:voice` and `C:part`, with stanzas, verses,
 choruses, refrains and bridges among the divisions. Its occasions and allusions are I items; the book or the album it
-appeared in is an `R:release`.
+appeared in is an `R:release`. Rhymes are compared within a stanza, and the scheme's letters run on from one stanza to
+the next: a sound that comes back in a later stanza takes a new letter there, and a second `C:rhyme`.
 
 **Several readings stand side by side.** A poem often means more than one thing at once, and a fabulap does not choose.
 Each interpretation is a `P:reading` whose `of` names what it reads: the line, the word, the image. Readings of the
@@ -2472,9 +2477,11 @@ a question is answered, its field stays pending and the readings stay side by si
 
 **A line's text is stored only when the source may be copied.** `C:line.text` is written only when the person says the
 poem may be copied: it is their own work, or it is out of copyright. Otherwise the line's `span` is the pointer, and
-the fabulap holds the line's number, stresses and rhyme without its words. Nothing is ever fetched: a fabulap is made
-from the copy of the poem on the person's disk, and no implementation goes looking for a text, a draft or a critic's
-reading.
+the fabulap holds the line's number, stresses and rhyme without its words. Nor are its words in its `name`: a line whose
+text is not written is named by its number (`line 5`). Single words the fabulap needs elsewhere, a term, a rhyme's
+sounds, an allusion's cue, are not the line's words, and are kept. A line's stance is that of its words; how sure its
+scansion is shows in its provenance's `confidence`. Nothing is ever fetched: a fabulap is made from the copy of the
+poem on the person's disk, and no implementation goes looking for a text, a draft or a critic's reading.
 
 The kinds' fields are in section 18.4.2.
 
@@ -2753,8 +2760,10 @@ question (`licence-recorded`, section 18.4.8).
 
 **History.** When the folder is a git clone, its history is read from the clone alone: its log, its tags, and the
 documents and change logs in the tree. Commits are grouped into episodes (`R:phase`), tags become releases, and authors
-become makers by name. A folder that is not a clone has only the history its own documents
-hold. Issues, pull requests and anything else held outside the clone are reserved for a later edition.
+become makers: by name only where the repository states that name itself (its licence's copyright holder, or a line of
+an authors file), otherwise as a numbered contributor, and never by address. A folder that is not a clone has only the
+history its own documents hold. Issues, pull requests and anything else held outside the clone are reserved for a later
+edition.
 
 **How a fabulac is built.** In five stages, each one whole run that lands its result before the next begins:
 
@@ -2765,6 +2774,11 @@ hold. Issues, pull requests and anything else held outside the clone are reserve
 | read | yes, once per file | for each file, against the survey: behaviours, structures, cases from the tests, terms, concepts, claims, events |
 | fold | yes | over the whole: aims, audience, uses, requirements, decisions, exclusions, inspiration, and the atem |
 | question | yes | the dialectic's questions where the build was unsure (section 18.6) |
+
+A file's reading holds only what it adds for its file. It may add to an item of the outline of its own file the fields
+its kind takes that the outline lacks (an interface's `takes`, `gives` and `raises`; a structure's `fields` and
+`invariants`; a component's `does`; a setting's `means`), and add inside one (a parameter's `means`), never changing
+what a rules stage read.
 
 After each stage the fabulac, with what the stage found, is written beside the folder, and a build that stops is resumed after the last
 stage that landed, as long as the tree digest has not moved. The fabulac's `derived.runs` lists every run. A build with
@@ -2783,18 +2797,19 @@ other languages and a fabulac kept as a volume of several files are reserved for
 **The cshort.** Compiling a fabulac writes a folder beside it, `<name>.cshort-<YYYY-MM-DD-HHMM>/`, holding the rebuilt
 tree and a `CSHORT.md`. The cshort rebuilds every `C:file` whose language is a programming language and that is not a
 test, and the README; tests are rebuilt only when asked, since their content is held as `P:case` items. `CSHORT.md`'s
-first line is the footer, one italic line naming the fabulac, the language, the day of the run (in UTC) and the model: "*a cshort of
-days.fabulac.cosm, in Python, compiled on 2026-11-05 by …*". Then come a table of the files written, each with the
-`C:file` it came from and its sha256, what was not rebuilt, and, last, the source's licence line. A compile is
-recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may be told in another language than its source's;
-the entry's `language` names the cshort's own.
+first line is the footer, one italic line naming the fabulac, the language, the day of the run (in UTC) and the model:
+"*a cshort of days.fabulac.cosm, in Python, compiled on 2026-11-05 by …*". Then come a table of the files written, each
+with the `C:file` it came from and its sha256, what was not rebuilt, and, last, the source's licence line, `Licence of
+the source: <source.licence>` (with none recorded, `Licence of the source: not recorded (<the open question>)`). A
+compile is recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may be told in another language than its
+source's; the entry's `language` names the cshort's own.
 
 A compile passes these checks, all without executing anything:
 
 | Check | Holds |
 |---|---|
 | `parses` | every rebuilt file in a programming language is parsed by that language's parser with no syntax error. Parsing is not running: nothing is imported, compiled to disk or executed |
-| `interfaces-present` | every `C:interface` of the fabulac is defined in the cshort's file its span names, with the same name, the same surface and the same parameter names in the same order |
+| `interfaces-present` | every `C:interface` of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, the same surface and the same parameter names in the same order |
 | `files-present` | the cshort holds every file it is required to rebuild, at its path, and the digests `CSHORT.md` lists are the files' |
 | `footer` | `CSHORT.md`'s first line is the footer, naming the fabulac's file, the language, the day of the run (in UTC) and the model; its last line is the licence line, agreeing with `source.licence` |
 | `provenance` | the compile is recorded in `shorts:` with `path`, `at`, `by`, `mode`, `order: code`, `route`, `language` and `files`, and the footer names the run |
@@ -3212,7 +3227,7 @@ them passing with no error; its old name, `emf-checks`, is read wherever a manif
 | `flavour-kind` | error | every item's kind belongs to the catalog's flavour: "C:line/1: a line belongs to fabulap, not to a fabulan" |
 | `code-span` | error | in a fabulac, every `span` is `{file, lines}`; its `file` is the path of a `C:file` of the fabulac; its `lines` are `n` or `n-m`, with n no greater than m, within the file's `length.lines` |
 | `licence-recorded` | error; a warning while pending | a fabulac records `source.licence`, a value or a question, and holds an `R:licence` item |
-| `question-about` | error | a question's `about` names an item, an item's field, a span of the right shape (in a fabulac, one whose file and lines exist), or a module or kind the fabula declares; a settled question is skipped (section 18.6) |
+| `question-about` | error | a question's `about` names an item, an item's field, a span of the right shape (in a fabulac, one whose file and lines exist), or a module or kind the fabula declares; a settled, stale or withdrawn question is skipped (section 18.6) |
 | `question-shape` | error | a question's answers agree with its state (section 18.6) |
 | `session-declared` | warning | a source `D:session/<id>` names a session of the fabula; the bare forms `session-<n>` and `elicit-…` are accepted without one |
 | `reading-whose` | warning | an author's or an expert's reading names the session it was given in; a critic's names the critic, or asks who |
@@ -3587,7 +3602,7 @@ provenance.
 | `to` | who can answer: `author` · `expert` · `maker` · `holder` (Ascribe's subject) · `owner` (Comprise's item owner) · a role's id · `anyone` |
 | `raised` | `{by, from, at, run}`: `by` is `bank`, `move`, `model` or `person`; `from` the bank entry (`fabulap/speaker`), the move or the stage that raised it; `at` a timestamp; `run` the run's trace id |
 | `state` | `open` · `answered` · `unknown` · `declined` · `stale` · `withdrawn` (section 18.6.3) |
-| `answers` | the answers, appended and never rewritten: each `{at, by, says, value, confidence, session, declined}`. `by` is a word of `to` or a role's id; `says` the person's words, verbatim; `value` what is written (null for "I don't know"); `confidence` how sure the person is, 0 to 1; `session` the session's id; `declined: true` on a refusal |
+| `answers` | the answers, appended and never rewritten: each `{at, by, says, value, confidence, session, declined}`. `by` is a word of `to` or a role's id; `says` the person's words, verbatim; `value` what is written (null for "I don't know" and for a refusal); `confidence` how sure the person is, 0 to 1, and 1 for a value given with none (absent on "I don't know" or a refusal unless the person gave one); `session` the session's id; `declined: true` on a refusal |
 | `settled` | `{at, run, wrote}`, written by `settle`: when, in which run, and the addresses it wrote (`[N:audience/owners#who]`). Absent until then |
 | `ended` | `{at, by, because}`, for `stale` and `withdrawn` |
 
@@ -3630,8 +3645,8 @@ bank question of a field directly (Comprise OES (https://comprise.cosmoes.org/),
 | `open` | `unknown` | `record`: "I don't know" | an answer with `value: null` and the person's words in `says` |
 | `open` | `declined` | `record`: a refusal to say | an answer with `declined: true` |
 | `answered`, `unknown`, `declined` | the same, settled | a run (`settle`) | what section 18.6.4 says, into the item; the question gains `settled` |
-| any | `open` | a person, a bank or a move asks again: another person, an expert after the author, a later session | earlier answers kept; the next answer is appended; an earlier `settled` stays as the record of the earlier write |
-| `open`, `answered` | `stale` | `question` or `settle` finds that `about` no longer holds: its item is gone, the field was dropped, or the source changed and the span's words are not found | `ended`, by the move, with the reason; nothing is written into items |
+| any | `open` | a person, a bank or a move asks again: another person, an expert after the author, a later session | earlier answers kept; the next answer is appended; an earlier `settled` stays as the record of the earlier write until the question is settled again, when the new settling replaces it (the earlier answer stays in `answers`) |
+| `open`, `answered` | `stale` | `question` or `settle` finds that `about` no longer holds: its item is gone, the field was dropped (it held a value in the volume before and is absent now), or the source changed and the span's words are not found | `ended`, by the move, with the reason; nothing is written into items |
 | `answered`, settled | the same | its own answer removed the item it is about, as a candidate a holder refuses is removed | nothing: the question keeps `settled` and its answers as the record, is not `stale`, and is not raised again |
 | any | `withdrawn` | whoever raised it, or a move that finds it duplicates another | `ended`, with who and why |
 
@@ -3649,12 +3664,12 @@ not written again: the new decompile reads the source afresh, and an open questi
 
 | `kind` | Written into a field | When `about` is a module or a kind |
 |---|---|---|
-| `text` | the answer, a string | a new item of the bank entry's kind (or the module's first kind): `name` its first words, `summary` the answer, and, where the kind requires a stance, `stance: hearsay` |
+| `text` | the answer, a string | a new item of the kind the bank entry `writes` (or, where the entry names none, the module's first kind; section 18.6.6): `name` its first words, `summary` the answer, where the kind requires a stance, `stance: hearsay`, and every other field the kind requires, which the answer cannot fill, as an open question, `{pending: "what is the <field> of this <kind>?"}` (section 10), for a later run to ask |
 | `choice` | one of `options` (or an open word where `options-open`) | as `text` |
 | `yes-no` | `true` or `false` | not allowed: a yes-no question is always about a field |
 | `number` | a number inside `range` | not allowed |
 | `date` | an ISO date, a year or a year-month, as text when it is not a full date | not allowed |
-| `ref` | an id that resolves (a list when `many`) | not allowed |
+| `ref` | an item's id that resolves, never an address (a list when `many`) | not allowed |
 | `span` | a span, into `span` or appended to `grounds` | not allowed |
 
 | The answer | The question | The item |
@@ -3668,30 +3683,44 @@ not written again: the new decompile reads the source afresh, and an open questi
 words, which are a better question than the one asked. **A refusal is a fact**, not a question: the subject declined to
 say, and no later run asks the same person again unless a person opens the question again.
 
+**An answer about a whole item** (`about: <item id>`). A value means the item must be read again (below). "I don't
+know" gives the item `pending: "<the person's own words>"`. A refusal sets its `provenance.state: not-disclosed` and
+removes its own `pending`, and lists nothing in `withheld`, since no field was asked.
+
 **The provenance of what is written.** A new item carries `provenance: {mode: dialectic, sources: [D:session/<id>],
 confidence: <the answer's>}`: the session is its source and the person's own confidence is its confidence. A field of
-an existing item leaves the item's mode as it was; the session's id is appended to the item's `provenance.sources`,
-and `provenance.answered` gains one entry for the field, `{<field path>: {sources: [D:session/<id>], confidence}}`.
+an existing item leaves the item's mode and its `provenance.state` as they were; the session's id is appended to the
+item's `provenance.sources`, and `provenance.answered` gains one entry for the field, `{<field path>: {sources:
+[D:session/<id>], confidence}}`. An item with no `provenance` gains one: `{mode: dialectic, sources:
+[D:session/<id>], confidence}`, with that entry in `answered`.
 
 **Rules first, the model only to read again.** `settle` writes every answer by rules, and asks a model only where an
-item must be read again in the light of an answer: a reading the author disowned, a behaviour now known to be
-unintended.
+item must be read again in the light of an answer: a value about a whole item or about a span of the source, a value
+that would replace a mapping or a list in a field (other than a `many` list or a span), and a yes-no answer about a
+field that holds something other than `true` or `false`. A yes-no answer into a field that holds `true` or `false`,
+such as a reading's or a behaviour's `intended`, is written by rules. A run with no model leaves an answer that must
+be read again `answered` and unsettled.
 
 **A settle run is recorded.** In a fabula, a settle run joins `derived.runs` and changes none of `derived`'s single
 keys, which describe the last run that derived the fabula from its source (section 18.4.1).
 
 **A write that would add a check error is not made.** The answer stays recorded and the question stays as it was, and a
 sibling question about the same address is raised with `why: counter`, asking again differently (a bank's `counters`
-give its words; section 18.6.6).
+give its words; section 18.6.6). While the counter question stands, the question it counters waits: no run tries its
+answer again, and settling the counter does not settle it.
 
 #### 18.6.5 Open questions and the dialectic
 
 The two are one thing in two lengths. `{pending: "…"}` (section 10) stays the inline short form, written where the value
 would go, and every reader that lists open questions keeps working. A `D:question` is its long form: the same open
 question with an address, an answerer, a reason, a shape and a record of what was said. A question raised about a
-pending field is `about: <item>#<field>`, `why: missing`, and `asks` the pending text. Settling an answer replaces the
-pending value; settling "I don't know" rewrites it in the person's words. A volume may hold either form, or both for
-one field, and neither is ever an error.
+pending field is `about: <item>#<field>`, `why: missing`, `kind: text`, and `asks` the pending text with its first
+letter capitalised. Settling an answer replaces the pending value; settling "I don't know" rewrites it in the person's
+words. A volume may hold either form, or both for one field, and neither is ever an error.
+
+An item below confidence 0.5, or whose `provenance.state` is `pending`, raises one question about the whole item:
+`why: unsure`, `kind: text`, asking whether the item is right and, if not, what is, with its summary quoted. An item
+that holds a pending of its own raises the questions of its pending values instead, since they say what is unsure.
 
 #### 18.6.6 Banks
 
@@ -3703,7 +3732,7 @@ of the format before anything else is known.
 dialectic:
   writes: <one line: what an answer writes>
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes]
   banks:
     <bank name>:
       for: {flavour: fabulap}                # or {module: S}, or nothing: the whole format
@@ -3717,7 +3746,8 @@ dialectic:
 An entry's `about` names a module (`I`: asked once of the volume), a kind (`C:voice`: asked of each item of that kind)
 or a kind's field (`C:voice#roles.speaker`: asked of each item where the field is absent or pending). `{name}`, and any
 `{<field>}`, are filled from the item when the question is raised. A raised question's `raised.from` is
-`<bank name>/<entry id>`.
+`<bank name>/<entry id>`. An entry about a module may say `writes`: the kind (`<kind>` of that module, or
+`<M>:<kind>`) that a new item written from its answer takes; absent, the module's first kind (section 18.6.4).
 
 **The older shape** keeps reading: `dialectic: {questions: {<letter>: ["…", …]}}` is one bank, named after the
 manifest, each string an entry `{about: <letter>, asks: <the string>, kind: text, why: missing}` with the bank's
@@ -3743,8 +3773,8 @@ field written carries the session as its source).
 
 | Check | Severity | Catches |
 |---|---|---|
-| `question-about` | error | an `about` that names nothing in the volume: an item that does not exist, a field path that does not parse, a span of the wrong shape (in a fabulac, one whose file or lines do not exist), a module or kind the format does not declare. A question that has `settled` is skipped, since its answer may have removed what it was about |
-| `question-shape` | error | a `choice` with no `options`; an `answered`, `unknown` or `declined` question with no answer; a last answer that disagrees with the state (a value for `answered`, `value: null` for `unknown`, `declined: true` for `declined`); an `open` question with `settled`; a `stale` or `withdrawn` question without `ended` |
+| `question-about` | error | an `about` that names nothing in the volume: an item that does not exist, a field path that does not parse, a span of the wrong shape (in a fabulac, one whose file or lines do not exist), a module or kind the format does not declare. A question that has `settled`, or whose state is `stale` or `withdrawn`, is skipped, since its answer may have removed what it was about, or it has ended because what it was about is gone |
+| `question-shape` | error | a `choice` with no `options`; an `answered`, `unknown` or `declined` question with no answer; a last answer that disagrees with the state (a value for `answered`, `value: null` for `unknown`, `declined: true` for `declined`); an `open` question with `settled` and no answer; a `stale` or `withdrawn` question without `ended` |
 | `session-declared` | warning | a source `D:session/<id>`, in provenance or in an answer, that names no session of the volume. A bare `session-<n>` or `elicit-…` with no item is accepted, with a note |
 
 They are the core's checks, and run on every volume that holds an item of D. The generic checks run on D's items as

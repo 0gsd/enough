@@ -645,7 +645,7 @@ additions of the second table.
 | `measure` | text → morph; `against` short (the null) | yes | `scale-range` `scale-evidence` `provenance` |
 | `morph` | short → short; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` `provenance` |
 | `read` | fabula → short; `with` morph; `in` context | yes | `coverage` `no-invention` `stance-kept` `scales-met` `labelled` `never-source` `provenance` |
-| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance` |
+| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: for `isotype` and `paratype`, `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance`; for `isograph`, `default-deny` `no-counts` `no-mark` `epoch` `provenance`. A check holds by the rules of the kind the call names: for an isograph, those of `ascribe-isograph/0` |
 | `band` | number → word; `as` a list of words (`[none, some]`: 0 is `none`; any other list: equal steps of ten) | no | `banded` |
 | `mark` | item \| word → the same; `as` marking | no | `verified-only-where-derived` |
 | `withhold` | item \| volume → nothing; `where` condition | no | `no-mark` |
@@ -690,7 +690,7 @@ The moves `thym 1` adds or extends. Every move in this table carries `since: 1` 
 | `reword` | line \| string \| short → the same; `to` N words; `with` morph | yes | `length` `one-line` `nothing-added` `provenance` | — |
 | `join` | list of string \| list of line \| list of short → short; `with` string | no | `provenance` | — |
 | `say` | number \| date \| word \| bool \| string → string | no | none | — |
-| `propose` | fabula → list of item (candidate nodes and their questions); `with` volume (the holograph) | yes | `no-invention` `provenance`, and Ascribe's own checks | — |
+| `propose` | fabula → list of item (candidate nodes and their questions); `with` volume (the holograph) | yes | `no-invention` `provenance`; the move itself holds every candidate to Ascribe's own checks (Ascribe, its section 10) | — |
 | `folders` | → list of folder; `of` folder | no | none | — |
 | `count` | adds folder (its text files) | no | none | — |
 | `words` | adds line \| string | no | none | — |
@@ -727,7 +727,8 @@ refused with the nearest name: "unknown move `summarise`; did you mean `tell`?" 
 A declaration may also say `since: 1` (only `thym 1` programs see the move) and carry a `thym-1:` mapping of the keys a
 `thym 1` program sees in addition to its own; inside it, `gives-when`, `contract-when` and `scaffold-when` choose a
 call's type, contract and scaffold by its `as` word or its first operand's type. Section 17.6 lists the keys, and
-section 4.9 says what each version sees.
+section 4.9 says what each version sees. A word a declaration lists among a modifier's words is that word even when it
+is also a type's name: `tell f as line` names the catem's depth, since `tell`'s `as` lists `line` among its words.
 
 ---
 
@@ -766,7 +767,7 @@ a program may also define a check of its own, as a contract block, and promise t
 | `stance-closed` | every claim's stance is in the fabula's closed list | MacroCOSM's generic `closed-list` check |
 | `terms-grounded` | every `L:term` is in FEED, or carries `{pending: "not in FEED"}`, or is a named entity | enough (the lexicon floor) |
 | `coverage` | every sentence of a telling traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | Thym's own; the trace records the sentence → item map |
-| `no-invention` | the telling names no entity, claim or event the fabula lacks | Thym's own |
+| `no-invention` | the telling names no entity, claim or event the fabula lacks; for `propose`, no candidate or question says what its fabula lacks | Thym's own |
 | `stance-kept` | each claim's stance in the telling is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim told over several sentences is said at the weakest any of them marks | Thym's own |
 | `footer` | a short ends with the footer line of MacroCOSM OES, its section 18.4.4 | enough (the short footer) |
 | `byte-exact` | the compiled bytes equal the source bytes | DocOES (MacroCOSM OES, its section 18.5) |
@@ -792,7 +793,7 @@ a program may also define a check of its own, as a contract block, and promise t
 | `digests` | every file in a package's catalog has the sha256 the catalog says | Thym's own |
 | `released` | nothing is in `graph.cosm` without a release recorded in the holograph | Thym's own; the release is Ascribe's (https://ascribe.cosmoes.org/) |
 | `provenance` | every output carries `made` | Thym's own |
-| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
+| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). A file's reading (section 20.6) passes them together with the fabula it was read with. `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
 
 The checks the moves of `thym 1` add:
 
@@ -802,16 +803,16 @@ The checks the moves of `thym 1` add:
 | `files-found` | every file the folder rule keeps (section 20.1) has a `C:file` item whose sha256 is the file's, and no `C:file` names a file the tree lacks | Thym's own |
 | `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it | MacroCOSM OES, its section 18.4.8 |
 | `licence-recorded` | the fabulac's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
-| `outline-cited` | every behaviour, structure and case a file's reading gives names the interfaces or components of the outline it is about, and they belong to that file | Thym's own |
+| `outline-cited` | every behaviour, structure and case a file's reading gives names the interfaces or components of the outline it is about, and they belong to that file, or, for a test file, to the files it tests | Thym's own |
 | `fold-grounded` | every intent and inspiration item the fold gives (aim, audience, use, requirement, decision, exclusion; influence, allusion, occasion) cites at least one item of the fabula so far, and the atem's line cites at least one use | Thym's own |
-| `history-grounded` | every change cites commits the clone's log answered, every release a tag it answered, every maker a name in those commits | Thym's own |
+| `history-grounded` | every change cites commits the clone's log answered, every release a tag it answered, and every maker rests on commits it answered and carries no address | Thym's own |
 | `parses` | every file of a cshort in a language the fabulac names is read by that language's parser without a syntax error; parsing is not running, and nothing is imported or executed | Thym's own; the host's syntax engine |
-| `interfaces-present` | every interface of the fabulac is defined in the cshort's file its span names, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
+| `interfaces-present` | every interface of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
 | `files-present` | the cshort holds every file it is required to rebuild, at its path (every `C:file` in a programming language that is not a test, and the README; MacroCOSM OES, its section 18.4.7), with `CSHORT.md`, and the digests `CSHORT.md` lists are the files' | Thym's own |
 | `uses-told` | a catem tells everything its depth asks for: at `overview` every use, at `manual` every use and every interface a person reaches | Thym's own |
-| `nothing-lost` | every item of every part gathered, and of the `with` volume, is in the output, byte-equal | Thym's own |
-| `ids-unique` | no two different items share an id (two byte-equal ones are one) | Thym's own |
-| `addressed` | every question's `about` resolves (an item, an `<item>#<field>`, a span of the source, or a module or kind the format declares), and every answer names a question that is `open` or `answered` and fits the question's `kind` | Thym's own; the dialectic is MacroCOSM OES's, its section 18.6 |
+| `nothing-lost` | every item of every part gathered, and of the `with` volume, is in the output with every field it carries, as it carries it (`made` aside); the output's item may say more | Thym's own |
+| `ids-unique` | no two different items of the output share an id (two byte-equal ones, `made` aside, are one; `gather` merges two that say the same item before they land, section 20.6) | Thym's own |
+| `addressed` | every question's `about` resolves (an item, an `<item>#<field>`, a span of the source, or a module or kind the format declares), and every answer names a question that is `open` and fits the question's `kind` | Thym's own; the dialectic is MacroCOSM OES's, its section 18.6 |
 | `no-duplicate` | no two open questions about the same address ask the same thing, nor does a new one repeat a question already in the volume | Thym's own |
 | `only-the-asked` | only the questions' answers, states and `settled` fields, the new session, and the fields that answered questions are about (with their provenance) differ from the input | Thym's own |
 | `only-the-changed` | every change names the value being edited and a line it holds with that digest; no line is replaced or dropped twice; and the output is the input with exactly those changes (section 21.3) | Thym's own |
@@ -1067,7 +1068,7 @@ end
 
 | time | what is refused | with |
 |---|---|---|
-| **compile** | a parse error (`parse`); a version line that names a grammar the compiler does not know, `thym 1` syntax or a move only `thym 1` sees under a `thym 0` line ("this needs `thym 1`", section 4.9), or a `thym 0` program that uses a `thym 1` file (`version`); an unknown move (`unknown-move`); an unknown URI or `use`d file (`unknown-uri`); two `use`d names that clash (`use-clash`); an unbound name (`unbound`); a type error (`type`); a name bound twice (`rebound`); recursion in `thym 0`, or in `thym 1` a move on a cycle without `depth:` (`recursion`); a `give` inside a loop (`type`); a `keep` outside a loop that collects, a loop that collects nothing or keeps two types, a contract that asks, a `depth:` out of range or on a move that never calls itself (`type`); a `keeps` naming no contract and no check (`unknown-check`); a block that `gives`, with a path that never reaches a `give` of each output, refused at the block's first line (`no-give`); emitted items with no `project` (`emit-without-project`); a static contract that cannot hold (the contract's check, such as `no-counts`), a fabula known to be of a flavour the move does not take among them (`flavour`) | the file and line, the check, and the fix where one is known |
+| **compile** | a parse error (`parse`); a version line that names a grammar the compiler does not know, `thym 1` syntax or a move only `thym 1` sees under a `thym 0` line ("this needs `thym 1`", section 4.9), or a `thym 0` program that uses a `thym 1` file (`version`); an unknown move (`unknown-move`); an unknown URI or `use`d file (`unknown-uri`); two `use`d names that clash (`use-clash`); an unbound name (`unbound`); a type error (`type`); an `insert` with neither `before` nor `after`, or with both (`type`); a name bound twice (`rebound`); recursion in `thym 0`, or in `thym 1` a move on a cycle without `depth:` (`recursion`); a `give` inside a loop (`type`); a `keep` outside a loop that collects, a loop that collects nothing or keeps two types, a contract that asks, a `depth:` out of range or on a move that never calls itself (`type`); a `keeps` naming no contract and no check (`unknown-check`); a block that `gives`, with a path that never reaches a `give` of each output, refused at the block's first line (`no-give`); emitted items with no `project` (`emit-without-project`); a static contract that cannot hold (the contract's check, such as `no-counts`), a fabula known to be of a flavour the move does not take among them (`flavour`) | the file and line, the check, and the fix where one is known |
 | **plan** | a model-backed node while agent-free (`agent-free`, section 19); a prompt the machine's model cannot hold (`preflight`, the 16 GB rule, section 12.5); a missing or changed input (`input`: its digest, or a folder's tree digest, differs from the plan's); a plan whose program cannot be read (`no-program`); a move with no implementation here (`move`), or none under `--rules` (`rules`); a cloud route whose gate is closed (`cloud`); a cloud plan whose count of model calls is open and that was given no ceiling (`calls`, section 23) | the node, the count or the size, and what would make it run |
 | **run** | a model-backed output that still fails its contract after narrow repair and its budget of attempts (the check's name, a kept contract's included), or that never fits the contract's schema (`schema`); a check the runtime lacks (the check's name, "not implemented"); a failed `assert`; a deterministic move that raises; a move that went deeper than its depth (`recursion`); a `thym 0` loop that section 8.1 refuses at run (`loop`); a fabula of a flavour the move does not take (`flavour`); a run that reached its ceiling of model calls (`calls`) | the trace, which says the node, the check and the attempts; nothing is written |
 
@@ -1526,10 +1527,10 @@ id: thym/orchard-notes
 name: The Hollins Lane orchard, autumn notes
 contents:
   - {path: text.md, sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7, role: text}
-  - {path: fabula.cosm, sha256: 0000000000000000000000000000000000000000000000000000000000000000, role: fabula}
-  - {path: morph.cosm, sha256: 1111111111111111111111111111111111111111111111111111111111111111, role: morph}
-made: {program: {name: publish-story, sha256: 2222222222222222222222222222222222222222222222222222222222222222},
-       trace: {run: 2026-11-01-1042-7f3a, sha256: 3333333333333333333333333333333333333333333333333333333333333333},
+  - {path: fabula.cosm, sha256: '0000000000000000000000000000000000000000000000000000000000000000', role: fabula}
+  - {path: morph.cosm, sha256: '1111111111111111111111111111111111111111111111111111111111111111', role: morph}
+made: {program: {name: publish-story, sha256: '2222222222222222222222222222222222222222222222222222222222222222'},
+       trace: {run: 2026-11-01-1042-7f3a, sha256: '3333333333333333333333333333333333333333333333333333333333333333'},
        at: 2026-11-01T10:42:00Z, by: enough/0.5.0}
 notice: "A Thym package. The text is its author's; the fabula, morph and context describe it. Readings made from it are the reader's and are labelled."
 nodes: []
@@ -1705,7 +1706,7 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 
 | key | holds |
 |---|---|
-| `name` | the move's name, a FEED headword, unique across the registry |
+| `name` | the move's name, a FEED headword, unique across the registry but for an entry that `extends` a move |
 | `takes` | a list of accepted types for the operands, in order; alternatives joined by `\|`; empty when the move's argument is its `of` |
 | `gives` | the type given |
 | `modifiers` | a mapping, modifier word → the type it takes (`as: order`, `to: words`, `with: morph`, `of: package`) |
@@ -1715,6 +1716,7 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 | `code` | the reference implementation, informative: `enough.thym.moves.emf:tell` |
 | `says` | one line, in FEED words, for the viewer and the readvisor |
 | `since` | `1`: the move exists for `thym 1` programs only (section 4.9) |
+| `extends` | `true`: the entry adds `as` kinds to a move another manifest declares, and nothing else (its `modifiers` are `{as: <kinds>}`); a call of one of its kinds gives the entry's `gives`, keeps its `contract` and runs its `code`. Ascribe's `project … as isograph` is one (section 6.2) |
 | `thym-1` | a mapping of the keys a `thym 1` program sees in addition to, or in place of, the entry's own: `takes`, `gives`, `modifiers`, `contract`, `scaffold`, and the three below; a `thym 0` program sees the entry without it |
 | `gives-when` | a list of `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}`: the type a call gives when its `as` word, or its first operand's type, is one of these |
 | `contract-when` | the same shape, with `contract: [...]`: the call's contract when its `as` word or first operand's type matches; else `contract` |
@@ -1783,17 +1785,18 @@ the holotype holds people or says it has none, and always fills `shape.markets`;
 <!-- atem: the agent off: only deterministic plans run; scaffolds where they are honest -->
 
 In agent-free mode the coprocessor is the refusing one: a plan with model-backed nodes is refused at plan time with
-their count and the first one's statement and line ("3 steps ask a model, the first `let f = derive story` (line 11);
-agent-free is on"). A cloud model is a model too: agent-free refuses a plan on the cloud route exactly as it refuses one
-on the local route, at plan time, before any broker is asked. A plan with no model-backed node runs. With `--rules`,
-each model-backed move that declares a `scaffold` runs it instead: `derive` gives the rules twin, `atem` the labelled
-scaffold, `tell` and `null` the ordered outline, and `measure` the seven statistics scales with the three judgement
-scales pending; in `thym 1`, `derive … as code` gives its file's outline marked pending, `tell` at a catem's depth
-the uses and interfaces in told order, `question` the bank's questions only, and `settle` its rules part, leaving the
-re-reads as open questions. A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder,
-`tell … as code`) still refuses. `survey`, `history`, `record` and the editing moves other than `reword` ask nothing, and run. The trace says `engine: rules` for
-each scaffold, and every output is marked `state: pending`, as a fabula's rules mode marks a twin. The viewer offers only
-plans that can run.
+their count, the route and the first one's statement and line ("3 steps ask a model on the local route, the first `let f
+= derive story` (line 11); agent-free is on"). A cloud model is a model too: agent-free refuses a plan on the cloud
+route exactly as it refuses one on the local route, at plan time, before any broker is asked. A plan with no
+model-backed node runs. With `--rules`, each model-backed move that declares a `scaffold` runs it instead: `derive`
+gives the rules twin, `atem` the labelled scaffold, `tell` and `null` the ordered outline, and `measure` the seven
+statistics scales with the three judgement scales pending; in `thym 1`, `derive … as code` gives its file's outline
+marked pending, `tell` at a catem's depth the uses and interfaces in told order, `question` the bank's questions only,
+and `settle` its rules part, leaving the answers that must be read again answered and unsettled, for a run with a model.
+A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `tell … as code`) still refuses.
+`survey`, `history`, `record` and the editing moves other than `reword` ask nothing, and run. The trace says `engine:
+rules` for each scaffold, and every output is marked `state: pending`, as a fabula's rules mode marks a twin. The viewer
+offers only plans that can run.
 
 ---
 
@@ -1958,17 +1961,24 @@ that landed. The stages, and the moves that make them:
 
 | stage | the move | asks | what it gives, and what its contract holds |
 |---|---|---|---|
-| survey | `survey repo`, rules only | no | a fabulac outline: a `C:file` per file (language, lines, sha256), a `C:component` per module, package and class, a `C:interface` per public function, class, method, constant and command-line entry point, with its name and parameters from the syntax tree, a `C:dependency` per import from outside the tree and per declared requirement, a `C:setting` per environment variable read and per command-line option, the licence and the means. `files-found`, `code-span`, `licence-recorded` |
-| history | `history repo with f`, rules only | no | the fabula so far, with the clone's history: changes grouped into episodes (the commits between two tags, split again where two commits stand more than fourteen days apart), a release per tag with its date, a maker per author's name (never an address). `history-grounded` |
+| survey | `survey repo`, rules only | no | a fabulac outline: a `C:file` per file (language, lines, sha256), a `C:component` per module, package and class, a `C:interface` per public function, class, method, constant and command-line entry point, with its name and parameters from the syntax tree, a `C:dependency` per import from outside the tree and per declared requirement, a `C:setting` per environment variable read and per command-line option, a `C:structure` per data shape (a data class, a named tuple, a typed dictionary, an enumeration, a class with annotated attributes), the messages of the errors a function raises on its interface's `raises`, what a function prints, logs or exits with as a behaviour, a command's exit statuses on its interface's `gives`, the licence and the means. `files-found`, `code-span`, `licence-recorded` |
+| history | `history repo with f`, rules only | no | the fabula so far, with the clone's history: changes grouped into episodes (the commits between two tags, split again where two commits stand more than fourteen days apart), a release per tag with its date, a maker per author: by name only where the repository states it (its licence's copyright holder, or a line of an authors file), otherwise as a numbered contributor, never by address. `history-grounded` |
 | read | `derive t as code with f`, once per file, in a loop that collects | yes | that file's behaviours, structures, cases, terms, claims and events, read against the outline. `code-span`, `outline-cited`, `coverage` (every interface and component the outline lists for the file is the subject of a behaviour or a structure), `terms-grounded`, `stance-closed`. Its scaffold gives the outline's own items for the file, marked pending |
-| (join) | `gather readings with f` | no | the fabula so far with every reading in it. `nothing-lost`, `ids-unique` |
+| (join) | `gather readings with f` | no | the fabula so far with every reading in it, each reading's additions to the outline merged into the outline's own items. `nothing-lost`, `ids-unique` |
 | fold | `derive repo with f` | yes | read as a whole: aims, audience, uses, requirements, decisions, exclusions, inspiration, and the atem. `fold-grounded`, `atem-shape`, `licence-recorded`. It has no scaffold: nothing but a model reads intent. A `derive` of a folder without `with` is refused: "derive of a folder folds what the stages found: derive repo with f" |
 | question | `question f`, landed with `gather` | yes | the dialectic's questions where the build was unsure (section 22) |
 
 Every stage's contract ends with `fabula-checks` and `provenance`, and the last program `keeps fabula-checks`. A
 reading is `derive` because a file read as code is a text decompiled, and the fold is `derive` because a folder
 decompiled with what is known of it is a decompile too; `read` keeps its meaning (section 14). `gather` takes a list
-of fabulas or of items and gives the `with` volume with every one of them in it.
+of fabulas or of items and gives the `with` volume with every one of them in it. An item whose id the volume already
+has may add the fields the volume's item lacks, and add inside a field (a parameter's `means`, an error's `when`); a
+field both say must agree, and a field a rules stage reads is never changed; a clash is refused, naming the item and
+the field.
+
+A file's reading holds only what it adds for its file: its own items, and what it adds to the outline's items of that
+file (MacroCOSM OES, its section 18.4.7). Its `fabula-checks` runs on the reading together with the fabula it was read
+with, and `its-own-file`, `code-span` and `outline-cited` on the reading's own items.
 
 ```thym
 thym 1
@@ -2241,7 +2251,8 @@ always have, and a replay of either run needs neither the person nor the model.
 
 `question v` takes a fabula or a volume and gives a list of question items. It asks the model, with the scaffold
 `bank`. Its rules part always runs first: it gives the opening questions of the manifest's bank for the volume's
-flavour or format, and a question for every `{pending: …}` field and every item marked unsure (a confidence below 0.5).
+flavour or format, a question for every `{pending: …}` field, and one for every item marked unsure (a confidence below
+0.5, or pending) that holds no pending of its own (MacroCOSM OES, its section 18.6.5).
 When the run asks the model, the model adds questions where the volume is unsure, ambiguous, in conflict or silent on
 intent, and only there. Under `--rules` the bank part alone runs. Each question says who raised it and is `open`. Its
 contract is `addressed`, `no-duplicate` and `provenance`. `question` gives a list, and a program lands the questions with
@@ -2250,28 +2261,33 @@ the volume through `gather asked with f`.
 ### 22.2 `record` and the answers volume
 
 A person's answers reach a program as an **answers volume**, which the page or an agent writes beside the volume it
-answers, `<the twin's name without .cosm>.answers-<YYYY-MM-DD-HHMM>.cosm`. It is a delta: the session's record, and for
-each question answered, only its id, its new state and its new answers. Its catalog declares the format of the volume it
-answers and carries that volume's `id`; its `nodes:` hold the `D:session` item and, for each question answered, a
-mapping of the question's `id`, its new `state` and its new `answers`. It is read only as a delta, never checked as a
-volume of that format on its own. To Thym it is a `volume`.
+answers, `<the twin's name without .cosm>.answers-<YYYY-MM-DD-HHMM>.cosm`, the stamp in UTC. It is a delta: the
+session's record, and for each question answered, only its id, its new state and its new answers. Its catalog declares
+the format of the volume it answers (`fabula/1` for a twin read under `emf/1`: an old spelling is never written),
+carries that volume's `id`, and its `macrocosm:` when that volume has one; its `nodes:` hold exactly one `D:session`
+item and, for each question answered, unknown or declined, a mapping of the question's `id`, its new `state` and its
+new `answers`, each naming the session. A skipped question shows only in the session's `skipped`. It is read only as a
+delta, never checked as a volume of that format on its own. To Thym it is a `volume`.
 
-`record said in f` is code: it appends each answer to its question's answers (never rewriting one), sets the
-question's state to `answered`, `unknown` or `declined`, and adds the session. Its contract is `addressed`,
-`only-the-asked` and `provenance`.
+`record said in f` is code: it appends each answer to its question's answers (never rewriting one), sets the question's
+state to `answered`, `unknown` or `declined`, and adds the session. It refuses an answers volume whose session the
+volume already holds, so a set of answers is recorded once, and it checks every entry before it writes any. Its contract
+is `addressed`, `only-the-asked` and `provenance`.
 
 ### 22.3 `settle`
 
-`settle f` takes a fabula or a volume and gives the same, with every answered question folded into the item it is
-about. It asks the model only where an answer means an item must be read again (an answer about intent or a conflict
-over a claim, an answer about a span). Every other answer (a field filled from a text, a choice, a number, a date or a
-reference) is written by rules, and a call that needs no reading asks nothing. An answer that the person does not know (`unknown`) leaves the field
-`{pending: "<the person's own words>"}`, and a refusal to say lists the field in the item's `withheld` and writes `provenance.state: not-disclosed`. Its scaffold,
-`direct`, runs the rules part only and leaves the re-reads as open questions. Its contract is `addressed`;
+`settle f` takes a fabula or a volume and gives the same, with every answered question folded into the item it is about.
+It asks the model only where an answer means an item must be read again (a value about a whole item or a span of the
+source, a value that would replace a structure, a yes-no answer about a field that is not `true` or `false`; MacroCOSM
+OES, its section 18.6.4). Every other answer (a field filled from a text, a choice, a yes-no, a number, a date or a
+reference) is written by rules, and a call that needs no reading asks nothing. An answer that the person does not know
+(`unknown`) leaves the field `{pending: "<the person's own words>"}`, and a refusal to say lists the field in the item's
+`withheld` and writes `provenance.state: not-disclosed`. Its scaffold, `direct`, runs the rules part only and leaves the
+answers that must be read again answered and unsettled, for a run with a model. Its contract is `addressed`;
 `only-the-asked` (the fields that change are exactly those the answered questions are about, with their provenance and
-the questions' `settled` field); `fabula-checks`; and `provenance`: every field written carries
-`provenance: {mode: dialectic, sources: [D:session/<id>], confidence}`. In a fabula the settle run joins
-`derived.runs`, and `derived`'s single keys stay those of the run that derived it.
+the questions' `settled` field); `fabula-checks`; and `provenance`: every field written carries `provenance: {mode:
+dialectic, sources: [D:session/<id>], confidence}`. In a fabula the settle run joins `derived.runs`, and `derived`'s
+single keys stay those of the run that derived it.
 
 ### 22.4 The two runs, read as a pair
 
@@ -2330,9 +2346,10 @@ route: a local model at best effort fails more often, and is refused honestly; i
 
 The **route** is chosen per run, and nowhere else: `local` (the default: the host's local model) or `cloud` (a cloud
 model through a broker, the host's named one or one the person names by the provider's id). On the command line it is
-`--model local`, `--model cloud` or `--model cloud:<id>` (section 11.3). A cloud route whose gate is closed is refused at
-plan time, check `cloud`, in the gate's own words: "the cloud is not open for this run: local models only is on".
-Nothing reaches a cloud model that the person did not choose for that run.
+`--model local`, `--model cloud` or `--model cloud:<id>` (section 11.3). A plan that asks a model on a cloud route whose
+gate is closed is refused at plan time, check `cloud`, in the gate's own words: "the cloud is not open for this run:
+'local models only' is on in the broker". A plan that asks nothing runs on either route and reaches no model. Nothing
+reaches a cloud model that the person did not choose for that run.
 
 ### 23.2 What the plan shows
 
@@ -2346,7 +2363,9 @@ models: {route: cloud, provider: broker-name, model: vendor/large-model, calls: 
 counts one, and a node with calls in a loop counts its asking calls times its `members.at_most`. `at_most` is `calls`
 times each node's attempts. `calls_open` lists the nodes whose count cannot be known at plan time: a recursive move
 that asks, a loop over a collection of unknown size. A command line prints it under the plan's atem:
-`61 model calls, at most 183, on the cloud (broker-name: vendor/large-model)`. The plan's root summary is the same in both versions. A
+`61 model calls, at most 183, on the cloud (broker-name: vendor/large-model)`; on the local route,
+`3 model calls, at most 9, on this machine (g40-04)`; with an open count it adds `; and more that cannot be counted
+before it runs`, naming the steps. The plan's root summary is the same in both versions. A
 plan compared by the conformance suite is compared without `models`, since the route is the run's choice, not the
 program's.
 
@@ -2355,8 +2374,9 @@ program's.
 - `made` gains `route` and `provider` (section 5.3), and `engine` stays `model:<id>`, the model's own id.
 - A candidate gains `route` and `provider` (section 12.2). A candidate recorded without them replays without them, so
   an older recorded run replays to the same bytes.
-- The trace's environment holds the id of the model that ran, the route, the provider, and the window of that model
-  (section 12.3).
+- The trace's environment holds the id of the model, as the route names it before the first request, the route, the
+  provider, and the window of that model (section 12.3); where a provider answers with a more exact id of its own, that
+  id is in `engine` and `made`.
 - A fabula a program builds records which model made it, in its catalog's `derived`: `model`, `route`, `provider`,
   `program` and `run` for the last run that derived it, and one entry in `derived.runs` per run that wrote into it,
   a settle run included (section 20.6).
@@ -2427,7 +2447,10 @@ A compiler conforms when every program in `programs/` compiles, enumerates to it
 back byte for byte and plans to its `expected/<name>/plan.cosm`, and when every `bad/` program is refused at the stage,
 check and line its first line names. A runtime conforms when every deterministic program's outputs match (run with
 the clock pinned to 2026-11-01T12:00:00Z, so an epoch in a recorded output stays comparable)
-`expected/<name>/outputs/` and every `replay/` run re-runs to its recorded outputs. The three programs of this document
+`expected/<name>/outputs/` and every `replay/` run re-runs to its recorded outputs. A deterministic program whose
+outputs carry its run's id (every item's `made`, a fabula's `derived.run`) cannot be frozen so: it is run as its latest
+recording under `replay/<name>/`, with that run's id and clock, and its outputs are compared with the recording's byte
+for byte. The three programs of this document
 (sections 4.1, 16.2 and 18) are the suite's first three, byte for byte, and the suite's test compiles every block marked
 `thym` here.
 
@@ -2500,7 +2523,7 @@ section it touched.
 18. **A `use`d path stays inside the program's folder** (section 8.4).
 19. **Section 1.3 says who stewards the specification**, in the sentence all five texts share.
 20. **`project` takes `as isograph`**, Ascribe's kind, beside Comprise OES's `isotype` and `paratype`: each MiniCOSM
-    declares the kinds it projects (sections 4.5, 6.2, 6.3 and 18).
+    declares the kinds it projects, in a `moves:` entry that `extends` the move (sections 4.5, 6.2, 6.3, 17.6 and 18).
 21. **The grammar's `call` may have no operand**, as `fabula of p` and every accessor have always been written
     (section 4.8).
 

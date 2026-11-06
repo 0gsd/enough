@@ -6,7 +6,8 @@ section 8 (an answer in each container and in F, form discovery and FEED groundi
 know", a refusal, a skip, an answer with a name refused); the private filter (section 11: each thing it withholds,
 each thing it never drops, a pure function); releases and `release-shape` (section 13); `propose` with a scripted
 coprocessor (section 9); the isograph, match tokens, the cryptograph and the isomorph (section 14); the manifest; the
-specification's own `cosm`, `json` and `yaml` blocks (skipped, with the reason, when the cosmoes-site checkout is
+specification's own `cosm`, `json` and `yaml` blocks, read from the bundled copy of the text (docs/ASCRIBE.md, which
+scripts/sync_specs.py keeps byte for byte cosmoes-site's specs/ascribe.md; skipped, with the reason, when it is
 absent).
 
 Every holograph is the invented sample (tests/fixtures/ascribe/sample-self) copied under tmp_path; nothing reads or
@@ -31,24 +32,18 @@ REPO = Path(__file__).resolve().parents[1]
 FIX = REPO / "tests" / "fixtures" / "ascribe"
 SAMPLE = FIX / "sample-self"
 JOURNAL = FIX / "journal"
-SPEC = Path("/Users/m3u/METMcloud/cosmoes-site/specs/ascribe.md")
+SPEC = REPO / "docs" / "ASCRIBE.md"
 NOW = "2026-11-05T19:30:00Z"
 PROG = {"name": "open-self", "sha256": "2" * 64}
 TRACE = {"run": "2026-11-05-1415-ab12", "sha256": "3" * 64}
-# The text's example (ASCRIBE 14.1) as the ruling of 2026-11-06 has it: the isograph names its run by id, where the
-# text's example still carries `"trace":{"sha256":…}` (for the second errata pass).
+# The text's example (ASCRIBE 14.1): the isograph names its run by id (the ruling of 2026-11-06), and the release
+# record carries the trace's digest.
 SPEC_ISOGRAPH = ('{"epoch":"2026-Q4","handle":"salt-and-crumb","hid":"aej6l5qrka6c6btarfiy2f7vnj",'
                  '"isograph":"ascribe-isograph/0","program":{"name":"open-self","sha256":"' + "2" * 64 + '"},'
                  '"run":"2026-11-05-1415-ab12","sample":true,"self":[{"form":"sourdough","kind":"affinity",'
                  '"marking":"stated","strength":"moderate","valence":"against"}]}')
 
 
-def ruled(text_json: str) -> str:
-    """The text's isograph with the ruling applied: `trace` out, `run` (TRACE's run id) in, canonical again."""
-    doc = json.loads(text_json)
-    doc.pop("trace", None)
-    doc["run"] = TRACE["run"]
-    return A.canonical_json(doc).decode("utf-8")
 LETTERS = list("ABCEIOQSUY")
 
 
@@ -948,16 +943,15 @@ def test_the_texts_cosm_example_lints_clean(tmp_path):
 def test_the_texts_json_isograph_is_what_the_projection_gives(tmp_path):
     js, = _blocks("json")
     doc = json.loads(js)
-    # the text's example still names a trace digest (errata); with the ruling applied it reads clean
-    assert A.isograph_problems(doc) == ["fields ascribe-isograph/0 does not name: trace", "no run"]
-    assert A.canonical_json(doc).decode() == js.strip() and A.isograph_problems(json.loads(ruled(js))) == []
+    assert A.isograph_problems(doc) == [] and doc["run"] == TRACE["run"]
+    assert A.canonical_json(doc).decode() == js.strip() == SPEC_ISOGRAPH
     root = _spec_holograph(tmp_path)
     frag = next(b for b in _blocks("yaml") if b.startswith("# A/affinities.cosm"))
     nodes = mc.yaml_load(frag)["nodes"]
     nodes[0]["visibility"] = "public"
     write_nodes(root, "A/affinities.cosm", *nodes)
     data, rec = A.project_isograph(root, epoch="2026-Q4", program=PROG, trace=TRACE)
-    assert data.decode("utf-8") == ruled(js) == SPEC_ISOGRAPH
+    assert data.decode("utf-8") == js.strip() == SPEC_ISOGRAPH
 
 
 def test_the_texts_yaml_fragments_read(tmp_path):
@@ -1086,7 +1080,7 @@ def test_project_as_isograph_runs_on_the_sample_to_the_texts_example(tmp_path):
     got = (t.dir / "outputs" / "isograph.json").read_text(encoding="utf-8")
     # the text's example, byte for byte, but for what only this run can know: its program's digest and its run's id
     js, = _blocks("json")
-    want = json.loads(ruled(js))
+    want = json.loads(js)
     want["program"]["sha256"] = hashlib.sha256(prog.read_bytes()).hexdigest()
     want["run"] = t.dir.name
     assert got == A.canonical_json(want).decode("utf-8")

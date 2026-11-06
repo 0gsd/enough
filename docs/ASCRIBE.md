@@ -441,7 +441,7 @@ write that would add a check error is not made, and a `why: counter` question is
 
 The earlier spelling of a session source, `session-<n>` (`sources: [session-1]`), stays valid: it names
 `D:session/session-<n>` whether or not the holograph holds that record. A writer writes `D:session/<id>` and a
-`D:session` item for every new session.
+`D:session` item for every new session, and a new session's number skips every number a source already cites.
 
 A question, its session and an answer, as a fragment:
 
@@ -480,8 +480,10 @@ A node needs a form. `settle` looks for one in this order: a form or polyform of
 about; a new form for one word FEED has, `feed: {word, pos, origin: feed}`; and, for anything else, a new form whose
 `feed` is `{pending: "not in FEED"}`, named in the holder's words. A word not in FEED is an open question, never an
 invented form: no writer grounds it in a sense FEED does not give, and the holder may answer it later with a
-definition or an encyclopedia article (`wiki`). Where the answer names no thing at all, the node is not written, and a
-follow-up asks what it is about.
+definition or an encyclopedia article (`wiki`). The form is found from the holder's own words for what the answer is
+about, or from a thing the answer names whole, never from a word guessed out of a sentence. Where the answer names no
+thing at all, the node is not written, and a follow-up asks what it is about: a question about the bank question
+(`about: D:question/<its id>`, raised from `settle`), whose answer settles both.
 
 After a node is written, a writer may raise **follow-up questions** about its optional fields, each `to: holder`,
 `why: missing`, about `<node>#<field>`:
@@ -559,7 +561,8 @@ answer.
 The step that proposes candidates asks the model; it is the move `propose`, declared in Ascribe's manifest:
 `propose f with h` takes the text's fabulan and, `with` it, the holograph, and gives the candidates and their questions,
 which the program lands with `gather` ([Thym](https://thym.cosmoes.org/), its section 6.3). Its contract is
-`no-invention`, `provenance` and Ascribe's own checks, and its run lands every candidate and question or none.
+`no-invention` and `provenance`, the move itself holds every candidate to Ascribe's own checks (section 10), and its run
+lands every candidate and question or none.
 
 ---
 
@@ -586,7 +589,7 @@ An Ascribe reader runs them after the generic ones, in one report. A generic rea
 | `relation-declared` | error | a link whose `rel` is neither a starter word nor a declared relation; a declared relation that repeats a starter word |
 | `when-shape` | error | a `when` that is not a date, a year or an era word |
 | `strength-range` | error | a `strength` that is not a whole number from 1 to 5 |
-| `release-shape` | error | a `releases` entry that lacks a field section 13 requires, or whose `as`, `epoch` or digests are not in their shape; a `morphs` entry that is not a bare file name ending `.morph.cosm` |
+| `release-shape` | error | a `releases` entry that lacks a field section 13 requires, holds a field section 13 does not name, or whose `as`, `epoch` or digests are not in their shape; a `morphs` entry that is not a bare file name ending `.morph.cosm` |
 | `no-pii` | warning, never an error in the holograph | what reads like personal data (section 10.3) |
 | `private-marker` | note | what a `.ascribe-private` marker would keep out of everything that leaves (section 11) |
 
@@ -638,8 +641,13 @@ side behind; this section is the rule, and an implementation applies it.
   written. A kept file that holds one is written out again without it, as its `nodes:` in the COSM YAML subset, and
   without its comments, since a comment cannot be tied to the node it was beside.
 - **Module D**, in every use but a transfer of the whole holograph into the holder's own keeping (section 8.6).
+- **Candidates**, in every use: every candidate (section 9) and every question about one, the holder's own keeping
+  included, since a candidate is not part of the self until the holder says yes.
+- **The catalog's `releases:`**, in every use: it is the holder's own account of what left (section 13).
+- **What it cannot read:** a symbolic link, and a `.cosm` file that does not parse, since either may hold what must be
+  withheld.
 
-**What it never drops.** Everything else, unchanged and byte for byte when its file holds nothing restricted. A
+**What it never drops.** Everything else, unchanged and byte for byte when its file holds nothing it withholds. A
 reference to a withheld item keeps its id and gains no name; the filter never rewrites a kept item, never adds a
 placeholder or a count for what it withheld, and never drops the catalog unless a marker sits beside it.
 
@@ -680,7 +688,8 @@ like any node, with its pending state shown.
 <!-- term: release -->
 A **release** is one act of the holder's by which something left the holograph: an isograph, a cryptograph, a list of
 match tokens or an isomorph (section 14). Every release is recorded in the holograph, in the catalog's `releases:`
-list, oldest first. The record is the holder's own and private, and it is what Thym's `released` check reads:
+list, oldest first. The record is the holder's own and private: the private filter withholds it in every use
+(section 11). It is what Thym's `released` check reads:
 nothing is in a package's `graph.cosm` without a release recorded in the holograph
 ([Thym](https://thym.cosmoes.org/), its section 15). It is the shape of a Holotype's isotype release in
 [Comprise OES](https://comprise.cosmoes.org/), its section 11.3, kept in a file because a holograph has no database.
@@ -706,10 +715,10 @@ A release, as a fragment of the catalog:
 releases:
   - epoch: 2026-Q4
     as: isograph
-    program: {name: open-self, sha256: 2222222222222222222222222222222222222222222222222222222222222222}
-    trace: {run: 2026-11-05-1415-ab12, sha256: 3333333333333333333333333333333333333333333333333333333333333333}
+    program: {name: open-self, sha256: '2222222222222222222222222222222222222222222222222222222222222222'}
+    trace: {run: 2026-11-05-1415-ab12, sha256: '3333333333333333333333333333333333333333333333333333333333333333'}
     at: 2026-11-05T14:15:00Z
-    sha256: 4444444444444444444444444444444444444444444444444444444444444444
+    sha256: '4444444444444444444444444444444444444444444444444444444444444444'
     items: [A:affinity/fast-bread, F:form/sourdough]
 ```
 
@@ -744,7 +753,7 @@ that only chooses, and can keep more back but never add a row, a word or a model
 later never flows into it by itself.
 
 ```text
-{isograph, hid, handle, epoch, sample, program, trace, self}
+{isograph, hid, handle, epoch, sample, program, run, self}
 self[]:  kind, form, valence, strength, when, marking
 ```
 
@@ -755,7 +764,8 @@ self[]:  kind, form, valence, strength, when, marking
 | `handle` | the catalog's `handle`: the pseudonym, never a name |
 | `epoch` | the release's epoch (section 13) |
 | `sample` | `true` when the catalog says so; absent otherwise |
-| `program`, `trace` | as the release records them: `{name, sha256}` and `{sha256}` |
+| `program` | as the release records it: `{name, sha256}` |
+| `run` | the id of the run that made it; the release record carries its trace's digest (section 13) |
 | `self[].kind` | the node's kind, one of the ten |
 | `self[].form` | the FEED word of the node's form (its `feed.word`, where `feed.origin` is `feed`); for a polyform, the sorted list of its forms' words, at most eight, every one so grounded |
 | `self[].valence` | the node's `valence`, when it has one |
@@ -772,10 +782,12 @@ text can identify.
 
 **Its rules.**
 
-- **Assertions, not measurements.** No number of anything; the only digits are in the epoch, a decade and the digests.
+- **Assertions, not measurements.** No number of anything; the only digits are in the epoch, a decade, the hid, the
+  run's id and the digests.
 - **Bands.** `strength` leaves only as its band, and `when` only as its decade.
 - **Sorted.** `self` is sorted by the order of the modules (A B C E I O Q S U Y), then by `form`, `valence`,
-  `strength` and `when`, so that file order leaks nothing. At most twenty entries of each kind; at most 64 kilobytes.
+  `strength` and `when`, so that file order leaks nothing. Two nodes that give the same entry give it once, and
+  nothing counts them. At most twenty entries of each kind; at most 64 kilobytes.
 - **One per epoch.** A holder releases at most one isograph in an epoch; one who releases more often chooses a shorter
   epoch.
 - **Stated and verified.** Every entry is marked `stated`: the holder's own word. **`verified`** is reserved for what a
@@ -794,7 +806,7 @@ The isograph of the holograph of section 4.4, were its node `A:affinity/fast-bre
 `visibility: public` (the two other nodes anchor to a form FEED does not have, and stay):
 
 ```json
-{"epoch":"2026-Q4","handle":"salt-and-crumb","hid":"aej6l5qrka6c6btarfiy2f7vnj","isograph":"ascribe-isograph/0","program":{"name":"open-self","sha256":"2222222222222222222222222222222222222222222222222222222222222222"},"sample":true,"self":[{"form":"sourdough","kind":"affinity","marking":"stated","strength":"moderate","valence":"against"}],"trace":{"sha256":"3333333333333333333333333333333333333333333333333333333333333333"}}
+{"epoch":"2026-Q4","handle":"salt-and-crumb","hid":"aej6l5qrka6c6btarfiy2f7vnj","isograph":"ascribe-isograph/0","program":{"name":"open-self","sha256":"2222222222222222222222222222222222222222222222222222222222222222"},"run":"2026-11-05-1415-ab12","sample":true,"self":[{"form":"sourdough","kind":"affinity","marking":"stated","strength":"moderate","valence":"against"}]}
 ```
 
 A package's `graph.cosm` ([Thym](https://thym.cosmoes.org/), its section 15) is an isograph made for one text: the
@@ -944,8 +956,9 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 4. **Reading a person's own texts** (section 9, new): the holder's own writing, decompiled to a fabulan, proposes
    candidate nodes that become the holder's only by their answer; the move `propose`.
 5. **The checks** (section 10): `release-shape` added; `no-pii` is an error at projection.
-6. **The private filter applied** (section 11): to every ingest, package, transfer and projection; restricted items
-   and module D withheld; a pure function of the folder; what it never drops.
+6. **The private filter applied** (section 11): to every ingest, package, transfer and projection; restricted items,
+   module D, candidates and their questions, and the catalog's `releases:` withheld; a pure function of the folder; what
+   it never drops.
 7. **Lenses** (section 12, new): `self`, `graph` and `timeline`, with the generic `map`, `tree` and text tree.
 8. **Releases** (section 13, new): the catalog key `releases`, the record Thym's `released` check reads.
 9. **Projections** (section 14, was "Projections, by reference"): the isograph's fixed schema
