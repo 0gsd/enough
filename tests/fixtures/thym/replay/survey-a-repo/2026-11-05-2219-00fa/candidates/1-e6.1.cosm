@@ -155,6 +155,10 @@ output:
     returns: Summary
     doc: The words and lines of a text, with the encoding it was read in.
   constants:
+  - name: WORD
+    value: re.compile(r"[A-Za-z]+")
+    line: 10
+    literal: false
   - name: DEFAULT_TOP
     value: '3'
     line: 11

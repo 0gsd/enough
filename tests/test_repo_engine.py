@@ -80,7 +80,9 @@ def test_the_outline_reads_classes_methods_constants_all_and_the_environment():
                                    {"name": "name", "annotation": "str", "line": 11, "default": '"x"'}]
     assert defs["A.go"]["signature"] == "def go(self, n: int, *, fast=False) -> None" and defs["A.go"]["kind"] == "method"
     assert defs["f"]["signature"] == "async def f(a, /, b=2, *args, c, **kw)"
-    assert ol["all"] == ["A", "f"] and ol["constants"] == [{"name": "LIMIT", "value": "3", "line": 4}]
+    assert ol["all"] == ["A", "f"] and ol["constants"] == [
+        {"name": "LIMIT", "value": "3", "line": 4},
+        {"name": "PAT", "value": "object()", "line": 5, "literal": False}]       # a value that is no literal, as written
     assert ol["env"] == [{"key": "A_MODE", "line": 14, "default": '"slow"', "in": "A.go"},
                          {"key": "F_KEY", "line": 17, "in": "f"}]
 
@@ -257,3 +259,35 @@ def test_the_outline_reads_data_shapes_and_the_words_a_user_sees():
                              'p.add_argument("--mode", choices=["a", "b"], metavar="M", help="how")\n')
     assert p["argparse"][0]["epilog"] == "See the README."
     assert p["argparse"][0]["args"][0]["choices"] == '["a", "b"]' and p["argparse"][0]["args"][0]["metavar"] == "M"
+
+
+def test_the_outline_reads_real_code_shapes():
+    """What real repositories hold (lane G1): definitions under `if`/`try`, `__all__` grown by `append`, nested
+    classes, a property's setter folded into it, overloads gathered on their function, type aliases and values that
+    are no literal, class attributes, and the docstring with its doctest examples (parsed, never run)."""
+    text = ('from typing import Union, overload\n'
+            'try:\n    import fast\n    HAS_FAST = True\nexcept ImportError:\n    HAS_FAST = False\n'
+            '__all__ = ["Box", "go"]\n'
+            'Event = Union[int, str]\n'
+            'PAT = re.compile("a")  # a pattern\n'
+            'class Box:\n    """A box.\n\n    More about it.\n\n    >>> Box().size\n    0\n    """\n'
+            '    __marker = object()\n'
+            '    class Inner:\n        def go(self): pass\n'
+            '    @property\n    def size(self): return 0\n'
+            '    @size.setter\n    def size(self, v): pass\n'
+            '@overload\ndef go(a: int) -> int: ...\n@overload\ndef go(a: str) -> str: ...\ndef go(a): return a\n'
+            'if HAS_FAST:\n    class Fast(Box):\n        pass\n    __all__.append("Fast")\n')
+    ol = RE.outline("m.py", text)
+    defs = {d["qual"]: d for d in ol["defs"]}
+    assert ol["all"] == ["Box", "go", "Fast"]
+    assert defs["Fast"]["cond"] == "if HAS_FAST" and defs["Box.Inner"]["nested"] and "Box.Inner.go" in defs
+    assert defs["Box.size"]["setter"] is True and [d["qual"] for d in ol["defs"]].count("Box.size") == 1
+    assert defs["go"]["overloads"] == ["def go(a: int) -> int", "def go(a: str) -> str"]
+    assert defs["Box"]["attrs"] == [{"name": "__marker", "value": "object()", "line": 18}]
+    assert defs["Box"]["docstring"].startswith("A box.") and defs["Box"]["examples"] == [
+        {"source": "Box().size", "want": "0"}]
+    consts = {c["name"]: c for c in ol["constants"]}
+    assert consts["Event"]["alias"] and consts["Event"]["literal"] is False
+    assert consts["PAT"]["value"] == 're.compile("a")' and "alias" not in consts["PAT"]
+    assert consts["HAS_FAST"]["value"] == "True" and consts["HAS_FAST"]["cond"] == "try"
+    assert consts["HAS_FAST"]["also"] == [{"value": "False", "cond": "except ImportError", "line": 6}]

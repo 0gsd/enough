@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -157,8 +158,8 @@ behaviours:
     errors: [{when: n is less than 1, message: n must be 1 or more}]
     lines: "46-51"
 terms:
-  - {slug: word, name: word, word: word, pos: noun, summary: The unit tiny counts., sense: A run of letters, compared
-     without case., lines: "10"}
+  - {slug: word, name: word, word: word, pos: noun, summary: The unit tiny counts., sense: 'A run of letters, compared
+     without case.', lines: "10"}
 """,
     "tests/test_counting.py": """
 cases:
@@ -484,7 +485,7 @@ def test_history_reads_a_real_clone_through_the_engine_and_replays_without_it(tm
     # a name only where the repository states it (the licence's holder); the others are roles with counts
     assert set(makers) == {"R:maker/contributor-1", "R:maker/orchard-tools", "R:maker/contributor-2"}
     text = g.read_text()
-    assert "@" not in text.replace("oes:", "") and "Ann Example" not in text and "Bo Example" not in text
+    assert not re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", text) and "Ann Example" not in text and "Bo Example" not in text
     assert all(c["ok"] for c in h.records[-1]["checks"]), h.records[-1]["checks"]
     assert FAB.lint(g).ok
     # the replay needs no clone and no git
@@ -874,3 +875,73 @@ def _text_blocks() -> list[str]:
     import re as _re
     text = (Path(__file__).resolve().parents[1] / "docs" / "THYM.md").read_text(encoding="utf-8")
     return [b for b in _re.findall(r"^```thym\n(.*?)^```", text, _re.S | _re.M)]
+
+
+# ---------------------------------------------------------------------------
+# Real code (lane G1): what three real repositories taught survey and history
+# ---------------------------------------------------------------------------
+
+def _pkg(tmp_path: Path) -> Path:
+    repo = tmp_path / "pkg-tool"
+    (repo / "src" / "pkg").mkdir(parents=True)
+    (repo / "tests").mkdir()
+    (repo / "docs").mkdir()
+    (repo / "src" / "pkg" / "__init__.py").write_text(
+        '"""A package."""\n__all__ = ("Cache", "make")\nfrom typing import Literal\n'
+        'Kind = Literal["a", "b"]\n'
+        'class _Base:\n    @property\n    def timer(self):\n        return 1\n'
+        'class Cache(_Base):\n    def get(self, key):\n        return key\n'
+        'def make(kind: Kind = "a"):\n    """Make one.\n\n    >>> make()\n    \'a\'\n    """\n    return kind\n')
+    (repo / "src" / "pkg" / "_impl.py").write_text("def _helper(x):\n    return x\n\ndef _other():\n    pass\n")
+    (repo / "tests" / "test_pkg.py").write_text("from pkg._impl import _helper\n\ndef test_h():\n    assert _helper(1)\n")
+    (repo / "docs" / "conf.py").write_text('project = "pkg"\n')
+    (repo / "LICENSE").write_text("MIT License\n\nCopyright (c) 2024 Ann Example (ann@example.com)\n\n"
+                                  "Permission is hereby granted, free of charge, to any person\n")
+    return repo
+
+
+def test_survey_reads_what_a_caller_reaches_and_leaves_the_tooling_out(tmp_path):
+    _pkg(tmp_path)
+    t = run_stage(tmp_path, DECOMPILE, "survey-the-repo", [{"name": "repo", "type": "folder", "path": "pkg-tool"}])
+    f = landed(t, "f")
+    _data, items = fabula_of(f)
+    # a private base whose methods a public class inherits, and a private name the tests import
+    assert items["C:interface/pkg._Base"]["exported"] is False and "C:interface/pkg._Base.timer" in items
+    assert items["C:interface/pkg._Base.timer"]["signature"] == "@property def timer(self)"
+    assert "C:interface/pkg._impl._helper" in items and "C:interface/pkg._impl._other" not in items
+    # a type alias a public signature names, the docstring and its doctest example, by rules
+    assert items["C:structure/pkg.Kind"]["shape"] == 'a type alias: Literal["a", "b"]'
+    assert items["C:behaviour/pkg.make.doc"]["does"].startswith("Make one.")
+    assert items["P:case/pkg.make.example-1"]["given"] == {"calls": ["make()"]}
+    assert items["P:case/pkg.make.example-1"]["expect"] == {"value": "'a'"}
+    # the repository's own tooling is no part of the program; an address never reaches the licence's holder
+    assert "C:component/docs.conf" not in items and not any(i.startswith("C:setting/docs") for i in items)
+    assert items["R:licence/mit"]["holder"] == "Ann Example"
+    assert not FAB.lint(f).errors
+
+
+def test_a_value_split_at_an_unquoted_comma_is_refused():
+    with pytest.raises(ValueError, match="a key with no value"):
+        CODE.parse_fold(mc.yaml_load("atem: {line: a, focus: b, push: c, pull: d, cites: []}\n"
+                                     "aims: [{slug: x, name: X, summary: Standard, HTML and more.}]\n"),
+                        taken=set(), paths=set())
+
+
+@pytest.mark.skipif(RE.git_binary() is None, reason="git is not installed here")
+def test_history_places_a_tag_outside_the_log_by_its_release_commit_and_stays_small(tmp_path):
+    repo = make_clone(tmp_path)
+    git(repo, "checkout", "-q", "-b", "side")
+    git(repo, "commit", "-q", "--allow-empty", "-m", "Release v0.3.0.", when="2026-10-20T09:00:00+00:00")
+    git(repo, "tag", "v0.3.0", when="2026-10-20T09:00:00+00:00")
+    git(repo, "checkout", "-q", "main")
+    git(repo, "commit", "-q", "--allow-empty", "-m", "Release v0.3.0.", when="2026-10-21T09:00:00+00:00")
+    t = run_stage(tmp_path, DECOMPILE, "survey-the-repo", [{"name": "repo", "type": "folder", "path": "tiny-tool"}])
+    f = landed(t, "f")
+    h = run_stage(tmp_path, DECOMPILE, "read-the-history", [{"name": "repo", "type": "folder", "path": "tiny-tool"},
+                  {"name": "f", "type": "fabula", "path": str(f.relative_to(tmp_path))}])
+    _data, items = fabula_of(landed(h))
+    rel = items["R:release/v0-3-0"]
+    assert "outside the history read" in rel["summary"] and rel.get("changes")
+    change = items[rel["changes"][-1]]
+    assert change["name"] == "Release v0.3.0." and change["nature"] == "build"
+    assert all(it["began"] <= it["ended"] for it in items.values() if it["type"] == "phase")

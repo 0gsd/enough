@@ -27,6 +27,7 @@ from __future__ import annotations
 import ast
 import configparser
 import datetime as dt
+import doctest
 import os
 import re
 import subprocess
@@ -438,7 +439,7 @@ def _argparse(text: str, tree: ast.AST) -> list[dict]:
             continue
         if fname == "ArgumentParser":
             parsers[var] = {"var": var, "prog": _str_arg(_kw(call, "prog")), "parent": None, "command": None,
-                            "help": _str_arg(_kw(call, "description")), "epilog": _str_arg(_kw(call, "epilog")),
+                            "help": template(text, _kw(call, "description")), "epilog": template(text, _kw(call, "epilog")),
                             "line": n.lineno, "args": []}
             order.append(var)
         elif fname == "add_subparsers" and isinstance(f, ast.Attribute):
@@ -476,8 +477,9 @@ def _argparse(text: str, tree: ast.AST) -> list[dict]:
             for k in ("dest", "action", "type", "default", "nargs", "choices", "required", "help", "metavar"):
                 v = _kw(n, k)
                 if v is not None:
-                    row[k] = _str_arg(v) if k in ("help", "dest", "metavar", "action", "nargs") and \
-                        _str_arg(v) is not None else _seg(text, v)
+                    said = template(text, v) if k == "help" else None     # an f-string help as its template
+                    row[k] = said if said is not None else _str_arg(v) if k in (
+                        "help", "dest", "metavar", "action", "nargs") and _str_arg(v) is not None else _seg(text, v)
             parsers[var]["args"].append(row)
     out = []
     for var in sorted(order, key=lambda v: parsers[v]["line"]):
@@ -600,6 +602,89 @@ def _words(text: str, fn: ast.AST) -> list[dict]:
     return out
 
 
+#: The longest docstring the outline keeps whole (the rest is cut with an ellipsis).
+DOC_CAP = 1500
+
+
+def _examples(doc: str) -> list[dict]:
+    """The doctest examples a docstring holds, read as text (`doctest.DocTestParser`, which parses and never runs):
+    `[{source, want}]`, a run of examples with no output folded into the next one that has some, at most eight."""
+    try:
+        found = doctest.DocTestParser().get_examples(doc)
+    except ValueError:                                  # an example the parser cannot read: none is taken
+        return []
+    out: list[dict] = []
+    pending: list[str] = []
+    for e in found:
+        pending.append(e.source.rstrip("\n"))
+        if e.want.strip():
+            out.append({"source": "\n".join(pending), "want": e.want.rstrip("\n")})
+            pending = []
+    return out[:8]
+
+
+def _is_main_guard(n: ast.AST) -> bool:
+    return isinstance(n, ast.If) and isinstance(n.test, ast.Compare) and isinstance(n.test.left, ast.Name) \
+        and n.test.left.id == "__name__" and any(isinstance(c, ast.Constant) and c.value == "__main__"
+                                                 for c in n.test.comparators)
+
+
+def _blocks(text: str, n: ast.AST) -> list[tuple[list, str]]:
+    """The statement lists a module-level `if`, `try` or `with` holds, each with the condition it runs under, as
+    written (`if HAS_LXML`, `except ImportError`); nothing for the `__main__` guard or any other statement."""
+    if _is_main_guard(n):
+        return []
+    if isinstance(n, ast.If):
+        test = _seg(text, n.test) or "…"
+        out = [(n.body, f"if {test}")]
+        if n.orelse:
+            out.append((n.orelse, f"not {test}"))
+        return out
+    if isinstance(n, ast.Try) or type(n).__name__ == "TryStar":
+        out = [(n.body, "try")]                                                    # type: ignore[attr-defined]
+        for h in n.handlers:                                                       # type: ignore[attr-defined]
+            out.append((h.body, f"except {_seg(text, h.type) or ''}".strip()))
+        if n.orelse:                                                               # type: ignore[attr-defined]
+            out.append((n.orelse, "try succeeded"))
+        if n.finalbody:                                                            # type: ignore[attr-defined]
+            out.append((n.finalbody, "finally"))
+        return out
+    if isinstance(n, (ast.With, ast.AsyncWith)):
+        return [(n.body, f"with {', '.join(_seg(text, i.context_expr) or '' for i in n.items)}")]
+    return []
+
+
+def _module_statements(text: str, tree: ast.Module):
+    """Every module-level statement with the condition it runs under (None at the top), descending into `if`, `try`
+    and `with` blocks (never the `__main__` guard, never a function or a class)."""
+    todo: list[tuple[list, str | None]] = [(tree.body, None)]
+    while todo:
+        body, cond = todo.pop(0)
+        for n in body:
+            yield n, cond
+            for sub, c in _blocks(text, n):
+                todo.append((sub, c if not cond else f"{cond}; {c}"))
+
+
+def _is_alias(n: ast.AST, val: ast.AST) -> bool:
+    """Whether a module-level assignment names a type: `X: TypeAlias = …`, `type X = …`, or a value built of typing's
+    forms (`Union[…]`, `Optional[…]`, `Literal[…]`, `Callable[…]`, `A | B` of names)."""
+    if type(n).__name__ == "TypeAlias":
+        return True
+    if isinstance(n, ast.AnnAssign) and "TypeAlias" in ast.unparse(n.annotation):
+        return True
+    if isinstance(val, ast.Subscript):
+        head = val.value.attr if isinstance(val.value, ast.Attribute) else getattr(val.value, "id", "")
+        return head in ("Union", "Optional", "Literal", "Callable", "Tuple", "List", "Dict", "Type", "Annotated",
+                        "tuple", "list", "dict", "type", "Iterator", "Iterable", "Mapping", "Sequence")
+    if isinstance(val, ast.BinOp) and isinstance(val.op, ast.BitOr):
+        sides = (val.left, val.right)
+        return all(isinstance(x, (ast.Name, ast.Subscript, ast.BinOp)) or (isinstance(x, ast.Constant) and x.value
+                                                                           is None) for x in sides) and \
+            any(isinstance(x, (ast.Name, ast.Subscript)) and ast.unparse(x)[:1].isupper() for x in sides)
+    return False
+
+
 def outline(path: str, text: str) -> dict:
     """A Python file's outline from its syntax tree (never run): `{ok, language, lines, doc, all, imports, defs,
     constants, env, main, argparse}`, every line number an integer, every value as written. `defs` are the
@@ -642,6 +727,7 @@ def outline(path: str, text: str) -> dict:
     out["imports"] = sorted(imports, key=lambda r: r["line"])
     defs: list[dict] = []
     owners: dict[int, str] = {}
+    by_qual: dict[str, dict] = {}
 
     def add_def(node: ast.AST, qual: str, kind: str) -> None:
         d: dict = {"name": node.name, "qual": qual, "kind": kind, "line": node.lineno,      # type: ignore
@@ -659,6 +745,12 @@ def outline(path: str, text: str) -> dict:
         doc1 = _doc1(node)
         if doc1:
             d["doc"] = doc1
+        full = ast.get_docstring(node, clean=True) or ""                              # type: ignore[arg-type]
+        if full and " ".join(full.split()) != doc1:
+            d["docstring"] = full if len(full) <= DOC_CAP else full[:DOC_CAP - 1] + "…"
+            ex = _examples(full)
+            if ex:
+                d["examples"] = ex
         if isinstance(node, ast.ClassDef):
             fields = []
             shape = _class_shape(node, decs)
@@ -671,6 +763,10 @@ def outline(path: str, text: str) -> dict:
                 elif shape == "enum" and isinstance(b, ast.Assign) and len(b.targets) == 1 and \
                         isinstance(b.targets[0], ast.Name) and not b.targets[0].id.startswith("_"):
                     fields.append({"name": b.targets[0].id, "default": _seg(text, b.value), "line": b.lineno})
+                elif isinstance(b, ast.Assign) and len(b.targets) == 1 and isinstance(b.targets[0], ast.Name):
+                    v = _seg(text, b.value) or ""          # a class attribute: `__slots__`, a sentinel, a default
+                    d.setdefault("attrs", []).append({"name": b.targets[0].id, "value": v if len(v) <= 120 else
+                                                      v[:119] + "…", "line": b.lineno})
             if fields:
                 d["fields"] = fields
             if shape:
@@ -684,33 +780,98 @@ def outline(path: str, text: str) -> dict:
             if rets:
                 d["returns_int"] = rets
         defs.append(d)
+        by_qual[qual] = d
         for ln in range(d["line"], d["end"] + 1):
             owners.setdefault(ln, qual) if kind == "class" else owners.__setitem__(ln, qual)
 
-    for n in tree.body:
-        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            add_def(n, n.name, "function")
-        elif isinstance(n, ast.ClassDef):
-            add_def(n, n.name, "class")
-            for b in n.body:
-                if isinstance(b, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    add_def(b, f"{n.name}.{b.name}", "method")
+    def add_body(body: list, prefix: str, cond: str | None, in_class: bool) -> None:
+        """The functions and classes of a module or a class body, in order: overloads gathered on the function they
+        type, a property's setter and deleter folded into the property, a nested class as `Outer.Inner`."""
+        pending: dict[str, list[str]] = {}
+        for n in body:
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                qual = f"{prefix}{n.name}"
+                decs = [_seg(text, x) or "" for x in n.decorator_list]
+                if any(re.fullmatch(r"(typing\.)?overload", d) for d in decs):
+                    pending.setdefault(qual, []).append(_signature(text, n))
+                    continue
+                acc = next((m.group(1) for d in decs for m in [re.fullmatch(rf"{re.escape(n.name)}\.(setter|deleter)",
+                                                                            d)] if m), None)
+                if acc and qual in by_qual:
+                    by_qual[qual][acc] = True
+                    by_qual[qual]["end"] = max(by_qual[qual]["end"], int(n.end_lineno or n.lineno))
+                    continue
+                add_def(n, qual, "method" if in_class else "function")
+                d = defs[-1]
+                if cond:
+                    d["cond"] = cond
+                if qual in pending:
+                    d["overloads"] = pending.pop(qual)
+            elif isinstance(n, ast.ClassDef):
+                qual = f"{prefix}{n.name}"
+                add_def(n, qual, "class")
+                if cond:
+                    defs[-1]["cond"] = cond
+                if prefix and in_class:
+                    defs[-1]["nested"] = True
+                add_body(n.body, f"{qual}.", None, True)
+            elif not in_class:
+                for sub, c in _blocks(text, n):
+                    add_body(sub, prefix, c if not cond else f"{cond}; {c}", False)
+
+    add_body(tree.body, "", None, False)
     out["defs"] = defs
     consts, names_all = [], None
-    for n in tree.body:
+    seen_const: dict[str, dict] = {}
+    for n, cond in _module_statements(text, tree):
         tgt, val = None, None
         if isinstance(n, ast.Assign) and len(n.targets) == 1 and isinstance(n.targets[0], ast.Name):
             tgt, val = n.targets[0].id, n.value
         elif isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name) and n.value is not None:
             tgt, val = n.target.id, n.value
+        elif isinstance(n, ast.AugAssign) and isinstance(n.target, ast.Name) and n.target.id == "__all__" \
+                and isinstance(n.value, (ast.List, ast.Tuple)):
+            names_all = (names_all or []) + [e.value for e in n.value.elts if isinstance(e, ast.Constant)
+                                             and isinstance(e.value, str)]
+            continue
+        elif isinstance(n, ast.Expr) and isinstance(n.value, ast.Call) and isinstance(n.value.func, ast.Attribute) \
+                and isinstance(n.value.func.value, ast.Name) and n.value.func.value.id == "__all__":
+            call = n.value
+            if call.func.attr == "append" and call.args and _str_arg(call.args[0]):
+                names_all = (names_all or []) + [_str_arg(call.args[0])]
+            elif call.func.attr == "extend" and call.args and isinstance(call.args[0], (ast.List, ast.Tuple)):
+                names_all = (names_all or []) + [e.value for e in call.args[0].elts if isinstance(e, ast.Constant)
+                                                 and isinstance(e.value, str)]
+            continue
+        elif type(n).__name__ == "TypeAlias":                                       # `type X = …` (3.12)
+            tgt, val = getattr(n.name, "id", None), n.value                          # type: ignore[attr-defined]
         if tgt == "__all__" and isinstance(val, (ast.List, ast.Tuple)):
-            names_all = [e.value for e in val.elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+            names_all = (names_all or []) + [e.value for e in val.elts if isinstance(e, ast.Constant)
+                                             and isinstance(e.value, str)]
         elif tgt and val is not None:
             lit = _literal(text, val)
-            if lit is not None:
-                consts.append({"name": tgt, "value": lit, "line": n.lineno})
+            if lit is not None and "#" in lit:    # a literal spread over lines with comments: its value, unparsed
+                lit = ast.unparse(val)
+                lit = lit if len(lit) <= 200 else lit[:199] + "…"
+            row: dict = {"name": tgt, "value": lit, "line": n.lineno}
+            if lit is None:                       # not a literal: the expression as written, and whether it names a type
+                s = _seg(text, val) or ""
+                s = ast.unparse(val) if "#" in s else s
+                row["value"] = s if len(s) <= 300 else s[:299] + "…"
+                row["literal"] = False
+                if _is_alias(n, val):
+                    row["alias"] = True
+            if cond:
+                row["cond"] = cond
+            if tgt in seen_const:                 # set again under another branch: one row, every value it takes
+                first = seen_const[tgt]
+                if row["value"] != first["value"]:
+                    first.setdefault("also", []).append({k: row[k] for k in ("value", "cond", "line") if k in row})
+                continue
+            seen_const[tgt] = row
+            consts.append(row)
     if names_all is not None:
-        out["all"] = names_all
+        out["all"] = list(dict.fromkeys(names_all))
     out["constants"] = consts
     out["env"] = _env_reads(text, tree, owners)
     for n in tree.body:

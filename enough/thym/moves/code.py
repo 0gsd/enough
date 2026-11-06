@@ -34,6 +34,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import re
+import tomllib
 from typing import Any
 
 from enough import macrocosm as mc
@@ -117,6 +118,15 @@ def is_test(path: str) -> bool:
     name = parts[-1]
     return (any(p in ("tests", "test", "testing") for p in parts[:-1]) or name.startswith("test_")
             or name.endswith("_test.py") or name == "conftest.py")
+
+
+#: Folders whose Python is the repository's own tooling (documentation builds, release scripts, examples), not the
+#: program: no component, no interface, no dependency of the program, and no file of a cshort.
+TOOLING_DIRS = ("docs", "doc", "dev", "scripts", "tools", "examples", "example", "benchmarks", "bench", ".github")
+
+
+def is_tooling(path: str) -> bool:
+    return "/" in path and path.split("/", 1)[0] in TOOLING_DIRS
 
 
 def is_readme(path: str) -> bool:
@@ -252,7 +262,8 @@ def read_licence(text: str) -> dict:
         c = _COPYRIGHT.search(ln)
         if c and not c.group(2).lower().startswith(("holder", "<", "[")):
             out["year"] = c.group(1)
-            out["holder"] = c.group(2).rstrip(".").strip()[:120]
+            holder = re.sub(r"<[^>]*>|\([^)]*@[^)]*\)|\S+@\S+", "", c.group(2))   # never an address
+            out["holder"] = " ".join(holder.split()).rstrip(".,; ").strip()[:120]
             out["line"] = i
             break
     out["lines"] = lines_in(text)
@@ -417,8 +428,9 @@ def survey(ctx: Any, repo: Value, **_: Any) -> Value:
         o.add(_file_item(f, e, file_ids[e.path], outlines.get(e.path)))
     # -- components, interfaces, settings
     scripts = [s for m in manifests.values() for s in m.get("scripts") or []]
+    reached = _reached_names(outlines, mods)
     for e in py:
-        _survey_module(o, f, e.path, outlines[e.path], file_ids, mods, scripts)
+        _survey_module(o, f, e.path, outlines[e.path], file_ids, mods, scripts, reached.get(mods[e.path], set()))
     # packages: a package component per folder holding an __init__.py, the modules `of` it
     for e in py:
         if e.path.endswith("__init__.py"):
@@ -450,6 +462,34 @@ def survey(ctx: Any, repo: Value, **_: Any) -> Value:
            "atem": {k: {"pending": f"{NOT_FOLDED}: what is its {k}?"} for k in ("line", "focus", "push", "pull")},
            "nodes": [_prov_last(it) for it in o.items.values()]}
     return Value("fabula", cat)
+
+
+def _import_target(imp: dict, mod: str, path: str) -> str:
+    """The dotted module an import names, a relative one resolved against the importing module."""
+    m = str(imp.get("module") or "")
+    level = int(imp.get("level") or 0)
+    if not level:
+        return m
+    base = mod.split(".")
+    pkg = ".".join(base[:len(base) - level + (1 if path.endswith("__init__.py") else 0)])
+    return f"{pkg}.{m}" if m and pkg else (m or pkg)
+
+
+def _reached_names(outlines: dict, mods: dict) -> dict[str, set[str]]:
+    """For each module of the tree, the names other modules of the tree and the tests import from it by name
+    (`from .keys import _hashkey`, `from vulture.noqa import _parse_error_codes`): a caller reaches them, public or
+    not."""
+    known = set(mods.values())
+    out: dict[str, set[str]] = {}
+    for path, ol in outlines.items():
+        if not isinstance(ol, dict) or not ol.get("ok"):
+            continue
+        mod = mods[path]
+        for imp in ol.get("imports") or []:
+            target = _import_target(imp, mod, path)
+            if target in known and target != mod:
+                out.setdefault(target, set()).update(n for n in imp.get("names") or [] if n != "*")
+    return out
 
 
 def _prov_last(it: dict) -> dict:
@@ -485,6 +525,8 @@ def _holds(path: str, ol: dict | None, binary: bool) -> Any:
         names += [c["name"] for c in ol.get("constants") or [] if c["name"].isupper() or c["name"] == "__version__"]
         if is_test(path):
             return "tests"
+        if is_tooling(path):
+            return f"the repository's own tooling ({path.split('/', 1)[0]}/), not part of the program"
         if names:
             s = ", ".join(names)
             return s if len(s) <= 300 else s[:299] + "…"
@@ -542,8 +584,87 @@ def _language(path: str) -> str:
     return _LANG.get(name.rsplit(".", 1)[1].lower(), "other")
 
 
-def _survey_module(o: _Outline, f: Folder, path: str, ol: dict, file_ids: dict, mods: dict, scripts: list) -> None:
-    if not isinstance(ol, dict) or not ol.get("ok") or is_test(path):
+def _base_names(d: dict) -> list[str]:
+    return [re.sub(r"\[.*$", "", str(b)).rsplit(".", 1)[-1] for b in d.get("bases") or []]
+
+
+def _chosen(ol: dict, reached: set[str]) -> dict[str, tuple[bool, str | None]]:
+    """The definitions of a module the outline names as interfaces: `{qual: (exported, why)}`. Public ones (in
+    `__all__` when there is one, else no leading underscore; dunder methods count), and three kinds a caller reaches
+    though they are not public: a name another module of the tree or a test imports, a private class a public class
+    inherits from (its public methods are the subclass's), and the classes nested in a chosen class."""
+    names_all = ol.get("all")
+    defs = ol.get("defs") or []
+    top = {str(d["qual"]): d for d in defs if "." not in str(d["qual"])}
+    out: dict[str, tuple[bool, str | None]] = {}
+    for q, d in top.items():
+        if _public(d["name"], names_all):
+            out[q] = (names_all is None or d["name"] in names_all, None)
+        elif d["name"] in reached:
+            out[q] = (False, "it is not public, but other modules of the tree or its tests import it")
+    grew = True
+    while grew:                                     # private bases of chosen classes, and their bases in turn
+        grew = False
+        for q in list(out):
+            for b in _base_names(top.get(q, {})):
+                if b in top and top[b].get("kind") == "class" and b not in out:
+                    out[b] = (False, f"it is private, and {q} inherits its methods")
+                    grew = True
+    for d in defs:                                  # nested classes and methods, in order (outer before inner)
+        q = str(d["qual"])
+        if "." not in q:
+            continue
+        owner = q.rsplit(".", 1)[0]
+        if owner not in out:
+            continue
+        if _public(d["name"], None) or d["name"] in reached:
+            out[q] = (out[owner][0], None)
+    return out
+
+
+def _notes(d: dict, why: str | None) -> list[str]:
+    """What the outline says of a definition beyond its signature, in plain words."""
+    notes = []
+    if why:
+        notes.append(f"Not exported: {why}.")
+    if d.get("cond"):
+        notes.append(f"Defined only under `{d['cond']}`.")
+    if d.get("overloads"):
+        notes.append("Typed by overloads: " + "; ".join(f"`{s}`" for s in d["overloads"]) + ".")
+    if d.get("attrs"):
+        notes.append("Class attributes: " + "; ".join(f"`{a['name']} = {a['value']}`" for a in d["attrs"]) + ".")
+    if d.get("setter") or d.get("deleter"):
+        notes.append("A property that can also be " + " and ".join(
+            w for w, k in (("set", "setter"), ("deleted", "deleter")) if d.get(k)) + ".")
+    return notes
+
+
+def _docstring_items(o: _Outline, d: dict, mod: str, path: str, iid: str) -> None:
+    """What a public definition's docstring says beyond its first paragraph (its arguments, returns, raises, notes),
+    as a behaviour in the docstring's words, and each doctest example in it as a case, exactly as written: the
+    behaviour a rebuild must keep, read by rules, whatever a model later makes of the code."""
+    sp, src = span(path, d["line"], d.get("end")), [loc(path, d["line"], d.get("end"))]
+    base = f"{name_slug(mod + '.' + str(d['qual']))}"
+    if d.get("docstring"):
+        o.add({"id": f"C:behaviour/{base}.doc", "type": "behaviour", "name": f"What the docstring of {d['qual']} says",
+               "summary": f"The docstring of {d['qual']} of {mod}, as written.", "stance": "observed", "of": [iid],
+               "when": f"{d['qual']} is used", "does": d["docstring"], "span": sp, "provenance": prov(src)})
+    for n, ex in enumerate(d.get("examples") or [], 1):
+        o.add({"id": f"P:case/{base}.example-{n}", "type": "case", "name": f"Example {n} of {d['qual']}",
+               "summary": f"A doctest example in the docstring of {d['qual']}, as written (never run here).",
+               "stance": "observed", "of": [iid], "given": {"calls": ex["source"].splitlines()},
+               "expect": {"value": ex["want"]}, "span": sp, "provenance": prov(src)})
+
+
+def _decorated(d: dict) -> str:
+    """The definition's line with its decorators before it, on one line: `@property def maxsize(self)`."""
+    decs = d.get("decorators") or []
+    return " ".join([f"@{x}" for x in decs] + [str(d.get("signature"))])
+
+
+def _survey_module(o: _Outline, f: Folder, path: str, ol: dict, file_ids: dict, mods: dict, scripts: list,
+                   reached: set[str] | None = None) -> None:
+    if not isinstance(ol, dict) or not ol.get("ok") or is_test(path) or is_tooling(path):
         return
     mod = mods[path]
     fid = file_ids[path]
@@ -551,28 +672,21 @@ def _survey_module(o: _Outline, f: Folder, path: str, ol: dict, file_ids: dict, 
     entry = _entry_function(ol, mod, scripts)
     names_all = ol.get("all")
     exposes: list[str] = []
-    classes_public: dict[str, bool] = {}
+    chosen = _chosen(ol, reached or set())
+    named = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", " ".join(str(d.get("signature")) for d in ol.get("defs") or []
+                                                            if str(d.get("qual")) in chosen)))
     for d in ol.get("defs") or []:
         kind = d.get("kind")
         qual = str(d.get("qual"))
-        if kind == "method":
-            cls = qual.split(".", 1)[0]
-            if not classes_public.get(cls) or not _public(d["name"], None):
-                continue
-            exported = True
-        else:
-            if not _public(d["name"], names_all):
-                if kind == "class":
-                    classes_public[qual] = False
-                continue
-            exported = names_all is None or d["name"] in names_all
-            if kind == "class":
-                classes_public[qual] = True
+        if qual not in chosen:
+            continue
+        exported, why = chosen[qual]
         surface = {"function": "function", "class": "class", "method": "method"}[kind]
         iid = f"C:interface/{name_slug(f'{mod}.{qual}')}"
+        summary = " ".join([d.get("doc") or f"The {surface} {qual} of {mod}."] + _notes(d, why))
         it: dict = {"id": iid, "type": "interface", "name": qual,
-                    "summary": d.get("doc") or f"The {surface} {qual} of {mod}.", "stance": "observed",
-                    "surface": surface, "signature": d.get("signature"), "defined-in": fid}
+                    "summary": summary, "stance": "observed",
+                    "surface": surface, "signature": _decorated(d), "defined-in": fid}
         if kind != "class":
             takes = _params_takes(d.get("params") or [], kind == "method")
             if takes:
@@ -587,6 +701,7 @@ def _survey_module(o: _Outline, f: Folder, path: str, ol: dict, file_ids: dict, 
         it["provenance"] = prov([loc(path, d.get("line"), d.get("end"))])
         o.add(it)
         exposes.append(it["id"])
+        _docstring_items(o, d, mod, path, it["id"])
         if kind == "class" and d.get("shape"):
             o.add(_structure(d, mod, path, fid))
     if exposes:
@@ -613,15 +728,31 @@ def _survey_module(o: _Outline, f: Folder, path: str, ol: dict, file_ids: dict, 
         it["span"] = span(path, env["line"])
         it["provenance"] = prov([loc(path, env["line"])])
         o.add(it)
-    # -- module constants: a value that shapes behaviour, by convention in capitals
+    # -- module constants: a value that shapes behaviour, by convention in capitals; a type alias the module names
     for c in ol.get("constants") or []:
         name = c["name"]
-        message = c["value"][:1] in "\"'" and len(words_in(c["value"])) >= 3
-        if not (re.fullmatch(r"_?[A-Z][A-Z0-9_]*", name) or name == "__version__" or message
-                or not name.startswith("_")):
-            continue
+        listed = names_all is not None and name in names_all
+        if c.get("literal") is False:
+            if c.get("alias") and (listed or name in named or (names_all is None and not name.startswith("_"))):
+                o.add({"id": f"C:structure/{name_slug(f'{mod}.{name}')}", "type": "structure", "name": name,
+                       "summary": f"The type {name} of {mod}: {c['value']}." + (
+                           f" Defined only under `{c['cond']}`." if c.get("cond") else ""),
+                       "stance": "observed", "defined-in": fid, "shape": f"a type alias: {c['value']}",
+                       "span": span(path, c["line"]), "provenance": prov([loc(path, c["line"])])})
+                continue
+            if not (re.fullmatch(r"_?[A-Z][A-Z0-9_]*", name) or listed or name in (reached or ())):
+                continue
+        else:
+            message = c["value"][:1] in "\"'" and len(words_in(c["value"])) >= 3
+            if not (re.fullmatch(r"_?[A-Z][A-Z0-9_]*", name) or name == "__version__" or message or listed
+                    or not name.startswith("_") or name in (reached or ())):
+                continue
+        said = f"set to {c['value']}" + (f" under `{c['cond']}`" if c.get("cond") else "")
+        for alt in c.get("also") or []:
+            said += f"; to {alt['value']}" + (f" under `{alt['cond']}`" if alt.get("cond") else "")
         it = {"id": f"C:setting/{name_slug(f'{mod}.{name}')}", "type": "setting", "name": name,
-              "summary": f"The constant {name} of {mod}, set to {c['value']}.", "stance": "observed", "key": name,
+              "summary": f"The constant {name} of {mod}, {said}." + (" It is exported." if listed else ""),
+              "stance": "observed", "key": name,
               "set-in": "constant", "default": c["value"], "span": span(path, c["line"]),
               "provenance": prov([loc(path, c["line"])])}
         o.add(it)
@@ -814,8 +945,8 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
     std_first: dict = {}
     third: dict[str, dict] = {}
     comp_uses: dict[str, set] = {}
-    for path, ol in outlines.items():
-        if not isinstance(ol, dict) or not ol.get("ok"):
+    for path, ol in sorted(outlines.items(), key=lambda kv: (is_test(kv[0]), kv[0])):
+        if not isinstance(ol, dict) or not ol.get("ok") or is_tooling(path):
             continue
         mod = mods[path]
         cid = f"C:component/{name_slug(mod)}"
@@ -846,6 +977,8 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
                         break
                 continue
             if imp.get("stdlib"):
+                if is_test(path):                 # what the tests use is not what the program needs
+                    continue
                 std_users.setdefault(topname, set()).update({user} if user else set())
                 std_first.setdefault("at", (path, int(imp.get("line") or 1)))
                 continue
@@ -879,6 +1012,8 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
         row, dec = third.get(key), declared.get(key)
         name = dec["package"] if dec else row["import"]
         scope = dec.get("scope") if dec else ("test" if row and row["tests"] else "run-time")
+        if scope == "build" and row and row["tests"]:          # a development group only the tests import
+            scope = "test"
         it = {"id": f"C:dependency/{slug(name)}", "type": "dependency", "name": name,
               "summary": f"{name}, a package from outside the tree" + (
                   f", imported as {row['import']}" if row and row["import"] != name else "") + ".",
@@ -978,7 +1113,6 @@ def _survey_means(o: _Outline, manifests: dict, req_python: str | None, outlines
 
 #: Two commits more than this many days apart start a new episode (THYM 20.6).
 EPISODE_GAP_DAYS = 14
-MAX_CHANGES = 300
 _NATURE = (("fix", re.compile(r"(?i)^(fix|bug|hotfix|repair|correct)|\bfix(es|ed)?\b")),
            ("removal", re.compile(r"(?i)^(remove|delete|drop)\b")),
            ("refactor", re.compile(r"(?i)^(refactor|rename|move|tidy|clean)")),
@@ -998,6 +1132,8 @@ def _days(stamp: str) -> int:
 
 def _nature(c: dict) -> str:
     paths = c.get("paths") or []
+    if re.match(r"(?i)(release|prepare|bump)\b|v?\d+(\.\d+)+\W*$", str(c.get("subject") or "").strip()):
+        return "build"
     if paths and all(re.search(r"(?i)\.(md|rst|txt)$|^docs/", p) for p in paths):
         return "docs"
     if paths and all(is_test(p) for p in paths):
@@ -1019,7 +1155,8 @@ def _because(body: str) -> str | None:
 
 
 def _named_holders(f: Folder) -> set[str]:
-    """The names the repository itself states as its makers: a licence's copyright holder, an AUTHORS file's lines."""
+    """The names the repository itself states as its makers: a licence's copyright holder, an AUTHORS file's lines,
+    the `authors` and `maintainers` of its `pyproject.toml` (their names only, never an address)."""
     names: set[str] = set()
     for e in f.texts():
         if "/" in e.path:
@@ -1028,6 +1165,14 @@ def _named_holders(f: Folder) -> set[str]:
             r = read_licence(f.text(e.path))
             if r.get("holder"):
                 names.add(r["holder"])
+        elif e.path == "pyproject.toml":
+            try:
+                proj = (tomllib.loads(f.text(e.path)) or {}).get("project") or {}
+            except (tomllib.TOMLDecodeError, ValueError):
+                proj = {}
+            for who in list(proj.get("authors") or []) + list(proj.get("maintainers") or []):
+                if isinstance(who, dict) and isinstance(who.get("name"), str) and who["name"].strip():
+                    names.add(who["name"].strip())
         elif re.match(r"(?i)^(authors|contributors|maintainers)(\.(md|txt|rst))?$", e.path):
             for ln in f.text(e.path).splitlines():
                 s = re.sub(r"<[^>]*>|\([^)]*@[^)]*\)", "", ln).strip(" -*\t")
@@ -1068,12 +1213,77 @@ def history(ctx: Any, repo: Value, **mods: Any) -> Value:
     return Value("fabula", {**cat, "nodes": items + new}, origin={"history": grounds})
 
 
+def _release_index(commits: list[dict], tags: list[dict]) -> tuple[list[tuple[int, dict, str]], list[dict]]:
+    """Where each tag stands in the history read (oldest first): `[(index, tag, how)]` and the tags it cannot place.
+    A tag on a commit read stands there (`how` "tag"); a tag whose commit is not among those read (a history rewritten
+    after the tag, a tag on a release branch) stands at the newest commit read whose subject names its version as a
+    release ("Release v6.2.6.", "Bump version to 6.2.6", "6.2.6"), `how` "subject"; any other is left unplaced."""
+    order = {c["sha"]: i for i, c in enumerate(commits)}
+    placed, loose = [], []
+    for t in tags:
+        if t.get("sha") in order:
+            placed.append((order[t["sha"]], t, "tag"))
+            continue
+        version = re.sub(r"^[vV](?=\d)", "", str(t["name"]))
+        ver = re.escape(version)
+        rx = re.compile(rf"^(?:(?:release|prepare|bump(?: version)?(?: to)?|version)[\s:]*)?v?{ver}\W*$"
+                        rf"|^release\s+v?{ver}\b", re.I)
+        hits = [i for i, c in enumerate(commits) if rx.search(str(c.get("subject") or "").strip())]
+        if hits:
+            placed.append((hits[-1], t, "subject"))
+        else:
+            loose.append(t)
+    placed.sort(key=lambda x: (x[0], x[1]["at"]))
+    return placed, loose
+
+
+#: The history kept item by item: the newest changes, each release's own commit; the rest are counted in their
+#: episode and release (MacroCOSM OES 18.4.7: the history serves the fabulac, it does not drown it).
+KEEP_CHANGES = 40
+MAX_EPISODES = 20
+MAX_MAKERS = 12
+MAX_RELEASES = 30
+
+
+def _episodes(commits: list[dict], release_of: dict) -> tuple[list[list[dict]], str]:
+    """The episodes, oldest first, and the rule that made them: the commits between two tags, split again where two
+    commits stand more than EPISODE_GAP_DAYS apart (THYM 20.6); where that gives more than MAX_EPISODES, the commits
+    between two tags alone; where that still does, one episode per calendar year."""
+    def cut(same) -> list[list[dict]]:
+        eps: list[list[dict]] = []
+        cur: list[dict] = []
+        for c in commits:
+            if cur and not same(cur[-1], c):
+                eps.append(cur)
+                cur = []
+            cur.append(c)
+        return eps + ([cur] if cur else [])
+    eps = cut(lambda a, b: release_of.get(a["sha"]) == release_of.get(b["sha"])
+              and abs(_days(b["at"]) - _days(a["at"])) <= EPISODE_GAP_DAYS)
+    if len(eps) <= MAX_EPISODES:
+        return eps, "tags and gaps"
+    eps = cut(lambda a, b: release_of.get(a["sha"]) == release_of.get(b["sha"]))
+    if len(eps) <= MAX_EPISODES:
+        return eps, "tags"
+    years: dict[str, list[dict]] = {}
+    for c in commits:
+        years.setdefault(c["at"][:4], []).append(c)
+    return [years[y] for y in sorted(years)], "years"
+
+
+def _tally(cs: list[dict]) -> str:
+    n: dict[str, int] = {}
+    for c in cs:
+        k = _nature(c)
+        n[k] = n.get(k, 0) + 1
+    return ", ".join(f"{v} {k}" for k, v in sorted(n.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
 def _history_items(f: Folder, h: dict, files_by_path: dict, grounds: dict) -> list[dict]:
     commits = [c for c in h.get("commits") or [] if isinstance(c, dict) and c.get("sha")]
     commits = list(reversed(commits))                       # oldest first
     tags = [t for t in h.get("tags") or [] if isinstance(t, dict) and t.get("name")]
-    order = {c["sha"]: i for i, c in enumerate(commits)}
-    tag_at = sorted(((order[t["sha"]], t) for t in tags if t.get("sha") in order), key=lambda x: x[0])
+    tag_at, loose = _release_index(commits, tags)
     grounds["commits"] = [c["sha"] for c in commits]
     grounds["tags"] = [t["name"] for t in tags]
     grounds["authors"] = sorted({str(c.get("author")) for c in commits})
@@ -1082,48 +1292,50 @@ def _history_items(f: Folder, h: dict, files_by_path: dict, grounds: dict) -> li
     release_of: dict[str, str] = {}
     start = 0
     releases = []
-    for idx, t in tag_at:
+    for idx, t, how in tag_at:
         rid = f"R:release/{slug(t['name'])}"
         for c in commits[start:idx + 1]:
             release_of.setdefault(c["sha"], rid)
-        releases.append((rid, t, commits[start:idx + 1]))
+        releases.append((rid, t, commits[start:idx + 1], commits[idx], how))
         start = max(start, idx + 1)
-    # episodes: the commits between two tags, split again where two commits stand more than 14 days apart
-    episodes: list[list[dict]] = []
-    cur: list[dict] = []
-    for c in commits:
-        if cur and (release_of.get(c["sha"]) != release_of.get(cur[-1]["sha"])
-                    or _days(c["at"]) - _days(cur[-1]["at"]) > EPISODE_GAP_DAYS):
-            episodes.append(cur)
-            cur = []
-        cur.append(c)
-    if cur:
-        episodes.append(cur)
+    episodes, rule = _episodes(commits, release_of)
     phase_of = {}
     for n, ep in enumerate(episodes, 1):
         for c in ep:
             phase_of[c["sha"]] = f"R:phase/episode-{n}"
-    # makers: roles and counts; a name only where the repository states it (its licence holder, its AUTHORS file)
+    # makers: roles and counts; a name only where the repository states it (its licence holder, its AUTHORS file,
+    # its packaging's authors); past MAX_MAKERS, the rest as one group
     named = _named_holders(f)
     counts: dict[str, int] = {}
     for c in commits:
         counts[c["author"]] = counts.get(c["author"], 0) + 1
     ranked = sorted(counts, key=lambda a: (-counts[a], a))
     maker_of: dict[str, str] = {}
-    for n, a in enumerate(ranked, 1):
+    for n, a in enumerate(ranked[:MAX_MAKERS], 1):
         shown = a if a in named else None
         mid = f"R:maker/{slug(shown)}" if shown else f"R:maker/contributor-{n}"
         maker_of[a] = mid
         mine = [c for c in commits if c["author"] == a]
         cap = "author" if n == 1 else "contributor"
-        who = shown or (f"the main contributor" if n == 1 else f"contributor {n}")
+        who = shown or ("the main contributor" if n == 1 else f"contributor {n}")
         out.append({"id": mid, "type": "maker", "name": shown or f"Contributor {n}",
-                    "summary": f"{who[:1].upper() + who[1:]} made {len(mine)} of the {len(commits)} commits, from "
-                               f"{mine[0]['at'][:10]} to {mine[-1]['at'][:10]}.",
+                    "summary": f"{who[:1].upper() + who[1:]} made {len(mine)} of the {len(commits)} commits read, "
+                               f"from {mine[0]['at'][:10]} to {mine[-1]['at'][:10]}.",
                     "stance": "observed", "capacity": cap,
-                    "provenance": prov([f"commit:{c['sha']}" for c in mine[-20:]])})
-    # changes: one per commit, the most recent MAX_CHANGES
-    shown_commits = commits[-MAX_CHANGES:]
+                    "provenance": prov([f"commit:{c['sha']}" for c in mine[-5:]])})
+    rest = ranked[MAX_MAKERS:]
+    if rest:
+        mine = [c for c in commits if c["author"] in rest]
+        for a in rest:
+            maker_of[a] = "R:maker/others"
+        out.append({"id": "R:maker/others", "type": "maker", "name": f"{len(rest)} other contributors",
+                    "summary": f"{len(rest)} other contributors made {len(mine)} of the {len(commits)} commits read, "
+                               f"at most {max(counts[a] for a in rest)} each.",
+                    "stance": "observed", "capacity": "contributor",
+                    "provenance": prov([f"commit:{c['sha']}" for c in mine[-5:]])})
+    # changes: the newest KEEP_CHANGES; the others are counted in their episode and their release
+    keep = {c["sha"] for c in commits[-KEEP_CHANGES:]}
+    shown_commits = [c for c in commits if c["sha"] in keep]
     for c in shown_commits:
         subject = str(c.get("subject") or "").strip() or "(no subject)"
         it: dict = {"id": f"R:change/{c['sha'][:12]}", "type": "change", "name": subject[:80],
@@ -1144,24 +1356,48 @@ def _history_items(f: Folder, h: dict, files_by_path: dict, grounds: dict) -> li
     shown_ids = {f"R:change/{c['sha'][:12]}" for c in shown_commits}
     for n, ep in enumerate(episodes, 1):
         rel = release_of.get(ep[-1]["sha"])
-        name = f"Up to {rel.split('/', 1)[1]}" if rel else f"Episode {n}"
+        name = (f"{ep[0]['at'][:4]}" if rule == "years" else
+                f"Up to {next(r[1]['name'] for r in releases if r[0] == rel)}" if rel else f"Episode {n}")
+        days = sorted(c["at"][:10] for c in ep)
+        firsts = "; ".join(str(c.get("subject") or "")[:60] for c in ep[:2])
         out.append({"id": f"R:phase/episode-{n}", "type": "phase", "name": name,
-                    "summary": f"{len(ep)} commit{'s' if len(ep) != 1 else ''} from {ep[0]['at'][:10]} to "
-                               f"{ep[-1]['at'][:10]}, beginning with: {str(ep[0].get('subject') or '')[:80]}",
-                    "stance": "observed", "began": ep[0]["at"][:10], "ended": ep[-1]["at"][:10],
+                    "summary": f"{len(ep)} commit{'s' if len(ep) != 1 else ''} from {days[0]} to {days[-1]} "
+                               f"({_tally(ep)}), beginning with: {firsts}",
+                    "stance": "observed", "began": days[0], "ended": days[-1],
                     "changes": [f"R:change/{c['sha'][:12]}" for c in ep if f"R:change/{c['sha'][:12]}" in shown_ids],
                     "provenance": prov([f"commit:{ep[0]['sha']}", f"commit:{ep[-1]['sha']}"])})
-    for rid, t, cs in releases:
+    tagged = sorted([(r[1]["at"], r) for r in releases] + [(t["at"], (None, t, [], None, "loose")) for t in loose],
+                    key=lambda x: (x[0], x[1][1]["name"]))
+    older = [r for _, r in tagged[:-MAX_RELEASES]] if len(tagged) > MAX_RELEASES else []
+    if older:
+        names = [r[1]["name"] for r in older]
+        out.append({"id": "R:phase/earlier-releases", "type": "phase", "name": "Earlier releases",
+                    "summary": f"{len(older)} earlier tags, from {names[0]} ({older[0][1]['at'][:10]}) to {names[-1]} "
+                               f"({older[-1][1]['at'][:10]}): {', '.join(names)}.",
+                    "stance": "observed", "began": older[0][1]["at"][:10], "ended": older[-1][1]["at"][:10],
+                    "provenance": prov([f"tag:{n}" for n in names])})
+    old_names = {r[1]["name"] for r in older}
+    releases = [r for r in releases if r[1]["name"] not in old_names]
+    loose = [t for t in loose if t["name"] not in old_names]
+    for rid, t, cs, at_c, how in releases:
         version = re.sub(r"^[vV](?=\d)", "", t["name"])
+        where = "" if how == "tag" else (f" Its tag stands on a commit outside the history read; the release is "
+                                          f"placed at the commit named \"{str(at_c.get('subject') or '')[:60]}\".")
         out.append({"id": rid, "type": "release", "name": t["name"],
-                    "summary": f"The tag {t['name']}, made on {t['at'][:10]}.", "stance": "observed",
+                    "summary": f"The tag {t['name']}, made on {t['at'][:10]}, after {len(cs)} commit"
+                               f"{'s' if len(cs) != 1 else ''} ({_tally(cs)}).{where}", "stance": "observed",
                     "version": version, "at": t["at"][:10], "tag": t["name"],
                     "changes": [f"R:change/{c['sha'][:12]}" for c in cs if f"R:change/{c['sha'][:12]}" in shown_ids],
-                    "provenance": prov([f"tag:{t['name']}", f"commit:{t['sha']}"])})
+                    "provenance": prov([f"tag:{t['name']}", f"commit:{at_c['sha']}"])})
+    for t in loose:
+        out.append({"id": f"R:release/{slug(t['name'])}", "type": "release", "name": t["name"],
+                    "summary": f"The tag {t['name']}, made on {t['at'][:10]}, on a commit outside the history read.",
+                    "stance": "observed", "version": re.sub(r"^[vV](?=\d)", "", t["name"]), "at": t["at"][:10],
+                    "tag": t["name"], "provenance": prov([f"tag:{t['name']}"])})
     for it in out:
         if it.get("changes") == []:
             it.pop("changes")
-    if h.get("truncated") or len(commits) > MAX_CHANGES or h.get("shallow"):
+    if h.get("truncated") or h.get("shallow"):
         out.append({"id": "R:phase/before-the-record", "type": "phase", "name": "Before what was read",
                     "summary": "The history read here does not reach the first commit.", "stance": "observed",
                     "began": {"pending": "when did the work begin?"}, "ended": commits[0]["at"][:10] if commits else
@@ -1202,6 +1438,24 @@ def local_outline(items: list[dict], path: str) -> list[dict]:
 def _compact(it: dict) -> dict:
     """An item as a model is shown it: without provenance and made."""
     return {k: v for k, v in it.items() if k not in ("provenance", "made", "stance")}
+
+
+#: What a reader is not shown of an outline item: the bookkeeping it cannot use (the file is the one it reads, the
+#: kind is in the id, the component's list of what it exposes is the interfaces that follow).
+_NOT_SHOWN = ("provenance", "made", "stance", "type", "defined-in", "sha256", "length", "exposes", "holds", "files",
+              "component", "language")
+
+
+def _shown(it: dict, path: str) -> dict:
+    """An outline item as a reader of `path` is shown it: its own fields, a span in this file as its lines."""
+    out = {k: v for k, v in it.items() if k not in _NOT_SHOWN}
+    sp = out.get("span")
+    if isinstance(sp, dict) and sp.get("file") == path:
+        out.pop("span")
+        out["lines"] = sp.get("lines")
+    if out.get("exported") is True:
+        out.pop("exported")
+    return out
 
 
 def _numbered(text: str, first: int = 1) -> str:
@@ -1273,6 +1527,7 @@ def parse_reading(out: Any, *, path: str, module: str, n_lines: int, taken: set[
         for i, row in enumerate(rows, 1):
             if not isinstance(row, dict):
                 raise ValueError(f"{section} entry {i} is not a mapping")
+            _broken_keys(section, i, row)
             for need in ("name", "summary"):
                 if not isinstance(row.get(need), str) or not row[need].strip():
                     raise ValueError(f"{section} entry {i} has no {need}")
@@ -1353,6 +1608,7 @@ def enrichments(rows: Any, base: list[dict], path: str, n_lines: int) -> list[di
     for i, row in enumerate(rows, 1):
         if not isinstance(row, dict) or not isinstance(row.get("id"), str):
             raise ValueError(f"enrich entry {i} names no id")
+        _broken_keys("enrich", i, row)
         iid = row["id"]
         b = local.get(iid)
         if b is None:
@@ -1435,6 +1691,16 @@ def _ground(feed: Any, word: str, pos: Any) -> dict:
     return {"word": w, "pos": str(pos or "noun"), "origin": "feed"}
 
 
+def _definitions(ol: Any) -> str:
+    """Every function, class and method of a file, private and nested ones too, one per line with its lines and
+    its decorated signature: what a reader of one chunk of a long file needs to name the helpers the other chunks
+    define."""
+    if not isinstance(ol, dict) or not ol.get("ok"):
+        return "(the file does not parse)"
+    rows = [f"{d['line']}-{d.get('end', d['line'])} {d.get('qual')}: {_decorated(d)}" for d in ol.get("defs") or []]
+    return "\n".join(rows) or "(none)"
+
+
 def reading_value(cat: dict, items: list[dict], path: str, new: list[dict]) -> dict:
     """A reading as a fabula: the outline's catalog and only what the reading adds for its file, its new items and
     its enrichments of the outline's own items of that file. Its references resolve against the fabula it was read
@@ -1467,15 +1733,17 @@ def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
               and it.get("defined-in") != files[path]["id"]][:120]
     feed = (getattr(ctx, "engines", None) or {}).get("feed")
     parts = chunks_of(text)
+    defs = _definitions(engine(ctx, "syntax").outline(path, text))
 
     def inputs(a: int, b: int) -> dict:
         lines = text.replace("\r\n", "\n").split("\n")
         return {"fabulac": Value("string", "read"), "path": Value("string", path),
                 "lines": Value("string", f"{a}-{b} of {n}"),
                 "code": Value("string", _numbered("\n".join(lines[a - 1:b]), a)),
-                "outline": Value("string", _yaml([_compact(x) for x in local])),
+                "outline": Value("string", _yaml([_shown(x, path) for x in local])),
                 "terms": Value("string", _yaml(terms) if terms else "[]"),
                 "elsewhere": Value("string", _yaml(others) if others else "[]"),
+                "definitions": Value("string", defs),
                 "test": Value("string", "yes" if is_test(path) else "no")}
 
     schema = {"format": "yaml", "stamp": "engine", "says": READ_SAYS}
@@ -1490,9 +1758,12 @@ def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     for a, b in parts:
         last_err = None
         for _try in range(2):
-            contract = {"schema": schema, "repair": {"allowed": [], "failed": [
-                {"name": "schema", "ok": False, "why": last_err}] if last_err else []}}
-            cand = ctx.ask(contract, inputs(a, b))
+            # ctx.ask takes `repair` as the list of repairs allowed, and carries only the runtime's failed verdicts;
+            # the reason this move could not read the last answer rides in the inputs, so the prompt says it
+            ins = inputs(a, b)
+            if last_err:
+                ins["failed"] = Value("string", last_err)
+            cand = ctx.ask({"schema": schema, "repair": []}, ins)
             try:
                 got = parse_reading(cand.get("output"), path=path, module=module, n_lines=n,
                                     taken=taken | {i["id"] for i in new}, feed=feed, base=items)
@@ -1645,6 +1916,26 @@ _FOLD_FIELDS = {
 }
 
 
+def _broken_keys(section: str, i: int, row: dict) -> None:
+    """A key with no value in an entry is the mark of a flow mapping split at an unquoted comma (`summary: Standard,
+    HTML and …` reads as `summary: Standard` and a key `HTML and …`): refused, so the answer is asked again with the
+    reason, instead of a summary silently cut short."""
+    bad: list[str] = []
+
+    def walk(x: Any) -> None:
+        if isinstance(x, dict):
+            bad.extend(str(k) for k, v in x.items() if v is None and " " in str(k))
+            for v in x.values():
+                walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+    walk(row)
+    if bad:
+        raise ValueError(f"{section} entry {i} has a key with no value, {bad[0][:60]!r}: a value holding a comma "
+                         "inside { } must be quoted")
+
+
 def parse_fold(data: dict, *, taken: set[str], paths: set[str]) -> tuple[list[dict], dict, list[str]]:
     """The fold's answer as items, the atem and the uses the atem's line cites; ValueError on a shape it cannot
     take. A stance of `observed` stands only on an entry that cites a document's lines; a model's inference is
@@ -1671,6 +1962,7 @@ def parse_fold(data: dict, *, taken: set[str], paths: set[str]) -> tuple[list[di
         for i, row in enumerate(rows, 1):
             if not isinstance(row, dict):
                 raise ValueError(f"{section} entry {i} is not a mapping")
+            _broken_keys(section, i, row)
             for need in ("name", "summary"):
                 if not isinstance(row.get(need), str) or not row[need].strip():
                     raise ValueError(f"{section} entry {i} has no {need}")
@@ -1783,7 +2075,8 @@ def rebuilt(items: list[dict]) -> tuple[list[dict], list[dict]]:
     """(the `C:file`s a cshort rebuilds, the rest): every file in a programming language that is not a test, and
     the README (MacroCOSM OES 18.4.7)."""
     files = [it for it in items if item_kind(it) == "file"]
-    want = [it for it in files if (it.get("language") == "python" and not is_test(str(it.get("path"))))
+    want = [it for it in files if (it.get("language") == "python" and not is_test(str(it.get("path")))
+                                   and not is_tooling(str(it.get("path"))) and str(it.get("path")).endswith(".py"))
             or is_readme(str(it.get("path")))]
     rest = [it for it in files if it not in want]
     return sorted(want, key=lambda it: path_key(str(it["path"]))), rest

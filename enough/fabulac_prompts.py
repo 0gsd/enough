@@ -105,14 +105,27 @@ claims: []
 events: []"""
 
 
+#: The one rule of YAML a model breaks most: inside `{ }` and `[ ]` an unquoted comma ends the value.
+QUOTING = ("Inside { } or [ ], put in single quotes every value that holds a comma, a colon, a # or a question mark "
+           "(write a quote inside one as two: 'it''s').")
+
+
 def read_messages(contract: dict, inputs: dict) -> list[dict]:
     user = (f"File: {_text(inputs, 'path')} (lines {_text(inputs, 'lines')}). Test file: {_text(inputs, 'test')}.\n\n"
             f"The outline for this file:\n```yaml\n{_text(inputs, 'outline')}```\n\n"
             f"Terms the specification already has (reuse their words): {_text(inputs, 'terms')}\n\n"
             f"Interfaces of the other files (elsewhere):\n```yaml\n{_text(inputs, 'elsewhere')}\n```\n\n"
-            f"The code, its lines numbered:\n```\n{_text(inputs, 'code')}\n```\n\n"
-            f"Answer in this shape (the values are examples):\n```yaml\n{READ_SHAPE}\n```")
-    return [{"role": "system", "content": READ_SYSTEM}, {"role": "user", "content": user}]
+            + (f"Every definition of the file, private ones too (lines, name, signature). Tell a private helper "
+               f"inside the behaviour of the interface that uses it, by its name and signature:\n```\n"
+               f"{_text(inputs, 'definitions')}\n```\n\n" if _text(inputs, "definitions") else "")
+            + f"The code, its lines numbered:\n```\n{_text(inputs, 'code')}\n```\n\n"
+            f"Answer in this shape (the values are examples):\n```yaml\n{READ_SHAPE}\n```\n"
+            f"{QUOTING}")
+    msgs = [{"role": "system", "content": READ_SYSTEM}, {"role": "user", "content": user}]
+    if _text(inputs, "failed"):
+        msgs.append({"role": "user", "content": "Your last answer for these lines could not be read: "
+                                                f"{_text(inputs, 'failed')}. Answer again, whole, so that it can."})
+    return msgs
 
 
 # ---------------------------------------------------------------------------
@@ -150,7 +163,7 @@ occasions: []"""
 def fold_messages(contract: dict, inputs: dict) -> list[dict]:
     user = (f"The program: {_text(inputs, 'name')}.\n\nThe specification so far:\n```yaml\n{_text(inputs, 'outline')}"
             f"```\n\nIts documents:\n```\n{_text(inputs, 'documents')}\n```\n\n"
-            f"Answer in this shape (the values are examples):\n```yaml\n{FOLD_SHAPE}\n```")
+            f"Answer in this shape (the values are examples):\n```yaml\n{FOLD_SHAPE}\n```\n{QUOTING}")
     return [{"role": "system", "content": FOLD_SYSTEM}, {"role": "user", "content": user}]
 
 

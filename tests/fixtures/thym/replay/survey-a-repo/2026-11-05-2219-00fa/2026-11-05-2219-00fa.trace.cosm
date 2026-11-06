@@ -1,12 +1,12 @@
 oes: thym/1
 kind: trace
-id: thym/2026-11-05-2046-2166
-name: survey-a-repo run 2026-11-05-2046-2166
+id: thym/2026-11-05-2219-00fa
+name: survey-a-repo run 2026-11-05-2219-00fa
 program:
   name: survey-a-repo
   sha256: 9125a109d4d452b2b86b3f1ea01da599cb4d8a9cdb98dfe4aead5df0513a71e1
 plan:
-  sha256: f725f3ad773b21db5edc7103f6e0e183aca3d293c68f8930f2d70ab378f4791f
+  sha256: 616dfd2f153b93eef97f720c1117af951978108223dc4dd06c1ce7456c888ca6
 environment:
   enough: unknown
   model: none
@@ -14,18 +14,19 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-01T12:00:00Z'
-ended: '2026-11-06T01:46:14Z'
+ended: '2026-11-06T03:19:44Z'
 outcome: landed
 nodes:
-- id: R:trace/2026-11-05-2046-2166
+- id: R:trace/2026-11-05-2219-00fa
   type: trace
-  name: survey-a-repo run 2026-11-05-2046-2166
-  summary: 'ran survey-a-repo on tiny-tool in 395174 s on code: 1 step, all checks green'
+  name: survey-a-repo run 2026-11-05-2219-00fa
+  summary: 'ran survey-a-repo on tiny-tool in 400784 s on code: 1 step, all checks green'
   records:
   - R:record/1
   outcome: landed
   inputs_root: /Users/m3u/METMcloud/METMroot/enough-dev/tests/fixtures/thym
   engines:
+  - ascribe
   - canon
   - dialectic
   - docoes
@@ -34,7 +35,7 @@ nodes:
   provenance:
     mode: derived
     sources:
-    - 2026-11-05-2046-2166.plan.cosm
+    - 2026-11-05-2219-00fa.plan.cosm
     confidence: 1
 - id: R:record/1
   type: record
@@ -48,7 +49,7 @@ nodes:
     path: inputs/tiny-tool
   outputs:
   - name: f
-    sha256: 93bf42a6cba5c8284e77e7387d9019c1585e66ba97d5dba8cfc89b1afdefc88c
+    sha256: a237aff66fca2c5dd550fad09fba077b8ac0deb31ce6492d9d7a610fc6136a50
     path: outputs/f.cosm
   engine: code
   attempts: 1
@@ -73,7 +74,7 @@ nodes:
   provenance:
     mode: derived
     sources:
-    - 2026-11-05-2046-2166.plan.cosm#R:node/1
+    - 2026-11-05-2219-00fa.plan.cosm#R:node/1
     confidence: 1
 - id: R:node/1
   type: node
