@@ -1,0 +1,112 @@
+oes: thym/1
+kind: plan
+id: thym/plan.join-the-notes
+name: join-the-notes on notes.md and 1 more
+program:
+  name: join-the-notes
+  sha256: 244b8499af1be63eb9b11e3e6fde2fe6ca4c4462deabe8c814607e8c3baafa5b
+inputs:
+- name: notes
+  type: list of short
+  path: inputs/notes.md
+  sha256: 6b55523c71c95207a00991dd694bd50d89d297a3cd152caff9d8c9d9098696de
+  members:
+  - path: inputs/notes.md
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+  - path: inputs/draft.md
+    sha256: 1031274c4682b6377f3de11a4797dd62c0ae5ab5fa9d4e2a975a341b156b0e23
+estimate:
+  steps: 3
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: join-the-notes on notes.md and 1 more
+  summary: Three nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  - R:node/3
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: let counts = for each n in notes
+  summary: let counts = for each n in notes
+  step:
+    program: join-the-notes
+    n: 1
+  move: for
+  asks: false
+  takes:
+  - notes
+  repeats: true
+  gives: counts
+  calls:
+  - say
+  - words
+  members:
+    at_most: 2
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 9
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L9-L11
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: join notes
+  summary: join notes
+  step:
+    program: join-the-notes
+    n: 3
+  move: join
+  asks: false
+  takes:
+  - notes
+  gives: all
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L12
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: join counts with ", "
+  summary: join counts with ", "
+  step:
+    program: join-the-notes
+    n: 4
+  move: join
+  asks: false
+  takes:
+  - counts
+  gives: sizes
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L13
+    confidence: 1

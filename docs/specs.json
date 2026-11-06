@@ -1,6 +1,6 @@
 {
   "source": "cosmoes-site",
-  "commit": "8c71e07",
+  "commit": "ebad7e5",
   "dirty": false,
   "synced": "2026-11-06",
   "client": {
@@ -37,7 +37,7 @@
       "revised": "2026-11-03",
       "path": "docs/THYM.md",
       "source": "specs/thym.md",
-      "sha256": "ec4c5686117223438c317a31238d481f037908b991697bba32c2120465ddb9c1"
+      "sha256": "405720c93a829054e762fea49fc0cbcd1dba34f1c505c1c0414031e34559adfc"
     },
     {
       "slug": "ascribe",

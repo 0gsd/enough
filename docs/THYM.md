@@ -1176,7 +1176,8 @@ over a run-time collection whose body is one plain statement (neither an `if` no
 `thym 0` node; any other gives a node named by the loop's own line, with move `for`, `repeats: true`, `members` where
 known, and `calls`, the moves its header and its body call, in written order, once each. A loop that collects gives
 such a node, which also `gives` the loop's name. `members: {at_most: n}` is given only where the plan alone knows the
-collection's size: a list written in the program, or a folder input (its files, counted before the `where`); a count
+collection's size: a list written in the program, a folder input (its files, counted before the `where`), or a list
+input (its members); a count
 is never read from a volume or fabula input, so a plan does not depend on where it was planned. A call of a user move that keeps contracts carries `keeps`, and one that may call itself
 carries `depth` in its budget.
 
@@ -1214,8 +1215,9 @@ python -m enough.thym conform   [<suite folder>]                   run the confo
 
 `plan` and `run` also take `--model local` (the default: the local model), `--model cloud` (the cloud model the host
 names) or `--model cloud:<the provider's model id>`, and `--calls <N>`, a ceiling on the run's model requests (section
-23). An input is given as `name=path`, a folder's path included (`repo=tool/`); when the program takes exactly one
-input, a bare path will do (`python -m enough.thym run tidy.thym notes.md`). An argument is `name=path` when the text
+23). An input is given as `name=path`, a folder's path included (`repo=tool/`), and a list input by its name once per
+member, in order (`xs=a.md xs=b.md`); when the program takes exactly one input, a bare path will do (`python -m
+enough.thym run tidy.thym notes.md`), and for a list, one bare path per member. An argument is `name=path` when the text
 before its first `=` is a name the program takes, and a bare path otherwise; a program of several inputs refuses a bare
 path ("tidy takes story and voice; give each as name=path"). The bare path is the command line's rule, not the
 grammar's, so it holds for both versions, and the plan it makes is the plan `name=path` makes.
@@ -1244,7 +1246,15 @@ builds the coprocessor call from the move's contract and the node's inputs. A fa
 already made are discarded, nothing is written to the target paths, and the trace records how far the run got. Outputs
 are written only when every node has succeeded, all at once, with the trace beside them.
 
-A run snapshots every folder it takes (section 20.3), so that its replay needs no repository. A program of several
+A list input (`takes xs: list of T`, in either version) is given member by member, in order; an empty list is not
+an input given. The plan records it as `{name, type, path, sha256, members: [{path, sha256}]}`: `path` is the first
+member's, `sha256` is over the members' digests in order, a folder member also has `files` and `bytes`, and the list's
+size is the sum of its members'. The run reads each member as it reads a single input of type T, held to its own
+digest, names it `xs[2]` in a refusal (counted from 1), and gives the program the list in the order given. The record
+of a node that takes the list names each member beside it, as `xs[n]`, with its digest and path.
+
+A run snapshots every folder it takes (section 20.3), a list's folder members each as `inputs/<name>.<n>.folder.cosm`,
+so that its replay needs no repository. A program of several
 outputs lands them all in the same step, or none. A folder output lands as a directory, `outputs/<name>/`, holding
 exactly the folder's files, and is renamed into place with every other output in that one step (section 20.4).
 
@@ -1638,7 +1648,7 @@ A `thym/1` volume is one file. Its catalog declares `oes: thym/1` and says which
 | `program` | `<name>.thym.cosm` beside the program | the enumeration of one `.thym` file (section 10); `source: {path, sha256, size}`, `front`, `built` |
 | `morph` | `<name>.morph.cosm` | one or more `M:morph` items |
 | `context` | `<name>.context.cosm` | one or more `C:context` items |
-| `plan` | `<run-id>.plan.cosm` | `program`, `inputs`, `estimate`, the `R:plan` item and its `R:node` items |
+| `plan` | `<run-id>.plan.cosm` | `program`, `inputs` (each `{name, type, path, sha256}`; a folder's also `files` and `bytes`, a list's `members`, section 12.1), `estimate`, the `R:plan` item and its `R:node` items |
 | `trace` | `<run-id>.trace.cosm` | `program`, `plan`, `environment`, `started`, `ended`, `outcome`, the `R:trace` item, its `R:record` items, and a copy of the plan's `R:node` items |
 | `package` | `package.cosm` or `<name>.package.cosm` | `contents`, `made`, `notice` (section 15) |
 | `folder` | `inputs/<name>.folder.cosm` in a run | a run's snapshot of a folder it took: `name`, `path`, `tree`, `commit`, `origin`, `files` (each `{path, sha256, size}`, with `binary: true` for a file that is not text) and `texts` (each text file's bytes as a block scalar) (section 20.3) |
@@ -2520,8 +2530,8 @@ section it touched.
     enumeration keeps it. The moves `derive`, `tell`, `atem` and `expand` are declared by `fabula/1`, which replaces
     `emf/1`; `derive` and `tell` gain the flavours (`as prose`, `as verse`, `as code`, a catem's depths), and `survey`,
     `history`, `gather`, `question`, `record`, `settle`, the editing moves, `join`, `say` and `folders` are new, and
-    so is Ascribe's `propose` (section 6.3). `in` takes a text on its right, a call needs no parentheses in a condition, and a bare path names the
-    one input of a program that takes one (sections 4.5 and 11.3).
+    so is Ascribe's `propose` (section 6.3). `in` takes a text on its right, a call needs no parentheses in a condition, a bare path names the
+    one input of a program that takes one, and a list input is given member by member (sections 4.5, 11.3 and 12.1).
 13. **Sections 20 to 23 are new.** Conformance, Changes and Withdrawn, sections 20, 21 and 22 of edition 0.5.4, are
     sections 24, 25 and 26, and the entry below names them by their numbers in this edition.
 14. **The taxonomy.** Thym is the transcognition language that connects OESes; `thym/1` is a built-in of MacroCOSM's

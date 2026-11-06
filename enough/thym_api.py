@@ -303,23 +303,6 @@ def plan_inputs(project_dir: Path, checked: Any, inputs: dict[str, Any]) -> list
     return rows
 
 
-def list_refusal(checked: Any, rows: list[dict]) -> Refusal | None:
-    """The runtime (`enough/thym/`) reads one path per input (`values.load_input`), so a list given member by member
-    cannot be planned or run yet (docs/fabula-landed-S4.md 2 names the core change). Every member has been checked
-    by then; this says so at the input's `takes` line, check `list-input`. None when no input is such a list."""
-    lists = [r for r in rows if "members" in r]
-    if not lists:
-        return None
-    r = lists[0]
-    block = _block(checked)
-    line = next((p.line for p in (block.takes if block else []) if p.name == r["name"]), None)
-    n = len(r["members"])
-    return Refusal("plan", "list-input",
-                   f"{r['name']} is a {r['type']}, and its {n} member{'s' if n != 1 else ''} were each checked; "
-                   "this enough cannot yet run a program on a list input: its Thym runtime reads one file per input",
-                   line)
-
-
 def make_plan(checked: Any, rows: list[dict]) -> dict | Refusal:
     from .thym import plan as _plan
     return _plan.plan(checked, rows)
@@ -994,9 +977,6 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         if isinstance(checked, Refusal):
             return prog, checked, checked, [], None
         rows = plan_inputs(project_dir, checked, inputs_of(body, checked))
-        held = list_refusal(checked, rows)
-        if held is not None:
-            return prog, checked, held, rows, None
         if asks_model:
             plan, info = _host.plan_for(checked, rows, route=route, model=model, llm_url=llm_url)
             return prog, checked, plan, rows, info

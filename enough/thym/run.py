@@ -92,8 +92,9 @@ from enough.thym.coprocessor import where as _coproc_where
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
-from enough.thym.values import (NOTHING, Value, canonical, filter_folder, item_id, item_key, load_input, members,
-                                 plain, posix_path, sha256_bytes, stamp, wrap, write_snapshot)
+from enough.thym.values import (NOTHING, Value, canonical, filter_folder, is_list_input, item_id, item_key, load_input,
+                                 load_list_input, member_name, member_snapshot, members, plain, posix_path,
+                                 sha256_bytes, stamp, wrap, write_snapshot)
 
 MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked", "before", "after")
 UNITS = ("words", "sentences")
@@ -1284,6 +1285,8 @@ class _Run:
         self.env: dict[str, Value] = {}
         self.inputs: dict[str, Value] = {}
         self.input_paths: dict[str, str] = {}
+        #: a list input's members' paths, in order (`xs` → [a.md, b.md]); its records and the trace name each
+        self.member_paths: dict[str, list[str]] = {}
         self.emitted: list[Value] = []
         self.slots: dict[str, Value] = {}
         self.withheld: dict[str, Value] = {}
@@ -1492,6 +1495,17 @@ class _Run:
             if not isinstance(spec, dict):
                 continue
             name = str(spec.get("name"))
+            if is_list_input(spec):                   # member by member; a folder member from its snapshot in a replay
+                v = load_list_input(spec, self.inputs_root, snapshots=self.snapshots)
+                if isinstance(v, Refusal):
+                    return v
+                self.inputs[name] = v
+                for n, (row, m) in enumerate(zip(spec.get("members") or [], v.payload), 1):
+                    path = posix_path(row.get("path") if isinstance(row, dict) else row)
+                    self.member_paths.setdefault(name, []).append(path)
+                    if m.type == "folder":
+                        self.folders[member_snapshot(name, n)[: -len(".folder.cosm")]] = m
+                continue
             snap = None
             if spec.get("type") == "folder" and self.snapshots is not None:
                 snap = self.snapshots / f"{name}.folder.cosm"
@@ -1540,6 +1554,17 @@ class _Run:
 
     # -- the run --------------------------------------------------------------------------------------------------
 
+    def _trace_inputs(self) -> list[dict]:
+        """The trace's inputs, `{name, path}`, in the plan's order; a list input's members each, as `xs[n]`."""
+        out = []
+        for spec in self.plan.get("inputs") or []:
+            name = str(spec.get("name")) if isinstance(spec, dict) else ""
+            if name in self.member_paths:
+                out.extend({"name": member_name(name, n), "path": p} for n, p in enumerate(self.member_paths[name], 1))
+            elif name in self.input_paths:
+                out.append({"name": name, "path": self.input_paths[name]})
+        return out
+
     def go(self) -> Trace | Refusal:
         r = self._prepare()
         if r is not None:
@@ -1583,7 +1608,7 @@ class _Run:
                                                                "sha256": prog.get("sha256")},
                            plan_sha256=sha256_bytes(plan_bytes), environment=env, started=self.started,
                            nodes=[n for n in self.nodes],
-                           inputs=[{"name": k, "path": p} for k, p in self.input_paths.items()],
+                           inputs=self._trace_inputs(),
                            extra={"inputs_root": str(self.inputs_root), "rules": self.rules,
                                   "replay_of": self.replay_of,
                                   "made_run": self.made_run if self.made_run != rid else None,
@@ -1846,6 +1871,9 @@ class _Run:
             v = self.env.get(t) if isinstance(self.env.get(t), Value) else None
             if v is not None:
                 ins.append(digest_row(t, v, path=self.input_paths.get(t, "")))
+                if t in self.member_paths and v.type == "list":   # a list input: each member as a single input is
+                    ins.extend(digest_row(member_name(t, n), m, path=p)
+                               for n, (m, p) in enumerate(zip(v.payload, self.member_paths[t]), 1))
         seconds = int(time.monotonic() - getattr(self, "_t0", time.monotonic()))
         tokens = cur.tokens + (cur.calls.tokens if cur.calls is not None else 0)
         rec = _trace.record(node, run_id=self.run_id, move=str(node.get("move") or ""), engine=cur.engine,

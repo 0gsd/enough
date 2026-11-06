@@ -429,3 +429,32 @@ def test_thym_moves_is_registered_and_the_block_stays_under_its_cap():
     assert TT._RUNNERS["thym_moves"] is TT.run_thym_moves
     assert TT.documented("thym_moves")
     assert T._DISPATCH["thym_moves"] is TT.run_thym_moves
+
+
+JOIN_THEM = """thym 1
+
+program join-them
+  why: several shorts as one.
+
+  takes xs: list of short
+  gives out: short
+
+  give join xs with " "
+end
+"""
+
+
+def test_run_takes_a_list_by_its_name_once_per_member(project: Path):
+    (project / "join.thym").write_text(JOIN_THEM, encoding="utf-8")
+    (project / "orchard" / "more.md").write_text("More about the lane.\n", encoding="utf-8")
+    r = run(project, tool("thym_run", program="join.thym", inputs="xs=orchard/more.md\nxs=orchard/notes.md"))
+    assert r.ok, r.body
+    assert r.body.startswith("ran join-them on more.md, notes.md"), r.body
+    out = Path(r.body.splitlines()[1].split(": ", 1)[1]).read_text(encoding="utf-8")
+    assert out.startswith("More about the lane. # The Hollins Lane orchard")
+    r = run(project, tool("thym_run", program="join.thym", path="orchard/more.md", inputs="xs=orchard/notes.md"))
+    assert r.ok and r.body.startswith("ran join-them on more.md, notes.md"), r.body      # <path> is the first member
+    r = run(project, tool("thym_run", program="join.thym", inputs="xs=orchard/more.md\nxs=meadow"))
+    assert not r.ok and "xs[2]" in r.body, r.body
+    r = run(project, tool("thym_check", path="join.thym", inputs="xs=orchard/more.md\nxs=orchard/notes.md"))
+    assert r.ok and r.body.startswith("ok\njoin-them: 1 nodes"), r.body

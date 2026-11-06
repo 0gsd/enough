@@ -1,0 +1,11 @@
+-- refused: compile type line 10
+thym 1
+
+program cut-the-notes
+  why: a list of notes taken where cut takes one short; a list is walked, or joined first.
+
+  takes notes: list of short
+  gives s: short
+
+  give cut notes to 20 words
+end

@@ -20,7 +20,7 @@ from enough import agent_free, canon, llm, macrocosm as mc, models, skeleton
 from enough import thym_host as H
 from enough.server import create_app
 from enough.thym import vault
-from enough.thym.values import digest_path
+from enough.thym.values import digest_path, list_digest
 
 REPO = Path(__file__).resolve().parent.parent
 SUITE = REPO / "tests" / "fixtures" / "thym"
@@ -635,8 +635,11 @@ def test_a_list_input_is_given_member_by_member_and_each_checked(client: TestCli
     r = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": ["notes.md", "hello.md"]}})
     assert r.status_code == 200, r.text
     p = r.json()
-    assert p["ok"] is False and (p["refusal"]["check"], p["refusal"]["line"]) == ("list-input", 6)
-    assert "its 2 members were each checked" in p["refusal"]["message"]
+    assert p["ok"] is True and not p.get("refusal"), p                     # the core plans a list member by member
+    plan_row = p["plan"]["inputs"][0]
+    assert [m["sha256"] for m in plan_row["members"]] == [digest_path(project / "notes.md"),
+                                                          digest_path(project / "hello.md")]
+    assert plan_row["sha256"] == list_digest([m["sha256"] for m in plan_row["members"]])
     (inp,) = p["inputs"]
     assert (inp["name"], inp["type"], inp["rel"]) == ("xs", "list of short", None)
     assert inp["members"] == [{"rel": "notes.md", "sha256": digest_path(project / "notes.md")},
@@ -657,8 +660,15 @@ def test_a_list_input_is_given_member_by_member_and_each_checked(client: TestCli
     assert many.status_code == 400
     assert many.json()["detail"] == ("story is a text: it takes a text (a markdown or plain file), one path, and a "
                                      "list of 2 was given")
-    run = client.post("/api/thym/run", json={"program": "join-them", "inputs": {"xs": ["notes.md", "hello.md"]}})
-    assert run.status_code == 400 and "cannot yet run a program on a list input" in run.json()["detail"]
+    done = wait_job(client, start(client, "/api/thym/run", {"program": "join-them",
+                                                            "inputs": {"xs": ["notes.md", "hello.md"]}})["id"])
+    res = done["result"]
+    assert done["state"] == "done" and res["outcome"] == "landed", done
+    (out,) = res["outputs"]
+    assert out["rel"] == "notes.out.md"                                      # beside the first member, as planned
+    landed = (project / "notes.out.md").read_text(encoding="utf-8")
+    notes = (project / "notes.md").read_text(encoding="utf-8")
+    assert landed.startswith(notes.strip().splitlines()[0]) and "A short note about the lane" in landed
 
 
 def test_a_plan_says_where_each_output_will_land_as_the_run_lands_it(client: TestClient, project: Path):

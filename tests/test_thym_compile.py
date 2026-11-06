@@ -20,6 +20,7 @@ import pytest
 from enough import macrocosm as mc
 from enough import thym
 from enough.thym import Refusal
+from enough.thym.values import list_digest
 from enough.thym import check as ck
 from enough.thym import contracts as ct
 from enough.thym import declarations as dc
@@ -117,6 +118,12 @@ def _true_digest(path: str, typ: str | None = None) -> str:
 def test_program_plans_to_its_fixture(program):
     want = mc.yaml_load(_text(SUITE / "expected" / program / "plan.cosm"))
     for inp in want["inputs"]:
+        if isinstance(inp.get("members"), list):           # a list input: each member's, and the list's over theirs
+            member = inp["type"][len("list of "):]
+            for m in inp["members"]:
+                assert m["sha256"] == _true_digest(m["path"], member), f"{program}: the fixture's digest of {m['path']}"
+            assert inp["sha256"] == list_digest([m["sha256"] for m in inp["members"]]), f"{program}: the list digest"
+            continue
         assert inp["sha256"] == _true_digest(inp["path"], inp.get("type")), \
             f"{program}: the fixture's digest of {inp['path']}"
     got = thym.plan_file(SUITE / "programs" / f"{program}.thym", want["inputs"])

@@ -116,11 +116,14 @@ def _takes(program: Path) -> tuple[str, list[tuple[str, str]]]:
     return info.name or program.stem, list(info.takes)
 
 
-def _pairs(items: list[str], program: Path | None = None,
-           names: list[str] | None = None) -> dict[str, str] | Refusal:
+def _pairs(items: list[str], program: Path | None = None, names: list[str] | None = None,
+           lists: set[str] | None = None) -> dict[str, str | list[str]] | Refusal:
     """The inputs from the command line (THYM.md 11.3): `name=path` when the text before the first `=` is a name the
     program takes, else a bare path, which stands for the program's one input. Without a program (a plan's inputs),
-    `names` are the names it takes; with neither, every argument must be `name=path`."""
+    `names` are the names it takes; with neither, every argument must be `name=path`. An input whose type is a list
+    (`lists`, read from the program's `takes` when it is given) is given by its name once per member, in order
+    (`xs=a.md xs=b.md`), and is a list of paths here; several bare paths are the members of a program's one input
+    when that input is a list. Any other input is given once."""
     prog = None
     if program is not None:
         try:
@@ -128,7 +131,9 @@ def _pairs(items: list[str], program: Path | None = None,
         except (OSError, UnicodeDecodeError, ValueError):
             takes = []
         names = [n for n, _ in takes]
-    out: dict[str, str] = {}
+        lists = {n for n, t in takes if _is_list(t)}
+    lists = lists or set()
+    out: dict[str, str | list[str]] = {}
     bare: list[str] = []
     for it in items:
         k, eq, v = it.partition("=")
@@ -136,6 +141,10 @@ def _pairs(items: list[str], program: Path | None = None,
         if eq and (names is None or k in names):
             if not v.strip():
                 return Refusal("plan", "input", f"{k}= names no path")
+            if k in lists:
+                out.setdefault(k, [])
+                out[k].append(v.strip())        # type: ignore[union-attr]
+                continue
             if k in out and out[k] != v.strip():
                 return Refusal("plan", "input", f"{k} is given twice ({out[k]} and {v.strip()}); give each input once")
             out[k] = v.strip()
@@ -152,23 +161,40 @@ def _pairs(items: list[str], program: Path | None = None,
             return Refusal("plan", "input", f"{who} takes nothing; run it without {bare[0]}")
         if len(names) > 1:
             return Refusal("plan", "input", f"{who} takes {said_and(names)}; give each as name=path")
+        if names[0] in lists:
+            out[names[0]] = list(out.get(names[0]) or []) + bare
+            return out
         if len(bare) > 1 or names[0] in out:
             return Refusal("plan", "input", f"{who} takes one input, {names[0]}; give it once")
         out[names[0]] = bare[0]
     return out
 
 
-def _inputs(program: Path, pairs: dict[str, str]) -> list[dict]:
+def _is_list(typ: Any) -> bool:
+    return isinstance(typ, str) and (typ == "list" or typ.startswith("list of "))
+
+
+def _inputs(program: Path, pairs: dict[str, str | list[str]]) -> list[dict]:
     """The plan's inputs from `name=path` pairs: each with its type (from the program's `takes`) and its sha256 (a
-    folder's tree digest for a folder input)."""
-    from enough.thym.values import digest_path, guess_type
+    folder's tree digest for a folder input); a list input's members each so, in order, under `members`."""
+    from enough.thym.values import digest_path, guess_type, list_member_type
+
+    def digest(p: Path, typ: str) -> str:
+        return (digest_path(p, typ if typ == "folder" else None) or "") if p.exists() else ""
+
     takes = dict(_takes(program)[1])
     out = []
     for name, raw in pairs.items():
+        if isinstance(raw, list):
+            typ = takes.get(name) or "list"
+            member = list_member_type(typ)
+            members = [{"path": r, "sha256": digest(Path(r), member)} for r in raw]
+            out.append({"name": name, "type": typ, "path": raw[0] if raw else "", "members": members})
+            continue
         p = Path(raw)
         typ = takes.get(name) or (guess_type(p) if p.exists() else "text")
         row = {"name": name, "type": typ, "path": raw}
-        row["sha256"] = (digest_path(p, typ if typ == "folder" else None) or "") if p.exists() else ""
+        row["sha256"] = digest(p, typ)
         out.append(row)
     return out
 
@@ -375,13 +401,30 @@ def cmd_run(args: argparse.Namespace) -> int:
             _say(str(Refusal("plan", "plan", f"{src} is not a plan volume")))
             return 2
         names = [str(r.get("name")) for r in plan.get("inputs") or [] if isinstance(r, dict)]
-        pairs = _pairs(args.inputs, names=names)
+        lists = {str(r.get("name")) for r in plan.get("inputs") or [] if isinstance(r, dict)
+                 and (_is_list(r.get("type")) or isinstance(r.get("members"), list))}
+        pairs = _pairs(args.inputs, names=names, lists=lists)
         if isinstance(pairs, Refusal):
             _say(str(_in_file(pairs, src)))
             return 2
         for row in plan.get("inputs") or []:
-            if isinstance(row, dict) and row.get("name") in pairs:
-                row["path"] = str(Path(pairs[row["name"]]).absolute())
+            if not isinstance(row, dict) or row.get("name") not in pairs:
+                continue
+            given = pairs[row["name"]]
+            if isinstance(given, list):              # a list's members, in order, where the plan recorded them
+                ms = row.get("members") if isinstance(row.get("members"), list) else []
+                if len(given) != len(ms):
+                    _say(str(_in_file(Refusal("plan", "input", f"{row['name']} has {len(ms)} member"
+                                              f"{'s' if len(ms) != 1 else ''} in the plan, and {len(given)} "
+                                              f"{'was' if len(given) == 1 else 'were'} given; give each, in order, or "
+                                              "plan it again"), src)))
+                    return 2
+                for m, g in zip(ms, given):
+                    if isinstance(m, dict):
+                        m["path"] = str(Path(g).absolute())
+                row["path"] = ms[0]["path"] if ms and isinstance(ms[0], dict) else row.get("path")
+            else:
+                row["path"] = str(Path(given).absolute())
         program: Any = Path(args.program_items) if args.program_items else None
         inputs_root = Path(args.inputs_root) if args.inputs_root else Path.cwd()
     else:
@@ -496,7 +539,8 @@ def build_parser() -> argparse.ArgumentParser:
                              "cloud:<the provider's model id>")
     routes.add_argument("--calls", metavar="N", type=int, default=None,
                         help="a ceiling on the run's model requests (a cloud plan whose count is open needs one)")
-    inputs_help = "name=path, one per input the program takes (a folder's path too); a bare path for a program of one"
+    inputs_help = ("name=path, one per input the program takes (a folder's path too), and once per member for a list "
+                   "(xs=a.md xs=b.md); a bare path for a program of one")
     p = sub.add_parser("plan", parents=[common, routes], help="compile and plan; prints the plan's atem and cost")
     p.add_argument("program")
     p.add_argument("inputs", nargs="*", help=inputs_help)

@@ -1,0 +1,14 @@
+thym 1
+
+program join-the-notes
+  why: notes given one by one, joined in the order they were given, with the words of each counted.
+
+  takes notes: list of short
+  gives all: short, sizes: short
+
+  let counts = for each n in notes
+    keep say (words n)
+  end
+  give all: join notes
+  give sizes: join counts with ", "
+end

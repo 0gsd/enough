@@ -197,20 +197,20 @@ def _resolve_inputs(project_dir: Path, pairs: list[tuple[str, str]],
                     takes: list[tuple[str, str]]) -> tuple[list[dict], dict[str, str]] | str:
     """The plan's inputs `[{name, type, path, sha256}]` from `(name, path)` pairs, each path read by the routes' rule
     and recorded absolute (the plan's digest is over the file the run will read), with its type from the program's
-    `takes` as `cli._inputs` does; also each input's name as the readvisor wrote it. A problem as a string."""
-    from .thym.values import digest_path, guess_type
+    `takes` as `cli._inputs` does; also each input's name as the readvisor wrote it. An input whose type is a list is
+    given by its name once per member, in order (`xs=a.md`, `xs=b.md`), each member held to what one input of the
+    member type takes and named `xs[n]`; its row is the routes' (`{name, type, members: [{path, sha256}], path,
+    sha256}`) and its label its members' paths joined by ", ". A problem as a string."""
+    from .thym.values import digest_path, guess_type, list_digest, list_member_type, member_name
     ct = _ct()
     types = dict(takes)
     rows: list[dict] = []
     labels: dict[str, str] = {}
     seen: dict[str, str] = {}
-    for name, raw in pairs:
+    lists: dict[str, dict] = {}
+
+    def one(name: str, raw: str, typ: str | None) -> tuple[str, Path, str, str] | str:
         rel = ct.tidy_rel(ct._tool_path(project_dir, raw))
-        if name in seen and seen[name] != rel:
-            return f"{name} is given twice ({seen[name]} and {rel}); give each input once"
-        if name in seen:
-            continue
-        seen[name] = rel
         if not rel or rel in ct.STORE_PREFIXES:
             return f"the input {name} has no path"
         try:
@@ -220,16 +220,46 @@ def _resolve_inputs(project_dir: Path, pairs: list[tuple[str, str]],
                     "the Canon store")
         if not target.exists():
             return f"no such file: {rel} (the input {name})"
-        typ = types.get(name) or guess_type(target)
-        if name in types:
+        typ = typ or guess_type(target)
+        if typ is not None:
             from . import thym_host
-            problem = thym_host.check_input(target, typ, name=name, shown=rel)
+            problem = thym_host.check_input(target, typ, name=name, shown=rel) if name.split("[")[0] in types \
+                else None
             if problem:
                 return problem
         try:
             sha = digest_path(target, typ if typ == "folder" else None) or ""
         except OSError as e:
             return f"{rel} could not be read ({e.strerror or e})"
+        return rel, target, typ, sha
+
+    for name, raw in pairs:
+        typ = types.get(name)
+        if isinstance(typ, str) and (typ == "list" or typ.startswith("list of ")):
+            row = lists.get(name)
+            if row is None:
+                row = lists[name] = {"name": name, "type": typ, "path": "", "sha256": "", "members": []}
+                rows.append(row)
+            n = len(row["members"]) + 1
+            got = one(member_name(name, n), raw, list_member_type(typ) or None)
+            if isinstance(got, str):
+                return got
+            rel, target, _, sha = got
+            row["members"].append({"path": str(target), "sha256": sha})
+            row["path"] = row["members"][0]["path"]
+            row["sha256"] = list_digest([m["sha256"] for m in row["members"]])
+            labels[name] = f"{labels[name]}, {rel}" if name in labels else rel
+            continue
+        rel = ct.tidy_rel(ct._tool_path(project_dir, raw))
+        if name in seen and seen[name] != rel:
+            return f"{name} is given twice ({seen[name]} and {rel}); give each input once"
+        if name in seen:
+            continue
+        seen[name] = rel
+        got = one(name, raw, typ)
+        if isinstance(got, str):
+            return got
+        rel, target, typ, sha = got
         rows.append({"name": name, "type": typ, "path": str(target), "sha256": sha})
         labels[name] = rel
     return rows, labels
@@ -366,7 +396,8 @@ def _snapshot(t: Any, *, path: str, mode: str, started: str, labels: dict[str, s
 def run_thym_run(project_dir: Path, call: Any) -> Any:
     """`thym_run <program> <path> [<inputs>]` — run a Thym program on a file, as `python -m enough.thym run` does:
     check, plan, preflight, run (THYM.md 11.3, 12.1). `<program>` is a name or a `.thym` path (`find_program`);
-    `<path>` is the program's first input; further inputs are `<inputs>` lines, `name=path`. The run lands under the
+    `<path>` is the program's first input; further inputs are `<inputs>` lines, `name=path`, a list input's name once
+    per member, in order (`<path>` its first member). The run lands under the
     Thym root only, and the answer is the trace's atem, the outputs' paths and the trace's path.
 
     Refused at plan time, nothing run: a plan whose steps ask a model while agent-free is on or while no model

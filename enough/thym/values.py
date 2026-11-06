@@ -525,10 +525,13 @@ def load_input(spec: dict, inputs_root: Path, *, snapshot: Path | None = None) -
     """One input of a plan (`{name, type, path, sha256}`) as a value, read from `path` (relative to `inputs_root`),
     or a plan-time refusal when it is missing or its digest differs from the plan's (THYM.md 9: "a missing or changed
     input"). A `folder` input is read under the folder rule and held to its tree digest; with `snapshot` (the run's
-    `inputs/<name>.folder.cosm`, in a replay) it is read from there and never from the disk (THYM 20.3)."""
+    `inputs/<name>.folder.cosm`, in a replay) it is read from there and never from the disk (THYM 20.3). A list input
+    (`type: list of T`, with `members`) is `load_list_input`'s, `snapshot` then the replay's `inputs/` folder."""
     name = str(spec.get("name") or "?")
     raw_path = spec.get("path")
     typ = str(spec.get("type") or "")
+    if is_list_input(spec):                        # with `snapshot`, a list's folder of snapshots (a replay's)
+        return load_list_input(spec, inputs_root, snapshots=snapshot)
     if not typ and isinstance(raw_path, str) and raw_path:            # a plan that does not say: a folder with no
         here = Path(raw_path) if Path(raw_path).is_absolute() else Path(inputs_root) / raw_path   # catalog is one
         typ = "folder" if here.is_dir() and folder_catalog(here) is None else ""
@@ -554,6 +557,63 @@ def load_input(spec: dict, inputs_root: Path, *, snapshot: Path | None = None) -
         return read_value(path, typ)
     except (OSError, ValueError) as e:
         return Refusal("plan", "input", f"input {name}: {raw_path} could not be read: {e}")
+
+
+def is_list_input(spec: dict) -> bool:
+    """Whether a plan's input row is a list given member by member (`type: list of T`, or a row with `members`)."""
+    typ = str(spec.get("type") or "")
+    return typ == "list" or typ.startswith("list of ") or isinstance(spec.get("members"), list)
+
+
+def list_member_type(typ: str) -> str:
+    """The member type of a list input's type (`list of short` → `short`); empty for a bare `list`."""
+    return typ[len("list of "):].strip() if typ.startswith("list of ") else ""
+
+
+def list_digest(shas: list[str]) -> str:
+    """A list input's digest as a plan records it: the sha256 over its members' digests, in order, as one text."""
+    return sha256_bytes("".join(str(s or "") for s in shas).encode("utf-8"))
+
+
+def member_name(name: str, n: int) -> str:
+    """A list input's member as refusals name it: `xs[2]` for the second, counted from 1."""
+    return f"{name}[{n}]"
+
+
+def member_snapshot(name: str, n: int) -> str:
+    """The file a run snapshots a list input's folder member in, under the run's `inputs/` (`xs.2.folder.cosm`)."""
+    return f"{name}.{n}.folder.cosm"
+
+
+def load_list_input(spec: dict, inputs_root: Path, *, snapshots: Path | None = None) -> Value | Refusal:
+    """A list input (`{name, type: list of T, members: [{path, sha256}], path, sha256}`) as a list value, its members
+    in the order given: each read as a single input of type T is, with the same refusals, named `xs[n]`, and each
+    held to its own digest. A member that is a folder is read, in a replay (`snapshots`, the recorded run's `inputs/`),
+    from its snapshot there (`member_snapshot`) and never from the disk. An empty list is not an input given."""
+    name = str(spec.get("name") or "?")
+    typ = str(spec.get("type") or "list")
+    member = list_member_type(typ)
+    rows = spec.get("members")
+    if not isinstance(rows, list):
+        return Refusal("plan", "input", f"{name} is a {typ}: the plan gives it as one path, and it takes a list "
+                                        "given member by member; plan it again")
+    if not rows:
+        return Refusal("plan", "input", f"{name} is a {typ}, and the plan gives it no member; give at least one")
+    got: list[Value] = []
+    for n, row in enumerate(rows, 1):
+        row = row if isinstance(row, dict) else {"path": row}
+        one = {"name": member_name(name, n), "type": member, "path": row.get("path"), "sha256": row.get("sha256")}
+        snap = None
+        if member == "folder" and snapshots is not None:
+            snap = Path(snapshots) / member_snapshot(name, n)
+            if not snap.is_file():
+                return Refusal("plan", "input", f"input {one['name']}: the recorded run kept no snapshot of "
+                                                f"{row.get('path') or one['name']}, so it cannot be replayed")
+        v = load_input(one, inputs_root, snapshot=snap)
+        if isinstance(v, Refusal):
+            return v
+        got.append(v)
+    return Value("list", got)
 
 
 def _load_folder(spec: dict, name: str, raw_path: Any, inputs_root: Path, snapshot: Path | None) -> Value | Refusal:

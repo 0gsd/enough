@@ -1,0 +1,171 @@
+oes: thym/1
+kind: program
+id: thym/join-the-notes
+name: join-the-notes
+source:
+  path: join-the-notes.thym
+  sha256: 244b8499af1be63eb9b11e3e6fde2fe6ca4c4462deabe8c814607e8c3baafa5b
+  size: 322
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/join-the-notes
+  type: program
+  name: join-the-notes
+  summary: Notes given one by one, joined in the order they were given, with the words of each counted.
+  why: notes given one by one, joined in the order they were given, with the words of each counted.
+  must: []
+  decided: []
+  takes:
+  - name: notes
+    type: list of short
+  gives:
+  - name: all
+    type: short
+  - name: sizes
+    type: short
+  lines: 3-14
+  order: 1
+  body: |
+    program join-the-notes
+      why: notes given one by one, joined in the order they were given, with the words of each counted.
+
+      takes notes: list of short
+      gives all: short, sizes: short
+
+      let counts = for each n in notes
+        keep say (words n)
+      end
+      give all: join notes
+      give sizes: join counts with ", "
+    end
+  steps:
+  - P:step/join-the-notes.1
+  - P:step/join-the-notes.3
+  - P:step/join-the-notes.4
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L3-L14
+    confidence: 1
+- id: P:step/join-the-notes.1
+  type: step
+  name: let counts = for each n in notes
+  summary: let counts = for each n in notes
+  of: P:program/join-the-notes
+  n: 1
+  text: '  let counts = for each n in notes'
+  line: 9
+  lines: 9-11
+  form: for
+  calls: []
+  binds: counts
+  uses:
+  - notes
+  asks: false
+  steps:
+  - P:step/join-the-notes.2
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L9-L11
+    confidence: 1
+- id: P:step/join-the-notes.2
+  type: step
+  name: keep say (words n)
+  summary: keep say (words n)
+  of: P:program/join-the-notes
+  n: 2
+  text: '    keep say (words n)'
+  line: 10
+  form: keep
+  move: say
+  calls:
+  - say
+  - words
+  uses:
+  - n
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L10
+    confidence: 1
+- id: P:step/join-the-notes.3
+  type: step
+  name: 'give all: join notes'
+  summary: 'give all: join notes'
+  of: P:program/join-the-notes
+  n: 3
+  text: '  give all: join notes'
+  slot: all
+  line: 12
+  form: give
+  move: join
+  calls:
+  - join
+  uses:
+  - notes
+  asks: false
+  contracts:
+  - P:contract/join-the-notes.3
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L12
+    confidence: 1
+- id: P:step/join-the-notes.4
+  type: step
+  name: 'give sizes: join counts with ", "'
+  summary: 'give sizes: join counts with ", "'
+  of: P:program/join-the-notes
+  n: 4
+  text: '  give sizes: join counts with ", "'
+  slot: sizes
+  line: 13
+  form: give
+  move: join
+  calls:
+  - join
+  uses:
+  - counts
+  asks: false
+  contracts:
+  - P:contract/join-the-notes.4
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L13
+    confidence: 1
+- id: P:contract/join-the-notes.3
+  type: contract
+  name: join
+  summary: What join must leave true of what it gives.
+  of: P:step/join-the-notes.3
+  move: join
+  checks:
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L12
+    confidence: 1
+- id: P:contract/join-the-notes.4
+  type: contract
+  name: join
+  summary: What join must leave true of what it gives.
+  of: P:step/join-the-notes.4
+  move: join
+  checks:
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - join-the-notes.thym#L13
+    confidence: 1

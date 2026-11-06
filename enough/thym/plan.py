@@ -18,7 +18,9 @@ The nodes come in evaluation order, a nested call before the call that takes its
 
 A `give` gives the output it names (`give code: …`) or the block's one output; a program of several outputs has a node
 giving each (THYM 8.2). A folder input's row is `{name, type: folder, path, sha256: <tree digest>, files, bytes}`
-(THYM 20.3). In `thym 1`, a loop whose collection is a call names its nodes with the call's temporary in the trailer
+(THYM 20.3). A list input's (`takes xs: list of T`, either version) is `{name, type: list of T, path, sha256,
+members: [{path, sha256}]}`: its members in the order given, `path` the first's, `sha256` over the members' digests
+in order; it is sized by their sum, and a loop over it has `members: {at_most: <its members>}`. In `thym 1`, a loop whose collection is a call names its nodes with the call's temporary in the trailer
 (`, for each l in t2 where …`), so the runtime walks what that node gave and asks for nothing again.
 
 Both grammar versions plan by these rules, and `thym 1` adds three (THYM 11.1, 12.5, 17.3):
@@ -74,7 +76,8 @@ from . import check as ck
 from . import enumerate as en
 from . import folder as fd
 from . import parse as ps
-from .values import posix_path
+from .types import is_list
+from .values import list_digest, list_member_type, posix_path
 
 _NUMBERS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
             "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty")
@@ -517,6 +520,8 @@ def _members(over: Any, rows: dict, counts: dict) -> int | None:
         row = rows[e.name]
         if row.get("type") == "folder" and isinstance(row.get("files"), int):
             return row["files"]
+        if isinstance(row.get("members"), list):    # a list input: its members, counted before the `where`
+            return len(row["members"])
         return counts.get(e.name)
     return None
 
@@ -583,6 +588,41 @@ def _folder_row(i: dict) -> dict:
     return row
 
 
+def _list_row(i: dict) -> dict:
+    """A list input's plan row: `{name, type: list of T, path, sha256, members: [{path, sha256}]}`, its members in
+    the order given, each path posix, `path` the first member's (outputs land beside it) and `sha256` over the
+    members' digests in order (`values.list_digest`). A folder member also records `files` and `bytes`, as a folder
+    input's row does (THYM 20.3)."""
+    typ = str(i.get("type"))
+    member = list_member_type(typ)
+    members = []
+    for m in i.get("members") or []:
+        m = m if isinstance(m, dict) else {"path": m}
+        if member == "folder":
+            f = _folder_row({**m, "name": str(i.get("name"))})
+            members.append({k: f[k] for k in ("path", "sha256", "files", "bytes")})
+        else:
+            members.append({"path": posix_path(m.get("path")), "sha256": str(m.get("sha256") or "")})
+    return {"name": str(i.get("name")), "type": typ, "path": members[0]["path"] if members else "",
+            "sha256": list_digest([m["sha256"] for m in members]), "members": members}
+
+
+def _list_given(p: Any, i: dict, block: Any, m: Any) -> Refusal | None:
+    """A list input given as one path, a single input given as a list, or a list given no member: refused at the
+    program's `takes` line, check `input` (THYM 12.1)."""
+    listed = isinstance(i.get("members"), list)
+    if is_list(p.type) and not listed:
+        return Refusal("plan", "input", f"{p.name} is a {p.type}: it takes a list given member by member, and one "
+                       f"path was given ({posix_path(i.get('path'))})", p.line, m.path)
+    if listed and not is_list(p.type):
+        return Refusal("plan", "input", f"{p.name} is a {p.type}: it takes one path, and a list of "
+                       f"{len(i['members'])} was given", p.line, m.path)
+    if listed and not i["members"]:
+        return Refusal("plan", "input", f"program {block.name} takes {p.name}: {p.type}, and no input was given "
+                       "for it", p.line, m.path)
+    return None
+
+
 def _here(inp: dict, root: Path | None) -> Path:
     """Where an input's path points: as given, or under `root` when it is relative and a root was given."""
     p = Path(str(inp.get("path") or ""))
@@ -592,6 +632,10 @@ def _here(inp: dict, root: Path | None) -> Path:
 def _size(inp: dict, root: Path | None = None) -> int:
     if isinstance(inp.get("size"), int):
         return inp["size"]
+    if isinstance(inp.get("members"), list):         # a list input: the sum of its members'
+        member = list_member_type(str(inp.get("type") or ""))
+        return sum(_size({**(m if isinstance(m, dict) else {"path": m}), "type": member}, root)
+                   for m in inp["members"])
     if inp.get("type") == "folder":                # what a prompt could hold of it: its text files
         try:
             f = fd.read(_here(inp, root))
@@ -607,6 +651,13 @@ def _size(inp: dict, root: Path | None = None) -> int:
     except OSError:
         pass
     return 0
+
+
+def _shown(row: dict) -> str:
+    """An input as a plan's name says it: its file's name; a list's first member's, and how many more there are."""
+    first = Path(str(row.get("path") or "")).name
+    more = len(row["members"]) - 1 if isinstance(row.get("members"), list) else 0
+    return f"{first} and {more} more" if more > 0 else first
 
 
 def run_id(program_sha: str, inputs: list[dict], now: _dt.datetime | None = None) -> str:
@@ -728,10 +779,13 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
         if str(given[p.name].get("type") or p.type) != p.type:
             return Refusal("plan", "input", f"{p.name} is a {p.type}; the input given for it is a "
                            f"{given[p.name].get('type')}", p.line, m.path)
+        wrong = _list_given(p, given[p.name], block, m)
+        if wrong is not None:
+            return wrong
     unknown = [n for n in given if n not in {p.name for p in block.takes}]
     if unknown:
         return Refusal("plan", "input", f"program {block.name} takes no {unknown[0]}", None, m.path)
-    ins = [_folder_row(i) if i.get("type") == "folder" else
+    ins = [_folder_row(i) if i.get("type") == "folder" else _list_row(i) if isinstance(i.get("members"), list) else
            {"name": str(i.get("name")), "type": str(i.get("type")), "path": posix_path(i.get("path")),
             "sha256": str(i.get("sha256"))} for i in inputs]
     program_sha = en.sha256(m.text.encode("utf-8"))
@@ -742,7 +796,7 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
     largest = max((sum(sizes.get(n, 0) for n in nd.inputs) // 4 for nd in nodes if nd.asks), default=0)
     asks = sum(1 for nd in nodes if nd.asks)
     words = max((nd.output_words for nd in nodes), default=0)
-    title = f"{block.name} on {Path(ins[0]['path']).name}" if ins else block.name
+    title = f"{block.name} on {_shown(ins[0])}" if ins else block.name
     summary = root_summary(len(nodes), asks)
     items: list[dict] = [{
         "id": f"R:plan/{rid}", "type": "plan", "name": title, "summary": summary,
