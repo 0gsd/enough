@@ -478,11 +478,15 @@ def test_toggle_on_untrusted_runs_the_audit_and_enables(
     monkeypatch.setattr(skillaudit, "run_llm_audit", fake_llm("pass", "clean"))
     r = client.post("/api/skills/toggle", data={"name": "widget", "enabled": "1"})
     assert r.status_code == 200
-    # The audit runs off the request path; give the task a moment.
-    for _ in range(100):
-        if skillaudit.read_verdict(project, "widget"):
+    # The audit runs off the request path, and it finishes in three steps: the verdict is written, the
+    # skill is switched on, and only then does the server let go of its claim on the skill. Until that
+    # last step the list still says "auditing", so wait for the claim to go and not for the verdict alone
+    # (a slow runner read the list between the two, twice: cda6f99 and the 0.6.0 commit).
+    for _ in range(200):
+        if skillaudit.read_verdict(project, "widget") and not skillaudit.is_auditing(project, "widget"):
             break
         time.sleep(0.05)
+    assert not skillaudit.is_auditing(project, "widget"), "the audit never let go of the skill"
     rec = skillaudit.read_verdict(project, "widget")
     assert rec and rec["verdict"] == "pass"
     assert enabled_map(project)["widget"] is True

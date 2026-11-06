@@ -31,14 +31,25 @@ def _read(rel: str) -> str:
 
 @pytest.fixture(scope="module")
 def built(tmp_path_factory) -> dict:
-    """Every telling of every document, built once into a scratch docs root and loaded through the reader."""
+    """Every telling of every document, built once into a scratch docs root and loaded through the reader.
+
+    Built from the texts in this checkout and from nothing else. A module's fixture is made before conftest's
+    per-test seams are in place, so without a specs root of its own this one read the developer's real
+    ~/enough/specs wherever the installed app had synced the specifications from cosmoes.org, and the suite
+    then failed on that machine alone (first seen the day 0.6.0 went live). An empty folder here means no
+    synced copy is in use and the bundled texts stand."""
     root = tmp_path_factory.mktemp("docs")
-    vols = {}
-    for doc in D.DOCUMENTS:
-        for lang in D.tellings(doc):
-            path = D.build(doc, lang, docs_root=root)
-            assert path.parent == root and path.name == f"{doc}.{lang}.doc.cosm"
-            vols[(doc, lang)] = mc.load_volume(path)
+    seam = pytest.MonkeyPatch()
+    seam.setenv("ENOUGH_SPECS_ROOT", str(tmp_path_factory.mktemp("no-synced-specs")))
+    try:
+        vols = {}
+        for doc in D.DOCUMENTS:
+            for lang in D.tellings(doc):
+                path = D.build(doc, lang, docs_root=root)
+                assert path.parent == root and path.name == f"{doc}.{lang}.doc.cosm"
+                vols[(doc, lang)] = mc.load_volume(path)
+    finally:
+        seam.undo()
     return {"root": root, "vols": vols}
 
 
