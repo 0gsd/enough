@@ -522,6 +522,59 @@ def move_line(d: Any) -> str:
     return f"- {move_signature(d)}; {asks}{contract}" + (f". {says}" if says else "")
 
 
+#: The owners in the order THYM 6.2 lists them; an owner it does not list comes after, in the registry's order.
+OWNERS_ORDER = ("thym", "fabula", "doc", "comprise", "ascribe")
+
+
+def listed_moves(version: int) -> list[Any]:
+    """Every move a program of grammar `version` (0 or 1) may call, as the compiler sees it (`declarations.load()`,
+    the registry the compile reads, in its view for `version`: a move another format `extends` carries the kinds it
+    added), in the text's order: by owner as THYM 6.2 lists them, each owner's moves in its manifest's order. The one
+    listing `thym_moves` and `GET /api/thym/moves` read. Raises what the declarations raise."""
+    from .thym import declarations as _decls
+    seen = _decls.load().view(version)
+    owners = list(dict.fromkeys(d.owner for d in seen.values()))
+    rank = {o: i for i, o in enumerate(list(OWNERS_ORDER) + [o for o in owners if o not in OWNERS_ORDER])}
+    return sorted(seen.values(), key=lambda d: rank[d.owner])             # stable: each owner's manifest order kept
+
+
+def _format_of(owner: str) -> str:
+    """`<owner>/<major>`: the major the owner's manifest says (`version:`), 1 when no manifest says."""
+    try:
+        from . import macrocosm as _mc
+        m = _mc.default_registry().manifests.get(owner)
+        v = (m.data or {}).get("version") if m is not None else None
+    except Exception:  # noqa: BLE001 - a registry that cannot be read names the first major
+        v = None
+    return f"{owner}/{v if isinstance(v, int) and not isinstance(v, bool) else 1}"
+
+
+def move_row(d: Any, *, versions: list[int]) -> dict:
+    """One move as `GET /api/thym/moves` answers it (docs/fabula-landed-S4.md 1): its owner and format, the manifest
+    file that declared it, `since`, the grammars that see it, its signature (`move_signature`), `takes` (each
+    operand's alternatives), `of` (the alternatives of a move whose argument is its `of`, else None), the other
+    modifiers, what it gives, whether it asks a model, its scaffold, its contract, its `says` line, and `extended`:
+    the kinds other owners add to it (`[{owner, as: [...]}]`, THYM 6.2), seen in this view."""
+    mods = {k: list(v) for k, v in dict(d.modifiers or {}).items()}
+    of = mods.pop("of", None) if not d.takes else None
+    return {"name": d.name, "owner": d.owner, "format": _format_of(d.owner),
+            "source": Path(d.source).name if d.source else None, "since": d.since, "versions": versions,
+            "signature": move_signature(d), "takes": [list(t) for t in d.takes], "of": of, "modifiers": mods,
+            "gives": list(d.gives), "asks": bool(d.asks), "scaffold": d.scaffold, "contract": list(d.contract),
+            "says": " ".join(str(d.says or "").split()),
+            "extended": [{"owner": owner, "as": list(words)} for words, _code, owner in (d.code_when or ())]}
+
+
+def moves_payload(version: int) -> dict:
+    """`GET /api/thym/moves?version=`: `{version, moves: [move_row, ...]}` from `listed_moves`. ValueError for a
+    version that is not 0 or 1."""
+    if version not in (0, 1) or isinstance(version, bool):
+        raise ValueError(f"version is 0 or 1 (the grammar's `thym <n>` line), not {version!r}")
+    names = {v: {d.name for d in listed_moves(v)} for v in (0, 1)}
+    return {"version": version,
+            "moves": [move_row(d, versions=[v for v in (0, 1) if d.name in names[v]]) for d in listed_moves(version)]}
+
+
 def run_thym_moves(project_dir: Path, call: Any) -> Any:
     """`thym_moves [<version>] [<move>]` — the moves a program of grammar `version` (1, the default, or 0) may use,
     each with its signature, whether it asks a model, its contract and its `says` line (THYM.md 6.3, 17.6), read from
@@ -531,15 +584,15 @@ def run_thym_moves(project_dir: Path, call: Any) -> Any:
     key = f"thym {raw}"
     if not skill_on(project_dir):
         return _skill_off("thym_moves", key)
-    from .thym import declarations as _decls
     if raw not in ("0", "1"):
         return _err("thym_moves", key, f"<version> is 0 or 1 (the grammar's `thym <n>` line), not {raw!r}.")
     version = int(raw)
     try:
-        seen = _decls.load().view(version)
+        listed = listed_moves(version)                  # the one listing GET /api/thym/moves reads too
     except Exception as e:  # noqa: BLE001 — a manifest that does not read is said in words
         log.exception("thym_moves: the declarations failed")
         return _err("thym_moves", key, f"the moves could not be read ({type(e).__name__}).")
+    seen = {d.name: d for d in listed}
     only = (extra.get("move") or "").strip()
     if only:
         if only not in seen:
@@ -548,7 +601,7 @@ def run_thym_moves(project_dir: Path, call: Any) -> Any:
         return _result("thym_moves", key, True, move_line(seen[only]))
     lines = [f"the moves a thym {version} program may use ({len(seen)}); a user move or a contract block may be "
              "written beside them:"]
-    lines += [move_line(seen[n]) for n in sorted(seen)]
+    lines += [move_line(d) for d in listed]
     return _result("thym_moves", key, True, "\n".join(lines))
 
 
@@ -584,6 +637,6 @@ def register() -> None:
         _t._TRACE_TOGGLE.setdefault(tool_name, "trace_log_enabled")
 
 
-__all__ = ["CEILING", "JOB_KIND", "OUTPUTS_NOTE", "PROGRAMS_SHOWN", "SKILL_NAME", "TOOL_NAMES", "move_line",
-           "move_signature", "program_names", "register", "run_thym_check", "run_thym_moves", "run_thym_run", "shown",
+__all__ = ["CEILING", "JOB_KIND", "OUTPUTS_NOTE", "PROGRAMS_SHOWN", "SKILL_NAME", "TOOL_NAMES", "listed_moves",
+           "move_line", "move_row", "move_signature", "moves_payload", "program_names", "register", "run_thym_check", "run_thym_moves", "run_thym_run", "shown",
            "skill_on"]

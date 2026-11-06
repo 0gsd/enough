@@ -479,3 +479,30 @@ def test_the_ascribe_engine_is_found_by_name_and_is_ascribes_own(monkeypatch):
     assert all(getattr(eng, n) is getattr(ascribe, n) for n in ascribe.THYM_FUNCTIONS)
     monkeypatch.setitem(sys.modules, "enough.ascribe", None)        # the module not there: skipped, no error
     assert "ascribe" not in H.engines(feed=None)
+
+
+def test_find_program_where_looks_in_one_place_only(tmp_path: Path):
+    """Lane S4: a shipped program and a project file of the same bare name are told apart by `where`."""
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    (proj / "tighten.thym").write_text("thym 0\n\nprogram mine\n  takes s: text\n  gives n: number\n\n"
+                                       "  give words s\nend\n", encoding="utf-8")
+    assert H.find_program("tighten.thym", proj) == proj / "tighten.thym"            # as before: the project's
+    assert H.find_program("tighten.thym", proj, where="shipped") == H.SHIPPED_PROGRAMS / "tighten.thym"
+    assert H.find_program("tighten", proj, where="shipped") == H.SHIPPED_PROGRAMS / "tighten.thym"
+    assert H.find_program("tighten.thym", proj, where="project") == proj / "tighten.thym"
+    assert H.find_program("mine", proj, where="project") == proj / "tighten.thym"
+    assert H.find_program("mine", proj, where="shipped") is None
+    assert H.find_program("publish-story.thym", proj, where="project") is None
+    assert H.find_program("x/tighten.thym", proj, where="shipped") is None
+    assert H.find_program("../tighten.thym", proj, where="project") is None
+    assert H.find_program("canon:v/a.thym", proj, where="project") is None
+    with pytest.raises(ValueError):
+        H.find_program("tighten.thym", proj, where="elsewhere")
+
+
+def test_accepts_says_a_list_by_its_members():
+    assert H.accepts("list of text") == "a list of texts (each a markdown or plain file)"
+    assert H.accepts("list of folder") == "a list of folders"
+    assert H.accepts("list of item") == "a list of items"
+    assert H.accepts("text") == "a text (a markdown or plain file)"

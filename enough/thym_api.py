@@ -58,7 +58,7 @@ from .thym import trace as _trace
 from .thym import vault as _vault
 from .thym.cli import plan_atem
 from .thym.coprocessor import RefusingCoprocessor
-from .thym.values import Value, digest_path, read_value
+from .thym.values import Value, digest_path, read_value, sha256_bytes
 
 log = logging.getLogger("enough.thym_api")
 
@@ -230,37 +230,94 @@ def _said(names: list[str]) -> str:
     return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
 
 
-def plan_inputs(project_dir: Path, checked: Any, inputs: dict[str, str]) -> list[dict]:
+def _given(v: Any) -> bool:
+    """Whether a request gave an input: a path that is not blank, or a list with at least one such path."""
+    if isinstance(v, list):
+        return any(str(x or "").strip() for x in v)
+    return bool(str(v or "").strip())
+
+
+def _one_input(project_dir: Path, rel: str, typ: str, name: str) -> tuple[Path, str]:
+    """One path held to what an input of type `typ` takes, as every input is (a list's members each in turn): 404 for
+    a path that is not there; 400 in words for one of the wrong kind or a folder with no catalog. `(path, sha256)`."""
+    shown = _canon_tools.tidy_rel(rel)
+    p = resolve(project_dir, rel)
+    if not p.exists() and not p.is_symlink():
+        raise HTTPException(404, f"no such file: {shown}")
+    problem = _host.check_input(p, typ, name=name, shown=shown)
+    if problem:
+        raise HTTPException(400, problem)
+    sha = digest_path(p, typ if typ == "folder" else None)
+    if sha is None:
+        raise HTTPException(400, f"{shown} is a folder with no catalog; {name} takes {_host.accepts(typ)}")
+    return p, sha
+
+
+def plan_inputs(project_dir: Path, checked: Any, inputs: dict[str, Any]) -> list[dict]:
     """The plan's inputs from `{<takes name>: <path>}`: every input the program takes, each in the program's order,
     with its type, its absolute path and its sha256 (a folder's tree digest; THYM.md 12.1, 20.3). Each path is held to
     what its input takes (`thym_host.check_input`: a text, a fabula, a folder, a volume, a morph, a context, a
     package). 404 for a path that is not there; 400 for a name the program does not take, an input missing, or a
-    path of the wrong kind, in words."""
+    path of the wrong kind, in words.
+
+    An input whose type is `list of T` is given as a list of paths (`{xs: ["a.md", "b.md"]}`): each member is held
+    to what an input of type T takes, in order, with the refusals a single path gets (the input named `xs[2]` for
+    the third); its row is `{name, type, members: [{path, sha256}], path, sha256}` (`path` the first member's, which
+    outputs land beside; `sha256` over the members' in order). A list given for an input that is not a list, and a
+    single path for one that is, are refused in words that name the input and its type."""
+    from .thym import types as _ty
     block = _block(checked)
     takes = {p.name: p.type for p in block.takes} if block is not None else {}
     prog = block.name if block else "the program"
     unknown = [n for n in inputs if n not in takes]
     if unknown:
         raise HTTPException(400, f"{prog} takes no {unknown[0]}; it takes {_said(list(takes)) if takes else 'nothing'}")
-    missing = [n for n in takes if not str(inputs.get(n) or "").strip()]
+    missing = [n for n in takes if not _given(inputs.get(n))]
     if missing:
         wants = _said([f"{n} ({_host.accepts(takes[n])})" for n in takes])
         raise HTTPException(400, f"{prog} takes {wants}; give {_said(missing)}")
     rows = []
     for name in takes:
-        rel = str(inputs[name] or "")
-        shown = _canon_tools.tidy_rel(rel)
-        p = resolve(project_dir, rel)
-        if not p.exists() and not p.is_symlink():
-            raise HTTPException(404, f"no such file: {shown}")
-        problem = _host.check_input(p, takes[name], name=name, shown=shown)
-        if problem:
-            raise HTTPException(400, problem)
-        sha = digest_path(p, takes[name] if takes[name] == "folder" else None)
-        if sha is None:
-            raise HTTPException(400, f"{shown} is a folder with no catalog; {name} takes {_host.accepts(takes[name])}")
-        rows.append({"name": name, "type": takes[name], "path": str(p), "sha256": sha})
+        typ, given = takes[name], inputs[name]
+        if _ty.is_list(typ):
+            if not isinstance(given, list):
+                raise HTTPException(400, f"{name} is a {typ}: it takes {_host.accepts(typ)}, given as a list of "
+                                         f"paths ([\"a.md\", \"b.md\"]), and one path was given "
+                                         f"({_canon_tools.tidy_rel(str(given))})")
+            member = _ty.element(typ)
+            members = []
+            for i, rel in enumerate(str(x or "") for x in given):
+                if not rel.strip():
+                    raise HTTPException(400, f"{name}[{i + 1}] is blank; every member of {name} names a path")
+                p, sha = _one_input(project_dir, rel, member, f"{name}[{i + 1}]")
+                members.append({"path": str(p), "sha256": sha})
+            joined = sha256_bytes("".join(m["sha256"] for m in members).encode("utf-8"))
+            rows.append({"name": name, "type": typ, "path": members[0]["path"], "sha256": joined,
+                         "members": members})
+            continue
+        if isinstance(given, list):
+            raise HTTPException(400, f"{name} is a {typ}: it takes {_host.accepts(typ)}, one path, and a list of "
+                                     f"{len(given)} was given")
+        p, sha = _one_input(project_dir, str(given or ""), typ, name)
+        rows.append({"name": name, "type": typ, "path": str(p), "sha256": sha})
     return rows
+
+
+def list_refusal(checked: Any, rows: list[dict]) -> Refusal | None:
+    """The runtime (`enough/thym/`) reads one path per input (`values.load_input`), so a list given member by member
+    cannot be planned or run yet (docs/fabula-landed-S4.md 2 names the core change). Every member has been checked
+    by then; this says so at the input's `takes` line, check `list-input`. None when no input is such a list."""
+    lists = [r for r in rows if "members" in r]
+    if not lists:
+        return None
+    r = lists[0]
+    block = _block(checked)
+    line = next((p.line for p in (block.takes if block else []) if p.name == r["name"]), None)
+    n = len(r["members"])
+    return Refusal("plan", "list-input",
+                   f"{r['name']} is a {r['type']}, and its {n} member{'s' if n != 1 else ''} were each checked; "
+                   "this enough cannot yet run a program on a list input: its Thym runtime reads one file per input",
+                   line)
 
 
 def make_plan(checked: Any, rows: list[dict]) -> dict | Refusal:
@@ -392,8 +449,6 @@ def land_beside(project_dir: Path, t: Any, first: Path | None) -> list[dict]:
     rows: list[dict] = []
     pairs: list[tuple[Path, Path]] = []
     beside = first is not None and rel_of(project_dir, first) is not None
-    parent = first.parent if first is not None else None
-    stem = stem_of(first) if first is not None else ""
     for name, out in t.outputs.items():
         out = Path(out)
         v = t.values.get(name)
@@ -404,26 +459,75 @@ def land_beside(project_dir: Path, t: Any, first: Path | None) -> list[dict]:
             row["files"] = sorted(f.relative_to(out).as_posix() for f in out.rglob("*") if f.is_file())
         if beside:
             if folder_out:
-                dst = parent / f"{stem}.{name}"
+                dst, _ = landing(first, name, "folder")
                 pairs.append((out, dst))
                 row["rel"] = rel_of(project_dir, dst)
             elif isinstance(v, Value) and v.type == "package":
-                single = parent / f"{stem}{_canon.PACKAGE_FILE_SUFFIX}"
+                single, folder = landing(first, name, "package")
                 pairs.append((out, single))
                 row["rel"] = rel_of(project_dir, single)
                 folder_src = t.dir / "outputs" / v.path.name if v.path is not None else None
                 if folder_src is not None and folder_src.is_dir():
-                    folder = parent / f"{stem}{_canon.PACKAGE_FOLDER_SUFFIX}"
                     pairs.append((folder_src, folder))
                     row["folder"] = rel_of(project_dir, folder)
             else:
                 ext = v.ext if isinstance(v, Value) else out.name.split(".", 1)[-1]
-                dst = parent / f"{stem}.{name}.{ext}"
+                dst, _ = landing(first, name, "file", ext)
                 pairs.append((out, dst))
                 row["rel"] = rel_of(project_dir, dst)
         rows.append(row)
     if pairs:
         copy_all(pairs)
+    return rows
+
+
+def landing(first: Path, name: str, kind: str, ext: str | None = None) -> tuple[Path, Path | None]:
+    """Where an output named `name` lands beside the first input `first` (`land_beside` and a plan's `writes` both
+    ask here): `kind` folder → the folder `<stem>.<name>/`; package → `<stem>.package.cosm`, with its folder form
+    `<stem>.thym/` second; file → `<stem>.<name>.<ext>`."""
+    parent, stem = first.parent, stem_of(first)
+    if kind == "folder":
+        return parent / f"{stem}.{name}", None
+    if kind == "package":
+        return parent / f"{stem}{_canon.PACKAGE_FILE_SUFFIX}", parent / f"{stem}{_canon.PACKAGE_FOLDER_SUFFIX}"
+    return parent / f"{stem}.{name}.{ext}", None
+
+
+#: The types whose values are written as plain characters (`Value.ext`: md for a text or a short, txt for the rest).
+_CHARACTER_TYPES = ("text", "short", "line", "word", "string", "number", "bool", "date", "nothing")
+
+
+def output_ext(typ: str | None) -> str | None:
+    """The extension an output of declared type `typ` is written with, asked of `Value.ext` (the property the run
+    lands it by) for a value of that type: md for a text or a short, txt for a plain value or a line, `<kind>.cosm`
+    or cosm for a mapping, a volume, an item or a list. None for a type that does not say (`any`)."""
+    from .thym import types as _ty
+    if not typ or typ in (_ty.ANY, "list"):
+        return Value("list", []).ext if typ == "list" else None
+    if _ty.is_list(typ):
+        return Value("list", []).ext
+    return Value(typ, "" if typ in _CHARACTER_TYPES else {}).ext
+
+
+def plan_writes(project_dir: Path, block: Any, first: Path | None) -> list[dict]:
+    """A plan's `writes`: every output the program gives, `{name, type, rel}` in `gives` order, `rel` the path it
+    will land at relative to the project (or `canon:`), its extension included, by `landing` (the run's own naming);
+    a package also `folder`, its folder form. `rel` is None when the first input is not a project or store file
+    (outputs then stay with the run) or the type does not say its extension."""
+    beside = first is not None and rel_of(project_dir, first) is not None
+    rows = []
+    for o in outputs_rows(block):
+        name, typ = o["name"], o["type"]
+        row: dict[str, Any] = {"name": name, "type": typ, "rel": None}
+        if beside:
+            kind = "folder" if typ == "folder" else "package" if typ == "package" else "file"
+            ext = output_ext(typ) if kind == "file" else ""
+            if ext is not None:
+                dst, folder = landing(first, name, kind, ext)
+                row["rel"] = rel_of(project_dir, dst)
+                if folder is not None:
+                    row["folder"] = rel_of(project_dir, folder)
+        rows.append(row)
     return rows
 
 
@@ -784,14 +888,44 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             body = None
         return body if isinstance(body, dict) else {}
 
-    def program_path(ref: Any) -> Path:
+    def program_path(ref: Any, where: Any = None) -> Path:
+        """The program a request names; with `where` (`shipped`, `project`, `canon`), in that place only."""
         ref = str(ref or "").strip()
         if not ref:
             raise HTTPException(400, "name a program: its name, its path, or a shipped program's file name")
-        found = _host.find_program(ref, project_dir)
+        place = where_of(where)
+        found = _host.find_program(ref, project_dir, where=place)
         if found is None:
+            if place == "shipped":
+                shipped = sorted(e["rel"] for e in _host.list_programs(None, canon=False, shipped=True))
+                raise HTTPException(404, f"no shipped program {ref}; the shipped programs are "
+                                         f"{_said(shipped) if shipped else 'none'}")
+            if place == "project":
+                raise HTTPException(404, f"no program {ref} in this project")
+            if place == "canon":
+                raise HTTPException(404, f"no program {ref} in the Canon store")
             raise HTTPException(404, f"no program {ref}")
         return found
+
+    def where_of(raw: Any) -> str | None:
+        """`where` from a request: None when left out (the program is found as before), else shipped, project or
+        canon; 400 in words for anything else."""
+        if raw in (None, ""):
+            return None
+        w = str(raw).strip().lower()
+        if w not in _host.WHERES:
+            raise HTTPException(400, f"where is shipped, project or canon, not {raw!r}")
+        return w
+
+    def where_is(found: Path) -> str:
+        """Which place a found program is in: shipped, canon or project."""
+        try:
+            if found.resolve().parent == _host.SHIPPED_PROGRAMS.resolve():
+                return "shipped"
+        except OSError:
+            pass
+        rel = rel_of(project_dir, found) or ""
+        return "canon" if rel.startswith("canon:") else "project"
 
     def route_of(body: dict) -> tuple[str, str | None, int | None]:
         """`(route, model, calls)` from a request (THYM.md 23.1): `route` local (the default) or cloud, or
@@ -836,13 +970,14 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             raise HTTPException(409, f"no model is running ({why})")
         return mode, why, False
 
-    def inputs_of(body: dict, checked: Any) -> dict[str, str]:
-        """`{name: path}` for every input: `inputs` names each (every one the program takes, of any type); `path`
-        alone stands for a program's one input, as the command line's bare path does (and for the first input, as
-        before)."""
+    def inputs_of(body: dict, checked: Any) -> dict[str, Any]:
+        """`{name: path}` for every input: `inputs` names each (every one the program takes, of any type; a list of
+        paths for an input whose type is a list); `path` alone stands for a program's one input, as the command
+        line's bare path does (and for the first input, as before)."""
         inputs = body.get("inputs")
         if isinstance(inputs, dict) and inputs:
-            return {str(k): str(v) for k, v in inputs.items()}
+            return {str(k): ([str(x) if x is not None else "" for x in v] if isinstance(v, list) else str(v))
+                    for k, v in inputs.items()}
         if body.get("path"):
             block = _block(checked)
             if block is None or not block.takes:
@@ -854,11 +989,14 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                  asks_model: bool = False) -> tuple[Path, Any, dict | Refusal, list[dict], dict | None]:
         """Blocking: the program, its compile, its plan over the request's inputs, and the route as read for it
         (`thym_host.plan_for`: the plan carries `models` when it asks and a model is to answer)."""
-        prog = program_path(body.get("program"))
+        prog = program_path(body.get("program"), body.get("where"))
         checked = _checked(prog)
         if isinstance(checked, Refusal):
             return prog, checked, checked, [], None
         rows = plan_inputs(project_dir, checked, inputs_of(body, checked))
+        held = list_refusal(checked, rows)
+        if held is not None:
+            return prog, checked, held, rows, None
         if asks_model:
             plan, info = _host.plan_for(checked, rows, route=route, model=model, llm_url=llm_url)
             return prog, checked, plan, rows, info
@@ -872,25 +1010,41 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             return asks_refusal(plan, why, route=route, program=prog)
         return _host.route_refusal(plan, info, calls=calls, ceiling="calls", program=prog)
 
-    def plan_payload(plan: dict, checked: Any, route: str, calls: int | None) -> dict:
-        """What a plan shows before anything runs (THYM.md 23.2): the route, the `models` block and its one line,
-        the ceiling, every input with what it takes (a folder's files and bytes), every output."""
-        from .thym.cli import models_line
-        block = _block(checked) if not isinstance(checked, Refusal) else None
+    def inputs_payload(rows: list, block: Any) -> list[dict]:
+        """The plan's inputs as the page reads them: `{name, type, rel, sha256, accepts}`, a folder's `files` and
+        `bytes`, a list's `members: [{rel, sha256}]` (its `rel` then None)."""
         takes = {r["name"]: r for r in takes_rows(block)}
         inputs = []
-        for row in plan.get("inputs") or []:
+        for row in rows or []:
             if not isinstance(row, dict):
                 continue
+            listed = isinstance(row.get("members"), list)
             item = {"name": row.get("name"), "type": row.get("type"),
-                    "rel": rel_of(project_dir, Path(str(row.get("path") or ""))), "sha256": row.get("sha256"),
+                    "rel": None if listed else rel_of(project_dir, Path(str(row.get("path") or ""))),
+                    "sha256": row.get("sha256"),
                     "accepts": (takes.get(row.get("name")) or {}).get("accepts") or _host.accepts(str(row.get("type")))}
             for k in ("files", "bytes"):
                 if k in row:
                     item[k] = row[k]
+            if listed:
+                item["members"] = [{"rel": rel_of(project_dir, Path(str(m.get("path") or ""))),
+                                    "sha256": m.get("sha256")} for m in row["members"]]
             inputs.append(item)
+        return inputs
+
+    def first_of(rows: list) -> Path | None:
+        """The first input's file, which outputs land beside (a list's first member)."""
+        return Path(rows[0]["path"]) if rows and rows[0].get("path") else None
+
+    def plan_payload(plan: dict, checked: Any, route: str, calls: int | None, rows: list | None = None) -> dict:
+        """What a plan shows before anything runs (THYM.md 23.2): the route, the `models` block and its one line,
+        the ceiling, every input with what it takes (a folder's files and bytes), every output, and `writes`: where
+        each output will land (`plan_writes`, the run's own naming)."""
+        from .thym.cli import models_line
+        block = _block(checked) if not isinstance(checked, Refusal) else None
         return {"route": route, "models": _macrocosm.jsonable(plan.get("models")) if plan.get("models") else None,
-                "models_line": models_line(plan), "calls": calls, "inputs": inputs, "outputs": outputs_rows(block),
+                "models_line": models_line(plan), "calls": calls, "inputs": inputs_payload(plan.get("inputs"), block),
+                "outputs": outputs_rows(block), "writes": plan_writes(project_dir, block, first_of(rows or [])),
                 "version": version_of(checked) if block is not None else None}
 
     # ---------------------------------------------------------------- programs
@@ -900,8 +1054,8 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         return {"programs": [program_row(e) for e in _host.list_programs(project_dir)]}
 
     @router.get("/api/thym/program")
-    def thym_program(path: str = Query(...)) -> dict:
-        found = program_path(path)
+    def thym_program(path: str = Query(...), where: str | None = Query(None)) -> dict:
+        found = program_path(path, where)
         vol = program_volume(found)
         if isinstance(vol, Refusal):
             raise HTTPException(400, f"line {vol.line}: {vol.message}" if vol.line else vol.message)
@@ -909,7 +1063,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         entry = next((e for e in _host.list_programs(project_dir) if Path(e["path"]) == found), None)
         rel = entry["rel"] if entry else (rel_of(project_dir, found) or found.name)
         name = found.name[: -len(".thym")]
-        return {"name": prog.get("name") or name, "rel": rel,
+        return {"name": prog.get("name") or name, "rel": rel, "where": entry["where"] if entry else where_is(found),
                 "why": " ".join(str(prog.get("why") or "").split()) or None,
                 "source": found.read_text(encoding="utf-8"),
                 "volume": cosm_payload(volume_from(vol, f"{name}.thym.cosm"), rel)}
@@ -919,7 +1073,18 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         body = await body_of(request)
         if isinstance(body.get("text"), str):
             return await asyncio.to_thread(compile_payload, text=body["text"])
-        return await asyncio.to_thread(lambda: compile_payload(path=program_path(body.get("path"))))
+        return await asyncio.to_thread(lambda: compile_payload(path=program_path(body.get("path"),
+                                                                                 body.get("where"))))
+
+    @router.get("/api/thym/moves")
+    def thym_moves(version: str = Query("1")) -> dict:
+        """Every move a program of grammar `version` (0 or 1) may call, from the declarations a compile reads, in
+        the text's order (`thym_tools.moves_payload`, the listing the `thym_moves` tool reads). Read-only."""
+        from . import thym_tools as _tt
+        raw = str(version).strip().removeprefix("thym").strip()
+        if raw not in ("0", "1"):
+            raise HTTPException(400, f"version is 0 or 1 (the grammar's `thym <n>` line), not {version!r}")
+        return _tt.moves_payload(int(raw))
 
     # ---------------------------------------------------------------- plans and runs
 
@@ -939,16 +1104,20 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
         route, model, calls = route_of(body)
         mode, why, scaffolds = await decide(body, route)
         asks_model = mode == "model" and not scaffolds
-        prog, checked, plan, _rows, info = await asyncio.to_thread(prepared, body, route=route, model=model,
-                                                                   asks_model=asks_model)
+        prog, checked, plan, rows, info = await asyncio.to_thread(prepared, body, route=route, model=model,
+                                                                  asks_model=asks_model)
         out: dict[str, Any] = {"ok": False, "plan": None, "atem": None, "mode": mode, "fits": True, "refusal": None,
                                "route": route, "models": None, "models_line": None, "calls": calls}
         if isinstance(plan, Refusal):
             out["refusal"] = refusal_dict(plan)
+            if rows and not isinstance(checked, Refusal):       # inputs checked, the plan held (a list input)
+                block = _block(checked)
+                out.update(inputs=inputs_payload(rows, block), outputs=outputs_rows(block),
+                           writes=plan_writes(project_dir, block, first_of(rows)), version=version_of(checked))
             return out
         r = plan_refusal(plan, mode, why, scaffolds, info, route=route, calls=calls, prog=prog)
         out.update(plan=_macrocosm.jsonable(plan), atem=plan_atem(plan), ok=r is None, refusal=refusal_dict(r))
-        out.update(plan_payload(plan, checked, route, calls))
+        out.update(plan_payload(plan, checked, route, calls, rows))
         if r is not None and r.check == "preflight":
             out.update(fits=False, why=r.message)
         return out

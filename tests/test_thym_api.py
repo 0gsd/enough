@@ -574,3 +574,147 @@ def test_a_folder_input_and_several_outputs_land_beside_it(client: TestClient, p
     assert sorted(p.relative_to(project / "tool.code").as_posix() for p in (project / "tool.code").rglob("*")
                   if p.is_file()) == outs[0]["files"]
     assert "files" not in outs[2] and (project / "tool.size.txt").is_file()
+
+
+# ---------------------------------------------------------------------------
+# Lane S4 (0.6): the moves, a list as an input, where outputs land, a shipped program beside a project file
+# ---------------------------------------------------------------------------
+
+def test_moves_lists_every_move_of_a_version_as_the_tool_does(client: TestClient, project: Path):
+    from enough import thym_tools as TT
+    from enough.thym import declarations
+    one = client.get("/api/thym/moves", params={"version": 1})
+    assert one.status_code == 200, one.text
+    body = one.json()
+    assert body["version"] == 1
+    names = [m["name"] for m in body["moves"]]
+    assert sorted(names) == sorted(declarations.load().view(1)) and len(names) == len(set(names))
+    owners = list(dict.fromkeys(m["owner"] for m in body["moves"]))
+    assert owners[:3] == ["thym", "fabula", "doc"], owners           # THYM 6.2's order, each owner's moves together
+    assert len(owners) == len({m["owner"] for m in body["moves"]})
+    tell = next(m for m in body["moves"] if m["name"] == "tell")
+    assert set(tell) == {"name", "owner", "format", "source", "since", "versions", "signature", "takes", "of",
+                         "modifiers", "gives", "asks", "scaffold", "contract", "says", "extended"}
+    assert tell["format"] == "fabula/1" and tell["versions"] == [0, 1] and tell["asks"] is True
+    assert tell["signature"].startswith("tell <fabula | item | volume") and tell["source"].endswith(".cosm")
+    ctx = next(m for m in body["moves"] if m["name"] == "context")
+    assert ctx["takes"] == [] and ctx["of"] and "of" not in ctx["modifiers"]
+    project_move = next(m for m in body["moves"] if m["name"] == "project")
+    assert {"owner": "ascribe", "as": ["isograph"]} in project_move["extended"]      # a second format's kinds
+    assert "isograph" in project_move["modifiers"]["as"]
+    zero = client.get("/api/thym/moves", params={"version": 0}).json()
+    zero_project = next(m for m in zero["moves"] if m["name"] == "project")
+    assert "isograph" not in zero_project["modifiers"].get("as", []) and zero_project["extended"] == []
+    assert len(zero["moves"]) < len(body["moves"])
+    assert all(m["versions"] == [1] for m in body["moves"] if m["name"] not in {z["name"] for z in zero["moves"]})
+    assert client.get("/api/thym/moves").json() == body                       # 1 by default
+    for bad in ("2", "x", "-1"):
+        r = client.get("/api/thym/moves", params={"version": bad})
+        assert r.status_code == 400 and "version is 0 or 1" in r.json()["detail"]
+    assert names == [d.name for d in TT.listed_moves(1)]                     # the listing the tool reads too
+
+
+LIST_JOIN = """thym 1
+
+program join-them
+  why: several shorts as one.
+
+  takes xs: list of short
+  gives out: short
+
+  give join xs with " "
+end
+"""
+
+
+def test_a_list_input_is_given_member_by_member_and_each_checked(client: TestClient, project: Path):
+    (project / "tools" / "join-them.thym").write_text(LIST_JOIN, encoding="utf-8")
+    row = next(p for p in client.get("/api/thym/programs").json()["programs"] if p["name"] == "join-them")
+    assert row["takes"] == [{"name": "xs", "type": "list of short",
+                             "accepts": "a list of shorts (each a markdown file)"}]
+    r = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": ["notes.md", "hello.md"]}})
+    assert r.status_code == 200, r.text
+    p = r.json()
+    assert p["ok"] is False and (p["refusal"]["check"], p["refusal"]["line"]) == ("list-input", 6)
+    assert "its 2 members were each checked" in p["refusal"]["message"]
+    (inp,) = p["inputs"]
+    assert (inp["name"], inp["type"], inp["rel"]) == ("xs", "list of short", None)
+    assert inp["members"] == [{"rel": "notes.md", "sha256": digest_path(project / "notes.md")},
+                              {"rel": "hello.md", "sha256": digest_path(project / "hello.md")}]
+    assert p["writes"] == [{"name": "out", "type": "short", "rel": "notes.out.md"}]
+    one = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": "notes.md"}})
+    assert one.status_code == 400 and one.json()["detail"].startswith("xs is a list of short: it takes a list of "
+                                                                       "shorts")
+    assert "one path was given (notes.md)" in one.json()["detail"]
+    wrong = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": ["notes.md", "notes.md.cosm"]}})
+    assert wrong.status_code == 400 and wrong.json()["detail"] == "notes.md.cosm is a volume; xs[2] takes a short (a " \
+                                                                  "markdown file)"
+    gone = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": ["gone.md", "notes.md.cosm"]}})
+    assert gone.status_code == 404 and gone.json()["detail"] == "no such file: gone.md"       # in order: the first
+    empty = client.post("/api/thym/plan", json={"program": "join-them", "inputs": {"xs": []}})
+    assert empty.status_code == 400 and empty.json()["detail"].endswith("; give xs")
+    many = client.post("/api/thym/plan", json={"program": "count-words", "inputs": {"story": ["notes.md", "hello.md"]}})
+    assert many.status_code == 400
+    assert many.json()["detail"] == ("story is a text: it takes a text (a markdown or plain file), one path, and a "
+                                     "list of 2 was given")
+    run = client.post("/api/thym/run", json={"program": "join-them", "inputs": {"xs": ["notes.md", "hello.md"]}})
+    assert run.status_code == 400 and "cannot yet run a program on a list input" in run.json()["detail"]
+
+
+def test_a_plan_says_where_each_output_will_land_as_the_run_lands_it(client: TestClient, project: Path):
+    p = client.post("/api/thym/plan", json={"program": "count-words", "path": "notes.md"}).json()
+    assert p["writes"] == [{"name": "n", "type": "number", "rel": "notes.n.txt"}]
+    done = wait_job(client, start(client, "/api/thym/run", {"program": "count-words", "path": "notes.md"})["id"])
+    assert [o["rel"] for o in done["result"]["outputs"]] == [w["rel"] for w in p["writes"]]
+    pk = client.post("/api/thym/plan", json={"program": "tools/pack-it.thym",
+                                             "inputs": {"story": "notes.md", "f": "notes.md.cosm"}}).json()
+    assert pk["writes"] == [{"name": "out", "type": "package", "rel": "notes.package.cosm", "folder": "notes.thym"}]
+    done = wait_job(client, start(client, "/api/thym/run", {"program": "tools/pack-it.thym",
+                                                            "inputs": {"story": "notes.md", "f": "notes.md.cosm"}})["id"])
+    out = done["result"]["outputs"][0]
+    assert (out["rel"], out["folder"]) == ("notes.package.cosm", "notes.thym")
+    shutil.copytree(INPUTS / "little-tool", project / "tool")
+    shutil.copyfile(SUITE / "programs" / "split-a-folder.thym", project / "tools" / "split-a-folder.thym")
+    sp = client.post("/api/thym/plan", json={"program": "split-a-folder", "inputs": {"repo": "tool"}}).json()
+    assert [(w["name"], w["rel"]) for w in sp["writes"]] == [("code", "tool.code"), ("prose", "tool.prose"),
+                                                            ("size", "tool.size.txt")]
+
+
+def test_output_ext_is_what_a_value_of_the_type_lands_with():
+    from enough import thym_api as A
+    assert [A.output_ext(t) for t in ("text", "short", "number", "word", "line", "fabula", "atem", "morph",
+                                      "context", "volume", "list of item", "change", "any")] == [
+        "md", "md", "txt", "txt", "txt", "cosm", "cosm", "morph.cosm", "context.cosm", "cosm", "cosm", "cosm", None]
+
+
+def test_where_tells_a_shipped_program_from_a_project_file_of_the_same_name(client: TestClient, project: Path):
+    mine = COUNT.replace("program count-words", "program my-tighten")
+    (project / "tighten.thym").write_text(mine, encoding="utf-8")
+    rows = client.get("/api/thym/programs").json()["programs"]
+    assert {(r["where"], r["rel"]) for r in rows} >= {("project", "tighten.thym"), ("shipped", "tighten.thym")}
+    as_today = client.get("/api/thym/program", params={"path": "tighten.thym"}).json()
+    assert (as_today["name"], as_today["where"]) == ("my-tighten", "project")          # unchanged: the project's
+    shipped = client.get("/api/thym/program", params={"path": "tighten.thym", "where": "shipped"}).json()
+    assert shipped["where"] == "shipped" and shipped["name"] == "tighten"
+    assert shipped["source"] == (H.SHIPPED_PROGRAMS / "tighten.thym").read_text(encoding="utf-8")
+    assert client.get("/api/thym/program", params={"path": "tighten", "where": "shipped"}).json()["name"] == "tighten"
+    assert client.get("/api/thym/program", params={"path": "tighten.thym",
+                                                   "where": "project"}).json()["name"] == "my-tighten"
+    c = client.post("/api/thym/compile", json={"path": "tighten.thym", "where": "shipped"}).json()
+    assert c["ok"] is True and c["name"] == "tighten"
+    assert client.post("/api/thym/compile", json={"path": "tighten.thym"}).json()["name"] == "my-tighten"
+    pl = client.post("/api/thym/plan", json={"program": "tighten.thym", "where": "project", "path": "notes.md"}).json()
+    assert pl["ok"] is True and pl["atem"].startswith("my-tighten:")
+    sp = client.post("/api/thym/plan", json={"program": "tighten.thym", "where": "shipped", "path": "hello.md"}).json()
+    assert sp["atem"].startswith("tighten:")
+    none = client.get("/api/thym/program", params={"path": "count-words.thym", "where": "shipped"})
+    assert none.status_code == 404 and none.json()["detail"].startswith("no shipped program count-words.thym; the "
+                                                                        "shipped programs are ")
+    assert "tighten.thym" in none.json()["detail"]
+    nope = client.post("/api/thym/compile", json={"path": "publish-story.thym", "where": "project"})
+    assert nope.status_code == 404 and nope.json()["detail"] == "no program publish-story.thym in this project"
+    assert client.post("/api/thym/run", json={"program": "publish-story", "where": "project",
+                                              "path": "notes.md"}).status_code == 404
+    bad = client.get("/api/thym/program", params={"path": "tighten.thym", "where": "elsewhere"})
+    assert bad.status_code == 400 and bad.json()["detail"] == "where is shipped, project or canon, not 'elsewhere'"
+    assert client.get("/api/thym/program", params={"path": "tools/count-words.thym"}).json()["where"] == "project"

@@ -1269,7 +1269,13 @@ ACCEPTS = {
 
 
 def accepts(typ: str) -> str:
-    """What an input of type `typ` takes, in words (`a text`, `a folder`, …); `a <typ>` for any other type."""
+    """What an input of type `typ` takes, in words (`a text`, `a folder`, …); `a <typ>` for any other type; a list
+    type as its members (`a list of texts (each a markdown or plain file)`)."""
+    if isinstance(typ, str) and typ.startswith("list of "):
+        inner = typ[len("list of "):].strip()
+        said = ACCEPTS.get(inner, "")
+        paren = said[said.index("("):] if "(" in said else ""
+        return f"a list of {inner}s" + (f" ({'each ' + paren[1:-1]})" if paren else "")
     return ACCEPTS.get(typ, f"a {typ}")
 
 
@@ -1413,13 +1419,24 @@ def list_programs(project_dir: Path | None = None, *, canon: bool = True, shippe
     return out
 
 
-def find_program(ref: str, project_dir: Path | None = None) -> Path | None:
+#: Where a program is kept, as `list_programs` says it and `find_program(where=...)` takes it.
+WHERES = ("project", "canon", "shipped")
+
+
+def find_program(ref: str, project_dir: Path | None = None, *, where: str | None = None) -> Path | None:
     """The file a program reference names, or None. `ref` is a path when it ends in `.thym` or holds a slash (a
     project-relative path, or a `canon:` store path), else a program's declared name, resolved in
-    `list_programs`' order: the project's first, then the store's, then the shipped one."""
+    `list_programs`' order: the project's first, then the store's, then the shipped one.
+
+    `where` (`project`, `canon` or `shipped`; None: as above) looks in that place only: `shipped` finds a shipped
+    program by its file name or its declared name and never a project file of the same name (`tighten.thym` at the
+    top of a project and the shipped `tighten.thym` share a `rel`); `project` never answers a shipped or a store
+    file; `canon` only a `canon:` path or a store program's name. ValueError for any other `where`."""
     ref = (ref or "").strip()
     if not ref:
         return None
+    if where is not None:
+        return _find_in(ref, project_dir, where)
     if ref.endswith(PROGRAM_SUFFIX) or "/" in ref:
         from . import canon_tools as _ct
         try:
@@ -1437,6 +1454,47 @@ def find_program(ref: str, project_dir: Path | None = None) -> Path | None:
             return SHIPPED_PROGRAMS / ref                   # a shipped file's name, when the project has no such file
         return None
     for entry in list_programs(project_dir):
+        if entry["name"] == ref:
+            return Path(entry["path"])
+    return None
+
+
+def _find_in(ref: str, project_dir: Path | None, where: str) -> Path | None:
+    """`find_program` in one place only (its `where`)."""
+    if where not in WHERES:
+        raise ValueError(f"where is project, canon or shipped, not {where!r}")
+    from . import canon_tools as _ct
+    is_path = ref.endswith(PROGRAM_SUFFIX) or "/" in ref
+    if where == "shipped":
+        if is_path:
+            if "/" in ref or _ct.store_prefix(ref):
+                return None                                  # a shipped program is named by its bare file name
+            p = SHIPPED_PROGRAMS / ref
+            return p if p.is_file() else None
+        rows = list_programs(None, canon=False, shipped=True)
+    elif where == "project":
+        if project_dir is None:
+            return None
+        if is_path:
+            if _ct.store_prefix(ref):
+                return None
+            try:
+                p = _ct.resolve(Path(project_dir), ref)
+            except _ct.TextTargetError:
+                return None
+            return p if p.is_file() else None
+        rows = list_programs(project_dir, canon=False, shipped=False)
+    else:
+        if is_path:
+            if not _ct.store_prefix(ref):
+                return None
+            try:
+                p = _ct.resolve(Path("."), ref)
+            except _ct.TextTargetError:
+                return None
+            return p if p.is_file() else None
+        rows = [r for r in list_programs(None, canon=True, shipped=False) if r["where"] == "canon"]
+    for entry in rows:
         if entry["name"] == ref:
             return Path(entry["path"])
     return None

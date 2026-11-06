@@ -408,6 +408,8 @@ def test_thym_moves_lists_what_a_program_of_a_version_may_use(project: Path):
     assert tell.startswith("- tell <fabula | item | volume") and "[with <morph>] gives short" in tell, tell
     assert "; asks a model, scaffold outline; contract coverage, no-invention" in tell, tell
     assert "- context of <text | package> gives context; asks nothing." in r.body
+    assert [ln.split(" ", 2)[1] for ln in lines[1:]] == [d.name for d in TT.listed_moves(1)], \
+        "the tool lists the moves in the text's order, from the listing GET /api/thym/moves reads"
     zero = run(project, tool("thym_moves", version="0"))
     assert zero.ok and len(zero.body.splitlines()) < len(lines), "a thym 0 program sees fewer moves"
     one = run(project, tool("thym_moves", move="derive"))
