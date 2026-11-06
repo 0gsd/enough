@@ -357,6 +357,7 @@ the card that comes before a decompile, and the card of a folder's <strong>fabul
 - build a small tool's fabulac once, then read its catem at depth overview before you read its code.
 - agent free, a build still lands the outline: the files, their interfaces, the history and the licence.
 - a cshort is text to read: enough never runs it.
+- section 12.4 of the help center has the decompile card and the twins it writes; section 12.7 has a folder's fabulac, stage by stage.
 
 ## cshort
 name: cshort / catem
@@ -371,6 +372,7 @@ open one from the fabulac card's list, from a toast when a compile lands, or fro
 ### ideas
 - read <code>CSHORT.md</code> first: it says which part of the fabulac every file was written from.
 - set a cshort beside the original and compare: what the fabulac missed is what the cshort lacks.
+- section 12.8 of the help center says what a cshort and a catem are, and why enough never runs a cshort.
 
 ## dialectic-card
 name: the questions
@@ -385,6 +387,7 @@ what a volume asks of a person: what its source could not say, each a <strong>qu
 ### ideas
 - "I don't know, but the support lead would" is a good answer: the field stays open in those words, for the next person to be asked.
 - answer two, send, settle: a short sitting is still a sitting.
+- section 13.7 of the help center has the whole of it: a question's parts, sittings, settling and asking again.
 
 ## holograph
 name: a holograph's questions
@@ -399,6 +402,7 @@ open it with <strong>questions</strong> in the cosm viewer on the holograph; the
 ### ideas
 - describe people by what they are to you ("a retired harbour pilot"), or by a pseudonym you declare in the catalog.
 - say <strong>partly</strong> to a candidate that is nearly right, then say it your way.
+- section 13.8 of the help center has Ascribe's rules, candidates and the isograph.
 
 ## atem-card
 name: atem card
@@ -594,7 +598,7 @@ path: *.thym → a plan, a run, a trace
 - read a program's plan before you run it on a long text: the cost line tells you how many times the model will be asked.
 - a program that asks nothing runs in a moment, agent free or not: <code>words</code>, <code>count</code> and <code>cut</code> never need a model.
 - a refused run is not a broken one: its trace says which step stopped it and why, and nothing it was making was kept.
-- section 13.4 of the help center has the whole of it: the three programs that come with enough, the trace, and the ten scales.
+- section 13.4 of the help center has the whole of it: the programs that come with enough, the trace, and the ten scales.
 
 ## package
 name: package
@@ -642,6 +646,7 @@ open a <code>.thym</code> file in the editor and a strip under the toolbar says 
 - write the version line first: <code>thym 1</code> opens folders, loops that collect, <code>keeps</code>, <code>depth</code> and several outputs.
 - leave a refusal on screen and read it whole: it says which statement, and usually what to write instead.
 - keep a program small and plan it on a real input before you trust a long run to it.
+- section 13.6 of the help center has the strip and Thym at hand; section 13.5 has what `thym 1` opens.
 
 ## thym-moves
 name: Thym at hand
@@ -657,3 +662,4 @@ type in the search to narrow the list; <kbd>↓</kbd> moves from the search to t
 - search for a check's name to find the moves that keep it.
 - switch to <code>thym 0</code> to see what an older program may call.
 - start from the shipped program closest to what you want, and change a copy.
+- section 13.6 of the help center has the moves and the programs to start from.

@@ -355,8 +355,9 @@ path: notes.md → notes.md.fabulan.cosm · tool/ → tool.fabulac.cosm
 
 ### ideas
 - 先给一个小工具构建一次 fabulac，在读它的代码之前，先读深度为 overview 的 catem。
-- 无代理模式下，构建照样会留下轮廓：文件、它们的接口、历史和许可证。
+- 无智能体时，构建照样会留下轮廓：文件、它们的接口、历史和许可证。
 - cshort 是供阅读的文本：enough 从不运行它。
+- 帮助中心的第 12.4 节讲反编译卡片和它写出的孪生文件；第 12.7 节一个阶段一个阶段地讲文件夹的 fabulac。
 
 ## cshort
 name: cshort / catem
@@ -371,6 +372,7 @@ fabulac 编译出来的东西，在这里阅读。<strong>cshort</strong> 是一
 ### ideas
 - 先读 <code>CSHORT.md</code>：它说明每个文件是根据 fabulac 的哪一部分写的。
 - 把 cshort 放在原代码旁边比较：fabulac 漏掉的，cshort 也会缺。
+- 帮助中心的第 12.8 节讲 cshort 和 catem 是什么，以及 enough 为什么从不运行 cshort。
 
 ## dialectic-card
 name: 问题
@@ -385,6 +387,7 @@ cosm 查看器工具栏里的<strong>问题</strong>会打开它，并显示待�
 ### ideas
 - “我不知道，但客服主管知道”是个好回答：这个字段会用这句话保持开放，好去问下一个人。
 - 答两个，发送，并入：短短一轮也是一轮。
+- 帮助中心的第 13.7 节把这一切讲全了：一个问题由哪几部分组成、一轮一轮地回答、并入，以及再问一次。
 
 ## holograph
 name: holograph 的问题
@@ -399,6 +402,7 @@ path: self/ → self/D/questions.cosm
 ### ideas
 - 用此人对你而言是谁来描述（“一位退休的港口引航员”），或用你在目录中声明的化名。
 - 对差不多对的候选回答<strong>部分是</strong>，然后用你的话重说一遍。
+- 帮助中心的第 13.8 节讲 Ascribe 的规则、候选和 isograph。
 
 ## atem-card
 name: atem 卡片
@@ -594,7 +598,7 @@ path: *.thym → a plan, a run, a trace
 - 在长文本上运行程序之前，先读它的计划：代价那一行会告诉你模型要被问几次。
 - 什么都不问的程序片刻就能跑完，开不开无智能体都一样：<code>words</code>、<code>count</code> 和 <code>cut</code> 从来用不着模型。
 - 被拒绝的运行并不是坏了：它的轨迹会说是哪一步、为什么拦下了它，而它正在做的东西一样都没保留。
-- 帮助中心的第 13.4 节把这一切讲全了：enough 附带的三个程序、轨迹，以及十个尺度。
+- 帮助中心的第 13.4 节把这一切讲全了：enough 附带的程序、轨迹，以及十个尺度。
 
 ## package
 name: 包
@@ -642,6 +646,7 @@ path: *.thym in the editor
 - 先写版本行：<code>thym 1</code> 打开文件夹、收集的循环、<code>keeps</code>、<code>depth</code> 和多个输出。
 - 把拒绝留在屏幕上读完：它会说明是哪条语句，通常还会说该改写成什么。
 - 让程序保持小巧，交给它长时间运行之前，先用真实的输入计划一遍。
+- 帮助中心的第 13.6 节讲这条提示条和手边的 Thym；第 13.5 节讲 `thym 1` 打开了什么。
 
 ## thym-moves
 name: 手边的 Thym
@@ -657,3 +662,4 @@ path: the moves, and the programs to start from
 - 搜索一个检查的名字，找到守住它的动作。
 - 切换到 <code>thym 0</code>，看看较早的程序能调用什么。
 - 从最接近你想要的附带程序开始，改它的副本。
+- 帮助中心的第 13.6 节讲这些动作和可以起步的程序。

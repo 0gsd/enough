@@ -75,6 +75,9 @@ Where push and pull differ is what an atem shows best.
 - `fabula_derive` takes `<flavour>` `fabulan` or `fabulap` (left out:
   enough suggests). Without a model both tools write a **scaffold**: say so,
   never present it as a reading.
+- Without `<route>` the decompile or the atem runs on this machine's model,
+  never the cloud; say `<route>cloud</route>` only when the person chose the
+  cloud for this job.
 - In a chat turn a model reads up to about 6,000 characters (longer gets the
   scaffold; the reader's decompile does a full pass); both refuse over about
   24,000. Shorts are compiled in the reader; you have no tool for them.

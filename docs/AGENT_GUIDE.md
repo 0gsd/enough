@@ -167,7 +167,7 @@ Every Python module in `enough/`:
 | [enough/ascribe.py](../enough/ascribe.py) | ~2315 | Ascribe (0.5.0; the `ascribe/1` MiniCOSM), grown in the 0.6 round from a reader into the module: a holograph's own checks beside the generic and the dialectic's — `form-anchored` (never on D), `relation-declared`, `when-shape`, `strength-range`, `no-pii` (a warning inside the holograph, an error at a projection), `private-marker` (a note), `release-shape` — plus `id-module` held to the module folders and `catalog-key` to the hid and handle, each finding with its `advice`; the bank of 44 questions put to the holder alone, answers recorded in the holder's words, settling, form discovery and follow-ups, a reading's candidates, the private filter, releases, the isograph (and, as engine functions, the cryptograph, match tokens and the isomorph); `python -m enough.ascribe lint <folder> [--json]`. Stdlib + PyYAML + `enough.macrocosm`, `enough.fabula`, `enough.dialectic` (no server, no model). See "Ascribe's module". Spec: [docs/ASCRIBE.md](ASCRIBE.md) | `lint_holograph()`, `report_dict()` / `advice_of()`, `raise_bank()`, `queue()`, `ask_again()`, `record_answers()`, `settle_holograph()`, `answer()`, `follow_ups()`, `candidates()` / `land_candidates()`, `private_filter()`, `releases()` / `append_release()`, `isograph_doc()` / `project_isograph()`, `open_holograph()`, `thym_engine()`, `pii_findings()`, `ASCRIBE_CHECKS`, `PII_PATTERNS`, `AscribeError` |
 | [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `canon.folder_flowchart`; its skip rule `_mirror_skip` is also what the project catalog enumerates), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~46700 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the docs viewer** (`#docs-mode`, `DOCS`, `DOCS_DENSITIES`, `DOCS_FAB`, `docs*` — the help center and the MacroCOSM spec at three densities, 0.4.4; it replaced ref mode and the spec viewer), **agent-free mode** (`AGENT_FREE`, `agentFree*`, the CSS block keyed on `html[data-agent-free]`), **the Canon chip + EMF face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
+| [enough/static/index.html](../enough/static/index.html) | ~46700 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the docs viewer** (`#docs-mode`, `DOCS`, `DOCS_DENSITIES`, `DOCS_FAB`, `docs*` — the help center and the MacroCOSM spec at three densities, 0.4.4; it replaced ref mode and the spec viewer), **agent-free mode** (`AGENT_FREE`, `agentFree*`, the CSS block keyed on `html[data-agent-free]`), **the Canon chip + the fabula's face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), since 0.6 **the fabula card, the fabulac's card and the cshort viewer** (`FAB`, `FAB_ROUTE`, `fab*`, `#fabula-modal`, `#cshort-modal`; see "The fabula" → "The UI"), **the dialectic card** (`DLG`, `dlg*`, `#dialectic-modal`) and **Thym's editor strip and Thym at hand** (`THYM_ED`, `thymEd*`, `#thym-ref-modal`, `thymRef*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -862,11 +862,16 @@ fabulac build or compile and a settle take `route` (`local`, `cloud`,
 local|cloud|cloud:<id>` and `--calls N` on `python -m enough.thym`, and
 `<model>` (and `<calls>` for `thym_run`) in a tool call; **their default is
 `local`**. A text's derivation, atem or short compile takes `route` too
-(`_body_route`; `fabula_derive` and `atem` take `<route>`), but **with no
-route it keeps the 0.4 path**, `llm.complete`, which follows the chat's
-slot: on a machine whose chat runs on the cloud slot such a job asks the
-cloud (`server._job_complete`). The page sends no route yet (a later lane
-adds the control).
+(`_body_route`; `fabula_derive` and `atem` take `<route>`), and since lane
+S2 **no route is `local` there as well**: `_body_route`, `_canon_mode`,
+`_job_complete`, `_model_complete` (handed to Thym's, the fabulac's and the
+dialectic's routers, so Thym's reading is local too), `_job_route` and
+`canon_tools.model` / `_said_route` all read a missing route as `local`; on
+the cloud slot a local job asks llama-server's `/health`
+(`_local_reachable`) and runs by rules when it does not answer. Nothing
+follows the chat's slot any more (`docs/fabula-landed-S2.md` has the table).
+The page always says the route: `local` unless the person chose the cloud on
+the card (see "The fabula" → "The UI").
 
 **The plan's models line (THYM 23.2).** A plan that asks a model is planned
 again with the route's reading (`thym_host.route_info`: llama-server's id
@@ -3636,8 +3641,10 @@ fabulac"). In Thym the moves stay `derive` and `tell`; DocOES's byte-exact
 a text's fabula file kept beside it. Spec: MacroCOSM OES §18.4 (18.4.1 the
 catalog, 18.4.2 the modules, 18.4.3 the conventions, 18.4.4 shorts, 18.4.5
 examples, 18.4.6 verse, 18.4.7 code, 18.4.8 the checks) and §18.3.5
-(atems). User-facing doc: HELP_CENTER §12.4 and §12.5.
-> **Placeholder (the user manual lane):** the HELP_CENTER section numbers above are 0.5.4's; put the manual's sections for the fabula, the dialectic and the fabulac here when they are written.
+(atems). User-facing doc: HELP_CENTER §12.4 (a text's fabula: prose or
+verse, old names, shorts), §12.5 (atems), §12.7 (a folder's fabulac),
+§12.8 (cshorts and catems), §13.7 (the dialectic), §13.8 (a holograph and
+Ascribe's rules) and §16.6 (where a job's model runs).
 
 **The name.** The fabula was called EMF (*enumerated meaning fabula*) from
 0.4.3 to 0.5.4, and EML before that; the 0.6 round retired the name. It
@@ -3946,16 +3953,31 @@ all sixteen). Since 0.6 the three routes that read or write a fabula live
 under `/api/fabula/`; the old paths (`/api/canon/derive`, `/api/canon/emf`,
 `/api/canon/compile`) are served by the same handlers through 0.6
 (`retired_names.ROUTES`), and `what: emf` still reads as `what: fabula`.
-Every derivation route takes `route` (`local` | `cloud`; absent: the 0.4
-path, see "Models" → "A model route per job"): a shut gate is a 403 in the
+Every derivation route takes `route` (`local` | `cloud`; absent: `local`,
+see "Models" → "A model route per job"): a shut gate is a 403 in the
 gate's own words, nothing written, no fall back.
+A job started with no `route` runs on this machine's model (`local`),
+whatever model slot the chat is on; it asks the cloud only when the request
+says `route: cloud` (and the cloud gate is open). With no local model
+running it runs by rules, or refuses in words; it never falls back to the
+cloud.
+`GET /api/fabula/suggest?path=<text>` → `{path, suggested, why}`: the
+flavour suggested for a text, twin or none.
+`GET /api/fabula/models` → `{agent_free, local: {running, model, window},
+cloud: {open, model, window, reason}}`: what a job would run on, read
+before it starts.
+A job of kind `compile` says `flavour` (`fabulac`, `fabulan`, `fabulap`)
+and `what` (`code`, `line`, `overview`, `manual`, `short`) from its first
+snapshot.
 
 | Route | Body | Returns | Refusals |
 |---|---|---|---|
 | `POST /api/fabula/derive` | `{path, what: fabula\|atem, force?, flavour?, route?, copyable?}` | `{job, flavour, suggested}` | 400: no path; `what` not fabula or atem ("what must be fabula or atem"); a folder; a Holotype or anything inside one; a package; `canon.cosm` / `rness/canon.cosm` / `.canon.json` ("kept by enough"); any `.cosm` ("already enumerated"); binary; not markdown or plain text; empty; traversal; a flavour that is not `fabulan`/`fabulap`; a bad route. 403 a shut gate. 404 missing. 409: a file of the twin's name that is not a fabula ("… is not a fabula; move or rename it first"); "already fresh" (fabula: fresh **and** `completeness: full`; atem: fresh with a line) unless `force`; a job holds the file |
 | `POST /api/canon/atem` | `{path, flavour?, route?}` → file atem (written; a minimal twin when none; never "already fresh") · `{path, selection: {text, start?, end?, lines?}}` → passage atem (not written; the result is `pinnable` with a `span`) · `{text}` or `{selection}` alone → the atem of the words (nothing written) | `{job}` | as derive for `path`; 400 nothing given, a selection that is not a mapping, text over 200 000 chars |
 | `POST /api/canon/atem/pin` | `{path, atem: {line, focus?, push?, pull?}, span, of?, flavour?}` | `{twin_path, item_id, job}` — synchronous; `job` is a finished `kind: pin` snapshot, also emitted | as derive for `path`; 400 no line, no usable span, `of` not a list of ids; 409 while a job holds the file |
-| `GET /api/fabula/twin?path=[&flavour=]` | the text (or a twin itself, any of its names) | `{twin_path, state: fresh\|stale, flavour, twins: {flavour: {path, state}}, suggested, cosm: <the /api/cosm payload>}` | 400 a flavour that is not `fabulan`/`fabulap`; 404 no file, or "<p> has no fabula yet" |
+| `GET /api/fabula/twin?path=[&flavour=]` | the text (or a twin itself, any of its names) | `{twin_path, state: fresh\|stale, flavour, twins: {flavour: {path, state}}, suggested, cosm: <the /api/cosm payload>}` | 400 a flavour that is not `fabulan`/`fabulap`; 404 no file, or "<p> has no fabula yet" (the page then asks `/api/fabula/suggest`) |
+| `GET /api/fabula/suggest?path=` (S2) | a text, a twin or a converted original | `{path, suggested: fabulan\|fabulap, why}` (`fabula_names.suggest_flavour`, the one rule) | 400 missing path, a folder, not readable as UTF-8, a bad path; 404 missing |
+| `GET /api/fabula/models` (S2) | | `{agent_free, local: {running, model, window}, cloud: {open, model, window, reason}}`; agent-free asks nothing; `reason` is the gate's clause with no provider named; never an error for a model that is down | |
 | `POST /api/fabula/compile` | `{path, order?, route?}` of a text's fabula (either declaration); a fabulac goes to its own compile (see "Building a fabulac") | `{job}`; result `{written, fabula_path, emf_path, mode, order, model, route, recorded}` — a short beside it, recorded in its `shorts:` | 404 missing; 400 not `.cosm`, not a fabula (says what it declares), refused, a bad `order`; 409 while the text's claim is held |
 | `GET /api/canon/job/{id}` · `POST /api/canon/job/{id}/cancel` | | the snapshot | 404; cancel 409 unless queued or running |
 
@@ -4083,12 +4105,64 @@ other leading slash is dropped, exactly as the routes read it.
 
 ### The UI (index.html)
 
-> **Placeholder (the page lanes of the 0.6 round):** this section describes
-> the page as 0.5.4 drew it. The fabula's words on screen (where it still
-> says "EMF twin"), the flavour and route controls, the twin route's new path,
-> the dialectic card on any volume, the fabulac's build card and viewer
-> (cshort and catem, read-only), and their uicheck screens and scenarios are
-> written here by the lane that writes the page's chapters.
+The 0.6 round's page work is three lanes (notes `docs/fabula-landed-U1a.md`,
+`-U1b.md`, `-U1c.md`): U1a the fabula card, the model line and the fabulac's
+card and viewer (this section and "Building a fabulac" → "The UI"), U1b the
+dialectic card ("The dialectic" → "The UI", "Ascribe's module" → "The UI"),
+U1c Thym's editor, moves, plan reader and inputs ("Thym" → "The UI").
+Words on screen say **fabula** and **twin**, never "EMF": "the fabula of
+<name>" heads the face, the docs facet is "built-ins and MiniCOSMs".
+Internal names keep the old word (`EMF_FACE`, `emf-*` classes, the job kind
+`emf`, `data-emf`); an `emf/1` file's badge shows `fabula/1`. Nothing in the
+page calls `/api/canon/derive|emf|compile` any more (the
+`fabula-decompile-card` scenario asserts it on the wire): `canonRefreshDoc` →
+`GET /api/fabula/twin`, `canonDecompile(path, {force, flip, flavour, route,
+quiet})` → `POST /api/fabula/derive` (`what: fabula`, `route` always said),
+`canonCompile(twin, order, route)` → `POST /api/fabula/compile`.
+
+- **The fabula card** — `#fabula-modal` (a `*-modal`, so the MODAL helper
+  gives it dialog semantics), one card with two faces; JS block "The fabula
+  round in the page (0.6, U1a)", ending `window.__fabReady = true`, and every
+  hook in older code is guarded by it. The **text face**:
+  `fabDecompileOpen(path, state, {flip})` → `fabTextPaint` / `fabDecompileGo`.
+  `canonDecompileAsk` (every "decompile" / "refresh twin": the chip, the twin
+  button with no twin, the sidebar and Canon menus) opens it; 0.5.4's
+  `confirmOverlay` is gone. Flavour radios prose · fabulan / verse · fabulap,
+  preselected from the twin the text has (the one derived last), else the
+  suggestion (`fabSuggestOf` → `GET /api/fabula/suggest` when the twin route
+  404s), tagged "suggested" with a note that the choice is the person's. Per
+  flavour: "its twin: X, up to date|out of date", "no twin of this flavour
+  yet: it will be X", or the old-name line; with a fresh twin of the chosen
+  flavour the button reads "decompile again" and sends `force`. Refusals (the
+  shut gate's 403, a 400) stay on the card in the server's words (`quiet`); a
+  face waiting to flip closes the card first and a refusal comes back as a
+  toast. The **folder face** is the fabulac's (see "Building a fabulac").
+  Both faces end with `#fab-dialectic` (`dlgFabLine`, see "The dialectic").
+- **The model line** — one component for every card that starts model work:
+  `fabRouteHTML(key, {ceiling, unit})` + `fabRouteOnEvent(e, key, cb)` +
+  `fabRouteBody(key, body)` (adds `route`, and `calls` when a ceiling is
+  given); a host calls `fabRouteReset(key)` and `fabGateLoad()` when it opens.
+  `fabGateLoad` reads `GET /api/fabula/models` (S2; `FAB_ROUTE.models` holds
+  `local` and `cloud`). Heading "where the model runs"; "here (<model>, a
+  <window>-token window)" (`fab.route.hereWindow`), "here (no model is
+  running)" or "here (this machine's model)"; a radio pair here / "cloud
+  (<model>)" only while `cloud.open`; agent-free says "agent-free: a rules
+  reading, no model". Here by default, reset every time a card opens, never
+  remembered. Hosts: the text face, the fabulac face (ceiling "at most N
+  model calls a stage", optional), the dialectic's settle (`'dlg'`), Thym's
+  run card (`#thym-route-box`, `thymRouteHTML`; the ceiling marked "needed"
+  when the plan's `models.calls_open` is not empty), and the face's short
+  menu (`fabShortRoutePaint`: "the model: here (…)" and an "on the cloud,
+  this once" `menuitemcheckbox`, forgotten after the one compile). A
+  holograph never gets one.
+- **`fabSet(el, html)`** writes a container only when its HTML changed and
+  puts the focus back on the same control (by id, else by name and value), so
+  a snapshot or a re-read can repaint under a person's hands. Use it for
+  anything a job snapshot or an event repaints (the fabulac face, the
+  dialectic card).
+- **The tree's old twin.** `fabDecorateTree` reads S2's
+  `data-old-twin` / `data-old-twin-of` on a row and tags it "old twin" with
+  the note as its title.
 
 - **The cosm viewer** — mode `cosm`, root `#cosm-mode`, icon `cosm`.
   `enterCosmMode(path, {focus})` → `GET /api/cosm`; re-entering the open path
@@ -4135,24 +4209,25 @@ other leading slash is dropped, exactly as the routes read it.
   `canonPaintChips()` paints it from `canonOnDocOpen(path)` (called in
   `openReadEdit` right after `convertOnDocOpen`) and again after every face
   or size switch, a save, a readvisor turn's end and any finished write; state
-  comes from the twin route (`GET /api/canon/emf` as 0.5.4's page calls it, served through 0.6 by `GET /api/fabula/twin`; `CANON.doc`; 404 = absent). Shown for text
+  comes from the twin route (`GET /api/fabula/twin`; `CANON.doc`; 404 =
+  absent). Shown for text
   paths only (`canonIsText`), project or `canon:`, never in home mode. The
   badge reuses `twin-on` / `twin-off` tinted `--accent-tool` (owner decision
-  5), with the corner dot when stale; the buttons are **twin** (the EMF face),
-  **atem** (the whole file → the card) and **decompile** / **refresh twin** (a
-  fresh, full twin asks first through `confirmOverlay`, then sends
-  `force: true`). The `(?)` (`data-help="canon-chip"`) sits on the read
+  5), with the corner dot when stale; the buttons are **twin** (the fabula's face),
+  **atem** (the whole file → the card) and **decompile** / **refresh twin**
+  (both open the fabula card, above). The `(?)` (`data-help="canon-chip"`) sits on the read
   toolbar's chip only. Compact forms come from container queries on each
   header; beside a convert chip the read toolbar drops it below 900px.
-- **The EMF face** — `#review-emf` (full), `#preview-emf` (mini):
+- **The fabula's face** (`EMF_FACE` in code) — `#review-emf` (full), `#preview-emf` (mini):
   `emfFaceShow`, `emfFaceHide`, `emfFaceRender`, `emfFaceAct`. The twin drawn
   by the viewer's functions (host `EMF_FACE`) **in place of** the reading surface,
-  at the reader's size. Head: "EMF twin of <name>", stale / scaffold tags,
+  at the reader's size. Head: "the fabula of <name>", stale / scaffold tags,
   lens, outline, open raw, **compile a short** — a split button
   (`.emf-short`: the main button sends no `order`, the caret `▾`
   opens `emfShortMenu()` with **as the author told it** / **by weight**, the
-  default marked from the twin's `source`; Esc, a click outside or a choice
-  closes it, Esc going no further) → a toast "wrote notes.short-….md" with
+  default marked from the twin's `source`, and the model line's two items
+  (`fabShortRoutePaint`); Esc, a click outside or a choice closes it, Esc
+  going no further) → a toast "wrote notes.short-….md" with
   **open** — and **back to the text**. Remembered per text (`CANON.faces`) until read/edit closes;
   "twin" on a text with none decompiles first and flips when the job is done.
 - **The atem card** — `#atem-modal`, a `*-modal`, so the shared MODAL helper
@@ -4193,9 +4268,32 @@ other leading slash is dropped, exactly as the routes read it.
   or running: "a message you send now waits until it is done".
   **`window.__canonReady`** guards read/edit's calls into the Canon block —
   give any new call from read/edit code the same guard.
+  **How a card follows a job (0.6).** A card registers the job it started,
+  or one already running that it adopts (a tool's, another tab's), with
+  `canonTrack(job, {want: 'fabulac' | 'dialectic' | …})`; `canonApply`
+  hands each snapshot to the card's own `…JobOnSnap` (`fabJobOnSnap`,
+  `dlgJobOnSnap`), `canonToast` ends in the card's words when the card is not
+  showing that job (`fabToastEnd`; a `dialectic` branch with the job's
+  message), `canonAfterWrite` repaints what the write touched
+  (`fabAfterWrite`, `dlgAfterWrite`: the tree, Canon, an open viewer), and
+  `canonBusyPaint` names the work ("building the fabulac of …", "settling the
+  answers into …"). A compile snapshot is a fabulac's when `snap.flavour ===
+  'fabulac'` (S2; `fabIsFabulacSnap` keeps `want` and the result's shape as a
+  fallback). A new card adds a `want` of its own and a branch in each of the
+  three.
 - **uicheck**: screens `canon`, `canon-volume`, `cosm-viewer`,
   `cosm-viewer-holotype`, `cosm-viewer-mini`, `canon-chip`, `emf-face`, `emf-face-mini`, `emf-short-menu`
   (SHORT: the split button's menu open), `atem-card`, `atem-card-mini`;
+  0.6 (U1a) screens `fabula-decompile`, `fabula-decompile-old` (an old-named
+  twin beside a new one), `fabula-build`, `fabula-cosm`, `fabula-cshort`,
+  `fabula-catem` (`thym-run` shows the model line); scenarios
+  `fabula-decompile-card` (the card, not a job; verse suggested and checked;
+  no cloud with the gate shut; Esc writes nothing; a decompile by rules lands
+  `rain.md.fabulap.cosm`; the wire says `/api/fabula/derive`, `what: fabula`,
+  `route: local`, no retired route), `fabulac-build-outline` and
+  `cshort-read` (see "Building a fabulac"), seeded by `_seed_fabula` in
+  `works/` (`tally/` + its fabulac with five runs, a cshort and a catem,
+  `tiny-tool/`, the poem `rain.md`, `letter.md` with an old and a new twin);
   scenarios `canon-open-catalog`, `cosm-lens`,
   `twin-flip`, `atem-selection`, `atem-pin`, `compile-short` (SHORT, rules
   mode: the menu's two orders with told marked, Esc closing only the menu,
@@ -4240,8 +4338,10 @@ it against the real declarations). Design and rulings: `docs/thym-architecture.m
 plan `docs/thym-050-plan.md`, lane notes `docs/thym-landed-*.md`, and for
 `thym 1` `docs/fabula-pins-thym1.md` (sections 9 to 11 are rulings) and
 `docs/fabula-landed-T1*.md` (all local, gitignored). User-facing:
-HELP_CENTER §12.6 (packages, sealed packages, unpack, readings) and §13.4
-(programs, run with…, the trace, morphs, the readvisor's tools, agent free).
+HELP_CENTER §12.6 (packages, sealed packages, unpack, readings), §13.4
+(programs, run with… and its inputs, the plan, the trace, morphs, the
+readvisor's tools, agent free), §13.5 (`thym 1`) and §13.6 (writing a
+program, Thym at hand).
 `GET /api/thym-spec?lang=` serves THYM.md raw (`/api/macrocosm-spec`'s
 twin, in `HOME_PATHS`, English only; a `static/i18n/<lang>/THYM.md` would win).
 
@@ -4325,7 +4425,11 @@ move as `thym 1` sees it (`declarations.views(decls, version)`); a
   block or any known check (`check.known_checks`: the text's table,
   everything a declaration names, and the registry's). A failed keep re-runs
   the body when the move asks, up to its attempts, with the verdicts in the
-  repair; a program's keeps are checked before anything lands.
+  repair; a program's keeps are checked before anything lands. A move's own
+  `repair` mapping may say `replaces: true`; its `failed` then stands
+  instead of the runtime's verdicts on its last output, so a move that asks
+  again for one part carries that part's verdicts alone (S3:
+  `thym/run.py` `_move_replaces`; `moves/code.py` uses it for a part re-ask).
 - **Recursion under `depth`**: a user move that calls itself (directly or
   through a cycle) must say `depth: <1–64>` under its why ("move tree-of
   calls itself; a move that calls itself says how deep it may go: add
@@ -4526,10 +4630,8 @@ before any engine or model work.
 
 ### The UI (index.html, U1)
 
-> **Placeholder (the page lanes of the 0.6 round):** the run card's route
-> control and models line, a folder input and several outputs, and the
-> `thym 1` layouts (contract blocks, loop nodes, `keeps`, `depth`) are
-> written here by the lane that writes the page's chapters.
+What 0.6 added (U1a: the route; U1c: the rest; `docs/fabula-landed-U1c.md`)
+is listed after the 0.5.0 block below.
 
 One CSS block and one JS block, both "Thym in the page (0.5.0, U1)", ending
 `window.__thymReady = true`; every hook into older code is guarded by it.
@@ -4559,6 +4661,111 @@ the trace opens with green checks, `orchard/harvest.n.txt` in the tree) and
 `thym-read-labelled` (the band in every face and size, gone on close, the
 text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
 `orchard/`.
+
+**0.6 (U1a, U1c).**
+
+- **The run card's route and inputs.** `#thym-route-box` (`thymRouteHTML`,
+  the model line of "The fabula" → "The UI") sits above the plan; `route` and
+  `calls` go to `/api/thym/plan` and `/api/thym/run`, and a route change plans
+  again. `THYM_PICK` holds `inputs`, `takes`, `outputs`, `source`, `preset`,
+  `told`. `thymRunOpen({input, program, name, inputs})` always reads the
+  program list; `thymProgramChosen` reads what the program takes (the list
+  row, else `POST /api/thym/compile {path}`) and its source. One row per
+  input in `#thym-inputs` (`role=group`; `thymInputsPaint`, `thymInputSet`):
+  the name, the server's `accepts` words, a text field with a `<datalist>` of
+  only what fits the type in the project's tree (`thymCandidates(type)`,
+  `thymFits`: texts and shorts with readings left out; twins by flavour,
+  labelled "prose · fabulan" …; folders, links left out; volumes, answers
+  files labelled "answers"; morphs, contexts, packages in all three forms).
+  Filled from the last inputs given to this program (localStorage
+  `enough.thym.inputs`, per program, only paths still in the tree;
+  `thymInRemember` / `thymInRemembered`), then the opener's `inputs`, then the
+  text the card opened on (a fabula input gets its twin). The plan is asked
+  only once every input is given ("give it {names} to see its plan"); the body
+  is `{program, inputs: {name: path}}` (`thymInputsBody`; the `path`
+  shorthand is no longer sent). The server checks every input again; its 400
+  shows as the plan's error. A `list of …` input takes a list
+  (`inputs: {xs: [...]}`, lane S4; before S4 the row said it could not be
+  given).
+- **The plan reader.** `thymPlanPaint` → `thymPlanReadHTML(pl, {source,
+  program, where})`, `thymPlanNodeHTML`, `thymStmtHTML`, `thymLandsAs`: the
+  cost line (`atem`) and `models_line`; a refusal with its statement (the
+  program's line from `GET /api/thym/program`'s `source`) and, for a project
+  program, "edit it at line N"; "its steps, in the order they run", each node
+  at its line with its statement, the asks badge and under it
+  `members.at_most` ("a loop: at most N passes") or "a loop over a collection
+  known only at run time", `keeps`, `budget.depth`, "up to N attempts, each
+  checked", "its model calls are counted only as it runs" for a node in
+  `models.calls_open`; "what it reads" (a folder's files and bytes and the
+  snapshot sentence: the plan holds the tree digest); "what it will write"
+  (each output `name type → <stem>.<name>.…` beside the first input, all at
+  once or none).
+- **Outputs and refusals.** A landed run stays on the card: "what it made, N
+  outputs", each by name and type with **open** and its path (a file where
+  its kind reads, a folder in Canon's folder view, a package at its catalog),
+  focus on the first open, "show the trace" in the foot; a run whose card was
+  closed opens its trace from the toast. A refused run (`outcome: refused`):
+  `thymToldLoad(run)` reads the trace — each failed record's failed checks
+  with their `why` (a kept contract's `assert … else "…"` words), and "what
+  the model was told when it was asked again" (the failures that rode into
+  each re-ask, `record.tries`, THYM 12.2). The trace viewer's record cards
+  fold the same under "attempts that failed: N".
+- **The editor's strip** ("writing a program: the compiler beside the
+  editor"): `#thym-ed` between the edit face's toolbar and its textarea, the
+  mini editor's own `#thym-ed-mini`. `THYM_ED`, `thymEdOpen(path, size)`
+  (called from `_showFullEdit` / `_showMiniEdit`, closed by `_hideFullEdit` /
+  `_hideMini`, all guarded by `__thymReady`), `thymEdCheck` (`POST
+  /api/thym/compile {text}` after a **700 ms** pause, `THYM_ED_WAIT`; never
+  `/plan`, `/run` or a model — the scenario asserts the wire), `thymEdPaint`,
+  `thymEdGo(line)`, `thymEdStep(back)`, `thymEdRefusals()` (steps through
+  `refusals: [...]` if the compiler ever returns several); F8 / shift+F8 in
+  the capture phase, only while no dialog is open; `saveEdit` repaints. The
+  textarea is plain (no editor library), so a refusal is never painted on its
+  line: the strip names the line as a button and F8 selects it. It says ✓ "it
+  compiles: program {name}, nothing refused" or ✗ `line N` + the check + the
+  compiler's message **verbatim**; the version line read from the first line
+  (`thym.ed.v0|v1|vNone`); takes · gives · steps · asks once clean; "a plan
+  and a run read the file as saved" while the text differs from disk; after a
+  copy, where it came from. The state is a polite atomic live region.
+  Buttons "the moves…" and "plan and run…", the `(?)` `thym-editor`. Entry
+  points: the tree's option-click on a `.thym` ("edit the program"), the
+  program page's "edit" (project files), a plan's "edit it at line N", a copy.
+- **Thym at hand** — `#thym-ref-modal`, two tabs (`role=tablist`, arrow
+  keys): `thymRefOpen`, `thymRefSkeleton`, `thymRefLoad`, `thymRefPaint`,
+  `thymRefTab`, `thymRefMoveHTML`, `thymRefPut`, `thymRefCall`,
+  `thymRefProgramsHTML`, `thymRefClose`. **the moves** from `GET
+  /api/thym/moves?version=` (S4), grouped by format in the text's order
+  (`thym/1`, `fabula/1`, `doc/1`, `comprise/1`, `ascribe/1`), searchable by
+  any word of a move (↓ to the first put), the `thym 1` / `thym 0` switch
+  (defaults to the open program's version line); **put it in** writes the
+  call at the caret, selects its first operand, closes the dialog, returns
+  focus to the text and checks again. **programs to start from**: every
+  `where: shipped` row of `GET /api/thym/programs` with its `why:` line,
+  **read it** and **copy into this project to change it**
+  (`thymCopyProgram`: `GET /api/thym/program` for the source, `POST
+  /api/file` to `programs/<file>.thym`, `-2`, `-3` …, opened in the editor
+  with "a copy of {file}: yours to change; the original is unchanged"). Copies
+  go to `programs/`, not the top, because a shipped program's `rel` is its
+  bare file name and a top-level copy collided with it in the run card (U1c
+  7.4; S4 tells a shipped program from a project file of the same name).
+  Reachable from the strip, a program's page and the run card ("read the
+  shipped programs, or copy one to change it…"). Bubble `thym-moves`.
+- **The dialectic's second run.** The dialectic card offers, on a fabula
+  with sittings, "run with {file}…" per sitting: it closes the card and opens
+  run with… on `settle.thym` with `f` = the fabula and `said` = the sitting,
+  planned at once.
+- **uicheck (0.6).** Seeds in `_seed_thym`: `broken.thym` (refused at line
+  9, `unknown-move`), `two-outs.thym` (`thym 1`: a folder and a short in, `n`
+  and `listing` out), `little-repo/`, `long-lines.md`, the tighten replay
+  trace. Screens `thym-editor`, `thym-editor-mini`, `thym-moves`,
+  `thym-programs`, `thym-run-inputs`, `thym-run-asks`, `thym-run-landed`,
+  `thym-run-refused` (the last two place a recorded shape; they run nothing),
+  `thym-trace-tries`. Scenarios `thym-editor-checks` (the compiler's words
+  byte for byte, the live region, F8, only `/api/thym/compile` on the wire),
+  `thym-moves-put`, `thym-run-folder-outputs`, `thym-shipped-copy`,
+  `thym-settle-from-dialectic`; `thym-run-roundtrip` now waits for the card's
+  outputs, then "show the trace". `screens.thym_moves_stub_js` hands the page
+  the moves payload only when `/api/thym/moves` does not answer.
 
 ### Tests
 
@@ -4721,6 +4928,59 @@ against it in a throwaway sandbox; a second model grades behaviour against
 the fabulac. Nothing of it runs inside enough, and agents of this repo may
 not clone or run third-party repositories.
 
+### The UI (index.html, U1a)
+
+User-facing: HELP_CENTER §12.7 (building) and §12.8 (compiling, reading,
+never run). Lane note `docs/fabula-landed-U1a.md` 4 and 5.
+
+- **The folder face** of `#fabula-modal`: `fabFolderOpen(folder | fabulac)`
+  → `GET /api/fabula/build` (+ `/api/fabula/compiled`) → `fabFolderPaint`,
+  painted through `fabSet`. Entry points: the tree's option-click on any
+  folder that is not `rness/`, a Holotype or a `*.thym` package folder ("build
+  its fabulac…"); on a `.fabulac.cosm` file "build and compile…"; the cosm
+  viewer's `#cosm-fab-btn` "build and compile…" on a fabulac (`fabIsFabulac`:
+  the name, or `catalog.flavour: fabulac`). The five stages ✓ landed (model,
+  here / on the cloud, or "by rules"), ▸ running, · waits; "N Python files";
+  one state line (none yet / moved / complete / outline / partway / folder
+  gone). The model line with the per-stage ceiling.
+- **Running.** `fabProgressText`: "stage n of 5: read · k of m files read · k
+  model calls, at most n · here|on the cloud" (also the toast's line and
+  `canonBusyPaint`'s), a bar from `chunk/chunks`; a queued build shows stage 1
+  from its first snapshot (S2). Foot: **build** | **take up again** (`POST
+  /api/fabula/resume`, when `landed > 0`, `!complete`, `!moved`) with "build
+  again from the survey" beside it | **build again** (`restart: true` when
+  complete); **cancel** (`POST /api/fabula/cancel`) while a job runs; "open the
+  fabulac". A `done` job with `result.refusal` is the outline: the card and
+  the toast show the job's `message` (S2 keeps it in the result). A build
+  already running when the card opens is adopted: `canonTrack(job, {want:
+  'fabulac'})`.
+- **Compile.** "compile it": as code | a catem at depth line | overview |
+  manual → `POST /api/fabula/compile {path: <fabulac>, what, route, calls?}`,
+  with the line "a cshort is text to read: enough never runs it" and a refusal
+  in the server's words (409 "a cshort needs a model, and none is answering
+  (…)"). "what it has made" lists `GET /api/fabula/compiled` (by, route,
+  date, files or depth, "not there any more", open).
+- **The viewer** — `#cshort-modal`, `fabViewOpen(path)` / `fabViewPaint`. A
+  cshort: "a cshort is source code to read: enough never runs it, and nothing
+  here can." once in bold, the footer, the licence line, the file list (links
+  listed, disabled), one file at a time from `GET /api/fabula/cshort/file` in
+  a monospaced `<pre>` (markdown rendered). A catem: its depth line and the
+  markdown with its footer. **No run, terminal or download control anywhere;
+  keep it so** (the `cshort-read` scenario asserts it). Also from a cshort
+  folder's / catem file's option-click ("read the cshort" / "read the catem")
+  and a compile's done toast; the tree tags a cshort folder "cshort".
+- **In the cosm viewer**, every fabula's rail gains `fabMadeHTML`: "made by
+  <model> · on the cloud|here · <date>", an "N runs" disclosure of
+  `derived.runs`, "an outline: …" for `completeness: outline`, "licence of the
+  source: …" or the pending sentence.
+- **uicheck.** Screens `fabula-build`, `fabula-cosm`, `fabula-cshort`,
+  `fabula-catem`; scenarios `fabulac-build-outline` (the folder menu item; a
+  build by rules lands survey and history, two ✓ and the job's words, take up
+  again and open offered; the viewer shows build and compile… and the outline
+  line) and `cshort-read` (open from the list; a `.py` as text in a `<pre>`;
+  no run/terminal/download control; Esc closes only the viewer, focus back in
+  the card). Seeded by `_seed_fabula` in `works/`.
+
 ---
 
 ## The dialectic (module D, 0.6)
@@ -4816,6 +5076,15 @@ questions, by rules), `POST /api/dialectic/ask-again {path, question}`.
 fabulac beside it, or a text (→ its twin). A write is made under the
 volume's claim (409 "<p> is being derived right now; …"). The full contract
 is `docs/fabula-landed-SV.md` section 1.3.
+`GET /api/dialectic/questions` also lists `closed` (settled or declined
+questions, newest first, at most 50; `closed_total` counts them all), and
+each card's `candidate` says where a reading saw a candidate (`text`,
+`sha256`, `span`, `confidence`, `made`), null for anything else. `POST
+/api/dialectic/raise` with `dry: true` counts what it would raise (`count`,
+`by` bank entry or rule) and writes nothing. A recorded sitting and a landed
+settle send the `dialectic` event (`{path, session, what: recorded |
+settled}`) on the app's event stream. (S3; `POST /api/dialectic/answers`'
+`recorded` now says `answered`, `unknown` or `declined` for an address too.)
 
 **The tool** `dialectic` puts **one or two questions at a time** (`SHOWN`
 = 2) and records the person's words **verbatim** (`through: agent`, the
@@ -4826,6 +5095,78 @@ model's id); it never answers for them ("Never answer for them."), and
 <volume>` (`answer` interactive by default: `?` I don't know, `-` skip, `x`
 decline, `q` stop; `--from ANSWERS` records an answers volume; nothing but
 the volume and its answers volumes is ever written). Run it under the seams.
+
+### The UI (index.html, U1b)
+
+User-facing: HELP_CENTER §13.7. Lane note `docs/fabula-landed-U1b.md`, with
+S3's adoptions in `-U1c.md` 8. Markup `#dialectic-modal` (a `*-modal`), CSS
+"0.6 (U1b): the dialectic card", JS block "The dialectic in the page (0.6,
+U1b)" ending `window.__dlgReady = true`; every hook in older code is guarded
+by it. State `DLG` (separate from `FAB` and the editor's).
+
+- **Open.** `dlgOpen(path)` takes any volume path the routes take (a text, a
+  twin, a fabulac or its folder, a holograph folder, a `.cosm`). From: the
+  cosm viewer's `#cosm-dlg-btn` "questions" with the open count
+  (`dlgCosmPaint`; a project volume whose listing answers, not `canon:`,
+  `thym-run:` or inline volumes); the fabula card's `#fab-dialectic` line on
+  both faces (`dlgFabLine`); a decompile's or a build's done toast that landed
+  questions (`dlgToastOffer(toastId, volume, toastOpts)`, also for a Thym run
+  that lands them); a settle's toast.
+- **Listing and the queue.** `dlgLoad` → `GET /api/dialectic/questions`, plus
+  `GET /api/cosm` of the volume (the ids a `ref` answer may name, module
+  names). **One or two at a time**: `DLG_SHOWN = 2`, `dlgQueue` (the server's
+  order; what a settle or a refusal put next at its head; nothing already in
+  the sitting). `dlgQuestionHTML`: asks, why, for whom, about (a link that
+  closes the card and opens the viewer on that item), hint, and the input
+  `dlgInputHTML` fits the kind (text / `many` one to a line; choice as radios
+  or checkboxes with "other:" when `options_open`; yes-no; number with
+  min/max; date; ref with a datalist of the volume's ids filtered by the
+  `options` prefixes; span), plus three toggle buttons (`aria-pressed`) "I
+  don't know", "I'd rather not say", "skip for now".
+- **The live check.** `dlgCheckSoon` / `dlgCheck` / `dlgCheckPaint`: `POST
+  /api/dialectic/check` 450 ms after typing stops (at once for a radio or a
+  checkbox); the refusal beside the field in `.dlg-check` (`aria-live=polite`,
+  the field `aria-invalid`); a value written differently is said back
+  ("written as: true").
+- **Drafts and the sitting.** Drafts live in `DLG.drafts` per volume until
+  recorded: closing the card, following an item link or another sitting
+  landing loses nothing (words typed for a question answered elsewhere are
+  said and kept). "keep these, and the next" holds the pair; "send the
+  sitting (N)" (`dlgSend`) posts `{path, answers, through: "person"}` (never
+  `who`); the reply is shown per question in the server's words; a refused
+  answer comes back first with what was typed; a 422 puts every answer back.
+- **The re-read.** `dlgOnEvent` on the `dialectic` SSE event (S3): an open
+  card on the named volume reads its listing again, drafts kept, not while its
+  own sitting is being sent; `dlgOnAgent` on the chat's `tool` event with
+  `name: dialectic` says "the readvisor recorded answers beside this volume
+  …"; also a re-read on window focus. The question area repaints only when
+  what is shown changes (`DLG.mainKey`), so typing survives a re-read.
+- **Settle, closed, raise.** `dlgSettleHTML` / `dlgSettle` / `dlgJobOnSnap`:
+  a fabula's settle carries the model line (`fabRouteHTML('dlg', {ceiling:
+  'cloud'})`) and is followed as a CanonJob (`want: 'dialectic'`); any other
+  volume and a holograph are "settled at once, by rules" and send `{path}`
+  only. After: the job's `message`, "waiting" (`waiting_in` → "in the sitting
+  X, not settled yet", else "waits for a model to read <item> again"),
+  `counters` and a holograph's `follow_ups` put next. On a fabula with
+  sittings, "run with {file}…" per sitting opens Thym's run card on
+  `settle.thym`. "answered before (n)" reads the listing's `closed`
+  (`dlgClosed`) with "ask again" each (`POST /api/dialectic/ask-again`).
+  "raise the questions" when the volume holds none (`dlgRaiseHTML` /
+  `dlgRaise`), with the count read first by a dry raise (`dlgDryLoad`,
+  "raising them asks N questions").
+- **uicheck.** Seed `_seed_dialectic` in `talks/` reads the check's own
+  fixtures, `scripts/uicheck/fixtures/dialectic/` (`DIALECTIC_OWN`; see "The
+  browser check owns its fixtures" under the pre-commit suite), with
+  `DIALECTIC_KINDS` added on top, and per-language `answer-<lang>/` and
+  `self-ask-<lang>/` copies (the scenarios write). Screens
+  `dialectic-card`, `dialectic-kinds-yes-number`, `-date-ref`,
+  `-span-pending`, `dialectic-sitting`, `dialectic-waiting`,
+  `dialectic-raise`, `dialectic-cosm-count` (and the four holograph screens
+  under "Ascribe's module"). Scenarios `dialectic-answer-kinds` (every kind
+  by keyboard alone; refusals with `aria-invalid`; nine recorded; settle by
+  rules; the wire: `through: person`, no `who`, `route: local`) and
+  `dialectic-holograph-no-cloud` (below). `_reset` in `interactions.py`
+  closes the card.
 
 ---
 
@@ -4888,6 +5229,45 @@ cryptograph, the bridge to Comprise, Ascribe-Connect.
 - **The cryptograph, match tokens, the isomorph** are engine functions of
   the module (`cryptograph`, `make_tokens`, `isomorph`), the holder's side
   only; no Thym move gives them in this edition.
+
+### The UI (index.html, U1b: a holograph)
+
+User-facing: HELP_CENTER §13.8. A holograph opens the same `#dialectic-modal`
+(see "The dialectic" → "The UI"), with:
+
+- **`#dlg-rules`**: "for the holder alone", the personal-data rule (refused,
+  nothing written; describe people by what they are to you, or by a
+  pseudonym) and "nothing here goes to a cloud model", with the `holograph`
+  bubble. The refusal is the server's words beside the field, as a check's
+  (never a page error). S3 reworded `ascribe.REFUSED_PII` to "describe people
+  by what they are to you (…), or by a pseudonym you declare" (the retired
+  word "role" is out of user-facing text; `ascribe.ADVICE` keeps the
+  specification's own wording, ASCRIBE §10.3, until the text changes).
+- **No model anywhere.** No model line is drawn for a holograph; settle sends
+  `{path}` only; no request names `who`, `route` or `model`. The
+  `dialectic-holograph-no-cloud` scenario asserts it with the gate made to
+  read open (through `/api/fabula/models`): a fabula's settle offers the cloud,
+  a holograph's card never does, before, after a sitting and after settling;
+  an email refused while typing and when sent, the other answer kept.
+- **Candidates** (`dlgIsCandidate`: a `choice` of exactly yes/no/partly about
+  an item): "a reading of your own text proposes this; it is not yours until
+  you say so", its summary, yes / partly / no each with what it does, and
+  (`dlgCandFromHTML`, from the card's `candidate`) "read from journal.md,
+  line 3, 80 % sure" — never the words, which a holograph does not hold.
+- **The isograph face**: `#cosm-iso-btn` "the isograph…" on a holograph in the
+  viewer → `dlgIsoOpen` / `dlgIsoPaint` / `dlgIsoGo`: what an isograph is and
+  what it leaves out, said before the button; the holder's programs (`GET
+  /api/thym/programs`: in the project, compiling, one `volume` input, asking
+  no model, else the sentence on what to write); "make the isograph" → `POST
+  /api/ascribe/isograph`; after: "written: <file>", "the release was recorded
+  in the holograph first: epoch, run, N items left", "open". Not made in a
+  scenario (it records a release per epoch).
+- **The viewer's report** shows each finding's `advice` on a line of its own
+  (`cosmProblemHTML`; `cosmAdviceTrim` cuts the message's copy of it).
+- **uicheck.** Seeds `self/` (sample-self, bank raised, two journal
+  candidates landed, one affinity public), `self-pii/`, `open-self.thym`;
+  screens `dialectic-holograph`, `dialectic-candidate`,
+  `dialectic-isograph`, `dialectic-holograph-cosm`.
 
 ---
 
@@ -5912,7 +6292,9 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   renumbering English is a translation job too (0.4.4 renumbered §13.2 →
   §13.3 and added §10.7, §13.2, §16.5 in all six; 0.5.0 added §12.6 and §13.4
   in all six, with the same defined terms in the same places, so no telling
-  falls back to English for them).
+  falls back to English for them; the 0.6 round added §12.7, §12.8, §13.5 to
+  §13.8 and §16.6, retitled §12.4, and defines the terms fabulac, cshort,
+  catem, MiniCOSM and holograph).
 - **The docs viewer (0.4.4)** — mode `docs`, root `#docs-mode` (carries
   `data-doc` and `data-density`), one viewer for five documents:
   `help-center` (icon `hxc`, the UI language's telling, badge "written by
@@ -7491,6 +7873,27 @@ Nothing here touches your real state. Both servers boot through
 dir — and `tests/conftest.py` does the same for every test via an autouse
 fixture. The UI language is flipped with `POST /api/ui-config`, which
 lands in the scratch `$HOME`, never in your `~/enough/config/ui.json`.
+
+**The browser check owns its fixtures (0.6).** A seed copies what it needs
+from `scripts/uicheck/fixtures/` (today `dialectic/`: `close.md`, its
+fabulan with nine questions and an answers volume, the files as they stood
+at 43f70be; `DIALECTIC_OWN` in `scripts/uicheck/server.py`), never from the
+suite's `tests/fixtures/`. The suite's fixtures follow the specifications'
+examples and move whenever a text is corrected (the third errata pass put 29
+open questions in the twin and broke two scenarios that counted nine); a
+screen or scenario asserts what a person sees, so its data must change only
+when the check's author changes it. Add new seed data there, not by reading a
+suite fixture.
+
+**A wait is made in short calls, with the budget in the check (0.6).** One
+`js_await` has a 20 s reply limit, so a wait that looped inside the page for
+longer could never be honoured under load ("no reply within 20.0s").
+`_wait_js(d, cond, ms)` in `interactions.py` now polls from the harness: each
+call reads the condition and returns at once (10 s limit a call; a busy
+page's timeout is retried), and the budget `ms` is kept in Python. The 0.6
+scenarios use `_ready(d, cond)` for a surface's ready condition (a minute)
+and give a job 90 s and a plan 60 s. Never write a wait as one long in-page
+loop.
 
 **Two lists of accepted failures**, and they work the same way on
 purpose: both are green today, both go red when something NEW appears,

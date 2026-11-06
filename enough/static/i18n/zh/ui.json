@@ -83,7 +83,7 @@
     "canon.job.compiled": "已写好 {name}",
     "canon.job.dismiss": "关闭",
     "canon.job.emf": "fabula 已写好：{n} 项",
-    "canon.job.emfAgentFree": "fabula 已写好 —— 无代理：按规则阅读，没有模型",
+    "canon.job.emfAgentFree": "fabula 已写好 —— 无智能体：按规则阅读，没有模型",
     "canon.job.emfRules": "fabula 已写好 —— 一个骨架：当时没有模型在运行",
     "canon.job.failed": "没有成功",
     "canon.job.lost": "运行期间 enough 重启了；什么也没有写入",

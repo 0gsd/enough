@@ -357,6 +357,7 @@ die Karte vor einer Dekompilierung, und die Karte des <strong>fabulac</strong> e
 - bau einmal das fabulac eines kleinen Werkzeugs und lies sein catem in der Tiefe overview, bevor du seinen Code liest.
 - agentenfrei landet ein Bau trotzdem den Umriss: die Dateien, ihre Schnittstellen, die Geschichte und die Lizenz.
 - ein cshort ist Text zum Lesen: enough führt ihn nie aus.
+- Abschnitt 12.4 des Hilfe-Centers hat die Karte zum Dekompilieren und die Zwillinge, die sie schreibt; Abschnitt 12.7 hat das fabulac eines Ordners, Stufe für Stufe.
 
 ## cshort
 name: cshort / catem
@@ -371,6 +372,7 @@ was ein fabulac kompiliert, hier gelesen. ein <strong>cshort</strong> ist ein Or
 ### ideas
 - lies zuerst <code>CSHORT.md</code>: es sagt, aus welchem Teil des fabulac jede Datei geschrieben wurde.
 - leg einen cshort neben das Original und vergleiche: was dem fabulac fehlte, fehlt dem cshort.
+- Abschnitt 12.8 des Hilfe-Centers sagt, was ein cshort und ein catem sind und warum enough einen cshort nie ausführt.
 
 ## dialectic-card
 name: die Fragen
@@ -385,6 +387,7 @@ was ein Band von einem Menschen wissen will: was seine Quelle nicht sagen konnte
 ### ideas
 - „ich weiß es nicht, aber die Support-Leitung wüsste es“ ist eine gute Antwort: das Feld bleibt in diesen Worten offen, damit die nächste Person gefragt wird.
 - zwei beantworten, abschicken, einarbeiten: auch eine kurze Sitzung ist eine Sitzung.
+- Abschnitt 13.7 des Hilfe-Centers hat das Ganze: die Teile einer Frage, Sitzungen, das Einarbeiten und das erneute Fragen.
 
 ## holograph
 name: die Fragen eines holograph
@@ -399,6 +402,7 @@ ein <strong>holograph</strong> (Ascribe) beschreibt einen Menschen ohne Namen un
 ### ideas
 - beschreib Menschen über das, was sie für dich sind („ein Lotse im Ruhestand“), oder über ein Pseudonym, das du im Katalog erklärst.
 - sag <strong>teilweise</strong> zu einem Kandidaten, der fast stimmt, und sag es dann auf deine Weise.
+- Abschnitt 13.8 des Hilfe-Centers hat die Regeln von Ascribe, die Kandidaten und den isograph.
 
 ## atem-card
 name: atem-Karte
@@ -594,7 +598,7 @@ path: *.thym → a plan, a run, a trace
 - lies den Plan eines Programms, bevor du es auf einen langen Text loslässt: die Kostenzeile sagt dir, wie oft das Modell gefragt wird.
 - ein Programm, das nichts fragt, läuft in einem Augenblick, agentenfrei oder nicht: <code>words</code>, <code>count</code> und <code>cut</code> brauchen nie ein Modell.
 - ein abgelehnter Lauf ist kein kaputter: seine Spur sagt, welcher Schritt ihn angehalten hat und warum, und nichts von dem, was er gerade machte, wurde behalten.
-- Abschnitt 13.4 des Hilfe-Centers hat das Ganze: die drei Programme, die mit enough kommen, die Spur und die zehn Skalen.
+- Abschnitt 13.4 des Hilfe-Centers hat das Ganze: die Programme, die mit enough kommen, die Spur und die zehn Skalen.
 
 ## package
 name: Paket
@@ -642,6 +646,7 @@ path: *.thym in the editor
 - schreib zuerst die Versionszeile: <code>thym 1</code> öffnet Ordner, sammelnde Schleifen, <code>keeps</code>, <code>depth</code> und mehrere Ausgaben.
 - lass eine Ablehnung stehen und lies sie ganz: sie sagt, welche Anweisung, und meist, was stattdessen zu schreiben ist.
 - halte ein Programm klein und plane es an einer echten Eingabe, bevor du ihm einen langen Lauf anvertraust.
+- Abschnitt 13.6 des Hilfe-Centers hat den Streifen und Thym zur Hand; Abschnitt 13.5 hat, was `thym 1` öffnet.
 
 ## thym-moves
 name: Thym zur Hand
@@ -657,3 +662,4 @@ tippe in die Suche, um die Liste einzuengen; <kbd>↓</kbd> geht von der Suche z
 - such nach dem Namen einer Prüfung, um die Handgriffe zu finden, die sie halten.
 - wechsle zu <code>thym 0</code>, um zu sehen, was ein älteres Programm aufrufen darf.
 - fang mit dem mitgelieferten Programm an, das dem am nächsten kommt, was du willst, und ändere eine Kopie.
+- Abschnitt 13.6 des Hilfe-Centers hat die Handgriffe und die Programme zum Anfangen.

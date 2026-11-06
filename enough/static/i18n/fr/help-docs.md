@@ -358,6 +358,7 @@ la carte qui précède une décompilation, et la carte du <strong>fabulac</stron
 - construisez une fois le fabulac d'un petit outil, puis lisez son catem à la profondeur overview avant de lire son code.
 - sans agent, une construction pose quand même l'esquisse : les fichiers, leurs interfaces, l'historique et la licence.
 - un cshort est un texte à lire : enough ne l'exécute jamais.
+- la section 12.4 du centre d'aide présente la carte de décompilation et les jumeaux qu'elle écrit ; la section 12.7, le fabulac d'un dossier, étape par étape.
 
 ## cshort
 name: cshort / catem
@@ -372,6 +373,7 @@ ouvrez-en un depuis la liste de la carte du fabulac, depuis une notification qua
 ### ideas
 - lisez d'abord <code>CSHORT.md</code> : il dit de quelle partie du fabulac chaque fichier a été écrit.
 - posez un cshort à côté de l'original et comparez : ce qui manque au fabulac manque au cshort.
+- la section 12.8 du centre d'aide dit ce que sont un cshort et un catem, et pourquoi enough n'exécute jamais un cshort.
 
 ## dialectic-card
 name: les questions
@@ -386,6 +388,7 @@ ce qu’un volume demande à une personne : ce que sa source ne pouvait pas dire
 ### ideas
 - « je ne sais pas, mais la responsable du support le saurait » est une bonne réponse : le champ reste ouvert avec ces mots, pour que la personne suivante soit interrogée.
 - répondez à deux, envoyez, intégrez : une courte séance reste une séance.
+- la section 13.7 du centre d’aide dit tout : les parties d’une question, les séances, l’intégration et les questions redemandées.
 
 ## holograph
 name: les questions d’un holograph
@@ -400,6 +403,7 @@ ouvrez-la avec <strong>questions</strong> dans la visionneuse cosm, sur le holog
 ### ideas
 - décrivez les gens par ce qu’ils sont pour vous (« un pilote du port à la retraite »), ou par un pseudonyme que vous déclarez dans le catalogue.
 - dites <strong>en partie</strong> à un candidat presque juste, puis dites-le à votre façon.
+- la section 13.8 du centre d’aide présente les règles d’Ascribe, les candidats et l’isograph.
 
 ## atem-card
 name: carte atem
@@ -595,7 +599,7 @@ path: *.thym → a plan, a run, a trace
 - lisez le plan d'un programme avant de le lancer sur un long texte : la ligne de coût dit combien de fois le modèle sera interrogé.
 - un programme qui ne demande rien tourne en un instant, sans agent ou pas : <code>words</code>, <code>count</code> et <code>cut</code> n'ont jamais besoin de modèle.
 - une exécution refusée n'est pas une exécution cassée : sa trace dit quelle étape l'a arrêtée et pourquoi, et rien de ce qu'elle préparait n'a été gardé.
-- la section 13.4 du centre d'aide dit tout : les trois programmes fournis avec enough, la trace, et les dix échelles.
+- la section 13.4 du centre d'aide dit tout : les programmes fournis avec enough, la trace, et les dix échelles.
 
 ## package
 name: paquet
@@ -643,6 +647,7 @@ ouvrez un fichier <code>.thym</code> dans l’éditeur, et une bande sous la bar
 - écrivez d’abord la ligne de version : <code>thym 1</code> ouvre les dossiers, les boucles qui collectent, <code>keeps</code>, <code>depth</code> et plusieurs sorties.
 - laissez un refus à l’écran et lisez-le en entier : il dit quelle instruction, et le plus souvent quoi écrire à la place.
 - gardez un programme petit et planifiez-le sur une vraie entrée avant de lui confier une longue exécution.
+- la section 13.6 du centre d’aide présente la bande et Thym sous la main ; la section 13.5, ce qu’ouvre `thym 1`.
 
 ## thym-moves
 name: Thym sous la main
@@ -658,3 +663,4 @@ tapez dans la recherche pour resserrer la liste ; <kbd>↓</kbd> passe de la rec
 - cherchez le nom d’une vérification pour trouver les mouvements qui la tiennent.
 - passez à <code>thym 0</code> pour voir ce qu’un programme plus ancien peut appeler.
 - partez du programme livré le plus proche de ce que vous voulez, et modifiez une copie.
+- la section 13.6 du centre d’aide présente les mouvements et les programmes pour commencer.

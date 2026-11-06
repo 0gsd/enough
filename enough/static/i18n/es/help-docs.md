@@ -358,6 +358,7 @@ la tarjeta que viene antes de una descompilación, y la tarjeta del <strong>fabu
 - construye una vez el fabulac de una herramienta pequeña y lee su catem a la profundidad overview antes de leer su código.
 - sin agente, una construcción deja igualmente el esbozo: los archivos, sus interfaces, la historia y la licencia.
 - un cshort es un texto para leer: enough nunca lo ejecuta.
+- la sección 12.4 del centro de ayuda tiene la tarjeta de descompilar y los gemelos que escribe; la sección 12.7, el fabulac de una carpeta, etapa por etapa.
 
 ## cshort
 name: cshort / catem
@@ -372,6 +373,7 @@ abre uno desde la lista de la tarjeta del fabulac, desde un aviso cuando termina
 ### ideas
 - lee primero <code>CSHORT.md</code>: dice de qué parte del fabulac se escribió cada archivo.
 - pon un cshort junto al original y compáralos: lo que le faltó al fabulac le falta al cshort.
+- la sección 12.8 del centro de ayuda dice qué son un cshort y un catem, y por qué enough nunca ejecuta un cshort.
 
 ## dialectic-card
 name: las preguntas
@@ -386,6 +388,7 @@ lo que un volumen pregunta a una persona: lo que su fuente no podía decir, cada
 ### ideas
 - «no lo sé, pero la responsable de soporte lo sabría» es una buena respuesta: el campo queda abierto con esas palabras, para preguntar a la siguiente persona.
 - responde dos, envía, incorpora: una sesión corta también es una sesión.
+- la sección 13.7 del centro de ayuda lo tiene todo: las partes de una pregunta, las sesiones, incorporar y volver a preguntar.
 
 ## holograph
 name: las preguntas de un holograph
@@ -400,6 +403,7 @@ un <strong>holograph</strong> (Ascribe) describe a una persona sin nombre, y se 
 ### ideas
 - describe a las personas por lo que son para ti («un práctico del puerto jubilado»), o con un seudónimo que declares en el catálogo.
 - di <strong>en parte</strong> a un candidato que casi acierta, y luego dilo a tu manera.
+- la sección 13.8 del centro de ayuda tiene las reglas de Ascribe, los candidatos y el isograph.
 
 ## atem-card
 name: tarjeta del atem
@@ -595,7 +599,7 @@ path: *.thym → a plan, a run, a trace
 - lee el plan de un programa antes de ejecutarlo sobre un texto largo: la línea del coste te dice cuántas veces se le va a preguntar al modelo.
 - un programa que no pregunta nada se ejecuta en un momento, sin agente o no: <code>words</code>, <code>count</code> y <code>cut</code> nunca necesitan un modelo.
 - una ejecución rechazada no es una ejecución rota: su traza dice qué paso la detuvo y por qué, y no se guardó nada de lo que estaba haciendo.
-- la sección 13.4 del centro de ayuda lo tiene todo: los tres programas que vienen con enough, la traza y las diez escalas.
+- la sección 13.4 del centro de ayuda lo tiene todo: los programas que vienen con enough, la traza y las diez escalas.
 
 ## package
 name: paquete
@@ -643,6 +647,7 @@ abre un archivo <code>.thym</code> en el editor y una franja bajo la barra de he
 - escribe primero la línea de versión: <code>thym 1</code> abre las carpetas, los bucles que recogen, <code>keeps</code>, <code>depth</code> y varias salidas.
 - deja un rechazo en pantalla y léelo entero: dice qué instrucción y, casi siempre, qué escribir en su lugar.
 - mantén pequeño un programa y planifícalo sobre una entrada real antes de confiarle una ejecución larga.
+- la sección 13.6 del centro de ayuda tiene la franja y Thym a mano; la sección 13.5, lo que abre <code>thym 1</code>.
 
 ## thym-moves
 name: Thym a mano
@@ -658,3 +663,4 @@ escribe en la búsqueda para acotar la lista; <kbd>↓</kbd> pasa de la búsqued
 - busca el nombre de una comprobación para encontrar los movimientos que la mantienen.
 - cambia a <code>thym 0</code> para ver qué puede llamar un programa más antiguo.
 - empieza por el programa incluido más cercano a lo que quieres, y cambia una copia.
+- la sección 13.6 del centro de ayuda tiene los movimientos y los programas para empezar.
