@@ -4529,15 +4529,43 @@ at all (`copy_all`), replacing an earlier copy.
 | Route | Answers |
 |---|---|
 | `GET /api/thym/programs` | `{programs: [{name, where (project/canon/shipped), rel, steps, asks, takes: [{name, type, accepts}], gives, outputs: [{name, type}], version, why}]}`, project → canon → shipped; a row that does not compile is `{name, where, rel, problem}` |
-| `GET /api/thym/program?path=` | `{name, rel, why, source, volume}` (a name, a project path, a `canon:` path or a shipped file name; 404 when none) |
-| `POST /api/thym/compile {path} \| {text}` | `{ok, name, refusal: {stage, check, line, message}, estimate, version, takes, outputs}` |
-| `POST /api/thym/plan {program, inputs \| path, mode?, route?, model?, calls?}` | `{ok, plan, atem, mode, fits, refusal, why?, route, models, models_line, calls, inputs, outputs, version}`; rules mode refuses a plan that asks (check `agent-free` or `no-model`), model mode runs the route's checks and the preflight. `inputs` fills every input by name, each checked by its type (`thym_host.check_input`: "notes.md is a file; repo takes a folder") |
-| `POST /api/thym/run {program, inputs \| path, mode?, route?, model?, calls?}` | `{job}`: a CanonJob of kind `thym`, claim key the first input's path (so a run and a decompile of one file exclude each other), the generation lock in model mode on the local route only; result `{run, trace, atem, outcome, mode, route, models, outputs: [{name, type, path, rel, files?, folder?}], refusal?}` (a folder output lands as `<stem>.<output>/`). Refused before any job: compile 400, plan 409 (asks while rules/agent-free, a shut gate, an open cloud count with no `calls`, preflight), `mode: model` with no model 409 |
+| `GET /api/thym/program?path=&where=` | `{name, rel, where, why, source, volume}` (a name, a project path, a `canon:` path or a shipped file name; 404 when none) |
+| `POST /api/thym/compile {path, where?} \| {text}` | `{ok, name, refusal: {stage, check, line, message}, estimate, version, takes, outputs}` |
+| `POST /api/thym/plan {program, where?, inputs \| path, mode?, route?, model?, calls?}` | `{ok, plan, atem, mode, fits, refusal, why?, route, models, models_line, calls, inputs, outputs, writes, version}`; rules mode refuses a plan that asks (check `agent-free` or `no-model`), model mode runs the route's checks and the preflight. `inputs` fills every input by name, each checked by its type (`thym_host.check_input`: "notes.md is a file; repo takes a folder") |
+| `POST /api/thym/run {program, where?, inputs \| path, mode?, route?, model?, calls?}` | `{job}`: a CanonJob of kind `thym`, claim key the first input's path (so a run and a decompile of one file exclude each other), the generation lock in model mode on the local route only; result `{run, trace, atem, outcome, mode, route, models, outputs: [{name, type, path, rel, files?, folder?}], refusal?}` (a folder output lands as `<stem>.<output>/`). Refused before any job: compile 400, plan 409 (asks while rules/agent-free, a shut gate, an open cloud count with no `calls`, preflight), `mode: model` with no model 409 |
+| `GET /api/thym/moves?version=0\|1` | `{version, moves: [{name, owner, format, signature, takes, gives, asks, contract, scaffold, since, versions, says, extended, …}]}`: every move a program of that grammar may call, from the declarations the compiler reads, grouped by owner in THYM 6.2's order (`thym_tools.moves_payload`, the same listing the `thym_moves` tool reads); `extended: [{owner, as}]` where another format adds to a move; 400 for any other version. Read-only. Its one reader is the page's Thym at hand (`thymRefLoad`) |
 | `GET /api/thym/runs` · `GET /api/thym/trace?run=` | the 200 newest runs, newest first (`[]` when the root is absent) · one run's head and `path: thym:runs/<run>/<run>.trace.cosm` |
 | `POST /api/canon/package {path, morph?, context?, encrypt?}` | runs the generated program `export` over the text and its **fresh** twin (409 "derive the twin first"), lands `<stem>.thym/` and `<stem>.package.cosm`; `encrypt: true` writes `<stem>.thym.enc` and returns `key` **once**, in the response only. Synchronous, under the text's claim |
 | `POST /api/canon/unpack {path, key?}` | verifies every digest and span first, then writes `<stem>.md`, its twin named as the package's fabula declares (`fabula/1` → `<stem>.md.<flavour>.cosm`, an old `emf/1` → `<stem>.md.cosm`; source and locators renamed), `<stem>.morph|context|graph.cosm`; 400 sealed without or with a wrong key; 409 bad digest, unresolved span, or a file beside it that differs (identical bytes are fine); nothing written on any refusal |
 | `POST /api/canon/read {path, morph}` | `{job}`, kind `read`: the generated program `reading` (`read f with mine`, or the null); result `{reading, label: "read through <name>", run, trace, mode}`; the file `<text-stem>.read-<morph>-YYYY-MM-DD-HHMM.md` (`-2`, `-3`) beside the text or package, with `read_through:` front matter and the THYM.md §14 footer. **Agent-free gated**; rules mode fails the job ("read has no scaffold") |
 | `GET /api/thym-spec?lang=` | THYM.md, raw markdown; home-accessible (in `server.py`, not the router) |
+
+**`where`.** A shipped program and a project file can share a bare name
+(`tighten.thym`): pass `where: shipped`, `project` or `canon` to `program`,
+`compile`, `plan` and `run` to choose; without it the project's file wins,
+then Canon's, then the shipped one, as before.
+
+**`writes`.** A plan names where each output will land: `writes: [{name,
+type, rel, folder?}]` in `gives` order, by `landing`, the run's own naming
+(`plan_writes`; a package also its folder form). `rel` is null when the first
+input is not a project or store file (the outputs then stay with the run) or
+the type does not say its extension. The page reads it and works no name out
+for itself.
+
+**A list as an input.** An input of type `list of T` is given as a JSON
+array of paths, in order (`inputs: {notes: ["a.md", "b.md"]}`); each member
+is checked as a single input is, as `notes[n]`. Its plan row is `{name, type,
+path, sha256, members: [{path, sha256}]}`: `path` the first member's, which
+the outputs land beside, and `sha256` over the members' digests in order (a
+folder member also carries `files` and `bytes`); the reply's `inputs` give
+`members: [{rel, sha256}]` with the row's own `rel` null. It plans and runs
+(lane T3; `docs/fabula-landed-T3.md`): the run reads each member as a single
+input and holds it to its own digest, the record lists the list row and then
+each member as `notes[n]`, and a list of folders is snapshotted member by
+member. On the command line a list is given by its name once per member, in
+order (`notes=a.md notes=b.md`; bare paths when it is the program's one
+input); a saved plan is run with the same number of members. `thym_run` and
+`thym_check` take `<inputs>` lines the same way.
 
 **Jobs.** Runs and readings are CanonJobs (`canon_jobs.KINDS` gained
 `thym`, `read`) whose snapshot carries `progress: {node, of, name, move,
@@ -4601,15 +4629,15 @@ with…. A run fires `{"canon": snapshot(kind="thym", …)}`. Tests:
 ### The conformance suite
 
 `tests/fixtures/thym/` (THYM.md §24.3; its `README.md` is the layout):
-`programs/` (fourteen: the three of 0.5.0, byte for byte `defaults/thym/`,
+`programs/` (fifteen: the three of 0.5.0, byte for byte `defaults/thym/`,
 and `thym 0` and `thym 1` programs for the fold, loops that collect,
-contracts, bounded recursion, folders, editing, the fabulac survey and the
-dialectic), `inputs/` (the orchard notes and their twin, a package in folder
+contracts, bounded recursion, folders, editing, the fabulac survey, the
+dialectic and a list as an input, `join-the-notes`), `inputs/` (the orchard notes and their twin, a package in folder
 form, `plain-letter.morph.cosm`, `on-the-train.context.cosm`, the folders
 `little-tool/` and `tiny-tool/`, a fabulan of `close.md` and an answers
 volume for it, texts to edit), `expected/<name>/items.cosm` and `plan.cosm`
 (and `outputs/` where a run is frozen; the clock is pinned to
-2026-11-01T12:00:00Z), `bad/` (42 compile-time refusals, the first line
+2026-11-01T12:00:00Z), `bad/` (43 compile-time refusals, the first line
 naming stage, check and line; each file is read by its own version line, and
 conform says `(thym N)`), and **replay fixtures**, every one with engine
 records, so each replays with no dictionary, no git and no model:
@@ -4622,7 +4650,7 @@ moved) and `…/2026-11-02-0843-ff92/` (its FEED records re-recorded
 `tighten`, `settle-the-answers` and `survey-a-repo`. A deterministic program
 whose outputs carry a run's id cannot be frozen: conform runs it as its
 recording (that run's id and clock) and compares its outputs byte for byte.
-`python -m enough.thym conform`: **113 passed / 0 failed / 0 skipped**, with
+`python -m enough.thym conform`: **119 passed / 0 failed / 0 skipped**, with
 or without FEED. A run that records no engine calls replays only while every
 engine answers as it did, so record engine calls for any new fixture. A
 replay refuses at the first input, call or prompt whose digest differs,
@@ -4662,13 +4690,13 @@ the trace opens with green checks, `orchard/harvest.n.txt` in the tree) and
 text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
 `orchard/`.
 
-**0.6 (U1a, U1c).**
+**0.6 (U1a, U1c, U1d; `docs/fabula-landed-U1d.md`).**
 
 - **The run card's route and inputs.** `#thym-route-box` (`thymRouteHTML`,
   the model line of "The fabula" → "The UI") sits above the plan; `route` and
   `calls` go to `/api/thym/plan` and `/api/thym/run`, and a route change plans
   again. `THYM_PICK` holds `inputs`, `takes`, `outputs`, `source`, `preset`,
-  `told`. `thymRunOpen({input, program, name, inputs})` always reads the
+  `told`, `where`. `thymRunOpen({input, program, name, inputs})` always reads the
   program list; `thymProgramChosen` reads what the program takes (the list
   row, else `POST /api/thym/compile {path}`) and its source. One row per
   input in `#thym-inputs` (`role=group`; `thymInputsPaint`, `thymInputSet`):
@@ -4684,11 +4712,14 @@ text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
   only once every input is given ("give it {names} to see its plan"); the body
   is `{program, inputs: {name: path}}` (`thymInputsBody`; the `path`
   shorthand is no longer sent). The server checks every input again; its 400
-  shows as the plan's error. A `list of …` input takes a list
-  (`inputs: {xs: [...]}`, lane S4; before S4 the row said it could not be
-  given).
+  shows as the plan's error. A `list of …` input is a group of member fields
+  in order (add another, remove; `thymListMembersHTML`,
+  `thymMemberAdd|Remove|Set`), sent as a JSON array (`inputs: {xs: [...]}`);
+  it is ready with one non-blank member. `where` is sent wherever a program
+  is named (`thymProgramURL`, `THYM_PICK.where`, `DOCS.progWhere`), and each
+  program radio carries `data-where`.
 - **The plan reader.** `thymPlanPaint` → `thymPlanReadHTML(pl, {source,
-  program, where})`, `thymPlanNodeHTML`, `thymStmtHTML`, `thymLandsAs`: the
+  program, where})`, `thymPlanNodeHTML`, `thymStmtHTML`: the
   cost line (`atem`) and `models_line`; a refusal with its statement (the
   program's line from `GET /api/thym/program`'s `source`) and, for a project
   program, "edit it at line N"; "its steps, in the order they run", each node
@@ -4697,9 +4728,10 @@ text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
   known only at run time", `keeps`, `budget.depth`, "up to N attempts, each
   checked", "its model calls are counted only as it runs" for a node in
   `models.calls_open`; "what it reads" (a folder's files and bytes and the
-  snapshot sentence: the plan holds the tree digest); "what it will write"
-  (each output `name type → <stem>.<name>.…` beside the first input, all at
-  once or none).
+  snapshot sentence: the plan holds the tree digest; a list's members in
+  order); "what it will write" reads the plan's `writes` (each output's path
+  as the run will name it, beside the first input or a list's first member,
+  all at once or none).
 - **Outputs and refusals.** A landed run stays on the card: "what it made, N
   outputs", each by name and type with **open** and its path (a file where
   its kind reads, a folder in Canon's folder view, a package at its catalog),
@@ -4734,9 +4766,12 @@ text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
   keys): `thymRefOpen`, `thymRefSkeleton`, `thymRefLoad`, `thymRefPaint`,
   `thymRefTab`, `thymRefMoveHTML`, `thymRefPut`, `thymRefCall`,
   `thymRefProgramsHTML`, `thymRefClose`. **the moves** from `GET
-  /api/thym/moves?version=` (S4), grouped by format in the text's order
-  (`thym/1`, `fabula/1`, `doc/1`, `comprise/1`, `ascribe/1`), searchable by
-  any word of a move (↓ to the first put), the `thym 1` / `thym 0` switch
+  /api/thym/moves?version=` (S4; no stand-in in the check), in the route's
+  order, grouped by format (`thym/1`, `fabula/1`, `doc/1`, `comprise/1`,
+  `ascribe/1`), a move another format adds to with one line per extension
+  (`thymRefExtended`, "ascribe/1 adds `project … as isograph`"), searchable
+  by any word of a move or of what an extension adds (↓ to the first **put
+  it in**, there only while a program is open in the editor), the `thym 1` / `thym 0` switch
   (defaults to the open program's version line); **put it in** writes the
   call at the caret, selects its first operand, closes the dialog, returns
   focus to the text and checks again. **programs to start from**: every
@@ -4748,8 +4783,9 @@ text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
   go to `programs/`, not the top, because a shipped program's `rel` is its
   bare file name and a top-level copy collided with it in the run card (U1c
   7.4; S4 tells a shipped program from a project file of the same name).
-  Reachable from the strip, a program's page and the run card ("read the
-  shipped programs, or copy one to change it…"). Bubble `thym-moves`.
+  "the moves…" is on the strip and a program's page; the run card's "read
+  the shipped programs, or copy one to change it…" opens the same dialog at
+  its programs tab. Bubble `thym-moves`.
 - **The dialectic's second run.** The dialectic card offers, on a fabula
   with sittings, "run with {file}…" per sitting: it closes the card and opens
   run with… on `settle.thym` with `f` = the fabula and `said` = the sitting,
@@ -4764,8 +4800,13 @@ text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
   byte for byte, the live region, F8, only `/api/thym/compile` on the wire),
   `thym-moves-put`, `thym-run-folder-outputs`, `thym-shipped-copy`,
   `thym-settle-from-dialectic`; `thym-run-roundtrip` now waits for the card's
-  outputs, then "show the trace". `screens.thym_moves_stub_js` hands the page
-  the moves payload only when `/api/thym/moves` does not answer.
+  outputs, then "show the trace", and tells a shipped row by its
+  `data-where`. U1d added the seeds `orchard/join-the-notes.thym` (a list of
+  shorts) and a top-level `open-house.thym` beside the shipped one, the
+  screens `thym-run-list` and `thym-run-same-name`, and the scenarios
+  `thym-run-list`, `thym-moves-route` and `thym-same-name`; `thym-moves` and
+  `thym-moves-put` read the real route (no stand-in).
+  `tests/test_ui_check.py` pins them.
 
 ### Tests
 
@@ -7759,8 +7800,7 @@ touching `cloud.py`, `tools.py`, and `server.py`.
   usual way): `uv run python -m enough.fabula lint <fabula> [--json]` (a
   fabula's own checks), `python -m enough.dialectic list|raise|answer|settle
   <volume>`, `python -m enough.ascribe lint <holograph>`, and `python -m
-  enough.thym conform` (113 passed, 0 failed, 0 skipped at the end of the
-  round's integration). A real-model check of a fabulac build is by hand, on
+  enough.thym conform` (119 passed, 0 failed, 0 skipped since lane T3). A real-model check of a fabulac build is by hand, on
   a scratch project holding a small folder of your own Python (agents of
   this repo do not clone or run third-party repositories).
 - **Validate a commit on an isolated export of the exact tree.** Each wave of

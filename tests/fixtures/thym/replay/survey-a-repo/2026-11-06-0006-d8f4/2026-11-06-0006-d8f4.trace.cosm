@@ -24,7 +24,7 @@ nodes:
   records:
   - R:record/1
   outcome: landed
-  inputs_root: /Users/m3u/METMcloud/METMroot/enough-dev/tests/fixtures/thym
+  inputs_root: .
   engines:
   - ascribe
   - canon

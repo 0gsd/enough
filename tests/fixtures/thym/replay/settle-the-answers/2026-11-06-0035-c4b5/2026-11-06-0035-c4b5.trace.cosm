@@ -26,7 +26,7 @@ nodes:
   - R:record/1
   - R:record/2
   outcome: landed
-  inputs_root: /private/tmp/claude-501/-Users-m3u--claude-spares-spare-KWx7g8/e6dd56a4-2d3c-4549-9c4b-5a67e09cf882/scratchpad/x3/enough/tests/fixtures/thym
+  inputs_root: .
   engines:
   - ascribe
   - canon
