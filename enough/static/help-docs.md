@@ -627,3 +627,33 @@ ask for one with <strong>read through…</strong> on a package, or on a text tha
 - read a letter through your own morph to hear how you would have said it, then go back to the original.
 - keep the readings: each names its morph and its day, so you can lay one text's readings side by side.
 - section 12.6 of the help center has readings and their label; section 13.4 has the morphs they are told through.
+
+## thym-editor
+name: a program as you write it
+path: *.thym in the editor
+
+### what
+open a <code>.thym</code> file in the editor and a strip under the toolbar says what the <strong>compiler</strong> makes of it each time you pause: <em>it compiles</em>, or the line it refuses, the check that refused it and the compiler's own words, which name the statement and, where one is known, the fix. it also says which grammar the first line asks for — <code>thym 0</code> or <code>thym 1</code>, and what a <code>thym 0</code> program has to say to use a <code>thym 1</code> word — and, once it compiles, what the program takes, what it gives and how many of its steps ask a model. checking only reads: nothing runs and no model is asked.
+
+### how
+<kbd>F8</kbd> puts the caret on the line the compiler names, the whole line selected; <kbd>shift</kbd>+<kbd>F8</kbd> steps back. <strong>the moves…</strong> opens Thym at hand, where <strong>put it in</strong> writes a call at the caret. <strong>plan and run…</strong> opens run with… on this program: a plan and a run read the file as saved, so save first to plan what you see. a shipped program is never edited where it lives: copy it into the project (from its page, or from the programs to start from) and change the copy.
+
+### ideas
+- write the version line first: <code>thym 1</code> opens folders, loops that collect, <code>keeps</code>, <code>depth</code> and several outputs.
+- leave a refusal on screen and read it whole: it says which statement, and usually what to write instead.
+- keep a program small and plan it on a real input before you trust a long run to it.
+
+## thym-moves
+name: Thym at hand
+path: the moves, and the programs to start from
+
+### what
+<strong>the moves</strong> are every step a program may call, from the declarations the compiler reads: each with its signature (what it takes, its words such as <code>as</code>, <code>with</code>, <code>to</code>, and what it gives), whether it asks a model, the checks its contract keeps, its scaffold for a run by rules, the format that declares it, and whether only <code>thym 1</code> sees it. they are grouped by that format and searchable by any word of them. <strong>programs to start from</strong> are the ones shipped with enough, each with its <code>why:</code> line.
+
+### how
+type in the search to narrow the list; <kbd>↓</kbd> moves from the search to the first move's button. with a program open in the editor, <strong>put it in</strong> writes a call of the move at the caret and selects its first operand for you to rename. <strong>read it</strong> opens a shipped program as a document; <strong>copy into this project to change it</strong> writes a copy you own in <code>programs/</code> and opens it in the editor, and the shipped file stays as it is.
+
+### ideas
+- search for a check's name to find the moves that keep it.
+- switch to <code>thym 0</code> to see what an older program may call.
+- start from the shipped program closest to what you want, and change a copy.

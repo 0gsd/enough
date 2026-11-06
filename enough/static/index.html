@@ -8508,21 +8508,21 @@
     }
 
     /* The run / read card, and (U2) the package / unpack card. */
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-panel {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .modal-panel {
       max-width: 620px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-head img.thym-mast-icon {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .modal-head img.thym-mast-icon {
       width: 22px;
       height: 22px;
       object-fit: contain;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-head h3 {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .modal-head h3 {
       flex: 0 0 auto;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-source {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-source {
       flex: 1 1 auto;
       min-width: 0;
       color: var(--fg-muted);
@@ -8532,26 +8532,26 @@
       text-overflow: ellipsis;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-close {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .modal-close {
       margin-left: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-body {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-body {
       color: var(--fg);
       font-size: 13px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-sec-h {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-sec-h {
       margin: 12px 0 6px;
       color: var(--fg-muted);
       font-size: 11px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-sec-h:first-child {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-sec-h:first-child {
       margin-top: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-list {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-list {
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -8559,7 +8559,7 @@
       overflow-y: auto;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) label.thym-opt {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       column-gap: 8px;
@@ -8569,16 +8569,16 @@
       cursor: pointer;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt:has(input:checked) {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) label.thym-opt:has(input:checked) {
       border-color: var(--accent-tool);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt.problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) label.thym-opt.problem {
       cursor: default;
       opacity: 0.6;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt input {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) label.thym-opt input {
       grid-row: 1 / span 3;
       align-self: start;
       width: 16px;
@@ -8586,7 +8586,7 @@
       margin: 2px 0 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-main {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-main {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
@@ -8594,54 +8594,54 @@
       min-width: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-name {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-name {
       font-weight: 600;
       overflow-wrap: anywhere;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-where {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-where {
       font-size: 11px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-meta,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-why,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-meta,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-why,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-problem {
       grid-column: 2;
       font-size: 11.5px;
       color: var(--fg-muted);
       overflow-wrap: anywhere;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-opt-problem {
       font-style: italic;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-note,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-meta {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-note,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-meta {
       margin: 6px 0;
       font-size: 11.5px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-note[hidden] {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-note[hidden] {
       display: none;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-row {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row label {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-row label {
       flex-shrink: 0;
       color: var(--fg-muted);
       font-size: 11px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row input {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-row input {
       flex: 1 1 auto;
       min-width: 0;
       font: inherit;
@@ -8654,66 +8654,466 @@
       padding: 4px 7px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) p.thym-atem-line {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) p.thym-atem-line {
       font-size: 16px;
       color: var(--fg);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-fits,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-refusal,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-unavail,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-wait {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-fits,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-refusal,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-unavail,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-wait {
       margin: 4px 0;
       font-size: 12px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-refusal {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-refusal {
       color: var(--accent-error, #c0392b);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-unavail {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-unavail {
       color: var(--fg-muted);
       font-style: italic;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-wait {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-wait {
       display: flex;
       align-items: center;
       gap: 8px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) ol.thym-plan-nodes {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) ol.thym-plan-nodes {
       margin: 6px 0 0;
       padding-left: 1.8em;
       font-size: 12px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) ol.thym-plan-nodes code {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) ol.thym-plan-nodes code {
       color: var(--fg);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-status[hidden] {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-status[hidden] {
       display: none;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-status {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-status {
       margin-top: 10px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-bar {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-bar {
       height: 4px;
       border-radius: 2px;
       background: var(--border);
       overflow: hidden;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-bar span {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-bar span {
       display: block;
       height: 100%;
       background: var(--accent-tool);
     }
+
+    /* ---------------- 0.6 (U1c): writing, planning and running Thym ----------------
+       The editor's strip (#thym-ed, #thym-ed-mini), the run card's inputs and
+       readable plan, a landed run's outputs, and Thym at hand (#thym-ref-modal). */
+    .thym-ed {
+      flex-shrink: 0;
+      padding: 6px 28px 7px 48px;      /* the right edge clears the line nav */
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .thym-ed[hidden] {
+      display: none;
+    }
+
+    .thym-ed.refused {
+      border-left: 3px solid var(--accent-error, #c0392b);
+    }
+
+    .thym-ed.clean {
+      border-left: 3px solid var(--accent-tool);
+    }
+
+    .thym-ed-mini {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .thym-ed-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 4px 12px;
+    }
+
+    .thym-ed-state {
+      flex: 1 1 22em;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .thym-ed-state .thym-verdict {
+      margin-right: 6px;
+      font-weight: 700;
+    }
+
+    .thym-ed-state .thym-verdict.ok {
+      color: var(--accent-tool);
+    }
+
+    .thym-ed-state .thym-verdict.no,
+    .thym-ed-msg {
+      color: var(--accent-error, #c0392b);
+    }
+
+    .thym-ed-wait {
+      color: var(--fg-muted);
+      font-style: italic;
+    }
+
+    .thym-ed-acts {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      flex: 0 1 auto;
+    }
+
+    button.thym-ed-btn,
+    button.thym-ed-line {
+      min-height: 22px;
+      padding: 2px 10px;
+      font: inherit;
+      font-size: 12px;
+      color: var(--fg);
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button.thym-ed-line {
+      min-height: 20px;
+      padding: 0 6px;
+      font-family: var(--font-mono);
+      border-color: var(--accent-error, #c0392b);
+    }
+
+    button.thym-ed-btn:hover,
+    button.thym-ed-line:hover {
+      border-color: var(--fg-faint);
+    }
+
+    button.thym-ed-btn:focus-visible,
+    button.thym-ed-line:focus-visible {
+      outline: 2px solid var(--accent-tool);
+      outline-offset: 1px;
+    }
+
+    .thym-ed-detail p {
+      margin: 3px 0 0;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    .thym-ed-detail code,
+    .thym-ed-check {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    .thym-ed-detail p.thym-ed-io {
+      color: var(--fg);
+    }
+
+    /* The run card's inputs: one row per input, its name and what it takes over the field. */
+    #thym-modal .thym-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #thym-modal .thym-inputs[hidden],
+    #thym-modal .thym-sec-h[hidden] {
+      display: none;
+    }
+
+    #thym-modal .thym-in {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    #thym-modal .thym-in label {
+      font-size: 12px;
+      color: var(--fg);
+      overflow-wrap: anywhere;
+    }
+
+    #thym-modal .thym-in-what,
+    #thym-modal .thym-in-note,
+    .thym-meta-i {
+      color: var(--fg-muted);
+      font-size: 11.5px;
+    }
+
+    #thym-modal .thym-in input {
+      min-width: 0;
+      min-height: 24px;
+      box-sizing: border-box;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 7px;
+    }
+
+    #thym-modal .thym-in input:focus-visible {
+      outline: 2px solid var(--accent-tool);
+      outline-offset: 0;
+    }
+
+    #thym-modal .thym-in-note:empty {
+      display: none;
+    }
+
+    /* The plan, readable: each step at its line, what it keeps and how it loops. */
+    :is(#thym-modal, #thym-ref-modal) ol.thym-plan-read {
+      margin: 4px 0 0;
+      padding-left: 1.8em;
+      font-size: 12px;
+      color: var(--fg);
+    }
+
+    :is(#thym-modal, #thym-ref-modal) ol.thym-plan-read li {
+      margin: 3px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .thym-plan-line {
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .thym-plan-sub {
+      display: block;
+      color: var(--fg-muted);
+      font-size: 11.5px;
+    }
+
+    .thym-plan-path {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #thym-modal ul.thym-plan-io,
+    #thym-modal ul.thym-outs,
+    #thym-modal ol.thym-told-list {
+      margin: 4px 0;
+      padding-left: 1.3em;
+      font-size: 12px;
+    }
+
+    #thym-modal ul.thym-plan-io li,
+    #thym-modal ul.thym-outs li,
+    #thym-modal ol.thym-told-list li {
+      margin: 3px 0;
+      overflow-wrap: anywhere;
+    }
+
+    #thym-modal pre.thym-stmt {
+      margin: 4px 0;
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: var(--bg-alt, var(--bg-raise));
+      border-left: 3px solid var(--accent-error, #c0392b);
+      border-radius: 3px;
+    }
+
+    #thym-modal .thym-told {
+      margin: 6px 0;
+    }
+
+    #thym-modal .thym-told ul.thym-checks {
+      margin: 2px 0;
+      padding-left: 0;
+      list-style: none;
+      font-size: 12px;
+    }
+
+    #thym-modal .thym-told ul.thym-checks li {
+      overflow-wrap: anywhere;
+    }
+
+    #thym-modal .thym-told .thym-verdict {
+      margin-right: 5px;
+      color: var(--accent-error, #c0392b);
+    }
+
+    :is(#thym-modal, #thym-ref-modal, #dialectic-modal) button.thym-btn {
+      min-height: 22px;
+    }
+
+    /* Thym at hand: two tabs, the moves (searchable, grouped by format) and the programs. */
+    .thym-ref-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .thym-ref-tabs button[role="tab"] {
+      min-height: 26px;
+      padding: 4px 12px;
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--fg-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .thym-ref-tabs button[role="tab"][aria-selected="true"] {
+      color: var(--fg);
+      border-bottom-color: var(--accent-tool);
+    }
+
+    .thym-ref-tabs button[role="tab"]:focus-visible {
+      outline: 2px solid var(--accent-tool);
+      outline-offset: -2px;
+    }
+
+    #thym-ref-modal .modal-panel {
+      max-width: 680px;
+    }
+
+    #thym-ref-modal .thym-ref-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+    }
+
+    #thym-ref-modal .thym-ref-bar label.dict-sc {
+      flex: 0 0 auto;
+      color: var(--fg-muted);
+      font-size: 11px;
+    }
+
+    #thym-ref-modal #thym-ref-q {
+      flex: 1 1 14em;
+      min-width: 0;
+      min-height: 24px;
+      box-sizing: border-box;
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 7px;
+    }
+
+    #thym-ref-modal .thym-ref-v {
+      display: inline-flex;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    #thym-ref-modal .thym-ref-v label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    #thym-ref-modal .thym-ref-v input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    #thym-ref-modal .thym-ref-list {
+      max-height: calc(52vh / var(--uiz, 1));
+      overflow-y: auto;
+    }
+
+    #thym-ref-modal .thym-ref-group h4 {
+      margin: 12px 0 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #thym-ref-modal article.tref-move,
+    #thym-ref-modal article.tref-prog {
+      padding: 6px 8px;
+      margin: 0 0 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    #thym-ref-modal .tref-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 3px 8px;
+    }
+
+    #thym-ref-modal code.tref-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    #thym-ref-modal .tref-tag {
+      font-size: 11px;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0 7px;
+    }
+
+    #thym-ref-modal .tref-tag.asks {
+      border-color: var(--accent-tool);
+    }
+
+    #thym-ref-modal pre.tref-sig {
+      margin: 4px 0;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    #thym-ref-modal p.tref-says,
+    #thym-ref-modal p.tref-meta,
+    #thym-ref-modal p.tref-ex {
+      margin: 3px 0;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #thym-ref-modal p.tref-meta {
+      color: var(--fg-muted);
+    }
+
 
     /* The package / unpack card (U2): the parts that go in or come out,
        the seal box, and the key, shown once (THYM.md 15.3) — large, mono,
@@ -9113,6 +9513,12 @@
     #dialectic-modal .dlg-cand-h {
       font-size: 11px;
       color: var(--fg-muted);
+    }
+
+    #dialectic-modal .dlg-cand-from {
+      font-size: 11px;
+      color: var(--fg-muted);
+      font-style: italic;
     }
 
     #dialectic-modal p.dlg-check {
@@ -18085,6 +18491,10 @@
         <!-- 0.5.0: a reading's label (THYM.md 14), shown while a reading is open;
              thymBandPaint(). Never dismissible: the label is never hidden. -->
         <div class="read-band" id="read-band-edit" role="note" hidden><span class="read-band-lead"></span><span class="read-band-line"></span><span class="mode-help-anchor" data-help="reading"></span></div>
+        <!-- 0.6 (U1c): a .thym program's checks beside it as it is written;
+             thymEdOpen() / thymEdPaint(). The mini editor gets its own,
+             made with the textarea (#thym-ed-mini). -->
+        <div class="thym-ed" id="thym-ed" hidden></div>
         <textarea id="edit-textarea" class="edit-textarea" spellcheck="false"></textarea>
         <div class="review-linenav" id="edit-linenav" aria-label="line navigation" data-i18n-aria="review.linenav.aria"></div>
       </div>
@@ -19705,6 +20115,32 @@
         <button type="button" id="thym-trace-btn" hidden data-i18n="thym.job.trace">show the trace</button>
         <button type="button" class="primary" id="thym-go" disabled></button>
         <button type="button" id="thym-close" data-i18n="atem.card.close">close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 0.6 (Thym, U1c): Thym at hand. Two tabs: the moves a program may
+       call (GET /api/thym/moves), searchable, grouped by the format that
+       declares them, each with an example and "put it in" for the program
+       open in the editor; and the programs shipped with enough, each read
+       or copied into the project to be changed. thymRefOpen(tab). -->
+  <div id="thym-ref-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="thymRefClose()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="thym-ref-title">
+      <div class="modal-head">
+        <img class="svg-icon thym-mast-icon" data-icon="cosm" alt="" draggable="false">
+        <h3 id="thym-ref-title" data-i18n="thym.ref.title">Thym at hand</h3>
+        <span class="thym-source" id="thym-ref-source"></span>
+        <span class="mode-help-anchor" data-help="thym-moves"></span>
+        <button class="modal-close" onclick="thymRefClose()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
+      </div>
+      <div class="thym-ref-tabs" role="tablist" aria-label="Thym at hand" data-i18n-aria="thym.ref.title">
+        <button type="button" role="tab" id="thym-ref-tab-moves" aria-controls="thym-ref-body" aria-selected="true" data-tref-tab="moves" data-i18n="thym.ref.tab.moves">the moves</button>
+        <button type="button" role="tab" id="thym-ref-tab-programs" aria-controls="thym-ref-body" aria-selected="false" tabindex="-1" data-tref-tab="programs" data-i18n="thym.ref.tab.programs">programs to start from</button>
+      </div>
+      <div class="modal-body thym-body" id="thym-ref-body" role="tabpanel" aria-labelledby="thym-ref-tab-moves"></div>
+      <div class="modal-foot">
+        <button type="button" id="thym-ref-close" data-i18n="atem.card.close">close</button>
       </div>
     </div>
   </div>
@@ -29463,12 +29899,15 @@
         positionEditMarks();
         updateEditLineNavCursor();
       }));
+      // 0.6 (U1c): a program is checked as it is written.
+      if (window.__thymReady) thymEdOpen(path, 'full');
     }
     function _hideFullEdit() {
       const root = document.getElementById('edit-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
       EDIT_PATH = null;
+      if (window.__thymReady) thymEdClose();
     }
 
     // Mini EDIT face — plaintext textarea into #preview.
@@ -29486,9 +29925,11 @@
       document.getElementById('preview').classList.add('open');
       ta.focus();
       updateDocCounters();
+      if (window.__thymReady) thymEdOpen(path, 'mini');
     }
 
     function _hideMini() {
+      if (window.__thymReady) thymEdClose();
       const p = document.getElementById('preview');
       p.classList.remove('open');
       document.getElementById('preview-body').innerHTML = '';
@@ -34807,6 +35248,14 @@
       } else if (d.engine === 'skipped') {
         head += '<p class="thym-meta">' + cosmEsc(t('thym.rec.skipped', 'on the branch not taken: nothing ran')) + '</p>';
       }
+      // 0.6 (U1c): every attempt that failed, and so what the next ask was told.
+      const tries = Array.isArray(d.tries) ? d.tries.filter(cosmIsMap) : [];
+      if (tries.length) {
+        head += '<details class="thym-io"><summary>' + cosmEsc(t('thym.rec.tries', 'attempts that failed: {n}').replace('{n}', String(tries.length)))
+          + '</summary><ol class="thym-told-list">' + tries.map((x) => '<li>' + cosmEsc(t('thym.told.after', 'after attempt {n}:').replace('{n}', String(x.attempt)))
+            + ' ' + (Array.isArray(x.failed) ? x.failed : []).map((f) => '<code>' + cosmEsc(String((f && f.name) || '?')) + '</code> '
+              + cosmEsc(String((f && f.why) || ''))).join('; ') + '</li>').join('') + '</ol></details>';
+      }
       const io = (rows, label) => (Array.isArray(rows) && rows.length ? '<div><dt>' + cosmEsc(label) + '</dt><dd>'
         + rows.map((x) => cosmEsc(String((x && x.name) || '?')) + ' <code title="' + cosmEsc(String((x && x.sha256) || ''))
           + '">' + cosmEsc(String((x && x.sha256) || '').slice(0, 12)) + '</code>'
@@ -34817,7 +35266,7 @@
           + '</summary><dl class="thym-facts">' + ios + '</dl></details>';
       }
       return cosmCardBaseHTML(rec, 'record', host, {
-        skip: ['checks', 'inputs', 'outputs', 'node', 'move', 'engine', 'attempts', 'tokens', 'seconds'], head });
+        skip: ['checks', 'inputs', 'outputs', 'node', 'move', 'engine', 'attempts', 'tokens', 'seconds', 'tries'], head });
     }
 
     // A morph (§13.5): the ten scales first, then whatever else it holds.
@@ -35035,6 +35484,21 @@
       if (act === 'package') { thymPackOpen(el.dataset.path); return; }
       if (act === 'unpack') { thymUnpackOpen(el.dataset.path); return; }
       if (act === 'plan-lens' && host && host.path) enterMerirmaidLens(host.path, 'plan');
+      // 0.6 (U1c): writing a program, and the programs to start from.
+      if (act === 'edit-program') { void thymEditProgram(el.dataset.program); return; }
+      if (act === 'edit-at') {
+        const line = el.dataset.line;
+        thymPickClose();
+        void thymEditProgram(el.dataset.program).then(() => { if (line) thymEdGo(line); });
+        return;
+      }
+      if (act === 'copy-program') { void thymCopyProgram(el.dataset.program); return; }
+      if (act === 'moves') { thymRefOpen('moves'); return; }
+      if (act === 'programs') { thymRefOpen('programs'); }
+    }
+    async function thymEditProgram(path) {
+      if (!path) return;
+      await openReadEdit(path, { size: 'full', face: 'edit' });
     }
 
     // ---- menus: Canon's shift-click and the tree's option-click ----
@@ -35063,6 +35527,7 @@
       if (!isDir && THYM_PROGRAM_RE.test(path)) {
         return '<button type="button" class="ctx-item" data-act="thym-run-program">'
           + escapeHtml(t('thym.runWith', 'run with…')) + '</button>'
+          + '<button type="button" class="ctx-item" data-act="thym-edit">' + escapeHtml(t('thym.ed.menu', 'edit the program')) + '</button>'
           + '<button type="button" class="ctx-item" data-act="open-raw">' + escapeHtml(t('menu.openRaw', 'open raw')) + '</button>';
       }
       return '';
@@ -35070,6 +35535,7 @@
     function thymMenuRun(act, path) {
       if (act === 'thym-run') { thymRunOpen({ input: path }); return true; }
       if (act === 'thym-run-program') { thymRunOpen({ program: path }); return true; }
+      if (act === 'thym-edit') { void thymEditProgram(path); return true; }
       if (act === 'thym-read') { thymReadOpen(path); return true; }
       if (act === 'thym-package') { thymPackOpen(path); return true; }
       if (act === 'thym-unpack') { thymUnpackOpen(path); return true; }
@@ -35180,9 +35646,19 @@
     }
 
     function thymDocActs(data) {
+      const ref = String(data.rel || data.path || '');
+      // 0.6 (U1c): a project's program is edited where it is; a shipped or a
+      // Canon one is copied into the project first, never changed in place.
+      const mine = !/^canon:/.test(ref) && !!document.querySelector('#tree li.file[data-path="' + CSS.escape(ref) + '"]');
       return '<div class="thym-acts thym-doc-acts"><button type="button" class="thym-btn" data-tact="run-program" data-program="'
-        + cosmEsc(data.rel || data.path) + '" data-name="' + cosmEsc(data.name || '') + '">'
-        + cosmEsc(t('thym.runWith', 'run with…')) + '</button><span class="mode-help-anchor" data-help="thym"></span></div>';
+        + cosmEsc(ref) + '" data-name="' + cosmEsc(data.name || '') + '">'
+        + cosmEsc(t('thym.runWith', 'run with…')) + '</button>'
+        + (mine ? '<button type="button" class="thym-btn" data-tact="edit-program" data-program="' + cosmEsc(ref) + '">'
+          + cosmEsc(t('thym.ed.edit', 'edit')) + '</button>'
+          : '<button type="button" class="thym-btn" data-tact="copy-program" data-program="' + cosmEsc(ref) + '">'
+          + cosmEsc(t('thym.ref.copy', 'copy into this project to change it')) + '</button>')
+        + '<button type="button" class="thym-btn" data-tact="moves">' + cosmEsc(t('thym.ed.moves', 'the moves…')) + '</button>'
+        + '<span class="mode-help-anchor" data-help="thym"></span></div>';
     }
 
     function thymDocNotes(data) {
@@ -35357,6 +35833,13 @@
       seq: 0,
       morphs: null, morph: null,
       job: null, snap: null, result: null, error: null,
+      // 0.6 (U1c): every input by its name and type, and what it gives.
+      inputs: {},           // {<takes name>: <project path>}
+      takes: null,          // [{name, type, accepts}] of the chosen program, or null while unknown
+      outputs: null,        // [{name, type}]
+      source: null,         // the chosen program as written (its lines name a refusal's statement)
+      preset: null,         // inputs the opener named ({f, said} from the dialectic card)
+      told: null,           // a refused run's re-asks, read from its trace
     };
     const thymEl = (id) => document.getElementById(id);
 
@@ -35390,33 +35873,37 @@
     function thymPickReset(face) {
       THYM_PICK.seq++;
       Object.assign(THYM_PICK, { face, input: null, program: null, programName: '', fixed: false, programs: null,
-        plan: null, morphs: null, morph: null, job: null, snap: null, result: null, error: null });
+        plan: null, morphs: null, morph: null, job: null, snap: null, result: null, error: null,
+        inputs: {}, takes: null, outputs: null, source: null, preset: null, told: null });
     }
 
-    // "run with…": from a text (`input`), or from a program (`program`).
-    async function thymRunOpen({ input = null, program = null, name = '' } = {}) {
+    // "run with…": from a text (`input`), or from a program (`program`); 0.6
+    // (U1c): `inputs` names what the opener knows ({f, said} for a settle).
+    async function thymRunOpen({ input = null, program = null, name = '', inputs = null } = {}) {
       if (IS_HOME) return;
       if (THYM_PICK.open) thymPickClose();
       thymPickReset('run');
       Object.assign(THYM_PICK, { input, program, programName: name || (program ? canonBase(program).replace(/\.thym$/i, '') : ''),
-        fixed: !!program });
-      if (!THYM_PICK.input && THYM_PICK.fixed) THYM_PICK.input = thymDefaultText();
+        fixed: !!program, preset: cosmIsMap(inputs) ? Object.assign({}, inputs) : null });
       thymPickSkeleton();
       thymPickOpenModal();
       // 0.6: here by default, every time the card opens; the cloud only when its gate is.
       if (window.__fabReady) { fabRouteReset('thym'); void fabGateLoad().then(() => { if (THYM_PICK.open) thymPickPaint(); }); }
       thymPickPaint();
       const seq = THYM_PICK.seq;
+      const r = await canonJSON('/api/thym/programs');
+      if (seq !== THYM_PICK.seq) return;
+      THYM_PICK.programs = r.ok && r.data && Array.isArray(r.data.programs) ? r.data.programs : { error: thymErr(r) };
       if (!THYM_PICK.fixed) {
-        const r = await canonJSON('/api/thym/programs');
-        if (seq !== THYM_PICK.seq) return;
-        THYM_PICK.programs = r.ok && r.data && Array.isArray(r.data.programs) ? r.data.programs : { error: thymErr(r) };
         thymPickPaint();
         const first = thymEl('thym-list').querySelector('input:not(:disabled)');
         if (first) first.focus({ preventScroll: true });
       } else {
-        void thymPlanLoad();
-        thymEl('thym-input')?.focus({ preventScroll: true });
+        const chosen = THYM_PICK.program;
+        await thymProgramChosen(chosen, THYM_PICK.programName);
+        if (!THYM_PICK.open || THYM_PICK.program !== chosen) return;
+        const want = thymEl('thym-inputs')?.querySelector('input:not([disabled])');
+        if (want) want.focus({ preventScroll: true });
       }
     }
     window.thymRunOpen = thymRunOpen;
@@ -35440,17 +35927,6 @@
       if (first) first.focus({ preventScroll: true });
     }
     window.thymReadOpen = thymReadOpen;
-
-    // The text a program-first run starts on: the one open in the reader,
-    // else the first text the tree shows.
-    function thymDefaultText() {
-      if (typeof RE_PATH === 'string' && reIsActive() && canonIsText(RE_PATH)) return RE_PATH;
-      return thymTreeTexts()[0] || '';
-    }
-    function thymTreeTexts() {
-      return Array.from(document.querySelectorAll('#tree li.file[data-path]')).map((li) => li.dataset.path)
-        .filter((p) => canonIsText(p) && !THYM_READING_RE.test(canonBase(p)));
-    }
 
     // The morphs a reading may be told through: the package's own; the
     // morph files beside the text or in the project's tree; the null morph.
@@ -35490,13 +35966,6 @@
       src.title = (run && P.fixed ? P.program : P.input) || '';
       thymEl('thym-help').dataset.help = run ? 'thym' : 'reading';
       let h = '';
-      if (run && P.fixed) {
-        h += '<div class="thym-row"><label for="thym-input" class="dict-sc">' + cosmEsc(t('thym.pick.on', 'run it on'))
-          + '</label><input type="text" id="thym-input" list="thym-texts" spellcheck="false" autocomplete="off" value="'
-          + cosmEsc(P.input || '') + '" placeholder="' + cosmEsc(t('thym.pick.on.placeholder', 'a text in this project, e.g. notes.md'))
-          + '"><datalist id="thym-texts">' + thymTreeTexts().map((p) => '<option value="' + cosmEsc(p) + '">').join('')
-          + '</datalist></div>';
-      }
       if (!run) {
         h += '<p class="thym-note">' + cosmEsc(t('thym.read.note', 'a reading is a new file beside the text, labelled as a reading; the text is never replaced')) + '</p>';
       }
@@ -35504,6 +35973,13 @@
         h += '<div class="thym-sec-h dict-sc" id="thym-list-h">' + cosmEsc(run ? t('thym.pick.programs', 'programs')
           : t('thym.pick.morphs', 'read it through')) + '</div>'
           + '<div class="thym-list" id="thym-list" role="radiogroup" aria-labelledby="thym-list-h"></div>';
+        if (run) h += '<div class="fab-row"><button type="button" class="thym-btn" data-tact="programs">'
+          + cosmEsc(t('thym.ref.startFrom', 'read the shipped programs, or copy one to change it…')) + '</button></div>';
+      }
+      // 0.6 (U1c): every input the chosen program takes, each by its type.
+      if (run) {
+        h += '<div class="thym-sec-h dict-sc" id="thym-inputs-h">' + cosmEsc(t('thym.in.head', 'what it takes')) + '</div>'
+          + '<div class="thym-inputs" id="thym-inputs" role="group" aria-labelledby="thym-inputs-h"></div>';
       }
       h += '<p class="thym-note" id="thym-af-note" hidden></p>';
       // 0.6 (U1a): where the model runs, chosen for this run (pins P6).
@@ -35551,6 +36027,7 @@
       }
       if (note) { note.textContent = afNote; note.hidden = !afNote; }
       if (run && window.__fabReady) fabSet(thymEl('thym-route-box'), thymRouteHTML());
+      if (run) thymInputsPaint();
       if (run) thymPlanPaint();
       thymStatusPaint();
       thymFootPaint();
@@ -35586,11 +36063,11 @@
     // the shorthand: `path` is its first input), shown before anything runs.
     async function thymPlanLoad() {
       const P = THYM_PICK;
-      if (P.face !== 'run' || !P.program || !P.input) { P.plan = null; thymPickPaint(); return; }
+      if (P.face !== 'run' || !P.program || !thymInputsReady()) { P.plan = null; thymPickPaint(); return; }
       const seq = ++P.seq;
       P.plan = { loading: true };
       thymPickPaint();
-      const body = { program: P.program, path: P.input };
+      const body = { program: P.program, inputs: thymInputsBody() };
       if (window.__fabReady) fabRouteBody('thym', body);
       const r = await canonPost('/api/thym/plan', body);
       if (seq !== P.seq) return;
@@ -35604,9 +36081,23 @@
       if (!el) return;
       const pl = P.plan;
       if (!P.program) { el.innerHTML = '<p class="thym-meta">' + cosmEsc(t('thym.pick.choose', 'choose a program to see what it will do and what it costs')) + '</p>'; return; }
-      if (!P.input) { el.innerHTML = '<p class="thym-meta">' + cosmEsc(t('thym.pick.chooseText', 'name the text it runs on')) + '</p>'; return; }
+      const missing = thymInputsMissing();
+      if (missing.length) {
+        el.innerHTML = '<p class="thym-meta">' + cosmEsc(t('thym.in.give', 'give it {names} to see its plan')
+          .replace('{names}', () => missing.join(', '))) + '</p>';
+        return;
+      }
       if (!pl || pl.loading) { el.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.pick.planning', 'planning…')) + '</p>'; return; }
       if (pl.error) { el.innerHTML = '<p class="' + (pl.missing ? 'thym-unavail' : 'thym-refusal') + '">' + cosmEsc(pl.error) + '</p>'; return; }
+      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: thymProgramWhere(P.program) });
+    }
+
+    // 0.6 (U1c): a plan a person can read before it runs (THYM.md 11, 12,
+    // 23.2): the cost line and the models line; the refusal at its statement,
+    // as written; each step at its line with what it keeps, a loop said as
+    // known or known only at run time, a recursion's depth, the calls counted
+    // only as it runs; every input (a folder's snapshot); what lands where.
+    function thymPlanReadHTML(pl, { source = null, program = null, where = null } = {}) {
       let h = '';
       if (pl.atem) h += '<p class="thym-atem-line">' + cosmEsc(String(pl.atem)) + '</p>';
       // 0.6: which model, how many calls at most, before anything runs.
@@ -35616,6 +36107,7 @@
         h += '<p class="thym-refusal">' + cosmEsc(t('thym.pick.refused', 'refused at {stage} ({check}), line {line}: {message}')
           .replace('{stage}', () => String(ref.stage || '?')).replace('{check}', () => String(ref.check || '?'))
           .replace('{line}', () => String(ref.line == null ? '?' : ref.line)).replace('{message}', () => String(ref.message || ''))) + '</p>';
+        h += thymStmtHTML(source, ref.line, program, where);
       } else if (pl.fits === false) {
         h += '<p class="thym-refusal">' + cosmEsc(t('thym.pick.noFit', 'it does not fit this machine: {why}')
           .replace('{why}', () => String(pl.why || ''))) + '</p>';
@@ -35625,11 +36117,102 @@
       }
       const plan = cosmIsMap(pl.plan) ? pl.plan : null;
       const nodes = plan && Array.isArray(plan.nodes) ? plan.nodes.filter((n) => cosmIsMap(n) && n.type === 'node') : [];
+      const models = cosmIsMap(pl.models) ? pl.models : (plan && cosmIsMap(plan.models) ? plan.models : null);
+      const open = new Set(models && Array.isArray(models.calls_open) ? models.calls_open.map(String) : []);
       if (nodes.length) {
-        h += '<ol class="thym-plan-nodes">' + nodes.map((n) => '<li><code>' + cosmEsc(String(n.move || '')) + '</code> '
-          + cosmEsc(String(n.name || n.id || '')) + (n.asks === true ? ' ' + thymAsksBadge() : '') + '</li>').join('') + '</ol>';
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.plan.steps', 'its steps, in the order they run')) + '</div>'
+          + '<ol class="thym-plan-nodes thym-plan-read">' + nodes.map((n) => thymPlanNodeHTML(n, open)).join('') + '</ol>';
       }
-      el.innerHTML = h;
+      const ins = Array.isArray(pl.inputs) ? pl.inputs.filter(cosmIsMap) : [];
+      if (ins.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.plan.inputs', 'what it reads')) + '</div><ul class="thym-plan-io">'
+          + ins.map((i) => {
+            let li = '<li><code>' + cosmEsc(String(i.name || '')) + '</code> ' + cosmEsc(String(i.rel || '')) + ' <span class="thym-meta-i">'
+              + cosmEsc(String(i.accepts || i.type || '')) + '</span>';
+            if (i.type === 'folder') {
+              li += '<span class="thym-plan-sub">' + cosmEsc(t('thym.plan.folder', '{files} files, {bytes} bytes, read as they are when the run starts: the plan holds the folder’s digest, and a change after planning refuses the run')
+                .replace('{files}', String(i.files == null ? '?' : i.files)).replace('{bytes}', String(i.bytes == null ? '?' : i.bytes))) + '</span>';
+            }
+            return li + '</li>';
+          }).join('') + '</ul>';
+      }
+      const outs = Array.isArray(pl.outputs) ? pl.outputs.filter(cosmIsMap) : [];
+      if (outs.length) {
+        const first = ins.length ? String(ins[0].rel || '') : '';
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.plan.writes', 'what it will write')) + '</div><ul class="thym-plan-io">'
+          + outs.map((o) => '<li><code>' + cosmEsc(String(o.name || '')) + '</code> <span class="thym-meta-i">' + cosmEsc(String(o.type || ''))
+            + '</span>' + (first ? ' → <span class="thym-plan-path">' + cosmEsc(thymLandsAs(first, o)) + '</span>' : '') + '</li>').join('')
+          + '</ul><p class="thym-meta">' + cosmEsc(first
+            ? (outs.length > 1 ? t('thym.plan.landAll', 'beside {first}, all of them at once or none; the run’s record (its trace) is kept with enough’s runs')
+              : t('thym.plan.landOne', 'beside {first}; the run’s record (its trace) is kept with enough’s runs')).replace('{first}', () => first)
+            : t('thym.plan.landNone', 'the run’s record (its trace) is kept with enough’s runs')) + '</p>';
+      }
+      return h;
+    }
+
+    // One step of a plan, as a person reads it.
+    function thymPlanNodeHTML(n, open) {
+      const bits = [];
+      const loop = n.move === 'for' || n.repeats === true;
+      if (loop) {
+        const most = cosmIsMap(n.members) ? n.members.at_most : null;
+        bits.push(most != null ? t('thym.plan.loopKnown', 'a loop: at most {n} passes').replace('{n}', String(most))
+          : t('thym.plan.loopOpen', 'a loop over a collection known only at run time'));
+      }
+      if (Array.isArray(n.keeps) && n.keeps.length) {
+        bits.push(t('thym.plan.keeps', 'keeps {names}').replace('{names}', () => n.keeps.map(String).join(', ')));
+      }
+      const depth = cosmIsMap(n.budget) ? n.budget.depth : null;
+      if (depth != null) bits.push(t('thym.plan.depth', 'calls itself at most {n} deep').replace('{n}', String(depth)));
+      if (n.asks === true && cosmIsMap(n.budget) && n.budget.attempts > 1) {
+        bits.push(t('thym.plan.attempts', 'up to {n} attempts, each checked').replace('{n}', String(n.budget.attempts)));
+      }
+      if (open.has(String(n.id))) bits.push(t('thym.plan.callsOpen', 'its model calls are counted only as it runs'));
+      return '<li' + (n.asks === true ? ' class="asks"' : '') + '>'
+        + (n.line != null ? '<span class="thym-plan-line">' + cosmEsc(t('cosm.span.one', 'line {n}').replace('{n}', String(n.line))) + '</span> ' : '')
+        + '<code>' + cosmEsc(String(n.name || n.move || n.id || '')) + '</code>'
+        + (n.asks === true ? ' ' + thymAsksBadge() : '')
+        + (bits.length ? '<span class="thym-plan-sub">' + cosmEsc(bits.join(' · ')) + '</span>' : '') + '</li>';
+    }
+
+    // The statement a refusal names, as the program writes it (its line,
+    // without indentation), and for a project's own program a way to it.
+    function thymStmtHTML(source, line, program, where) {
+      if (source == null || line == null) return '';
+      const raw = String(source).split('\n')[Number(line) - 1];
+      if (raw == null || !raw.trim()) return '';
+      let h = '<pre class="thym-stmt"><span class="thym-plan-line">' + cosmEsc(String(line)) + '</span> ' + cosmEsc(raw.trim()) + '</pre>';
+      if (where === 'project' && program) {
+        h += '<div class="fab-row"><button type="button" class="thym-btn" data-tact="edit-at" data-program="' + cosmEsc(program)
+          + '" data-line="' + cosmEsc(String(line)) + '">' + cosmEsc(t('thym.ed.editAt', 'edit it at line {n}').replace('{n}', String(line))) + '</button></div>';
+      }
+      return h;
+    }
+
+    // Where an output lands beside the first input (thym_api.land_beside):
+    // `<stem>.<output>.<ext>`, a folder as `<stem>.<output>/`, a package as
+    // `<stem>.package.cosm` with its folder `<stem>.thym/`. The extension is
+    // the value's, known when it lands.
+    function thymLandsAs(first, o) {
+      const i = first.lastIndexOf('/');
+      const dir = i === -1 ? '' : first.slice(0, i + 1);
+      let name = first.slice(i + 1).replace(/\/$/, '');
+      let stem;
+      const pkg = /^(.+?)(\.package\.cosm|\.thym\.enc|\.thym)$/i.exec(name);
+      if (pkg) stem = pkg[1];
+      else {
+        const twin = /^(.+?)\.(?:[^.]+\.)?fabula[npc]?(?:\.answers-[^.]+)?\.cosm$/i.exec(name);
+        if (twin) stem = twin[1];
+        else {
+          if (/\.cosm$/i.test(name) && name.length > 5) name = name.slice(0, -5);
+          const dot = name.lastIndexOf('.');
+          stem = dot > 0 ? name.slice(0, dot) : name;
+        }
+      }
+      const out = String(o.name || '');
+      if (o.type === 'folder') return dir + stem + '.' + out + '/';
+      if (o.type === 'package') return dir + stem + '.package.cosm, ' + dir + stem + '.thym/';
+      return dir + stem + '.' + out + '.…';
     }
 
     function thymCanGo() {
@@ -35666,10 +36249,8 @@
             .replace('{stage}', () => String(ref.stage || '?')).replace('{check}', () => String(ref.check || '?'))
             .replace('{line}', () => String(ref.line == null ? '?' : ref.line)).replace('{message}', () => String(ref.message || ''))) + '</p>';
         }
-        const rels = thymLanded(res.outputs);
-        if (rels.length) {
-          h += '<p class="thym-meta">' + cosmEsc(t('thym.trace.outputs', 'landed beside the text:')) + ' ' + rels.map(cosmEsc).join(', ') + '</p>';
-        }
+        h += thymOutputsHTML(res.outputs);
+        h += thymToldHTML(P.told);
       } else if (P.job) {
         const s = P.snap || {};
         const pct = thymPct(s);
@@ -35708,7 +36289,7 @@
       if (!thymCanGo()) return;
       P.error = null;
       if (P.face === 'run') {
-        const body = { program: P.program, path: P.input };
+        const body = { program: P.program, inputs: thymInputsBody() };
         if (P.plan && (P.plan.mode === 'rules' || P.plan.mode === 'model')) body.mode = P.plan.mode;
         if (window.__fabReady) fabRouteBody('thym', body);
         const seq = P.seq;
@@ -35717,7 +36298,8 @@
         const r = await canonPost('/api/thym/run', body);
         if (seq !== P.seq) return;
         if (!r.ok || !r.data || !r.data.job) { P.job = null; P.error = thymErr(r); thymPickPaint(); return; }
-        const label = (P.programName || canonBase(P.program)) + ' · ' + canonBase(P.input);
+        const firstIn = (P.takes && P.takes[0] && P.inputs[P.takes[0].name]) || P.input || '';
+        const label = (P.programName || canonBase(P.program)) + ' · ' + canonBase(firstIn);
         P.job = r.data.job.id;
         canonTrack(r.data.job, { want: 'thym', label, writes: false });
       } else {
@@ -35752,13 +36334,19 @@
       if (e.kind === 'thym') {
         if (res.run) THYM.outputs.set(String(res.run), Array.isArray(res.outputs) ? res.outputs : []);
         if (showing) {
-          Object.assign(P, { job: null, result: res });
+          Object.assign(P, { job: null, result: res, told: null });
           thymPickPaint();
-        }
-        // The trace lands: the run's record, opened where its cards read;
-        // a refused run stays on the card, which says where it stopped.
-        if (res.run && res.outcome !== 'refused' && (showing || e.want === 'thym')) {
-          if (showing) thymPickClose();
+          // 0.6 (U1c): a landed run stays on the card, its outputs by name,
+          // each to open, and the trace one button away; a refused one says
+          // what its contract held to and what the model was told again.
+          const st = thymEl('thym-status');
+          const first = st.querySelector('[data-topen]');
+          if (first) first.focus({ preventScroll: true });
+          else thymEl('thym-trace-btn').focus({ preventScroll: true });
+          st.scrollIntoView({ block: 'nearest' });
+          if (res.run && res.outcome === 'refused') void thymToldLoad(String(res.run));
+        } else if (res.run && res.outcome !== 'refused' && e.want === 'thym') {
+          // The card was closed while it ran: the toast's way, the trace.
           void thymOpenTrace(String(res.run));
         }
       } else if (e.kind === 'read') {
@@ -35807,21 +36395,23 @@
       const r = e.target.closest('input[name="thym-opt"]');
       if (r) {
         if (P.face === 'run') {
-          P.program = r.value;
-          P.programName = r.dataset.name || canonBase(r.value);
-          P.result = null;
-          void thymPlanLoad();
+          void thymProgramChosen(r.value, r.dataset.name || canonBase(r.value));
         } else {
           P.morph = r.value;
           thymFootPaint();
         }
         return;
       }
-      if (e.target.id === 'thym-input') {
-        P.input = e.target.value.trim();
-        P.result = null;
-        void thymPlanLoad();
-      }
+      const inp = e.target.closest('input[data-take]');
+      if (inp) thymInputSet(inp.dataset.take, inp.value);
+    });
+    // 0.6 (U1c): what a landed run made opens by its name; a refusal's
+    // statement opens in the editor at its line.
+    thymEl('thym-body').addEventListener('click', (e) => {
+      const o = e.target.closest('[data-topen]');
+      if (o) { e.preventDefault(); thymOpenOutput(o.dataset.topen, o.dataset.tkind || ''); return; }
+      const a = e.target.closest('[data-tact]');
+      if (a) { e.preventDefault(); thymAct(a, null); }
     });
     thymEl('thym-go').addEventListener('click', () => { void thymGo(); });
     thymEl('thym-close').addEventListener('click', thymPickClose);
@@ -35843,10 +36433,10 @@
       thymPickClose();
     }, true);
     thymEl('thym-body').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && e.target.id === 'thym-input') {
+      const inp = e.target.closest && e.target.closest('input[data-take]');
+      if (e.key === 'Enter' && inp) {
         e.preventDefault();
-        THYM_PICK.input = e.target.value.trim();
-        void thymPlanLoad();
+        thymInputSet(inp.dataset.take, inp.value);
       }
     });
     // The switch flipped while the card is open: what it offers changes.
@@ -36313,6 +36903,784 @@
       thymPackClose();
     }, true);
     thymDecorateTree();
+
+    // ================================================================
+    // Thym, written, checked, planned and run (0.6, U1c)
+    // ================================================================
+    // The run card takes every input by its type; the editor checks a
+    // program as the person pauses (POST /api/thym/compile, the compiler's
+    // own words, never a model, never a run); the reference lists the moves
+    // (GET /api/thym/moves, when the server has it) and the shipped
+    // programs, any of which is copied into the project to be changed.
+
+    // ---- the inputs of a run, each by its type ----
+    const THYM_IN_KEY = 'enough.thym.inputs';
+
+    function thymInRemembered(program) {
+      try {
+        const all = JSON.parse(localStorage.getItem(THYM_IN_KEY) || '{}');
+        return cosmIsMap(all[program]) ? all[program] : {};
+      } catch (_e) { return {}; }
+    }
+    function thymInRemember(program, inputs) {
+      try {
+        const all = JSON.parse(localStorage.getItem(THYM_IN_KEY) || '{}');
+        all[program] = inputs;
+        const keys = Object.keys(all);
+        if (keys.length > 60) delete all[keys[0]];
+        localStorage.setItem(THYM_IN_KEY, JSON.stringify(all));
+      } catch (_e) { /* not kept: the card works without it */ }
+    }
+
+    // The project's files and folders as the tree lists them.
+    function thymTreePaths() {
+      const files = [], dirs = [], twins = [];
+      document.querySelectorAll('#tree li[data-path]').forEach((li) => {
+        const p = li.dataset.path;
+        if (!p) return;
+        if (li.classList.contains('dir')) { if (!li.classList.contains('symlink')) dirs.push(p.replace(/\/$/, '')); return; }
+        files.push(p);
+        if (li.dataset.emf) twins.push(li.dataset.emf);
+      });
+      return { files, dirs, twins, holotypes: Array.from(document.querySelectorAll('#tree li.dir[data-holotype="1"]')).map((li) => li.dataset.path) };
+    }
+
+    // A fabula's flavour by its name (prose · fabulan, verse · fabulap, code · fabulac).
+    function thymFlavourOf(path) {
+      const m = /\.(fabula[npc])(?:\.answers-[^/]*)?\.cosm$/i.exec(path || '');
+      if (!m) return '';
+      const f = m[1].toLowerCase();
+      return (f === 'fabulan' ? t('fab.fl.prose', 'prose') : f === 'fabulap' ? t('fab.fl.verse', 'verse')
+        : t('thym.fl.code', 'code')) + ' · ' + f;
+    }
+
+    // What the project holds that an input of `type` may take, as the
+    // server will check it (thym_host.check_input): `[{value, label}]`.
+    function thymCandidates(type) {
+      const T = thymTreePaths();
+      const seen = new Set();
+      const out = [];
+      const add = (value, label) => { if (value && !seen.has(value)) { seen.add(value); out.push({ value, label: label || '' }); } };
+      const cosm = T.files.filter((p) => /\.cosm$/i.test(p));
+      if (type === 'text' || type === 'short') {
+        T.files.filter((p) => canonIsText(p) && !THYM_READING_RE.test(canonBase(p))).forEach((p) => add(p));
+      } else if (type === 'fabula') {
+        T.twins.forEach((p) => add(p, thymFlavourOf(p)));
+        cosm.filter((p) => /\.fabula[npc]?\.cosm$|\.md\.cosm$/i.test(p) && !/\.answers-/i.test(p)).forEach((p) => add(p, thymFlavourOf(p)));
+      } else if (type === 'folder') {
+        T.dirs.forEach((p) => add(p + '/'));
+      } else if (type === 'volume') {
+        cosm.forEach((p) => add(p, /\.answers-/i.test(p) ? t('thym.in.answers', 'answers') : thymFlavourOf(p)));
+        T.twins.forEach((p) => add(p, thymFlavourOf(p)));
+        T.holotypes.forEach((p) => add(p, 'Holotype'));
+      } else if (type === 'morph') {
+        cosm.filter((p) => /\.morph\.cosm$/i.test(p)).forEach((p) => add(p));
+      } else if (type === 'context') {
+        cosm.filter((p) => /\.context\.cosm$/i.test(p)).forEach((p) => add(p));
+      } else if (type === 'package') {
+        T.files.filter((p) => /\.package\.cosm$|\.thym\.enc$/i.test(p)).forEach((p) => add(p));
+        T.dirs.filter((p) => /\.thym$/i.test(p)).forEach((p) => add(p + '/'));
+      }
+      return out;
+    }
+
+    // Would `path` (what the run card was opened on) fit an input of `type`?
+    function thymFits(path, type) {
+      if (!path) return false;
+      const p = String(path);
+      if (type === 'text' || type === 'short') return canonIsText(p);
+      if (type === 'folder') return /\/$/.test(p) || thymTreePaths().dirs.includes(p);
+      if (type === 'fabula') return /\.fabula[npc]?\.cosm$/i.test(p) && !/\.answers-/i.test(p);
+      if (type === 'volume') return /\.cosm$/i.test(p);
+      if (type === 'morph') return /\.morph\.cosm$/i.test(p);
+      if (type === 'context') return /\.context\.cosm$/i.test(p);
+      if (type === 'package') return THYM_PACKAGE_RE.test(p) || /\.thym\.enc$/i.test(p);
+      return false;
+    }
+
+    function thymIsList(type) { return /^list\b/i.test(String(type || '')); }
+
+    // A program was chosen: what it takes and gives, its source, the inputs
+    // it had last time (or what the card was opened on), then its plan.
+    async function thymProgramChosen(ref, name) {
+      const P = THYM_PICK;
+      Object.assign(P, { program: ref, programName: name || canonBase(ref).replace(/\.thym$/i, ''), result: null, told: null,
+        plan: null, takes: null, outputs: null, source: null, inputs: {} });
+      const seq = ++P.seq;
+      thymPickPaint();
+      const rows = Array.isArray(P.programs) ? P.programs : [];
+      let row = rows.find((p) => p && (p.rel === ref || p.name === ref));
+      if (!row || !Array.isArray(row.takes)) {
+        const r = await canonPost('/api/thym/compile', { path: ref });
+        if (seq !== P.seq) return;
+        row = r.ok && r.data ? { takes: r.data.takes, outputs: r.data.outputs, problem: r.data.ok ? null
+          : (r.data.refusal && r.data.refusal.message) } : { takes: null, problem: thymErr(r) };
+      }
+      P.takes = Array.isArray(row.takes) ? row.takes.filter(cosmIsMap) : [];
+      P.outputs = Array.isArray(row.outputs) ? row.outputs : (cosmIsMap(row.gives) ? [row.gives] : []);
+      // What the person gave it before, where it is still there; then what
+      // the opener named; then the text the card was opened on, in the
+      // first input that takes it (and a fabula input takes that text's twin).
+      const T = thymTreePaths();
+      const there = (p) => { const q = String(p || '').replace(/\/$/, ''); return T.files.includes(q) || T.dirs.includes(q) || T.twins.includes(q); };
+      const was = thymInRemembered(ref);
+      for (const tk of P.takes) {
+        if (was[tk.name] && there(was[tk.name])) P.inputs[tk.name] = was[tk.name];
+      }
+      if (P.preset) for (const [k, v] of Object.entries(P.preset)) if (P.takes.some((x) => x.name === k)) P.inputs[k] = String(v);
+      if (P.input) {
+        const tk = P.takes.find((x) => thymFits(P.input, x.type) && !(P.preset && P.preset[x.name]));
+        if (tk) P.inputs[tk.name] = thymFits(P.input, 'folder') && !/\/$/.test(P.input) ? P.input + '/' : P.input;
+        const li = document.querySelector('#tree li.file[data-path="' + CSS.escape(String(P.input)) + '"]');
+        const fab = P.takes.find((x) => x.type === 'fabula' && !P.inputs[x.name]);
+        if (fab && li && li.dataset.emf) P.inputs[fab.name] = li.dataset.emf;
+      }
+      thymPickPaint();
+      const src = await canonJSON('/api/thym/program?path=' + encodeURIComponent(ref));
+      if (seq !== P.seq) return;
+      P.source = src.ok && src.data && typeof src.data.source === 'string' ? src.data.source : null;
+      void thymPlanLoad();
+    }
+
+    function thymInputsMissing() {
+      const P = THYM_PICK;
+      if (!Array.isArray(P.takes)) return [];
+      return P.takes.filter((x) => !String(P.inputs[x.name] || '').trim()).map((x) => x.name);
+    }
+    function thymInputsReady() {
+      const P = THYM_PICK;
+      return Array.isArray(P.takes) && !P.takes.some((x) => thymIsList(x.type)) && !thymInputsMissing().length;
+    }
+    function thymInputsBody() {
+      const out = {};
+      for (const x of THYM_PICK.takes || []) out[x.name] = String(THYM_PICK.inputs[x.name] || '').trim().replace(/\/$/, '');
+      return out;
+    }
+    function thymInputSet(name, value) {
+      const P = THYM_PICK;
+      const v = String(value || '').trim();
+      if ((P.inputs[name] || '') === v) return;
+      if (v) P.inputs[name] = v; else delete P.inputs[name];
+      if (P.program) thymInRemember(P.program, P.inputs);
+      P.result = null;
+      P.told = null;
+      void thymPlanLoad();
+    }
+
+    // One row per input: its name, what it takes, a field with what fits
+    // offered (a datalist, typed or picked), and for a folder what a run
+    // reads of it. Rebuilt only when the program changes, so focus and what
+    // is being typed survive a repaint.
+    function thymInputsPaint() {
+      const P = THYM_PICK;
+      const box = thymEl('thym-inputs');
+      const head = thymEl('thym-inputs-h');
+      if (!box) return;
+      const key = String(P.program || '') + '|' + JSON.stringify(P.takes);
+      const show = !!P.program;
+      box.hidden = !show;
+      if (head) head.hidden = !show;
+      if (!show) { box.innerHTML = ''; box._key = null; return; }
+      if (box._key === key) {
+        box.querySelectorAll('input[data-take]').forEach((inp) => {
+          const v = P.inputs[inp.dataset.take] || '';
+          if (document.activeElement !== inp && inp.value !== v) inp.value = v;
+        });
+        return;
+      }
+      box._key = key;
+      if (P.takes === null) {
+        box.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.in.reading', 'reading what it takes…')) + '</p>';
+        return;
+      }
+      if (!P.takes.length) {
+        box.innerHTML = '<p class="thym-meta">' + cosmEsc(t('thym.in.nothing', 'it takes nothing')) + '</p>';
+        return;
+      }
+      box.innerHTML = P.takes.map((x, i) => {
+        const id = 'thym-in-' + i;
+        const typ = String(x.type || '');
+        let h = '<div class="thym-in"><label for="' + id + '"><code>' + cosmEsc(String(x.name)) + '</code> <span class="thym-in-what">'
+          + cosmEsc(String(x.accepts || typ)) + '</span></label>';
+        if (thymIsList(typ)) {
+          return h + '<p class="thym-note" id="' + id + '">' + cosmEsc(t('thym.in.list', 'a list cannot be given from here yet: each input takes one file or folder of the project')) + '</p></div>';
+        }
+        const cands = thymCandidates(typ);
+        h += '<input type="text" id="' + id + '" data-take="' + cosmEsc(String(x.name)) + '" list="' + id + '-dl" spellcheck="false" autocomplete="off"'
+          + ' aria-describedby="' + id + '-n" value="' + cosmEsc(P.inputs[x.name] || '') + '" placeholder="'
+          + cosmEsc(cands.length ? t('thym.in.pick', 'type or pick: {n} in this project fit').replace('{n}', String(cands.length))
+            : t('thym.in.none', 'nothing in this project fits yet')) + '">'
+          + '<datalist id="' + id + '-dl">' + cands.map((c) => '<option value="' + cosmEsc(c.value) + '"'
+            + (c.label ? ' label="' + cosmEsc(c.label) + '"' : '') + '>').join('') + '</datalist>';
+        const note = typ === 'folder' ? t('thym.in.folder', 'a folder of the project: the run reads its files as they are when it starts, and nothing in the folder is changed')
+          : (typ === 'fabula' ? t('thym.in.fabula', 'a text’s twin: prose (fabulan), verse (fabulap) or code (fabulac)') : '');
+        h += '<span class="thym-in-note" id="' + id + '-n">' + cosmEsc(note) + '</span>';
+        return h + '</div>';
+      }).join('');
+    }
+
+    // ---- what a run landed, each output by its name ----
+    function thymOutputsHTML(outputs) {
+      const rows = Array.isArray(outputs) ? outputs.filter(cosmIsMap) : [];
+      if (!rows.length) return '';
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(rows.length > 1 ? t('thym.out.many', 'what it made, {n} outputs').replace('{n}', String(rows.length))
+        : t('thym.out.one', 'what it made')) + '</div><ul class="thym-outs">';
+      for (const o of rows) {
+        const rel = typeof o.rel === 'string' && o.rel ? o.rel : null;
+        const kind = o.type === 'folder' || Array.isArray(o.files) ? 'folder' : (o.type === 'package' ? 'package' : 'file');
+        h += '<li><code>' + cosmEsc(String(o.name || '')) + '</code> <span class="thym-meta-i">' + cosmEsc(String(o.type || '')) + '</span> ';
+        if (rel) {
+          h += '<button type="button" class="thym-btn" data-topen="' + cosmEsc(rel) + '" data-tkind="' + kind + '" aria-label="'
+            + cosmEsc(t('thym.out.open.aria', 'open {name}: {path}').replace('{name}', () => String(o.name || '')).replace('{path}', () => rel)) + '">'
+            + cosmEsc(t('thym.out.open', 'open')) + '</button> <span class="thym-plan-path">' + cosmEsc(rel) + '</span>';
+          if (o.folder) h += ' <span class="thym-plan-path">' + cosmEsc(String(o.folder)) + '</span>';
+        } else {
+          h += '<span class="thym-meta-i">' + cosmEsc(t('thym.out.inRun', 'kept with the run only: its first input is not a file of this project')) + '</span>';
+        }
+        if (Array.isArray(o.files)) {
+          h += '<span class="thym-plan-sub">' + cosmEsc(t('thym.out.files', 'a folder of {n} files').replace('{n}', String(o.files.length))) + '</span>';
+        }
+        h += '</li>';
+      }
+      return h + '</ul>';
+    }
+
+    function thymOpenOutput(rel, kind) {
+      if (!rel) return;
+      thymPickClose();
+      if (kind === 'folder') { cosmOpenPath(rel.replace(/\/$/, ''), 'folder'); return; }
+      if (kind === 'package' || THYM_PACKAGE_RE.test(rel)) { void enterCosmMode(thymPackageCatalog(rel)); return; }
+      cosmOpenPath(rel, 'file');
+    }
+
+    // ---- a refused run: its contract's words, and the re-asks ----
+    // The trace keeps every failed attempt of a node (`tries`: {attempt,
+    // failed: [{name, why}]}); each attempt but the last was followed by a
+    // re-ask that told the model those failures (THYM.md 12.2).
+    async function thymToldLoad(run) {
+      const P = THYM_PICK;
+      const seq = P.seq;
+      const r = await canonJSON('/api/thym/trace?run=' + encodeURIComponent(run));
+      if (seq !== P.seq || !r.ok || !r.data || !cosmIsMap(r.data.volume)) return;
+      const X = thymItems(r.data.volume);
+      const out = [];
+      for (const rec of X.kind('record')) {
+        const d = thymD(rec);
+        const tries = Array.isArray(d.tries) ? d.tries.filter(cosmIsMap) : [];
+        const failed = (Array.isArray(d.checks) ? d.checks : []).filter((c) => c && c.ok !== true);
+        if (!tries.length && !failed.length) continue;
+        out.push({ name: String(rec.name || d.move || ''), attempts: Number(d.attempts) || tries.length, tries, failed });
+      }
+      P.told = out;
+      thymStatusPaint();
+    }
+
+    function thymToldHTML(told) {
+      if (!Array.isArray(told) || !told.length) return '';
+      let h = '';
+      for (const r of told) {
+        h += '<div class="thym-told"><p class="thym-meta"><code>' + cosmEsc(r.name) + '</code></p>';
+        if (r.failed.length) {
+          h += '<ul class="thym-checks">' + r.failed.map((c) => '<li class="fail"><span class="thym-verdict" aria-hidden="true">✗</span><code>'
+            + cosmEsc(String(c.name || '?')) + '</code> <span class="thym-why">' + cosmEsc(String(c.why || '')) + '</span></li>').join('') + '</ul>';
+        }
+        const asked = r.tries.filter((x) => Number(x.attempt) < r.attempts || r.tries.indexOf(x) < r.tries.length - 1);
+        if (asked.length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('thym.told.head', 'what the model was told when it was asked again:')) + '</p><ol class="thym-told-list">'
+            + asked.map((x) => '<li>' + cosmEsc(t('thym.told.after', 'after attempt {n}:').replace('{n}', String(x.attempt))) + ' '
+              + (Array.isArray(x.failed) ? x.failed : []).map((f) => '<code>' + cosmEsc(String((f && f.name) || '?')) + '</code> '
+                + cosmEsc(String((f && f.why) || ''))).join('; ') + '</li>').join('') + '</ol>';
+        }
+        h += '</div>';
+      }
+      return h;
+    }
+
+    // ---- writing a program: the compiler beside the editor ----
+    // A `.thym` file in the edit face (full or mini) shows a strip: what the
+    // compiler says of the text as typed (POST /api/thym/compile {text},
+    // 700 ms after typing stops; a check reads, it never runs or asks a
+    // model), each refusal at its line in the compiler's own words, F8 /
+    // shift+F8 to step to it; the version line it reads; what it takes and
+    // gives; the moves at hand; plan and run.
+    const THYM_ED = { path: null, size: null, seq: 0, timer: null, res: null, checked: null, busy: false, at: 0, note: null };
+    const THYM_ED_WAIT = 700;
+
+    function thymEdRoot() { return THYM_ED.size === 'full' ? thymEl('thym-ed') : thymEl('thym-ed-mini'); }
+
+    function thymEdSkeleton() {
+      return '<div class="thym-ed-row"><span class="thym-ed-state" role="status" aria-live="polite" aria-atomic="true"></span>'
+        + '<span class="thym-ed-acts"><button type="button" class="thym-ed-btn" data-ted="moves">'
+        + cosmEsc(t('thym.ed.moves', 'the moves…')) + '</button><button type="button" class="thym-ed-btn" data-ted="plan">'
+        + cosmEsc(t('thym.ed.plan', 'plan and run…')) + '</button><span class="mode-help-anchor" data-help="thym-editor"></span></span></div>'
+        + '<div class="thym-ed-detail"></div>';
+    }
+
+    function thymEdOpen(path, size) {
+      thymEdClose();
+      if (IS_HOME || !THYM_PROGRAM_RE.test(String(path || ''))) return;
+      const keepNote = THYM_ED.note && THYM_ED.note.path === path ? THYM_ED.note : null;
+      Object.assign(THYM_ED, { path, size, res: null, checked: null, busy: false, at: 0, note: keepNote });
+      let root = thymEl('thym-ed');
+      if (size === 'mini') {
+        const ta = thymEl('mini-edit-textarea');
+        if (!ta) return;
+        root = document.createElement('div');
+        root.id = 'thym-ed-mini';
+        root.className = 'thym-ed thym-ed-mini';
+        ta.parentNode.insertBefore(root, ta);
+      }
+      root.innerHTML = thymEdSkeleton();
+      root.hidden = false;
+      applyHelpBubbles();
+      thymEdPaint();
+      void thymEdCheck();
+    }
+
+    function thymEdClose() {
+      clearTimeout(THYM_ED.timer);
+      THYM_ED.seq++;
+      const full = thymEl('thym-ed');
+      if (full) { full.hidden = true; full.innerHTML = ''; }
+      thymEl('thym-ed-mini')?.remove();
+      THYM_ED.path = null;
+    }
+
+    function thymEdText() {
+      const ta = reEditTextarea();
+      return ta ? ta.value : '';
+    }
+
+    // The version line as the file says it (the compiler's rule: the first
+    // line, `thym 0` or `thym 1`), read so that a refused text still says it.
+    function thymEdVersion(text) {
+      const first = String(text || '').split('\n').find((l) => l.trim() && !/^\s*--/.test(l));
+      const m = first && /^thym\s+(\d+)\s*(?:--.*)?$/.exec(first.trim());
+      return m ? m[1] : null;
+    }
+
+    function thymEdSoon() {
+      clearTimeout(THYM_ED.timer);
+      THYM_ED.timer = setTimeout(() => { void thymEdCheck(); }, THYM_ED_WAIT);
+    }
+
+    async function thymEdCheck() {
+      if (!THYM_ED.path) return;
+      const text = thymEdText();
+      if (text === THYM_ED.checked && THYM_ED.res) return;
+      const seq = ++THYM_ED.seq;
+      THYM_ED.busy = true;
+      const r = await canonPost('/api/thym/compile', { text });
+      if (seq !== THYM_ED.seq || !THYM_ED.path) return;
+      THYM_ED.busy = false;
+      THYM_ED.checked = text;
+      THYM_ED.res = r.ok && cosmIsMap(r.data) ? r.data : { unavailable: true, error: thymErr(r), missing: thymMissing(r) };
+      THYM_ED.at = 0;
+      thymEdPaint();
+    }
+
+    // The refusals the compiler gave, each `{line, check, message}`. The
+    // compiler stops at the first, so there is one at a time; the strip
+    // steps through however many a reply holds.
+    function thymEdRefusals() {
+      const res = THYM_ED.res;
+      if (!res || res.ok || res.unavailable) return [];
+      const list = Array.isArray(res.refusals) ? res.refusals : (cosmIsMap(res.refusal) ? [res.refusal] : []);
+      return list.filter(cosmIsMap);
+    }
+
+    function thymEdPaint() {
+      const root = thymEdRoot();
+      if (!root || !THYM_ED.path) return;
+      const state = root.querySelector('.thym-ed-state');
+      const detail = root.querySelector('.thym-ed-detail');
+      const res = THYM_ED.res;
+      const refs = thymEdRefusals();
+      let s = '';
+      root.classList.toggle('refused', refs.length > 0);
+      root.classList.toggle('clean', !!(res && res.ok));
+      if (!res) s = '<span class="thym-ed-wait">' + cosmEsc(t('thym.ed.checking', 'checking…')) + '</span>';
+      else if (res.unavailable) s = '<span class="thym-ed-wait">' + cosmEsc(res.missing ? t('thym.ed.noRoute', 'this server cannot check a program yet') : res.error) + '</span>';
+      else if (res.ok) {
+        s = '<span class="thym-verdict ok" aria-hidden="true">✓</span>' + cosmEsc(t('thym.ed.clean', 'it compiles: program {name}, nothing refused')
+          .replace('{name}', () => String(res.name || '')));
+      } else if (refs.length) {
+        const i = Math.min(THYM_ED.at, refs.length - 1);
+        const ref = refs[i];
+        s = '<span class="thym-verdict no" aria-hidden="true">✗</span>'
+          + (ref.line != null ? '<button type="button" class="thym-ed-line" data-ted="go" data-line="' + cosmEsc(String(ref.line)) + '" aria-label="'
+            + cosmEsc(t('thym.ed.goLine.aria', 'go to line {n}').replace('{n}', String(ref.line))) + '">'
+            + cosmEsc(t('cosm.span.one', 'line {n}').replace('{n}', String(ref.line))) + '</button> ' : '')
+          + '<code class="thym-ed-check">' + cosmEsc(String(ref.check || '')) + '</code> <span class="thym-ed-msg">' + cosmEsc(String(ref.message || '')) + '</span>'
+          + (refs.length > 1 ? ' <span class="thym-meta-i">' + cosmEsc(t('thym.ed.nOf', '{i} of {n}').replace('{i}', String(i + 1)).replace('{n}', String(refs.length))) + '</span>' : '');
+      }
+      if (state && state._h !== s) { state.innerHTML = s; state._h = s; }
+      // The detail: the version line, what it takes and gives, the keys.
+      const text = THYM_ED.checked != null ? THYM_ED.checked : thymEdText();
+      const v = thymEdVersion(text);
+      const code = (x) => '<code>' + cosmEsc(x) + '</code>';
+      const fill = (str) => cosmEsc(str).replace(/\{v0\}/g, code('thym 0')).replace(/\{v1\}/g, code('thym 1'));
+      let d = '';
+      if (v === '1') d += '<p>' + fill(t('thym.ed.v1', 'the first line says {v1}: folders, loops that collect, contracts it keeps, depth and several outputs are open to it')) + '</p>';
+      else if (v === '0') d += '<p>' + fill(t('thym.ed.v0', 'the first line says {v0}: to use a thym 1 word (a folder, a loop that collects, keeps, depth, several outputs, the editing or the dialectic moves) it must say {v1} instead')) + '</p>';
+      else d += '<p>' + fill(t('thym.ed.vNone', 'no version line yet: a program’s first line says {v0} or {v1}')) + '</p>';
+      if (res && res.ok) {
+        const takes = (res.takes || []).filter(cosmIsMap).map((x) => x.name + ': ' + x.type).join(', ');
+        const gives = (res.outputs || []).filter(cosmIsMap).map((x) => x.name + ': ' + x.type).join(', ');
+        const est = cosmIsMap(res.estimate) ? res.estimate : {};
+        const bits = [];
+        bits.push(takes ? t('thym.pick.takes', 'takes {takes}').replace('{takes}', () => takes) : t('thym.in.nothing', 'it takes nothing'));
+        if (gives) bits.push(t('thym.pick.gives', 'gives {gives}').replace('{gives}', () => gives));
+        if (est.steps != null) bits.push(t('thym.pick.steps', '{n} steps').replace('{n}', String(est.steps)));
+        bits.push(Number(est.asks) ? t('thym.pick.asks', '{n} ask a model').replace('{n}', String(est.asks)) : t('thym.pick.asksNone', 'no step asks a model'));
+        d += '<p class="thym-ed-io">' + cosmEsc(bits.join(' · ')) + '</p>';
+      }
+      if (refs.length) d += '<p class="thym-ed-keys">' + cosmEsc(t('thym.ed.keys', 'F8 goes to the line the compiler names, shift+F8 back; nothing runs while you write')) + '</p>';
+      const ta = reEditTextarea();
+      if (ta && ta.value !== RE_PRISTINE) d += '<p class="thym-ed-keys">' + cosmEsc(t('thym.ed.unsaved', 'a plan and a run read the file as saved: save to plan what you see')) + '</p>';
+      if (THYM_ED.note && THYM_ED.note.path === THYM_ED.path) d += '<p class="thym-ed-keys">' + cosmEsc(THYM_ED.note.text) + '</p>';
+      if (detail && detail._h !== d) { detail.innerHTML = d; detail._h = d; }
+    }
+
+    // Put the caret on line `n`, the whole line selected, a few lines below the top.
+    function thymEdGo(n) {
+      const ta = reEditTextarea();
+      if (!ta) return;
+      const lines = ta.value.split('\n');
+      const k = Math.max(1, Math.min(Number(n) || 1, lines.length));
+      let start = 0;
+      for (let i = 0; i < k - 1; i++) start += lines[i].length + 1;
+      const end = start + lines[k - 1].length;
+      ta.focus({ preventScroll: true });
+      ta.setSelectionRange(start, end);
+      const lh = parseFloat(getComputedStyle(ta).lineHeight) || 20;
+      ta.scrollTop = Math.max(0, (k - 4) * lh);
+      try { if (RE_SIZE === 'full') updateEditLineNavCursor(); } catch (_e) { /* no line nav */ }
+    }
+    window.thymEdGo = thymEdGo;
+
+    function thymEdStep(back) {
+      const refs = thymEdRefusals().filter((r) => r.line != null);
+      if (!refs.length) return false;
+      THYM_ED.at = ((THYM_ED.at + (back ? -1 : 1)) % refs.length + refs.length) % refs.length;
+      if (refs.length === 1) THYM_ED.at = 0;
+      thymEdPaint();
+      thymEdGo(refs[THYM_ED.at].line);
+      return true;
+    }
+
+    document.addEventListener('input', (e) => {
+      if (!THYM_ED.path || !e.target || (e.target.id !== 'edit-textarea' && e.target.id !== 'mini-edit-textarea')) return;
+      thymEdSoon();
+      thymEdPaint();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'F8' || !THYM_ED.path || modalStackTop()) return;
+      if (thymEdStep(e.shiftKey)) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest && e.target.closest('[data-ted]');
+      if (!b || !THYM_ED.path) return;
+      const act = b.dataset.ted;
+      if (act === 'go') { e.preventDefault(); thymEdGo(b.dataset.line); return; }
+      if (act === 'moves') { thymRefOpen('moves'); return; }
+      if (act === 'plan') { void thymRunOpen({ program: THYM_ED.path }); }
+    });
+
+    // ---- Thym at hand: the moves, and the programs to start from ----
+    // `#thym-ref-modal`, two tabs. The moves come from GET /api/thym/moves
+    // ({version, moves: [{name, owner, format, since, versions, signature,
+    // takes, of, modifiers, gives, asks, scaffold, contract, says}]}, the
+    // shape of the `thym_moves` tool's listing; see docs/fabula-landed-U1c.md);
+    // a server without that route says so and points at the text's 6.3.
+    // The programs are GET /api/thym/programs' shipped rows.
+    const THYM_REF = { open: false, tab: 'moves', version: 1, q: '', moves: new Map(), programs: null, seq: 0, copied: null };
+    const THYM_REF_OWNERS = ['thym', 'fabula', 'doc', 'comprise', 'ascribe'];
+
+    function thymRefOpen(tab = 'moves') {
+      if (IS_HOME) return;
+      if (THYM_PICK.open) thymPickClose();
+      const v = THYM_ED.path ? thymEdVersion(thymEdText()) : null;
+      Object.assign(THYM_REF, { open: true, tab, version: v === '0' ? 0 : 1, q: '', copied: null });
+      const m = thymEl('thym-ref-modal');
+      m.classList.remove('hidden');
+      m.setAttribute('aria-hidden', 'false');
+      thymRefSkeleton();
+      applyHelpBubbles();
+      void thymRefLoad();
+    }
+    window.thymRefOpen = thymRefOpen;
+
+    function thymRefClose() {
+      const m = thymEl('thym-ref-modal');
+      if (!m || m.classList.contains('hidden')) return;
+      m.classList.add('hidden');
+      m.setAttribute('aria-hidden', 'true');
+      THYM_REF.open = false;
+      THYM_REF.seq++;
+    }
+    window.thymRefClose = thymRefClose;
+
+    function thymRefSkeleton() {
+      const R = THYM_REF;
+      document.querySelectorAll('#thym-ref-modal [data-tref-tab]').forEach((b) => {
+        const on = b.dataset.trefTab === R.tab;
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+        b.tabIndex = on ? 0 : -1;
+      });
+      thymEl('thym-ref-body').setAttribute('aria-labelledby', 'thym-ref-tab-' + R.tab);
+      thymEl('thym-ref-source').textContent = THYM_ED.path ? canonBase(THYM_ED.path) : '';
+      let h = '';
+      if (R.tab === 'moves') {
+        h += '<div class="thym-ref-bar"><label for="thym-ref-q" class="dict-sc">' + cosmEsc(t('thym.ref.find', 'find a move')) + '</label>'
+          + '<input type="search" id="thym-ref-q" spellcheck="false" autocomplete="off" placeholder="'
+          + cosmEsc(t('thym.ref.find.placeholder', 'a name, a type, a check, a word of what it does')) + '" value="' + cosmEsc(R.q) + '">'
+          + '<span class="thym-ref-v" role="radiogroup" aria-label="' + cosmEsc(t('thym.ref.version.aria', 'which grammar')) + '">'
+          + [1, 0].map((n) => '<label><input type="radio" name="thym-ref-v" value="' + n + '"' + (R.version === n ? ' checked' : '') + '>'
+            + '<code>thym ' + n + '</code></label>').join('') + '</span></div>'
+          + '<p class="thym-note" id="thym-ref-target">' + cosmEsc(THYM_ED.path
+            ? t('thym.ref.target', '“put it in” writes the call at the cursor of {file}').replace('{file}', () => canonBase(THYM_ED.path))
+            : t('thym.ref.noTarget', 'open a program in the editor, and “put it in” writes a call at its cursor')) + '</p>'
+          + '<p class="thym-meta" id="thym-ref-count" role="status" aria-live="polite"></p>'
+          + '<div id="thym-ref-list" class="thym-ref-list"></div>';
+      } else {
+        h += '<p class="thym-note">' + cosmEsc(t('thym.ref.progs.note', 'the programs shipped with enough are read in place and never changed; a copy in this project is yours to change, and a run that names the program finds the project’s first')) + '</p>'
+          + '<div id="thym-ref-list" class="thym-ref-list"></div>';
+      }
+      thymEl('thym-ref-body').innerHTML = h;
+    }
+
+    async function thymRefLoad() {
+      const R = THYM_REF;
+      const seq = ++R.seq;
+      thymRefPaint();
+      if (R.tab === 'moves' && !R.moves.has(R.version)) {
+        const r = await canonJSON('/api/thym/moves?version=' + R.version);
+        if (seq !== R.seq) return;
+        R.moves.set(R.version, r.ok && r.data && Array.isArray(r.data.moves) ? r.data.moves.filter(cosmIsMap)
+          : { error: thymErr(r), missing: thymMissing(r) || r.status === 404 });
+      } else if (R.tab === 'programs' && !Array.isArray(R.programs)) {
+        const r = await canonJSON('/api/thym/programs');
+        if (seq !== R.seq) return;
+        R.programs = r.ok && r.data && Array.isArray(r.data.programs) ? r.data.programs : { error: thymErr(r) };
+      }
+      thymRefPaint();
+      const q = thymEl('thym-ref-q');
+      if (q && !thymEl('thym-ref-modal').contains(document.activeElement)) q.focus({ preventScroll: true });
+    }
+
+    function thymRefPaint() {
+      const R = THYM_REF;
+      const list = thymEl('thym-ref-list');
+      if (!list) return;
+      if (R.tab === 'programs') { list.innerHTML = thymRefProgramsHTML(); return; }
+      const all = R.moves.get(R.version);
+      const count = thymEl('thym-ref-count');
+      if (all === undefined) {
+        list.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.ref.loading', 'reading the moves…')) + '</p>';
+        if (count) count.textContent = '';
+        return;
+      }
+      if (!Array.isArray(all)) {
+        list.innerHTML = '<p class="thym-unavail">' + cosmEsc(all.missing ? t('thym.ref.noRoute', 'this server does not list the moves yet: the text of Thym lists them in its section 6.3')
+          : all.error) + '</p><div class="fab-row"><button type="button" class="thym-btn" data-tref="spec">'
+          + cosmEsc(t('thym.ref.spec', 'open the text of Thym')) + '</button></div>';
+        if (count) count.textContent = '';
+        return;
+      }
+      const q = R.q.trim().toLowerCase();
+      const hit = (m) => !q || [m.name, m.says, m.signature, m.owner, m.format, (m.contract || []).join(' '), m.scaffold]
+        .some((x) => String(x || '').toLowerCase().includes(q));
+      const shown = all.filter(hit);
+      if (count) {
+        count.textContent = (q ? t('thym.ref.countQ', '{n} of {all} moves') : t('thym.ref.count', '{all} moves a thym {v} program may call'))
+          .replace('{n}', String(shown.length)).replace('{all}', String(all.length)).replace('{v}', String(R.version));
+      }
+      if (!shown.length) { list.innerHTML = '<p class="thym-unavail">' + cosmEsc(t('thym.ref.noHit', 'no move says that')) + '</p>'; return; }
+      const owners = THYM_REF_OWNERS.concat(Array.from(new Set(shown.map((m) => String(m.owner || '')))).filter((o) => !THYM_REF_OWNERS.includes(o)));
+      let h = '';
+      for (const o of owners) {
+        const ms = shown.filter((m) => String(m.owner || '') === o).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+        if (!ms.length) continue;
+        const fmt = String(ms[0].format || (o + '/1'));
+        h += '<section class="thym-ref-group"><h4><code>' + cosmEsc(fmt) + '</code> <span class="thym-meta-i">'
+          + cosmEsc(o === 'comprise' || o === 'ascribe' ? t('thym.ref.mini', 'a MiniCOSM’s, in its own manifest') : t('thym.ref.core', 'a built-in of the core'))
+          + '</span></h4>' + ms.map((m) => thymRefMoveHTML(m)).join('') + '</section>';
+      }
+      list.innerHTML = h;
+    }
+
+    // A call of the move as a program writes it, its operands named by
+    // their types for the person to rename: `derive text`, `context of text`.
+    function thymRefCall(m) {
+      const first = (alts) => String((Array.isArray(alts) ? alts[0] : alts) || 'x').replace(/^list of /, '').split(/\s*\|\s*/)[0].trim();
+      const takes = Array.isArray(m.takes) ? m.takes : [];
+      if (!takes.length && m.of) return m.name + ' of ' + first(m.of);
+      return [m.name].concat(takes.length ? [takes.map(first).join(', ')] : []).join(' ');
+    }
+
+    function thymRefMoveHTML(m) {
+      const vs = Array.isArray(m.versions) ? m.versions.map(Number) : (Number(m.since) >= 1 ? [1] : [0, 1]);
+      const tags = [m.asks ? thymAsksBadge()
+        : '<span class="tref-tag">' + cosmEsc(t('thym.ref.asksNot', 'asks nothing')) + '</span>'];
+      if (!vs.includes(0)) tags.push('<span class="tref-tag">' + cosmEsc(t('thym.ref.only1', 'thym 1 only')) + '</span>');
+      const contract = Array.isArray(m.contract) ? m.contract : [];
+      const call = thymRefCall(m);
+      let h = '<article class="tref-move" data-move="' + cosmEsc(String(m.name)) + '"><div class="tref-head"><code class="tref-name">'
+        + cosmEsc(String(m.name)) + '</code>' + tags.join('') + '</div>'
+        + '<pre class="tref-sig">' + cosmEsc(String(m.signature || call)) + '</pre>';
+      if (m.says) h += '<p class="tref-says">' + cosmEsc(String(m.says)) + '</p>';
+      const meta = [];
+      meta.push(contract.length ? t('thym.ref.keeps', 'its contract: {checks}').replace('{checks}', () => contract.join(', '))
+        : t('thym.ref.noContract', 'no contract'));
+      if (m.asks) meta.push(m.scaffold ? t('thym.ref.scaffold', 'by rules: {name}').replace('{name}', () => String(m.scaffold))
+        : t('thym.ref.noScaffold', 'no scaffold: a rules run refuses it'));
+      h += '<p class="tref-meta">' + cosmEsc(meta.join(' · ')) + '</p>';
+      h += '<p class="tref-ex"><span class="thym-meta-i">' + cosmEsc(t('thym.ref.example', 'for example')) + '</span> <code>let r = '
+        + cosmEsc(call) + '</code></p>';
+      if (THYM_ED.path) {
+        h += '<div class="fab-row"><button type="button" class="thym-btn" data-tref-put="' + cosmEsc(String(m.name)) + '" aria-label="'
+          + cosmEsc(t('thym.ref.put.aria', 'put a call of {name} at the cursor').replace('{name}', () => String(m.name))) + '">'
+          + cosmEsc(t('thym.ref.put', 'put it in')) + '</button></div>';
+      }
+      return h + '</article>';
+    }
+
+    function thymRefPut(name) {
+      const all = THYM_REF.moves.get(THYM_REF.version);
+      const m = Array.isArray(all) ? all.find((x) => x.name === name) : null;
+      const ta = reEditTextarea();
+      if (!m || !ta || !THYM_ED.path) return;
+      const call = thymRefCall(m);
+      thymRefClose();
+      // After the dialog has handed focus back: the call at the caret, its
+      // first operand selected, so typing names it.
+      setTimeout(() => {
+        const at = ta.selectionStart, to = ta.selectionEnd;
+        ta.focus({ preventScroll: true });
+        ta.setRangeText(call, at, to, 'end');
+        const sp = call.indexOf(' ');
+        const opStart = sp === -1 ? at + call.length : at + sp + 1 + (call.slice(sp + 1).startsWith('of ') ? 3 : 0);
+        const rest = call.slice(opStart - at);
+        const opEnd = opStart + (rest.search(/[,\s]/) === -1 ? rest.length : rest.search(/[,\s]/));
+        ta.setSelectionRange(opStart, opEnd);
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }, 60);
+    }
+
+    function thymRefProgramsHTML() {
+      const R = THYM_REF;
+      if (R.programs === null) return '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.pick.loading', 'finding the programs…')) + '</p>';
+      if (!Array.isArray(R.programs)) return '<p class="thym-unavail">' + cosmEsc(R.programs.error) + '</p>';
+      const rows = R.programs.filter((p) => p && p.where === 'shipped');
+      if (!rows.length) return '<p class="thym-unavail">' + cosmEsc(t('thym.ref.noProgs', 'no programs are shipped with this build')) + '</p>';
+      return rows.map((p, i) => {
+        const ref = String(p.rel || p.name || '');
+        const io = [];
+        if (Array.isArray(p.takes)) io.push(t('thym.pick.takes', 'takes {takes}').replace('{takes}', () => p.takes.map((x) => x.name + ': ' + x.type).join(', ')));
+        const outs = Array.isArray(p.outputs) ? p.outputs : (cosmIsMap(p.gives) ? [p.gives] : []);
+        if (outs.length) io.push(t('thym.pick.gives', 'gives {gives}').replace('{gives}', () => outs.map((x) => x.name + ': ' + x.type).join(', ')));
+        if (p.steps != null) io.push(t('thym.pick.steps', '{n} steps').replace('{n}', String(p.steps)));
+        if (p.steps != null) io.push(Number(p.asks) ? t('thym.pick.asks', '{n} ask a model').replace('{n}', String(p.asks)) : t('thym.pick.asksNone', 'no step asks a model'));
+        const copied = R.copied && R.copied.ref === ref ? R.copied : null;
+        return '<article class="tref-prog"><div class="tref-head"><code class="tref-name">' + cosmEsc(String(p.name || ref)) + '</code>'
+          + (p.version != null ? '<span class="tref-tag"><code>thym ' + cosmEsc(String(p.version)) + '</code></span>' : '')
+          + '<span class="thym-meta-i">' + cosmEsc(ref) + '</span></div>'
+          + (p.problem ? '<p class="thym-refusal">' + cosmEsc(String(p.problem)) + '</p>'
+            : (p.why ? '<p class="tref-says">' + cosmEsc(String(p.why)) + '</p>' : '') + '<p class="tref-meta">' + cosmEsc(io.join(' · ')) + '</p>')
+          + '<div class="fab-row"><button type="button" class="thym-btn" data-tref-read="' + cosmEsc(ref) + '">'
+          + cosmEsc(t('thym.ref.read', 'read it')) + '</button><button type="button" class="thym-btn" data-tref-copy="' + cosmEsc(ref) + '" id="thym-ref-copy-' + i + '">'
+          + cosmEsc(t('thym.ref.copy', 'copy into this project to change it')) + '</button></div>'
+          + (copied ? '<p class="' + (copied.error ? 'thym-refusal' : 'thym-fits') + '" role="status">' + cosmEsc(copied.error || copied.text) + '</p>' : '')
+          + '</article>';
+      }).join('');
+    }
+
+    // A shipped (or Canon) program copied into the project, never edited
+    // where it lives: `programs/<file>.thym`, `-2`, `-3` … when the name is
+    // taken (a folder, so that its path never reads as a shipped file's bare
+    // name; a run by the program's name finds the project's first); then it
+    // opens in the editor, saying where it came from.
+    async function thymCopyProgram(ref) {
+      if (IS_HOME || !ref) return;
+      const src = await canonJSON('/api/thym/program?path=' + encodeURIComponent(ref));
+      const fail = (msg) => {
+        THYM_REF.copied = { ref, error: msg };
+        if (THYM_REF.open) thymRefPaint(); else alert(msg);
+      };
+      if (!src.ok || !src.data || typeof src.data.source !== 'string') { fail(thymErr(src)); return; }
+      const base = canonBase(String(src.data.rel || ref)).replace(/\.thym$/i, '') || 'program';
+      let dest = null;
+      for (let k = 1; k < 50 && !dest; k++) {
+        const name = 'programs/' + base + (k === 1 ? '' : '-' + k) + '.thym';
+        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(name));
+        if (r.status === 404) dest = name;
+      }
+      if (!dest) { fail(t('thym.ref.copyNoName', 'no free name for the copy')); return; }
+      const fd = new FormData();
+      fd.append('path', dest);
+      fd.append('content', src.data.source);
+      const w = await fetch('/api/file', { method: 'POST', body: fd });
+      if (!w.ok) { fail(t('thym.ref.copyFailed', 'the copy could not be written ({status})').replace('{status}', String(w.status))); return; }
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      THYM_ED.note = { path: dest, text: t('thym.ref.copied', 'a copy of {file}: yours to change; the original is unchanged').replace('{file}', () => canonBase(ref)) };
+      thymRefClose();
+      await openReadEdit(dest, { size: 'full', face: 'edit' });
+    }
+    window.thymCopyProgram = thymCopyProgram;
+
+    function thymProgramWhere(ref) {
+      const rows = Array.isArray(THYM_PICK.programs) ? THYM_PICK.programs : [];
+      const row = rows.find((p) => p && p.rel === ref);
+      if (row) return row.where;
+      return document.querySelector('#tree li.file[data-path="' + CSS.escape(String(ref || '')) + '"]') ? 'project' : null;
+    }
+
+    thymEl('thym-ref-modal').addEventListener('click', (e) => {
+      const c = (sel) => e.target.closest(sel);
+      let b;
+      if ((b = c('[data-tref-tab]'))) { thymRefTab(b.dataset.trefTab); return; }
+      if ((b = c('[data-tref-put]'))) { thymRefPut(b.dataset.trefPut); return; }
+      if ((b = c('[data-tref-read]'))) { const p = b.dataset.trefRead; thymRefClose(); void enterProgramDoc(p); return; }
+      if ((b = c('[data-tref-copy]'))) { void thymCopyProgram(b.dataset.trefCopy); return; }
+      if ((b = c('[data-tref="spec"]'))) { thymRefClose(); void enterDocsMode({ doc: 'thym' }); return; }
+      if (c('#thym-ref-close')) thymRefClose();
+    });
+    function thymRefTab(tab) {
+      if (tab === THYM_REF.tab) return;
+      THYM_REF.tab = tab;
+      thymRefSkeleton();
+      void thymRefLoad().then(() => {
+        if (tab === 'programs') thymEl('thym-ref-tab-programs')?.focus({ preventScroll: true });
+      });
+    }
+    thymEl('thym-ref-modal').addEventListener('keydown', (e) => {
+      const tab = e.target.closest && e.target.closest('[data-tref-tab]');
+      if (tab && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+        e.preventDefault();
+        const next = tab.dataset.trefTab === 'moves' ? 'programs' : 'moves';
+        thymRefTab(next);
+        thymEl('thym-ref-tab-' + next)?.focus({ preventScroll: true });
+      }
+      if (e.target.id === 'thym-ref-q' && e.key === 'ArrowDown') {
+        const first = thymEl('thym-ref-list')?.querySelector('button');
+        if (first) { e.preventDefault(); first.focus(); }
+      }
+    });
+    thymEl('thym-ref-modal').addEventListener('input', (e) => {
+      if (e.target.id === 'thym-ref-q') { THYM_REF.q = e.target.value; thymRefPaint(); }
+    });
+    thymEl('thym-ref-modal').addEventListener('change', (e) => {
+      if (e.target.name === 'thym-ref-v') { THYM_REF.version = Number(e.target.value) === 0 ? 0 : 1; void thymRefLoad(); }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || thymEl('thym-ref-modal').classList.contains('hidden')) return;
+      const top = modalStackTop();
+      if (top && top.el.id !== 'thym-ref-modal') return;
+      e.stopPropagation();
+      if (e.target.id === 'thym-ref-q' && e.target.value) { e.preventDefault(); e.target.value = ''; THYM_REF.q = ''; thymRefPaint(); return; }
+      thymRefClose();
+    }, true);
 
     // The hooks in the Canon, cosm and docs code call in here only once this
     // block has run (its state is const, so it is not there before).
@@ -37256,6 +38624,7 @@
       raising: false, raised: null, rerror: null, again: null, agentNote: null,
       iso: { programs: null, chosen: null, busy: false, result: null, error: null },
       mainKey: null, timers: new Map(), checkSeq: 0,
+      dry: null,            // 0.6 (U1c): {vol, count} of a dry raise
     };
 
     function dlgDrafts() {
@@ -37307,7 +38676,7 @@
       DLG.seq++;
       Object.assign(DLG, { face: 'q', path: String(path), data: same ? DLG.data : null, error: null,
         cosm: same ? DLG.cosm : null, sent: null, sending: false, job: null, snap: null, result: null, jerror: null,
-        raising: false, raised: null, rerror: null, again: null, agentNote: null, mainKey: null });
+        raising: false, raised: null, rerror: null, again: null, agentNote: null, mainKey: null, dry: null });
       if (!same) DLG.vol = null;
       fabRouteReset('dlg');
       dlgModal(true);
@@ -37447,7 +38816,7 @@
       const shown = dlgShown();
       const key = shown.map((c) => { const d = dlgDraft(c); return dlgKey(c) + '\u0001' + (d.mode || '') + '\u0001' + (d.refused || ''); }).join('\u0002')
         + '|' + (DLG.cosm ? 1 : 0) + '|' + I18N.lang + '|' + (DLG.raising ? 1 : 0) + '|' + dlgQuestionItems() + '|' + (DLG.raised ? 1 : 0)
-        + '|' + (DLG.rerror || '');
+        + '|' + (DLG.rerror || '') + '|' + (DLG.dry && DLG.dry.count != null ? DLG.dry.count : '');
       if (key === DLG.mainKey) return;
       DLG.mainKey = key;
       let h = '';
@@ -37470,12 +38839,47 @@
       shown.forEach((c, i) => dlgCheckPaint(i, dlgDraft(c)));
     }
 
+    // 0.6 (U1c, adopting S3): where the reading saw a candidate, as the
+    // holograph records it (the text by name, the span, how sure); never the
+    // words, which a holograph does not hold.
+    function dlgCandFromHTML(cd) {
+      if (!cosmIsMap(cd)) return '';
+      const bits = [];
+      if (cd.text) bits.push(t('dlg.cand.from', 'read from {text}').replace('{text}', () => String(cd.text)));
+      // A span as the reading recorded it: `{lines: "12-18"}`, `[12, 18]` or "12-18".
+      const sp = cosmIsMap(cd.span) ? (cd.span.lines != null ? cd.span.lines : null)
+        : (Array.isArray(cd.span) ? cd.span.join('-') : cd.span);
+      if (sp != null && String(sp).trim()) {
+        bits.push(/^\s*\d+\s*$/.test(String(sp)) ? t('cosm.span.one', 'line {n}').replace('{n}', String(sp).trim())
+          : t('dlg.cand.span', 'lines {span}').replace('{span}', () => String(sp)));
+      }
+      if (typeof cd.confidence === 'number') bits.push(t('dlg.cand.sure', '{pct} % sure').replace('{pct}', String(Math.round(cd.confidence * 100))));
+      return bits.length ? '<span class="dlg-cand-from">' + cosmEsc(bits.join(', ')) + '</span>' : '';
+    }
+
+    // 0.6 (U1c, adopting S3): how many questions raising would ask, read
+    // before the button by a dry raise (nothing landed), once per volume.
+    async function dlgDryLoad(vol) {
+      const seq = DLG.seq;
+      DLG.dry = { vol, loading: true };
+      const r = await canonPost('/api/dialectic/raise', { path: vol, dry: true });
+      if (seq !== DLG.seq || !DLG.dry || DLG.dry.vol !== vol) return;
+      DLG.dry = { vol, count: r.ok && r.data && typeof r.data.count === 'number' ? r.data.count : null };
+      if (DLG.open) dlgPaint();
+    }
+
     function dlgRaiseHTML() {
+      const vol = DLG.vol || DLG.path;
+      if (vol && !(DLG.dry && DLG.dry.vol === vol)) void dlgDryLoad(vol);
+      const dry = DLG.dry && DLG.dry.vol === vol && typeof DLG.dry.count === 'number' ? DLG.dry.count : null;
       let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.raise.head', 'no questions yet')) + '</div>'
         + '<p class="thym-note">' + cosmEsc(dlgHolo()
           ? t('dlg.raise.holo', 'raising them asks Ascribe’s opening questions, four for each part of the self and four for its forms, all of the holder alone, and one for each open field or unsure node; by rules, no model.')
           : t('dlg.raise.why', 'raising them asks the format’s opening questions, and one for each open field and each unsure item; by rules, no model.')) + '</p>'
-        + '<div class="fab-row"><button type="button" id="dlg-raise" data-dlg="raise"' + (DLG.raising ? ' disabled' : '') + '>'
+        + (dry != null ? '<p class="thym-meta" id="dlg-raise-count">' + cosmEsc(dry === 1 ? t('dlg.raise.countOne', 'raising them asks one question')
+          : t('dlg.raise.count', 'raising them asks {n} questions').replace('{n}', String(dry))) + '</p>' : '')
+        + '<div class="fab-row"><button type="button" id="dlg-raise" data-dlg="raise"' + (DLG.raising ? ' disabled' : '')
+        + (dry != null ? ' aria-describedby="dlg-raise-count"' : '') + '>'
         + cosmEsc(t('dlg.raise.go', 'raise the questions')) + '</button></div>';
       if (DLG.rerror) h += '<p class="thym-refusal">' + cosmEsc(DLG.rerror) + '</p>';
       return h;
@@ -37529,7 +38933,8 @@
         let h = '';
         if (cand) {
           h += '<div class="dlg-cand"><span class="dlg-cand-h">' + cosmEsc(t('dlg.cand.head', 'a reading of your own text proposes this; it is not yours until you say so')) + '</span>'
-            + (c.item.summary ? '<span class="dlg-cand-sum">' + cosmEsc(String(c.item.summary)) + '</span>' : '') + '</div>';
+            + (c.item.summary ? '<span class="dlg-cand-sum">' + cosmEsc(String(c.item.summary)) + '</span>' : '')
+            + dlgCandFromHTML(c.candidate) + '</div>';
         }
         h += '<div class="dlg-opts' + (cand ? ' dlg-opts-cand' : '') + '" role="' + (many ? 'group' : 'radiogroup') + '" aria-labelledby="dlg-asks-' + i + '" aria-describedby="' + desc + '">';
         h += opts.map((o) => '<label class="dlg-opt"><input type="' + (many ? 'checkbox' : 'radio') + '" name="dlg-r-' + i + '" value="' + cosmEsc(o) + '"'
@@ -37789,6 +39194,14 @@
           h += '<div class="fab-row"><button type="button" id="dlg-settle-go" data-dlg="settle"' + (running ? ' disabled' : '') + '>'
             + cosmEsc(t('dlg.settle.go', 'settle the answers')) + '</button></div>';
         }
+        // 0.6 (U1c): the same second run as a Thym program, its two inputs
+        // given (the fabula, a sitting's answers), to read its plan first.
+        if (!atOnce && sittings.length && !running && window.__thymReady && d.path) {
+          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.thym', 'or run the program settle-the-answers on one sitting, its plan read first:')) + '</p>'
+            + '<ul class="dlg-files">' + sittings.map((s) => '<li><button type="button" class="thym-btn" data-dlg="thym-settle" data-dlg-path="'
+              + cosmEsc(String(s.path || '')) + '">' + cosmEsc(t('dlg.settle.thymGo', 'run with {file}…').replace('{file}', () => canonBase(String(s.path || ''))))
+              + '</button></li>').join('') + '</ul>';
+        }
         if (running) {
           const s = DLG.snap || {};
           h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(s.state === 'queued' || s.phase === 'waiting'
@@ -37854,6 +39267,15 @@
 
     // ---- what was settled or declined before: ask again ----
     function dlgClosed() {
+      // 0.6 (U1c, adopting S3): the listing says them (`closed`, newest
+      // first); the volume's own items are read only from a server without it.
+      const d = DLG.data;
+      if (d && Array.isArray(d.closed)) {
+        const waiting = new Set((d.waiting || []).map((w) => w && w.id));
+        return d.closed.filter((c) => c && c.id).map((c) => ({ id: String(c.id), asks: c.asks, state: c.state,
+          settled: !waiting.has(c.id) && !c.waiting_in, waiting_in: c.waiting_in || null,
+          answers: cosmIsMap(c.last) ? [c.last] : [] }));
+      }
       const out = [];
       for (const m of (DLG.cosm && DLG.cosm.modules) || []) {
         if (m.letter !== 'D') continue;
@@ -37875,7 +39297,8 @@
           const answers = Array.isArray(q.answers) ? q.answers : [];
           const last = answers.length ? answers[answers.length - 1] : {};
           const said = last.declined ? '' : (last.says != null ? '“' + String(last.says) + '” · ' : '');
-          const note = DLG.again && DLG.again.id === q.id ? '<span class="dlg-row-what ' + (DLG.again.error ? 'bad' : '') + '">' + cosmEsc(DLG.again.error || t('dlg.again.done', 'asked again: it is open')) + '</span>' : '';
+          const note = DLG.again && DLG.again.id === q.id ? '<span class="dlg-row-what ' + (DLG.again.error ? 'bad' : '') + '">' + cosmEsc(DLG.again.error || t('dlg.again.done', 'asked again: it is open')) + '</span>'
+            : (q.waiting_in ? '<span class="dlg-row-what">' + cosmEsc(t('dlg.waiting.in', 'in the sitting {file}, not settled yet').replace('{file}', () => String(q.waiting_in))) + '</span>' : '');
           return '<li><span class="dlg-row-asks">' + cosmEsc(String(q.asks || q.id)) + '</span><span class="dlg-row-what">' + cosmEsc(said + (words[q.state] || q.state)
             + (q.settled ? ' · ' + t('dlg.st.settled', 'settled') : '')) + '</span>' + note
             + '<button type="button" data-dlg="again" data-dlg-key="' + cosmEsc(q.id) + '">' + cosmEsc(t('dlg.again', 'ask again')) + '</button></li>';
@@ -37988,6 +39411,13 @@
       }
       if (act === 'about') { void dlgShowItem(b.dataset.dlgItem); return; }
       if (act === 'settle') { void dlgSettle(); return; }
+      if (act === 'thym-settle') {
+        const f = DLG.data && DLG.data.path;
+        const said = b.dataset.dlgPath;
+        dlgClose();
+        void thymRunOpen({ program: 'settle.thym', inputs: { f, said } });
+        return;
+      }
       if (act === 'again') { void dlgAgain(b.dataset.dlgKey); return; }
       if (act === 'raise') { void dlgRaise(); return; }
       if (act === 'iso-go') { void dlgIsoGo(); return; }
@@ -38189,6 +39619,18 @@
     window.dlgOnLanguage = () => { DLG.mainKey = null; if (DLG.open) dlgPaint(); if (COSM.data) dlgCosmRefresh(); };
 
     // The hooks in the Canon, cosm, fabula and chat code call in here only once this block has run.
+    // 0.6 (U1c, adopting S3): the `dialectic` event. An open card on the
+    // volume it names reads its listing again (drafts are kept: they live in
+    // DLG.drafts, which a listing never touches); its own sitting's event is
+    // the same read the card already made, and costs one listing.
+    function dlgOnEvent(d) {
+      const vol = String(d.path || '').replace(/\/$/, '');
+      const mine = String(DLG.vol || DLG.path || '').replace(/\/$/, '');
+      if (!DLG.open || !mine || vol !== mine || DLG.sending) return;
+      const seq = DLG.seq;
+      void dlgLoad(seq).then(() => { if (seq === DLG.seq && DLG.open) { DLG.dry = null; dlgPaint(); } });
+    }
+
     window.__dlgReady = true;
 
 
@@ -39963,6 +41405,7 @@
       convertRefreshDoc();
       // 0.4.3: and an EMF twin of this text is out of date now.
       if (window.__canonReady) canonRefreshDoc();
+      if (window.__thymReady) thymEdPaint();
     }
 
     async function revertEdit() {
@@ -41403,6 +42846,14 @@
       let d;
       try { d = JSON.parse(e.data); } catch (_err) { return; }
       if (window.__canonReady) canonOnSnap(d);
+    });
+
+    // 0.6 (U1c, adopting S3): a sitting recorded or settled anywhere (another
+    // tab, a readvisor's tool): an open dialectic card on that volume reads again.
+    es.addEventListener('dialectic', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_err) { return; }
+      if (window.__dlgReady && d && d.path) dlgOnEvent(d);
     });
 
     es.addEventListener('convert-install', (e) => {

@@ -628,3 +628,33 @@ demandez-en une avec <strong>lire à travers…</strong> sur un paquet, ou sur u
 - lisez une lettre à travers votre propre morph pour entendre comment vous l'auriez dite, puis revenez à l'original.
 - gardez les lectures : chacune nomme son morph et son jour, si bien que vous pouvez poser côte à côte les lectures d'un même texte.
 - la section 12.6 du centre d'aide parle des lectures et de leur étiquette ; la section 13.4, des morphs à travers lesquels elles sont racontées.
+
+## thym-editor
+name: un programme pendant que vous l’écrivez
+path: *.thym in the editor
+
+### what
+ouvrez un fichier <code>.thym</code> dans l’éditeur, et une bande sous la barre d’outils dit, chaque fois que vous marquez une pause, ce que le <strong>compilateur</strong> en fait : <em>il compile</em>, ou la ligne qu’il refuse, la vérification qui l’a refusée et les mots du compilateur lui-même, qui nomment l’instruction et, quand on la connaît, la correction. elle dit aussi quelle grammaire la première ligne demande — <code>thym 0</code> ou <code>thym 1</code>, et ce qu’un programme en <code>thym 0</code> doit dire pour employer un mot de <code>thym 1</code> — et, dès qu’il compile, ce que le programme prend, ce qu’il donne et combien de ses étapes interrogent un modèle. vérifier ne fait que lire : rien ne tourne et aucun modèle n’est interrogé.
+
+### how
+<kbd>F8</kbd> met le curseur sur la ligne que nomme le compilateur, la ligne entière sélectionnée ; <kbd>shift</kbd>+<kbd>F8</kbd> revient. <strong>les mouvements…</strong> ouvre Thym sous la main, où <strong>l’insérer</strong> écrit un appel au curseur. <strong>planifier et lancer…</strong> ouvre lancer avec… sur ce programme : un plan et une exécution lisent le fichier tel qu’enregistré, enregistrez donc d’abord pour planifier ce que vous voyez. un programme livré n’est jamais modifié là où il est : copiez-le dans le projet (depuis sa page, ou depuis les programmes pour commencer) et modifiez la copie.
+
+### ideas
+- écrivez d’abord la ligne de version : <code>thym 1</code> ouvre les dossiers, les boucles qui collectent, <code>keeps</code>, <code>depth</code> et plusieurs sorties.
+- laissez un refus à l’écran et lisez-le en entier : il dit quelle instruction, et le plus souvent quoi écrire à la place.
+- gardez un programme petit et planifiez-le sur une vraie entrée avant de lui confier une longue exécution.
+
+## thym-moves
+name: Thym sous la main
+path: the moves, and the programs to start from
+
+### what
+<strong>les mouvements</strong> sont toutes les étapes qu’un programme peut appeler, d’après les déclarations que lit le compilateur : chacun avec sa signature (ce qu’il prend, ses mots comme <code>as</code>, <code>with</code>, <code>to</code>, et ce qu’il donne), s’il interroge un modèle, les vérifications que tient son contrat, son échafaudage pour une exécution par règles, le format qui le déclare, et si seul <code>thym 1</code> le voit. ils sont groupés par ce format et se cherchent par n’importe lequel de leurs mots. <strong>des programmes pour commencer</strong> sont ceux livrés avec enough, chacun avec sa ligne <code>why:</code>.
+
+### how
+tapez dans la recherche pour resserrer la liste ; <kbd>↓</kbd> passe de la recherche au bouton du premier mouvement. avec un programme ouvert dans l’éditeur, <strong>l’insérer</strong> écrit un appel du mouvement au curseur et sélectionne son premier opérande pour que vous le renommiez. <strong>le lire</strong> ouvre un programme livré comme un document ; <strong>copier dans ce projet pour le modifier</strong> écrit une copie qui est à vous dans <code>programs/</code> et l’ouvre dans l’éditeur, et le fichier livré reste tel quel.
+
+### ideas
+- cherchez le nom d’une vérification pour trouver les mouvements qui la tiennent.
+- passez à <code>thym 0</code> pour voir ce qu’un programme plus ancien peut appeler.
+- partez du programme livré le plus proche de ce que vous voulez, et modifiez une copie.

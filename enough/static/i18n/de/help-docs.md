@@ -627,3 +627,33 @@ fordere eine an mit <strong>lesen durch…</strong> auf einem Paket oder auf ein
 - lies einen Brief durch deinen eigenen Morph, um zu hören, wie du es gesagt hättest, und geh dann zurück zum Original.
 - behalte die Lesarten: jede nennt ihren Morph und ihren Tag, so kannst du die Lesarten eines Textes nebeneinanderlegen.
 - Abschnitt 12.6 des Hilfe-Centers hat die Lesarten und ihre Kennzeichnung; Abschnitt 13.4 hat die Morphs, durch die sie erzählt werden.
+
+## thym-editor
+name: ein Programm, während du es schreibst
+path: *.thym in the editor
+
+### what
+öffne eine <code>.thym</code>-Datei im Editor, und ein Streifen unter der Werkzeugleiste sagt jedes Mal, wenn du innehältst, was der <strong>Compiler</strong> daraus macht: <em>es kompiliert</em>, oder die Zeile, die er ablehnt, die Prüfung, die abgelehnt hat, und die eigenen Worte des Compilers, die die Anweisung nennen und, wo eine bekannt ist, die Abhilfe. er sagt auch, welche Grammatik die erste Zeile verlangt — <code>thym 0</code> oder <code>thym 1</code>, und was ein Programm in <code>thym 0</code> sagen muss, um ein Wort von <code>thym 1</code> zu nutzen — und, sobald es kompiliert, was das Programm nimmt, was es liefert und wie viele seiner Schritte ein Modell fragen. die Prüfung liest nur: nichts läuft, und kein Modell wird gefragt.
+
+### how
+<kbd>F8</kbd> setzt die Schreibmarke auf die Zeile, die der Compiler nennt, die ganze Zeile markiert; <kbd>shift</kbd>+<kbd>F8</kbd> geht zurück. <strong>die Handgriffe…</strong> öffnet Thym zur Hand, wo <strong>einsetzen</strong> einen Aufruf an die Schreibmarke schreibt. <strong>planen und ausführen…</strong> öffnet ausführen mit… für dieses Programm: Plan und Lauf lesen die Datei wie gespeichert, also speichere zuerst, um zu planen, was du siehst. ein mitgeliefertes Programm wird nie dort bearbeitet, wo es liegt: kopiere es ins Projekt (von seiner Seite oder aus den Programmen zum Anfangen) und ändere die Kopie.
+
+### ideas
+- schreib zuerst die Versionszeile: <code>thym 1</code> öffnet Ordner, sammelnde Schleifen, <code>keeps</code>, <code>depth</code> und mehrere Ausgaben.
+- lass eine Ablehnung stehen und lies sie ganz: sie sagt, welche Anweisung, und meist, was stattdessen zu schreiben ist.
+- halte ein Programm klein und plane es an einer echten Eingabe, bevor du ihm einen langen Lauf anvertraust.
+
+## thym-moves
+name: Thym zur Hand
+path: the moves, and the programs to start from
+
+### what
+<strong>die Handgriffe</strong> sind alle Schritte, die ein Programm aufrufen darf, aus den Deklarationen, die der Compiler liest: jeder mit seiner Signatur (was er nimmt, seine Wörter wie <code>as</code>, <code>with</code>, <code>to</code>, und was er liefert), ob er ein Modell fragt, den Prüfungen, die sein Vertrag hält, seinem Gerüst für einen Lauf nach Regeln, dem Format, das ihn deklariert, und ob nur <code>thym 1</code> ihn sieht. sie sind nach diesem Format gruppiert und nach jedem ihrer Wörter durchsuchbar. <strong>Programme zum Anfangen</strong> sind die mit enough mitgelieferten, jedes mit seiner <code>why:</code>-Zeile.
+
+### how
+tippe in die Suche, um die Liste einzuengen; <kbd>↓</kbd> geht von der Suche zur Schaltfläche des ersten Handgriffs. ist ein Programm im Editor offen, schreibt <strong>einsetzen</strong> einen Aufruf des Handgriffs an die Schreibmarke und markiert seinen ersten Operanden, damit du ihn umbenennst. <strong>lesen</strong> öffnet ein mitgeliefertes Programm als Dokument; <strong>in dieses Projekt kopieren, um es zu ändern</strong> schreibt eine Kopie, die dir gehört, nach <code>programs/</code> und öffnet sie im Editor, und die mitgelieferte Datei bleibt, wie sie ist.
+
+### ideas
+- such nach dem Namen einer Prüfung, um die Handgriffe zu finden, die sie halten.
+- wechsle zu <code>thym 0</code>, um zu sehen, was ein älteres Programm aufrufen darf.
+- fang mit dem mitgelieferten Programm an, das dem am nächsten kommt, was du willst, und ändere eine Kopie.

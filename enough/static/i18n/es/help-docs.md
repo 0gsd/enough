@@ -628,3 +628,33 @@ pide una con <strong>leer a través de…</strong> en un paquete, o en un texto 
 - lee una carta a través de tu propio morfo para oír cómo lo habrías dicho tú, y luego vuelve al original.
 - guarda las lecturas: cada una nombra su morfo y su día, así que puedes poner lado a lado las lecturas de un mismo texto.
 - la sección 12.6 del centro de ayuda trata de las lecturas y su etiqueta; la sección 13.4, de los morfos a través de los que se cuentan.
+
+## thym-editor
+name: un programa mientras lo escribes
+path: *.thym in the editor
+
+### what
+abre un archivo <code>.thym</code> en el editor y una franja bajo la barra de herramientas dice, cada vez que haces una pausa, qué saca de él el <strong>compilador</strong>: <em>compila</em>, o la línea que rechaza, la comprobación que la rechazó y las propias palabras del compilador, que nombran la instrucción y, cuando se conoce, el arreglo. también dice qué gramática pide la primera línea — <code>thym 0</code> o <code>thym 1</code>, y qué tiene que decir un programa en <code>thym 0</code> para usar una palabra de <code>thym 1</code> — y, en cuanto compila, qué toma el programa, qué da y cuántos de sus pasos preguntan a un modelo. comprobar solo lee: nada se ejecuta y no se pregunta a ningún modelo.
+
+### how
+<kbd>F8</kbd> pone el cursor en la línea que nombra el compilador, con la línea entera seleccionada; <kbd>shift</kbd>+<kbd>F8</kbd> vuelve atrás. <strong>los movimientos…</strong> abre Thym a mano, donde <strong>ponerlo</strong> escribe una llamada en el cursor. <strong>planificar y ejecutar…</strong> abre ejecutar con… sobre este programa: un plan y una ejecución leen el archivo tal como está guardado, así que guarda antes para planificar lo que ves. un programa incluido nunca se edita donde está: cópialo al proyecto (desde su página, o desde los programas para empezar) y cambia la copia.
+
+### ideas
+- escribe primero la línea de versión: <code>thym 1</code> abre las carpetas, los bucles que recogen, <code>keeps</code>, <code>depth</code> y varias salidas.
+- deja un rechazo en pantalla y léelo entero: dice qué instrucción y, casi siempre, qué escribir en su lugar.
+- mantén pequeño un programa y planifícalo sobre una entrada real antes de confiarle una ejecución larga.
+
+## thym-moves
+name: Thym a mano
+path: the moves, and the programs to start from
+
+### what
+<strong>los movimientos</strong> son todos los pasos que un programa puede llamar, según las declaraciones que lee el compilador: cada uno con su firma (lo que toma, sus palabras como <code>as</code>, <code>with</code>, <code>to</code>, y lo que da), si pregunta a un modelo, las comprobaciones que mantiene su contrato, su andamio para una ejecución por reglas, el formato que lo declara y si solo <code>thym 1</code> lo ve. están agrupados por ese formato y se buscan por cualquiera de sus palabras. <strong>programas para empezar</strong> son los incluidos con enough, cada uno con su línea <code>why:</code>.
+
+### how
+escribe en la búsqueda para acotar la lista; <kbd>↓</kbd> pasa de la búsqueda al botón del primer movimiento. con un programa abierto en el editor, <strong>ponerlo</strong> escribe una llamada del movimiento en el cursor y selecciona su primer operando para que lo renombres. <strong>leerlo</strong> abre un programa incluido como documento; <strong>copiar a este proyecto para cambiarlo</strong> escribe una copia tuya en <code>programs/</code> y la abre en el editor, y el archivo incluido queda como está.
+
+### ideas
+- busca el nombre de una comprobación para encontrar los movimientos que la mantienen.
+- cambia a <code>thym 0</code> para ver qué puede llamar un programa más antiguo.
+- empieza por el programa incluido más cercano a lo que quieres, y cambia una copia.

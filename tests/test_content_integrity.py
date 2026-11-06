@@ -126,6 +126,7 @@ COGNATES: dict[str, frozenset[str]] = {
         "agent",            # "un agent" — the slider's word (agentmode.agent, 0.4.4)
         "prose",            # "la prose" — a text's flavour, fabulan (fab.fl.prose, 0.6)
         "questions",        # "des questions" — the cosm viewer's dialectic button (dlg.cosm.label, 0.6)
+        "code",             # "le code" — a fabula's flavour, fabulac (thym.fl.code, 0.6 U1c)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"

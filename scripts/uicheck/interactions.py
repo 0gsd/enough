@@ -29,6 +29,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 from collections.abc import Callable
 
 from .driver import Driver, StepError
@@ -38,8 +39,9 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       GIRRAPH, HARVEST, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS,
                       THYM_BAND_READY, THYM_MORPH, THYM_READING, THYM_READING_FOOTER,
                       THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY,
-                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL, FAB_READY, FABV_READY,
-                      DLG_ANSWER, DLG_KINDS, DLG_READY, DLG_SELF_ASK)
+                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL,
+                      DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
+                      THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG, thym_moves_stub_js)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -61,6 +63,9 @@ def _reset(d: Driver) -> None:
     d.js("(() => { try { atemCardClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { thymPickClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
+    # 0.6 (U1c): Thym at hand, and a program's text put back so no dirty guard asks.
+    d.js("(() => { try { thymRefClose(); const ta = reEditTextarea(); if (ta && RE_PATH && /\\.thym$/.test(RE_PATH))"
+         " { ta.value = RE_PRISTINE; RE_EDIT_BUFFER = RE_PRISTINE; } } catch (e) {} return true; })()")
     d.js("(() => { try { fabCardClose(); fabViewClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { dlgClose(); DLG.drafts.clear(); DLG.putNext = []; } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
@@ -3293,10 +3298,40 @@ def scenario_docs_graph_roundtrip(d: Driver) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def _wait_js(d: Driver, cond: str, ms: int = 10000) -> bool:
-    """Wait inside the page for a JS condition (the reason COUNCIL_READY gives)."""
-    return bool(d.js_await("(async () => { for (let i = 0; i < %d; i++) { if (%s) return true;"
-                           " await new Promise((r) => setTimeout(r, 50)); } return false; })()"
-                           % (max(1, ms // 50), cond)))
+    """Wait for a JS condition, `ms` in all, asking the page in short calls (0.6, U1c).
+
+    It used to be ONE evaluate that looped in the page for up to `ms`, under js_await's own 20 s reply limit: a
+    wait of 30 s for a job ("the build did not finish") failed as "no reply within 20.0s" whenever another sweep
+    shared the machine. Each call now reads the condition and returns at once; the budget is kept here."""
+    probe = "(() => { try { return !!(%s); } catch (e) { return false; } })()" % cond
+    deadline = time.monotonic() + ms / 1000
+    while True:
+        try:
+            if d.js(probe, timeout=10.0):
+                return True
+        except RuntimeError:                       # StepError, or the CDP's own "no reply within …"
+            pass                                   # a page busy for a moment: ask again within the budget
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.05)
+
+
+# The ready states of this round's cards, as conditions `_wait_js` polls (the screens' FAB_READY, FABV_READY,
+# COSM_READY and DLG_READY loop inside one evaluate, which a loaded machine can push past its reply limit).
+_FAB_OK = ("FAB.open && (FAB.face === 'text' ? !!FAB.flavour : (FAB.build !== null && (FAB.build.error"
+           " || !FAB.build.exists || FAB.compiled !== null)))")
+_FABV_OK = ("FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem' || FABV.text !== null"
+            " || FABV.ferror)))")
+_COSM_OK = "!!document.querySelector('#cosm-body .cosm-card, #cosm-body .cosm-refusal, #cosm-body .cosm-error')"
+_DLG_OK = ("DLG.open && (DLG.face === 'iso' ? (DLG.iso.programs !== null || DLG.iso.error)"
+           " : ((DLG.data && DLG.cosm !== null) || DLG.error))")
+
+
+def _ready(d: Driver, cond: str, ms: int = 60000) -> bool:
+    """A card or viewer has read what it shows (one of the conditions above), polled within a minute."""
+    ok = _wait_js(d, cond, ms)
+    time.sleep(0.12)                               # the paint after the read, as DLG_READY waits for it
+    return ok
 
 
 def _select_text(d: Driver, root_sel: str, text: str) -> dict | None:
@@ -3580,7 +3615,7 @@ def scenario_fabula_decompile_card(d: Driver) -> list[str]:
          " window.fetch = (u, o) => { try { window.__fabCalls.push([String(u), o && o.body ? String(o.body) : '']); }"
          " catch (e) {} return window.__fabFetch(u, o); }; } return true; })()")
     d.js(f"canonDecompileAsk('{FAB_POEM}', 'absent')")
-    d.js_await(FAB_READY[1])
+    _ready(d, _FAB_OK)
     c = _fab_card(d)
     if not c.get("open") or c.get("face") != "text":
         fails.append(f"\"decompile\" did not open the fabula card: {c}")
@@ -3600,9 +3635,9 @@ def scenario_fabula_decompile_card(d: Driver) -> list[str]:
     if (_raw(d, FAB_POEM + ".fabulap.cosm"), _raw(d, FAB_POEM + ".fabulan.cosm")) != before:
         fails.append("closing the card wrote a twin")
     d.js(f"canonDecompileAsk('{FAB_POEM}', 'absent')")
-    d.js_await(FAB_READY[1])
+    _ready(d, _FAB_OK)
     d.click("#fab-go")
-    if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done')).length > 0", 20000):
+    if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done')).length > 0", 90000):
         fails.append("no toast said the fabula was written")
     twin = None
     for _ in range(40):
@@ -3641,7 +3676,7 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
         d.js(f"fabFolderOpen('{FAB_TINY}')")
     else:
         d.click('#tree-context-menu [data-act="fab-build"]')
-    d.js_await(FAB_READY[1])
+    _ready(d, _FAB_OK)
     first = d.js("(() => ({open: FAB.open, exists: FAB.build && FAB.build.exists, landed: FAB.build && FAB.build.landed,"
                  " go: document.getElementById('fab-go').textContent}))()") or {}
     if not first.get("open"):
@@ -3649,7 +3684,7 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
         _reset(d)
         return fails
     d.click("#fab-go")
-    if not _wait_js(d, "FAB.result !== null || FAB.error !== null", 30000):
+    if not _wait_js(d, "FAB.result !== null || FAB.error !== null", 90000):
         fails.append("the build did not finish")
         _reset(d)
         return fails
@@ -3670,7 +3705,7 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
         fails.append(f"no \"open the fabulac\" once it exists: {st}")
     d.click("#fab-open")
     d.wait_for("#cosm-mode.open")
-    d.js_await(COSM_READY[1])
+    _ready(d, _COSM_OK)
     cv = d.js("(() => ({btn: !document.getElementById('cosm-fab-btn').hidden,"
               " outline: !!document.querySelector('#cosm-rail .cosm-scaffold')}))()") or {}
     if not cv.get("btn") or not cv.get("outline"):
@@ -3688,7 +3723,7 @@ def scenario_cshort_read(d: Driver) -> list[str]:
     fails: list[str] = []
     _reset(d)
     d.js(f"fabFolderOpen('{FAB_TOOL}')")
-    d.js_await(FAB_READY[1])
+    _ready(d, _FAB_OK)
     rows = d.js("Array.from(document.querySelectorAll('#fab-compile ul.fab-made-list button[data-fab=\"view\"]'))"
                 ".map((b) => b.dataset.fabPath)") or []
     if FAB_CSHORT not in rows:
@@ -3696,7 +3731,7 @@ def scenario_cshort_read(d: Driver) -> list[str]:
         d.js(f"fabViewOpen('{FAB_CSHORT}')")
     else:
         d.click('#fab-compile button[data-fab="view"][data-fab-path="%s"]' % FAB_CSHORT)
-    d.js_await(FABV_READY[1])
+    _ready(d, _FABV_OK)
     d.js("(() => { const b = Array.from(document.querySelectorAll('#fabv-body button[data-fab=\"file\"]'))"
          ".find((x) => /cli\\.py$/.test(x.dataset.fabPath)); if (b) b.click(); return true; })()")
     _wait_js(d, "FABV.file && /cli\\.py$/.test(FABV.file) && FABV.text !== null", 8000)
@@ -3780,7 +3815,7 @@ def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
     d.js(_DLG_WIRE)
     d.js(f"enterCosmMode({json.dumps(vol)})")
     d.wait_for("#cosm-mode.open")
-    d.js_await(COSM_READY[1])
+    _ready(d, _COSM_OK)
     if not _wait_js(d, "!document.getElementById('cosm-dlg-btn').hidden", 8000):
         fails.append("the cosm viewer offers no questions button on a fabulan")
         _reset(d)
@@ -3791,7 +3826,7 @@ def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
     d.focus("#cosm-dlg-btn")
     d.key("Enter")
     d.wait_for("#dialectic-modal:not(.hidden)")
-    d.js_await(DLG_READY[1])
+    _ready(d, _DLG_OK)
     if not _focus_inside(d, "#dialectic-modal"):
         fails.append(f"the card did not take the focus: {_active(d)}")
 
@@ -3953,14 +3988,14 @@ def scenario_dialectic_holograph_no_cloud(d: Driver) -> list[str]:
     d.js(gate)
     # the probe can see a cloud offer: a fabula with a sitting waiting
     d.js_await(f"(async () => {{ await dlgOpen({json.dumps(DLG_ANSWER.format(lang=lang))}); return true; }})()")
-    d.js_await(DLG_READY[1])
+    _ready(d, _DLG_OK)
     d.js("(() => { DLG.result = {message: 'probe'}; DLG.mainKey = null; dlgPaint(); return true; })()")
     sitting = d.js("(DLG.data.sittings || []).length")
     if sitting and not d.js("!!document.querySelector('#dlg-settle input[name=\"dlg-route\"][value=\"cloud\"]')"):
         fails.append("with the gate open a fabula's settle should offer the cloud (the probe sees nothing)")
     d.js("dlgClose()")
     d.js_await(f"(async () => {{ await dlgOpen({json.dumps(holo)}); return true; }})()")
-    d.js_await(DLG_READY[1])
+    _ready(d, _DLG_OK)
 
     def no_cloud(when: str) -> None:
         bad = d.js("(() => { const m = document.getElementById('dialectic-modal');"
@@ -4030,7 +4065,7 @@ def _raw(d: Driver, path: str) -> str | None:
 def scenario_thym_run_roundtrip(d: Driver) -> list[str]:
     """"run with…" on a text, rules mode, a program that asks no model: the
     programs are listed → choosing count-words plans it ("it can run") → run
-    → the card gives way to the trace in the cosm viewer, one record with its
+    → the card shows what it made, and "show the trace" opens it in the cosm viewer, one record with its
     checks → what landed beside the text is in the tree."""
     fails: list[str] = []
     _reset(d)
@@ -4057,6 +4092,11 @@ def scenario_thym_run_roundtrip(d: Driver) -> list[str]:
     if "count-words" not in cost:
         fails.append(f"the plan's cost line does not name the program: {cost!r}")
     d.click("#thym-go")
+    # 0.6 (U1c): a landed run stays on the card with what it made; the trace is one button away.
+    if not _wait_js(d, "!!document.querySelector('#thym-status [data-topen]') && !document.getElementById('thym-trace-btn').hidden", 20000):
+        fails.append("the landed run did not show what it made on the card: "
+                     + str(d.js("(document.getElementById('thym-status') || {}).innerText")))
+    d.click("#thym-trace-btn")
     if not _wait_js(d, "document.getElementById('cosm-mode').classList.contains('open')"
                        " && /^thym(-run)?:/.test(String(COSM.path))"
                        " && !!document.querySelector('#cosm-body [data-kind=\"R/record\"] .cosm-card')", 20000):
@@ -4445,6 +4485,272 @@ def scenario_agentfree_toggle(d: Driver) -> list[str]:
     return fails
 
 
+
+# ---------------------------------------------------------------------------
+# 0.6 (U1c): writing, checking, planning and running Thym
+# ---------------------------------------------------------------------------
+
+#: Every request the page makes from now on is written down (`window.__u1cWire`), to say what checking did not do.
+_WIRE_ON = ("(() => { if (!window.__u1cWireOn) { const real = window.fetch; window.__u1cWireOn = true;"
+            " window.fetch = (u, o) => { (window.__u1cWire = window.__u1cWire || []).push(String(u)); return real(u, o); }; }"
+            " window.__u1cWire = []; return true; })()")
+
+
+def _ed_text(d: Driver) -> str:
+    return d.js("(document.querySelector('#thym-ed .thym-ed-state') || {}).textContent || ''") or ""
+
+
+def _ed_restore(d: Driver) -> None:
+    d.js("(() => { try { const ta = reEditTextarea(); if (ta) { ta.value = RE_PRISTINE; RE_EDIT_BUFFER = RE_PRISTINE; } }"
+         " catch (e) {} return true; })()")
+
+
+def scenario_thym_editor_checks(d: Driver) -> list[str]:
+    """A program refused at line 9, written by keyboard: the strip says the compiler's own words at line 9
+    (byte for byte what POST /api/thym/compile says) → F8 puts the caret on line 9, the whole line → typing
+    a fix over it, the strip says it compiles, after a pause and with no click → shift+F8 does nothing once
+    clean → checking asked nothing but the compile route: no plan, no run, no model."""
+    fails: list[str] = []
+    _reset(d)
+    want = d.js_await("(async () => { const src = await (await fetch('/api/file/raw?path=' + encodeURIComponent(%s))).text();"
+                      " const r = await fetch('/api/thym/compile', {method: 'POST', headers: {'Content-Type': 'application/json'},"
+                      " body: JSON.stringify({text: src})}); return r.ok ? await r.json() : null; })()" % json.dumps(THYM_BROKEN))
+    if not want or not want.get("refusal"):
+        return [f"POST /api/thym/compile did not refuse {THYM_BROKEN}: {want}"]
+    msg = want["refusal"]["message"]
+    d.js(_WIRE_ON)
+    d.js_await("(async () => { await openReadEdit(%s, {size: 'full', face: 'edit'}); return true; })()" % json.dumps(THYM_BROKEN))
+    if not _wait_js(d, "!!document.querySelector('#thym-ed.refused')"):
+        fails.append(f"the strip did not show the refusal: {_ed_text(d)!r}")
+        _ed_restore(d)
+        _reset(d)
+        return fails
+    said = _ed_text(d)
+    if msg not in said:
+        fails.append(f"the strip does not carry the compiler's words ({msg!r}): {said!r}")
+    if str(THYM_BROKEN_LINE) not in (d.js("(document.querySelector('#thym-ed [data-ted=\"go\"]') || {}).textContent || ''") or ""):
+        fails.append(f"the refusal's line is not line {THYM_BROKEN_LINE}: {said!r}")
+    live = d.js("(document.querySelector('#thym-ed .thym-ed-state') || {}).getAttribute('aria-live')")
+    if live != "polite":
+        fails.append(f"the strip's words are not a polite live region: aria-live={live!r}")
+    if "thym 1" not in (d.js("document.querySelector('#thym-ed .thym-ed-detail').textContent") or ""):
+        fails.append("the strip does not say which version line the program reads")
+    d.focus("#edit-textarea")
+    d.js("(() => { const ta = document.getElementById('edit-textarea'); ta.setSelectionRange(0, 0); return true; })()")
+    d.key("F8")
+    sel = d.js("(() => { const ta = document.getElementById('edit-textarea');"
+               " return {active: document.activeElement === ta, text: ta.value.slice(ta.selectionStart, ta.selectionEnd),"
+               " line: ta.value.slice(0, ta.selectionStart).split('\\n').length}; })()") or {}
+    if not sel.get("active") or sel.get("line") != THYM_BROKEN_LINE or "frobnicate" not in (sel.get("text") or ""):
+        fails.append(f"F8 did not select line {THYM_BROKEN_LINE} in the editor: {sel}")
+    d.type_text("  let x = words story")
+    if not _wait_js(d, "!!document.querySelector('#thym-ed.clean')", 8000):
+        fails.append(f"after typing a fix the strip did not say it compiles: {_ed_text(d)!r}")
+    d.key("Shift+F8")
+    still = d.js("document.activeElement && document.activeElement.id") or ""
+    if still != "edit-textarea":
+        fails.append(f"shift+F8 on a clean program moved focus to {still!r}")
+    wire = d.js("window.__u1cWire || []") or []
+    bad = [u for u in wire if re.search(r"/api/thym/(plan|run)\b|/api/chat|/api/fabula/(derive|compile)", u)]
+    if bad:
+        fails.append(f"checking a program asked for more than a compile: {bad}")
+    if not any("/api/thym/compile" in u for u in wire):
+        fails.append(f"the strip never asked the compiler: {wire}")
+    _ed_restore(d)
+    _reset(d)
+    return fails
+
+
+def scenario_thym_moves_put(d: Driver) -> list[str]:
+    """The moves at hand, by keyboard: from the editor's strip, "the moves…" opens Thym at hand with the search
+    focused → typing "cut" leaves the moves that say it → arrow down reaches cut's "put it in" → Enter closes the
+    dialog and writes `cut short` at the caret, `short` selected for the person to rename, focus in the text →
+    the strip checks again. Esc closes the dialog and gives focus back to the button that opened it."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await(thym_moves_stub_js())
+    d.js_await("(async () => { await openReadEdit(%s, {size: 'full', face: 'edit'}); return true; })()" % json.dumps(THYM_TWO))
+    if not _wait_js(d, "!!document.querySelector('#thym-ed.clean')"):
+        fails.append(f"{THYM_TWO} did not compile clean in the strip: {_ed_text(d)!r}")
+    d.js("(() => { const ta = document.getElementById('edit-textarea'); const at = ta.value.indexOf('  give n:');"
+         " ta.focus(); ta.setSelectionRange(at, at); return true; })()")
+    d.focus("#thym-ed [data-ted='moves']")
+    d.key("Enter")
+    if not _wait_js(d, "!document.getElementById('thym-ref-modal').classList.contains('hidden')"
+                       " && document.activeElement && document.activeElement.id === 'thym-ref-q'"
+                       " && !!document.querySelector('#thym-ref-list article.tref-move')"):
+        fails.append("the moves did not open with the search focused: "
+                     + str(d.js("({active: document.activeElement && document.activeElement.id,"
+                                " body: (document.getElementById('thym-ref-body') || {}).innerText})")))
+        _reset(d)
+        return fails
+    groups = d.js("Array.from(document.querySelectorAll('#thym-ref-list .thym-ref-group h4 code')).map((c) => c.textContent)") or []
+    if not groups or groups[0] != "thym/1" or "fabula/1" not in groups:
+        fails.append(f"the moves are not grouped by the format that declares them: {groups}")
+    d.type_text("cut")
+    if not _wait_js(d, "Array.from(document.querySelectorAll('#thym-ref-list article.tref-move')).every((a) =>"
+                       " a.textContent.toLowerCase().includes('cut')) && !!document.querySelector('[data-tref-put=\"cut\"]')"):
+        fails.append("searching for cut did not leave only the moves that say it")
+    d.key("ArrowDown")
+    if d.js("(document.activeElement || {}).dataset && document.activeElement.dataset.trefPut") != "cut":
+        fails.append("arrow down from the search did not reach cut's \"put it in\": "
+                     + str(d.js("document.activeElement && document.activeElement.outerHTML.slice(0, 120)")))
+        d.focus("[data-tref-put='cut']")
+    d.key("Enter")
+    if not _wait_js(d, "document.getElementById('thym-ref-modal').classList.contains('hidden')"
+                       " && document.activeElement && document.activeElement.id === 'edit-textarea'"):
+        fails.append("\"put it in\" did not close the dialog and return to the text")
+    got = d.js("(() => { const ta = document.getElementById('edit-textarea'); return {sel: ta.value.slice(ta.selectionStart,"
+               " ta.selectionEnd), before: ta.value.slice(Math.max(0, ta.selectionStart - 4), ta.selectionStart)}; })()") or {}
+    if got.get("sel") != "short" or not str(got.get("before", "")).endswith("cut "):
+        fails.append(f"the call was not written at the caret with its operand selected: {got}")
+    # Esc gives focus back to the opener.
+    d.focus("#thym-ed [data-ted='moves']")
+    d.key("Enter")
+    _wait_js(d, "!document.getElementById('thym-ref-modal').classList.contains('hidden')")
+    d.js("(() => { const q = document.getElementById('thym-ref-q'); if (q) { q.value = ''; q.dispatchEvent(new Event('input', {bubbles: true})); } return true; })()")
+    d.key("Escape")
+    if not _wait_js(d, "document.getElementById('thym-ref-modal').classList.contains('hidden')"
+                       " && document.activeElement && document.activeElement.dataset.ted === 'moves'", 4000):
+        fails.append("Esc did not close Thym at hand and return focus to \"the moves…\": "
+                     + str(d.js("document.activeElement && document.activeElement.outerHTML.slice(0, 120)")))
+    _ed_restore(d)
+    _reset(d)
+    return fails
+
+
+def scenario_thym_run_folder_outputs(d: Driver) -> list[str]:
+    """Run with… a thym 1 program that takes a folder and a short, inputs typed by keyboard: one field per input,
+    the folder field offering the project's folders → the plan reads the loop with its passes, the folder's files
+    and the two outputs and where they land → run → the card stays, both outputs by name with "open" → the
+    landed files are in the tree → opened again, the program remembers what it was given."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await("(async () => { localStorage.removeItem('enough.thym.inputs'); await thymRunOpen({program: %s});"
+               " return true; })()" % json.dumps(THYM_TWO))
+    if not _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-take]').length === 2"
+                       " && document.activeElement && document.activeElement.dataset.take === 'repo'"):
+        fails.append("the card did not show two inputs with the first focused: "
+                     + str(d.js("(document.getElementById('thym-inputs') || {}).innerText")))
+        _reset(d)
+        return fails
+    offered = d.js("Array.from(document.querySelectorAll('#thym-in-0-dl option')).map((o) => o.value)") or []
+    if THYM_REPO not in offered or any(not v.endswith("/") for v in offered):
+        fails.append(f"the folder input does not offer the project's folders only: {offered[:8]}")
+    d.type_text(THYM_REPO)
+    d.key("Tab")
+    d.type_text(THYM_LONG)
+    d.key("Enter")
+    if not _wait_js(d, "!!document.querySelector('#thym-plan ol.thym-plan-read') && !document.getElementById('thym-go').disabled", 60000):
+        fails.append("the plan did not come: " + str(d.js("(document.getElementById('thym-plan') || {}).innerText")))
+        _reset(d)
+        return fails
+    plan = d.js("document.getElementById('thym-plan').innerText") or ""
+    # the loop's line by its number (the words around it are the UI language's)
+    lines = d.js("Array.from(document.querySelectorAll('#thym-plan ol.thym-plan-read .thym-plan-line'))"
+                 ".map((x) => (x.textContent.match(/\\d+/) || [''])[0])") or []
+    if "9" not in lines:
+        fails.append(f"the plan does not show the loop at line 9: {lines}")
+    for want in ("little-repo.n.", "little-repo.listing."):
+        if want not in plan:
+            fails.append(f"the plan does not say {want!r}: {plan!r}")
+    if not d.js("!!document.querySelector('#thym-plan .thym-plan-sub')"):
+        fails.append("the plan says nothing of the loop or the folder it reads")
+    d.focus("#thym-go")
+    d.key("Enter")
+    if not _wait_js(d, "document.querySelectorAll('#thym-status [data-topen]').length === 2", 90000):
+        fails.append("a landed run did not list its two outputs: "
+                     + str(d.js("(document.getElementById('thym-status') || {}).innerText")))
+        _reset(d)
+        return fails
+    names = d.js("Array.from(document.querySelectorAll('#thym-status ul.thym-outs li > code')).map((c) => c.textContent)") or []
+    if names != ["n", "listing"]:
+        fails.append(f"the outputs are not shown by name in the program's order: {names}")
+    if d.js("document.activeElement && document.activeElement.dataset.topen") is None:
+        fails.append("focus did not move to the first output's open")
+    for rel in ("orchard/little-repo.n.txt", "orchard/little-repo.listing.md"):
+        if not _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(rel)):
+            fails.append(f"{rel} landed but is not in the tree")
+    d.key("Escape")
+    _wait_js(d, "document.getElementById('thym-modal').classList.contains('hidden')")
+    d.js_await("(async () => { await thymRunOpen({program: %s}); return true; })()" % json.dumps(THYM_TWO))
+    _wait_js(d, "document.querySelectorAll('#thym-inputs input[data-take]').length === 2")
+    kept = d.js("Array.from(document.querySelectorAll('#thym-inputs input[data-take]')).map((i) => i.value)") or []
+    if kept != [THYM_REPO, THYM_LONG]:
+        fails.append(f"opened again, the program did not remember its inputs: {kept}")
+    _reset(d)
+    return fails
+
+
+def scenario_thym_shipped_copy(d: Driver) -> list[str]:
+    """The shipped programs are a place to start: the programs tab lists all nine with their why: lines → "copy
+    into this project to change it" on tighten writes a copy in the project's programs/, byte for byte the shipped
+    source, and opens it in the editor saying it is a copy → the shipped file is untouched."""
+    fails: list[str] = []
+    _reset(d)
+    shipped = d.js_await("(async () => { const r = await fetch('/api/thym/programs'); const j = await r.json();"
+                         " return j.programs.filter((p) => p.where === 'shipped').length; })()")
+    before = d.js_await("(async () => (await (await fetch('/api/thym/program?path=tighten.thym')).json()).source)()")
+    d.js("(() => { thymRefOpen('programs'); return true; })()")
+    if not _wait_js(d, "document.querySelectorAll('#thym-ref-list article.tref-prog').length > 0"):
+        fails.append("the programs tab listed nothing")
+        _reset(d)
+        return fails
+    listed = d.js("document.querySelectorAll('#thym-ref-list article.tref-prog').length")
+    if listed != shipped:
+        fails.append(f"the programs tab lists {listed} programs; {shipped} are shipped")
+    whys = d.js("document.querySelectorAll('#thym-ref-list article.tref-prog p.tref-says').length")
+    if whys != shipped:
+        fails.append(f"{whys} of {shipped} programs show their why: line")
+    d.click("[data-tref-copy='tighten.thym']")
+    if not _wait_js(d, "typeof RE_PATH === 'string' && /^programs\\/tighten(-\\d+)?\\.thym$/.test(RE_PATH) && RE_FACE === 'edit'"
+                       " && !!document.querySelector('#thym-ed.clean')", 12000):
+        fails.append("the copy did not open in the editor: " + str(d.js("({path: RE_PATH, face: RE_FACE})")))
+        _reset(d)
+        return fails
+    copy = d.js("RE_PATH")
+    text = _raw(d, copy)
+    if text != before:
+        fails.append(f"{copy} is not the shipped source byte for byte")
+    if "tighten.thym" not in (d.js("document.querySelector('#thym-ed .thym-ed-detail').textContent") or ""):
+        fails.append("the editor does not say the program is a copy of tighten.thym")
+    shipped_now = d.js_await("(async () => { const r = await fetch('/api/thym/programs'); const j = await r.json();"
+                             " const p = j.programs.find((x) => x.where === 'shipped' && x.rel === 'tighten.thym');"
+                             " return p ? p.name : null; })()")
+    if shipped_now != "tighten":
+        fails.append(f"the shipped tighten is not listed as it was: {shipped_now!r}")
+    _reset(d)
+    return fails
+
+
+def scenario_thym_settle_from_dialectic(d: Driver) -> list[str]:
+    """The dialectic's second run, offered where it makes sense: on a fabula with a sitting, the card offers
+    settle-the-answers on that sitting → the run card opens on the shipped program with its fabula and the
+    sitting's answers given, and its plan (here: refused, no model, at its statement) shows before anything runs."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await("(async () => { await dlgOpen(%s); return true; })()" % json.dumps(DLG_SITTING))
+    if not _wait_js(d, "!!document.querySelector('[data-dlg=\"thym-settle\"]')", 10000):
+        fails.append("the dialectic card does not offer settle-the-answers on its sitting: "
+                     + str(d.js("(document.getElementById('dlg-body') || document.getElementById('dialectic-modal') || {}).innerText")))
+        _reset(d)
+        return fails
+    said = d.js("document.querySelector('[data-dlg=\"thym-settle\"]').dataset.dlgPath")
+    d.click("[data-dlg='thym-settle']")
+    if not _wait_js(d, "!document.getElementById('thym-modal').classList.contains('hidden')"
+                       " && !!document.querySelector('#thym-plan .thym-refusal, #thym-plan ol.thym-plan-read')", 12000):
+        fails.append("the run card did not open with a plan")
+        _reset(d)
+        return fails
+    got = d.js("Object.fromEntries(Array.from(document.querySelectorAll('#thym-inputs input[data-take]')).map((i) => [i.dataset.take, i.value]))") or {}
+    if got.get("f") != DLG_SITTING or got.get("said") != said:
+        fails.append(f"the program's inputs are not the fabula and the sitting: {got}")
+    if d.js("document.getElementById('dialectic-modal').classList.contains('hidden')") is not True:
+        fails.append("the dialectic card stayed open under the run card")
+    _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -4527,4 +4833,10 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.6: the fabula round (U1b): the dialectic card ---
     "dialectic-answer-kinds": scenario_dialectic_answer_kinds,
     "dialectic-holograph-no-cloud": scenario_dialectic_holograph_no_cloud,
+    # --- 0.6: writing and running Thym (U1c) ---
+    "thym-editor-checks": scenario_thym_editor_checks,
+    "thym-moves-put": scenario_thym_moves_put,
+    "thym-run-folder-outputs": scenario_thym_run_folder_outputs,
+    "thym-shipped-copy": scenario_thym_shipped_copy,
+    "thym-settle-from-dialectic": scenario_thym_settle_from_dialectic,
 }

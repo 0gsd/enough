@@ -196,6 +196,49 @@ program count-words
 end
 """
 HARVEST = "harvest.md"
+# Writing and running Thym (0.6, U1c), beside the orchard notes: a program
+# refused at a known line (an unknown move on line 9, the compiler's words
+# name it), a `thym 1` program that takes a folder and a short and gives two
+# outputs (asks no model, so a scratch server runs it by rules), the folder
+# it reads, and a short whose long line `tighten` (shipped; it asks a model)
+# would reword, so its plan shows a model step refused at its statement.
+THYM_BROKEN = "broken.thym"
+THYM_BROKEN_LINE = 9
+FIXTURE_BROKEN = """thym 1
+
+program broken
+  why: a program the compiler refuses at line 9, by name.
+
+  takes story: text
+  gives n: number
+
+  let x = frobnicate story
+  give words story
+end
+"""
+THYM_TRIES_RUN = "2026-11-05-1956-ae6e"
+THYM_TWO = "two-outs.thym"
+FIXTURE_TWO = """thym 1
+
+program two-outs
+  why: a folder's Python files listed one to a line, and how many files a short has beside it.
+
+  takes repo: folder, s: short
+  gives n: number, listing: short
+
+  let rows = for each p in repo where suffix is py
+    keep join [p.path, (say p.lines)] with " · "
+  end
+  give n: count repo
+  give listing: join rows
+end
+"""
+THYM_REPO = "little-repo"
+FIXTURE_REPO = {"tool.py": "def tool():\n    return 1\n", "lib/util.py": "X = 2\n", "README.md": "# little repo\n"}
+THYM_LONG = "long-lines.md"
+FIXTURE_LONG = ("A short line.\n\nThis line runs on for far longer than thirty words, so that the shipped tighten "
+                "program has a line to reword, and its plan has a step that asks a model, which a scratch server cannot "
+                "answer, so the plan says so at the statement.\n")
 # The package and unpack cards (0.5.0, U2). The author's morph beside the
 # notes (a copy of the package's measured one), so "package…" packs a morph
 # as well — and a re-packed notes.thym/ keeps the scales the EMF face draws.
@@ -270,6 +313,10 @@ FABULA_RUNS = ("survey-the-repo", "read-the-history", "read-every-file", "fold-t
 #   no questions yet (raise the questions).
 DIALECTIC_DIR = "talks"
 DIALECTIC_FIXTURES = REPO / "tests" / "fixtures" / "dialectic"
+# The check's own guide, twin and sitting (0.6, U1c): copies of the suite's as they stood at 43f70be (the twin with
+# its nine questions, the sitting answering the summary and who). The suite's fixtures follow the specification's
+# example and change with it; the screens and scenarios count questions, so they read these, which nothing else moves.
+DIALECTIC_OWN = Path(__file__).resolve().parent / "fixtures" / "dialectic"
 ASCRIBE_FIXTURES = REPO / "tests" / "fixtures" / "ascribe"
 DIALECTIC_KINDS = """  - id: D:question/tone
     type: question
@@ -417,8 +464,8 @@ def _seed_dialectic(talks: Path) -> None:
     import datetime as _dt
     from enough import ascribe as _a
     from enough import macrocosm as _mc
-    guides = FABULA_FIXTURES / "guides"
-    twin = (THYM_FIXTURES / "inputs" / "close.md.fabulan.cosm").read_text(encoding="utf-8")
+    guides = DIALECTIC_OWN
+    twin = (DIALECTIC_OWN / "close.md.fabulan.cosm").read_text(encoding="utf-8")
     for name in ("kinds", "sitting", "bare") + tuple(f"answer-{lang}" for lang in DIALECTIC_LANGS):
         d = talks / name
         d.mkdir(parents=True, exist_ok=True)
@@ -434,7 +481,7 @@ def _seed_dialectic(talks: Path) -> None:
                 "\n      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: "
                 "[D:session/session-1], confidence: 1}}", "")
         (d / "close.md.fabulan.cosm").write_text(text, encoding="utf-8")
-    shutil.copyfile(DIALECTIC_FIXTURES / "close.md.fabulan.answers-2026-11-05-1200.cosm",
+    shutil.copyfile(DIALECTIC_OWN / "close.md.fabulan.answers-2026-11-05-1200.cosm",
                     talks / "sitting" / "close.md.fabulan.answers-2026-11-05-1200.cosm")
     shutil.copytree(ASCRIBE_FIXTURES / "bad" / "pii", talks / "self-pii", dirs_exist_ok=True)
     at = _dt.datetime(2026, 11, 5, 19, 30, tzinfo=_dt.timezone.utc)
@@ -506,8 +553,42 @@ def _seed_thym(orchard: Path) -> None:
     (orchard / THYM_READING).write_text(FIXTURE_READING, encoding="utf-8")
     (orchard / THYM_RULES_PROGRAM).write_text(FIXTURE_RULES_PROGRAM, encoding="utf-8")
     (orchard / HARVEST).write_text(FIXTURE_HARVEST, encoding="utf-8")
+    (orchard / THYM_BROKEN).write_text(FIXTURE_BROKEN, encoding="utf-8")
+    # A tighten run whose first reword failed `length` and was asked again (its record keeps the try).
+    shutil.copyfile(THYM_FIXTURES / "replay" / "tighten" / THYM_TRIES_RUN / f"{THYM_TRIES_RUN}.trace.cosm",
+                    orchard / f"{THYM_TRIES_RUN}.trace.cosm")
+    (orchard / THYM_TWO).write_text(FIXTURE_TWO, encoding="utf-8")
+    (orchard / THYM_LONG).write_text(FIXTURE_LONG, encoding="utf-8")
+    for rel, text in FIXTURE_REPO.items():
+        f = orchard / THYM_REPO / rel
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(text, encoding="utf-8")
     shutil.copyfile(THYM_REPLAY / "outputs" / "notes.thym" / "morph.cosm", orchard / THYM_MORPH)
     _seed_sealed(orchard)
+
+
+def thym_moves_payload(version: int) -> dict[str, Any]:
+    """What `GET /api/thym/moves?version=<0|1>` answers (docs/fabula-landed-U1c.md: the route the page codes
+    against and the server does not have yet): every move a program of that grammar may call, from the
+    declarations a compile reads (the bundled manifests), in the shape of the `thym_moves` tool's lines. The
+    moves reference in the page reads this; the check hands it to the page when the server cannot."""
+    from enough import thym_tools as _tt
+    from enough.thym import declarations as _decls
+    full = _decls.load()
+    seen = full.view(version)
+    views = {v: full.view(v) for v in (0, 1)}
+    moves = []
+    for name in sorted(seen):
+        d = seen[name]
+        mods = {k: list(v) for k, v in dict(d.modifiers or {}).items()}
+        of = mods.pop("of", None) if not d.takes else None
+        moves.append({"name": name, "owner": d.owner, "format": f"{d.owner}/1",
+                      "source": Path(d.source).name if d.source else None, "since": d.since,
+                      "versions": [v for v in (0, 1) if name in views[v]],
+                      "signature": _tt.move_signature(d), "takes": [list(t) for t in d.takes], "of": of,
+                      "modifiers": mods, "gives": list(d.gives), "asks": bool(d.asks), "scaffold": d.scaffold,
+                      "contract": list(d.contract), "says": " ".join(str(d.says or "").split())})
+    return {"version": version, "moves": moves}
 
 
 def _seed_sealed(orchard: Path) -> None:

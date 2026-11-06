@@ -75,6 +75,13 @@ THYM_MORPH = "orchard/notes.morph.cosm"
 THYM_SEALED = "orchard/received/notes.thym.enc"
 #: What the key screen paints in place of a real key: it seals nothing.
 THYM_PLACEHOLDER_KEY = "AAAA-BBBB-CCCC-DDDD-EEEE-FFFF"
+# Writing and running Thym (0.6, U1c): seeded by server._seed_thym().
+THYM_BROKEN = "orchard/broken.thym"              # refused at line 9: an unknown move
+THYM_BROKEN_LINE = 9
+THYM_TWO = "orchard/two-outs.thym"               # thym 1: a folder and a short in, two outputs, no model
+THYM_REPO = "orchard/little-repo/"
+THYM_LONG = "orchard/long-lines.md"              # a short with a line `tighten` (shipped, asks a model) would reword
+THYM_TRIES = "orchard/2026-11-05-1956-ae6e.trace.cosm"
 # The fabula round (0.6, U1a), seeded by server._seed_fabula() in works/: a
 # Python tool with its finished fabulac, the cshort and the catem it compiled
 # into, a folder of Python with no fabulac yet, a poem with no twin and a
@@ -270,6 +277,52 @@ THYM_UNPACK_READY: Step = ("eval_await", """(async () => {
   return true; })()""")
 #: Closes the package card even with a key showing (only "I have it" does, by hand).
 THYM_PACK_CLOSE: Step = ("eval", "(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
+
+
+def thym_moves_stub_js() -> str:
+    """JS that hands the page `GET /api/thym/moves`' answer when the server has no such route yet (U1c asked for
+    it): the same shape, built by the harness from the declarations a compile reads (server.thym_moves_payload).
+    When the route answers, nothing is stubbed and the page reads the server."""
+    from . import server as _server
+    payload = json.dumps({str(v): _server.thym_moves_payload(v) for v in (0, 1)})
+    return ("(async () => { try { const r = await fetch('/api/thym/moves?version=1'); if (r.ok) return true; } catch (e) {}"
+            " if (window.__thymMovesStub) return true; const data = " + payload + ";"
+            " const real = window.fetch; window.__thymMovesStub = true;"
+            " window.fetch = (u, o) => { const m = /^\\/api\\/thym\\/moves\\?version=(\\d)/.exec(String(u));"
+            " if (m && data[m[1]]) return Promise.resolve(new Response(JSON.stringify(data[m[1]]),"
+            " {status: 200, headers: {'Content-Type': 'application/json'}})); return real(u, o); };"
+            " return true; })()")
+
+
+def _thym_edit(path: str, size: str = "full") -> Step:
+    """A program open in the editor, its check strip drawn (clean or refused)."""
+    root = "#thym-ed" if size == "full" else "#thym-ed-mini"
+    return ("eval_await", "(async () => { await openReadEdit(%s, {size: %s, face: 'edit'});"
+                          " for (let i = 0; i < 200 && !document.querySelector(%s); i++)"
+                          " await new Promise((r) => setTimeout(r, 50)); return true; })()"
+            % (json.dumps(path), json.dumps(size), json.dumps(root + ".refused, " + root + ".clean")))
+
+
+#: The editor's text back as it is on disk, so a teardown never meets the dirty guard.
+THYM_EDIT_CLEAN: Step = ("eval", "(() => { try { const ta = reEditTextarea(); if (ta) { ta.value = RE_PRISTINE;"
+                                 " RE_EDIT_BUFFER = RE_PRISTINE; } } catch (e) {} return true; })()")
+#: The run card's plan has drawn (its steps, or a refusal at its statement).
+THYM_PLAN_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector('#thym-plan ol.thym-plan-read, #thym-plan .thym-refusal,'
+       + ' #thym-plan .thym-unavail'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+
+
+def _thym_run_on(program: str, inputs: dict[str, str] | None = None, text: str | None = None) -> Step:
+    """"run with…" opened from a program, its inputs given (as the dialectic card gives them), planned."""
+    return ("eval_await", "(async () => { await thymRunOpen({program: %s, inputs: %s, input: %s});"
+                          " return true; })()" % (json.dumps(program), json.dumps(inputs), json.dumps(text)))
+
+
+THYM_REF_CLOSE: Step = ("eval", "(() => { try { thymRefClose(); } catch (e) {} return true; })()")
+THYM_PICK_CLOSE: Step = ("eval", "(() => { try { thymPickClose(); } catch (e) {} return true; })()")
 
 
 def _thym_pick(text: str, program: str) -> Step:
@@ -1122,6 +1175,93 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=EXIT_ALL_MODES,
            note="a reading open in the full reader: the band under the toolbar, "
                 "\"read through null\" and the footer line, with the (?)"),
+
+    # --- 0.6, Thym (U1c): writing a program, the moves at hand, a plan to read, run with every input ---
+    Screen("thym-editor", "project",
+           setup=(_thym_edit(THYM_BROKEN), ("wait_for", "#thym-ed.refused"), ("wait_idle", "")),
+           teardown=(THYM_EDIT_CLEAN,) + EXIT_ALL_MODES,
+           note="a program refused at line 9 in the full editor: the strip under the toolbar with the line as a "
+                "button, the check and the compiler's own words, the version line it reads, F8's line, the "
+                "moves… and plan and run… buttons and the (?)"),
+
+    Screen("thym-editor-mini", "project",
+           setup=(_thym_edit(THYM_TWO, "mini"), ("wait_for", "#thym-ed-mini.clean"), ("wait_idle", "")),
+           teardown=(THYM_EDIT_CLEAN,) + EXIT_ALL_MODES,
+           note="a thym 1 program that compiles, in the mini editor: the strip above the text says so, the "
+                "version line, what it takes and gives, its steps"),
+
+    Screen("thym-moves", "project",
+           setup=(("eval_await", thym_moves_stub_js()), _thym_edit(THYM_TWO), ("wait_for", "#thym-ed.clean"),
+                  ("eval", "(() => { thymRefOpen('moves'); return true; })()"),
+                  ("wait_for", "#thym-ref-modal:not(.hidden) article.tref-move"), ("wait_idle", "")),
+           teardown=(THYM_REF_CLOSE, THYM_EDIT_CLEAN) + EXIT_ALL_MODES,
+           note="Thym at hand over the editor, its moves tab: the search, thym 1 / thym 0, where \"put it in\" "
+                "writes, the count, the moves grouped by the format that declares them, each with its "
+                "signature, whether it asks, its contract, its scaffold, an example and \"put it in\""),
+
+    Screen("thym-programs", "project",
+           setup=(("eval", "(() => { thymRefOpen('programs'); return true; })()"),
+                  ("wait_for", "#thym-ref-modal:not(.hidden) article.tref-prog"), ("wait_idle", "")),
+           teardown=(THYM_REF_CLOSE,) + EXIT_ALL_MODES,
+           note="the programs to start from: every shipped program with its version, file, why: line, what "
+                "it takes and gives, read it and copy into this project to change it"),
+
+    Screen("thym-run-inputs", "project",
+           setup=(_thym_run_on(THYM_TWO, {"repo": THYM_REPO, "s": THYM_LONG}),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY, ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="run with… a thym 1 program that takes a folder and a short: an input row for each with what "
+                "it takes and what a folder's run reads, the plan's steps at their lines with the loop said "
+                "with its passes, what it reads (the folder's files and bytes) and what it will write, two "
+                "outputs, beside the folder"),
+
+    Screen("thym-run-asks", "project",
+           setup=(_thym_run_on("tighten.thym", None, THYM_LONG),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY, ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="the shipped tighten on a short: its plan asks a model and none is here, so it is refused at "
+                "its statement (quoted, at its line), and the loop over the short's lines is said to be known "
+                "only at run time, keeping its contract"),
+
+    Screen("thym-run-landed", "project",
+           setup=(_thym_run_on(THYM_TWO, {"repo": THYM_REPO, "s": THYM_LONG}),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY,
+                  ("eval", "(() => { Object.assign(THYM_PICK, {result: {run: 'seed', outcome: 'landed',"
+                           " atem: 'ran two-outs on little-repo, long-lines.md in 0 s: 3 steps, all checks green',"
+                           " outputs: [{name: 'n', type: 'number', rel: 'orchard/little-repo.n.txt'},"
+                           " {name: 'listing', type: 'short', rel: 'orchard/little-repo.listing.md'}]}});"
+                           " thymPickPaint(); return true; })()"),
+                  ("wait_for", "#thym-status [data-topen]"), ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="a landed run of two outputs: what it made, each by its name and type with open and its path, "
+                "show the trace in the foot (the result is placed by the screen: it runs nothing)"),
+
+    Screen("thym-run-refused", "project",
+           setup=(_thym_run_on("tighten.thym", None, THYM_LONG),
+                  ("wait_for", "#thym-modal:not(.hidden)"), THYM_PLAN_READY,
+                  ("eval", "(() => { Object.assign(THYM_PICK, {result: {run: 'seed', outcome: 'refused',"
+                           " atem: 'ran tighten on long-lines.md in 31 s: refused at step 1',"
+                           " refusal: {stage: 'run', check: 'shorter', line: 18, message: '`give reword l to 30 words`"
+                           " (line 18, for l = line 3): the reworded line is not shorter than the line it replaces'},"
+                           " outputs: []}, told: [{name: 'let changes = for each l in lines of s where words l > 30',"
+                           " attempts: 3, failed: [{name: 'shorter', why: 'the reworded line is not shorter than the"
+                           " line it replaces'}], tries: [{attempt: 1, failed: [{name: 'length', why: '34 words, more"
+                           " than 30'}]}, {attempt: 2, failed: [{name: 'shorter', why: 'the reworded line is not"
+                           " shorter than the line it replaces'}]}, {attempt: 3, failed: [{name: 'shorter', why:"
+                           " 'the reworded line is not shorter than the line it replaces'}]}]}]});"
+                           " thymPickPaint(); return true; })()"),
+                  ("wait_for", "#thym-status .thym-told"), ("wait_idle", "")),
+           teardown=(THYM_PICK_CLOSE,) + EXIT_ALL_MODES,
+           note="a run its contract refused: the refusal in the runtime's words, the condition that failed in "
+                "the contract's own words, and what the model was told each time it was asked again (placed by "
+                "the screen from a recorded trace's shape: it runs nothing)"),
+
+    Screen("thym-trace-tries", "project",
+           setup=(("eval", f"enterCosmMode('{THYM_TRIES}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a recorded tighten run whose first reword failed length and was asked again: the record's "
+                "attempts that failed, folded, each with what the next ask was told"),
 
     # --- 0.5.0, Thym (U2): a package made, its key shown once, a package unpacked ---
     Screen("thym-package", "project",

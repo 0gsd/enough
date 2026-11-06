@@ -143,6 +143,10 @@ _KEYS = {
                   "windowsVirtualKeyCode": 40, "nativeVirtualKeyCode": 40},
     "Backspace": {"key": "Backspace", "code": "Backspace",
                   "windowsVirtualKeyCode": 8, "nativeVirtualKeyCode": 8},
+    # Thym (0.6, U1c): F8 steps to the line the compiler names, shift+F8 back.
+    "F8": {"key": "F8", "code": "F8", "windowsVirtualKeyCode": 119, "nativeVirtualKeyCode": 119},
+    "Shift+F8": {"key": "F8", "code": "F8", "windowsVirtualKeyCode": 119, "nativeVirtualKeyCode": 119,
+                 "modifiers": 8},
 }
 
 

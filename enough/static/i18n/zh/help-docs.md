@@ -627,3 +627,33 @@ path: *.read-*-YYYY-MM-DD-HHMM.md
 - 透过你自己的 morph 读一封信，听听换作你会怎么说，然后再回去读原信。
 - 把读本都留着：每一份都写着它的 morph 和日期，你可以把同一份文本的几份读本并排摆着看。
 - 帮助中心的第 12.6 节讲读本和它的标注；第 13.4 节讲它们所透过的那些 morph。
+
+## thym-editor
+name: 正在写的程序
+path: *.thym in the editor
+
+### what
+在编辑器里打开一个 <code>.thym</code> 文件，工具栏下方的条每当你停下来就会说出<strong>编译器</strong>的看法：<em>可以编译</em>，或者它拒绝的那一行、拒绝它的检查，以及编译器自己的话——它会点出那条语句，知道怎么改时也会说出改法。它还说明第一行要求哪种语法——<code>thym 0</code> 还是 <code>thym 1</code>，以及 <code>thym 0</code> 程序要用 <code>thym 1</code> 的词得写什么——一旦能编译，还会说出程序接收什么、给出什么，有几步要问模型。检查只读不做：什么都不运行，也不问任何模型。
+
+### how
+<kbd>F8</kbd> 把光标放到编译器指出的那一行，并选中整行；<kbd>shift</kbd>+<kbd>F8</kbd> 回退。<strong>动作…</strong> 打开手边的 Thym，在那里<strong>放进去</strong>会把调用写在光标处。<strong>计划并运行…</strong> 为这个程序打开“运行程序…”：计划和运行读取的是已保存的文件，所以要先保存，才能计划你看到的内容。附带的程序从不在原处编辑：把它复制到项目里（从它的页面，或从可以起步的程序里），然后改副本。
+
+### ideas
+- 先写版本行：<code>thym 1</code> 打开文件夹、收集的循环、<code>keeps</code>、<code>depth</code> 和多个输出。
+- 把拒绝留在屏幕上读完：它会说明是哪条语句，通常还会说该改写成什么。
+- 让程序保持小巧，交给它长时间运行之前，先用真实的输入计划一遍。
+
+## thym-moves
+name: 手边的 Thym
+path: the moves, and the programs to start from
+
+### what
+<strong>动作</strong>是程序可以调用的所有步骤，来自编译器读取的声明：每个都附有签名（接收什么、像 <code>as</code>、<code>with</code>、<code>to</code> 这样的词、给出什么）、是否要问模型、契约守住的检查、按规则运行时用的脚手架、声明它的格式，以及是否只有 <code>thym 1</code> 能看到。它们按那个格式分组，可以用其中任何一个词搜索。<strong>可以起步的程序</strong>是 enough 附带的程序，每个都有它的 <code>why:</code> 行。
+
+### how
+在搜索框里输入来缩小列表；<kbd>↓</kbd> 从搜索框移到第一个动作的按钮。编辑器里打开着程序时，<strong>放进去</strong>会把这个动作的调用写在光标处，并选中它的第一个操作数，方便你改名。<strong>阅读</strong>把附带的程序作为文档打开；<strong>复制到本项目里再修改</strong>会在 <code>programs/</code> 里写一份归你的副本并在编辑器里打开，附带的文件保持原样。
+
+### ideas
+- 搜索一个检查的名字，找到守住它的动作。
+- 切换到 <code>thym 0</code>，看看较早的程序能调用什么。
+- 从最接近你想要的附带程序开始，改它的副本。
