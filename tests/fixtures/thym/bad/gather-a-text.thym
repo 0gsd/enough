@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program gather-the-notes
+  why: gather takes a list of fabulas or of items, never texts.
+  takes t: text, f: fabula
+  gives g: fabula
+
+  give gather [t] with f
+end

@@ -1,0 +1,22 @@
+contract:
+  move: reword
+  schema:
+    format: markdown
+    says: the words alone, nothing before or after
+  checks:
+  - length
+  - one-line
+  - nothing-added
+  - provenance
+inputs:
+  line: c1360c423ba499a9e3251245f51b22de0f5a984b8741a0bfc08f3896b41aaa78
+  words: 624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4
+  kind: 38a9c1e721584da284b90ceea4ed7eb8db15ac4ea86c2c75ec925d5f8799fcf0
+engine: model:scripted
+attempts: 1
+tokens: 40
+seconds: 0
+output: 'The apples came in early this year, and the cider press in the long barn ran for nine days, until the last
+  of the late fruit was gone.
+
+  '

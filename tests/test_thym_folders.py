@@ -576,8 +576,11 @@ def test_count_of_a_folder_counts_its_text_files_where_the_declaration_allows_it
     assert (t.dir / "outputs" / "n.txt").read_text() == "6"
     m = ps.parse(src.read_text())
     assert ("count repo (a folder), which thym 1 allows" in [f for _, f in ck.check(m, decls=decls).module.features])
-    r = refused(src.read_text())                     # the shipped count takes no folder until its manifest says so
-    assert r.check == "type" and "count takes" in r.message
+    # the shipped count's thym 1 view now takes a folder (6.3: "count adds folder"); a thym 0 program has no folder
+    shipped = ok(src.read_text(), path=str(src))
+    assert ("count repo (a folder), which thym 1 allows" in [f for _, f in shipped.module.features])
+    r = refused(src.read_text().replace("thym 1", "thym 0", 1))
+    assert r.check == "version" and "this needs `thym 1`" in r.message
 
 
 def test_a_loop_over_a_call_with_its_own_where_runs(tmp_path):

@@ -44,33 +44,43 @@ _PLACEHOLDER = re.compile(r"^\s*(withheld|redacted|hidden|omitted|removed|elided
 
 class Checks:
     """A registry of check implementations, by name. `CHECKS` is the default, holding this module's checks; a test
-    copies it and adds its own."""
+    copies it and adds its own. A check may also be implemented for one kind a call names with `as` (`project h as
+    isograph`): each MiniCOSM that declares a kind of a move holds that kind to its own schema's rules under the
+    check's one name (THYM 6.2, 18), and a call of that kind is checked by that implementation."""
 
     def __init__(self) -> None:
         self._fns: dict[str, CheckFn] = {}
+        self._kinds: dict[tuple[str, str], CheckFn] = {}
 
-    def add(self, name: str, fn: CheckFn) -> None:
-        self._fns[name] = fn
+    def add(self, name: str, fn: CheckFn, *, kind: str | None = None) -> None:
+        if kind is None:
+            self._fns[name] = fn
+        else:
+            self._kinds[(name, kind)] = fn
 
-    def lookup(self, name: str) -> CheckFn | None:
+    def lookup(self, name: str, kind: Any = None) -> CheckFn | None:
+        if isinstance(kind, str) and (name, kind) in self._kinds:
+            return self._kinds[(name, kind)]
         return self._fns.get(name)
 
     def names(self) -> list[str]:
-        return sorted(self._fns)
+        return sorted(set(self._fns) | {n for n, _k in self._kinds})
 
     def copy(self) -> "Checks":
         other = Checks()
         other._fns = dict(self._fns)
+        other._kinds = dict(self._kinds)
         return other
 
 
 CHECKS = Checks()
 
 
-def check(name: str, *, registry: Checks | None = None) -> Callable[[CheckFn], CheckFn]:
-    """Register a check (in the default registry unless one is named)."""
+def check(name: str, *, registry: Checks | None = None, kind: str | None = None) -> Callable[[CheckFn], CheckFn]:
+    """Register a check (in the default registry unless one is named); with `kind`, the check as it holds of a call
+    whose `as` word is that kind."""
     def deco(fn: CheckFn) -> CheckFn:
-        (registry or CHECKS).add(name, fn)
+        (registry or CHECKS).add(name, fn, kind=kind)
         return fn
     return deco
 
@@ -79,7 +89,7 @@ def verdict(name: str, output: Value, inputs: dict, node: dict, decl: Any, ctx: 
             registry: Checks | None = None) -> tuple[bool, str] | Refusal:
     """One check's verdict, `(ok, why)`; `why` is empty when it holds. A check the registry lacks is a refusal; a
     check that raises fails, with what it raised."""
-    fn = (registry or CHECKS).lookup(name)
+    fn = (registry or CHECKS).lookup(name, _mods(node).get("as"))
     if fn is None:
         return Refusal("run", name, "check not implemented", line=(node or {}).get("line"))
     try:

@@ -201,6 +201,15 @@ def _order(it: mc.Item) -> int:
     return o if isinstance(o, int) and not isinstance(o, bool) else 0
 
 
+#: How the texts name the two groups of formats (MacroCOSM OES 18, 19): a format is a built-in of the core, or a MiniCOSM.
+FORMAT_GROUPS = {True: "built-ins", False: "MiniCOSMs"}
+
+
+def _format_group(it: Any) -> str:
+    """The group of a reference format item (`R:minicosm/<name>`): its `core` says which."""
+    return FORMAT_GROUPS[it.data.get("core") is True]
+
+
 def _plural(kind: str) -> str:
     return kind + ("es" if kind.endswith(("s", "x", "ch", "sh")) else "s")
 
@@ -688,7 +697,18 @@ class Exporter:
             def of(key: str, kind: str) -> list:
                 return [i for i in R if i.data.get("of") == key and i.kind == kind]
 
-            for mini in (i for i in R if i.kind == "minicosm"):
+            # the formats as the texts group them (0.6): the core's built-ins first, then the MiniCOSMs; the items keep
+            # their kind and ids (`R:minicosm/<name>`), so volumes built before and links from the help still resolve
+            formats = [i for i in R if i.kind == "minicosm"]
+            grouped = [i for i in formats if i.data.get("core") is True] + \
+                [i for i in formats if i.data.get("core") is not True]
+            said_group = None
+            for mini in grouped:
+                group = _format_group(mini)
+                if group != said_group:
+                    n = sum(1 for i in formats if _format_group(i) == group)
+                    h.append(f'<p class="docs-r-group">{_esc(group)} ({n})</p>')
+                    said_group = group
                 decl = mini.data.get("declaration")
                 title = mini.name + (f" · {decl}" if decl else "")
                 hid = self.iid[mini.key]
@@ -787,13 +807,21 @@ class Exporter:
             order = list(man.kinds(letter)) if man is not None else []
             for kind in sorted(kinds, key=lambda k: (order.index(k) if k in order else len(order), 0)):
                 its = sorted(kinds[kind], key=lambda it: (0, _order(it)) if "order" in it.data else (1, 0))
-                kid = f"{mid}-{re.sub(r'[^a-z0-9]+', '-', (kind or 'x').lower())}"
-                label = f"{_plural(kind)} ({len(its)})"
-                h.append(f'<h3 id="{kid}" data-toc="3">{_esc(label)}</h3>')
-                contents.append((3, kid, label, False))
-                for it in its:
-                    h.append(self._card(it, short))
-                    cards += 1
+                groups = [(kind, _plural(kind), its)]
+                if letter == "R" and kind == "minicosm":
+                    # the formats as the texts group them (0.6): the core's built-ins, then the MiniCOSMs
+                    groups = [(g, g, [i for i in its if _format_group(i) == g])
+                              for g in (FORMAT_GROUPS[True], FORMAT_GROUPS[False])]
+                for key, name, group in groups:
+                    if not group:
+                        continue
+                    kid = f"{mid}-{re.sub(r'[^a-z0-9]+', '-', (key or 'x').lower()).strip('-')}"
+                    label = f"{name} ({len(group)})"
+                    h.append(f'<h3 id="{kid}" data-toc="3">{_esc(label)}</h3>')
+                    contents.append((3, kid, label, False))
+                    for it in group:
+                        h.append(self._card(it, short))
+                        cards += 1
         return self._wrap("fabula", contents, "\n".join(h)), {"cards": cards}
 
     def render(self, density: str) -> tuple[str, dict]:
@@ -961,6 +989,7 @@ DOCS_CSS = """/* DocOES export (enough): the fragments' styles. Everything is sc
 .docoes .docs-outline [data-depth="5"] { padding-left: 6em; }
 .docoes .docs-ol-num { color: var(--dx-ink3); font-variant-numeric: tabular-nums; margin-right: 0.3em; }
 .docoes .docs-ol-atem, .docoes .docs-r-atem, .docoes .docs-r-sev { color: var(--dx-ink3); }
+.docoes .docs-r-group { color: var(--dx-ink3); font-variant: small-caps; letter-spacing: .03em; margin: 1.4em 0 .2em; }
 .docoes .docs-atem-line { color: var(--dx-ink2); margin-top: -0.3em; }
 .docoes .docs-ref { list-style: none; margin: 0.4em 0 1.2em; padding: 0; }
 .docoes .docs-ref li { margin: 0.3em 0; padding-left: 1.2em; text-indent: -1.2em; }

@@ -1,0 +1,99 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-05-2046-2166
+name: survey-a-repo run 2026-11-05-2046-2166
+program:
+  name: survey-a-repo
+  sha256: 9125a109d4d452b2b86b3f1ea01da599cb4d8a9cdb98dfe4aead5df0513a71e1
+plan:
+  sha256: f725f3ad773b21db5edc7103f6e0e183aca3d293c68f8930f2d70ab378f4791f
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-01T12:00:00Z'
+ended: '2026-11-06T01:46:14Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-05-2046-2166
+  type: trace
+  name: survey-a-repo run 2026-11-05-2046-2166
+  summary: 'ran survey-a-repo on tiny-tool in 395174 s on code: 1 step, all checks green'
+  records:
+  - R:record/1
+  outcome: landed
+  inputs_root: /Users/m3u/METMcloud/METMroot/enough-dev/tests/fixtures/thym
+  engines:
+  - canon
+  - dialectic
+  - docoes
+  - repo
+  - syntax
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-05-2046-2166.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: survey repo
+  summary: code, 1 attempt, 5 checks green.
+  node: R:node/1
+  move: survey
+  inputs:
+  - name: repo
+    sha256: 936073408dfbe6f8d5ebcb03f207b3a2012744d1d5064949b4bd543bbd5e904f
+    path: inputs/tiny-tool
+  outputs:
+  - name: f
+    sha256: 93bf42a6cba5c8284e77e7387d9019c1585e66ba97d5dba8cfc89b1afdefc88c
+    path: outputs/f.cosm
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: files-found
+    ok: true
+    why: ''
+  - name: code-span
+    ok: true
+    why: ''
+  - name: licence-recorded
+    ok: true
+    why: ''
+  - name: fabula-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-05-2046-2166.plan.cosm#R:node/1
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: survey repo
+  summary: 'files, parts, interfaces, settings, licence: rules only'
+  step:
+    program: survey-a-repo
+    n: 1
+  move: survey
+  asks: false
+  takes:
+  - repo
+  gives: f
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 11
+  provenance:
+    mode: derived
+    sources:
+    - survey-a-repo.thym#L11
+    confidence: 1

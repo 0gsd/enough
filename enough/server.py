@@ -50,6 +50,8 @@ from . import canon as _canon
 from . import canon_derive as _canon_derive
 from . import canon_tools as _canon_tools
 from . import canon_jobs as _canon_jobs
+from . import fabula_names as _fabula_names
+from . import model_route as _model_route
 from . import convert as _convert
 from . import docoes as _docoes
 from . import macrocosm as _macrocosm
@@ -359,11 +361,14 @@ def _walk_tree(
         entries = sorted(abs_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except OSError:
         return []
-    # EMF twins (`notes.md.cosm` beside `notes.md`, declaring `oes: emf/1`)
-    # hide behind their texts, which carry `emf: {path, state}` — the same
-    # one-row-per-document rule as convert twins (canon-043 plan §6.3).
-    emf_twins = _canon.emf_twins(entries)
-    emf_hidden = {t.name for t in emf_twins.values()}
+    # A text's twins (`notes.md.fabulan.cosm`, `.fabulap.cosm`, or the old
+    # `notes.md.cosm`, declaring `oes: fabula/1` or `emf/1`) hide behind their
+    # texts, which carry `emf: {path, state, flavour, others?}` (the wire name
+    # is kept) — the same one-row-per-document rule as convert twins
+    # (canon-043 plan §6.3). An old twin a flavour-named one superseded is an
+    # ordinary row with `old_twin: {of, twin}`.
+    emf_found = _canon.fabula_twins(entries)
+    emf_hidden = emf_found.hidden
     out: list[dict[str, Any]] = []
     for p in entries:
         if p.name.startswith("."):
@@ -474,10 +479,12 @@ def _walk_tree(
                 node["catalog"] = True
             elif p.suffix == ".cosm":
                 node["cosm"] = True
-            twin = emf_twins.get(p.name)
-            if twin is not None:
-                node["emf"] = _canon.emf_entry(
-                    p, "/".join(rel_parts + (twin.name,)), twin=twin)
+            entry = _canon.listing_entry(p, "/".join(rel_parts), emf_found)
+            if entry is not None:
+                node["emf"] = entry
+            old_twin = _canon.superseded_entry(p.name, "/".join(rel_parts), emf_found)
+            if old_twin is not None:
+                node["old_twin"] = old_twin
         out.append(node)
     return out
 
@@ -4163,11 +4170,20 @@ def create_app(
         questions, and the lenses it can be drawn in. `report` replaces the
         generic lint (a doc volume passes `docoes.lint_doc`'s)."""
         m = vol.manifest
+        report_of = None
         if report is None:
-            # A fabula's own checks are enough's (enough/fabula.py): run them, so the viewer shows them as run
-            # rather than as checks left to another tool. Any other format: the generic checks.
+            # A fabula's own checks are enough's (enough/fabula.py), and a holograph's Ascribe's (enough/ascribe.py:
+            # the generic checks, the dialectic's and Ascribe's seven in one report, each finding with its advice):
+            # run them, so the viewer shows them as run rather than as checks left to another tool. Any other
+            # format: the generic checks.
             from . import fabula as _fabula
-            report = _fabula.lint(vol) if _fabula.is_fabula(vol) else _macrocosm.lint(vol)
+            if vol.manifest is not None and vol.minicosm == "ascribe":
+                from . import ascribe as _ascribe
+                report = _ascribe.lint_holograph(vol)
+                report_of = _ascribe.report_dict
+            else:
+                report = _fabula.lint(vol) if _fabula.is_fabula(vol) else _macrocosm.lint(vol)
+        report_d = report_of(report) if report_of is not None else report.to_dict()
         modules: list[dict[str, Any]] = []
         if m is not None:
             found = vol.by_module()
@@ -4202,11 +4218,11 @@ def create_app(
             "catalog": _macrocosm.jsonable({k: v for k, v in vol.catalog.items() if k != "nodes"}),
             "modules": modules,
             "problems": [str(p) for p in report.problems()],
-            "pending": report.to_dict()["pending"],
+            "pending": report_d["pending"],
             # The checks panel: the same findings split by severity, and the
             # check ids this reader leaves to the MiniCOSM's own tools
             # (Comprise's fourteen rules and P checks), never failures.
-            "report": {k: v for k, v in report.to_dict().items()
+            "report": {k: v for k, v in report_d.items()
                        if k in ("ok", "errors", "warnings", "notes", "not_run")},
             "files": list(vol.files),
             "lenses": _macrocosm.lenses(vol) if not refused else [],
@@ -4911,22 +4927,24 @@ def create_app(
         except Exception:  # noqa: BLE001 — the write landed; a catalog hiccup heals at the next reconcile
             log.exception("canon: catalog after a derivation write failed")
 
-    def _text_target(path: str) -> dict[str, Any]:
+    def _text_target(path: str, flavour: str | None = None) -> dict[str, Any]:
         """Resolve and vet the text a derive, atem or pin names (blocking).
         The rules and their words live in `canon_tools.text_target` (P6), so
         the readvisor's tools refuse exactly what these routes refuse: a
         missing file (404), a folder, a Holotype or anything in one, a catalog
         or meta enough keeps, any `.cosm`, binaries, kinds that aren't
-        markdown or plain text, an empty file, and a `X.cosm` beside the text
-        that is not an EMF twin (409). A converted original is read through
-        its markdown twin, or refused with "convert it first"."""
+        markdown or plain text, an empty file, a flavour a text cannot take
+        (400), and a `X.<flavour>.cosm` beside the text that is not a fabula
+        (409). A converted original is read through its markdown twin, or
+        refused with "convert it first". The result carries the flavour (the
+        one asked, else the twin's, else the suggestion) and the suggestion."""
         try:
-            return _canon_tools.text_target(project_dir, path)
+            return _canon_tools.text_target(project_dir, path, flavour)
         except _canon_tools.TextTargetError as e:
             raise HTTPException(e.status, str(e)) from None
 
     def _twin_already_fresh(t: dict[str, Any], what: str) -> bool:
-        if _canon_derive.twin_state(t["target"]) != "fresh":
+        if _canon_derive.twin_state(t["target"], t["flavour"]) != "fresh":
             return False
         hdr = _canon.twin_header(t["twin"])
         if what == "atem":
@@ -4935,9 +4953,44 @@ def create_app(
         derived = hdr.get("derived") if isinstance(hdr.get("derived"), dict) else {}
         return derived.get("completeness") == "full"
 
-    async def _canon_mode() -> tuple[str, str]:
+    def _body_route(body: dict[str, Any]) -> str | None:
+        """The request's `route` (`local` | `cloud`), or None when it says none
+        (400 for anything else). The page's control for it is a later lane's."""
+        try:
+            return _canon_tools.check_route(body.get("route"))
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+
+    def _local_reachable() -> tuple[bool, str]:
+        if _agent_free.enabled():
+            return False, _agent_free.REASON
+        ok, why = _llm.check_llm_reachable(session.llm_url or _llm.DEFAULT_LLM_URL)
+        if ok and why == "loading":
+            return False, "the model is still loading"
+        return ok, why
+
+    async def _canon_mode(route: str | None = None) -> tuple[str, str]:
         """Model or rules, decided once, before the job starts (plan §3.8).
-        Agent-free mode is rules with `why == "agent-free"` (`llm.reachable`)."""
+        Agent-free mode is rules with `why == "agent-free"` (`llm.reachable`).
+
+        `route` (pins P6): None is today's way (`llm.reachable`: the session's
+        model, llama-server unless the chat runs on the cloud slot); `local`
+        asks llama-server even then; `cloud` asks the broker's gate and, when
+        it is shut, refuses the request (403) in the gate's own words — never
+        a silent fall back to a scaffold or to the local model."""
+        if route == "cloud":
+            if _agent_free.enabled():
+                return "rules", _agent_free.REASON
+            try:
+                gate = await asyncio.to_thread(_cloud.gate_status)
+            except Exception as e:  # noqa: BLE001
+                raise HTTPException(403, f"the cloud gate could not be read ({e})") from None
+            if not gate.get("open"):
+                raise HTTPException(403, gate.get("denial") or gate.get("reason") or "the cloud gate is shut")
+            return "model", f"cloud ({gate.get('model_id') or 'openrouter'})"
+        if route == "local" and _llm._current_slot() == "opro-api":
+            ok, why = await asyncio.to_thread(_local_reachable)
+            return ("model", why) if ok else ("rules", why)
         ok, why = await asyncio.to_thread(_llm.reachable, session.llm_url)
         return ("model", why) if ok else ("rules", why)
 
@@ -4972,34 +5025,73 @@ def create_app(
         except Exception as e:  # noqa: BLE001
             raise RuntimeError(f"the model stopped answering ({e}); nothing was written, run it again") from e
 
-    def _emf_work(t: dict[str, Any], mode: str, why: str = "") -> Callable[[Any], dict[str, Any]]:
+    def _job_complete(route: str | None, source: str) -> Callable[..., tuple[str, dict[str, Any]]]:
+        """The `complete` one job uses, by its route (pins P6, `model_route`):
+        None, or `local` while the chat is local, is `_model_complete` (today's
+        path: `llm.complete`, whose meta says `route: local`); `local` while the
+        chat runs on the cloud slot is llama-server through the factory;
+        `cloud` is the factory's cloud route (gate, cache with `source`, the
+        broker's journal). A refusal (agent-free, a gate shut mid-job) fails
+        the job in the refusal's own words; nothing is written."""
+        if route is None or (route == "local" and _llm._current_slot() != "opro-api"):
+            return _model_complete
+        inner = _model_route.make_complete(route, llm_url=session.llm_url, project_dir=project_dir,
+                                           source=source)
+
+        def complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
+            kw = {k: v for k, v in kw.items() if k == "max_tokens"}
+            try:
+                return inner(messages, **kw)
+            except _model_route.RouteRefused as e:
+                raise RuntimeError(f"{e}; nothing was written") from e
+            except _llm.LLMUnavailable as e:
+                raise RuntimeError(f"the model became unavailable ({e}); nothing was written, run it again") from e
+            except Exception as e:  # noqa: BLE001
+                raise RuntimeError(f"the model stopped answering ({e}); nothing was written, run it again") from e
+
+        return complete
+
+    def _emf_work(t: dict[str, Any], mode: str, why: str = "",
+                  route: str | None = None) -> Callable[[Any], dict[str, Any]]:
+        """Decompile the text into its twin of `t["flavour"]`, written under the
+        flavour's name (`replace_twin`): an old-named twin is the `previous`
+        (its pinned atems and its `shorts:` carried over) and is removed once
+        the new one loads clean."""
+        complete = _job_complete(route, "fabula") if mode == "model" else None
+
         def work(ctx: Any) -> dict[str, Any]:
             text, stat = _canon_derive.read_source(t["target"])
             twin = t["twin"]
             previous = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm, info = _canon_derive.derive_emf(
                 text, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
-                complete=_model_complete if mode == "model" else None, by="person",
-                on_progress=ctx.progress, should_stop=ctx.should_stop, previous=previous)
+                complete=complete, by="person", on_progress=ctx.progress, should_stop=ctx.should_stop,
+                previous=previous, flavour=t["flavour"], route=_job_route(mode, route),
+                copyable=bool(t.get("copyable")))
             ctx.check()
-            ctx.progress(phase="writing", message=f"writing {t['twin'].name}")
-            _canon_derive.write_twin(t["twin"], cosm)
+            ctx.progress(phase="writing", message=f"writing {t['new_twin'].name}")
+            wrote = _canon_derive.replace_twin(t["target"], t["flavour"], cosm)
             _canon_catalog_after(t["text_rel"])
             note = _rules_note(why) if info["mode"] == "rules" else ""
-            return {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
-                    "model": info["model"], "chunks": info["chunks"], "items": info["items"],
+            return {"twin_path": t["new_twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
+                    "model": info["model"], "route": info.get("route"), "provider": info.get("provider"),
+                    "flavour": t["flavour"], "suggested": t["suggested"], "replaced": wrote["removed"],
+                    "chunks": info["chunks"], "items": info["items"],
                     "counts": info["counts"], "dropped": info["dropped"], "normalized": info["normalized"],
                     "continued": info["continued"], "atem": info["atem"],
-                    "state": _canon_derive.twin_state(t["target"]),
-                    "message": f"wrote {t['twin'].name}{note}"}
+                    "state": _canon_derive.twin_state(t["target"], t["flavour"]),
+                    "message": f"wrote {t['new_twin'].name}{note}"}
         return work
 
-    def _file_atem_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
+    def _file_atem_work(t: dict[str, Any], mode: str,
+                        route: str | None = None) -> Callable[[Any], dict[str, Any]]:
+        complete = _job_complete(route, "atem") if mode == "model" else None
+
         def work(ctx: Any) -> dict[str, Any]:
             text, stat = _canon_derive.read_source(t["target"])
             title = _canon_derive.text_title(text, t["target"].name)
             atem = _canon_derive.derive_atem(
-                text, context=f"the whole of {title}", complete=_model_complete if mode == "model" else None,
+                text, context=f"the whole of {title}", complete=complete,
                 on_progress=ctx.progress, should_stop=ctx.should_stop)
             ctx.check()
             ctx.progress(phase="writing", message=f"writing the atem into {t['twin'].name}")
@@ -5007,19 +5099,23 @@ def create_app(
             existing = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm = _canon_derive.set_file_atem(
                 existing, atem, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
-                by="person", model=atem.get("model"), title=title)
+                by="person", model=atem.get("model"), title=title, flavour=t["flavour"],
+                route=atem.get("route") or _job_route(atem["mode"], route), provider=atem.get("provider"))
             _canon_derive.write_twin(twin, cosm)
             _canon_catalog_after(t["text_rel"])
             return {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": atem["mode"],
-                    "model": atem.get("model"), "atem": _canon_derive.atem_block(atem),
+                    "model": atem.get("model"), "route": atem.get("route"), "flavour": t["flavour"],
+                    "suggested": t["suggested"], "atem": _canon_derive.atem_block(atem),
                     "stance_profile": atem.get("stance_profile") or {}, "written": True,
-                    "state": _canon_derive.twin_state(t["target"]),
+                    "state": _canon_derive.twin_state(t["target"], t["flavour"]),
                     "message": f"wrote the atem into {twin.name}"}
         return work
 
     def _passage_atem_work(text: str, mode: str, *, t: dict[str, Any] | None,
                            selection: dict[str, Any] | None,
-                           why: str = "") -> Callable[[Any], dict[str, Any]]:
+                           why: str = "", route: str | None = None) -> Callable[[Any], dict[str, Any]]:
+        complete = _job_complete(route, "atem") if mode == "model" else None
+
         def work(ctx: Any) -> dict[str, Any]:
             context = None
             span = None
@@ -5028,18 +5124,30 @@ def create_app(
                 context = f"a passage of {_canon_derive.text_title(whole, t['target'].name)}"
                 span = _canon_derive.passage_span(whole, selection or {"text": text})
             atem = _canon_derive.derive_atem(
-                text, context=context, complete=_model_complete if mode == "model" else None,
+                text, context=context, complete=complete,
                 on_progress=ctx.progress, should_stop=ctx.should_stop)
             out = {**_canon_derive.atem_block(atem), "stance_profile": atem.get("stance_profile") or {},
-                   "mode": atem["mode"], "model": atem.get("model"), "written": False,
+                   "mode": atem["mode"], "model": atem.get("model"), "route": atem.get("route"), "written": False,
                    "pinnable": t is not None, "path": t["text_rel"] if t else None, "span": span,
                    "message": "the atem is ready" + (_rules_note(why)
                                                      if atem["mode"] == "rules" else "")}
             return out
         return work
 
+    def _job_route(mode: str, route: str | None) -> str | None:
+        """The route a job's record says: none in rules mode; the one asked; else
+        today's (`cloud` while the chat runs on the cloud slot, else `local`)."""
+        if mode != "model":
+            return None
+        return route or ("cloud" if _llm._current_slot() == "opro-api" else "local")
+
     def _start_canon_job(*, kind: str, path: str | None, mode: str, why: str, work: Any,
-                         key: str | None, doing: str) -> dict[str, Any]:
+                         key: str | None, doing: str, route: str | None = None,
+                         flavour: str | None = None) -> dict[str, Any]:
+        """Start one job. A model-mode job holds the generation lock (llama-server's
+        one slot) unless it runs on the cloud route (`model_route.holds_generation_lock`);
+        a job with no route asked keeps today's rule (it holds the lock). The
+        record says the job's `route` (model mode) and `flavour` (a decompile)."""
         reason = _agent_free_reason(mode, why)
         if reason:
             # The result says why too, beside its `mode: rules`.
@@ -5053,8 +5161,11 @@ def create_app(
         try:
             snap = canon_jobs.start(
                 kind=kind, path=path, mode=mode, work=work, key=key,
-                lock=session.generation_lock if mode == "model" else None,
-                message=_canon_start_message(mode, why, doing), reason=reason)
+                lock=(session.generation_lock if mode == "model"
+                      and _model_route.holds_generation_lock(route or "local") else None),
+                message=_canon_start_message(mode, why, doing), reason=reason,
+                extra=({"route": _job_route(mode, route), "flavour": flavour}
+                       if kind in ("emf", "atem", "compile") else None))   # Thym's runs: their lane's
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
         return {"job": snap}
@@ -5074,25 +5185,33 @@ def create_app(
 
     @app.post("/api/canon/derive")
     async def api_canon_derive(request: Request) -> dict[str, Any]:
-        """Derive a text's EMF twin (`what: emf`) or its file atem (`what:
-        atem`) as a background job: `{path, what, force?}` → `{job}`. 409 when
-        the twin is already fresh (pass `force`), or a job for the file is
-        queued or running. Model or rules is decided here, once."""
+        """Derive a text's twin, its fabula (`what: emf`, the internal name),
+        or its file atem (`what: atem`) as a background job: `{path, what,
+        force?, flavour?, route?}` → `{job, flavour, suggested}`. `flavour` is
+        `fabulan` or `fabulap` (absent: the twin's own, else the suggestion;
+        `fabulac` is refused for a text); `route` is `local` or `cloud`
+        (absent: today's model; `cloud` only with the broker's gate open, else
+        403 in the gate's words). 409 when the twin is already fresh (pass
+        `force`), or a job for the file is queued or running. Model or rules is
+        decided here, once."""
         body = await _json_body(request)
         what = str(body.get("what") or "emf").strip().lower()
         if what not in ("emf", "atem"):
             raise HTTPException(400, "what must be emf or atem")
-        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
+        route = _body_route(body)
+        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""), body.get("flavour"))
+        t["copyable"] = body.get("copyable") is True          # a fabulap's lines keep their words (18.4.6)
         if not body.get("force") and await asyncio.to_thread(_twin_already_fresh, t, what):
             said = "its atem is" if what == "atem" else f"{t['twin'].name} is"
             raise HTTPException(409, f"already fresh: {said} up to date with {t['target'].name}; "
                                      "pass force to derive it again")
-        mode, why = await _canon_mode()
-        work = _emf_work(t, mode, why) if what == "emf" else _file_atem_work(t, mode)
+        mode, why = await _canon_mode(route)
+        work = _emf_work(t, mode, why, route) if what == "emf" else _file_atem_work(t, mode, route)
         doing = (f"deriving the EMF twin of {t['target'].name}" if what == "emf"
                  else f"writing the atem of {t['target'].name}")
-        return _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
-                                key=t["key"], doing=doing)
+        out = _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
+                               key=t["key"], doing=doing, route=route, flavour=t["flavour"])
+        return {**out, "flavour": t["flavour"], "suggested": t["suggested"]}
 
     @app.post("/api/canon/atem")
     async def api_canon_atem(request: Request) -> dict[str, Any]:
@@ -5102,6 +5221,7 @@ def create_app(
         the result is `pinnable` and carries a `span` for the pin); `{text}`
         (or a selection with no path) = an atem of that text, nothing written."""
         body = await _json_body(request)
+        route = _body_route(body)
         path = str(body.get("path") or "").strip()
         selection = body.get("selection")
         if selection is not None and not isinstance(selection, dict):
@@ -5110,22 +5230,23 @@ def create_app(
         if sel_text is not None and not isinstance(sel_text, str):
             raise HTTPException(400, "selection.text must be text")
         if path and not (sel_text or "").strip():
-            t = await asyncio.to_thread(_text_target, path)
-            mode, why = await _canon_mode()
+            t = await asyncio.to_thread(_text_target, path, body.get("flavour"))
+            mode, why = await _canon_mode(route)
             return _start_canon_job(kind="atem", path=t["text_rel"], mode=mode, why=why,
-                                    work=_file_atem_work(t, mode), key=t["key"],
-                                    doing=f"writing the atem of {t['target'].name}")
+                                    work=_file_atem_work(t, mode, route), key=t["key"],
+                                    doing=f"writing the atem of {t['target'].name}", route=route,
+                                    flavour=t["flavour"])
         text = sel_text if (sel_text or "").strip() else body.get("text")
         if not isinstance(text, str) or not text.strip():
             raise HTTPException(400, "nothing to make an atem of: give a path, a selection or a text")
         if len(text) > CANON_ATEM_TEXT_MAX:
             raise HTTPException(400, "that passage is too long for an atem on the spot; derive the file instead")
-        t = await asyncio.to_thread(_text_target, path) if path else None
-        mode, why = await _canon_mode()
+        t = await asyncio.to_thread(_text_target, path, body.get("flavour")) if path else None
+        mode, why = await _canon_mode(route)
         return _start_canon_job(kind="atem", path=t["text_rel"] if t else None, mode=mode, why=why,
-                                work=_passage_atem_work(text, mode, t=t, selection=selection, why=why),
+                                work=_passage_atem_work(text, mode, t=t, selection=selection, why=why, route=route),
                                 key=None,
-                                doing="writing the atem of the passage")
+                                doing="writing the atem of the passage", route=route)
 
     @app.post("/api/canon/atem/pin")
     async def api_canon_atem_pin(request: Request) -> dict[str, Any]:
@@ -5147,7 +5268,7 @@ def create_app(
         of = body.get("of")
         if of is not None and not (isinstance(of, list) and all(isinstance(x, str) for x in of)):
             raise HTTPException(400, "of must be a list of item ids")
-        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
+        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""), body.get("flavour"))
 
         def _pin() -> str:
             with canon_jobs.holding(t["key"], t["text_rel"]):
@@ -5158,7 +5279,7 @@ def create_app(
                 cosm = _canon_derive.pin_atem(
                     existing, atem, span, source_name=t["target"].name, source_stat=stat,
                     rel_path=t["id_rel"], of=of, by="person",
-                    title=_canon_derive.text_title(text, t["target"].name))
+                    title=_canon_derive.text_title(text, t["target"].name), flavour=t["flavour"])
                 _canon_derive.write_twin(twin, cosm)
                 _canon_catalog_after(t["text_rel"])
                 return item_id
@@ -5177,19 +5298,27 @@ def create_app(
         return {"twin_path": t["twin_rel"], "item_id": item_id, "job": snap}
 
     @app.get("/api/canon/emf")
-    async def api_canon_emf(path: str = Query(...)) -> dict[str, Any]:
-        """A text's EMF twin for the reader and the viewer: `{twin_path,
-        state: fresh|stale, cosm: <the /api/cosm payload>}`; 404 when the text
-        has none. Takes the text (or the twin itself; a converted original is
-        read through its markdown twin)."""
+    async def api_canon_emf(path: str = Query(...), flavour: str | None = Query(None)) -> dict[str, Any]:
+        """A text's twin for the reader and the viewer: `{twin_path, state:
+        fresh|stale, flavour, twins: {flavour: {path, state}}, suggested, cosm:
+        <the /api/cosm payload>}`; 404 when the text has none. Takes the text
+        (or a twin itself, `.fabulan.cosm`, `.fabulap.cosm` or the old `.cosm`;
+        a converted original is read through its markdown twin). A text with
+        a twin of each flavour shows the one derived last (or the one named,
+        `flavour=`); `twins` names both."""
 
         def _build() -> dict[str, Any]:
             rel = _canon_rel(path)
             if not rel or rel in STORE_PREFIXES:
                 raise HTTPException(400, "missing path")
             target = _resolve_project_path(rel)
-            if target.name.endswith(".cosm") and _canon.is_emf_twin(target):
-                twin, text, twin_rel = target, target.parent / target.name[: -len(".cosm")], rel
+            asked = (flavour or "").strip().lower() or None
+            if asked is not None and asked not in _fabula_names.TEXT_FLAVOURS:
+                raise HTTPException(400, "flavour must be fabulan or fabulap")
+            of_twin = _fabula_names.text_of_twin(target) if target.name.endswith(".cosm") else None
+            if of_twin is not None:
+                text, head = of_twin, rel[: len(rel) - len(target.name)]
+                twin = target
             else:
                 if not target.exists():
                     raise HTTPException(404, f"no such file: {rel}")
@@ -5197,12 +5326,23 @@ def create_app(
                 if (target.is_file() and target.suffix.lower() not in _canon_derive.TEXT_SUFFIXES
                         and _convert.is_convertible(target) and _convert.twin_path(target).is_file()):
                     target, text_rel = _convert.twin_path(target), rel + ".md"
-                twin, text, twin_rel = _canon_derive.twin_path(target), target, text_rel + ".cosm"
-            if not _canon.is_emf_twin(twin):
+                text, head = target, text_rel[: len(text_rel) - len(target.name)]
+                twin = _fabula_names.find_twin(target, asked)
+            if twin is None or not _canon.is_emf_twin(twin):
                 raise HTTPException(404, f"{rel} has no EMF twin yet")
+            twins = _fabula_names.text_twins(text)
+            fl = next((f for f, p in twins.items() if p == twin), _fabula_names.flavour_of_twin(twin))
+            twin_rel = head + twin.name
+            try:
+                raw = text.read_bytes().decode("utf-8-sig", errors="replace")
+                suggested = _fabula_names.suggest_flavour(raw)
+            except OSError:
+                suggested = None
             vol = _macrocosm.load_volume(twin)
-            return {"twin_path": twin_rel, "state": _canon_derive.twin_state(text),
-                    "cosm": _cosm_payload(vol, twin_rel)}
+            return {"twin_path": twin_rel, "state": _canon.emf_state(text, twin), "flavour": fl,
+                    "twins": {f: {"path": head + p.name, "state": _canon.emf_state(text, p)}
+                              for f, p in twins.items()},
+                    "suggested": suggested, "cosm": _cosm_payload(vol, twin_rel)}
 
         return await asyncio.to_thread(_build)
 
@@ -5219,6 +5359,7 @@ def create_app(
         A twin's compile holds its text's claim, the one a decompile of that
         text holds, so the two never write the twin at once."""
         body = await _json_body(request)
+        route = _body_route(body)
         order = body.get("order")
         if order is not None and not isinstance(order, str):
             raise HTTPException(400, "order must be told or weight")
@@ -5236,9 +5377,9 @@ def create_app(
             if target.is_dir() or not target.name.endswith(".cosm"):
                 raise HTTPException(400, f"{target.name} is not an EMF; compile reads an emf/1 .cosm file")
             said = _macrocosm.sniff_declaration(target)
-            if said != _canon_derive.EMF_OES:
+            if said not in _canon_derive.FABULA_DECLARATIONS:
                 raise HTTPException(400, f"{target.name} is not an EMF (it declares {said or 'nothing'}); "
-                                         "compile reads emf/1")
+                                         "compile reads a fabula (fabula/1, or its old spelling emf/1)")
             vol = _macrocosm.load_volume(target)
             if vol.refused is not None:
                 raise HTTPException(400, str(vol.refused))
@@ -5254,12 +5395,13 @@ def create_app(
 
         text_path, default = await asyncio.to_thread(_vet)
         order = order or default
-        mode, why = await _canon_mode()
+        mode, why = await _canon_mode(route)
+        complete = _job_complete(route, "compile") if mode == "model" else None
         # The twin of a text shares the text's claim (canon_tools.text_target's
         # key: the resolved text), so a decompile and a compile never write it
-        # at once; a standalone EMF is claimed by its own path.
-        key = (str(target.parent / target.name[: -len(".cosm")]) if _canon.is_emf_twin(target)
-               else str(target))
+        # at once; a standalone fabula is claimed by its own path.
+        of_text = _fabula_names.text_of_twin(target)
+        key = str(of_text) if of_text is not None else str(target)
 
         def work(ctx: Any) -> dict[str, Any]:
             ctx.progress(phase="compiling", message=f"compiling {target.name}")
@@ -5271,8 +5413,9 @@ def create_app(
                 except OSError:
                     source_text = None
             md, info = _canon_derive.compile_short(
-                _macrocosm.load_volume(target), complete=_model_complete if mode == "model" else None,
+                _macrocosm.load_volume(target), complete=complete,
                 source_name=target.name, order=order, source_text=source_text, now=now)
+            short_route = info.get("route") or (_job_route(mode, route) if info["mode"] == "model" else None)
             ctx.check()
             out = _canon_derive.short_path(target, now)
             ctx.progress(phase="writing", message=f"writing {out.name}")
@@ -5281,17 +5424,18 @@ def create_app(
             try:
                 twin_text = target.read_bytes().decode("utf-8")       # bytes: CRLF kept as it is
                 _canon_derive.write_atomic(target, _canon_derive.record_short(
-                    twin_text, path=out.name, at=now, by=info["by"], mode=info["mode"], order=info["order"]))
+                    twin_text, path=out.name, at=now, by=info["by"], mode=info["mode"], order=info["order"],
+                    route=short_route))
             except (OSError, UnicodeDecodeError, _canon_derive.DeriveError) as e:
                 recorded = False
                 log.warning("canon: wrote %s but could not record it in %s (%s)", out.name, target.name, e)
             _canon_catalog_after(rel)
             return {"written": _rel_beside(rel, out.name), "emf_path": rel, "mode": info["mode"],
-                    "order": info["order"], "model": info["model"], "recorded": recorded,
+                    "order": info["order"], "model": info["model"], "route": short_route, "recorded": recorded,
                     "message": f"wrote {out.name}"}
 
         return _start_canon_job(kind="compile", path=rel, mode=mode, why=why, work=work,
-                                key=key, doing=f"compiling {target.name}")
+                                key=key, doing=f"compiling {target.name}", route=route)
 
     @app.get("/api/canon/job/{job_id}")
     async def api_canon_job(job_id: str) -> dict[str, Any]:

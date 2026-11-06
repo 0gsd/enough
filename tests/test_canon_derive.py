@@ -248,11 +248,12 @@ def test_the_engine_names_before_emf_are_gone():
 def test_rules_emf_lints_clean_and_is_grounded(feed, notes, tmp_path):
     text, stat = CD.read_source(notes)
     cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, now=NOW)
-    assert cosm.splitlines()[0] == "oes: emf/1"
+    assert cosm.splitlines()[0] == "oes: fabula/1"
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
-    assert list(doc)[:8] == ["oes", "macrocosm", "id", "name", "source", "derived", "atem", "nodes"]
-    assert doc["macrocosm"] == macrocosm.MACROCOSM_VERSION == "0.5.4" and doc["id"] == "emf/notes-md"
+    assert list(doc)[:9] == ["oes", "macrocosm", "flavour", "id", "name", "source", "derived", "atem", "nodes"]
+    assert doc["macrocosm"] == macrocosm.MACROCOSM_VERSION == "0.5.4" and doc["id"] == "fabula/notes-md"
+    assert doc["flavour"] == "fabulan"
     assert doc["name"] == "The Hollins Lane orchard, autumn notes"
     assert doc["source"] == {"path": "notes.md", **stat}
     assert doc["derived"] == {"at": NOW, "by": "person", "mode": "rules", "completeness": "full", "chunks": 1}
@@ -298,7 +299,7 @@ def test_catalog_id_is_the_slugged_path_and_standalone_has_no_source(notes, tmp_
     cosm, _ = CD.derive_emf(text, source_name="close.md", source_stat=None, rel_path="guides/close.md",
                             lookup=lambda ws: {})
     doc = macrocosm.yaml_load(cosm)
-    assert doc["id"] == "emf/guides--close-md" and "source" not in doc
+    assert doc["id"] == "fabula/guides--close-md" and "source" not in doc
     assert lint_errors(cosm, tmp_path) == []
 
 
@@ -315,11 +316,12 @@ def test_twin_written_atomically_and_fresh_then_stale(notes, monkeypatch):
     monkeypatch.setattr(os, "replace", spy)
     assert CD.twin_state(notes) == "absent"
     twin = CD.twin_path(notes)
-    assert twin.name == "notes.md.cosm"
+    assert twin.name == "notes.md.fabulan.cosm"
     CD.write_twin(twin, cosm)
     assert twin.read_text(encoding="utf-8") == cosm
-    assert len(replaced) == 1 and replaced[0][1] == "notes.md.cosm" and replaced[0][0].startswith(".notes.md.cosm.")
-    assert sorted(p.name for p in notes.parent.iterdir()) == ["notes.md", "notes.md.cosm"], "no temp left over"
+    assert (len(replaced) == 1 and replaced[0][1] == "notes.md.fabulan.cosm"
+            and replaced[0][0].startswith(".notes.md.fabulan.cosm."))
+    assert sorted(p.name for p in notes.parent.iterdir()) == ["notes.md", "notes.md.fabulan.cosm"], "no temp left"
     assert CD.twin_state(notes) == "fresh"
     assert canon.emf_state(notes, twin) == "fresh"                    # one rule: P2's
     with notes.open("a", encoding="utf-8") as fh:
@@ -460,7 +462,7 @@ def test_rules_compile_of_the_fixture(tmp_path):
     assert md.index("1. The orchard volunteers spread leaf mould") < md.index("2. The Hollins Lane orchard pressed")
     assert "counted on 12 October." in md and "(12 October)" not in md
     assert "## Terms" in md and "- **leaf mould** (not in FEED):" in md
-    assert lines[-1] == ("*a short of notes.md, told by weight, compiled from its EMF twin on 2026-10-22 by rules, "
+    assert lines[-1] == ("*a short of notes.md, told by weight, compiled from its fabula on 2026-10-22 by rules, "
                          "without a model*")
     assert CD.compile_text((FIX / "notes.md.cosm").read_text(encoding="utf-8")) .startswith("# The Hollins")
     with pytest.raises(CD.DeriveError):
@@ -493,7 +495,7 @@ def test_told_order_follows_the_spans(tmp_path):
         < body.index("Mara Okafor holds that the leaf mould")
     assert "## What it claims" not in body and "## Terms" not in body and "## What happens" not in body
     assert "X:atem" not in body and "mowing paragraph" not in body, "a pinned atem is not part of the telling"
-    assert md.splitlines()[-1] == ("*a short of notes.md, told as the author told it, compiled from its EMF twin on "
+    assert md.splitlines()[-1] == ("*a short of notes.md, told as the author told it, compiled from its fabula on "
                                    "2026-10-22 by rules, without a model*")
     assert "Also in the fabula" not in body, "every item of the fixture has a span"
 
@@ -538,7 +540,7 @@ def test_default_order_rule():
     assert CD.compile_short(twin)[1]["order"] == "weight"
     md, info = CD.compile_short(rain, source_name="rain.cosm", now=NOW)
     assert info["order"] == "weight"
-    assert md.splitlines()[-1] == ("*a short of rain.cosm, a standalone EMF, told by weight, compiled on 2026-10-22 "
+    assert md.splitlines()[-1] == ("*a short of rain.cosm, a standalone fabula, told by weight, compiled on 2026-10-22 "
                                    "by rules, without a model*")
 
 
@@ -560,8 +562,8 @@ def test_model_compile_uses_one_completion_and_says_the_order():
 
     twin = (FIX / "notes.md.cosm").read_text(encoding="utf-8")
     out = CD.compile_text(twin, complete=fake, order="weight", now=NOW)
-    assert out == ("# The orchard\n\nProse.\n\n---\n\n*a short of notes.md, told by weight, compiled from its EMF "
-                   "twin on 2026-10-22 by g40-04*\n") and len(seen) == 1
+    assert out == ("# The orchard\n\nProse.\n\n---\n\n*a short of notes.md, told by weight, compiled from its fabula "
+                   "on 2026-10-22 by g40-04*\n") and len(seen) == 1
     assert seen[0][0]["content"] == P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER["weight"])
     assert "It is assumed that" in seen[0][1]["content"] and "told by weight" in seen[0][1]["content"]
     md, info = CD.compile_short(twin, complete=fake, order="told", source_text="x", now=NOW)
@@ -569,7 +571,7 @@ def test_model_compile_uses_one_completion_and_says_the_order():
     assert seen[1][0]["content"] == P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER["told"])
     assert "author's own order" in seen[1][0]["content"]
     assert "told as the author told it" in seen[1][1]["content"]
-    assert md.endswith("*a short of notes.md, told as the author told it, compiled from its EMF twin on 2026-10-22 "
+    assert md.endswith("*a short of notes.md, told as the author told it, compiled from its fabula on 2026-10-22 "
                        "by g40-04*\n")
     # a model that does not say its name is "a model"
     md, info = CD.compile_short(twin, complete=lambda m: "Prose.", order="told", now=NOW)

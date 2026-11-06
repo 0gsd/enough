@@ -1,0 +1,12 @@
+-- refused: compile flavour line 11
+thym 1
+
+program poem-as-code
+  why: only a fabulac is told as code.
+
+  takes poem: text
+  gives code: folder
+
+  let f = derive poem as verse
+  give tell f as code
+end

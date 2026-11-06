@@ -510,7 +510,9 @@
 {"headword": "vendible", "form": "vendable", "position": 1, "pronunciation": "/ˈvɛndəbəl/", "labels": "[\"var.\"]", "synonyms": "[\"marketable\", \"merchantable\", \"sellable\", \"vendible\"]"}
 {"headword": "vendible", "form": "vendables", "position": 2, "pronunciation": "/ˈvɛndəbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vendible", "form": "vendibles", "position": 3, "pronunciation": "/ˈvɛndəbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vendor", "form": "vendors", "position": 1, "pronunciation": "/ˈvɛndərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vendor", "form": "vendored", "position": 1, "pronunciation": "/ˈvɛndərd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vendor", "form": "vendoring", "position": 2, "pronunciation": "/ˈvɛndərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vendor", "form": "vendors", "position": 3, "pronunciation": "/ˈvɛndərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vendue", "form": "vendues", "position": 1, "pronunciation": "/vɛnˈduz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veneer", "form": "veneered", "position": 1, "pronunciation": "/vəˈnɪrd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "veneer", "form": "veneering", "position": 2, "pronunciation": "/vəˈnɪrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"veneer\"]"}

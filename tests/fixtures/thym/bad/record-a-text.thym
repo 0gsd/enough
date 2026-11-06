@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program record-the-notes
+  why: record reads an answers volume, the file a page writes beside the fabula, never a text.
+  takes f: fabula, said: text
+  gives g: fabula
+
+  give record said in f
+end

@@ -1533,8 +1533,13 @@ class SpecTables:
     (§12.2, §18.5.4: Check | Default severity | Catches), the lenses (§14.5: Format | Lens | Draws; before 0.6,
     MiniCOSM | Lens | Draws), the formats (§18.1: Format | … | Enumerates, and §19: MiniCOSM | … | Enumerates), the
     kinds (Kind | … | What it is, or What it holds, inside a format's section: `### 18.N <name>:` for a built-in,
-    `### 19.N <name>:` for a MiniCOSM), and closed lists' values (a table whose first column is the list's field)."""
+    `### 19.N <name>:` for a MiniCOSM), and closed lists' values (a table whose first column is the list's field).
+    Since 0.6 also the fabula's and the dialectic's check tables (§18.4.8: Check | Severity | Holds; §18.6.8: Check |
+    Severity | Catches; a row may name several checks, and the first table to name a check gives its line), and the
+    dialectic's module D (§18.6, the core's, every format's): each kind's line (its bold `D:<kind>/<slug>` paragraph)
+    and its fields (Field | Holds), joined to every format's `R:kind/<name>.D.<kind>`."""
     checks: dict = field(default_factory=dict)       # id -> (severity, catches)
+    dialectic: dict = field(default_factory=dict)    # D kind -> {"atem": its line, "fields": {field: holds}}
     lenses: dict = field(default_factory=dict)       # (minicosm, lens) -> draws
     minicosms: dict = field(default_factory=dict)    # name -> enumerates
     kinds: dict = field(default_factory=dict)        # (minicosm, kind) -> what it is
@@ -1566,6 +1571,32 @@ def spec_tables(text: str) -> SpecTables:
                 last = None
         return last
 
+    # §18.6 (the dialectic, module D): each kind is introduced by a bold line naming `D:<kind>/<slug>`, and its fields
+    # table follows it
+    d_at = next((i for i, t in heads if re.match(r"^### 18\.6 The dialectic", t)), None)
+    d_end = next((i for i, t in heads if d_at is not None and i > d_at and re.match(r"^#{2,3} ", t)), len(lines))
+    d_lines: list[tuple[int, str]] = []
+    if d_at is not None:
+        for i in range(d_at, d_end):
+            ln = lines[i]
+            mt = None if ln.code else re.match(r"^\*\*`D:([a-z][a-z0-9-]*)/[^`]*`\*\*:\s*(.+)$", ln.text)
+            if mt:
+                d_lines.append((i, mt.group(1)))
+                first = re.split(r"(?<=\.)\s", mt.group(2).strip(), maxsplit=1)[0]
+                out.dialectic.setdefault(mt.group(1), {})["atem"] = _plain(first).rstrip(".")
+
+    generic: set[str] = set()
+
+    def dialectic_at(line_idx: int) -> str | None:
+        if d_at is None or not (d_at < line_idx < d_end):
+            return None
+        last = None
+        for i, k in d_lines:
+            if i > line_idx:
+                break
+            last = k
+        return last
+
     for blk in blocks:
         if blk.kind != "table":
             continue
@@ -1574,10 +1605,26 @@ def spec_tables(text: str) -> SpecTables:
             continue
         head = [_plain(c).casefold() for c in rows[0]]
         body = rows[1:]
+        d_kind = dialectic_at(blk.first)
         if head[:3] == ["check", "default severity", "catches"]:
             for r in body:
                 if len(r) >= 3:
                     out.checks[_plain(r[0])] = (_plain(r[1]), _plain(r[2]))
+                    generic.add(_plain(r[0]))
+        elif head[:3] in (["check", "severity", "holds"], ["check", "severity", "catches"]):
+            # §18.4.8 (a format's own table: it fills what no table gave) and §18.6.8 (the core's own checks: its
+            # line wins over a format's restatement); one row may name several checks
+            owns = head[2] == "catches"
+            for r in body:
+                if len(r) >= 3:
+                    for c in re.findall(r"`([a-z][a-z0-9-]*)`", r[0]) or [_plain(r[0])]:
+                        if c not in generic and (owns or c not in out.checks):
+                            out.checks[c] = (_plain(r[1]), _plain(r[2]))
+        elif d_kind and head[:2] == ["field", "holds"]:
+            fields = out.dialectic.setdefault(d_kind, {}).setdefault("fields", {})
+            for r in body:
+                if len(r) >= 2:
+                    fields[_plain(r[0])] = _plain(r[1])
         elif head[:3] in (["minicosm", "lens", "draws"], ["format", "lens", "draws"]):
             for r in body:
                 if len(r) >= 3:
@@ -1685,7 +1732,8 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                 req = m.required_fields(L, k)
                 fields_seen = set(refs) | set(checked) | set(req) | set(mc._strs(m.envelope.get("fields")))
                 klists = [f"R:list/{name}.{f}" for f in lists if f in fields_seen or f.split(".")[0] in fields_seen]
-                what = overlay(tables.kinds, k)
+                core_d = L in m.inherited and k in tables.dialectic      # the core's module D (§18.6)
+                what = tables.dialectic[k].get("atem") if core_d else overlay(tables.kinds, k)
                 katem = _atem_cut(what) if what and _count(_atem_cut(what), "en") >= 2 else \
                     f"the {k} kind of {title}'s {mname} module"
                 it = {"id": f"R:kind/{name}.{L}.{k}", "type": "kind", "name": k,
@@ -1694,6 +1742,8 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                       "required": req}
                 if klists:
                     it["lists"] = klists
+                if core_d and tables.dialectic[k].get("fields"):
+                    it["holds"] = dict(tables.dialectic[k]["fields"])        # §18.6.2's Field | Holds
                 declared_keys = {x: mc.jsonable(spec[x]) for x in spec if x not in ("refs", "checked", "required")}
                 if declared_keys:
                     it["declared"] = declared_keys   # the manifest's own keys for the kind (level, stored, status…)
@@ -1740,12 +1790,21 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                           "lens": mc.jsonable(lspec), "provenance": src})
         for c in m.checks():
             check_sel.setdefault(c, []).append(name)
-    vocab = list(mc.CHECKS) + list(DOC_CHECKS)
+    from . import fabula as _fabula
+    # the generic checks, DocOES's own, and since 0.6 the fabula's own (§18.4.8) and the core's dialectic's (§18.6.8)
+    fab_own = [c for c in _fabula.OWN_CHECKS if c not in mc.CORE_CHECKS]
+    vocab = list(dict.fromkeys(list(mc.CHECKS) + list(DOC_CHECKS) + fab_own + list(mc.CORE_CHECKS)))
+    every = [m.name for m in reg.manifests.values()]
     for c in vocab:
         sev, catches = tables.checks.get(c, (None, None))
-        severity = (DOC_SEVERITY.get(c) if c in DOC_CHECKS else mc.SEVERITY.get(c)) or (sev or "error")
+        severity = (DOC_SEVERITY.get(c) if c in DOC_CHECKS else mc.SEVERITY.get(c)) or (sev or "error").split(";")[0]
         sel = check_sel.get(c, [])
-        owner = "DocOES's own check" if c in DOC_CHECKS else "a generic check"
+        if c in mc.CORE_CHECKS:
+            owner, sel = "a check of the core's dialectic", sel or every       # run on every volume that holds D
+        elif c in fab_own:
+            owner, sel = "the fabula's own check", sel or ["fabula"]
+        else:
+            owner = "DocOES's own check" if c in DOC_CHECKS else "a generic check"
         it = {"id": f"R:check/{c}", "type": "check", "name": c,
               "summary": f"The {c} check, {owner}: " + (catches + "." if catches else "see the spec."),
               "atem": _atem_cut(catches) if catches else _atem_cut(f"the {c} check, {owner}"),

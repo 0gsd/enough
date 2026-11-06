@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program settle-into-another
+  why: settle gives what it takes; a fabula settled is a fabula, and never a volume of another kind.
+  takes f: fabula
+  gives v: volume
+
+  give settle f
+end

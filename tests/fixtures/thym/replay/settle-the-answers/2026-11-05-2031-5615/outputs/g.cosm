@@ -1,0 +1,297 @@
+oes: fabula/1
+macrocosm: 0.5.4
+flavour: fabulan
+id: fabula/guides--close-md
+name: The morning close
+source: {path: close.md, sha256: d297e46db2cbd55a0fb8af894c130604f087455510bec9417548ce3742191b14, size: 494, mtime_ns: 1792660324518000000}
+derived:
+  at: 2026-11-05T10:02:11Z
+  by: person
+  model: g40-04
+  route: local
+  mode: model
+  completeness: full
+  chunks: 1
+  runs:
+    - {program: settle-the-answers, run: 2026-11-05-2031-5615, at: 2026-11-01T12:00:00Z}
+atem:
+  line: Meadow closes each customer's books overnight once the bank feeds arrive, locks the day, and retries a failed close before anyone opens the summary.
+  focus: How Meadow's overnight close works, what it guarantees, and what it waits on.
+  push: Trust the morning summary, because every day is locked and a failed close is caught before seven.
+  pull: The summary is only as early as the bank feeds, which Meadow does not control, so a late feed still delays it.
+shorts:
+  - {path: close.short-2026-10-22-0931.md, at: 2026-10-22T09:31:12Z, by: g40-04, mode: model, order: told}
+nodes:
+  # --- I: Inspiration -------------------------------------------------------------------------------------------
+  - id: I:occasion/why-written
+    type: occasion
+    name: Why the guide was written
+    summary: Nothing in the text says what prompted Meadow to write the guide.
+    stance: assumed
+    roles: {event: an owner's call to support about a late morning summary}
+    span: {lines: "1"}
+    provenance:
+      mode: derived
+      sources: [close.md#L1, D:session/session-2]
+      confidence: 0.3
+      state: pending
+      answered: {roles.event: {sources: [D:session/session-2], confidence: 0.9}}
+  # --- L E K: the twin of 18.4.5, item for item ------------------------------------------------------------------
+  - id: L:term/close
+    type: term
+    name: close
+    summary: The word the text uses for locking one day of a customer's books.
+    feed: {word: close, pos: noun, origin: feed}
+    sense: Locking one day of the books so that no entry in the day can change.
+    span: {lines: "3-7"}
+    provenance: {mode: derived, sources: ['close.md#L3-L7'], confidence: 0.9, state: known}
+  - id: L:term/morning-summary
+    type: term
+    name: morning summary
+    summary: The phrase the text uses for the statement an owner reads each morning.
+    feed: {pending: "not in FEED"}
+    sense: The one-page statement of the books that an owner reads each morning.
+    span: {lines: "5-8"}
+    provenance: {mode: derived, sources: ['close.md#L5-L8'], confidence: 0.8, state: known}
+  - id: E:org/meadow
+    type: org
+    name: Meadow
+    summary: Meadow Software, the company whose overnight close the text describes.
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['close.md#L3'], confidence: 0.9, state: known}
+  - id: E:person/support-lead
+    type: person
+    name: the Support Lead
+    summary: The holder of the Support Lead role at Meadow; the text names the role, never a person.
+    span: {lines: "5-6"}
+    provenance: {mode: derived, sources: ['close.md#L5-L6'], confidence: 0.9, state: known}
+  - id: E:thing/bank-feed
+    type: thing
+    name: bank feeds
+    summary: The transaction feeds from each customer's banks, which the close waits for.
+    span: {lines: "3-7"}
+    provenance: {mode: derived, sources: ['close.md#L3-L7'], confidence: 0.9, state: known}
+  - id: K:concept/close
+    type: concept
+    name: the close
+    summary: The overnight run that settles and locks one day of a customer's books.
+    defined-by: P:claim/close-locks-the-day
+    span: {lines: "3-7"}
+    provenance: {mode: derived, sources: ['close.md#L3-L7'], confidence: 0.9, state: known}
+  - id: K:concept/owner
+    type: concept
+    name: owner
+    summary: A restaurant owner who is a customer of Meadow.
+    span: {lines: "5-8"}
+    provenance: {mode: derived, sources: ['close.md#L5-L8'], confidence: 0.8, state: known}
+  # --- N: Intent ---------------------------------------------------------------------------------------------------
+  - id: N:aim/trust-the-summary
+    type: aim
+    name: Owners trust the morning summary
+    summary: The guide sets out to make owners trust the morning summary by showing that every day is locked and every failed close is caught.
+    stance: deduced
+    measure: An owner reads the summary before opening without calling support to ask whether it is final.
+    roles: {for: N:audience/owners}
+    links: [{rel: depends-on, to: P:claim/close-locks-the-day}]
+    span: {lines: "3-8"}
+    provenance: {mode: derived, sources: ['close.md#L3-L8'], confidence: 0.7, state: known}
+  - id: N:audience/owners
+    type: audience
+    name: Restaurant owners, then support staff
+    summary: The guide is written for the restaurant owners who read the morning summary; Meadow's support staff read it too.
+    stance: hearsay
+    who: restaurant owners who are Meadow's customers, and Meadow's support staff
+    needs: To know whether the morning summary can be relied on, and what happens when the close fails.
+    span: {lines: "5"}
+    provenance:
+      mode: derived
+      sources: ['close.md#L5', D:session/session-1]
+      confidence: 0.9
+      state: known
+      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: [D:session/session-1], confidence: 1}}
+  - id: N:exclusion/no-feed-promise
+    type: exclusion
+    name: No promise about the feeds
+    summary: The guide promises nothing about when the bank feeds arrive, only what the close does once they have.
+    stance: deduced
+    horizon: never
+    because: The bank feeds come from the customers' banks, which Meadow does not run.
+    span: {lines: "3-7"}
+    provenance: {mode: derived, sources: ['close.md#L3-L7'], confidence: 0.6, state: known}
+  # --- C: Construction ---------------------------------------------------------------------------------------------
+  - id: C:part/the-morning-close
+    type: part
+    name: The morning close
+    summary: The guide's one section, under its heading, six sentences long.
+    stance: observed
+    division: section
+    number: 1
+    heading: The morning close
+    span: {lines: "1-8"}
+    provenance: {mode: derived, sources: ['close.md#L1-L8'], confidence: 1, state: known}
+  - id: C:voice/meadow-we
+    type: voice
+    name: Meadow, in the first person plural
+    summary: The guide speaks as Meadow, reporting in the third person until its last sentence, which says we.
+    stance: observed
+    perspective: mixed
+    tone: plain, reassuring
+    roles: {speaker: E:org/meadow, addressee: N:audience/owners}
+    span: {lines: "3-8"}
+    provenance: {mode: derived, sources: ['close.md#L3-L8'], confidence: 0.8, state: known}
+  - id: C:device/hearsay-as-evidence
+    type: device
+    name: A report as evidence
+    summary: The guide supports its picture of owners with the Support Lead's report rather than with a measurement.
+    stance: deduced
+    figure: appeal to authority
+    where: [P:claim/owners-read-summary-first]
+    effect: The habit of owners is presented as known, though it rests on one role's impression.
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['close.md#L5'], confidence: 0.6, state: known}
+  # --- R: Production -----------------------------------------------------------------------------------------------
+  - id: R:maker/meadow
+    type: maker
+    name: Meadow, as author
+    summary: Meadow wrote the guide; the text speaks as Meadow and names no writer.
+    stance: deduced
+    who: E:org/meadow
+    capacity: author
+    span: {lines: "8"}
+    provenance: {mode: derived, sources: ['close.md#L8'], confidence: 0.7, state: known}
+  - id: R:release/handbook
+    type: release
+    name: In the Meadow handbook
+    summary: The guide is a file of the Meadow handbook, at guides/close.md; when it was first published is not known.
+    stance: observed
+    venue: the Meadow handbook, guides/close.md
+    at: {pending: "when was the guide first published?"}
+    provenance: {mode: derived, sources: ['close.md#L1'], confidence: 0.5, state: pending}
+  # --- P T X: the twin of 18.4.5, item for item --------------------------------------------------------------------
+  - id: P:claim/meadow-closes-overnight
+    type: claim
+    name: Meadow closes overnight
+    summary: Meadow closes the books of every customer overnight, after the bank feeds arrive.
+    stance: observed
+    salience: high
+    roles: {actor: E:org/meadow, act: K:concept/close, after: E:thing/bank-feed}
+    links: [{rel: depends-on, to: P:claim/every-customer-has-a-feed}]
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['close.md#L3'], confidence: 0.9, state: known}
+  - id: P:claim/every-customer-has-a-feed
+    type: claim
+    name: Every customer has a bank feed
+    summary: Every customer of Meadow has at least one bank feed for the close to wait on.
+    stance: assumed
+    salience: normal
+    roles: {holder: K:concept/owner, thing: E:thing/bank-feed}
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['close.md#L3'], confidence: 0.6, state: known}
+  - id: P:claim/close-locks-the-day
+    type: claim
+    name: A close locks the day
+    summary: A close locks the day, so no entry in the day can change.
+    stance: axiom
+    salience: critical
+    roles: {subject: K:concept/close}
+    links: [{rel: defines, to: K:concept/close}]
+    span: {lines: "4"}
+    provenance: {mode: derived, sources: ['close.md#L4'], confidence: 0.9, state: known}
+  - id: P:claim/owners-read-summary-first
+    type: claim
+    name: Owners read the summary first
+    summary: The Support Lead reports that most owners read the morning summary before the owners open the restaurant.
+    stance: hearsay
+    salience: normal
+    roles: {source: E:person/support-lead, actor: K:concept/owner, object: L:term/morning-summary}
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['close.md#L5'], confidence: 0.8, state: known}
+  - id: P:claim/late-feed-delays-summary
+    type: claim
+    name: A late feed delays the summary
+    summary: A late bank feed delays the morning summary, because the close waits for the bank feeds.
+    stance: deduced
+    salience: normal
+    roles: {cause: E:thing/bank-feed, effect: L:term/morning-summary}
+    links: [{rel: depends-on, to: P:claim/meadow-closes-overnight}]
+    span: {lines: "7"}
+    provenance: {mode: derived, sources: ['close.md#L7'], confidence: 0.8, state: known}
+  - id: P:claim/daily-summary-keeps-owners
+    type: claim
+    name: The daily summary keeps owners
+    summary: Meadow holds that a morning summary arriving every day is why owners stay with Meadow.
+    stance: opinion
+    salience: low
+    roles: {holder: E:org/meadow, actor: K:concept/owner, object: L:term/morning-summary}
+    span: {lines: "8"}
+    provenance: {mode: derived, sources: ['close.md#L8'], confidence: 0.8, state: known}
+  - id: T:event/feeds-arrive
+    type: event
+    name: The bank feeds arrive
+    summary: The bank feeds of every customer arrive overnight.
+    agent: E:thing/bank-feed
+    when: overnight
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['close.md#L3'], confidence: 0.9, state: known}
+  - id: T:event/close-runs
+    type: event
+    name: The close runs
+    summary: Meadow runs the close for every customer once the bank feeds have arrived.
+    agent: E:org/meadow
+    patient: K:concept/close
+    after: T:event/feeds-arrive
+    when: overnight
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['close.md#L3'], confidence: 0.9, state: known}
+  - id: X:atem/1
+    type: atem
+    name: When the close fails
+    summary: The atem of the passage on what happens when the overnight close fails or starts late.
+    line: A failed close is retried at five and escalated by phone before seven, and any late bank feed pushes the summary back.
+    focus: What happens when the overnight close fails or starts late.
+    push: A failed close will not reach the owner's morning unnoticed, because a retry and a call stand in the way.
+    pull: The safety net covers a failed close, not a late feed, so a slow bank still delays the summary.
+    of: [K:concept/close]
+    span: {lines: "6-7"}
+    provenance: {mode: derived, sources: ['close.md#L6-L7'], confidence: 0.8, state: known}
+  # --- D: the dialectic ---------------------------------------------------------------------------------------------
+  - id: D:question/audience
+    type: question
+    about: N:audience/owners
+    asks: Whom did you write the guide for?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/audience, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: answered
+    answers:
+      - {at: 2026-11-05T10:20:40Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-1}
+    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: ['N:audience/owners#summary', 'N:audience/owners#who']}
+  - id: D:question/occasion
+    type: question
+    about: I:occasion/why-written#roles.event
+    asks: What prompted this guide?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/occasion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:01:30Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: an owner's call to support about a late morning summary, confidence: 0.9, session: D:session/session-2}
+    settled: {at: 2026-11-01T12:00:00Z, run: 2026-11-05-2031-5615, wrote: [I:occasion/why-written#roles.event]}
+  - id: D:session/session-1
+    type: session
+    at: 2026-11-05T10:18:05Z
+    with: {to: author, who: Meadow's head of support}
+    through: person
+    asked: [D:question/audience, D:question/occasion]
+    answered: [D:question/audience]
+    skipped: [D:question/occasion]
+  - id: D:session/session-2
+    type: session
+    at: 2026-11-05T12:00:00Z
+    with: {to: author, who: Meadow's head of support}
+    through: person
+    asked: [D:question/occasion]
+    answered: [D:question/occasion]
+    skipped: []

@@ -6,7 +6,7 @@ One interface, `Coprocessor.complete(contract, inputs, *, budget) -> Candidate`,
     Contract  = {move, schema, checks, repair}                         what the move needs back and what must hold
     Inputs    = {name: (value, digest)}                                the node's operands, by name
     Budget    = {attempts, output_words, prompt_tokens_max, seconds}   the node's budget and the machine's limits
-    Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}]}
+    Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}], route?, provider?}
 
 `schema` says what comes back (`{format: yaml | markdown, ...}`); `repair` is a mapping, `{allowed: [the narrow repairs
 the move allows], failed: [the checks the last attempt failed, {name, ok, why}]}`, so that a second attempt can ask
@@ -20,7 +20,8 @@ candidates a run recorded, and refuses when the contract or an input's digest di
 `ModelCoprocessor`, is enough's and lives outside the package, in `enough/thym_host.py`.
 
 A recorded candidate is `candidates/<key>.<attempt>.cosm` under the run's folder: `{contract: {move, schema, checks},
-inputs: {name: sha256}, engine, attempts, tokens, seconds, output}`. The key comes from the node's call counter
+inputs: {name: sha256}, engine, attempts, tokens, seconds, route?, provider?, output}` (`route` and `provider` only
+when the candidate carried them, so a record made before routes replays unchanged). The key comes from the node's call counter
 (`engines.CallCounter`): `<node>` for the node's first request, `<node>-<k>` for every later request and every model
 call an engine makes, so that no two calls of a node collide; the engine calls themselves are recorded beside them as
 `<node>-e<k>` (`engines.py`). The runtime passes `at=(key, attempt)` to a coprocessor whose `complete` takes it.
@@ -59,13 +60,20 @@ class Budget(TypedDict):
     seconds: int
 
 
-class Candidate(TypedDict):
+class Candidate(TypedDict, total=False):
     output: Any
     engine: str
     attempts: int
     tokens: int
     seconds: int
     checks: list
+    #: which route answered and through which provider (THYM 23.1), when the coprocessor knows; absent otherwise
+    route: str
+    provider: str
+
+
+#: The candidate's optional keys that `made`, the record and a replay carry when present (absent stays absent).
+WHERE = ("route", "provider")
 
 
 Inputs = dict          # {name: (Value, sha256)}
@@ -77,10 +85,22 @@ class Coprocessor(Protocol):
 
 
 def candidate(output: Any, *, engine: str, attempts: int = 1, tokens: int = 0, seconds: int = 0,
-              checks: list | None = None) -> Candidate:
-    """A candidate with every field of section 12.2 (integers only: no floats reach a `.cosm`)."""
-    return Candidate(output=output, engine=str(engine), attempts=int(attempts), tokens=int(tokens),
-                     seconds=int(seconds), checks=list(checks or []))
+              checks: list | None = None, route: str | None = None, provider: str | None = None) -> Candidate:
+    """A candidate with every field of section 12.2 (integers only: no floats reach a `.cosm`), and the route and
+    provider when they are known."""
+    out = Candidate(output=output, engine=str(engine), attempts=int(attempts), tokens=int(tokens),
+                    seconds=int(seconds), checks=list(checks or []))
+    for k, v in (("route", route), ("provider", provider)):
+        if v:
+            out[k] = str(v)  # type: ignore[literal-required]
+    return out
+
+
+def where(cand: Any) -> dict:
+    """The route and provider a candidate carries, as `made` writes them (only the keys it has)."""
+    if not isinstance(cand, dict):
+        return {}
+    return {k: str(cand[k]) for k in WHERE if cand.get(k)}
 
 
 def contract_key(contract: Contract) -> dict:
@@ -192,7 +212,7 @@ class RecordingCoprocessor:
         record = {"contract": contract_key(contract), "inputs": input_digests(inputs),
                   "engine": cand.get("engine"), "attempts": int(cand.get("attempts") or 1),
                   "tokens": int(cand.get("tokens") or 0), "seconds": int(cand.get("seconds") or 0),
-                  "output": plain(cand.get("output"))}
+                  **where(cand), "output": plain(cand.get("output"))}
         _write_atomic(candidate_path(self.run_dir, key, attempt), mc.dump(record).encode("utf-8"))
         return cand
 
@@ -236,4 +256,4 @@ class ReplayCoprocessor:
                                                 f"{str(rec_in.get(name))[:12]}")
         return candidate(rec.get("output"), engine=str(rec.get("engine") or "replay"),
                          attempts=int(rec.get("attempts") or 1), tokens=int(rec.get("tokens") or 0),
-                         seconds=int(rec.get("seconds") or 0))
+                         seconds=int(rec.get("seconds") or 0), route=rec.get("route"), provider=rec.get("provider"))

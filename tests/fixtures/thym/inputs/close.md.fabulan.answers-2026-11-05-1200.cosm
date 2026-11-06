@@ -1,0 +1,18 @@
+# An answers volume (Thym 22.2): the delta a page writes beside the twin it answers. One session; for each question
+# answered, its id, its new state and its new answers. Read only as a delta, never checked as a fabula on its own.
+oes: fabula/1
+macrocosm: 0.5.4
+id: fabula/guides--close-md
+nodes:
+  - id: D:session/session-2
+    type: session
+    at: 2026-11-05T12:00:00Z
+    with: {to: author, who: Meadow's head of support}
+    through: person
+    asked: [D:question/occasion]
+    answered: [D:question/occasion]
+    skipped: []
+  - id: D:question/occasion
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:01:30Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: "an owner's call to support about a late morning summary", confidence: 0.9, session: D:session/session-2}

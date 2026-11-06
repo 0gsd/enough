@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program settle-the-essay
+  why: settle folds a volume's answered questions into its items; a text has none.
+  takes essay: text
+  gives g: fabula
+
+  give settle essay
+end

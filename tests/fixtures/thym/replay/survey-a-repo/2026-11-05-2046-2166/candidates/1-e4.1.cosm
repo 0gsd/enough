@@ -1,0 +1,22 @@
+engine: syntax.outline
+inputs:
+  call: c683d209318697f7b95460812f034267d1ec46118e082c73abfb6e7b9dde1182
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  lines: 5
+  imports:
+  - module: sys
+    line: 1
+    stdlib: true
+  - module: cli
+    level: 1
+    names:
+    - main
+    line: 3
+  defs: []
+  constants: []
+  env: []

@@ -117,7 +117,7 @@ class CanonJobs:
     # -- control ----------------------------------------------------------
 
     def _new(self, *, kind: str, path: str | None, mode: str, state: str, message: str,
-             key: str | None, reason: str | None = None) -> str:
+             key: str | None, reason: str | None = None, extra: dict[str, Any] | None = None) -> str:
         """Record a job under the table lock; 409 when `key` is claimed. Caller holds `self._lock`."""
         if kind not in KINDS:
             raise ValueError(f"unknown job kind {kind!r}")
@@ -136,21 +136,25 @@ class CanonJobs:
         }
         if reason:
             self._snaps[job_id]["reason"] = reason
+        for k, v in (extra or {}).items():       # route, flavour (0.6): said only when known
+            if v is not None and k not in self._snaps[job_id]:
+                self._snaps[job_id][k] = v
         self._stops[job_id] = threading.Event()
         self._trim()
         return job_id
 
     def start(self, *, kind: str, path: str | None, mode: str, work: Callable[[JobContext], Any],
               key: str | None = None, lock: asyncio.Lock | None = None, message: str = "",
-              reason: str | None = None) -> dict[str, Any]:
+              reason: str | None = None, extra: dict[str, Any] | None = None) -> dict[str, Any]:
         """Claim `key` (409 when a job for it is queued or running), record the job and schedule it on the running
-        loop. `work(ctx)` is blocking and runs in a worker thread; with `lock` (model mode: the session's
-        generation lock) the job waits for it first, `queued` meanwhile. Returns the first snapshot."""
+        loop. `work(ctx)` is blocking and runs in a worker thread; with `lock` (model mode on the local route: the
+        session's generation lock) the job waits for it first, `queued` meanwhile. `extra` adds fields to the
+        record (`route`, `flavour`; None values are left out). Returns the first snapshot."""
         with self._lock:
             waiting = lock is not None and lock.locked()
             job_id = self._new(kind=kind, path=path, mode=mode, state="queued",
                                message="waiting for the model" if waiting else (message or "starting"), key=key,
-                               reason=reason)
+                               reason=reason, extra=extra)
         self._fire(job_id)
         task = asyncio.get_running_loop().create_task(self._run(job_id, work, lock, message))
         self._tasks[job_id] = task

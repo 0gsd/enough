@@ -1891,7 +1891,9 @@
 {"headword": "linseed", "form": "linseeds", "position": 1, "pronunciation": "/ˈlɪnˌsidz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "linsey", "form": "linseys", "position": 1, "pronunciation": "/ˈlɪnziz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "linstock", "form": "linstocks", "position": 1, "pronunciation": "/ˈlɪnˌstɑks/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "lint", "form": "lints", "position": 1, "pronunciation": "/lɪnts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "lint", "form": "linted", "position": 1, "pronunciation": "/ˈlɪntɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "lint", "form": "linting", "position": 2, "pronunciation": "/ˈlɪntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "lint", "form": "lints", "position": 3, "pronunciation": "/lɪnts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "lintel", "form": "lintels", "position": 1, "pronunciation": "/ˈlɪntəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "lintel", "form": "lintol", "position": 2, "pronunciation": "/ˈlɪntəl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "lintel", "form": "lintols", "position": 3, "pronunciation": "/ˈlɪntəlz/", "labels": "[\"pl.\"]", "synonyms": null}

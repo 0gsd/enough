@@ -87,6 +87,11 @@ def alternatives(spec) -> list[str]:
     return [" ".join(a.split()) for a in str(spec).split("|") if a.strip()]
 
 
+def _is_word(a: str) -> bool:
+    """An alternative that names a word rather than a type (`overview`, `isotype`, a word class such as `order`)."""
+    return a not in ALL_SIMPLE and not is_list(a) and a not in (ANY, NOTHING, CONDITION) and a not in UNITS
+
+
 def is_word_choice(alts: list[str]) -> bool:
     """True when a declaration names words rather than types (`'isotype | paratype'`, `order`, `marking`)."""
     return bool(alts) and all(a not in ALL_SIMPLE and not is_list(a) and a not in (ANY, NOTHING, CONDITION)
@@ -114,8 +119,8 @@ def accepts(alts: list[str], actual: str | None, *, word: str | None = None) -> 
         if actual == WORD and word is not None:
             if a in WORD_CLASSES and word in WORD_CLASSES[a]:
                 return True
-            if a == word and a not in ALL_SIMPLE:
-                return True
+            if a == word and (a not in ALL_SIMPLE or any(_is_word(x) for x in alts)):
+                return True                 # in a list of words, a word that is also a type's name (`line`)
         if actual == NOTHING and a in OPTIONAL:
             return True
     return False

@@ -1,0 +1,82 @@
+oes: thym/1
+kind: plan
+id: thym/plan.drop-the-todos
+name: drop-the-todos on draft.md
+program:
+  name: drop-the-todos
+  sha256: 3cf4bd863286f52768a99bdb8531c5d1e5270717ba66795b96091b473c3e9d97
+inputs:
+- name: draft
+  type: text
+  path: inputs/draft.md
+  sha256: 1031274c4682b6377f3de11a4797dd62c0ae5ab5fa9d4e2a975a341b156b0e23
+estimate:
+  steps: 2
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: drop-the-todos on draft.md
+  summary: Two nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: let changes = for each l in lines of draft where "TODO" in l
+  summary: let changes = for each l in lines of draft where "TODO" in l
+  step:
+    program: drop-the-todos
+    n: 1
+  move: for
+  asks: false
+  takes:
+  - draft
+  repeats: true
+  gives: changes
+  calls:
+  - lines
+  - drop
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 9
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L9-L11
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: edit draft with changes
+  summary: edit draft with changes
+  step:
+    program: drop-the-todos
+    n: 3
+  move: edit
+  asks: false
+  takes:
+  - draft
+  - changes
+  gives: clean
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L12
+    confidence: 1

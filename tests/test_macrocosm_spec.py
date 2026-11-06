@@ -66,8 +66,9 @@ def test_spec_example_loads_and_lints_clean(index, tmp_path):
 
 
 def test_spec_examples_use_only_declared_catalog_keys(tmp_path):
-    """Every key an example's catalog carries is one its manifest declares (no `catalog-key` note), and the EMF
-    example carries the `shorts:` list SHORT added (plan §15), so the manifest's declaration of it is tested."""
+    """Every key an example's catalog carries is one its manifest declares (no `catalog-key` note), and a fabula
+    example carries the `shorts:` list (18.4.1; the EMF example did before 0.6), each entry in its shape, so the
+    manifest's declaration of it is tested."""
     shorts = 0
     for index, text in enumerate(_blocks()):
         data = mc.yaml_load(text)
@@ -77,12 +78,18 @@ def test_spec_examples_use_only_declared_catalog_keys(tmp_path):
         report = mc.lint(mc.load_volume(path))
         notes = [str(p) for p in report.notes if p.check == "catalog-key"]
         assert not notes, f"example {index + 1}: " + "; ".join(notes)
-        if data.get("oes") == "emf/1" and isinstance(data.get("shorts"), list):
+        if data.get("oes") in ("fabula/1", "emf/1") and isinstance(data.get("shorts"), list):
             shorts += 1
             for entry in data["shorts"]:
-                assert set(entry) == {"path", "at", "by", "mode", "order"}, entry
-                assert entry["order"] in ("told", "weight") and entry["mode"] in ("model", "rules")
-    assert shorts >= 1, "no example shows an EMF's shorts: list"
+                if entry.get("order") == "code":                    # a cshort (18.4.7)
+                    assert set(entry) == {"path", "at", "by", "mode", "order", "route", "language", "files"}, entry
+                    assert entry["path"].endswith("/")
+                else:                                               # a prose or verse short (18.4.4)
+                    assert {"path", "at", "by", "mode", "order"} <= set(entry) <= {"path", "at", "by", "mode",
+                                                                                   "order", "route"}, entry
+                    assert entry["order"] in ("told", "weight")
+                assert entry["mode"] in ("model", "rules")
+    assert shorts >= 2, "no fabula example shows a shorts: list"
 
 
 # ---------------------------------------------------------------------------

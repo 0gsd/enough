@@ -1,0 +1,34 @@
+# An answers volume for appendix C's fabulap: an expert in Blake's work, in one sitting, answering three questions,
+# not knowing one and declining one.
+oes: fabula/1
+macrocosm: 0.5.4
+id: fabula/poems--the-sick-rose-txt
+nodes:
+  - id: D:session/session-1
+    type: session
+    at: 2026-11-05T12:00:00Z
+    with: {to: expert, who: a scholar of Blake's illuminated books}
+    through: person
+    asked: [D:question/speaker, D:question/worm-intended, D:question/bed, D:question/the-plate, D:question/dark]
+    answered: [D:question/speaker, D:question/worm-intended, D:question/bed, D:question/the-plate, D:question/dark]
+    skipped: []
+  - id: D:question/speaker
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:02:00Z, by: expert, says: "No one in particular: a voice of experience. The rose is a flower and a woman at once.", value: "an unnamed voice of experience, speaking to a rose that is a flower and a woman at once", confidence: 0.8, session: D:session/session-1}
+  - id: D:question/worm-intended
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:04:00Z, by: expert, says: "Yes, I think he meant both.", value: true, confidence: 0.7, session: D:session/session-1}
+  - id: D:question/bed
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:05:00Z, by: expert, says: Both., value: both, confidence: 1, session: D:session/session-1}
+  - id: D:question/the-plate
+    state: unknown
+    answers:
+      - {at: 2026-11-05T12:07:00Z, by: expert, says: "I don't know which copy of the plate the text was taken from.", value: null, session: D:session/session-1}
+  - id: D:question/dark
+    state: declined
+    answers:
+      - {at: 2026-11-05T12:08:00Z, by: expert, says: "I'd rather not say how it should be read aloud.", value: null, session: D:session/session-1, declined: true}

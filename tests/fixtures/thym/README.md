@@ -12,7 +12,6 @@ corpus, which holds the public sample Holotype `holotypes/meadow` that `open-hou
 | `expected/<name>/outputs/` | the outputs of deterministic runs, byte for byte (a folder output is a folder here, `outputs/<name>/`, as it lands) (recorded from the first conforming run, then frozen; `conform` runs them with the clock pinned to 2026-11-01T12:00:00Z) |
 | `replay/<name>/<run-id>/` | recorded runs of model-backed programs: plan, trace, candidates; re-run to the recorded outputs. Two of `publish-story` on Qwen3.8-27B, both with their engine calls recorded as `candidates/<node>-e<k>.1.cosm`, so each replays with no dictionary and no engine: `2026-11-01-2148-35b5` (checkpoint A's run, re-recorded on 2026-11-05 under its own id: recorded before engine calls were, it replayed with live engines and stopped matching when the grammar version Canon stamps moved; the id is kept because other fixtures and the UI check copy its package) and `2026-11-02-0843-ff92` (wave 2; its FEED answers re-recorded on 2026-11-05 with the engine's six fields, every other record as it was). Re-record, never hand-edit |
 | `bad/<slug>.thym` | programs that must be refused; the first line says `-- refused: <stage> <check> line <n>` |
-| `draft-0.6/` | not part of the suite run: a copy of the 0.6 draft of the specification text, `thym-0.6-draft.md`, whose `thym 1` blocks `tests/test_thym_shipped.py` compiles, and `programs/`, the six programs the round ships as the draft has them (compiled there against scratch declarations of the moves the move lanes write) |
 
 **Passing.** A compiler conforms when every program in `programs/` compiles, enumerates to its `expected/items.cosm`,
 compiles back byte for byte, plans to its `expected/plan.cosm`, and every `bad/` program is refused at the stage,
@@ -34,6 +33,25 @@ check and line its first line names. A runtime conforms when every deterministic
 | `loop-as-a-unit` | `h`: `../cosm/holotypes/meadow` (a `thym 1` loop of several statements: one node, its body run member by member) |
 | `contract-holds` | `t`: `inputs/notes.md` (a contract block, kept by a move and by the program) |
 | `bounded-recursion` | `t`: `inputs/notes.md` (a move that calls itself under `depth: 2`) |
+| `drop-the-todos` | `draft`: `inputs/draft.md` (the text's deterministic editor, section 21.5: every line that says TODO dropped by one `edit`) |
+| `tighten` | `s`: `inputs/long-lines.md` (the editor program people copy, section 21.5, byte for byte `defaults/thym/tighten.thym`; it asks, so it conforms by replay: `replay/tighten/2026-11-05-1956-ae6e/`, recorded with a scripted coprocessor whose first answer for line 3 runs past thirty words and fails `length`, so the loop node asks again with the failure in `repair.failed`, and whose answers for lines 3 and 6 pass; its words are the input's own, so `nothing-added` needs no FEED and the replay passes with or without one) |
+| `settle-the-answers` | `f`: `inputs/close.md.fabulan.cosm` (a copy of the fabula fixture `guides/close.md`'s twin, MacroCOSM OES 18.6.9, with one question answered and one open); `said`: `inputs/close.md.fabulan.answers-2026-11-05-1200.cosm` (its answers volume, THYM 22.2: one session answering the open question). Byte for byte `defaults/thym/settle.thym`, the text's second run of the dialectic (22.4). `settle` asks only where an item must be read again, and nothing here must be, so its run asks nothing; but its plan counts `settle` as a node that asks, so it conforms by replay: `replay/settle-the-answers/2026-11-05-2031-5615/`, whose engine calls (`dialectic.thym_record`, `dialectic.thym_settle`) are recorded, so it replays with no dialectic engine and no model |
+| `survey-a-repo` | `repo`: `inputs/tiny-tool/` (a fabulac's outline by rules alone, THYM 20.6: its syntax read through the host's `syntax` engine and its file counts through `repo`, nothing run; its outputs cannot be frozen byte for byte, since the runtime writes the run's id into every item's `made`, so `conform` runs it as its recording, under the recorded run's id and clock, and compares its outputs with `replay/survey-a-repo/2026-11-05-2046-2166/outputs/` byte for byte (where the host's engines are there; elsewhere it conforms by its replay alone); that recording holds every engine call, `candidates/1-e<k>.1.cosm`, and replays with no engine and no folder) |
+
+The editor's static refusals are `bad/lines-in-zero.thym` and `bad/words-of-a-string-in-zero.thym` (`compile version`:
+a move only `thym 1` declares, and a signature only `thym 1`'s view of `words` has), and `bad/replace-a-short.thym`,
+`bad/edit-with-strings.thym`, `bad/join-numbers.thym`, `bad/say-a-fabula.thym`, `bad/gather-a-text.thym`,
+`bad/insert-without-place.thym` (`compile type`: `insert` takes exactly one of `before` and `after`). Its run refusals
+(a change applied to another text, two changes to one line, a `reword` that fails every attempt) are cases of `tests/test_thym_edit.py`: the suite holds files, not runs that refuse.
+
+The dialectic's static refusals (THYM 22) are `bad/question-in-zero.thym` (`compile version`: a move only `thym 1` declares), and `bad/question-a-text.thym`, `bad/record-a-text.thym`, `bad/settle-a-text.thym` and `bad/settle-gives-a-volume.thym` (`compile type`). Its runs (questions by rules and with a model, an answers volume recorded, settling with a re-read, the two runs as a pair and their replays) are cases of `tests/test_thym_dialectic.py`.
+
+`inputs/tiny-tool/` is a small Python program of the suite's own (a package of four modules with a command line, a
+test file, a README, a change log, an MIT licence and a `pyproject.toml`), never run: `inputs/conftest.py` keeps pytest
+from collecting its test. `tests/test_thym_code.py` builds its whole fabulac with `defaults/thym/decompile-python.thym`
+and compiles it back with `compile-python.thym` under a scripted coprocessor, and makes a clone of it in a temporary
+folder for the history. The fabulac's static refusals are `bad/tell-a-poem-as-code.thym` (`compile flavour`) and
+`bad/cshort-as-a-short.thym` (`compile type`: `tell … as code` gives a folder).
 
 The orchard text and its twin are copies of `../cosm/emf/notes.md` and `notes.md.cosm`; inside the package the twin's
 `source.path` and its spans say `text.md`, as a package's fabula must.

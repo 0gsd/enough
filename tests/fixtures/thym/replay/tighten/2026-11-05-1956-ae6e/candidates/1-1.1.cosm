@@ -1,0 +1,22 @@
+contract:
+  move: reword
+  schema:
+    format: markdown
+    says: the words alone, nothing before or after
+  checks:
+  - length
+  - one-line
+  - nothing-added
+  - provenance
+inputs:
+  line: c59515da3271bc762a22d8aebf503f3d5b28e93126d7ebb95c7bf05282ae42dc
+  words: 624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4
+  kind: 38a9c1e721584da284b90ceea4ed7eb8db15ac4ea86c2c75ec925d5f8799fcf0
+engine: model:scripted
+attempts: 1
+tokens: 40
+seconds: 0
+output: 'The bees stayed all summer in the wild strip by the south wall, where nobody mowed; the parish counted
+  more of them there than in any other part.
+
+  '

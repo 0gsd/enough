@@ -15,18 +15,26 @@ from __future__ import annotations
 from typing import Any
 
 
-# Section 7.3's table, in its order.
+# Section 7.3's table, in its order. It is the specification's list, held to the text by a test; it is not the
+# list of what may be named: a `keeps` or a contract may name any check a declaration's contract names or a move
+# module registers (`check.known_checks` reads all three), so a move lane that registers a new check needs no line
+# here, only a row in the text's table.
 CHECKS = (
     "span-resolves", "stance-closed", "terms-grounded", "coverage", "no-invention", "stance-kept", "footer",
     "byte-exact", "atem-shape", "length", "span-inside", "whole-sentences", "weight-order", "scale-range",
     "scale-evidence", "null-pinned", "scales-met", "labelled", "never-source", "default-deny", "no-counts", "banded",
     "no-mark", "verified-derived", "verified-only-where-derived", "standing-gate", "epoch", "digests", "released",
-    "provenance", "emf-checks",
+    "provenance", "fabula-checks", "flavour", "files-found", "code-span", "licence-recorded", "outline-cited",
+    "fold-grounded", "history-grounded", "parses", "interfaces-present", "files-present", "uses-told", "nothing-lost",
+    "ids-unique", "addressed", "no-duplicate", "only-the-asked", "only-the-changed", "one-line", "nothing-added",
 )
+
+# A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
+OLD_NAMES = {"emf-checks": "fabula-checks"}
 
 # Section 9's compile-time check names.
 COMPILE = ("parse", "version", "unknown-move", "unknown-uri", "use-clash", "unbound", "rebound", "type", "recursion",
-           "no-give", "emit-without-project")
+           "unknown-check", "no-give", "emit-without-project", "flavour")
 
 # The static contract checks the compiler refuses by their own name (section 7.1).
 STATIC = ("no-counts",)

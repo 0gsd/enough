@@ -5,7 +5,8 @@ For each program under `programs/`: it compiles, enumerates to `expected/<name>/
 byte, and plans to `expected/<name>/plan.cosm` (compared with the compiler's `plan.normalise`); these parts need the
 compiler (`parse`, `check`, `enumerate`, `plan`) and are skipped, with a line saying so, while it is not there. A
 deterministic program's run is compared with `expected/<name>/outputs/` byte for byte when that folder holds recorded
-outputs, and every recorded run under `replay/<name>/` is replayed to its recorded outputs; these parts need only the
+outputs, or, when its outputs carry its run's id and so cannot be frozen, run as its latest recording under
+`replay/<name>/` (that run's id and clock) and compared with the recording's outputs; and every recorded run under `replay/<name>/` is replayed to its recorded outputs; these parts need only the
 runtime and the moves. Every `bad/` program must be refused at the stage, check and line its first line names.
 
 The suite reads each file by its own version line (THYM 24.3): a `thym 0` program by the `thym 0` grammar and the
@@ -178,8 +179,12 @@ def _run_parts(rep: Report, name: str, suite: Path, exp: Path, root: Path, kw: d
         plan = mc.yaml_load(mc.read_text(plan_file))
         asks = (plan.get("estimate") or {}).get("asks") if isinstance(plan.get("estimate"), dict) else None
         recorded = sorted(p for p in outs.rglob("*") if p.is_file()) if outs.is_dir() else []
+        replays = sorted(d for d in (suite / "replay" / name).glob("*") if d.is_dir()) \
+            if (suite / "replay" / name).is_dir() else []
         if asks:
             pass                                    # a model-backed program conforms by replay, below
+        elif not recorded and replays:
+            _run_against_recording(rep, name, plan, suite, items_file, replays[-1], root, kw)
         elif not recorded:
             rep.add("skip", f"{name}: run (no recorded outputs under expected/{name}/outputs/ yet)")
         else:
@@ -214,6 +219,42 @@ def _run_parts(rep: Report, name: str, suite: Path, exp: Path, root: Path, kw: d
             rep.add("FAIL", f"{what}: {'; '.join((t.replay or {}).get('differences') or ['outputs differ'])}")
         else:
             rep.add("pass", f"{what} re-runs to its recorded outputs")
+
+
+def _run_against_recording(rep: Report, name: str, plan: dict, suite: Path, items_file: Path, run_dir: Path,
+                           root: Path, kw: dict) -> None:
+    """A deterministic program whose outputs carry its run's id (every item's `made`; a fabula's `derived.run`)
+    cannot be frozen byte for byte: it is run here as the recorded run, under that run's id and clock, and its
+    outputs compared with the recording's byte for byte. Where an engine the recording names is not here (a host
+    without them), the run conforms by its replay alone, below, as a model-backed program does."""
+    from enough.thym import run as _run
+    from enough.thym import trace as _trace
+    from enough.thym.engines import recorded_names
+    found = sorted(run_dir.glob("*.trace.cosm"))
+    tv = _trace.load(found[0]) if found else None
+    if not isinstance(tv, dict):
+        rep.add("FAIL", f"{name}: run (replay/{name}/{run_dir.name} holds no trace to run against)")
+        return
+    head = _trace.root_item(tv)
+    have = kw.get("engines") or {}
+    if any(n not in have for n in recorded_names(head) or []):
+        return
+    t = _run.run(plan, inputs_root=suite, root=root, program=items_file if items_file.is_file() else None,
+                 record=False, **{**kw, "made_run": str(head.get("made_run") or run_dir.name),
+                                  "now": _trace.parse_utc(tv.get("started"))})
+    what = f"{name}: run lands replay/{name}/{run_dir.name}/outputs/ byte for byte, under the recorded run's id"
+    if isinstance(t, Refusal):
+        rep.add("FAIL", f"{name}: run refused at plan time: {t}")
+    elif not t.landed:
+        rep.add("FAIL", f"{name}: run refused: {t.refusal}")
+    else:
+        outs, landed = run_dir / "outputs", t.dir / "outputs"
+        want = sorted(p for p in outs.rglob("*") if p.is_file()) if outs.is_dir() else []
+        bad = [p.relative_to(outs).as_posix() for p in want
+               if not (landed / p.relative_to(outs)).is_file()
+               or (landed / p.relative_to(outs)).read_bytes() != p.read_bytes()]
+        rep.add("FAIL" if bad or not want else "pass", what + (f" (differs: {', '.join(bad)})" if bad else
+                                                             " (it holds no outputs)" if not want else ""))
 
 
 def _records_engines(run_dir: Path) -> bool:

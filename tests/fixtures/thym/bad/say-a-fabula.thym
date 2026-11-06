@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program say-it-all
+  why: say gives a number, a date, a word or a bool as a string, never a fabula.
+  takes f: fabula
+  gives s: string
+
+  give say f
+end

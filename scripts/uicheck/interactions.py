@@ -3533,7 +3533,7 @@ def scenario_compile_short(d: Driver) -> list[str]:
         fails.append(f"the short {short} is not there beside the text")
     else:
         last = body.rstrip("\n").splitlines()[-1]
-        if not (last.startswith("*a short of press.md, told as the author told it, compiled from its EMF twin on ")
+        if not (last.startswith("*a short of press.md, told as the author told it, compiled from its fabula on ")
                 and last.endswith(" by rules, without a model*")):
             fails.append(f"the short does not end with the footer line: {last!r}")
         if not body.startswith("# The Hollins Lane orchard") or "## What it claims" in body:

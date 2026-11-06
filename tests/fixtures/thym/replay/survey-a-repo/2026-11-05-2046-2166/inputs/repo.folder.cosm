@@ -1,0 +1,209 @@
+oes: thym/1
+kind: folder
+id: "thym/2026-11-05-2046-2166.repo"
+name: "inputs/tiny-tool"
+path: "inputs/tiny-tool"
+tree: 936073408dfbe6f8d5ebcb03f207b3a2012744d1d5064949b4bd543bbd5e904f
+files:
+  - {path: "CHANGES.md", sha256: 4eb78dd96d855d7cd4cbe03078a9491c1ea6197daadbf97924926941c4797248, size: 166}
+  - {path: "LICENSE", sha256: 09263ad6f9b944faa2045474de5214d6896425053e9e3e76ddf1cec49cb52c15, size: 1070}
+  - {path: "README.md", sha256: feaadfd275158b70ed7241ca5af0c2e4c3a5933e86d787614cc131e5be96fa3d, size: 444}
+  - {path: "pyproject.toml", sha256: ec971f9b34b554a9d1a7d7b547159af61adca28395d745739458fc8ab9fe8e1c, size: 338}
+  - {path: "tests/test_counting.py", sha256: a1bd0e883d85d0d617b476d4c933acba157b6e44bd13547164783a464b8f67ae, size: 404}
+  - {path: "tiny/__init__.py", sha256: e34b7f505dc98cb28163684424e88fab42a8a477dd1f3b4b7f05b53f7f5fba6c, size: 66}
+  - {path: "tiny/__main__.py", sha256: 13a1a5b340cdcfc1902b62be90e508c7c71886000d5bf087e7854aadf09fb35e, size: 52}
+  - {path: "tiny/cli.py", sha256: a0bfa45a2aa178873e46e38cd6be4624d29b71fb9aeeab61d10d61c308e9a91a, size: 1385}
+  - {path: "tiny/counting.py", sha256: 2a8293afb70e83d4cc9570028adbbef03ebaf8dbffe4114a66954d0670059353, size: 1792}
+texts:
+  - path: "CHANGES.md"
+    text: |2
+      # Changes
+
+      ## 0.2.0
+
+      - New: `tiny top` lists the commonest words.
+      - `TINY_ENCODING` names the encoding a file is read with.
+
+      ## 0.1.0
+
+      - First release: `tiny count`.
+  - path: "LICENSE"
+    text: |2
+      MIT License
+
+      Copyright (c) 2026 Orchard Tools
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+      documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+      rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+      persons to whom the Software is furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+      Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+      WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+      COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+      OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  - path: "README.md"
+    text: |2
+      # tiny
+
+      Count the words of a text file, or list its commonest words.
+
+          tiny count notes.txt            # 42
+          tiny count notes.txt --lines    # 7
+          tiny top notes.txt -n 2         # the: 5, and: 3
+
+      Words are runs of letters, compared without case. A file that cannot be read is named on standard error,
+      with exit status 1. `TINY_ENCODING` names the encoding to read with (UTF-8 when unset).
+
+      Python 3.10 or later, standard library only.
+  - path: "pyproject.toml"
+    text: |2
+      [project]
+      name = "tiny-tool"
+      version = "0.2.0"
+      description = "Count the words of a text file."
+      requires-python = ">=3.10"
+      license = "MIT"
+      dependencies = []
+
+      [project.optional-dependencies]
+      test = ["pytest>=8"]
+
+      [project.scripts]
+      tiny = "tiny.cli:main"
+
+      [build-system]
+      requires = ["setuptools>=68"]
+      build-backend = "setuptools.build_meta"
+  - path: "tests/test_counting.py"
+    text: |2
+      import pytest
+
+      from tiny.counting import CountError, count_words, top_words
+
+
+      def test_words_are_runs_of_letters():
+          assert count_words("It's a dog-day, 2 dogs.") == 6
+
+
+      def test_top_words_break_ties_by_letter():
+          assert top_words("b a b a c", 2) == [("a", 2), ("b", 2)]
+
+
+      def test_top_needs_one_or_more():
+          with pytest.raises(CountError, match="n must be 1 or more"):
+              top_words("a", 0)
+  - path: "tiny/__init__.py"
+    text: |2
+      """tiny: count the words of a text file."""
+      __version__ = "0.2.0"
+  - path: "tiny/__main__.py"
+    text: |2
+      import sys
+
+      from .cli import main
+
+      sys.exit(main())
+  - path: "tiny/cli.py"
+    text: |2
+      """The command line: tiny count FILE [--lines], tiny top FILE [-n N]."""
+      from __future__ import annotations
+
+      import argparse
+      import sys
+
+      from . import __version__
+      from .counting import CountError, count_words, read_text, top_words
+
+
+      def build_parser() -> argparse.ArgumentParser:
+          p = argparse.ArgumentParser(prog="tiny", description="Count the words of a text file.")
+          p.add_argument("--version", action="version", version=f"tiny {__version__}")
+          sub = p.add_subparsers(dest="command", required=True)
+          c = sub.add_parser("count", help="count the words, or the lines, of a file")
+          c.add_argument("file")
+          c.add_argument("--lines", action="store_true", help="count lines instead of words")
+          t = sub.add_parser("top", help="list the commonest words")
+          t.add_argument("file")
+          t.add_argument("-n", type=int, default=3, help="how many words to list")
+          return p
+
+
+      def main(argv: list[str] | None = None) -> int:
+          args = build_parser().parse_args(argv)
+          try:
+              text = read_text(args.file)
+              if args.command == "count":
+                  print(len(text.splitlines()) if args.lines else count_words(text))
+              else:
+                  print(", ".join(f"{w}: {k}" for w, k in top_words(text, args.n)))
+          except CountError as e:
+              print(f"tiny: {e}", file=sys.stderr)
+              return 1
+          return 0
+
+
+      if __name__ == "__main__":
+          sys.exit(main())
+  - path: "tiny/counting.py"
+    text: |2
+      """Words, counted: what a word is, how many a text holds, and which come most often."""
+      from __future__ import annotations
+
+      import os
+      import re
+      from collections import Counter
+      from dataclasses import dataclass
+      from pathlib import Path
+
+      WORD = re.compile(r"[A-Za-z]+")
+      DEFAULT_TOP = 3
+
+
+      class CountError(Exception):
+          """A file that cannot be counted; its message is shown to the user as it is."""
+
+
+      @dataclass(frozen=True)
+      class Summary:
+          """What a text holds, counted."""
+          words: int
+          lines: int
+          encoding: str = "utf-8"
+
+
+      def read_text(path: Path, env: dict | None = None) -> str:
+          """The text of a file, read in the encoding TINY_ENCODING names (UTF-8 when unset)."""
+          env = os.environ if env is None else env
+          encoding = env.get("TINY_ENCODING", "utf-8") or "utf-8"
+          try:
+              return Path(path).read_text(encoding=encoding)
+          except (OSError, UnicodeDecodeError, LookupError) as e:
+              raise CountError(f"cannot read {path}: {e.__class__.__name__}") from None
+
+
+      def words(text: str) -> list[str]:
+          """The words of a text, lowercased, in order."""
+          return [w.lower() for w in WORD.findall(text)]
+
+
+      def count_words(text: str) -> int:
+          """How many words a text holds."""
+          return len(words(text))
+
+
+      def top_words(text: str, n: int = DEFAULT_TOP) -> list[tuple[str, int]]:
+          """The n commonest words with their counts, commonest first; ties in alphabetical order."""
+          if n < 1:
+              raise CountError("n must be 1 or more")
+          counts = Counter(words(text))
+          return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:n]
+
+
+      def summarise(text: str, encoding: str = "utf-8") -> Summary:
+          """The words and lines of a text, with the encoding it was read in."""
+          return Summary(count_words(text), len(text.splitlines()), encoding)
+nodes: []

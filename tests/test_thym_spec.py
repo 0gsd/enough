@@ -74,8 +74,10 @@ def test_thym_manifest_is_in_the_registry():
     assert list(reg.manifests)[:5] == list(mc.REGISTRY_ORDER)   # the five keep their order; thym follows
 
 
-def _declared_moves() -> dict[str, tuple[str, dict]]:
-    """Every move declared in a manifest's moves: block or a *.moves.cosm sidecar, by name."""
+def _declared_moves(*, extensions: list | None = None) -> dict[str, tuple[str, dict]]:
+    """Every move declared in a manifest's moves: block or a *.moves.cosm sidecar, by name. An entry that says
+    `extends: true` adds kinds to a move another owner declares (THYM 6.2: each MiniCOSM declares the kinds it
+    projects); it is not a second declaration of the name, and goes into `extensions` as (owner, entry)."""
     found: dict[str, tuple[str, dict]] = {}
     for p in sorted(MANIFESTS.glob("*.cosm")):
         data = _yaml(_text(p))
@@ -87,9 +89,23 @@ def _declared_moves() -> dict[str, tuple[str, dict]]:
             continue
         for mv in moves:
             name = str(mv["name"])
+            if mv.get("extends") is True:
+                if extensions is not None:
+                    extensions.append((owner, mv))
+                continue
             assert name not in found, f"move {name} declared twice: {found[name][0]} and {owner}"
             found[name] = (owner, mv)
     return found
+
+
+def test_a_kind_another_owner_adds_extends_a_move_it_does_not_declare():
+    """Ascribe adds `isograph` to Comprise's `project` (THYM 6.2, 6.3, 18): an extension names a move another owner
+    declares, adds only `as` kinds, for `thym 1`, and the code that runs them."""
+    ext: list = []
+    moves = _declared_moves(extensions=ext)
+    assert [(o, mv["name"], mv["modifiers"]) for o, mv in ext] == [("ascribe", "project", {"as": "isograph"})]
+    for owner, mv in ext:
+        assert moves[mv["name"]][0] != owner and mv.get("since") == 1 and mv.get("code") and mv.get("says")
 
 
 def test_moves_are_declared_by_their_owners():
@@ -112,9 +128,16 @@ def test_every_contract_check_is_defined_in_the_spec():
     section = text[text.index("### 7.3 The named checks"):text.index("### 7.4")]
     defined = set(_CHECK_ROW.findall(section))
     assert len(defined) >= 30
-    for name, (owner, mv) in _declared_moves().items():
-        for check in mv.get("contract") or []:
-            assert check in defined, f"{owner}: move {name} names a check the spec does not define: {check}"
+    ext: list = []
+    entries = [(n, o, mv) for n, (o, mv) in _declared_moves(extensions=ext).items()]
+    for name, (owner, mv) in ((mv["name"], (o, mv)) for o, mv in ext):
+        entries.append((name, owner, mv))
+    old = {"emf-checks"}                     # fabula-checks' old name, which a thym 0 view keeps (7.3)
+    for name, owner, mv in entries:
+        views = [mv, mv.get("thym-1") or {}]
+        rules = [r for v in views for k in ("contract-when",) for r in (v.get(k) or [])]
+        for check in [c for v in views for c in (v.get("contract") or [])] + [c for r in rules for c in r["contract"]]:
+            assert check in defined | old, f"{owner}: move {name} names a check the spec does not define: {check}"
 
 
 def test_comprise_manifest_is_still_a_byte_copy():
@@ -153,7 +176,7 @@ def test_spec_cosm_block_loads_and_lints_clean(index, tmp_path):
 def test_spec_thym_block_is_a_complete_program(index):
     text = _thym_blocks()[index]
     lines = [l for l in text.splitlines() if l.strip() and not l.lstrip().startswith("--")]
-    assert lines[0] == "thym 0", f"thym block {index + 1} does not start with its version line"
+    assert lines[0] in ("thym 0", "thym 1"), f"thym block {index + 1} does not start with its version line"
     assert lines[-1] == "end", f"thym block {index + 1} does not close its last block"
     assert re.search(r"^(program|move|morph|context) [a-z][a-z0-9-]*", text, re.M)
     if not HAVE_COMPILER:

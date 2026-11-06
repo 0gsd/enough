@@ -1,4 +1,11 @@
-"""The readvisor's Thym tools: `thym_check` and `thym_run` (0.5.0, wave 2, R1; docs/THYM.md 11.3, 12.1, 12.5, 19).
+"""The readvisor's Thym tools: `thym_check`, `thym_run` (0.5.0, wave 2, R1; docs/THYM.md 11.3, 12.1, 12.5, 19) and
+`thym_moves` (0.6: the moves a program of a version may use, so an agent writes one without guessing).
+
+**Models in a run** (THYM.md 23). `thym_check` and `thym_run` take `<model>`: `local` (the default: this machine's
+model, whatever slot the chat is on), `cloud` (the cloud model the broker names) or `cloud:<model id>`, and
+`thym_run` takes `<calls>`, a ceiling on the run's model requests. The check answers the plan's `models` line as the
+command line prints it; the run refuses a shut gate in the gate's words, a cloud plan whose count is open without
+`<calls>`, and agent-free on both routes, before anything is asked. A cloud run takes no lock either way.
 
 Registered into `tools._DISPATCH` the way `canon_tools` is, and traced under the universal toggle like the other
 MacroCOSM tools. Their tags are in `prompt.CANON_TOOL_INSTRUCTIONS` (the owner's 1,000-character block), and their
@@ -37,7 +44,10 @@ from typing import Any
 
 log = logging.getLogger("enough.thym_tools")
 
-TOOL_NAMES: tuple[str, ...] = ("thym_check", "thym_run")
+TOOL_NAMES: tuple[str, ...] = ("thym_check", "thym_run", "thym_moves")
+
+#: How a tool call gives a run's ceiling, in the refusal that asks for one.
+CEILING = "<calls>"
 
 #: The skill both tools answer to (the owner's decision, docs/thym-050-plan.md §3).
 SKILL_NAME = "macrocosm-oes"
@@ -136,16 +146,37 @@ def _takes(checked: Any) -> list[tuple[str, str]]:
     return [(p.name, p.type) for p in progs[0].takes] if progs else []
 
 
-def _gives(checked: Any) -> tuple[str, str] | None:
+def _gives(checked: Any) -> list[tuple[str, str]]:
+    """Every output the program gives, `(name, type)`, in its `gives` order (several in `thym 1`)."""
     progs = checked.programs()
-    g = progs[0].gives if progs else None
-    return (g.name, g.type) if g is not None else None
+    if not progs:
+        return []
+    outs = list(getattr(progs[0], "outputs", None) or ([progs[0].gives] if progs[0].gives else []))
+    return [(g.name, g.type) for g in outs]
 
 
 def _plan_line(plan: dict) -> str:
-    """The plan's one line exactly as `python -m enough.thym plan` prints it (THYM.md 11.3)."""
-    from .thym.cli import plan_atem
-    return plan_atem(plan)
+    """The plan's lines exactly as `python -m enough.thym plan` prints them (THYM.md 11.3, 23.2): its atem, and its
+    `models` line when it asks a model."""
+    from .thym.cli import models_line, plan_atem
+    line = models_line(plan)
+    return plan_atem(plan) + (f"\n{line}" if line else "")
+
+
+def _route(extra: dict) -> tuple[str, str | None, int | None] | str:
+    """`(route, model, calls)` from `<model>` and `<calls>`; a problem as a string."""
+    from .thym.cli import parse_model
+    from .thym import Refusal
+    got = parse_model(extra.get("model") or "local")
+    if isinstance(got, Refusal):
+        return "<model> is local, cloud or cloud:<model id>, not " + repr(extra.get("model"))
+    raw = (extra.get("calls") or "").strip()
+    calls = None
+    if raw:
+        if not raw.isdigit() or int(raw) < 1:
+            return f"<calls> is a ceiling of at least 1 model call, not {raw!r}"
+        calls = int(raw)
+    return got[0], got[1], calls
 
 
 def _inputs_lines(raw: str | None) -> list[tuple[str, str]] | str:
@@ -189,12 +220,17 @@ def _resolve_inputs(project_dir: Path, pairs: list[tuple[str, str]],
                     "the Canon store")
         if not target.exists():
             return f"no such file: {rel} (the input {name})"
+        typ = types.get(name) or guess_type(target)
+        if name in types:
+            from . import thym_host
+            problem = thym_host.check_input(target, typ, name=name, shown=rel)
+            if problem:
+                return problem
         try:
-            sha = digest_path(target) or ""
+            sha = digest_path(target, typ if typ == "folder" else None) or ""
         except OSError as e:
             return f"{rel} could not be read ({e.strerror or e})"
-        rows.append({"name": name, "type": types.get(name) or guess_type(target), "path": str(target),
-                     "sha256": sha})
+        rows.append({"name": name, "type": typ, "path": str(target), "sha256": sha})
         labels[name] = rel
     return rows, labels
 
@@ -205,17 +241,16 @@ def _placeholders(takes: list[tuple[str, str]]) -> list[dict]:
     return [{"name": n, "type": t, "path": n, "sha256": "", "size": 0} for n, t in takes]
 
 
-def _asks_refusal(plan: dict, why: str, check: str) -> Any:
-    """The plan-time refusal of THYM.md 19, in the runtime's words (`run._environment`): the count of the steps that
-    ask a model and the first one's line."""
+def _asks_refusal(plan: dict, why: str, check: str, *, route: str = "local", program: Any = None) -> Any:
+    """The plan-time refusal of THYM.md 19, in the text's words (`thym_host.asks_said`): how many steps ask a model on
+    which route, and the first one's statement and line."""
+    from . import thym_host
     from .thym import Refusal
-    asks = [n for n in plan.get("nodes") or [] if isinstance(n, dict) and n.get("type") == "node"
-            and n.get("asks") is True]
-    if not asks:
+    said = thym_host.asks_said(plan, route=route, program=program)
+    if said is None:
         return None
-    k = len(asks)
-    many = f"{k} step{'s' if k != 1 else ''} ask{'' if k != 1 else 's'} a model"
-    return Refusal("plan", check, f"{many}; {why}", line=asks[0].get("line"))
+    many, line = said
+    return Refusal("plan", check, f"{many}; {why}", line=line)
 
 
 def _then(said: str, more: str) -> str:
@@ -245,7 +280,6 @@ def run_thym_check(project_dir: Path, call: Any) -> Any:
         return _err("thym_check", "", "thym_check needs a <path>: a .thym file (or a program's name).")
     from . import thym_host
     from .thym import Refusal
-    from .thym import plan as _plan
     path = thym_host.find_program(ref, project_dir)
     if path is None:
         return _not_found("thym_check", ref, project_dir)
@@ -258,6 +292,9 @@ def run_thym_check(project_dir: Path, call: Any) -> Any:
     if isinstance(checked, Refusal):
         return _result("thym_check", ref, True, str(_named(checked, label)))
     takes, gives = _takes(checked), _gives(checked)
+    route = _route(extra)
+    if isinstance(route, str):
+        return _err("thym_check", ref, route)
     pairs = _inputs_lines(extra.get("inputs"))
     if isinstance(pairs, str):
         return _err("thym_check", ref, pairs)
@@ -270,7 +307,7 @@ def run_thym_check(project_dir: Path, call: Any) -> Any:
         inputs, measured = _placeholders(takes), False
     lines = ["ok"]
     try:
-        plan = _plan.plan(checked, inputs)
+        plan, info = thym_host.plan_for(checked, inputs, route=route[0], model=route[1], llm_url=_ct()._llm_url)
     except Exception as e:  # noqa: BLE001
         log.exception("thym_check: the plan failed")
         return _err("thym_check", ref, f"{label} compiles, and its plan could not be made ({type(e).__name__}).")
@@ -278,8 +315,11 @@ def run_thym_check(project_dir: Path, call: Any) -> Any:
         lines.append(str(_named(plan, label)))
     else:
         lines.append(_plan_line(plan))
+        said = thym_host.route_refusal(plan, info, calls=route[2], ceiling=CEILING, program=path)
+        if said is not None:
+            lines.append(str(_named(said, label)))
     sig = ", ".join(f"{n}: {t}" for n, t in takes) or "nothing"
-    lines.append(f"takes {sig}" + (f"; gives {gives[0]}: {gives[1]}" if gives else ""))
+    lines.append(f"takes {sig}" + (f"; gives {', '.join(f'{n}: {t}' for n, t in gives)}" if gives else ""))
     if not measured and not isinstance(plan, Refusal) and (plan.get("estimate") or {}).get("asks"):
         lines.append("planned without inputs, so the largest prompt is not measured: add <inputs> lines "
                      "(name=path) to measure it on files")
@@ -345,6 +385,9 @@ def run_thym_run(project_dir: Path, call: Any) -> Any:
     from .thym import Refusal
     from .thym import plan as _plan
     from .thym import run as _run
+    route = _route(extra)
+    if isinstance(route, str):
+        return _err("thym_run", ref, route)
     path = thym_host.find_program(ref, project_dir)
     if path is None:
         return _not_found("thym_run", ref, project_dir)
@@ -379,22 +422,35 @@ def run_thym_run(project_dir: Path, call: Any) -> Any:
             said = _then(said, "The first input goes in <path>, further ones in <inputs> lines (name=path).")
         return _err("thym_run", ref, said)
 
-    # The environment (THYM.md 12.1, 19): agent-free first, then whether a model answers.
+    # The environment (THYM.md 12.1, 19, 23): agent-free first (both routes, before any broker is asked), then
+    # whether a model answers on the run's route.
     ct = _ct()
     agent_free = _agent_free.enabled()
+    on, model_id, calls = route
     complete = None
     if agent_free:
-        no = _asks_refusal(plan, "agent-free is on", "agent-free")
+        no = _asks_refusal(plan, "agent-free is on", "agent-free", route=on, program=path)
         if no is not None:
             return _err("thym_run", ref, _then(str(_named(no, label)), "Turn agent-free off in ui preferences to "
                                                                        "run it, or run a program that asks no model."))
+    elif on == "cloud":
+        if thym_host.plan_asks(plan):
+            complete = thym_host.route_complete("cloud", model=model_id, llm_url=ct._llm_url, project_dir=project_dir)
     else:
-        complete, _why = ct.model()
+        complete, _why = ct.model("local")
         if complete is None:
-            no = _asks_refusal(plan, "no model is running", "rules")
+            no = _asks_refusal(plan, "no model is running", "rules", route=on, program=path)
             if no is not None:
                 return _err("thym_run", ref, _then(str(_named(no, label)), "Start the model to run it, or run a "
                                                                            "program that asks no model."))
+    info = None
+    if complete is not None and thym_host.plan_asks(plan):
+        plan, info = thym_host.plan_for(checked, inputs, route=on, model=model_id, llm_url=ct._llm_url)
+        if isinstance(plan, Refusal):
+            return _err("thym_run", ref, str(_named(plan, label)))
+        no = thym_host.route_refusal(plan, info, calls=calls, ceiling=CEILING, program=path)
+        if no is not None:
+            return _err("thym_run", ref, str(_named(no, label)))
     asks = bool((plan.get("estimate") or {}).get("asks"))
     if asks:
         long = _text_too_long(plan, labels)
@@ -402,7 +458,9 @@ def run_thym_run(project_dir: Path, call: Any) -> Any:
             return _err("thym_run", ref, long + ".")
 
     kw = thym_host.runtime_kwargs(rules=complete is None, complete=complete, llm_url=ct._llm_url,
-                                  catalog=thym_host.catalog_engine(project_dir))   # `context of` reads it (16.1)
+                                  catalog=thym_host.catalog_engine(project_dir),   # `context of` reads it (16.1)
+                                  route=on, model=model_id, calls=calls, project_dir=project_dir, info=info,
+                                  ceiling=CEILING, program=path)
     root = kw.pop("root", None) or thym_host.host_root()
     started = _stamp()
     try:
@@ -419,10 +477,79 @@ def run_thym_run(project_dir: Path, call: Any) -> Any:
         why = str(_named(t.refusal, label)) if t.refusal is not None and not t.refusal.file else str(t.refusal or "")
         body = "\n".join(x for x in (t.atem(), why, f"trace: {t.path}", "nothing landed") if x)
         return _result("thym_run", ref, False, "error: " + body, effects)
+    from .thym.cli import _output_lines
     out = [t.atem()]
-    out += [f"{name}: {p}" for name, p in t.outputs.items()]
+    out += _output_lines(t)                        # every output as it landed, a folder output as a directory
     out += [f"trace: {t.path}", OUTPUTS_NOTE]
     return _result("thym_run", ref, True, "\n".join(out), effects)
+
+
+# ---------------------------------------------------------------------------
+# thym_moves
+# ---------------------------------------------------------------------------
+
+def _alts(alts: Any) -> str:
+    return " | ".join(str(a) for a in alts) if isinstance(alts, (list, tuple)) else str(alts)
+
+
+def move_signature(d: Any) -> str:
+    """A declared move as a program calls it: `tell <fabula | item | volume> [as <order>] [by <order>] [with
+    <morph>]`, then what it gives; a move whose argument is its `of` reads `context of <text | package>`."""
+    mods = dict(getattr(d, "modifiers", None) or {})
+    parts = [d.name]
+    if "of" in mods and not d.takes:
+        parts.append(f"of <{_alts(mods.pop('of'))}>")
+    parts += [f"<{_alts(t)}>" for t in d.takes]
+    parts += [f"[{w} <{_alts(a)}>]" for w, a in mods.items()]
+    gives = _alts(d.gives)
+    if gives in ("same-as-with", "same-as-in"):
+        gives = f"what its {gives.rsplit('-', 1)[1]} is"
+    out = " ".join(parts) + f" gives {gives}"
+    whens = [(on, what, val) for on, what, val in getattr(d, "gives_when", ()) or ()]
+    if whens:
+        said = "; ".join(f"{'as' if on == 'as' else 'of'} {_alts(what)}: {_alts(val)}" for on, what, val in whens)
+        out += f" ({said})"
+    return out
+
+
+def move_line(d: Any) -> str:
+    """One move, as `thym_moves` lists it: its signature; whether it asks a model (and its scaffold); its contract;
+    its `says` line."""
+    asks = "asks a model" + (f", scaffold {d.scaffold}" if d.scaffold else ", no scaffold") if d.asks \
+        else "asks nothing"
+    contract = f"; contract {', '.join(d.contract)}" if d.contract else ""
+    says = " ".join(str(d.says or "").split())
+    return f"- {move_signature(d)}; {asks}{contract}" + (f". {says}" if says else "")
+
+
+def run_thym_moves(project_dir: Path, call: Any) -> Any:
+    """`thym_moves [<version>] [<move>]` — the moves a program of grammar `version` (1, the default, or 0) may use,
+    each with its signature, whether it asks a model, its contract and its `says` line (THYM.md 6.3, 17.6), read from
+    the declarations a compile reads; `<move>` shows only that one. Read-only; allowed in every mode."""
+    extra = getattr(call, "extra", None) or {}
+    raw = (extra.get("version") or call.path or "1").strip().removeprefix("thym").strip()
+    key = f"thym {raw}"
+    if not skill_on(project_dir):
+        return _skill_off("thym_moves", key)
+    from .thym import declarations as _decls
+    if raw not in ("0", "1"):
+        return _err("thym_moves", key, f"<version> is 0 or 1 (the grammar's `thym <n>` line), not {raw!r}.")
+    version = int(raw)
+    try:
+        seen = _decls.load().view(version)
+    except Exception as e:  # noqa: BLE001 — a manifest that does not read is said in words
+        log.exception("thym_moves: the declarations failed")
+        return _err("thym_moves", key, f"the moves could not be read ({type(e).__name__}).")
+    only = (extra.get("move") or "").strip()
+    if only:
+        if only not in seen:
+            near = ", ".join(sorted(seen)[:PROGRAMS_SHOWN * 4])
+            return _err("thym_moves", key, f"a thym {version} program has no move {only!r}; it has: {near}.")
+        return _result("thym_moves", key, True, move_line(seen[only]))
+    lines = [f"the moves a thym {version} program may use ({len(seen)}); a user move or a contract block may be "
+             "written beside them:"]
+    lines += [move_line(seen[n]) for n in sorted(seen)]
+    return _result("thym_moves", key, True, "\n".join(lines))
 
 
 # ---------------------------------------------------------------------------
@@ -432,17 +559,31 @@ def run_thym_run(project_dir: Path, call: Any) -> Any:
 _RUNNERS = {
     "thym_check": run_thym_check,
     "thym_run": run_thym_run,
+    "thym_moves": run_thym_moves,
 }
 
 
+def documented(tool_name: str) -> bool:
+    """Is the tool named in the MacroCOSM block the model reads? A dispatchable tool no prompt names can never be
+    called (`tests/test_prompt_weight.py`'s guard), so `thym_moves` joins the dispatch table once the block (prompt.py,
+    capped at 1,000 characters, not this module's) names it: docs/fabula-landed-T1-models.md section C has the
+    wording that fits."""
+    from . import prompt
+    return tool_name in prompt.CANON_TOOL_INSTRUCTIONS
+
+
 def register() -> None:
-    """Add the two tools to `tools._DISPATCH` and `_TRACE_TOGGLE`. Idempotent, called once at `tools` import time;
-    traced under the universal toggle, like the MacroCOSM tools beside them."""
+    """Add the tools to `tools._DISPATCH` and `_TRACE_TOGGLE`. Idempotent, called once at `tools` import time;
+    traced under the universal toggle, like the MacroCOSM tools beside them. `thym_moves` waits until the block names
+    it (`documented`); its runner works now (`run_thym_moves`)."""
     from . import tools as _t
     for tool_name, runner in _RUNNERS.items():
+        if tool_name == "thym_moves" and not documented(tool_name):
+            continue
         _t._DISPATCH.setdefault(tool_name, runner)
         _t._TRACE_TOGGLE.setdefault(tool_name, "trace_log_enabled")
 
 
-__all__ = ["JOB_KIND", "OUTPUTS_NOTE", "PROGRAMS_SHOWN", "SKILL_NAME", "TOOL_NAMES", "program_names", "register",
-           "run_thym_check", "run_thym_run", "shown", "skill_on"]
+__all__ = ["CEILING", "JOB_KIND", "OUTPUTS_NOTE", "PROGRAMS_SHOWN", "SKILL_NAME", "TOOL_NAMES", "move_line",
+           "move_signature", "program_names", "register", "run_thym_check", "run_thym_moves", "run_thym_run", "shown",
+           "skill_on"]

@@ -49,6 +49,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from . import agent_free as _agent_free
 from . import canon as _canon
 from . import canon_tools as _canon_tools
+from . import fabula_names as _fabula_names
 from . import macrocosm as _macrocosm
 from . import thym_host as _host
 from .thym import Refusal
@@ -103,6 +104,9 @@ def stem_of(path: Path) -> str:
     stem = _canon.package_stem(name)
     if stem:
         return stem
+    got = _fabula_names.parse(name)
+    if got is not None and got[1] is not None:              # notes.md.fabulan.cosm -> notes (a short's stem)
+        return _fabula_names.short_stem(name)
     if name.endswith(".cosm") and len(name) > len(".cosm"):
         name = name[: -len(".cosm")]
     base, dot, _ext = name.rpartition(".")
@@ -153,9 +157,30 @@ def _why(block: Any) -> str | None:
     return " ".join(block.why.text.split()) if block is not None and block.why is not None else None
 
 
+def version_of(checked: Any) -> int:
+    """The grammar a compiled program is written in: 0 or 1 (its `thym <n>` line)."""
+    v = getattr(getattr(checked, "module", None), "version", 0)
+    return int(v) if isinstance(v, int) and not isinstance(v, bool) else 0
+
+
+def takes_rows(block: Any) -> list[dict]:
+    """A program's inputs as the page's pickers read them: `{name, type, accepts}`, `accepts` saying in words what
+    the input takes (`thym_host.accepts`: a text, a fabula, a folder, a volume, a morph, a context, a package)."""
+    return [{"name": p.name, "type": p.type, "accepts": _host.accepts(p.type)} for p in block.takes] if block else []
+
+
+def outputs_rows(block: Any) -> list[dict]:
+    """Every output a program gives, `{name, type}`, in its `gives` order (THYM 8.2: several in `thym 1`)."""
+    if block is None:
+        return []
+    outs = list(getattr(block, "outputs", None) or ([block.gives] if block.gives else []))
+    return [{"name": p.name, "type": p.type} for p in outs]
+
+
 def program_row(entry: dict) -> dict:
-    """One row of `GET /api/thym/programs`: `{name, where, rel, problem, steps, asks, takes, gives, why}` for a program
-    that compiles; `{name, where, rel, problem}` for one that does not (the problem is the refusal, with its line)."""
+    """One row of `GET /api/thym/programs`: `{name, where, rel, problem, version, steps, asks, takes, gives, outputs,
+    why}` for a program that compiles (`takes` rows `{name, type, accepts}`; `gives` the first output, `outputs` every
+    one); `{name, where, rel, problem}` for one that does not (the problem is the refusal, with its line)."""
     row = {"name": entry.get("name"), "where": entry.get("where"), "rel": entry.get("rel"),
            "problem": entry.get("problem")}
     if row["problem"]:
@@ -166,10 +191,9 @@ def program_row(entry: dict) -> dict:
         return row
     block = _block(checked)
     est = estimate(checked)
-    row.update(steps=est["steps"], asks=est["asks"],
-               takes=[{"name": p.name, "type": p.type} for p in block.takes] if block else [],
+    row.update(version=version_of(checked), steps=est["steps"], asks=est["asks"], takes=takes_rows(block),
                gives={"name": block.gives.name, "type": block.gives.type} if block and block.gives else None,
-               why=_why(block))
+               outputs=outputs_rows(block), why=_why(block))
     return row
 
 
@@ -183,7 +207,8 @@ def compile_payload(*, path: Path | None = None, text: str | None = None) -> dic
     if block is None:
         r = Refusal("plan", "no-program", "there is nothing to run: the file has no program block")
         return {"ok": False, "name": None, "refusal": refusal_dict(r), "estimate": estimate(checked)}
-    return {"ok": True, "name": block.name, "refusal": None, "estimate": estimate(checked)}
+    return {"ok": True, "name": block.name, "refusal": None, "estimate": estimate(checked),
+            "version": version_of(checked), "takes": takes_rows(block), "outputs": outputs_rows(block)}
 
 
 def program_volume(path: Path) -> dict | Refusal:
@@ -201,26 +226,39 @@ def volume_from(mapping: dict, filename: str) -> "_macrocosm.Volume":
 # Plans
 # ---------------------------------------------------------------------------
 
+def _said(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
 def plan_inputs(project_dir: Path, checked: Any, inputs: dict[str, str]) -> list[dict]:
-    """The plan's inputs from `{<takes name>: <path>}`: each in the program's order, with its type, its absolute path
-    and its sha256 (THYM.md 12.1). 404 for a file that is not there; 400 for a name the program does not take."""
+    """The plan's inputs from `{<takes name>: <path>}`: every input the program takes, each in the program's order,
+    with its type, its absolute path and its sha256 (a folder's tree digest; THYM.md 12.1, 20.3). Each path is held to
+    what its input takes (`thym_host.check_input`: a text, a fabula, a folder, a volume, a morph, a context, a
+    package). 404 for a path that is not there; 400 for a name the program does not take, an input missing, or a
+    path of the wrong kind, in words."""
     block = _block(checked)
     takes = {p.name: p.type for p in block.takes} if block is not None else {}
+    prog = block.name if block else "the program"
     unknown = [n for n in inputs if n not in takes]
     if unknown:
-        raise HTTPException(400, f"{block.name if block else 'the program'} takes no {unknown[0]}; it takes "
-                                 f"{', '.join(takes) or 'nothing'}")
+        raise HTTPException(400, f"{prog} takes no {unknown[0]}; it takes {_said(list(takes)) if takes else 'nothing'}")
+    missing = [n for n in takes if not str(inputs.get(n) or "").strip()]
+    if missing:
+        wants = _said([f"{n} ({_host.accepts(takes[n])})" for n in takes])
+        raise HTTPException(400, f"{prog} takes {wants}; give {_said(missing)}")
     rows = []
     for name in takes:
-        if name not in inputs:
-            continue
         rel = str(inputs[name] or "")
+        shown = _canon_tools.tidy_rel(rel)
         p = resolve(project_dir, rel)
-        if not p.exists():
-            raise HTTPException(404, f"no such file: {_canon_tools.tidy_rel(rel)}")
-        sha = digest_path(p)
+        if not p.exists() and not p.is_symlink():
+            raise HTTPException(404, f"no such file: {shown}")
+        problem = _host.check_input(p, takes[name], name=name, shown=shown)
+        if problem:
+            raise HTTPException(400, problem)
+        sha = digest_path(p, takes[name] if takes[name] == "folder" else None)
         if sha is None:
-            raise HTTPException(400, f"{_canon_tools.tidy_rel(rel)} is a folder with no catalog")
+            raise HTTPException(400, f"{shown} is a folder with no catalog; {name} takes {_host.accepts(takes[name])}")
         rows.append({"name": name, "type": takes[name], "path": str(p), "sha256": sha})
     return rows
 
@@ -230,18 +268,18 @@ def make_plan(checked: Any, rows: list[dict]) -> dict | Refusal:
     return _plan.plan(checked, rows)
 
 
-def asks_refusal(plan: dict, why: str) -> Refusal | None:
-    """In rules mode, a plan whose nodes ask a model is refused at plan time with their count and the first one's line
-    (THYM.md 19): check `agent-free` when agent-free mode chose rules, `no-model` when no model answers."""
-    _head, nodes = _run.plan_parts(plan)
-    asks = [n for n in nodes if n.get("asks") is True]
-    if not asks:
+def asks_refusal(plan: dict, why: str, *, route: str | None = "local", program: Any = None) -> Refusal | None:
+    """In rules mode, a plan whose nodes ask a model is refused at plan time (THYM.md 19), in the text's words: how
+    many steps ask a model on which route, and the first one's statement and line ("3 steps ask a model on the local
+    route, the first `let f = derive story` (line 11); agent-free is on"). Check `agent-free` when agent-free mode
+    chose rules, `no-model` when no model answers. `program` (its path or text) names the statement."""
+    said = _host.asks_said(plan, route=route, program=program)
+    if said is None:
         return None
-    k = len(asks)
-    many = f"{k} step{'s' if k != 1 else ''} ask{'' if k != 1 else 's'} a model"
+    many, line = said
     if why == _agent_free.REASON:
-        return Refusal("plan", "agent-free", f"{many}; agent-free is on", line=asks[0].get("line"))
-    return Refusal("plan", "no-model", f"{many}; no model is running", line=asks[0].get("line"))
+        return Refusal("plan", "agent-free", f"{many}; agent-free is on", line=line)
+    return Refusal("plan", "no-model", f"{many}; no model is running", line=line)
 
 
 def scaffold_refusal(plan: dict) -> Refusal | None:
@@ -265,18 +303,38 @@ def scaffold_refusal(plan: dict) -> Refusal | None:
 # ---------------------------------------------------------------------------
 
 def runtime(project_dir: Path, *, mode: str, why: str, scaffolds: bool, complete: Callable | None,
-            n_ctx: int | None) -> dict:
+            n_ctx: int | None, route: str | None = None, model: str | None = None, calls: int | None = None,
+            info: dict | None = None, program: Any = None) -> dict:
     """The keyword arguments `enough.thym.run.run` takes for one run from the app (`thym_host.runtime_kwargs`'s, with
     the mode decided by the route rather than read again): the model coprocessor in model mode, the refusing one
     otherwise; the preflight; the environment with the model's window; the root; the engines, the surrounding catalog
-    among them."""
+    among them; the ceiling on model calls.
+
+    With a `route` (THYM.md 23): the coprocessor is on that route (`complete` is the route's), its candidates say the
+    route and the provider; the preflight refuses a shut gate, an open count without `calls`, a step the route's
+    window cannot hold; the environment names the model that answered, the route and the provider."""
     af = why == _agent_free.REASON or _agent_free.enabled()
-    model = mode == "model" and not scaffolds
-    return {"coprocessor": _host.ModelCoprocessor(complete) if model else RefusingCoprocessor(),
-            "agent_free": af, "rules": scaffolds,
-            "preflight": _host.preflight_hook(n_ctx if n_ctx else (lambda: None)) if model else None,
-            "environment": _host.environment(agent_free=af, n_ctx=n_ctx if model else None),
-            "root": _host.host_root(), "engines": _host.engines(catalog=_host.catalog_engine(project_dir))}
+    use = mode == "model" and not scaffolds
+    if route is None:
+        return {"coprocessor": _host.ModelCoprocessor(complete) if use else RefusingCoprocessor(),
+                "agent_free": af, "rules": scaffolds,
+                "preflight": _host.preflight_hook(n_ctx if n_ctx else (lambda: None)) if use else None,
+                "environment": _host.environment(agent_free=af, n_ctx=n_ctx if use else None),
+                "root": _host.host_root(), "engines": _host.engines(catalog=_host.catalog_engine(project_dir)),
+                "calls": calls}
+    provider = _host.CLOUD_PROVIDER if route == "cloud" else None
+    planned = (info or {}).get("model") or (model if route == "cloud" else None)
+    cop = (_host.ModelCoprocessor(complete, route=route, provider=provider, model_id=planned) if use
+           else RefusingCoprocessor())
+    window = n_ctx or (info or {}).get("window") or (_host.CLOUD_WINDOW if route == "cloud" else None)
+    return {"coprocessor": cop, "agent_free": af, "rules": scaffolds,
+            "preflight": (_host.route_preflight(route, model=model, window=window, calls=calls, ceiling="calls",
+                                                info=info, program=program) if use else None),
+            "environment": _host.environment(agent_free=af, n_ctx=window if use else None,
+                                             route=route if use else None, provider=provider,
+                                             model=cop.model_seen if use else None),
+            "root": _host.host_root(), "engines": _host.engines(catalog=_host.catalog_engine(project_dir)),
+            "calls": calls}
 
 
 def _tmp_beside(dst: Path) -> Path:
@@ -326,9 +384,11 @@ def copy_all(pairs: list[tuple[Path, Path]]) -> None:
 
 
 def land_beside(project_dir: Path, t: Any, first: Path | None) -> list[dict]:
-    """A landed run's outputs, `[{name, path, rel}]`: `path` the output in the run's folder; `rel` the copy made beside
-    the first input when that input is a project or store file (`<stem>.<output>.<ext>`; a package as
-    `<stem>.package.cosm`, with `folder` naming its folder form `<stem>.thym`), else None. All copies or none."""
+    """A landed run's outputs, every one in the program's order, `[{name, type, path, rel}]`: `path` the output in the
+    run's folder; `rel` the copy made beside the first input when that input is a project or store file
+    (`<stem>.<output>.<ext>`; a folder output as the folder `<stem>.<output>/`; a package as `<stem>.package.cosm`,
+    with `folder` naming its folder form `<stem>.thym`), else None. A folder output also lists its `files` (paths
+    inside it, sorted). All copies or none."""
     rows: list[dict] = []
     pairs: list[tuple[Path, Path]] = []
     beside = first is not None and rel_of(project_dir, first) is not None
@@ -337,9 +397,17 @@ def land_beside(project_dir: Path, t: Any, first: Path | None) -> list[dict]:
     for name, out in t.outputs.items():
         out = Path(out)
         v = t.values.get(name)
-        row: dict[str, Any] = {"name": name, "path": str(out), "rel": None}
+        typ = v.type if isinstance(v, Value) else ("folder" if out.is_dir() else None)
+        row: dict[str, Any] = {"name": name, "type": typ, "path": str(out), "rel": None}
+        folder_out = typ == "folder" or (typ != "package" and out.is_dir())
+        if folder_out:
+            row["files"] = sorted(f.relative_to(out).as_posix() for f in out.rglob("*") if f.is_file())
         if beside:
-            if isinstance(v, Value) and v.type == "package":
+            if folder_out:
+                dst = parent / f"{stem}.{name}"
+                pairs.append((out, dst))
+                row["rel"] = rel_of(project_dir, dst)
+            elif isinstance(v, Value) and v.type == "package":
                 single = parent / f"{stem}{_canon.PACKAGE_FILE_SUFFIX}"
                 pairs.append((out, single))
                 row["rel"] = rel_of(project_dir, single)
@@ -359,12 +427,16 @@ def land_beside(project_dir: Path, t: Any, first: Path | None) -> list[dict]:
     return rows
 
 
-def run_result(project_dir: Path, t: Any, first: Path | None, mode: str) -> dict:
+def run_result(project_dir: Path, t: Any, first: Path | None, mode: str, *, route: str | None = None,
+               plan: dict | None = None) -> dict:
     """A finished run as a job's result: `{run, trace, atem, outcome, mode, outputs}`, with `refusal` when it did
-    not land."""
+    not land; with a route, `route` (model mode only) and the plan's `models` block."""
     outputs = land_beside(project_dir, t, first) if t.landed else []
     out = {"run": t.run_id, "trace": str(t.path), "atem": t.atem(), "outcome": t.outcome, "mode": mode,
            "outputs": outputs}
+    if route is not None:
+        out["route"] = route if mode == "model" else None
+        out["models"] = (plan or {}).get("models")
     if not t.landed:
         out["refusal"] = refusal_dict(t.refusal)
     return out
@@ -618,8 +690,14 @@ def unpack_package(project_dir: Path, path: Path, *, key: str | None = None,
     stem = stem_of(path)
     parent = path.parent
     text_name = f"{stem}.md"
+    # The twin is named as its declaration says: a fabula/1 under its flavour's name (`notes.md.fabulan.cosm`), a
+    # fabula still saying its old spelling emf/1 under the old name (`notes.md.cosm`), its declaration kept.
+    head = fabula.mapping() or {}
+    fl = head.get("flavour") if head.get("flavour") in _fabula_names.TEXT_FLAVOURS else "fabulan"
+    twin_name = (f"{text_name}{_fabula_names.COSM}" if _fabula_names.is_old_declaration(head.get("oes"))
+                 else _fabula_names.twin_name(text_name, fl))
     files: list[tuple[str, Path, bytes]] = [("text", parent / text_name, text.bytes()),
-                                            ("twin", parent / f"{text_name}.cosm", _unpacked_twin(fabula, text_name))]
+                                            ("twin", parent / twin_name, _unpacked_twin(fabula, text_name))]
     for role, v in extra.items():
         if not v.is_nothing:
             files.append((role, parent / f"{stem}.{role}.cosm", v.bytes()))
@@ -715,19 +793,53 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             raise HTTPException(404, f"no program {ref}")
         return found
 
-    async def decide(body: dict) -> tuple[str, str, bool]:
-        """`(mode, why, scaffolds)`: the route's mode, decided once before anything runs (module docstring)."""
+    def route_of(body: dict) -> tuple[str, str | None, int | None]:
+        """`(route, model, calls)` from a request (THYM.md 23.1): `route` local (the default) or cloud, or
+        `cloud:<model id>`; `model` a cloud model's id; `calls` a ceiling of at least 1. 400 in words otherwise."""
+        raw = str(body.get("route") or "local").strip()
+        model = body.get("model")
+        if raw.startswith("cloud:"):
+            raw, model = "cloud", raw[len("cloud:"):]
+        if raw not in _host.ROUTES:
+            raise HTTPException(400, f"route is local or cloud (or cloud:<model id>), not {raw!r}")
+        model = str(model).strip() or None if model not in (None, "") else None
+        if raw == "local" and model:
+            raise HTTPException(400, "a local run uses this machine's model; model names a cloud model, with route "
+                                     "cloud")
+        calls = body.get("calls")
+        if calls is not None:
+            if isinstance(calls, bool) or not isinstance(calls, int) or calls < 1:
+                raise HTTPException(400, f"calls is a ceiling of at least 1 model call, not {calls!r}")
+        return raw, model, calls
+
+    async def local_mode() -> tuple[str, str]:
+        """Model or rules on the local route, whatever slot the chat is on (`canon_mode("local")`)."""
+        try:
+            return await canon_mode("local")
+        except TypeError:                                    # a canon_mode that knows no routes: today's way
+            return await canon_mode()
+
+    async def decide(body: dict, route: str = "local") -> tuple[str, str, bool]:
+        """`(mode, why, scaffolds)`: the route's mode, decided once before anything runs (module docstring). On the
+        cloud route the mode is `model` unless agent-free is on; whether the gate is open is the plan's refusal
+        (check `cloud`), so the plan still shows what would run."""
         want = str(body.get("mode") or "auto").strip().lower()
         if want not in ("auto", "model", "rules"):
             raise HTTPException(400, "mode is model, rules, or left out")
         if want == "rules":
             return "rules", "asked", True
-        mode, why = await canon_mode()
+        if route == "cloud":
+            mode, why = (("rules", _agent_free.REASON) if _agent_free.enabled() else ("model", "cloud"))
+        else:
+            mode, why = await local_mode()
         if want == "model" and mode != "model":
             raise HTTPException(409, f"no model is running ({why})")
         return mode, why, False
 
     def inputs_of(body: dict, checked: Any) -> dict[str, str]:
+        """`{name: path}` for every input: `inputs` names each (every one the program takes, of any type); `path`
+        alone stands for a program's one input, as the command line's bare path does (and for the first input, as
+        before)."""
         inputs = body.get("inputs")
         if isinstance(inputs, dict) and inputs:
             return {str(k): str(v) for k, v in inputs.items()}
@@ -738,23 +850,48 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             return {block.takes[0].name: str(body.get("path"))}
         raise HTTPException(400, "give inputs: {<name>: <path>}, or a path for the program's first input")
 
-    def prepared(body: dict) -> tuple[Path, Any, dict | Refusal, list[dict]]:
-        """Blocking: the program, its compile, its plan over the request's inputs."""
+    def prepared(body: dict, *, route: str = "local", model: str | None = None,
+                 asks_model: bool = False) -> tuple[Path, Any, dict | Refusal, list[dict], dict | None]:
+        """Blocking: the program, its compile, its plan over the request's inputs, and the route as read for it
+        (`thym_host.plan_for`: the plan carries `models` when it asks and a model is to answer)."""
         prog = program_path(body.get("program"))
         checked = _checked(prog)
         if isinstance(checked, Refusal):
-            return prog, checked, checked, []
+            return prog, checked, checked, [], None
         rows = plan_inputs(project_dir, checked, inputs_of(body, checked))
-        return prog, checked, make_plan(checked, rows), rows
+        if asks_model:
+            plan, info = _host.plan_for(checked, rows, route=route, model=model, llm_url=llm_url)
+            return prog, checked, plan, rows, info
+        return prog, checked, make_plan(checked, rows), rows, None
 
-    def plan_refusal(plan: dict, mode: str, why: str, scaffolds: bool, n_ctx: int | None) -> Refusal | None:
+    def plan_refusal(plan: dict, mode: str, why: str, scaffolds: bool, info: dict | None, *, route: str,
+                     calls: int | None, prog: Path) -> Refusal | None:
         if scaffolds:
             return scaffold_refusal(plan)
         if mode != "model":
-            return asks_refusal(plan, why)
-        if n_ctx:
-            return _host.preflight_hook(n_ctx)(plan)
-        return None
+            return asks_refusal(plan, why, route=route, program=prog)
+        return _host.route_refusal(plan, info, calls=calls, ceiling="calls", program=prog)
+
+    def plan_payload(plan: dict, checked: Any, route: str, calls: int | None) -> dict:
+        """What a plan shows before anything runs (THYM.md 23.2): the route, the `models` block and its one line,
+        the ceiling, every input with what it takes (a folder's files and bytes), every output."""
+        from .thym.cli import models_line
+        block = _block(checked) if not isinstance(checked, Refusal) else None
+        takes = {r["name"]: r for r in takes_rows(block)}
+        inputs = []
+        for row in plan.get("inputs") or []:
+            if not isinstance(row, dict):
+                continue
+            item = {"name": row.get("name"), "type": row.get("type"),
+                    "rel": rel_of(project_dir, Path(str(row.get("path") or ""))), "sha256": row.get("sha256"),
+                    "accepts": (takes.get(row.get("name")) or {}).get("accepts") or _host.accepts(str(row.get("type")))}
+            for k in ("files", "bytes"):
+                if k in row:
+                    item[k] = row[k]
+            inputs.append(item)
+        return {"route": route, "models": _macrocosm.jsonable(plan.get("models")) if plan.get("models") else None,
+                "models_line": models_line(plan), "calls": calls, "inputs": inputs, "outputs": outputs_rows(block),
+                "version": version_of(checked) if block is not None else None}
 
     # ---------------------------------------------------------------- programs
 
@@ -786,18 +923,32 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
 
     # ---------------------------------------------------------------- plans and runs
 
+    def route_complete(route: str, model: str | None) -> Callable[..., Any]:
+        """The run's `complete` on its route (pins P6): `local` is the session's `model_complete` while the chat is
+        local (llama-server, the same seam as a derivation), else llama-server through the factory, never the cloud
+        slot; `cloud` is the factory's cloud route (the gate on every call, the cache under source `thym`, the
+        broker's journal), never a fall back to local."""
+        from . import llm as _llm
+        if route == "local" and _llm._current_slot() != "opro-api":
+            return model_complete
+        return _host.route_complete(route, model=model, llm_url=llm_url, project_dir=project_dir)
+
     @router.post("/api/thym/plan")
     async def thym_plan(request: Request) -> dict:
         body = await body_of(request)
-        mode, why, scaffolds = await decide(body)
-        _prog, _checked_, plan, _rows = await asyncio.to_thread(prepared, body)
-        out: dict[str, Any] = {"ok": False, "plan": None, "atem": None, "mode": mode, "fits": True, "refusal": None}
+        route, model, calls = route_of(body)
+        mode, why, scaffolds = await decide(body, route)
+        asks_model = mode == "model" and not scaffolds
+        prog, checked, plan, _rows, info = await asyncio.to_thread(prepared, body, route=route, model=model,
+                                                                   asks_model=asks_model)
+        out: dict[str, Any] = {"ok": False, "plan": None, "atem": None, "mode": mode, "fits": True, "refusal": None,
+                               "route": route, "models": None, "models_line": None, "calls": calls}
         if isinstance(plan, Refusal):
             out["refusal"] = refusal_dict(plan)
             return out
-        n_ctx = await asyncio.to_thread(_host._read_n_ctx, llm_url) if mode == "model" and not scaffolds else None
-        r = plan_refusal(plan, mode, why, scaffolds, n_ctx)
+        r = plan_refusal(plan, mode, why, scaffolds, info, route=route, calls=calls, prog=prog)
         out.update(plan=_macrocosm.jsonable(plan), atem=plan_atem(plan), ok=r is None, refusal=refusal_dict(r))
+        out.update(plan_payload(plan, checked, route, calls))
         if r is not None and r.check == "preflight":
             out.update(fits=False, why=r.message)
         return out
@@ -805,37 +956,47 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
     @router.post("/api/thym/run")
     async def thym_run(request: Request) -> dict:
         body = await body_of(request)
-        mode, why, scaffolds = await decide(body)
-        prog, _checked_, plan, rows = await asyncio.to_thread(prepared, body)
+        route, model, calls = route_of(body)
+        mode, why, scaffolds = await decide(body, route)
+        asks_model = mode == "model" and not scaffolds
+        prog, checked, plan, rows, info = await asyncio.to_thread(prepared, body, route=route, model=model,
+                                                                  asks_model=asks_model)
         if isinstance(plan, Refusal):
             where = f" (line {plan.line})" if plan.line else ""
             raise HTTPException(400, f"{plan.message}{where}")
-        n_ctx = await asyncio.to_thread(_host._read_n_ctx, llm_url) if mode == "model" and not scaffolds else None
-        r = plan_refusal(plan, mode, why, scaffolds, n_ctx)
+        r = plan_refusal(plan, mode, why, scaffolds, info, route=route, calls=calls, prog=prog)
         if r is not None:
             raise HTTPException(409, r.message)
         first = Path(rows[0]["path"]) if rows else None
         rel = rel_of(project_dir, first) if first is not None else None
         name = (plan.get("program") or {}).get("name") or prog.stem
+        complete = route_complete(route, model) if asks_model else None
 
         def work(ctx: Any) -> dict:
             def progress(step: dict) -> None:
                 ctx.progress(phase="running", chunk=step["node"], chunks=step["of"], progress=step,
                              message=f"step {step['node']} of {step['of']}: {step['move']}")
-            kw = runtime(project_dir, mode=mode, why=why, scaffolds=scaffolds, complete=model_complete, n_ctx=n_ctx)
+            kw = runtime(project_dir, mode=mode, why=why, scaffolds=scaffolds, complete=complete,
+                         n_ctx=(info or {}).get("window"), route=route, model=model, calls=calls, info=info,
+                         program=prog)
             t = _run.run(plan, inputs_root=project_dir, program=prog, progress=progress,
                          should_stop=ctx.should_stop, **kw)
             if isinstance(t, Refusal):
                 raise RuntimeError(t.message)
-            out = run_result(project_dir, t, first, mode)
+            out = run_result(project_dir, t, first, mode, route=route, plan=plan)
             if out["outputs"] and rel is not None:
                 catalog_after(rel)
             out["message"] = t.atem()
             return out
 
+        job_kw: dict[str, Any] = {}
+        if _host._accepts(start_job, {"route": route}):
+            # the lock is llama-server's: a model run on the local route holds it, a cloud run does not
+            job_kw["route"] = route if mode == "model" else None
         return start_job(kind="thym", path=rel, mode=mode, why=why if not scaffolds else "", work=work,
                          key=str(first) if first is not None else None,       # the claim a derivation takes
-                         doing=f"running {name} on {first.name if first is not None else 'nothing'}")
+                         doing=f"running {name} on {first.name if first is not None else 'nothing'}"
+                               + (" on the cloud" if mode == "model" and route == "cloud" else ""), **job_kw)
 
     @router.get("/api/thym/runs")
     def thym_runs() -> dict:

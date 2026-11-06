@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program replace-the-whole
+  why: a change is made of a line, never of a whole short.
+  takes s: short
+  gives c: change
+
+  give replace s with "a new short"
+end

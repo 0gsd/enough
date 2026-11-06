@@ -1,0 +1,13 @@
+-- refused: compile type line 10
+thym 1
+
+program insert-anywhere
+  why: insert takes exactly one of before and after; a call that says neither has no place to put its line.
+  takes draft: text
+  gives longer: text
+
+  let changes = for each l in lines of draft where "TODO" in l
+    keep insert "DONE"
+  end
+  give edit draft with changes
+end

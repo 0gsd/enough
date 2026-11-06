@@ -1765,6 +1765,7 @@
 {"headword": "categorize", "form": "categorizes", "position": 6, "pronunciation": "/ˈkætəɡəˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "categorize", "form": "categorizing", "position": 7, "pronunciation": "/ˈkætəɡəˌraɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "category", "form": "categories", "position": 1, "pronunciation": "/ˈkætəˌɡɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "catem", "form": "catems", "position": 1, "pronunciation": "/ˈsiˌɑtəmz/, /ˈkɑtəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "catena", "form": "catenae", "position": 1, "pronunciation": "/kəˈtiˌni/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "catena", "form": "catenas", "position": 2, "pronunciation": "/kəˈtinəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "catenane", "form": "catenanes", "position": 1, "pronunciation": "/ˈkætəˌneɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -2642,6 +2643,7 @@
 {"headword": "characid", "form": "characids", "position": 1, "pronunciation": "/ˈkærəsɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "characin", "form": "characins", "position": 1, "pronunciation": "/ˈkærəsɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "character", "form": "characters", "position": 1, "pronunciation": "/ˈkɛrɪktərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "characteristic", "form": "characteristics", "position": 1, "pronunciation": "/ˌkɛrəktərˈɪstɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "characterization", "form": "characterizations", "position": 1, "pronunciation": "/ˌkɛrəktərəˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "characterize", "form": "characterized", "position": 1, "pronunciation": "/ˈkɛrəktəˌraɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "characterize", "form": "characterizes", "position": 2, "pronunciation": "/ˈkɛrəktəˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -9296,6 +9298,7 @@
 {"headword": "crystallizer", "form": "crystallizers", "position": 1, "pronunciation": "/ˈkrɪstəˌlaɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "crystallographer", "form": "crystallographers", "position": 1, "pronunciation": "/ˌkrɪstəˈlɑɡrəfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "crystalloid", "form": "crystalloids", "position": 1, "pronunciation": "/ˈkrɪstəˌlɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "cshort", "form": "cshorts", "position": 1, "pronunciation": "/ˈsiˌʃɔrts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ctenidium", "form": "ctenidia", "position": 1, "pronunciation": "/tɪˈnɪdiə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ctenizid", "form": "ctenizids", "position": 1, "pronunciation": "/ˈtɛnəzɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ctenophoran", "form": "ctenophorans", "position": 1, "pronunciation": "/tɪˈnɑfərənz/", "labels": "[\"pl.\"]", "synonyms": null}

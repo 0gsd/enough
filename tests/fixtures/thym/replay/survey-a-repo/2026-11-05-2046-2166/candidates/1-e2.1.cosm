@@ -1,0 +1,46 @@
+engine: syntax.outline
+inputs:
+  call: c6aeba9436d148c694c4fb39f320a031e9ad1124b7b5232edf0db374ab6a62de
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  lines: 16
+  imports:
+  - module: pytest
+    line: 1
+    stdlib: false
+  - module: tiny.counting
+    level: 0
+    names:
+    - CountError
+    - count_words
+    - top_words
+    line: 3
+    stdlib: false
+  defs:
+  - name: test_words_are_runs_of_letters
+    qual: test_words_are_runs_of_letters
+    kind: function
+    line: 6
+    end: 7
+    signature: def test_words_are_runs_of_letters()
+    params: []
+  - name: test_top_words_break_ties_by_letter
+    qual: test_top_words_break_ties_by_letter
+    kind: function
+    line: 10
+    end: 11
+    signature: def test_top_words_break_ties_by_letter()
+    params: []
+  - name: test_top_needs_one_or_more
+    qual: test_top_needs_one_or_more
+    kind: function
+    line: 14
+    end: 16
+    signature: def test_top_needs_one_or_more()
+    params: []
+  constants: []
+  env: []

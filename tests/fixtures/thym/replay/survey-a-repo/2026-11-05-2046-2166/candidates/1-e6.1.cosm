@@ -1,0 +1,165 @@
+engine: syntax.outline
+inputs:
+  call: 69a76b97675b9df6851bf98b5f383b361208a21ec6e9fc16db982c47639b9621
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  lines: 56
+  doc: 'Words, counted: what a word is, how many a text holds, and which come most often.'
+  imports:
+  - module: __future__
+    level: 0
+    names:
+    - annotations
+    line: 2
+    stdlib: true
+  - module: os
+    line: 4
+    stdlib: true
+  - module: re
+    line: 5
+    stdlib: true
+  - module: collections
+    level: 0
+    names:
+    - Counter
+    line: 6
+    stdlib: true
+  - module: dataclasses
+    level: 0
+    names:
+    - dataclass
+    line: 7
+    stdlib: true
+  - module: pathlib
+    level: 0
+    names:
+    - Path
+    line: 8
+    stdlib: true
+  defs:
+  - name: CountError
+    qual: CountError
+    kind: class
+    line: 14
+    end: 15
+    signature: class CountError(Exception)
+    bases:
+    - Exception
+    doc: A file that cannot be counted; its message is shown to the user as it is.
+  - name: Summary
+    qual: Summary
+    kind: class
+    line: 19
+    end: 23
+    signature: class Summary
+    bases: []
+    decorators:
+    - dataclass(frozen=True)
+    doc: What a text holds, counted.
+    fields:
+    - name: words
+      annotation: int
+      line: 21
+    - name: lines
+      annotation: int
+      line: 22
+    - name: encoding
+      annotation: str
+      line: 23
+      default: '"utf-8"'
+    shape: frozen dataclass
+  - name: read_text
+    qual: read_text
+    kind: function
+    line: 26
+    end: 33
+    signature: 'def read_text(path: Path, env: dict | None = None) -> str'
+    params:
+    - name: path
+      kind: positional
+      annotation: Path
+    - name: env
+      kind: positional
+      annotation: dict | None
+      default: None
+    returns: str
+    doc: The text of a file, read in the encoding TINY_ENCODING names (UTF-8 when unset).
+    words:
+    - kind: raise
+      error: CountError
+      text: 'cannot read {path}: {e.__class__.__name__}'
+      line: 33
+  - name: words
+    qual: words
+    kind: function
+    line: 36
+    end: 38
+    signature: 'def words(text: str) -> list[str]'
+    params:
+    - name: text
+      kind: positional
+      annotation: str
+    returns: list[str]
+    doc: The words of a text, lowercased, in order.
+  - name: count_words
+    qual: count_words
+    kind: function
+    line: 41
+    end: 43
+    signature: 'def count_words(text: str) -> int'
+    params:
+    - name: text
+      kind: positional
+      annotation: str
+    returns: int
+    doc: How many words a text holds.
+  - name: top_words
+    qual: top_words
+    kind: function
+    line: 46
+    end: 51
+    signature: 'def top_words(text: str, n: int = DEFAULT_TOP) -> list[tuple[str, int]]'
+    params:
+    - name: text
+      kind: positional
+      annotation: str
+    - name: n
+      kind: positional
+      annotation: int
+      default: DEFAULT_TOP
+    returns: list[tuple[str, int]]
+    doc: The n commonest words with their counts, commonest first; ties in alphabetical order.
+    words:
+    - kind: raise
+      error: CountError
+      text: n must be 1 or more
+      line: 49
+  - name: summarise
+    qual: summarise
+    kind: function
+    line: 54
+    end: 56
+    signature: 'def summarise(text: str, encoding: str = "utf-8") -> Summary'
+    params:
+    - name: text
+      kind: positional
+      annotation: str
+    - name: encoding
+      kind: positional
+      annotation: str
+      default: '"utf-8"'
+    returns: Summary
+    doc: The words and lines of a text, with the encoding it was read in.
+  constants:
+  - name: DEFAULT_TOP
+    value: '3'
+    line: 11
+  env:
+  - key: TINY_ENCODING
+    line: 29
+    default: '"utf-8"'
+    in: read_text

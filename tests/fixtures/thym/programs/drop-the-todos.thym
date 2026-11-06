@@ -1,0 +1,13 @@
+thym 1
+
+program drop-the-todos
+  why: every line that still says TODO leaves the draft, and nothing else changes.
+
+  takes draft: text
+  gives clean: text
+
+  let changes = for each l in lines of draft where "TODO" in l
+    keep drop l
+  end
+  give edit draft with changes
+end

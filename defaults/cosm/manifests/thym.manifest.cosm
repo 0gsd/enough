@@ -210,11 +210,15 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     gives: number
     code: enough.thym.moves.edit:count
     says: how many items, lines or members
+    thym-1:                             # thym 1 also counts a folder: its text files (docs/THYM.md, 6.3, 20.2)
+      takes: ['volume | fabula | short | list | folder']
   - name: words
     takes: ['text | short | atem']
     gives: number
     code: enough.thym.moves.edit:words
     says: how many words
+    thym-1:                             # thym 1 also counts the words of a line or a string (docs/THYM.md, 6.3)
+      takes: ['text | short | atem | line | string']
   - name: digest
     takes: ['text | fabula | short | atem | item | volume | morph | graph | package']
     gives: string
@@ -301,6 +305,116 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     modifiers: {of: package}
     code: enough.thym.moves.pack:isomorph_of
     says: the morph a package carries, the author's shared one, or nothing
+  # thym 1 only (since: 1; docs/THYM.md, 6.3, 20 to 22): the dialectic's three, the editing moves, and four helpers
+  - name: gather
+    takes: ['list of fabula | list of item']
+    gives: same-as-with
+    modifiers: {with: 'fabula | volume'}
+    contract: [nothing-lost, ids-unique, fabula-checks, provenance]
+    code: enough.thym.moves.edit:gather
+    says: the with volume with every part in it, nothing lost
+    since: 1
+  - name: question
+    takes: ['fabula | volume']
+    gives: list of item
+    asks: true
+    contract: [addressed, no-duplicate, provenance]
+    scaffold: bank
+    code: enough.thym.moves.dialectic:question
+    says: the questions to ask a person where a volume is unsure, open, or silent
+    since: 1
+  - name: record
+    takes: [volume]
+    gives: same-as-in
+    modifiers: {in: 'fabula | volume'}
+    contract: [addressed, only-the-asked, provenance]
+    code: enough.thym.moves.dialectic:record
+    says: a person's answers written into the questions they answer
+    since: 1
+  - name: settle
+    takes: ['fabula | volume']
+    gives: 'fabula | volume'
+    gives-when:
+      - {takes: fabula, gives: fabula}
+      - {takes: volume, gives: volume}
+    asks: true
+    contract: [addressed, only-the-asked, fabula-checks, provenance]
+    scaffold: direct
+    code: enough.thym.moves.dialectic:settle
+    says: every answered question folded into the item it is about
+    since: 1
+  - name: lines
+    takes: []
+    gives: list of line
+    modifiers: {of: 'text | short'}
+    code: enough.thym.moves.edit:lines
+    says: every line of a text or a short, numbered
+    since: 1
+  - name: replace
+    takes: [line]
+    gives: change
+    modifiers: {with: 'string | line | short'}
+    code: enough.thym.moves.edit:replace
+    says: a change that puts new words in place of a line
+    since: 1
+  - name: drop
+    takes: [line]
+    gives: change
+    code: enough.thym.moves.edit:drop
+    says: a change that takes a line out
+    since: 1
+  - name: insert
+    takes: ['string | line | short']
+    gives: change
+    modifiers: {before: line, after: line}
+    code: enough.thym.moves.edit:insert
+    says: a change that puts new lines before or after a line
+    since: 1
+  - name: edit
+    takes: ['text | short']
+    gives: 'text | short'
+    gives-when:
+      - {takes: text, gives: text}
+      - {takes: short, gives: short}
+    modifiers: {with: list of change}
+    contract: [only-the-changed, never-source, provenance]
+    code: enough.thym.moves.edit:edit
+    says: a text or a short with every change made at once, and no other line moved
+    since: 1
+  - name: reword
+    takes: ['line | string | short']
+    gives: 'line | string | short'
+    gives-when:
+      - {takes: line, gives: line}
+      - {takes: string, gives: string}
+      - {takes: short, gives: short}
+    modifiers: {to: words, with: morph}
+    asks: true
+    contract: [length, one-line, nothing-added, provenance]
+    code: enough.thym.moves.edit:reword
+    says: a line said again in fewer words, adding nothing
+    since: 1
+  - name: join
+    takes: ['list of string | list of line | list of short']
+    gives: short
+    modifiers: {with: string}
+    contract: [provenance]
+    code: enough.thym.moves.edit:join
+    says: a short of the members, one a line, or joined by the string
+    since: 1
+  - name: say
+    takes: ['number | date | word | bool | string']
+    gives: string
+    code: enough.thym.moves.edit:say
+    says: a number, a date, a word or a yes or no, as a string
+    since: 1
+  - name: folders
+    takes: []
+    gives: list of folder
+    modifiers: {of: folder}
+    code: enough.thym.moves.edit:folders
+    says: the folders right below a folder, in path order
+    since: 1
 
 extension:
   status: not built

@@ -636,6 +636,7 @@
 {"headword": "implement", "form": "implemented", "position": 1, "pronunciation": "/ˈɪmpləˌmɛntɪd/", "labels": "[\"past\"]", "synonyms": "[\"enforced\"]"}
 {"headword": "implement", "form": "implementing", "position": 2, "pronunciation": "/ˈɪmpləˌmɛntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "implement", "form": "implements", "position": 3, "pronunciation": "/ˈɪmpləmənts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "implementation", "form": "implementations", "position": 1, "pronunciation": "/ˌɪmpləmɛnˈteɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "implementer", "form": "implementers", "position": 1, "pronunciation": "/ˈɪmpləˌmɛntərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "implementer", "form": "implementor", "position": 2, "pronunciation": "/ˈɪmpləˌmɛntər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "implementer", "form": "implementors", "position": 3, "pronunciation": "/ˈɪmpləˌmɛntərz/", "labels": "[\"pl.\"]", "synonyms": null}

@@ -38,6 +38,9 @@ program count-words
 end
 """
 
+#: How a plan that asks is refused when no model answers (THYM.md 19): the count, the route, the first statement.
+STORY_ASKS = "3 steps ask a model on the local route, the first `let f = derive story` (line 12)"
+
 PACK = """thym 0
 
 program pack-it
@@ -112,12 +115,14 @@ def start(client: TestClient, url: str, body: dict) -> dict:
 def test_programs_lists_the_projects_and_the_shipped_three(client: TestClient):
     rows = client.get("/api/thym/programs").json()["programs"]
     by = {(r["where"], r["rel"]): r for r in rows}
-    assert {r["rel"] for r in rows if r["where"] == "shipped"} == {"open-house.thym", "publish-story.thym",
+    assert {r["rel"] for r in rows if r["where"] == "shipped"} >= {"open-house.thym", "publish-story.thym",
                                                                   "read-my-way.thym"}
     count = by[("project", "tools/count-words.thym")]
     assert count == {"name": "count-words", "where": "project", "rel": "tools/count-words.thym", "problem": None,
-                     "steps": 1, "asks": 0, "takes": [{"name": "story", "type": "text"}],
-                     "gives": {"name": "n", "type": "number"}, "why": "how long a text is, in words."}
+                     "version": 0, "steps": 1, "asks": 0,
+                     "takes": [{"name": "story", "type": "text", "accepts": "a text (a markdown or plain file)"}],
+                     "gives": {"name": "n", "type": "number"}, "outputs": [{"name": "n", "type": "number"}],
+                     "why": "how long a text is, in words."}
     ps = by[("shipped", "publish-story.thym")]
     assert (ps["name"], ps["steps"], ps["asks"]) == ("publish-story", 7, 3)
     assert ps["gives"] == {"name": "out", "type": "package"} and ps["why"].startswith("a story leaves the house")
@@ -146,7 +151,9 @@ def test_program_gives_its_source_and_its_volume(client: TestClient):
 def test_compile_answers_ok_or_the_refusal_with_its_line(client: TestClient):
     ok = client.post("/api/thym/compile", json={"path": "tools/count-words.thym"}).json()
     assert ok == {"ok": True, "name": "count-words", "refusal": None,
-                  "estimate": {"steps": 1, "asks": 0, "largest_prompt": 0, "output_words": 0}}
+                  "estimate": {"steps": 1, "asks": 0, "largest_prompt": 0, "output_words": 0}, "version": 0,
+                  "takes": [{"name": "story", "type": "text", "accepts": "a text (a markdown or plain file)"}],
+                  "outputs": [{"name": "n", "type": "number"}]}
     bad = (SUITE / "bad" / "type.thym").read_text(encoding="utf-8")
     first = bad.split("\n", 1)[0].split()             # -- refused: compile type line 9
     r = client.post("/api/thym/compile", json={"text": bad}).json()
@@ -165,7 +172,7 @@ def test_plan_takes_the_shorthand_and_says_its_cost(client: TestClient):
     asks = client.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md"}).json()
     assert asks["ok"] is False and asks["atem"].startswith("publish-story: 7 nodes, 3 ask a model")
     assert (asks["refusal"]["stage"], asks["refusal"]["check"]) == ("plan", "no-model")
-    assert asks["refusal"]["message"] == "3 steps ask a model; no model is running"
+    assert asks["refusal"]["message"] == STORY_ASKS + "; no model is running"
     assert client.post("/api/thym/plan", json={"program": "count-words", "path": "missing.md"}).status_code == 404
     assert client.post("/api/thym/plan", json={"program": "count-words",
                                                "inputs": {"nope": "notes.md"}}).status_code == 400
@@ -218,7 +225,7 @@ def test_a_package_a_run_makes_lands_in_both_forms(client: TestClient, project: 
 
 def test_a_plan_that_asks_is_refused_in_rules_mode_and_scaffolds_run_when_asked(client: TestClient, project: Path):
     r = client.post("/api/thym/run", json={"program": "publish-story", "path": "notes.md"})
-    assert r.status_code == 409 and r.json()["detail"] == "3 steps ask a model; no model is running"
+    assert r.status_code == 409 and r.json()["detail"] == (STORY_ASKS + "; no model is running")
     job = start(client, "/api/thym/run", {"program": "publish-story", "path": "notes.md", "mode": "rules"})
     done = wait_job(client, job["id"])
     assert done["state"] == "done", done
@@ -240,7 +247,7 @@ def test_agent_free_refuses_a_reading_and_a_plan_that_asks_and_runs_one_that_doe
         r = c.post("/api/canon/read", json={"path": "notes.md", "morph": "plain-letter.morph.cosm"})
         assert r.status_code == 409 and r.json()["detail"].startswith("agent-free mode:")
         r = c.post("/api/thym/run", json={"program": "publish-story", "path": "notes.md"})
-        assert r.status_code == 409 and r.json()["detail"] == "3 steps ask a model; agent-free is on"
+        assert r.status_code == 409 and r.json()["detail"] == STORY_ASKS + "; agent-free is on"
         plan = c.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md"}).json()
         assert plan["refusal"]["check"] == "agent-free"
         job = start(c, "/api/thym/run", {"program": "count-words", "path": "notes.md"})
@@ -419,3 +426,151 @@ def test_a_package_folder_is_a_volume_not_a_program(project: Path, client) -> No
     r = client.get("/api/cosm", params={"path": "nothing-here.thym"})
     assert r.status_code == 404 and "no program" in r.json()["detail"]
 
+
+
+# ---------------------------------------------------------------------------
+# Models in a run (THYM.md 23): the route on plan and run, the plan's models block, the gate, the ceiling, the lock;
+# every input of every type; folder inputs and several outputs
+# ---------------------------------------------------------------------------
+
+ALL_TYPES = """thym 0
+
+program every-kind
+  why: one input of every kind a picker offers, counted.
+
+  takes a: text, b: fabula, c: morph, d: context, e: package, f: volume
+  gives n: number
+
+  give words a
+end
+"""
+
+
+def gate(monkeypatch: pytest.MonkeyPatch, open_: bool) -> list:
+    from enough import cloud
+    asked: list = []
+
+    def status() -> dict:
+        asked.append(1)
+        return {"open": open_, "reason": None if open_ else "'local models only' is on in the broker",
+                "denial": None if open_ else "error: the broker's copy", "model_id": "vendor/large-model" if open_
+                else None}
+    monkeypatch.setattr(cloud, "gate_status", status)
+
+    def no_cloud(*a, **kw):
+        raise AssertionError("the cloud was asked")
+    monkeypatch.setattr(cloud, "chat_completion", no_cloud)
+    return asked
+
+
+def test_a_cloud_plan_says_so_plainly_before_anything_runs(client: TestClient, monkeypatch):
+    gate(monkeypatch, True)
+    r = client.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md", "route": "cloud"}).json()
+    assert r["ok"] is True and r["mode"] == "model" and r["route"] == "cloud" and r["calls"] is None
+    assert r["models"] == {"route": "cloud", "provider": "openrouter", "model": "vendor/large-model", "calls": 3,
+                           "at_most": 9, "calls_open": [], "window": H.CLOUD_WINDOW}
+    assert r["models_line"] == "3 model calls, at most 9, on the cloud (openrouter: vendor/large-model)"
+    assert r["inputs"] == [{"name": "story", "type": "text", "rel": "notes.md",
+                            "sha256": digest_path(INPUTS / "notes.md"),
+                            "accepts": "a text (a markdown or plain file)"}]
+    assert r["outputs"] == [{"name": "out", "type": "package"}] and r["version"] == 0
+    other = client.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md",
+                                                "route": "cloud:vendor/other", "calls": 12}).json()
+    assert other["models"]["model"] == "vendor/other" and other["calls"] == 12
+
+
+def test_a_shut_gate_refuses_the_cloud_plan_and_run_in_its_words(client: TestClient, monkeypatch):
+    asked = gate(monkeypatch, False)
+    r = client.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md", "route": "cloud"}).json()
+    assert r["ok"] is False and (r["refusal"]["check"], r["refusal"]["line"]) == ("cloud", 12)
+    assert r["refusal"]["message"] == "the cloud is not open for this run: 'local models only' is on in the broker"
+    run = client.post("/api/thym/run", json={"program": "publish-story", "path": "notes.md", "route": "cloud"})
+    assert run.status_code == 409 and run.json()["detail"].startswith("the cloud is not open for this run")
+    assert asked and not H.host_root().exists(), "nothing ran"
+
+
+def test_agent_free_refuses_the_cloud_without_asking_the_broker(project: Path, monkeypatch):
+    from enough import cloud
+    monkeypatch.setattr(cloud, "gate_status", lambda: (_ for _ in ()).throw(AssertionError("the broker was asked")))
+    set_agent_free(True)
+    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False)) as c:
+        r = c.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md", "route": "cloud"}).json()
+        assert r["refusal"]["check"] == "agent-free"
+        assert r["refusal"]["message"] == ("3 steps ask a model on the cloud route, the first `let f = derive story` "
+                                           "(line 12); agent-free is on")
+
+
+def test_route_and_calls_are_checked(client: TestClient):
+    def plan(**extra) -> int:
+        return client.post("/api/thym/plan", json={"program": "count-words", "path": "notes.md", **extra}).status_code
+    assert plan(route="sky") == 400 and plan(calls=0) == 400 and plan(calls="7") == 400
+    assert plan(route="local", model="vendor/x") == 400
+    assert plan(route="local", calls=3) == 200
+
+
+def test_a_cloud_run_holds_no_lock_and_a_local_one_does(client: TestClient, monkeypatch):
+    from enough import model_route
+    seen: list = []
+    original = model_route.holds_generation_lock
+
+    def spy(route):
+        seen.append(route)
+        return original(route)
+    monkeypatch.setattr(model_route, "holds_generation_lock", spy)
+    gate(monkeypatch, True)
+    job = start(client, "/api/thym/run", {"program": "count-words", "path": "notes.md", "route": "cloud"})
+    done = wait_job(client, job["id"])
+    assert done["state"] == "done" and done["result"]["route"] == "cloud" and seen == ["cloud"]
+    assert done["result"]["models"] is None, "a run that asks nothing makes no model calls"
+
+
+def test_every_input_of_every_type_is_filled_and_held_to_its_kind(client: TestClient, project: Path):
+    (project / "tools" / "every-kind.thym").write_text(ALL_TYPES, encoding="utf-8")
+    good = {"a": "notes.md", "b": "notes.md.cosm", "c": "plain-letter.morph.cosm", "d": "on-the-train.context.cosm",
+            "e": "orchard-notes.thym", "f": "notes.md.cosm"}
+    r = client.post("/api/thym/plan", json={"program": "every-kind", "inputs": good})
+    assert r.status_code == 200 and r.json()["ok"] is True, r.text
+    assert [(i["name"], i["type"]) for i in r.json()["inputs"]] == [
+        ("a", "text"), ("b", "fabula"), ("c", "morph"), ("d", "context"), ("e", "package"), ("f", "volume")]
+    row = next(p for p in client.get("/api/thym/programs").json()["programs"] if p["name"] == "every-kind")
+    assert [t["accepts"] for t in row["takes"]] == [H.accepts(t) for t in ("text", "fabula", "morph", "context",
+                                                                           "package", "volume")]
+    for name, wrong, words in (("a", "notes.md.cosm", "notes.md.cosm is a volume; a takes a text"),
+                               ("b", "notes.md", "notes.md is not a fabula; b takes a fabula"),
+                               ("c", "on-the-train.context.cosm", "is not a morph; c takes a morph"),
+                               ("d", "plain-letter.morph.cosm", "is not a context; d takes a context"),
+                               ("e", "notes.md", "notes.md is not a package; e takes a package"),
+                               ("f", "notes.md", "notes.md is not a volume; f takes a volume")):
+        bad = client.post("/api/thym/plan", json={"program": "every-kind", "inputs": {**good, name: wrong}})
+        assert bad.status_code == 400 and words in bad.json()["detail"], (name, bad.text)
+    missing = client.post("/api/thym/plan", json={"program": "every-kind", "inputs": {"a": "notes.md"}})
+    assert missing.status_code == 400
+    assert missing.json()["detail"].startswith("every-kind takes a (a text (a markdown or plain file)), b (a fabula")
+    assert missing.json()["detail"].endswith("; give b, c, d, e and f")
+
+
+def test_a_folder_input_and_several_outputs_land_beside_it(client: TestClient, project: Path):
+    shutil.copytree(INPUTS / "little-tool", project / "tool")
+    shutil.copyfile(SUITE / "programs" / "split-a-folder.thym", project / "tools" / "split-a-folder.thym")
+    listed = next(r for r in client.get("/api/thym/programs").json()["programs"] if r["name"] == "split-a-folder")
+    assert listed["version"] == 1 and [o["name"] for o in listed["outputs"]] == ["code", "prose", "size"]
+    p = client.post("/api/thym/plan", json={"program": "split-a-folder", "inputs": {"repo": "tool"}}).json()
+    assert p["ok"] is True and p["version"] == 1
+    assert p["outputs"] == [{"name": "code", "type": "folder"}, {"name": "prose", "type": "folder"},
+                            {"name": "size", "type": "number"}]
+    (row,) = p["inputs"]
+    assert (row["name"], row["type"], row["rel"], row["accepts"]) == ("repo", "folder", "tool", "a folder")
+    assert row["files"] == 7 and row["sha256"] == digest_path(project / "tool", "folder")
+    bad = client.post("/api/thym/plan", json={"program": "split-a-folder", "inputs": {"repo": "notes.md"}})
+    assert bad.status_code == 400 and bad.json()["detail"] == "notes.md is a file; repo takes a folder"
+    job = start(client, "/api/thym/run", {"program": "split-a-folder", "path": "tool"})
+    done = wait_job(client, job["id"])
+    assert done["state"] == "done", done
+    outs = done["result"]["outputs"]
+    assert [(o["name"], o["type"], o["rel"]) for o in outs] == [("code", "folder", "tool.code"),
+                                                                ("prose", "folder", "tool.prose"),
+                                                                ("size", "number", "tool.size.txt")]
+    assert outs[0]["files"] == ["little/__init__.py", "little/cli.py", "little/count.py"]
+    assert sorted(p.relative_to(project / "tool.code").as_posix() for p in (project / "tool.code").rglob("*")
+                  if p.is_file()) == outs[0]["files"]
+    assert "files" not in outs[2] and (project / "tool.size.txt").is_file()

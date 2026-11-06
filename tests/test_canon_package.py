@@ -214,7 +214,7 @@ def test_the_catalog_lists_a_package_as_one_item(volume: Path):
     assert (by["notes.package.cosm"]["kind"], by["notes.thym.enc"]["kind"]) == ("package", "sealed")
     assert by["notes.md"]["package"] == {"path": "notes.package.cosm", "folder": "notes.thym",
                                          "sealed": "notes.thym.enc"}
-    assert by["notes.md"]["emf"]["path"] == "notes.md.cosm"
+    assert by["notes.md"]["fabula"]["path"] == "notes.md.cosm"
     report = mc.lint(mc.load_volume_text(canon.build_catalog("orchard"), filename="canon.cosm"))
     assert report.ok, report.to_dict()
 

@@ -81,6 +81,11 @@ class MoveDecl:
     gives_when: tuple = field(default=(), hash=False, compare=False)
     contract_when: tuple = field(default=(), hash=False, compare=False)
     scaffold_when: tuple = field(default=(), hash=False, compare=False)
+    #: the kinds another owner adds to this move (`extends: true`, THYM 6.2): each `(words, code, owner)`, a call
+    #: whose `as` word is one of `words` running that owner's `code`; seen only by the views the extension is for
+    code_when: tuple = field(default=(), hash=False, compare=False)
+    #: an entry that adds `as` kinds to a move another owner declares, rather than declaring one of its own
+    extends: bool = field(default=False, hash=False, compare=False)
 
     def view(self, version: int) -> "MoveDecl | None":
         """What a program of grammar `version` sees of this move: None when the move is not there for it (`since`
@@ -292,13 +297,56 @@ def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | Non
         if read is None:
             return None
         thym1 = {THYM1_KEYS[k]: v for k, v in read.items()}
+    extends = entry.get("extends", False)
+    if extends not in (None, True, False):
+        problems.append(f"{where}: move {name}: extends must be true or false")
+        return None
     return MoveDecl(
         name=name, owner=owner,
         takes=sig["takes"], gives=sig["gives"], modifiers=sig["modifiers"],
         asks=bool(asks), contract=sig["contract"], scaffold=sig["scaffold"],
         code=entry.get("code") if isinstance(entry.get("code"), str) else None,
-        says=str(entry.get("says") or ""), source=source, since=since, thym1=thym1,
+        says=str(entry.get("says") or ""), source=source, since=since, thym1=thym1, extends=bool(extends),
         **{THYM1_KEYS[k]: sig[k] for k in WHEN_KEYS if k in sig})
+
+
+def _extend(base: MoveDecl, ext: MoveDecl, problems: list[str]) -> MoveDecl | None:
+    """`base` with the `as` kinds `ext` adds (THYM 6.2: each MiniCOSM declares the kinds it projects). The kinds
+    are seen by the views from `ext.since` on (a `since: 1` extension leaves the `thym 0` view as it was); a call of
+    one of them gives what `ext` gives, is held to `ext`'s contract and runs `ext`'s code. None, with a problem,
+    when `ext` cannot extend `base`."""
+    where = f"{Path(ext.source or ext.owner).name}: move {ext.name}"
+    words = tuple(ext.modifiers.get("as") or ())
+    if not words or set(ext.modifiers) != {"as"}:
+        problems.append(f"{where}: an extension adds `as` kinds and nothing else (modifiers: {{as: <kinds>}})")
+        return None
+    if ext.since < 1 and base.since < 1:
+        problems.append(f"{where}: an extension of a move a thym 0 program sees says since: 1, so that a thym 0 "
+                        "program sees the move as it was")
+        return None
+    if not ext.code:
+        problems.append(f"{where}: an extension names the code that runs its kinds")
+        return None
+    now = base.view(1) or base
+    have = tuple(now.modifiers.get("as") or ())
+    clash = [w for w in words if w in have]
+    if clash:
+        problems.append(f"{where}: {', '.join(clash)} is already a kind of {base.name} (by {base.owner})")
+        return None
+    if ext.takes != now.takes:
+        problems.append(f"{where}: an extension takes what the move takes ({now.takes!r})")
+        return None
+    mods = dict(now.modifiers)
+    mods["as"] = have + words
+    thym1 = dict(base.thym1)
+    thym1["modifiers"] = mods
+    thym1["contract_when"] = tuple(now.contract_when) + (("as", words, tuple(ext.contract)),)
+    if ext.gives != now.gives:
+        thym1["gives_when"] = tuple(now.gives_when) + (("as", words, tuple(ext.gives)),)
+    thym1["code_when"] = tuple(now.code_when) + ((words, ext.code, ext.owner),)
+    if base.since >= 1:
+        return dataclasses.replace(base, **thym1)
+    return dataclasses.replace(base, thym1=thym1)
 
 
 def _sidecars(reg: mc.Registry, problems: list[str]) -> list[tuple[str, str, list]]:
@@ -359,17 +407,30 @@ def _load(reg: mc.Registry) -> Declarations:
         blocks[owner] = (path, moves)
     order = [n for n in reg.manifests if n in blocks] + sorted(n for n in blocks if n not in reg.manifests)
     out = Declarations()
+    extensions: list[MoveDecl] = []
     for owner in order:
         path, moves = blocks[owner]
         for entry in moves:
             d = _decl(owner, entry, path, problems)
             if d is None:
                 continue
+            if d.extends:
+                extensions.append(d)
+                continue
             if d.name in out:
                 problems.append(f"{Path(path).name}: move {d.name} is declared again; the first, by "
                                 f"{out[d.name].owner}, is kept")
                 continue
             out[d.name] = d
+    for ext in extensions:                       # after every owner's own: an extension may come before its move
+        base = out.get(ext.name)
+        if base is None or base.owner == ext.owner:
+            problems.append(f"{Path(ext.source or ext.owner).name}: move {ext.name} extends a move "
+                            + ("no other owner declares" if base is None else "its own owner declares"))
+            continue
+        grown = _extend(base, ext, problems)
+        if grown is not None:
+            out[ext.name] = grown
     out.problems = problems
     return out
 

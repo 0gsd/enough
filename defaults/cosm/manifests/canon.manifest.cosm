@@ -86,8 +86,8 @@ paths:
             more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
 
 envelope:
-  fields: [id, type, name, summary, path, parent, parts, size, mtime, kind, twin, emf, atem, short_of, shorts, holotype,
-           counts, status, visibility, provenance, pending, links]
+  fields: [id, type, name, summary, path, parent, parts, size, mtime, kind, twin, fabula, emf, atem, short_of, shorts,
+           holotype, counts, status, visibility, provenance, pending, links]   # emf: fabula's spelling before 0.6, read
   references: [links]
   required: [id, type, name, path]
   status: [active, dormant, planned, retired]
@@ -98,7 +98,8 @@ envelope:
 
 closed-lists:
   twin.state: [fresh, edited, stale, conflict]     # a convert twin (X.ext.md) beside its original
-  emf.state: [fresh, stale]                         # an EMF twin (X.cosm) beside its text
+  fabula.state: [fresh, stale]                      # a text's fabula, its twin (X.fabulan.cosm, X.fabulap.cosm)
+  emf.state: [fresh, stale]                         # the same field as catalogs before 0.6 wrote it
 
 references:
   forms:
@@ -113,7 +114,7 @@ modules:
     subtitle: What the volume holds
     kinds:
       folder: {refs: [parent, parts], checked: [path, holotype, counts]}
-      file: {refs: [parent], checked: [path, size, kind, twin, emf, atem, short_of, shorts]}   # short_of, shorts: paths
+      file: {refs: [parent], checked: [path, size, kind, twin, fabula, atem, short_of, shorts]}   # short_of, shorts: paths
       article: {refs: [parent], checked: [path, title, source]}     # a saved wiki article folder
 
 checks:

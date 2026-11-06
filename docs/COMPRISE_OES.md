@@ -10,14 +10,21 @@ Comprise OES is the MiniCOSM for companies: the format of a Holotype, one compan
 that are at once a file system and a relational database. Every part of the company the format knows (its legal bodies,
 roles, markets, products, representations, inventories, systems and people) has a place in both readings.
 
+A MiniCOSM is a domain's OES with a specification of its own, and there are two: Comprise OES, for companies, and
+Ascribe, for a person. Both are written in MacroCOSM OES (https://macro.cosmoes.org/), an OES: the shared grammar and its
+core, which holds the formats built into every reader, the densities and the dialectic, the one way of asking a person
+what a source means. Thym (https://thym.cosmoes.org/), the transcognition language that connects OESes, is the language of the
+programs this text names.
+
 Comprise OES replaces COSM 0.3, the earlier specification of the product tree, as the description of the format; COSM
 0.3's product tree is chapter P below, whole. Where this specification sits among the OES specifications, and why any of
 them exists, is said at https://cosmoes.org/.
 
-**Status.** Normative. Comprise, the product, is the reference implementation: its reader and writer read and write
-this format, and the `python -m core …` lines quoted in this text are its command line, given as examples of how a
-check is run, never as the rule. Where an implementation and this text disagree, one of them is in error; the Changes
-appendix (section 14) records which was corrected. *Not checked* marks a rule the checks do not enforce (section 13.3).
+**Status.** Normative. Comprise OES is stewarded by Verroes (Graham Smith). Comprise, the product, is the reference
+implementation: its reader and writer read and write this format, and the `python -m core …` lines quoted in this text
+are its command line, given as examples of how a check is run, never as the rule. Where an implementation and this
+text disagree, one of them is in error; the Changes appendix (section 14) records which was corrected. *Not checked*
+marks a rule the checks do not enforce (section 13.3).
 
 **The format does not change.** A Comprise OES file is a `.cosm` file: the COSM YAML subset (section 2.5) and, for
 sketches, the one-line shorthand (P.6), exactly as Holotypes were written before the format had a name. `comprise/1`
@@ -133,6 +140,7 @@ The two readings agree because one rule holds: **a path names the same thing a p
   store.sqlite                           the local database (2.8)
   people.yaml  people.proposed.yaml      the people file, imported once into the local database
   feeds/<slug>/runs/  scans/  bindings/  reports/   kept payloads, replay pages, reviewed sources, report definitions
+  codebases/<name>.fabulac.cosm          optional: the fabulacs the codebases point at (chapter S)
   logo.svg | logo.png                    optional: replaces the drawn company mark
 ```
 
@@ -157,6 +165,7 @@ One YAML mapping. Its keys:
 | `atoms` | the concerns: a list of `atom/<slug>` (or `{id: atom/<slug>}`) | the loader |
 | `perspective` | the concern you stand in by default, `atom/<slug>` | the renderers, the isotype |
 | `sources` | every source an item outside P cites: `{id, page, url, supports, date}` | the checks (`source-undeclared`) |
+| `sessions` | the dialectic's sessions: one `D:session` record per elicitation sitting (section 8) | the pages |
 | `attestations` | the signed versions on record | versions |
 | `grants` | scoped, time-limited permissions for an agent to read: `net-scan`, `reflections`, `system-scan`, `directory`, `accounting`, `mcp`, `vendor` | scans, feeds, rule 9 |
 | `groups` | named sets of concerns (*atom groups*), usable as a relationship's end | rule 8 |
@@ -235,8 +244,9 @@ not write one (section 13.3).
 ### 2.7 Other folders
 
 `vendors/` (3.5) and `snapshots/` (10) are read-only to the app. `feeds/`, `scans/` and `bindings/` hold what sources
-brought in and what a person reviewed. `reports/` holds report definitions (`<slug>.report.yaml`). None of them is part
-of the model; none is read by the checks except where a section says so.
+brought in and what a person reviewed. `reports/` holds report definitions (`<slug>.report.yaml`). `codebases/` holds
+the fabulacs that `S:codebase` items name in their `fabula` field (chapter S); a fabulac is read there, never written
+by Comprise OES. None of them is part of the model; none is read by the checks except where a section says so.
 
 ### 2.8 The local database
 
@@ -244,7 +254,8 @@ of the model; none is read by the checks except where a section says so.
 
 - **Derived** (rebuilt from the files by `python -m core index`): `nodes`, `edges`, `nodes_fts`.
 - **Canonical, never in a file:** the people (`people_meta`, `persons`, `assignments`, `memberships`, `credentials`,
-  `access`), sealed field by field; `series`; feed runs, synced SKUs, listings, levels and drift; scan runs, the scan log
+  `access`), their personal fields sealed field by field (chapter E); `series`; feed runs, synced SKUs, listings,
+  levels and drift; scan runs, the scan log
   and candidates; logins, invites, tokens, keys (public halves only) and the audit; standing statements and evidence;
   isotype settings and releases.
 
@@ -526,9 +537,12 @@ service directly.
 | L1 | `function` | a cluster of units that share infrastructure and a job (make, sell, fulfil, support); may nest | function, product, service | |
 | L0 | `product` · `service` | the unit that does the work: a product is an artifact, a service an activity | nothing: what is inside goes in `substrate` | parts |
 
-P has one more kind, `release` (`P:release/<unit>@<version>`: date, channels, build, notes, listings), declared in the
-schema. P's checks do not know the kind, and a `P:release` item fails them as an unknown kind: a disagreement recorded,
-not resolved; its resolution is reserved for a later edition.
+P has one more kind, `release` (`P:release/<unit>@<version>`: date, channels, build, notes, listings), which stands
+outside the levels. A release is one version of a unit put out, not a part of the tree: it holds no parts, is no item's
+part, and names the product or service it releases in `unit` (and, in `build`, the `S:codebase` it was built from,
+when there is one). It carries P's identity like every P item (P.3.1). The invariants below are the tree's and pass
+over a release; P's checks know the kind and hold it to these rules (`release`, P.9), and the seven conditions leave
+it out.
 
 **Invariants**, checked except where marked:
 
@@ -573,7 +587,7 @@ stale or leak.
 | `version` | of this description, not of the thing; optional; no check reads it |
 | `confidence`, `consensus` | 0 to 1: how sure the elicitation was; how much the sources agreed |
 | `sources` | the sources it came from (4.1) |
-| `visibility` | `public` · `internal` · `restricted`. When absent: `public` for the brand, suites and offerings; `internal` for functions; for a product or service, `public` only when one of its flows touches a market or a channel (P.5.2) |
+| `visibility` | `public` · `internal` · `restricted`. When absent: `public` for the brand, suites and offerings; `internal` for functions; for a product or service, `public` only when one of its flows touches a market or a channel (P.5.2); for a release, its unit's |
 | `kind` | the brand only: `company` · `nonprofit` · `public-body` · `project` · `community` · `product-line` · `other` |
 
 ##### P.3.2 flow
@@ -819,7 +833,7 @@ reports them. Severities: an error blocks, a warning is recorded, a note is advi
 
 | Check | Severity | Fails when |
 |---|---|---|
-| `type` | error | the kind is not one of P's levels |
+| `type` | error | the kind is not one of P's levels or `release` |
 | `type-prefix` | error | the id's kind disagrees with `type` (the brand's id has no kind) |
 | `legacy` | note | `firm` or `stack` was read as `brand` or `function` |
 | `identity-min` | error | id, name, type, summary or owner is missing |
@@ -843,7 +857,8 @@ reports them. Severities: an error blocks, a warning is recorded, a note is advi
 | `confidence` | note | `confidence` or `sources` missing |
 | `no-humans` | warning | a personal pronoun in identity, rules or principles; a singular one in mattering |
 | `no-humans?` | note | two capitalized words that could be a person's name |
-| `orphan`, `single-parent`, `acyclic` | error | containment is broken (P.2) |
+| `orphan`, `single-parent`, `acyclic` | error | containment is broken (P.2); a release is never an orphan |
+| `release` | error | a release holds parts or is an item's part, or its `unit` is not a product or service of the tree (P.2) |
 | `flow-mirror` | warning | a feeds edge only one end declares (P.5.1) |
 
 **The seven conditions** (*equilibrium*). The tree is in equilibrium only when all seven are `ok`:
@@ -921,7 +936,22 @@ SKUs a feed brings in live in the local database, not the files; a mapping row m
 | `integration` | data moving between two systems | `from`, `to` | |
 | `datastore` | where a system keeps data | `system` | |
 | `account` | an account on a system, and who holds it | `system`, `holder` | |
-| `codebase` | source code, and what it runs | `runs` | |
+| `codebase` | source code, and what it runs; `fabula`, optional: the fabulac that describes the code | `runs` | `codebase-fabula` (`fabula`) |
+
+**A codebase's fabulac.** A codebase may point at a **fabulac**, the fabula of a folder of source code, as MacroCOSM OES
+(https://macro.cosmoes.org/), its section 18.4.7, defines it, in its `fabula` field: the path of a `.fabulac.cosm`
+file inside the Holotype, relative to its root and written with `/`, conventionally under `codebases/`
+(`fabula: codebases/firefox.fabulac.cosm`). The field is a path, not a reference (section 7): it names a file of the
+volume, never an item, and it never leaves the Holotype.
+
+- **Checked** (`codebase-fabula`): the file must be there, inside the Holotype, load, and declare `oes: fabula/1` with
+  `flavour: fabulac` (an error otherwise). When the source folder the fabulac describes is present, the fabulac must be
+  fresh against it, its tree digest unchanged (a warning when it is stale). With no folder present, freshness is not
+  judged.
+- **Shown.** A reader shows the fabulac's atem line beside the codebase, under the codebase's visibility (4.2). No other
+  part of the fabulac is rendered from the Holotype.
+- **Read, never built.** Comprise OES reads a fabulac; it does not build one. A fabulac is made by decompiling the
+  folder, as MacroCOSM OES defines it, and one a Holotype holds was made elsewhere and copied in.
 
 ### Chapter E · Employees
 
@@ -934,7 +964,7 @@ module with personal data, and it is never in a file (2.6). Its kinds are tables
 | `assignment` | `assignments`: a person in a position, with a share, dates and the employer | `position`, `employer` |
 | `membership` | `memberships`: a person in an audience (member-owner, partner, player) | `audience` |
 | `credential` | `credentials`: a licence or certification a person holds; issuer, scope and data sealed | |
-| `access` | `access` | |
+| `access` | `access`: a person's level of access to the Holotype in the app, one row per person per concern: `admin` · `steward` (with `scope`, the modules the person edits) · `editor-of-own` · `viewer`. An active person with no row is a `viewer`. The row holds the person's id and no personal data, and is not sealed | |
 | `intake`, `continuity` | a person's profile, inside `persons.data` | |
 | `broadcast` | declared; reserved for a later edition | |
 
@@ -1096,7 +1126,7 @@ address; it opens nothing to a reader who may not see it.
 - An id whose slug falls outside that set (one with a slash, a colon, a `#`, a space or a non-ASCII letter) parses as an
   id but has **no path** in `comprise/1`; the command line says so. *Not checked:* the checks do not warn about such ids
   (section 13.3).
-- The catalog's own entries (sources, grants, groups, attestations) have no path in `comprise/1`.
+- The catalog's own entries (sources, sessions, grants, groups, attestations) have no path in `comprise/1`.
 
 ### 6.5 Where paths are accepted
 
@@ -1225,9 +1255,37 @@ pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; w
 - **What it does to the checks.** An open value is never an error. It makes a rule *unverifiable* where the rule needs
   the value (a price, a rate, a reporting line, a counterparty), and an unverifiable rule refuses signing.
 - **Not the same as "not disclosed".** `provenance.state: not-disclosed` says the subject declined to say: a fact.
-- **Not the same as "to fill in".** *To fill in* counts the details the question bank would still ask about an item,
-  its open questions included; an item with nothing left to fill in is **complete**. The three health figures (open
-  questions, to fill in, complete) come from one place.
+- **Not the same as "to fill in".** *To fill in* counts the details the question banks (below) would still ask about an
+  item, its open questions included; an item with nothing left to fill in is **complete**. The three health figures
+  (open questions, to fill in, complete) come from one place.
+
+**Asking** (*elicitation*). Comprise OES fills a Holotype by asking with the dialectic, the core's one way of asking a
+person what a source means and recording what they say, as MacroCOSM OES (https://macro.cosmoes.org/),
+its section 18.6, defines it. What Comprise OES adds to it:
+
+- **The banks.** Comprise OES's question banks are the dialectic banks of its manifest (its `dialectic:` key, read as
+  the core reads every manifest's banks): one bank per module, each question about a field of one or more kinds,
+  asked of the item with the most left to fill in. A bank may also hold a *counter* per check: the question to put
+  when that check refuses an answer.
+- **The sitting.** One elicitation sitting is one session of the dialectic, written as a `D:session` record in the
+  catalog's `sessions:` (2.2). Its id keeps the spelling `elicit-<date>-<hex>` (`D:session/elicit-2026-11-02-a3f9`),
+  and the catalog's `sources:` declares the same id as a source, as before; the record sits beside that declaration
+  and does not replace it. The record holds `at` (when the sitting began), `with: {to, who}` (`to` the role answering
+  or `owner`; `who` a plain description, never a name), `through` (`person` or `agent`), `model` (the model that
+  parsed or rephrased answers, when one did), `covers: {part, module}` (the concern, and the module's letter, or `*`
+  for a sitting across the Holotype), and `asked`, `answered` and `skipped`: the fields put to the person, each as
+  `atom/<concern>//<id>#<field path>`.
+- **Ask, check, commit.** A question is put to one field. The answer becomes the field's value, and the write goes
+  through the checks (section 9): a write that would add an error is undone, and the bank's counter for that check is
+  put instead. Outside P, the item written takes `provenance.mode: dialectic`, the session's id among its `sources` and
+  the answer's `confidence`; in P, the session's id joins the item's `sources` (4.1). The bare id `elicit-…` names the
+  session wherever it is written, so `provenance: {mode: dialectic, sources: [elicit-…]}` reads as it always has.
+- **"I don't know"** stays an open question, in the person's own words: the field is written `{pending: "<their
+  words>"}`, and the question waits for the next sitting.
+- **Who is asked.** A question goes to the item's owner by default, as every open question does (above): a role, never
+  a person.
+- **No question items.** A Holotype holds no `D:question` items: a question asked in a sitting is a bank's question put
+  to one field, and one left open is an open question where the value would go.
 
 ---
 
@@ -1261,6 +1319,7 @@ write the app makes goes through them, and a write that adds an error is undone.
 | `no-humans` | error / warning | a pointer to `E:person` from an unrestricted item (error); a singular pronoun in name or summary (warning) |
 | `bond`, `bond-mirror` | error / warning | section 3.2 |
 | `aim` | error | kind or stance missing or outside its list; a malformed horizon |
+| `codebase-fabula` | error / warning | a codebase's `fabula` is not a fabulac inside the Holotype (error); the fabulac is stale against its source folder (warning); chapter S |
 | `module-none` | warning | `module: none` without a reason |
 
 ### 9.3 The fourteen rules
@@ -1298,7 +1357,8 @@ reason.
 ## 10. Versions
 
 - **A saved version** (*snapshot*) is an immutable copy of the model files at a moment, at `snapshots/<stamp>/`: the
-  catalog, everything under `atoms/`, the bindings and the fetched vendors; never the local database, the people file,
+  catalog, everything under `atoms/`, the fabulacs under `codebases/`, the bindings and the fetched vendors; never the
+  local database, the people file,
   feed payloads or scan runs. Its `manifest.yaml` holds when and by whom, every file's sha256, each concern's content
   hash and item count, the export's hash, the checks' verdict, the people counts, the perspective concern's standing,
   and its own hash. Taking one changes nothing and is always allowed.
@@ -1356,6 +1416,7 @@ identity:  name, domains, jurisdiction, founded, kind
 shape:     employees (some | none), structure (single | group), markets
 offers[]:  name, summary, kind (suite, offering, function, product, service, audience)
 seeks[], open_to[]:  kind (the aim kinds), summary
+optional:  program, trace, bonds, policies, and the optional keys of items (below)
 ```
 
 | Field | Derived from |
@@ -1406,7 +1467,7 @@ with Comprise: *minimal*, which reproduces those rules byte for byte; *fuller*, 
 which adds the rest of the table. A subject with first-party standing may write its own program, and a program that breaks a rule is refused,
 with the line. A first release states a market word, and after that it moves only after 90 days past its boundary. The moves are declared
 in a sidecar, `comprise.moves.cosm`, and never in the manifest; the language a program is written in is Thym
-(https://thym.cosmoes.org/).
+(https://thym.cosmoes.org/), the transcognition language that connects OESes.
 
 Further isotype fields a subject may open one at a time, each opt-in and marked verified or stated, are reserved for a
 later edition.
@@ -1510,8 +1571,8 @@ item is absent.
 | P's card and Mermaid views | one item's nine aspects (`card`); `map`, `tree`, `flow`, `affect`, `mattering` (P.8); the product-tree tooling's |
 | the deck | PDF, SVG and HTML pages of a product tree, made by the agent skill's deck tool; the app does not call it |
 
-Renderers driven by a reader's own style profile, and rewritings for beginners, story problems and narrative (the text
-cases of what the trade calls *transcreation*), are reserved for a later edition.
+Renderers driven by a reader's own style profile, and shorts compiled for one audience (for beginners, as story
+problems, as narrative), are reserved for a later edition.
 
 ---
 
@@ -1547,7 +1608,8 @@ cases of what the trade calls *transcreation*), are reserved for a later edition
 
 **Verified:** the load, the `oes:` declaration included (2.3); the id grammar; kinds per module; the envelope's closed
 lists, required fields and provenance; owners are roles; every reference resolves (with the exceptions in 7.3);
-relationship kinds and bases; aims; P's per-item checks and seven conditions; the fourteen rules.
+relationship kinds and bases; aims; a codebase's fabulac; P's per-item checks, releases included, and seven
+conditions; the fourteen rules.
 
 **Not verified** (a writer must still keep them):
 
@@ -1569,6 +1631,32 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
 
+**Edition 0.6.0 · 2026-11-05.**
+
+1. **Where Comprise OES stands.** The lead says there are two MiniCOSMs, Comprise OES and Ascribe, both written in
+   MacroCOSM OES, an OES: the shared grammar and its core, which holds the formats built into every reader, the
+   densities and the dialectic; Thym is
+   named the transcognition language that connects OESes (the lead and 11.3). The status paragraph names the steward.
+2. **Elicitation is the dialectic** (section 8). The question banks are the dialectic banks of the manifest. A sitting
+   is a session of the dialectic, written as a `D:session` record in the catalog's new `sessions:` (2.2) beside the
+   source the catalog already declares for it, its id still spelled `elicit-<date>-<hex>`; ask, check and commit, "I
+   don't know" and who is asked are said against the core's primitive. Provenance written before,
+   `{mode: dialectic, sources: [elicit-…]}`, stays valid as written. Sessions join the catalog entries that have no
+   path (6.4.8).
+3. **`S:codebase` gains `fabula`** (chapter S): an optional path to a fabulac inside the Holotype, by convention under
+   `codebases/` (2.1, 2.7), checked by `codebase-fabula` (9.2, 13.3), its atem line shown beside the codebase. Comprise
+   OES reads a fabulac and never builds one. A saved version copies `codebases/` (section 10).
+4. **`P:release` is resolved.** The first edition recorded a disagreement: `P:release` declared in the schema and
+   rejected by P's checks as an unknown kind. In this edition P's checks know `release`, a kind outside the levels:
+   no parts, in no item's parts, naming its unit, its visibility its unit's (P.2, P.3.1; in P.9, `type`, `orphan` and
+   the new `release`). The reference implementation's checks were corrected.
+5. **`access` is described** (chapter E): one row per person per concern holding a level, and for a steward the
+   modules; it holds no personal data and is not sealed. Section 2.8 says it is the people tables' personal fields
+   that are sealed.
+6. **The isotype's schema line** (11.3) names its optional keys, `program` and `trace` among them; an outside chart
+   still requires both (11.4).
+7. **Words.** Section 12 names the reserved tellings for one audience as shorts; the trade's word for them is dropped.
+
 **Edition 0.5.4 · 2026-11-03, second revision.** Rules the reference implementation keeps and this text had not stated
 are written in: the logo file served script-free (2.1); a sample's names and mark (2.2); team members named by account
 id (2.8); standing and its proven levels (section 11); fees and promoted entries (11.3); the holder's handle, the
@@ -1588,6 +1676,12 @@ fields, style-profile renderers). The manifest's rules, formerly among the decis
 "How to read this". Status passages, decision and slice references, repository paths, pointers to planning documents
 and the item counts of the sample Holotypes are removed; the cross-references to Thym and to the overview are their
 cosmoes.org homes. Section 14, "Decisions in this version", becomes this appendix.
+
+**Edition 1 · 2026-11-03, the outside chart and the sealed package.** Section 11.4, the outside chart
+(`comprise-paratype/0`), and section 11.5, the sealed package (a cryptotype: a Thym package in its encrypted form), are
+added, and section 11.3 gains what a release may also carry and the dial, a release as a program's projection. They
+write down rulings made on 2026-11-02; Comprise 0.3.0, the reference implementation that carries them, shipped on
+2026-11-04.
 
 **Edition 1 · 2026-10-20.** The first edition of the format under its own name, replacing COSM 0.3.
 

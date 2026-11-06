@@ -1,0 +1,89 @@
+oes: thym/1
+kind: program
+id: thym/survey-a-repo
+name: survey-a-repo
+source:
+  path: survey-a-repo.thym
+  sha256: 9125a109d4d452b2b86b3f1ea01da599cb4d8a9cdb98dfe4aead5df0513a71e1
+  size: 360
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/survey-a-repo
+  type: program
+  name: survey-a-repo
+  summary: A folder of Python read by its syntax into the outline of a fabulac, before any model reads a line.
+  why: a folder of Python read by its syntax into the outline of a fabulac, before any model reads a line.
+  must:
+  - nothing in the folder is run, imported or installed.
+  decided: []
+  takes:
+  - name: repo
+    type: folder
+  gives:
+  - name: f
+    type: fabula
+  lines: 3-12
+  order: 1
+  body: |
+    program survey-a-repo
+      why: a folder of Python read by its syntax into the outline of a fabulac, before any model reads a
+           line.
+      must: nothing in the folder is run, imported or installed.
+
+      takes repo: folder
+      gives f: fabula
+
+      give survey repo                                 -- files, parts, interfaces, settings, licence: rules only
+    end
+  steps:
+  - P:step/survey-a-repo.1
+  provenance:
+    mode: derived
+    sources:
+    - survey-a-repo.thym#L3-L12
+    confidence: 1
+- id: P:step/survey-a-repo.1
+  type: step
+  name: give survey repo
+  summary: 'files, parts, interfaces, settings, licence: rules only'
+  of: P:program/survey-a-repo
+  n: 1
+  text: '  give survey repo                                 -- files, parts, interfaces, settings, licence: rules
+    only'
+  line: 11
+  form: give
+  move: survey
+  calls:
+  - survey
+  uses:
+  - repo
+  asks: false
+  contracts:
+  - P:contract/survey-a-repo.1
+  provenance:
+    mode: derived
+    sources:
+    - survey-a-repo.thym#L11
+    confidence: 1
+- id: P:contract/survey-a-repo.1
+  type: contract
+  name: survey
+  summary: What survey must leave true of what it gives.
+  of: P:step/survey-a-repo.1
+  move: survey
+  checks:
+  - files-found
+  - code-span
+  - licence-recorded
+  - fabula-checks
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - survey-a-repo.thym#L11
+    confidence: 1

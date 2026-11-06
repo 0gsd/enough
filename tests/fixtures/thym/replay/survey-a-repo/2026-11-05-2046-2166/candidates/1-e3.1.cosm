@@ -1,0 +1,18 @@
+engine: syntax.outline
+inputs:
+  call: 0f3fdec76d2fc099f9ecd96879dac9f99b6631f66dac2d4ddd97c5782d5a6970
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  lines: 2
+  doc: 'tiny: count the words of a text file.'
+  imports: []
+  defs: []
+  constants:
+  - name: __version__
+    value: '"0.2.0"'
+    line: 2
+  env: []

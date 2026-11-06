@@ -1,0 +1,22 @@
+# An answers volume for appendix D's fabulac: the maker answers two questions and skips the third, which stays open.
+oes: fabula/1
+macrocosm: 0.5.4
+id: fabula/tally
+nodes:
+  - id: D:session/session-1
+    type: session
+    at: 2026-11-05T12:00:00Z
+    with: {to: maker, who: tally's maintainer}
+    through: agent
+    model: g40-04
+    asked: [D:question/hide-zero, D:question/old-ledger, D:question/shared-ledger]
+    answered: [D:question/hide-zero, D:question/old-ledger]
+    skipped: [D:question/shared-ledger]
+  - id: D:question/hide-zero
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:01:00Z, by: maker, says: "Yes, on purpose: a 0 is noise until you ask for --all.", value: true, confidence: 1, session: D:session/session-1}
+  - id: D:question/old-ledger
+    state: answered
+    answers:
+      - {at: 2026-11-05T12:02:00Z, by: maker, says: Never., value: never, confidence: 1, session: D:session/session-1}

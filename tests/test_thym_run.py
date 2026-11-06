@@ -395,8 +395,10 @@ def test_the_replay_coprocessor_refuses_a_changed_input_or_contract(root):
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     rc = ReplayCoprocessor(t.dir)
     story = load_input(brief_plan()["inputs"][0], SUITE)
+    # a hand plan names no grammar version, so its derive is held to the thym 1 view's contract, which spells the
+    # fabula's checks fabula-checks (a thym 0 program's view still says emf-checks: test_thym_versions)
     contract = {"move": "derive", "schema": {"format": "yaml"},
-                "checks": ["span-resolves", "stance-closed", "terms-grounded", "coverage", "emf-checks", "provenance"],
+                "checks": ["span-resolves", "stance-closed", "terms-grounded", "coverage", "fabula-checks", "provenance"],
                 "repair": {"allowed": ["normalise-stance"], "failed": []}}
     budget = {"attempts": 3, "output_words": 0, "prompt_tokens_max": 400, "seconds": 600}
     ok = rc.complete(contract, {"story": (story, story.sha256)}, budget=budget, at=("1", 1))

@@ -1,12 +1,10 @@
-"""Every `thym 1` program the round ships, and every `thym 1` block of the 0.6 draft of the specification, compiles
-(design 5, ruling 14; THYM 4.8, 7.5, 8.1, 8.3, 20 to 22).
+"""Every `thym 1` program the round ships, and every `thym 1` block of the specification, compiles against the real
+declared moves (design 5, ruling 14; THYM 4.8, 7.5, 8.1, 8.3, 20 to 22).
 
-The moves those programs call do not exist yet (`survey`, `history`, `gather`, `question`, `record`, `settle`, the
-editor's moves, `join`, `say`, `folders`; `derive`, `tell`, `count` and `words` extended): the move lanes write them.
-So the programs compile here against scratch declarations of those moves, with the signatures of the design's table
-(3.2), read by the compiler's own reader into the declarations every other move has. The draft of the text is a copy
-kept under `tests/fixtures/thym/draft-0.6/` (`thym-0.6-draft.md`); its `thym 1` blocks are read from it here, and the
-shipped programs, as the text has them, are files beside it. Nothing here runs a program.
+The text is the synced copy, docs/THYM.md (scripts/sync_specs.py); the draft copy earlier lanes kept under
+tests/fixtures/thym/draft-0.6/ is gone. The declarations are the manifests' own (`declarations.load()`), held here to
+the text's table of the moves `thym 1` adds or extends (6.3). The shipped programs are defaults/thym/'s, each a block
+of the text byte for byte. Nothing here runs a program.
 """
 from __future__ import annotations
 
@@ -23,77 +21,50 @@ from enough.thym import parse as ps
 from enough.thym import plan as pl
 
 REPO = Path(__file__).resolve().parents[1]
-DRAFT = REPO / "tests" / "fixtures" / "thym" / "draft-0.6"
-TEXT = DRAFT / "thym-0.6-draft.md"
-SHIPPED = DRAFT / "programs"
-
-#: The design's table (3.2), as declarations: the moves the round adds (each `since: 1`) and the four it extends (their
-#: additions under `thym-1:`). Scratch: the move lanes write the real ones in the manifests.
-NEW = [
-    {"name": "survey", "takes": ["folder"], "gives": "fabula", "since": 1,
-     "contract": ["files-found", "code-span", "licence-recorded", "fabula-checks", "provenance"]},
-    {"name": "history", "takes": ["folder"], "gives": "fabula", "modifiers": {"with": "fabula"}, "since": 1,
-     "contract": ["history-grounded", "fabula-checks", "provenance"]},
-    {"name": "gather", "takes": ["list of fabula | list of item"], "gives": "same-as-with",
-     "modifiers": {"with": "fabula | volume"}, "since": 1,
-     "contract": ["nothing-lost", "ids-unique", "fabula-checks", "provenance"]},
-    {"name": "question", "takes": ["fabula | volume"], "gives": "list of item", "asks": True, "scaffold": "bank",
-     "since": 1, "contract": ["addressed", "no-duplicate", "provenance"]},
-    {"name": "record", "takes": ["volume"], "gives": "same-as-in", "modifiers": {"in": "fabula | volume"},
-     "since": 1, "contract": ["addressed", "only-the-asked", "provenance"]},
-    {"name": "settle", "takes": ["fabula | volume"], "gives": "fabula | volume", "asks": True, "scaffold": "direct",
-     "since": 1, "contract": ["addressed", "only-the-asked", "fabula-checks", "provenance"]},
-    {"name": "lines", "takes": [], "gives": "list of line", "modifiers": {"of": "text | short"}, "since": 1},
-    {"name": "replace", "takes": ["line"], "gives": "change", "modifiers": {"with": "string | line | short"},
-     "since": 1},
-    {"name": "drop", "takes": ["line"], "gives": "change", "since": 1},
-    {"name": "insert", "takes": ["string | line | short"], "gives": "change",
-     "modifiers": {"before": "line", "after": "line"}, "since": 1},
-    {"name": "edit", "takes": ["text | short"], "gives": "text | short", "modifiers": {"with": "list of change"},
-     "since": 1, "contract": ["only-the-changed", "never-source", "provenance"]},
-    {"name": "reword", "takes": ["line | string | short"], "gives": "line | string | short",
-     "modifiers": {"to": "words", "with": "morph"}, "asks": True, "since": 1,
-     "contract": ["length", "one-line", "nothing-added", "provenance"]},
-    {"name": "join", "takes": ["list of string | list of line | list of short"], "gives": "short",
-     "modifiers": {"with": "string"}, "since": 1, "contract": ["provenance"]},
-    {"name": "say", "takes": ["number | date | word | bool | string"], "gives": "string", "since": 1},
-    {"name": "folders", "takes": [], "gives": "list of folder", "modifiers": {"of": "folder"}, "since": 1},
-]
-CHANGED = {
-    "derive": {"thym-1": {"takes": ["text | folder"], "modifiers": {"as": "prose | verse | code", "with": "fabula"},
-                          "contract": ["span-resolves", "stance-closed", "terms-grounded", "coverage", "fabula-checks",
-                                       "provenance"],
-                          "contract-when": [
-                              {"as": ["code"], "contract": ["code-span", "outline-cited", "coverage", "terms-grounded",
-                                                            "stance-closed", "fabula-checks", "provenance"]},
-                              {"takes": "folder", "contract": ["fold-grounded", "atem-shape", "licence-recorded",
-                                                               "fabula-checks", "provenance"]}]}},
-    "tell": {"thym-1": {"modifiers": {"as": "order | code | line | overview | manual", "by": "order",
-                                      "with": "morph"},
-                        "gives-when": [{"as": ["code"], "gives": "folder"}]}},
-    "count": {"thym-1": {"takes": ["volume | fabula | short | list | folder"]}},
-    "words": {"thym-1": {"takes": ["text | short | atem | line | string"]}},
-}
+TEXT = REPO / "docs" / "THYM.md"
+SHIPPED = REPO / "defaults" / "thym"
+#: The programs the round ships (design 5); defaults/thym/ also holds the three thym 0 programs of 0.5.0.
+ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "settle", "tighten")
 
 
 def scratch_decls() -> dc.Declarations:
-    """The bundled declarations, with the round's moves declared (scratch) by the compiler's own reader."""
-    base = dc.load()
-    out = base.copy()
-    problems: list[str] = []
-    for entry in NEW:
-        d = dc._decl("thym", dict(entry), "scratch.moves.cosm", problems)
-        assert d is not None, problems
-        out[entry["name"]] = d
-    for name, extra in CHANGED.items():
-        old = base[name]
-        entry = {"name": name, "takes": [" | ".join(a) for a in old.takes], "gives": " | ".join(old.gives),
-                 "modifiers": {k: " | ".join(v) for k, v in old.modifiers.items()}, "asks": old.asks,
-                 "contract": list(old.contract), **({"scaffold": old.scaffold} if old.scaffold else {}), **extra}
-        d = dc._decl(old.owner, entry, "scratch.moves.cosm", problems)
-        assert d is not None, problems
-        out[name] = d
-    return out
+    """The real declarations (the name is kept from the days the round's moves were declared here in scratch)."""
+    return dc.load()
+
+
+def _table_rows() -> list[tuple[str, ...]]:
+    text = TEXT.read_text(encoding="utf-8")
+    part = text[text.index("The moves `thym 1` adds or extends."):text.index("`propose` is Ascribe's:")]
+    return [m.groups() for m in re.finditer(r"^\| `([a-z-]+)` \| (.*?) \| (.*?) \| (.*?) \| (.*?) \|$", part, re.M)]
+
+
+def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
+    """Each row of 6.3's second table is a real declaration's `thym 1` view: its contract (where the row names one
+    list), whether it asks, its scaffold; the three rows that choose by the call are held to their `-when` rules."""
+    d = dc.load()
+    rows = _table_rows()
+    assert len(rows) == 20
+    for name, _sig, asks, contract, scaffold in rows:
+        v = d[name].view(1)
+        assert v is not None, name
+        assert v.asks is asks.startswith("yes"), name
+        if "·" not in contract and "as above" not in contract:
+            assert list(v.contract) == re.findall(r"`([a-z-]+)`", contract), name
+        if "·" not in scaffold:
+            want = re.findall(r"`([a-z-]+)`", scaffold)
+            assert ([v.scaffold] if v.scaffold else []) == want, name
+    derive, tell = d["derive"].view(1), d["tell"].view(1)
+    assert dc.chosen(derive, as_word="code")["contract"] == ("code-span", "outline-cited", "coverage",
+                                                             "terms-grounded", "stance-closed", "fabula-checks",
+                                                             "provenance")
+    assert dc.chosen(derive, first_type="folder")["contract"] == ("fold-grounded", "atem-shape", "licence-recorded",
+                                                                  "fabula-checks", "provenance")
+    assert dc.chosen(tell, as_word="code")["contract"] == ("parses", "interfaces-present", "files-present", "footer",
+                                                           "provenance")
+    assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "uses-told", "footer",
+                                                             "provenance")
+    assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
+    assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "tell", "count", "words"}
 
 
 def compile_with(text: str, decls: dc.Declarations, path: str | None = None):
@@ -127,35 +98,23 @@ def _first_name(text: str) -> str:
     return mt.group(2) if mt else "?"
 
 
-#: Blocks of the draft that do not compile, and why: a fault in the text, for the editor (docs/fabula-landed-T1c.md).
-#: When the text is mended, its block compiles and this test says so.
-TEXT_FAULTS = {
-    "folder-outline": ("type", "a list holds values of one type; [d.path, (join below)] mixes short, string"),
-}
-
-
 @pytest.mark.parametrize("line, text", DRAFT_BLOCKS, ids=[f"L{ln}-{_first_name(b)}" for ln, b in DRAFT_BLOCKS])
-def test_every_thym_1_block_of_the_draft_compiles(line, text):
+def test_every_thym_1_block_of_the_text_compiles(line, text):
     r = compile_with(text, scratch_decls())
-    fault = TEXT_FAULTS.get(_first_name(text))
-    if fault is not None:
-        assert isinstance(r, Refusal) and (r.check, r.message) == fault, f"the block at line {line} now: {r}"
-        return
-    assert not isinstance(r, Refusal), f"the block at line {line} of the draft: {r}"
+    assert not isinstance(r, Refusal), f"the block at line {line} of docs/THYM.md: {r}"
 
 
-def test_folder_outline_compiles_once_its_list_holds_one_type():
-    """The fault in the text's folder-outline (8.3) is its list `[d.path, (join below)]`, a string and a short; with
-    both shorts the program compiles, recursion, depth and the collect node included."""
+def test_folder_outline_compiles_as_the_text_now_writes_it():
+    """The text's folder-outline (8.3), mended by the errata pass (a list of one type): recursion under depth and
+    the collect node, as written."""
     text = next(b for _, b in DRAFT_BLOCKS if _first_name(b) == "folder-outline")
-    mended = text.replace("give join [d.path, (join below)]", "give join [(join [d.path]), (join below)]")
-    c = compile_with(mended, scratch_decls())
+    c = compile_with(text, scratch_decls())
     assert not isinstance(c, Refusal), str(c)
     plan = pl.plan(c, [{"name": "d", "type": "folder", "path": "tool", "sha256": "1" * 64, "files": 7, "bytes": 1}])
     node = next(n for n in plan["nodes"] if n["type"] == "node")
     assert node["name"] == "tree-of d" and node["budget"] == {"attempts": 1, "output_words": 0, "depth": 12}
     assert c.module.features[0][1] == "the type folder"
-    assert any(f == (9, "a move that calls itself (move tree-of)") for f in c.module.features), c.module.features
+    assert any(f[1] == "a move that calls itself (move tree-of)" for f in c.module.features), c.module.features
 
 
 def test_the_draft_holds_the_blocks_this_round_names():
@@ -165,15 +124,15 @@ def test_the_draft_holds_the_blocks_this_round_names():
                             "settle-the-answers"]), names
 
 
-SHIPPED_FILES = sorted(SHIPPED.glob("*.thym"))
+SHIPPED_FILES = [SHIPPED / f"{n}.thym" for n in ROUND]
 
 
 @pytest.mark.parametrize("path", SHIPPED_FILES, ids=[p.stem for p in SHIPPED_FILES])
 def test_every_shipped_program_compiles_plans_and_enumerates(path):
     """Design 5: decompile-python (five programs), compile-python, decompile-prose, decompile-verse, settle and tighten,
-    as the text has them, each a block of the draft byte for byte."""
+    as the text has them, each a block of the text byte for byte."""
     text = path.read_text(encoding="utf-8")
-    assert text in [b for _, b in DRAFT_BLOCKS], f"{path.name} is not a block of the draft as written"
+    assert text in [b for _, b in DRAFT_BLOCKS], f"{path.name} is not a block of docs/THYM.md as written"
     d = scratch_decls()
     c = compile_with(text, d, str(path))
     assert not isinstance(c, Refusal), str(c)
@@ -185,9 +144,9 @@ def test_every_shipped_program_compiles_plans_and_enumerates(path):
     assert en.compile_volume(vol) == text
 
 
-def test_the_shipped_programs_are_the_six_of_the_design():
-    assert [p.stem for p in SHIPPED_FILES] == ["compile-python", "decompile-prose", "decompile-python",
-                                               "decompile-verse", "settle", "tighten"]
+def test_the_shipped_programs_are_the_six_of_the_design_and_the_three_of_0_5_0():
+    assert sorted(p.stem for p in SHIPPED.glob("*.thym")) == sorted(ROUND + ("open-house", "publish-story",
+                                                                             "read-my-way"))
 
 
 def test_the_shipped_programs_plan_as_the_text_says():

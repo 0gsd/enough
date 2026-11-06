@@ -1,0 +1,11 @@
+-- refused: compile type line 10
+thym 1
+
+program code-in-a-short
+  why: tell as code gives a folder, the cshort, and a short cannot hold one.
+
+  takes f: fabula
+  gives s: short
+
+  give tell f as code
+end

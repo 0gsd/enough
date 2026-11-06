@@ -1,0 +1,133 @@
+oes: thym/1
+kind: program
+id: thym/drop-the-todos
+name: drop-the-todos
+source:
+  path: drop-the-todos.thym
+  sha256: 3cf4bd863286f52768a99bdb8531c5d1e5270717ba66795b96091b473c3e9d97
+  size: 276
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/drop-the-todos
+  type: program
+  name: drop-the-todos
+  summary: Every line that still says TODO leaves the draft, and nothing else changes.
+  why: every line that still says TODO leaves the draft, and nothing else changes.
+  must: []
+  decided: []
+  takes:
+  - name: draft
+    type: text
+  gives:
+  - name: clean
+    type: text
+  lines: 3-13
+  order: 1
+  body: |
+    program drop-the-todos
+      why: every line that still says TODO leaves the draft, and nothing else changes.
+
+      takes draft: text
+      gives clean: text
+
+      let changes = for each l in lines of draft where "TODO" in l
+        keep drop l
+      end
+      give edit draft with changes
+    end
+  steps:
+  - P:step/drop-the-todos.1
+  - P:step/drop-the-todos.3
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L3-L13
+    confidence: 1
+- id: P:step/drop-the-todos.1
+  type: step
+  name: let changes = for each l in lines of draft where "TODO" in l
+  summary: let changes = for each l in lines of draft where "TODO" in l
+  of: P:program/drop-the-todos
+  n: 1
+  text: '  let changes = for each l in lines of draft where "TODO" in l'
+  line: 9
+  lines: 9-11
+  form: for
+  calls:
+  - lines
+  binds: changes
+  uses:
+  - draft
+  asks: false
+  steps:
+  - P:step/drop-the-todos.2
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L9-L11
+    confidence: 1
+- id: P:step/drop-the-todos.2
+  type: step
+  name: keep drop l
+  summary: keep drop l
+  of: P:program/drop-the-todos
+  n: 2
+  text: '    keep drop l'
+  line: 10
+  form: keep
+  move: drop
+  calls:
+  - drop
+  uses:
+  - l
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L10
+    confidence: 1
+- id: P:step/drop-the-todos.3
+  type: step
+  name: give edit draft with changes
+  summary: give edit draft with changes
+  of: P:program/drop-the-todos
+  n: 3
+  text: '  give edit draft with changes'
+  line: 12
+  form: give
+  move: edit
+  calls:
+  - edit
+  uses:
+  - draft
+  - changes
+  asks: false
+  contracts:
+  - P:contract/drop-the-todos.3
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L12
+    confidence: 1
+- id: P:contract/drop-the-todos.3
+  type: contract
+  name: edit
+  summary: What edit must leave true of what it gives.
+  of: P:step/drop-the-todos.3
+  move: edit
+  checks:
+  - only-the-changed
+  - never-source
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - drop-the-todos.thym#L12
+    confidence: 1

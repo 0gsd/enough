@@ -11,8 +11,12 @@ Nothing runs on import, ingest, listing, reconcile or startup. Twins are written
 `macrocosm.lint` with no errors in both modes: what a model wrote that still fails after one repair turn is dropped
 and counted in `derived.dropped`, and references left dangling become open questions, `{pending: "..."}`.
 
-The shape written is docs/MACROCOSM_OES.md §18.4 (the `emf/1` MiniCOSM, defaults/cosm/manifests/emf.manifest.cosm);
-an atem's four parts are the owner's definitions (§18.3.5).
+The shape written is docs/MACROCOSM_OES.md §18.4 (the fabula, `oes: fabula/1`, defaults/cosm/manifests/
+fabula.manifest.cosm): a text's twin is `<text>.fabulan.cosm` or `<text>.fabulap.cosm` (`enough.fabula_names`), its
+catalog carries `flavour`, its id is `fabula/<slug>`, and `derived` records the model's `route` (and `provider`, for a
+cloud model). Twins written before 0.6 (`<text>.cosm`, `oes: emf/1`) are read as they are and updated in place by an
+atem or a short; only decompiling the text again writes it anew, under the new name (`replace_twin`). An atem's four
+parts are the owner's definitions (§18.3.5).
 """
 
 from __future__ import annotations
@@ -34,15 +38,41 @@ from typing import Any, Callable, Iterable
 
 from . import canon as _canon
 from . import canon_prompts as P
+from . import fabula_names as _names
 from . import macrocosm
+from . import verse as _verse
 
-EMF_OES = "emf/1"
+FABULA_OES = _names.OES                    # what a writer writes
+EMF_OES = _names.OLD_OES                   # the old spelling: read, never written
+FABULA_DECLARATIONS = _names.DECLARATIONS
 PENDING_NO_MODEL = "a model has not read this passage"
 PENDING_NOT_IN_FEED = "not in FEED"
 RULES_CONFIDENCE = 0.3
 STANCES = ("axiom", "observed", "deduced", "opinion", "assumed", "hearsay")
 SALIENCE = ("critical", "high", "normal", "low")
+# The first edition's six modules, in their order (callers list counts by it).
 MODULE_ORDER = ("L", "E", "K", "P", "T", "X")
+# Every module, in the order a twin writes them (MacroCOSM OES 18.4.2), the dialectic's D last; the six of the
+# first edition keep their relative order.
+MODULES_ALL = ("I", "L", "E", "K", "N", "C", "R", "P", "T", "X", "D")
+# The kinds every item of which carries a `stance` that is the fabula's own (how the fabula knows the item), not the
+# text's: every kind of I, N, C and R, and the readings and cases of P (MacroCOSM OES 18.4.2, 18.4.3).
+FABULA_STANCE_KINDS = frozenset(
+    "influence allusion occasion aim audience use requirement decision exclusion part device voice line metre rhyme "
+    "file component interface structure behaviour dependency setting maker change phase release means licence "
+    "reading case".split())
+# The highest confidence a stance allows on those kinds: a model's own judgement is at most 0.5 (18.4.3).
+STANCE_CONFIDENCE_CAP = {"opinion": 0.5, "assumed": 0.5, "deduced": 0.7}
+# What the whole-text request may write, per flavour; anything else in its reply is ignored (never written).
+WHOLE_KINDS = {
+    "fabulan": frozenset("influence allusion occasion aim audience decision exclusion device voice maker release"
+                         .split()),
+    "fabulap": frozenset("influence allusion occasion aim audience maker release".split()),
+}
+# The kinds the rules own in a fabulap (enough/verse.py): a model's items of these kinds are not written.
+VERSE_RULES_KINDS = frozenset(("part", "line", "metre", "rhyme"))
+# The whole-text request's system prompt is held under this many characters (it is read once per text).
+WHOLE_SYSTEM_MAX = 3_000
 
 # Chunking (plan §7.3 A step 1): by headings, then ~1,200-token windows. Tokens are reckoned as chars / 3, the
 # estimator server.py and the skill audit use.
@@ -304,6 +334,29 @@ def _call(complete: CompleteFn, messages: list[dict], **kw: Any) -> tuple[str, d
     return (text if isinstance(text, str) else ""), meta
 
 
+class _Seen:
+    """What the answers of one derivation said of their route: the first `route` and `provider` a `meta` gave."""
+
+    def __init__(self) -> None:
+        self.route: str | None = None
+        self.provider: str | None = None
+
+
+def _watching(complete: CompleteFn) -> tuple[CompleteFn, _Seen]:
+    """`complete` wrapped so the route each answer came by (`meta["route"]`, `meta["provider"]`) is noted."""
+    seen = _Seen()
+
+    def watched(messages: list[dict], **kw: Any) -> tuple[str, dict]:
+        text, meta = _call(complete, messages, **kw)
+        if seen.route is None and isinstance(meta.get("route"), str) and meta["route"]:
+            seen.route = meta["route"]
+        if seen.provider is None and isinstance(meta.get("provider"), str) and meta["provider"]:
+            seen.provider = meta["provider"]
+        return text, meta
+
+    return watched, seen
+
+
 def _default_lookup(words: list) -> dict:
     from . import dictionary as _dictionary
     return _dictionary.lookup_many(words)
@@ -409,30 +462,37 @@ def read_source(path: Path) -> tuple[str, dict]:
             {"sha256": hashlib.sha256(data).hexdigest(), "size": len(data), "mtime_ns": st.st_mtime_ns})
 
 
-def twin_path(text_path: Path | str) -> Path:
-    """`notes.md` → `notes.md.cosm` (the convert-twin convention, owner decision 4)."""
-    return _canon.emf_twin_path(Path(text_path))
+def twin_path(text_path: Path | str, flavour: str | None = None) -> Path:
+    """The text's twin: of `flavour` when given, else the one derived last, when it exists; else the name a new
+    twin takes, `notes.md` → `notes.md.fabulan.cosm` (`.fabulap.cosm` for verse). An old-named `notes.md.cosm` is
+    found while it is the text's fabulan."""
+    return _canon.emf_twin_path(Path(text_path), flavour)
 
 
-def twin_state(text_path: Path | str) -> str:
+def new_twin_path(text_path: Path | str, flavour: str) -> Path:
+    """Where a decompile of the text as `flavour` writes: always the flavour's name (`notes.md.fabulan.cosm`)."""
+    return _names.twin_path(Path(text_path), flavour)
+
+
+def twin_state(text_path: Path | str, flavour: str | None = None) -> str:
     """`fresh`, `stale` or `absent` — P2's rule (`canon.emf_state`), the one the listings use: a twin is fresh
-    while the text's size and mtime match its `source:`, or else its sha256 does. Absent when there is no
-    `X.cosm` declaring `emf/1` beside the text."""
+    while the text's size and mtime match its `source:`, or else its sha256 does. Absent when the text has no twin
+    (of `flavour`, when given)."""
     text = Path(text_path)
-    twin = twin_path(text)
-    if not _canon.is_emf_twin(twin):
+    twin = _names.find_twin(text, flavour)
+    if twin is None:
         return "absent"
     return _canon.emf_state(text, twin)
 
 
 def short_path(emf_path: Path | str, now: dt.datetime | None = None) -> Path:
-    """Where compiling an EMF writes its short (plan §15, owner decision 3): beside it,
+    """Where compiling a fabula writes its short (plan §15, owner decision 3; MacroCOSM OES 18.4.4): beside it,
     `<stem>.short-YYYY-MM-DD-HHMM.md` in local time, `-2`, `-3` … on a collision, so every compile is a new file
-    and never an overwrite. `notes.md.cosm` → `notes.short-…md`; a standalone `rain.cosm` → `rain.short-…md`; the
-    stem drops `.cosm` and then one extension. Canon's catalogs recognise the name (`canon.SHORT_RE`)."""
+    and never an overwrite. The stem is the text's, whatever the twin is called: `close.md.fabulan.cosm` and the
+    old `close.md.cosm` both give `close.short-…md`; a standalone `rain.fabulan.cosm` (or `rain.cosm`) gives
+    `rain.short-…md` (`fabula_names.short_stem`). Canon's catalogs recognise the name (`canon.SHORT_RE`)."""
     emf = Path(emf_path)
-    name = emf.name[: -len(".cosm")] if emf.name.endswith(".cosm") and len(emf.name) > 5 else emf.name
-    stem = Path(name).stem or name
+    stem = _names.short_stem(emf.name)
     when = now or dt.datetime.now()
     if when.tzinfo is not None:
         when = when.astimezone()
@@ -462,17 +522,51 @@ def write_atomic(path: Path, text: str) -> None:
 write_twin = write_atomic
 
 
+def replace_twin(text_path: Path | str, flavour: str, cosm: str) -> dict:
+    """Write a decompile's twin of the text as `flavour`, always under the flavour's name, and return `{path,
+    removed}` (MacroCOSM OES 18.4, its volume; pins P3.2). When the text's fabulan was an old-named twin
+    (`notes.md.cosm`) and this is a fabulan, the old twin is removed, but only after the new file loads clean (no
+    refusal, no errors); the caller has carried its `shorts:` (and pinned atems) into `cosm` through `previous`. If
+    the new file does not load clean the old one is left, and the new one is the twin (P3.3). `removed` is the old
+    file's name, or None. Nothing else renames or removes a twin."""
+    text = Path(text_path)
+    flavour = _flavour(flavour)
+    new = new_twin_path(text, flavour)
+    current = _names.find_twin(text, flavour)
+    old = current if current is not None and _names.is_old_name(current) else None
+    write_atomic(new, cosm)
+    removed = None
+    if old is not None and old != new:
+        vol = macrocosm.load_volume(new)
+        if vol.refused is None and not macrocosm.lint(vol).errors:
+            try:
+                old.unlink()
+                removed = old.name
+            except OSError:
+                removed = None
+    return {"path": new, "removed": removed}
+
+
 def catalog_id(rel_path: str) -> str:
-    """`emf/<slug>`: the text's path in its volume or project, slugged by the Canon rule (P0 decision 16):
-    `guides/close.md` → `emf/guides--close-md`."""
-    return f"emf/{_canon.slug(rel_path)}"
+    """`fabula/<slug>`: the text's path in its volume or project, slugged by the Canon rule (P0 decision 16;
+    MacroCOSM OES 18.4.1): `guides/close.md` → `fabula/guides--close-md`. A twin written as `emf/<slug>` is read
+    as it is."""
+    return f"fabula/{_canon.slug(rel_path)}"
+
+
+def _flavour(flavour: str | None) -> str:
+    fl = _names.check_text_flavour(flavour)
+    return fl or _names.OLD_FLAVOUR
 
 
 def _catalog(*, rel_path: str, source_name: str, source_stat: dict | None, name: str, derived: dict,
-             atem: dict | None, nodes: list) -> dict:
+             atem: dict | None, nodes: list, flavour: str | None = None, shorts: list | None = None) -> dict:
+    """The catalog's keys in the order MacroCOSM OES 18.4.1 gives: oes, macrocosm, flavour, id, name, source,
+    derived, atem, shorts, nodes."""
     cat: dict[str, Any] = {
-        "oes": EMF_OES,
+        "oes": FABULA_OES,
         "macrocosm": macrocosm.MACROCOSM_VERSION,
+        "flavour": _flavour(flavour),
         "id": catalog_id(rel_path),
         "name": name,
     }
@@ -482,15 +576,23 @@ def _catalog(*, rel_path: str, source_name: str, source_stat: dict | None, name:
     cat["derived"] = derived
     if atem is not None:
         cat["atem"] = atem
+    if shorts:
+        cat["shorts"] = shorts
     cat["nodes"] = nodes
     return cat
 
 
 def _derived(*, now: dt.datetime | None, by: str, model: str | None, mode: str, completeness: str,
-             chunks: int, dropped: int = 0) -> dict:
+             chunks: int, dropped: int = 0, route: str | None = None, provider: str | None = None) -> dict:
+    """`derived`, keys in the spec's order: at, by, model, route, provider (cloud), mode, completeness, chunks,
+    dropped. `route` and `provider` are written in model mode only (rules mode has none)."""
     d: dict[str, Any] = {"at": _now(now), "by": by or "person"}
     if mode == "model" and model:
         d["model"] = str(model)
+    if mode == "model" and route:
+        d["route"] = str(route)
+        if route == "cloud" and provider:
+            d["provider"] = str(provider)
     d.update(mode=mode, completeness=completeness, chunks=int(chunks))
     if dropped:
         d["dropped"] = int(dropped)
@@ -1108,6 +1210,7 @@ def derive_atem(text: str, *, context: str | None = None, complete: CompleteFn |
         out = rules_atem(text)
         out.update(stance_profile={}, mode="rules")
         return out
+    complete, seen = _watching(complete)
     model = None
     if len(text) <= ATEM_ONE_SHOT_CHARS:
         _check(should_stop)
@@ -1139,6 +1242,10 @@ def derive_atem(text: str, *, context: str | None = None, complete: CompleteFn |
     out["mode"] = "model"
     if model:
         out["model"] = str(model)
+    if seen.route:
+        out["route"] = seen.route
+        if seen.provider:
+            out["provider"] = seen.provider
     return out
 
 
@@ -1192,6 +1299,13 @@ def _map_refs(item: dict, fn: Callable[[str, Any], Any]) -> None:
             if isinstance(roles, dict):
                 for k in list(roles):
                     roles[k] = fn(f"{head}.{k}", roles[k])
+            continue
+        if tail:                              # a field of each entry of a list: `grounds.of`, `departures.line`
+            seq = item[head] if isinstance(item[head], list) else []
+            for e in seq:
+                if isinstance(e, dict) and tail in e:
+                    sub = e[tail]
+                    e[tail] = [fn(fpath, x) for x in sub] if isinstance(sub, list) else fn(fpath, sub)
             continue
         v = item[head]
         if isinstance(v, list):
@@ -1407,7 +1521,7 @@ def _normalize(items: list[dict], *, chunk_: Chunk, source: str,
             continue
         if item["id"] == atem_id:
             atems += 1
-        fixes += n
+        fixes += n + _policy(item)
         if old and old != item["id"]:
             remap.setdefault(old, item["id"])
         if item["id"] in out:
@@ -1419,6 +1533,61 @@ def _normalize(items: list[dict], *, chunk_: Chunk, source: str,
         _map_refs(it, lambda f, v: _remap_value(v, remap))
     fixes += _resolve_names(result)
     return result, remap, unplaced, fixes
+
+
+def _as_list(v: Any) -> list:
+    return v if isinstance(v, list) else ([] if v is None else [v])
+
+
+def _policy(it: dict) -> int:
+    """The conventions of MacroCOSM OES 18.4.3 on the kinds whose stance is the fabula's own (every kind of I, N, C,
+    R; readings and cases), applied deterministically after a model's item is normalized; returns the fixes. A stance
+    the closed list does not hold is `deduced` (a model's item is reasoned, not read, unless it says it saw it); the
+    confidence never passes what its stance allows (`opinion` and `assumed` 0.5, `deduced` 0.7). A reading is the
+    model's own: `whose: {by: model}`, `stance: opinion`, `of` a list, `grounds` only the entries that name what they
+    rest on. A device's `where`, a metre's or a rhyme's `lines` are lists. Claims and the first edition's kinds are
+    left exactly as they were."""
+    kind = it.get("type")
+    if kind not in FABULA_STANCE_KINDS:
+        return 0
+    fixes = 0
+    if kind == "reading":
+        whose = it.get("whose")
+        if not (isinstance(whose, dict) and whose.get("by") == "model"):
+            it["whose"] = {"by": "model"}
+            fixes += 1
+        if it.get("stance") != "opinion":
+            it["stance"] = "opinion"
+            fixes += 1
+        if "of" in it and not isinstance(it["of"], list):
+            it["of"] = _as_list(it["of"])
+            fixes += 1
+        if "grounds" in it:
+            kept = []
+            for g in _as_list(it["grounds"]):
+                if isinstance(g, dict) and g.get("of"):
+                    kept.append({"of": g["of"], **({"because": " ".join(str(g["because"]).split())}
+                                                   if g.get("because") else {})})
+                else:
+                    fixes += 1
+            if kept:
+                it["grounds"] = kept
+            else:
+                it.pop("grounds", None)
+    if it.get("stance") not in STANCES:
+        it["stance"] = "deduced"
+        fixes += 1
+    for field in {"device": ("where",), "metre": ("lines",), "rhyme": ("lines",)}.get(kind, ()):
+        if field in it and not isinstance(it[field], list):
+            it[field] = _as_list(it[field])
+            fixes += 1
+    prov = it.get("provenance")
+    cap = STANCE_CONFIDENCE_CAP.get(it["stance"])
+    if cap is not None and isinstance(prov, dict) and isinstance(prov.get("confidence"), (int, float)) \
+            and prov["confidence"] > cap:
+        prov["confidence"] = cap
+        fixes += 1
+    return fixes
 
 
 def _remap_value(v: Any, remap: dict[str, str]) -> Any:
@@ -1488,15 +1657,19 @@ def _merge_into(first: dict, other: dict) -> None:
         fp["sources"] = fs
 
 
-def _lint_items(items: list[dict], workdir: Path, label: str, *, ignore: tuple[str, ...] = ()) -> dict[str, list]:
-    """Check items as a throwaway `emf/1` volume in `workdir`: `{item id: [problems]}` for the errors (the key ""
-    for problems with no item). `ignore` names checks left for later (a passage's references to items another
-    passage holds are resolved after the merge)."""
-    doc = {"oes": EMF_OES, "macrocosm": macrocosm.MACROCOSM_VERSION, "id": "emf/derivation", "name": label,
-           "nodes": items}
+def _lint_items(items: list[dict], workdir: Path, label: str, *, ignore: tuple[str, ...] = (),
+                flavour: str | None = None) -> dict[str, list]:
+    """Check items as a throwaway `fabula/1` volume of `flavour` (default a fabulan) in `workdir`, by the fabula's
+    whole lint (`enough.fabula.lint`: the generic checks, `flavour-kind` among them, and the fabula's own):
+    `{item id: [problems]}` for the errors (the key "" for problems with no item). `ignore` names checks left for
+    later (a passage's references to items another passage holds are resolved after the merge). An item of a kind
+    outside the flavour fails `flavour-kind`, so it is never written."""
+    from . import fabula as _fabula
+    doc = {"oes": FABULA_OES, "macrocosm": macrocosm.MACROCOSM_VERSION, "flavour": _flavour(flavour),
+           "id": "fabula/derivation", "name": label, "nodes": items}
     path = workdir / f"{label}.cosm"
     path.write_text(_dump(doc), encoding="utf-8")
-    report = macrocosm.lint(macrocosm.load_volume(path))
+    report = _fabula.lint(macrocosm.load_volume(path))
     bad: dict[str, list] = {}
     for p in report.errors:
         if p.check in ignore or p.check == "catalog-key":
@@ -1572,16 +1745,22 @@ def _salvage(text: str, finish: str | None) -> tuple[list[dict], list[str], bool
 
 
 def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[dict], workdir: Path,
-                  stats: dict, on_progress: ProgressFn | None, chunks: int) -> tuple[list[dict], dict, int]:
+                  stats: dict, on_progress: ProgressFn | None, chunks: int, flavour: str | None = None,
+                  ) -> tuple[list[dict], dict, int]:
     """One passage, in at most three completions, each with an output budget (`EMF_MAX_TOKENS`, bounded by the
     model's window): the reading; ONE continuation when the reading was cut off (after the last complete item);
     ONE repair of only the items that still fail after normalization (or, when the reading held no list at all,
     one retry). Returns `(items that pass, remap, dropped)`: `dropped` counts the items that still fail, an item
-    lost to a cut the continuation could not recover, and one per passage with no readable list."""
+    lost to a cut the continuation could not recover, and one per passage with no readable list.
+
+    `flavour` `fabulap` reads a passage of a poem with VERSE_SYSTEM and VERSE_USER (the chunk's lines annotated
+    with the poem's line numbers, `verse_chunks`), checks the items as a fabulap, and leaves out the kinds the rules
+    own (`VERSE_RULES_KINDS`); a fabulan's passage is read exactly as before."""
     prefix = f"c{c.id}"
-    system = {"role": "system", "content": P.EMF_SYSTEM.format(source=source)}
-    user = P.EMF_USER.format(terms=_passage_terms(table, c), source=source, start=c.start_line, end=c.end_line,
-                             passage=c.text_numbered)
+    verse = flavour == "fabulap"
+    system = {"role": "system", "content": (P.VERSE_SYSTEM if verse else P.EMF_SYSTEM).format(source=source)}
+    user = (P.VERSE_USER if verse else P.EMF_USER).format(
+        terms=_passage_terms(table, c), source=source, start=c.start_line, end=c.end_line, passage=c.text_numbered)
 
     def ask(extra: str = "") -> tuple[str, dict]:
         reply, meta = _call(complete, [system, {"role": "user", "content": user + extra}],
@@ -1615,7 +1794,9 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
         retried = True
     items, remap, unplaced, fixes = _normalize(raw, chunk_=c, source=source, prefix=prefix)
     stats["normalized"] = stats.get("normalized", 0) + fixes
-    bad = _lint_items(items, workdir, f"{prefix}-check", ignore=("ref-unresolved",)) if items else {}
+    if verse:
+        items = [it for it in items if it.get("type") not in VERSE_RULES_KINDS]
+    bad = _lint_items(items, workdir, f"{prefix}-check", ignore=("ref-unresolved",), flavour=flavour) if items else {}
     if "" in bad:                             # a problem with no item: none can be trusted to pass
         bad.update({it["id"]: bad[""] for it in items})
     passing = [it for it in items if it["id"] not in bad]
@@ -1634,6 +1815,8 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
     raw4, _broken4, _cut4, _listed4 = _salvage(reply4, meta4.get("finish_reason"))
     fixed, remap4, _unplaced4, fixes4 = _normalize(raw4, chunk_=c, source=source, prefix=f"{prefix}r")
     stats["normalized"] += fixes4
+    if verse:
+        fixed = [it for it in fixed if it.get("type") not in VERSE_RULES_KINDS]
     # Only what stands in for a failed item is taken: an item with a failed item's id first, then — for the
     # failed items it did not answer by id (renamed) and the ones that had no usable id (unplaced, unreadable) —
     # as many new ones. Anything the model repeated from the items that passed is ignored.
@@ -1651,7 +1834,8 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
             continue
         taken.append(it)
         slots -= 1
-    bad4 = _lint_items(passing + taken, workdir, f"{prefix}-repair", ignore=("ref-unresolved",)) if taken else {}
+    bad4 = _lint_items(passing + taken, workdir, f"{prefix}-repair", ignore=("ref-unresolved",),
+                       flavour=flavour) if taken else {}
     good = [it for it in taken if it["id"] not in bad4]
     for k, v in remap4.items():
         remap.setdefault(k, v)
@@ -1659,7 +1843,7 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
 
 
 def _id_shaped(v: Any) -> bool:
-    return isinstance(v, str) and bool(_ID_RE.match(v.strip())) and v.strip()[0] in MODULE_ORDER
+    return isinstance(v, str) and bool(_ID_RE.match(v.strip())) and v.strip()[0] in MODULES_ALL
 
 
 def _resolve_after_merge(items: list[dict], remap: dict[str, str]) -> None:
@@ -1690,7 +1874,7 @@ def _resolve_after_merge(items: list[dict], remap: dict[str, str]) -> None:
 
 
 def _order(items: list[dict]) -> list[dict]:
-    rank = {m: i for i, m in enumerate(MODULE_ORDER)}
+    rank = {m: i for i, m in enumerate(MODULES_ALL)}
     return sorted(items, key=lambda it: rank.get(str(it.get("id", " "))[:1], len(rank)))
 
 
@@ -1714,13 +1898,14 @@ def _ground_terms(items: list[dict], lookup: LookupFn) -> None:
             it["sense"] = " ".join(str(entry["definition"]).split())
 
 
-def _final_clean(items: list[dict], workdir: Path, remap: dict[str, str]) -> tuple[list[dict], int]:
-    """The whole twin's items, checked together; what still fails is dropped and the references to it become open
-    questions, until nothing fails (a few rounds at most)."""
+def _final_clean(items: list[dict], workdir: Path, remap: dict[str, str],
+                 flavour: str | None = None) -> tuple[list[dict], int]:
+    """The whole twin's items, checked together as a fabula of `flavour`; what still fails is dropped and the
+    references to it become open questions, until nothing fails (a few rounds at most)."""
     dropped = 0
     for _round in range(4):
         _resolve_after_merge(items, remap)
-        bad = _lint_items(items, workdir, "twin-check")
+        bad = _lint_items(items, workdir, "twin-check", flavour=flavour)
         bad.pop("", None)
         if not bad:
             break
@@ -1730,71 +1915,461 @@ def _final_clean(items: list[dict], workdir: Path, remap: dict[str, str]) -> tup
     return items, dropped
 
 
+# ---------------------------------------------------------------------------
+# The rules' structure of a text (no model): its parts, and what the file itself shows of its making
+# ---------------------------------------------------------------------------
+
+_FRONT_MATTER = re.compile(r"\A﻿?---[ \t]*\n(.*?)\n(?:---|\.\.\.)[ \t]*(?:\n|\Z)", re.S)
+_COPYRIGHT = re.compile(r"^\s*(?:copyright\b|©|\(c\))\s*(?:©\s*)?(?P<year>\d{4}(?:\s*[-–]\s*\d{4})?)?[,\s]*"
+                        r"(?P<holder>.*?)[.\s]*(?P<arr>all rights reserved)?[.\s]*$", re.I)
+
+
+def _observed_prov(source: str, a: int, b: int | None = None) -> dict:
+    """What the rules read exactly is observed at full confidence (MacroCOSM OES 18.4.3, a scaffold says it is one)."""
+    return {"mode": "derived", "sources": [_locator(source, a, b)], "confidence": 1.0, "state": "known"}
+
+
+def structure_nodes(text: str, source: str) -> list[dict]:
+    """A prose text's structure as the rules read it, with no model (`stance: observed`, confidence 1):
+
+    - `C:part`: each section the text's own headings make (outside code fences), the title heading left out (a twin
+      is named from it): `division: section` (`chapter` when the heading says Chapter or Part), `number` among its
+      siblings, `of` the section it sits in, `heading`, its span from the heading to the line before the next
+      heading of its level or above. A text whose only heading is its title has no parts.
+    - `R:maker`, `R:licence`, `R:release` from what the file itself states: a front matter's `author`/`authors`,
+      `licence`/`license`/`copyright` and `version`; a copyright line (`© 2026 Meadow. All rights reserved.`).
+
+    Nothing is inferred: who wrote a text the file does not name is left to the dialectic."""
+    lines = _lines(text)
+    norm = "\n".join(lines)
+    heading_lines, _code = _line_kinds(norm)
+    heads: list[tuple[int, int, str]] = []
+    for n in sorted(heading_lines):
+        raw = lines[n - 1].strip()
+        level = len(raw) - len(raw.lstrip("#"))
+        said = _strip_inline(raw.lstrip("#").strip().rstrip("#").strip())
+        if said:
+            heads.append((n, level, said))
+    first_text = next((i for i, ln in enumerate(lines, 1) if ln.strip()), 0)
+    fm = _FRONT_MATTER.match(norm)
+    fm_end = fm.group(0).rstrip("\n").count("\n") + 1 if fm else 0
+    if heads and (heads[0][1] == 1 or heads[0][0] in (first_text, fm_end + 1)):
+        heads = heads[1:]
+    items: list[dict] = []
+    ids: set[str] = set()
+
+    def new_id(base: str) -> str:
+        iid, k = base, 2
+        while iid in ids:
+            iid = f"{base}-{k}"
+            k += 1
+        ids.add(iid)
+        return iid
+
+    placed: list[tuple[int, int, str, str | None]] = []       # (line, level, id, parent id)
+    for i, (n, level, said) in enumerate(heads):
+        end = len(lines)
+        for m, lv, _s in heads[i + 1:]:
+            if lv <= level:
+                end = m - 1
+                break
+        while end > n and not lines[end - 1].strip():
+            end -= 1
+        parent = next((pid for _pl, plv, pid, _par in reversed(placed) if plv < level), None)
+        number = 1 + sum(1 for _pl, _plv, _pid, par in placed if par == parent)
+        iid = new_id(f"C:part/{item_slug(said)}")
+        it: dict[str, Any] = {
+            "id": iid, "type": "part", "name": said,
+            "summary": f"The section headed \"{said}\", lines {n}-{end}." if end > n
+            else f"The heading \"{said}\", line {n}.",
+            "stance": "observed",
+            "division": "chapter" if re.match(r"(?i)(chapter|part)\b", said) else "section",
+            "number": number,
+        }
+        if parent:
+            it["of"] = parent
+        it.update(heading=said, span=_span(n, end), provenance=_observed_prov(source, n, end))
+        items.append(it)
+        placed.append((n, level, iid, parent))
+    # what the file states of its making
+    meta: dict = {}
+    if fm:
+        data = _yaml(fm.group(1))
+        meta = data if isinstance(data, dict) else {}
+    fm_span = (1, fm_end) if fm else None
+
+    def said_of(key: str) -> Any:
+        for k, v in meta.items():
+            if str(k).lower() == key:
+                return v
+        return None
+
+    authors = said_of("author") or said_of("authors")
+    for who in (_as_list(authors) if fm_span else []):
+        if isinstance(who, dict):
+            who = who.get("name")
+        if not (isinstance(who, str) and who.strip()):
+            continue
+        who = " ".join(who.split())
+        items.append({"id": new_id(f"R:maker/{item_slug(who)}"), "type": "maker", "name": who,
+                      "summary": f"{who} is named as the text's author in its front matter.",
+                      "stance": "observed", "capacity": "author", "span": _span(*fm_span),
+                      "provenance": _observed_prov(source, *fm_span)})
+    lic = said_of("licence") or said_of("license")
+    if fm_span and isinstance(lic, (str, int, float)) and str(lic).strip():
+        lic = " ".join(str(lic).split())
+        items.append({"id": new_id(f"R:licence/{item_slug(lic)}"), "type": "licence", "name": lic,
+                      "summary": f"The text's front matter gives its licence as {lic}.", "stance": "observed",
+                      "identifier": lic, "span": _span(*fm_span), "provenance": _observed_prov(source, *fm_span)})
+    version = said_of("version")
+    if fm_span and isinstance(version, (str, int, float)) and str(version).strip():
+        version = str(version).strip()
+        items.append({"id": new_id(f"R:release/{item_slug('version ' + version)}"), "type": "release",
+                      "name": f"Version {version}", "summary": f"The text's front matter calls it version {version}.",
+                      "stance": "observed", "version": version, "span": _span(*fm_span),
+                      "provenance": _observed_prov(source, *fm_span)})
+    if not any(it["type"] == "licence" for it in items):
+        for n, raw in enumerate(lines, 1):
+            said = _strip_inline(raw.lstrip("#>*-_ ").strip())
+            m = _COPYRIGHT.match(said)
+            # a copyright line names a year or carries the sign: "Copyright law is complex." is prose
+            if not m or not (m.group("year") or "©" in said or "(c)" in said.lower()) or len(said) > 120:
+                continue
+            holder = " ".join((m.group("holder") or "").split()).strip(" ,.")
+            year = (m.group("year") or "").strip()
+            it = {"id": new_id(f"R:licence/{item_slug('copyright ' + (holder or year))}"), "type": "licence",
+                  "name": f"Copyright {' '.join(x for x in (year, holder) if x)}".strip(),
+                  "summary": f"Line {n} states the text's copyright"
+                             f"{' as all rights reserved' if m.group('arr') else ''}.",
+                  "stance": "observed"}
+            if m.group("arr"):
+                it["identifier"] = "all rights reserved"
+            if holder:
+                it["holder"] = holder
+            if year:
+                it["year"] = year
+            it.update(span=_span(n), provenance=_observed_prov(source, n))
+            items.append(it)
+            break
+    return items
+
+
+# ---------------------------------------------------------------------------
+# Verse: a poem read by stanza (enough/verse.py holds the rules)
+# ---------------------------------------------------------------------------
+
+def verse_chunks(text: str, poem: _verse.Poem | None = None) -> list[Chunk]:
+    """A poem's passages for a model: whole stanzas packed up to ~1,200 tokens (the first from its header on), each
+    line numbered with its line in the file and, for a line of the poem, `[n]` its number in the poem."""
+    poem = poem or _verse.read_poem(text)
+    lines = _lines(text)
+    num = _verse.line_table(poem)
+    out: list[Chunk] = []
+    for a, b in _verse.stanza_groups(poem, CHUNK_CHARS, text, per_line=12):
+        body = "\n".join(f"{n}| [{num[n]}] {lines[n - 1].strip()}" if n in num else f"{n}| {lines[n - 1]}"
+                         for n in range(a, b + 1))
+        out.append(Chunk(len(out) + 1, a, b, body))
+    return out
+
+
+def _pron_lookup(lookup: LookupFn | None, pron: Callable | None) -> Callable:
+    """The pronunciation lookup verse rules read: the one given; else FEED's own (`verse.feed_pronunciations`) when
+    the term lookup is FEED's default; else none (a caller with its own FEED stand-in and no pronunciations scans
+    nothing: every line's scansion is then an open question)."""
+    if pron is not None:
+        return pron
+    if lookup is None or lookup is _default_lookup:
+        return _verse.feed_pronunciations
+    return lambda ws: {}
+
+
+# ---------------------------------------------------------------------------
+# The whole-text request: the atem, and the items only the whole shows (I, N, C:device/voice, R)
+# ---------------------------------------------------------------------------
+
+WHOLE_DIGEST_CLAIMS = 12
+WHOLE_DIGEST_OTHERS = 12
+WHOLE_DIGEST_LINE = 160
+
+
+def _digest(items: list[dict]) -> str:
+    """What the passages found, compactly: the claims by salience with their stances, the parts, the entities and
+    concepts, each by id so the whole-text items can name them."""
+    sal = {s: i for i, s in enumerate(SALIENCE)}
+    claims = sorted((it for it in items if it.get("type") == "claim"),
+                    key=lambda c: (sal.get(str(c.get("salience") or "normal"), 2), _first_line(c.get("span"))))
+    out = []
+    for c in claims[:WHOLE_DIGEST_CLAIMS]:
+        line = f"- {c['id']} ({c.get('stance') or '?'}, {c.get('salience') or 'normal'}): " \
+               f"{' '.join(str(c.get('summary') or '').split())}"
+        out.append(line[:WHOLE_DIGEST_LINE])
+    parts = [it for it in items if it.get("type") == "part"][:WHOLE_DIGEST_OTHERS]
+    if parts:
+        out.append("- parts: " + "; ".join(f"{p['id']} ({p.get('name')})" for p in parts))
+    named = [it for it in items if it.get("type") in ENTITY_KINDS + ("concept",)][:WHOLE_DIGEST_OTHERS]
+    if named:
+        out.append("- named: " + "; ".join(f"{e['id']} ({e.get('name')})" for e in named))
+    for kind in ("voice", "device"):
+        got = [it for it in items if it.get("type") == kind][:6]
+        if got:
+            out.append(f"- {kind}s: " + "; ".join(f"{d['id']} ({d.get('name')})" for d in got))
+    return "\n".join(out) or "- (nothing yet)"
+
+
+def whole_messages(text: str, *, source: str, flavour: str | None, passage_atems: list[dict],
+                   items: list[dict]) -> list[dict]:
+    """The whole-text request: ATEM_SYSTEM followed by the flavour's WHOLE_ITEMS and WHOLE_RULES; the user message
+    ATEM_WHOLE_USER (the passages' atems, the opening and close, or the whole text when it is short) followed by the
+    digest of what the passages found."""
+    fl = _flavour(flavour)
+    system = P.ATEM_SYSTEM + (P.WHOLE_ITEMS_VERSE if fl == "fabulap" else P.WHOLE_ITEMS_PROSE).format() \
+        + P.WHOLE_RULES.format(source=source)
+    atem_lines = []
+    for a in passage_atems:
+        line = a.get("line")
+        if isinstance(line, str) and line.strip():
+            atem_lines.append(f"- lines {(a.get('span') or {}).get('lines', '?')}: {' '.join(line.split())}")
+    user = P.ATEM_WHOLE_USER.format(name=source, atems="\n".join(atem_lines) or "- (none)", body=_edges(text))
+    user += P.WHOLE_DIGEST.format(digest=_digest(items))
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
+def _whole_nodes(reply: str, finish: str | None) -> tuple[list[dict], list[str], bool]:
+    """`(items, unreadable item texts, a nodes list was there)` from the whole-text reply."""
+    body = _strip_fences(reply or "")
+    data = _yaml(body)
+    if isinstance(data, dict) and "nodes" in data:
+        got = data.get("nodes")
+        if isinstance(got, list):
+            return [_plain(x) for x in got if isinstance(x, dict)], [], True
+        return [], [], got is not None
+    m = re.search(r"^nodes\s*:", body, re.M)
+    if not m:
+        return [], [], False
+    items, broken, _cut, listed = _salvage(body[m.start():], finish)
+    return items, broken, listed
+
+
+def whole_items(reply: str, *, finish: str | None = None, complete: CompleteFn | None, messages: list[dict],
+                text: str, source: str, flavour: str | None, items: list[dict], workdir: Path,
+                stats: dict | None = None, on_progress: ProgressFn | None = None,
+                remap: dict[str, str] | None = None) -> tuple[list[dict], dict]:
+    """The items of the whole-text reply, made checkable and checked beside `items` (the passages' items, already
+    clean): normalized (kinds, stance words, spans clamped to the text, provenance filled) and held to the
+    conventions (`_policy`); only the kinds `WHOLE_KINDS` allows for the flavour are taken (the rest ignored, never
+    written); what fails the fabula's checks gets ONE repair turn (with `complete`, the same messages and EMF_REPAIR);
+    what still fails is dropped. A reference to an id a passage wrote and the merge renamed follows `remap`; one that
+    names nothing is left for the caller's `_final_clean`, which makes it an open question. Returns `(new items,
+    {items, dropped, ignored, repaired})`: `dropped` counts what failed after the repair and the unreadable entries;
+    an id the passages already hold is merged into theirs."""
+    fl = _flavour(flavour)
+    stats = stats if stats is not None else {"normalized": 0}
+    allowed = WHOLE_KINDS[fl]
+    n_lines = max(1, len(_lines(text)))
+    whole = Chunk(0, 1, n_lines, "")
+    raw, broken, _listed = _whole_nodes(reply, finish)
+    out = {"items": 0, "dropped": 0, "ignored": 0, "repaired": False}
+
+    def place(raw_items: list[dict], prefix: str) -> tuple[list[dict], list[tuple[dict, str]]]:
+        got, _remap, unplaced, fixes = _normalize(raw_items, chunk_=whole, source=source, prefix=prefix)
+        stats["normalized"] = stats.get("normalized", 0) + fixes
+        keep = [it for it in got if it.get("type") in allowed]
+        out["ignored"] += len(got) - len(keep)
+        for it in keep:
+            _map_refs(it, lambda f, v: _remap_value(v, remap or {}))
+        return keep, unplaced
+
+    new, unplaced = place(raw, "w")
+    have = {it["id"]: it for it in items}
+    for it in [x for x in new if x["id"] in have]:
+        _merge_into(have[it["id"]], it)
+    new = [it for it in new if it["id"] not in have]
+    bad = _lint_items(items + new, workdir, "whole-check", flavour=fl, ignore=("ref-unresolved",)) if new else {}
+    if "" in bad:
+        bad.update({it["id"]: bad[""] for it in new})
+    failing = [it for it in new if it["id"] in bad]
+    passing = [it for it in new if it["id"] not in bad]
+    n_fail = len(failing) + len(unplaced) + len(broken)
+    if n_fail and complete is not None:
+        out["repaired"] = True
+        _progress(on_progress, phase="repairing", message=f"repairing {n_fail} item{'s' if n_fail != 1 else ''} "
+                                                          "of the whole-text reading")
+        shown = macrocosm.dump({"nodes": failing + [r for r, _ in unplaced]}) if failing or unplaced else ""
+        shown += "".join(f"\nThis item could not be read as YAML:\n{b}\n" for b in broken)
+        problems = _problem_lines({k: v for k, v in bad.items() if k and k in {f["id"] for f in failing}},
+                                  [f"- {r.get('id') or 'an item'}: {why}" for r, why in unplaced]
+                                  + ["- an item that is not valid YAML"] * bool(broken))
+        repair = [messages[0], {"role": "user", "content": messages[-1]["content"]
+                                + P.EMF_REPAIR.format(items=shown.strip(), problems=problems)}]
+        reply2, meta2 = _call(complete, repair, max_tokens=EMF_MAX_TOKENS)
+        raw2, _broken2, _cut2, _listed2 = _salvage(reply2, meta2.get("finish_reason"))
+        fixed, _unpl2 = place(raw2, "wr")
+        taken = [it for it in fixed if it["id"] not in have and it["id"] not in {p["id"] for p in passing}]
+        taken = [it for i, it in enumerate(taken) if it["id"] not in {t["id"] for t in taken[:i]}][:n_fail]
+        bad2 = _lint_items(items + passing + taken, workdir, "whole-repair", flavour=fl,
+                           ignore=("ref-unresolved",)) if taken else {}
+        good = [it for it in taken if it["id"] not in bad2]
+        passing += good
+        out["dropped"] = max(0, n_fail - len(good))
+    else:
+        out["dropped"] = n_fail
+    out["items"] = len(passing)
+    return passing, out
+
+
+# ---------------------------------------------------------------------------
+# The dialectic, carried over when a text is decompiled again (MacroCOSM OES 18.6.3)
+# ---------------------------------------------------------------------------
+
+def carry_dialectic(previous: str | None, nodes: list[dict], catalog: dict, *, text: str | None = None,
+                    now: dt.datetime | None = None) -> tuple[list[dict], dict | None]:
+    """The new twin's items with every question and session of the twin it replaces carried over by the dialectic's
+    own rule (`enough.dialectic.carry_over`: answers, states and sessions kept; a question whose `about` no longer
+    resolves goes stale; a new open question an old one already asks is dropped). `(nodes, None)` when there was no
+    previous twin, it holds no D item, or it cannot be read; else `(nodes, {carried, stale, dropped})`."""
+    if not previous:
+        return nodes, None
+    from . import dialectic as _dl
+    try:
+        old = _dl.twin_from_text(previous, filename="previous.cosm")
+    except Exception:  # noqa: BLE001 - an unreadable old twin carries nothing, as for pins and shorts
+        return nodes, None
+    if not any(_dl.is_d_item(d) for d in old.ledger.items):
+        return nodes, None
+    led = _dl.ledger_from_items(_manifest(), nodes, catalog={k: v for k, v in catalog.items() if k != "nodes"})
+    got = _dl.carry_over(old, led, at=now, by="derive", source_text=text)
+    return [_plain(d) for d in led.items], {"carried": len(got.carried), "stale": len(got.stale),
+                                            "dropped": len(got.dropped)}
+
+
 def derive_emf(text: str, *, source_name: str, source_stat: dict | None, complete: CompleteFn | None = None,
                lookup: LookupFn | None = None, by: str = "person", now: dt.datetime | None = None,
                rel_path: str | None = None, on_progress: ProgressFn | None = None,
-               should_stop: StopFn | None = None, previous: str | None = None) -> tuple[str, dict]:
-    """Decompile a text into its EMF twin: `(cosm_text, info)` (plan §7.3 A).
+               should_stop: StopFn | None = None, previous: str | None = None, flavour: str | None = None,
+               route: str | None = None, provider: str | None = None, copyable: bool = False,
+               pron: Callable | None = None) -> tuple[str, dict]:
+    """Decompile a text into its twin, a fabula: `(cosm_text, info)` (plan §7.3 A; MacroCOSM OES 18.4).
+
+    - `flavour` — `fabulan` (default) or `fabulap`, written in the catalog; `fabulac` is refused (a folder's).
+    - `copyable` — the person says the text may be copied (their own work, or out of copyright): a fabulap's lines
+      then carry their `text` (18.4.6). Off by default: a line is its number, span, stresses and rhyme.
+    - `pron` — the pronunciation lookup verse rules read (`verse.feed_pronunciations`' shape); default FEED's own
+      when `lookup` is FEED's default, else none.
+    - `route`, `provider` — the job's model route, recorded in `derived` when the answers' `meta` does not say
+      (it does, through `llm.complete` and `model_route`).
 
     - `source_name` — the text's file name (the twin's `source.path`, provenance locators); `source_stat` —
-      `{sha256, size, mtime_ns}` of the bytes read (`read_source`), or None for a standalone EMF; `rel_path` —
+      `{sha256, size, mtime_ns}` of the bytes read (`read_source`), or None for a standalone fabula; `rel_path` —
       the text's path in its volume or project, for the catalog id (default: `source_name`).
     - `complete` — `complete(messages) -> (text, meta)`, or None for rules mode. `lookup` — FEED batch lookup,
       `dictionary.lookup_many` by default (all None when FEED is not built: terms are then `{pending}`).
     - `by` — `person`, or the readvisor's name. `on_progress(fields)` and `should_stop()` are the job's hooks:
-      the stop is checked between passages and before the atem; a passage being read is finished first.
+      the stop is checked between passages and before the whole-text request; a passage being read is finished.
     - `previous` — the twin being replaced, if any: the passage atems a person pinned into it (its `X:atem`
-      items) are carried over with their ids; an `of` that no longer names an item becomes an open question.
+      items) are carried over with their ids (an `of` that no longer names an item becomes an open question), its
+      `shorts:` list, and its dialectic (questions, answers, sessions: `carry_dialectic`).
 
-    Model mode: per passage one completion with an output budget (claims first, capped per kind) → a reply cut
-    off by the budget keeps its complete items and gets ONE continuation after the last of them → every item
-    normalized deterministically (kinds, modules, synonyms, stance/salience words, spans, provenance, counted in
-    `info["normalized"]`) → checked as a throwaway volume against the emf manifest → ONE repair turn for only the
-    items that still fail → those still failing are dropped (`derived.dropped`); passages merge (ids
-    `<M>:<kind>/<slug of the name>`, the first of two wins, its span extended and the sources appended);
-    references are resolved after the merge (dangling ones become `{pending}`); terms are grounded in FEED and
-    laid over the deterministic lexicon (the floor: a model twin never has zero terms); one more completion
-    writes the whole text's atem from the passages' atems and its opening and closing.
+    A fabulan, model mode: per passage one completion with an output budget (claims first, capped per kind) → a
+    reply cut off by the budget keeps its complete items and gets ONE continuation after the last of them → every
+    item normalized deterministically (kinds, modules, synonyms, stance/salience words, spans, provenance, counted
+    in `info["normalized"]`) → checked as a throwaway fabula → ONE repair turn for only the items that still fail
+    → those still failing are dropped (`derived.dropped`); passages merge (ids `<M>:<kind>/<slug of the name>`, the
+    first of two wins, its span extended and the sources appended); references are resolved after the merge
+    (dangling ones become `{pending}`); terms are grounded in FEED and laid over the deterministic lexicon (the
+    floor: a model twin never has zero terms); the rules' structure (`structure_nodes`: the sections, what the file
+    states of its making) is added; then ONE whole-text request (`whole_messages`) writes the text's atem and the
+    items only the whole shows (aims, audience, decisions, exclusions, influences, allusions, occasions, devices,
+    voice, a named maker), each with its stance as the conventions say; what of those fails after one repair is
+    dropped and counted, and the twin lands without it.
+
+    A fabulap: the poem is read by stanza (`verse_chunks`, VERSE_SYSTEM: devices, voice, readings side by side,
+    the words in the sense they have there, entities, claims and events only where the poem makes them); the rules
+    (`verse.rules_items`) write every line, stanza, refrain, rhyme and the metre; the whole-text request adds
+    allusions, occasions, an aim and a named maker or release.
 
     Rules mode: the lexicon from `candidate_terms` + FEED and the entities from `entity_candidates`, each with
     the line of its first use as its span, `confidence: 0.3`, `state: pending` and `pending: "a model has not
-    read this passage"`; no concepts, claims or events (rules cannot read those); the atem scaffold;
-    `derived.mode: rules`. `info` = `{mode, model, chunks, items, dropped, normalized, continued, atem,
-    counts}`."""
+    read this passage"`; no concepts, claims or events (rules cannot read those); the rules' structure (a fabulan's
+    sections; a fabulap's lines, stanzas, rhymes and metre), read exactly and so `observed` (or `deduced`, for what
+    FEED's pronunciations give); the atem scaffold; `derived.mode: rules`. `info` = `{mode, model, chunks, items,
+    dropped, normalized, continued, atem, counts, whole, dialectic}`."""
     lookup = lookup or _default_lookup
+    flavour = _flavour(flavour)
+    verse = flavour == "fabulap"
     source = source_name
     rel = rel_path or source_name
-    parts = chunk(text)
+    poem = _verse.read_poem(text) if verse else None
+    parts = verse_chunks(text, poem) if verse else chunk(text)
+    seen = _Seen()
+    if complete is not None:
+        complete, seen = _watching(complete)
     _progress(on_progress, phase="lexicon", chunk=0, chunks=len(parts), message="finding the words it leans on")
-    table = _term_table(text, lookup)
+    words_text = _verse.decap(text, poem) if verse else text
+    table = _term_table(words_text, lookup)
+    if verse:
+        structure = _verse.rules_items(text, source=source, pron=_pron_lookup(lookup, pron), copyable=copyable).items
+    else:
+        structure = structure_nodes(text, source)
+    whole_info: dict | None = None
     if complete is None:
-        nodes = _rules_nodes(text, table, source)
-        atem = atem_block(rules_atem(text))
+        nodes = _order(_rules_nodes(words_text, table, source) + structure)
+        atem = atem_block(rules_atem(_verse_prose(poem, text) if verse else text))
         mode, model, dropped, stats = "rules", None, 0, {"normalized": 0, "continued": 0}
     else:
-        nodes, atem, model, dropped, stats = _model_nodes(
+        nodes, atem, model, dropped, stats, whole_info = _model_nodes(
             text, parts, complete=complete, lookup=lookup, table=table, source=source, on_progress=on_progress,
-            should_stop=should_stop)
+            should_stop=should_stop, flavour=flavour, structure=structure)
         mode = "model"
     _check(should_stop)
     carried = _carried_pins(previous, nodes)
     if carried:                               # a hand-edited pin that no longer checks is not carried
         with tempfile.TemporaryDirectory(prefix="enough-emf-") as tmp:
-            bad = _lint_items(nodes + carried, Path(tmp), "carried-check")
+            bad = _lint_items(nodes + carried, Path(tmp), "carried-check", flavour=flavour)
         keep = [it for it in carried if it["id"] not in bad]
         dropped += len(carried) - len(keep)
         nodes = nodes + keep
+    route = seen.route or route
+    provider = seen.provider or provider
     derived = _derived(now=now, by=by, model=model, mode=mode, completeness="full", chunks=len(parts),
-                       dropped=dropped)
-    cat = _catalog(rel_path=rel, source_name=source, source_stat=source_stat, name=text_title(text, source_name),
-                   derived=derived, atem=atem, nodes=nodes)
+                       dropped=dropped, route=route, provider=provider)
+    name = (poem.title if poem and poem.title else None) or text_title(text, source_name)
+    cat = _catalog(rel_path=rel, source_name=source, source_stat=source_stat, name=name,
+                   derived=derived, atem=atem, nodes=nodes, flavour=flavour, shorts=_carried_shorts(previous))
+    nodes, dialectic = carry_dialectic(previous, nodes, cat, text=text, now=now)
+    cat["nodes"] = nodes
     counts: dict[str, int] = {}
     for it in nodes:
         counts[it["id"][:1]] = counts.get(it["id"][:1], 0) + 1
-    info = {"mode": mode, "model": model, "chunks": len(parts), "items": len(nodes), "dropped": dropped,
+    info = {"mode": mode, "model": model, "flavour": flavour, "route": route if mode == "model" else None,
+            "provider": provider if mode == "model" and route == "cloud" else None,
+            "chunks": len(parts), "items": len(nodes), "dropped": dropped,
             "normalized": stats["normalized"], "continued": stats["continued"],
-            "atem": macrocosm.jsonable(atem), "counts": counts}
+            "atem": macrocosm.jsonable(atem), "counts": counts, "whole": whole_info, "dialectic": dialectic,
+            "copyable": bool(copyable) if verse else None}
     return _dump(cat), info
+
+
+def _verse_prose(poem: _verse.Poem | None, text: str) -> str:
+    """A poem's lines as one run of text, for the rules' atem scaffold (its first sentence, read across lines)."""
+    if poem is None or not poem.lines:
+        return text
+    return " ".join(vl.text for vl in poem.lines)
+
+
+def _carried_shorts(previous: str | None) -> list | None:
+    """The `shorts:` list of the twin a derivation replaces (the same name refreshed, or an old-named twin replaced
+    by one under the new name), carried as it is: a fabula records every telling compiled from it (MacroCOSM OES
+    18.4, 18.4.4). None when there is none or it cannot be read."""
+    if not previous:
+        return None
+    data = _yaml(previous)
+    if not isinstance(data, dict) or data.get("oes") not in FABULA_DECLARATIONS:
+        return None
+    got = data.get("shorts")
+    if not isinstance(got, list):
+        return None
+    out = [_plain(e) if isinstance(e, dict) else e for e in got]
+    return [_FlowMap(e) if isinstance(e, dict) else e for e in out] or None
 
 
 def _carried_pins(previous: str | None, nodes: list[dict]) -> list[dict]:
@@ -1804,7 +2379,7 @@ def _carried_pins(previous: str | None, nodes: list[dict]) -> list[dict]:
     if not previous:
         return []
     data = _yaml(previous)
-    old = data.get("nodes") if isinstance(data, dict) and data.get("oes") == EMF_OES else None
+    old = data.get("nodes") if isinstance(data, dict) and data.get("oes") in FABULA_DECLARATIONS else None
     ids = {it["id"] for it in nodes}
     out = []
     for it in old if isinstance(old, list) else []:
@@ -1897,8 +2472,13 @@ def _rules_nodes(text: str, table: list[dict], source: str) -> list[dict]:
 
 
 def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup: LookupFn, table: list[dict],
-                 source: str, on_progress: ProgressFn | None,
-                 should_stop: StopFn | None) -> tuple[list[dict], dict, str | None, int, dict]:
+                 source: str, on_progress: ProgressFn | None, should_stop: StopFn | None,
+                 flavour: str | None = None, structure: list[dict] | None = None,
+                 ) -> tuple[list[dict], dict, str | None, int, dict, dict]:
+    """Model mode: every passage read (`_read_passage`), merged, grounded, laid over the lexicon floor, joined by
+    the rules' `structure` items, cleaned; then the whole-text request (`whole_messages`, `whole_items`) gives the
+    atem and the whole-text items. Returns `(items, atem, model, dropped, stats, whole)`."""
+    fl = _flavour(flavour)
     meta: dict[str, Any] = {"normalized": 0, "continued": 0}
     merged: dict[str, dict] = {}
     remap: dict[str, str] = {}
@@ -1910,7 +2490,7 @@ def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup:
             _progress(on_progress, phase="reading", chunk=c.id, chunks=len(parts),
                       message=f"reading passage {c.id} of {len(parts)}")
             items, rm, lost = _read_passage(c, complete=complete, source=source, table=table, workdir=work,
-                                            stats=meta, on_progress=on_progress, chunks=len(parts))
+                                            stats=meta, on_progress=on_progress, chunks=len(parts), flavour=fl)
             dropped += lost
             for k, v in rm.items():
                 remap.setdefault(k, v)
@@ -1927,20 +2507,27 @@ def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup:
         items = [it for it in items if it.get("type") != "atem"]
         _ground_terms(items, lookup)
         items = _with_floor(items, _term_nodes(table, source, pending=PENDING_FLOOR), remap)
-        items, lost = _final_clean(_order(items), work, remap)
+        have = {it["id"] for it in items}
+        items += [_plain(it) for it in (structure or []) if it["id"] not in have]
+        items, lost = _final_clean(_order(items), work, remap, fl)
         dropped += lost
-    _check(should_stop)
-    _progress(on_progress, phase="atem", chunk=len(parts), chunks=len(parts), message="writing the atem")
-    atem_lines = []
-    for a in passage_atems:
-        line = a.get("line")
-        if isinstance(line, str) and line.strip():
-            atem_lines.append(f"- lines {(a.get('span') or {}).get('lines', '?')}: {' '.join(line.split())}")
-    user = P.ATEM_WHOLE_USER.format(name=source, atems="\n".join(atem_lines) or "- (none)", body=_edges(text))
-    reply, m2 = _call(complete, [{"role": "system", "content": P.ATEM_SYSTEM}, {"role": "user", "content": user}])
-    atem = atem_block(_read_atem(reply))
+        _check(should_stop)
+        _progress(on_progress, phase="atem", chunk=len(parts), chunks=len(parts),
+                  message="writing the atem and reading the whole")
+        messages = whole_messages(text, source=source, flavour=fl, passage_atems=passage_atems, items=items)
+        reply, m2 = _call(complete, messages)            # the model's own budget, as the atem always had
+        atem = atem_block(_read_atem(reply))
+        new, whole = whole_items(reply, finish=m2.get("finish_reason"), complete=complete, messages=messages,
+                                 text=text, source=source, flavour=fl, items=items, workdir=work, stats=meta,
+                                 on_progress=on_progress, remap=remap)
+        dropped += whole["dropped"]
+        if new:
+            items, lost = _final_clean(_order(items + new), work, remap, fl)
+            dropped += lost
+            whole["dropped"] += lost
     return (items, atem, meta.get("model") or m2.get("model"), dropped,
-            {"normalized": meta["normalized"], "continued": meta["continued"]})
+            {"normalized": meta["normalized"], "continued": meta["continued"]}, whole)
+
 
 
 # ---------------------------------------------------------------------------
@@ -1949,13 +2536,13 @@ def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup:
 
 def _load_twin(twin_text: str) -> dict:
     data = _yaml(twin_text)
-    if not isinstance(data, dict) or data.get("oes") != EMF_OES:
-        raise DeriveError("the EMF twin could not be read; fix it or derive it again")
+    if not isinstance(data, dict) or data.get("oes") not in FABULA_DECLARATIONS:
+        raise DeriveError("the twin could not be read as a fabula; fix it or derive it again")
     nodes = data.get("nodes")
     if nodes is None:
         data["nodes"] = []
     elif not isinstance(nodes, list):
-        raise DeriveError("the EMF twin's nodes: is not a list; fix it or derive it again")
+        raise DeriveError("the twin's nodes: is not a list; fix it or derive it again")
     return _plain(data)
 
 
@@ -1974,7 +2561,8 @@ def next_atem_id(twin_text: str | None) -> str:
 def pin_atem(twin_text_or_none: str | None, atem: dict, span: dict | None, *, source_name: str,
              source_stat: dict | None, now: dt.datetime | None = None, of: list | None = None,
              rel_path: str | None = None, by: str = "person", model: str | None = None,
-             name: str | None = None, title: str | None = None) -> str:
+             name: str | None = None, title: str | None = None, flavour: str | None = None,
+             route: str | None = None, provider: str | None = None) -> str:
     """Append a passage's atem to the twin as `X:atem/<n>` (with its `span` and the `of` items it centres on) and
     return the twin's new text. No twin yet → a minimal one, `completeness: atem`, holding just this item. An
     atem whose push or pull is still an open question is a scaffold: `confidence: 0.3`, `state: pending`.
@@ -2014,19 +2602,21 @@ def pin_atem(twin_text_or_none: str | None, atem: dict, span: dict | None, *, so
     if refs:
         item["of"] = [_pending(f"{r} is not an item of this twin") for r in refs]
     derived = _derived(now=now, by=by, model=model, mode="rules" if scaffold else "model", completeness="atem",
-                       chunks=1)
+                       chunks=1, route=route, provider=provider)
     return _dump(_catalog(rel_path=rel_path or source_name, source_name=source_name,
                                    source_stat=source_stat, name=title or source_name, derived=derived, atem=None,
-                                   nodes=[item]))
+                                   nodes=[item], flavour=flavour))
 
 
 def set_file_atem(twin_text_or_none: str | None, atem: dict, *, source_name: str, source_stat: dict | None,
                   now: dt.datetime | None = None, rel_path: str | None = None, by: str = "person",
-                  model: str | None = None, title: str | None = None) -> str:
+                  model: str | None = None, title: str | None = None, flavour: str | None = None,
+                  route: str | None = None, provider: str | None = None) -> str:
     """Set the twin's `atem:` block (the file's atem) and return the twin's new text, keeping its nodes. No twin →
     a minimal one (`completeness: atem`, `nodes: []`). A minimal twin is remade around the new atem (its
     `source:` and `derived:` describe the atem, so they are refreshed); a full twin keeps its `source:` and
-    `derived:` — only its atem changes."""
+    `derived:` — only its atem changes. A twin keeps its declaration, its id and its flavour: an old twin
+    (`oes: emf/1`) stays one, in place; only a new twin is written as `fabula/1` with `flavour`."""
     block = atem_block(atem)
     mode = "rules" if _atem_is_scaffold(block) else "model"
     if twin_text_or_none:
@@ -2036,8 +2626,12 @@ def set_file_atem(twin_text_or_none: str | None, atem: dict, *, source_name: str
             fresh = _catalog(rel_path=rel_path or source_name, source_name=source_name, source_stat=source_stat,
                              name=str(data.get("name") or title or source_name),
                              derived=_derived(now=now, by=by, model=model, mode=mode, completeness="atem",
-                                              chunks=1),
-                             atem=block, nodes=data["nodes"])
+                                              chunks=1, route=route, provider=provider),
+                             atem=block, nodes=data["nodes"], flavour=data.get("flavour") or flavour)
+            if data.get("oes") == EMF_OES:      # an old twin keeps saying what it said (no flavour key then)
+                fresh = {k: (EMF_OES if k == "oes" else v) for k, v in fresh.items() if k != "flavour"}
+            if data.get("id"):
+                fresh["id"] = data["id"]
             for k, v in data.items():          # keep keys this module does not write
                 fresh.setdefault(k, v)
             fresh["nodes"] = fresh.pop("nodes")
@@ -2046,9 +2640,11 @@ def set_file_atem(twin_text_or_none: str | None, atem: dict, *, source_name: str
         out["atem"] = block                    # in place when there was one; before nodes when there wasn't
         out["nodes"] = data["nodes"]
         return _dump(out)
-    derived = _derived(now=now, by=by, model=model, mode=mode, completeness="atem", chunks=1)
+    derived = _derived(now=now, by=by, model=model, mode=mode, completeness="atem", chunks=1, route=route,
+                       provider=provider)
     return _dump(_catalog(rel_path=rel_path or source_name, source_name=source_name, source_stat=source_stat,
-                                   name=title or source_name, derived=derived, atem=block, nodes=[]))
+                                   name=title or source_name, derived=derived, atem=block, nodes=[],
+                                   flavour=flavour))
 
 
 # ---------------------------------------------------------------------------
@@ -2076,8 +2672,8 @@ def _as_doc(volume_or_text: Any) -> tuple[dict, list[dict]]:
         data = volume_or_text
     else:
         data = _yaml(str(volume_or_text))
-    if not isinstance(data, dict) or data.get("oes") != EMF_OES:
-        raise DeriveError("not an EMF (oes: emf/1)")
+    if not isinstance(data, dict) or data.get("oes") not in FABULA_DECLARATIONS:
+        raise DeriveError("not a fabula (oes: fabula/1, or its old spelling emf/1)")
     nodes = data.get("nodes") if isinstance(data.get("nodes"), list) else []
     return data, [n for n in nodes if isinstance(n, dict)]
 
@@ -2166,6 +2762,8 @@ def outline(volume_or_text: Any, *, order: str = "weight", source_text: str | No
     atem = cat.get("atem") if isinstance(cat.get("atem"), dict) else {}
     if isinstance(atem.get("line"), str) and atem["line"].strip():
         out += [_sentence(atem["line"]), ""]
+    if order == "told" and cat.get("flavour") == "fabulap" and any(it.get("type") == "line" for it in items):
+        return title, out + _verse_told_lines(items, by_id, names)
     if order == "told":
         return title, out + _told_lines(items, by_id, names, title=title, source_text=source_text)
     order = {it_id: i for i, it_id in enumerate(by_id)}
@@ -2209,6 +2807,9 @@ def outline(volume_or_text: Any, *, order: str = "weight", source_text: str | No
         for i, ev in enumerate(_event_order(events), 1):
             out.append(f"{i}. {_event_said(ev)}")
         out.append("")
+    readings = [it for it in items if it.get("type") == "reading" and isinstance(it.get("summary"), str)]
+    if readings:
+        out += ["## How it can be read", ""] + [f"- {_reading_said(r)}" for r in readings] + [""]
     terms = [it for it in items if it.get("type") == "term"]
     if terms:
         out += ["## Terms", ""]
@@ -2438,15 +3039,102 @@ def _told_lines(items: list[dict], by_id: dict, names: set[str], *, title: str,
     return out
 
 
+def _reading_said(r: dict) -> str:
+    """A reading as a short tells it: whose it is, said first, so a guess never reads as the poem's own word."""
+    whose = r.get("whose") if isinstance(r.get("whose"), dict) else {}
+    by = whose.get("by")
+    lead = {"model": "One reading, the model's own guess:", "author": "The author's reading:",
+            "expert": "An expert's reading:", "critic": "A critic's reading:",
+            "reader": "A reader's reading:"}.get(by, "One reading:")
+    return f"{lead} {_sentence(r['summary'])}"
+
+
+def _verse_said(it: dict, by_id: dict, names: set[str]) -> str | None:
+    """One item of a fabulap, said as a line of its telling."""
+    kind = it.get("type")
+    summary = it.get("summary") if isinstance(it.get("summary"), str) and it["summary"].strip() else None
+    if kind == "line":
+        n = it.get("number")
+        bits = []
+        if isinstance(it.get("stresses"), str):
+            bits.append(it["stresses"])
+        if isinstance(it.get("rhyme"), str):
+            bits.append(f"rhyme {it['rhyme']}")
+        tail = f" ({', '.join(bits)})" if bits else ""
+        text = it.get("text") if isinstance(it.get("text"), str) else None
+        return f"Line {n}{tail}: {text}" if text else f"Line {n}{tail}."
+    if kind == "reading" and summary:
+        return _reading_said(it)
+    if kind == "device" and summary:
+        fig = it.get("figure") if isinstance(it.get("figure"), str) else "a figure"
+        return f"*{fig}*: {_sentence(summary)}"
+    if kind in ("voice", "metre", "rhyme", "part") and summary:
+        return _sentence(summary)
+    if summary and kind in FABULA_STANCE_KINDS:
+        return _sentence(summary)
+    return _told_item(it, by_id, names)
+
+
+def _verse_told_lines(items: list[dict], by_id: dict, names: set[str]) -> list[str]:
+    """A fabulap told as the author told it, stanza by stanza (MacroCOSM OES 18.4.4, 18.4.6): first how the poem is
+    built (its metre, its rhymes, its voice), then under each stanza's heading its lines in order (each with its
+    stresses and rhyme letter, and its words only when the fabulap holds them), then what the fabula says of that
+    stanza (devices, readings side by side, words, names, claims, events) in the order of their spans; what no
+    stanza places (allusions, aims, a maker) comes last, under "Also in the fabula"."""
+    parts = sorted((it for it in items if it.get("type") == "part" and _span_place(it.get("span"), None)),
+                   key=lambda p: _span_place(p.get("span"), None))
+    built = [it for it in items if it.get("type") in ("metre", "rhyme", "voice")]
+    out: list[str] = []
+    if built:
+        out += ["## How it is built", ""]
+        out += [f"- {s}" for it in built if (s := _verse_said(it, by_id, names))] + [""]
+    rank = {"line": 0, "device": 1, "reading": 2, "term": 3, **{k: 4 for k in ENTITY_KINDS}, "concept": 5,
+            "claim": 6, "event": 7}
+    groups: dict[str, list[tuple[tuple, dict]]] = {p["id"]: [] for p in parts}
+    also: list[dict] = []
+    for pos, it in enumerate(items):
+        kind = it.get("type")
+        if kind in ("part", "metre", "rhyme", "voice", "atem") or kind not in rank and kind not in FABULA_STANCE_KINDS:
+            continue
+        where = _span_place(it.get("span"), None)
+        home = None
+        if kind == "line" and isinstance(it.get("part"), str) and it["part"] in groups:
+            home = it["part"]
+        elif where:
+            for p in parts:
+                a, b = _span_place(p["span"], None)
+                if a <= where[0] <= b:
+                    home = p["id"]
+                    break
+        if home is None:
+            also.append(it)
+            continue
+        key = (rank.get(kind, 8), it.get("number") if kind == "line" else where[0] if where else 0, pos)
+        groups[home].append((key, it))
+    for p in parts:
+        got = sorted(groups[p["id"]], key=lambda x: x[0])
+        if not got:
+            continue
+        out += [f"## {p.get('name') or 'Stanza'}", ""]
+        out += [f"- {s}" for _k, it in got if (s := _verse_said(it, by_id, names))] + [""]
+    tail = [s for it in also if (s := _verse_said(it, by_id, names))]
+    if tail:
+        out += [f"## {ALSO_HEADING}", ""] + [f"- {s}" for s in tail] + [""]
+    return out
+
+
 def short_footer(*, text_name: str, standalone: bool, order: str, day: str, model: str | None,
                  mode: str) -> str:
-    """The one italic line every short ends with (owner decision 6): what it is a short of, in which order, when,
-    and by which model or by rules."""
+    """The one italic line every short ends with (owner decision 6; MacroCOSM OES 18.4.4): what it is a short of,
+    in which order, when, and by which model or by rules: `*a short of notes.md, told as the author told it,
+    compiled from its fabula on 2026-10-23 by g40-04*`; a standalone fabula's `*a short of rain.fabulan.cosm, a
+    standalone fabula, told by weight, compiled on …*`. (A footer an earlier edition wrote, "from its EMF twin",
+    reads the same; nothing rewrites it.)"""
     who = f"by {model or 'a model'}" if mode == "model" else "by rules, without a model"
     said = ORDER_SAID[order]
     if standalone:
-        return f"*a short of {text_name}, a standalone EMF, {said}, compiled on {day} {who}*"
-    return f"*a short of {text_name}, {said}, compiled from its EMF twin on {day} {who}*"
+        return f"*a short of {text_name}, a standalone fabula, {said}, compiled on {day} {who}*"
+    return f"*a short of {text_name}, {said}, compiled from its fabula on {day} {who}*"
 
 
 def _local_day(now: dt.datetime | None) -> str:
@@ -2485,6 +3173,7 @@ def compile_short(volume_or_text: Any, *, complete: CompleteFn | None = None, so
     system = P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER[chosen])
     user = P.COMPILE_USER.format(name=title, said=ORDER_SAID[chosen], outline="\n".join(lines))
     reply, meta = _call(complete, [{"role": "system", "content": system}, {"role": "user", "content": user}])
+    route = meta.get("route") if isinstance(meta, dict) and isinstance(meta.get("route"), str) else None
     body = reply.strip()
     m = re.match(r"^```(?:markdown|md|gfm)?\s*\n(.*?)\n```\s*$", body, re.S)
     if m:
@@ -2494,8 +3183,10 @@ def compile_short(volume_or_text: Any, *, complete: CompleteFn | None = None, so
     model = meta.get("model") if isinstance(meta, dict) and meta.get("model") else None
     foot = short_footer(text_name=text_name, standalone=standalone, order=chosen, day=day, model=model,
                         mode="model")
-    return (body + "\n\n---\n\n" + foot + "\n",
-            {"order": chosen, "mode": "model", "model": model, "by": model or "a model"})
+    info = {"order": chosen, "mode": "model", "model": model, "by": model or "a model"}
+    if route:
+        info["route"] = route
+    return body + "\n\n---\n\n" + foot + "\n", info
 
 
 def compile_text(volume_or_text: Any, *, complete: CompleteFn | None = None, source_name: str | None = None,
@@ -2536,24 +3227,28 @@ def _flow_entry(entry: dict) -> str:
 
 
 def record_short(twin_text: str, *, path: str, at: dt.datetime | None = None, by: str, mode: str,
-                 order: str) -> str:
+                 order: str, route: str | None = None) -> str:
     """Append one telling to the EMF's `shorts:` list — `{path, at, by, mode, order}`: the short's file name
     beside the twin, when (UTC), the model's id or `rules`, `model` | `rules`, `told` | `weight` — and return the
     EMF's new text. The list is made just above `nodes:` when there is none. Everything else stays byte for byte:
     the change is made in the text, never by loading and dumping the twin (its comments, quoting and order are
-    the author's). Raises DeriveError when the result would not read back as the same EMF with one more short."""
+    the author's). `route` (`local` | `cloud`) is added when a model told it (MacroCOSM OES 18.4.1). An old twin
+    (`oes: emf/1`) gets its entry in place, its declaration untouched. Raises DeriveError when the result would not
+    read back as the same fabula with one more short."""
     if mode not in ("model", "rules"):
         raise DeriveError("mode must be model or rules")
     _check_order(order)
     if not isinstance(path, str) or not path.strip():
         raise DeriveError("a short needs its path")
     before = _yaml(twin_text)
-    if not isinstance(before, dict) or before.get("oes") != EMF_OES:
-        raise DeriveError("not an EMF (oes: emf/1)")
+    if not isinstance(before, dict) or before.get("oes") not in FABULA_DECLARATIONS:
+        raise DeriveError("not a fabula (oes: fabula/1, or its old spelling emf/1)")
     old = before.get("shorts")
     if old is not None and not isinstance(old, list):
         raise DeriveError("the EMF's shorts: is not a list; fix it by hand")
     entry = {"path": path.strip(), "at": _now(at), "by": str(by or mode), "mode": mode, "order": order}
+    if mode == "model" and route in ("local", "cloud"):
+        entry["route"] = route
     nl = "\r\n" if "\r\n" in twin_text else "\n"
     lines = twin_text.splitlines(keepends=True)
     if lines and not lines[-1].endswith(("\n", "\r")):
@@ -2601,5 +3296,5 @@ __all__ = [
     "default_order", "derive_atem", "derive_emf", "entity_candidates", "item_slug", "next_atem_id", "outline",
     "parse_lines", "passage_span", "pin_atem", "read_source", "record_short", "rules_atem", "sentences",
     "set_file_atem", "short_footer", "short_path", "source_path", "text_title", "twin_path", "twin_state",
-    "write_atomic", "write_twin",
+    "write_atomic", "write_twin", "replace_twin", "new_twin_path", "FABULA_OES", "EMF_OES",
 ]

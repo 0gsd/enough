@@ -1,0 +1,11 @@
+-- refused: compile version line 9
+thym 0
+
+program count-the-lines
+  why: the lines of a text, read by a thym 0 program, which has no lines move.
+  takes draft: text
+  gives n: number
+
+  let all = lines of draft
+  give count all
+end

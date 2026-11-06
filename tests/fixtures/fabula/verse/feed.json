@@ -1,0 +1,2158 @@
+{
+ "_note": "entries copied from reflib/dict (FEED) for the words of the verse fixtures; a word FEED lacks is absent",
+ "words": {
+  "a": {
+   "definition": "The indefinite article, used before a singular countable noun to indicate one unspecified member of a class, as in a cat",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "a",
+   "ipa": "/eɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "article; noun",
+   "pos_primary": "article",
+   "slant_rhymes": [],
+   "word": "a"
+  },
+  "abash": {
+   "definition": "To make someone embarrassed, self-conscious, or suddenly unsure of themselves.",
+   "form_of": null,
+   "frequency_rank": 1,
+   "hyphenation": "abash",
+   "ipa": "/əˈbæʃ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "catch",
+    "grass"
+   ],
+   "word": "abash"
+  },
+  "all": {
+   "definition": "The whole of a group or quantity; as a pronoun or adverb, everyone, everything, or entirely.",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "all",
+   "ipa": "/ɔl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "determiner; pronoun; adjective; adverb",
+   "pos_primary": "determiner",
+   "slant_rhymes": [
+    "for",
+    "nor",
+    "explore"
+   ],
+   "word": "all"
+  },
+  "anchor": {
+   "definition": "A heavy device used to hold a vessel in place; figuratively, a person or thing that provides stability. It also denotes ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "an·chor",
+   "ipa": "/ˈæŋkər/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "anchor"
+  },
+  "and": {
+   "definition": "A conjunction used to join words, phrases or clauses, often indicating addition or connection.",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "and",
+   "ipa": "/ænd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "stand"
+   ],
+   "pos": "conjunction",
+   "pos_primary": "conjunction",
+   "slant_rhymes": [],
+   "word": "and"
+  },
+  "are": {
+   "definition": "The present-tense form of be used with you, we, and they, as in we are ready. As a noun, a metric unit of area equal to ",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "are",
+   "ipa": "/ɑr/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "are"
+  },
+  "art": {
+   "definition": "The creation of works, visual, musical, or literary, valued for their beauty, meaning, or skill rather than practical us",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "art",
+   "ipa": "/ɑrt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "dark"
+   ],
+   "word": "art"
+  },
+  "at": {
+   "definition": "A preposition marking location, time, or a point of activity, as in meet me at the corner at noon, or good at chess. In ",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "at",
+   "ipa": "/æt/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "that"
+   ],
+   "pos": "preposition; noun",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "at"
+  },
+  "ballad": {
+   "definition": "A simple narrative poem or song, often anonymous in origin and passed down orally, that tells a story of love, tragedy, ",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "bal·lad",
+   "ipa": "/ˈbæləd/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "ballad"
+  },
+  "be": {
+   "definition": "The basic verb of existence, identity, or state, used as an auxiliary with other verbs and as a link between a subject a",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "be",
+   "ipa": "/bi/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "me",
+    "she"
+   ],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "need"
+   ],
+   "word": "be"
+  },
+  "bed": {
+   "definition": "A piece of furniture for sleeping, or by extension any prepared surface for resting, a layer of material, or a body of w",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "bed",
+   "ipa": "/bɛd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "thread"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "bed"
+  },
+  "bird": {
+   "definition": "A warm-blooded, egg-laying animal with feathers and wings, usually able to fly. Slang senses extend it to a fellow, a pr",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "bird",
+   "ipa": "/bɜrd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "heard"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "bird"
+  },
+  "bridge": {
+   "definition": "A structure carrying a path over a river, valley, or gap, or by extension anything that connects two separated things, i",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "bridge",
+   "ipa": "/brɪdʒ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "with",
+    "his"
+   ],
+   "word": "bridge"
+  },
+  "cambric": {
+   "definition": "A finely woven, lightweight fabric, originally linen but now often cotton, prized for handkerchiefs and fine shirting. I",
+   "form_of": null,
+   "frequency_rank": 1,
+   "hyphenation": "cam·bric",
+   "ipa": "/ˈkeɪmbrɪk/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "cambric"
+  },
+  "catch": {
+   "definition": "To seize, capture, or intercept something in motion, or to grasp an idea, a disease, or someone's meaning. As a noun, th",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "catch",
+   "ipa": "/kætʃ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "grass"
+   ],
+   "word": "catch"
+  },
+  "ceaselessly": {
+   "definition": "Without ever stopping, continuously and without pause.",
+   "form_of": null,
+   "frequency_rank": 2,
+   "hyphenation": "cease·less·ly",
+   "ipa": "/ˈsisləsli/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adverb",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "ceaselessly"
+  },
+  "connect": {
+   "definition": "To join two things, or to become joined, whether physically, electronically, or in thought; to establish rapport; to lan",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "con·nect",
+   "ipa": "/kəˈnɛkt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "connect"
+  },
+  "could": {
+   "definition": "The past-tense and conditional form of can, covering past ability, polite requests, and possibilities that never happene",
+   "form_of": "can",
+   "frequency_rank": 6,
+   "hyphenation": "could",
+   "ipa": "/kʊd/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "could"
+  },
+  "crimson": {
+   "definition": "A deep, slightly blue-tinged red, and by extension anything of that color; as a verb, to turn or dye that shade, especia",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "crim·son",
+   "ipa": "/ˈkrɪmzən/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "little"
+   ],
+   "word": "crimson"
+  },
+  "dark": {
+   "definition": "Having little or no light, or, of a color, deep and shadowed rather than pale. Also describes ignorance, gloom, or conce",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "dark",
+   "ipa": "/dɑrk/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective; noun; verb",
+   "pos_primary": "adjective",
+   "slant_rhymes": [
+    "art"
+   ],
+   "word": "dark"
+  },
+  "destroy": {
+   "definition": "To damage something so completely that it ceases to exist or function; to ruin a person's health, career, or well-being.",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "de·stroy",
+   "ipa": "/dɪˈstrɔɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "joy"
+   ],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "destroy"
+  },
+  "detached": {
+   "definition": "Separated from something to which it was connected; showing emotional distance or impartiality.",
+   "form_of": "detach",
+   "frequency_rank": 4,
+   "hyphenation": "de·tached",
+   "ipa": "/dɪˈtætʃt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; adjective",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "vast"
+   ],
+   "word": "detached"
+  },
+  "does": {
+   "definition": "Female deer, rabbits, hares, or squirrels; or, in the verb form, the third-person present tense of do.",
+   "form_of": "do",
+   "frequency_rank": 6,
+   "hyphenation": "does",
+   "ipa": "/dʌz/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "was"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "love"
+   ],
+   "word": "does"
+  },
+  "ductile": {
+   "definition": "Capable of being drawn out into thin wire without snapping, a prized property of metals like copper and gold. By extensi",
+   "form_of": null,
+   "frequency_rank": 2,
+   "hyphenation": "duc·tile",
+   "ipa": "/ˈdʌktəl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "ductile"
+  },
+  "ever": {
+   "definition": "At any time, or always, continuously; also used to intensify a question, as in why ever would you.",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "ev·er",
+   "ipa": "/ˈɛvər/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "never"
+   ],
+   "pos": "adverb; adjective; determiner",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "ever"
+  },
+  "experience": {
+   "definition": "Something lived through, or the knowledge and skill built up from having lived through many things; as a verb, to underg",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "ex·pe·ri·ence",
+   "ipa": "/ɪkˈspɪriəns/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "experience"
+  },
+  "explore": {
+   "definition": "To travel through an unfamiliar place in order to learn about it, or to investigate a subject or idea systematically; in",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "ex·plore",
+   "ipa": "/ɪkˈsplɔr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "for",
+    "nor",
+    "sore"
+   ],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "all"
+   ],
+   "word": "explore"
+  },
+  "fair": {
+   "definition": "Just and even-handed; also, light in coloring, or pleasing to look at in an old literary sense. As a noun it is a gather",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "fair",
+   "ipa": "/fɛr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "there",
+    "where",
+    "somewhere"
+   ],
+   "pos": "adjective; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [
+    "tell"
+   ],
+   "word": "fair"
+  },
+  "feathers": {
+   "definition": null,
+   "form_of": "feather",
+   "frequency_rank": 4,
+   "hyphenation": null,
+   "ipa": "/ˈfɛðərz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "feathers"
+  },
+  "filament": {
+   "definition": "A fine thread or wire, especially the thin strand that glows inside an incandescent bulb. Botanists also use it for the ",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "fil·a·ment",
+   "ipa": "/ˈfɪləmənt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "traditional"
+   ],
+   "word": "filament"
+  },
+  "flies": {
+   "definition": "Third person singular of fly: travels through the air, or operates an aircraft; also the plural of fly, the two-winged i",
+   "form_of": "fly",
+   "frequency_rank": 4,
+   "hyphenation": "flies",
+   "ipa": "/flaɪz/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "flies"
+  },
+  "fling": {
+   "definition": "To throw something with force, or to move oneself abruptly and violently, as in flinging open a door. As a noun it also ",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "fling",
+   "ipa": "/flɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "thing"
+   ],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "fling"
+  },
+  "for": {
+   "definition": "A preposition marking purpose, direction, benefit, or duration, as in working for a wage or waiting for a bus. As a conj",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "for",
+   "ipa": "/fɔr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "nor",
+    "explore",
+    "sore"
+   ],
+   "pos": "preposition; conjunction",
+   "pos_primary": "preposition",
+   "slant_rhymes": [
+    "all"
+   ],
+   "word": "for"
+  },
+  "forth": {
+   "definition": "Forward, onward, or out into view, as in venturing forth or bringing something forth.",
+   "form_of": "fourth",
+   "frequency_rank": 4,
+   "hyphenation": "forth",
+   "ipa": "/fɔrθ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adverb",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "forth"
+  },
+  "found": {
+   "definition": "Past tense and past participle of find, as in she found her keys. As a separate verb, to found is to establish an instit",
+   "form_of": "find",
+   "frequency_rank": 6,
+   "hyphenation": "found",
+   "ipa": "/faʊnd/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "found"
+  },
+  "gale": {
+   "definition": "A very strong wind, stronger than a breeze but short of a full storm on the Beaufort scale; figuratively, a sudden outbu",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "gale",
+   "ipa": "/ɡeɪl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "gale"
+  },
+  "going": {
+   "definition": "Moving, leaving, or in progress, as in the going rate or a going concern. As a noun it can mean a departure, or the cond",
+   "form_of": "go",
+   "frequency_rank": 6,
+   "hyphenation": "go·ing",
+   "ipa": "/ˈɡoʊɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "throwing"
+   ],
+   "pos": "verb; noun; adjective",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "going"
+  },
+  "gossamer": {
+   "definition": "A fine, filmy strand of spider silk floating in the air, or a delicate sheer fabric resembling it. As an adjective, extr",
+   "form_of": null,
+   "frequency_rank": 2,
+   "hyphenation": "gos·sa·mer",
+   "ipa": "/ˈɡɑsəmər/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "gossamer"
+  },
+  "grass": {
+   "definition": "Any of the low green plants of the family Poaceae that carpet lawns and meadows, or, informally, an informer who reports",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "grass",
+   "ipa": "/ɡræs/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "catch"
+   ],
+   "word": "grass"
+  },
+  "has": {
+   "definition": null,
+   "form_of": "have",
+   "frequency_rank": 6,
+   "hyphenation": null,
+   "ipa": "/hæz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "has"
+  },
+  "heard": {
+   "definition": "Past tense and past participle of hear, meaning perceived by ear or learned of. Used alone, it serves informally as an a",
+   "form_of": "hear",
+   "frequency_rank": 5,
+   "hyphenation": "heard",
+   "ipa": "/hɜrd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "bird"
+   ],
+   "pos": "verb; interjection",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "heard"
+  },
+  "her": {
+   "definition": "Belonging to a woman, girl, or something referred to as she, as in her coat; also the pronoun for that same person as th",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "her",
+   "ipa": "/hɜr/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "determiner; pronoun",
+   "pos_primary": "determiner",
+   "slant_rhymes": [
+    "heard",
+    "words"
+   ],
+   "word": "her"
+  },
+  "his": {
+   "definition": "Belonging to or associated with him, used before a noun as in his coat, or alone as in the coat is his. In older and dia",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "his",
+   "ipa": "/hɪz/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "is"
+   ],
+   "pos": "determiner; pronoun",
+   "pos_primary": "determiner",
+   "slant_rhymes": [
+    "with",
+    "bridge"
+   ],
+   "word": "his"
+  },
+  "hold": {
+   "definition": "To grasp, contain, or keep possession of something, from a hand holding a cup to a shelf holding books. As a noun it can",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "hold",
+   "ipa": "/hoʊld/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "hold"
+  },
+  "hope": {
+   "definition": "To want something with a real, if uncertain, expectation that it will happen, or to trust confidently in someone. As a n",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "hope",
+   "ipa": "/hoʊp/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "hope"
+  },
+  "how": {
+   "definition": "A word asking about manner, method, degree, or reason, as in how did you do that. As a noun, the means by which somethin",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "how",
+   "ipa": "/haʊ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "thou"
+   ],
+   "pos": "adverb; conjunction; noun; interjection",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "out",
+    "without",
+    "found"
+   ],
+   "word": "how"
+  },
+  "howling": {
+   "definition": "Making a long, mournful cry, as in a howling wind. As an adjective, it also means very great or extreme, as in a howling",
+   "form_of": "howl",
+   "frequency_rank": 3,
+   "hyphenation": "howl·ing",
+   "ipa": "/ˈhaʊlɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; adjective; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "surrounding"
+   ],
+   "word": "howling"
+  },
+  "i": {
+   "definition": "The first-person singular pronoun, used by a speaker or writer as the subject of a verb, as in I am ready, and always wr",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "i",
+   "ipa": "/aɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "my"
+   ],
+   "pos": "pronoun; noun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [],
+   "word": "i"
+  },
+  "in": {
+   "definition": "As a preposition, indicating location within, enclosure, or a period of time, as in in the box or in April. As an adverb",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "in",
+   "ipa": "/ɪn/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "preposition; adverb",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "in"
+  },
+  "invisible": {
+   "definition": "Unable to be seen, whether because it is too small, too far, transparent, or simply hidden from view. It can also descri",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "in·vis·ible",
+   "ipa": "/ɪnˈvɪzəbəl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "invisible"
+  },
+  "is": {
+   "definition": "The third-person singular present-tense form of be, used with he, she, and it, as in it is raining.",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "is",
+   "ipa": "/ɪz/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "his"
+   ],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "with",
+    "bridge"
+   ],
+   "word": "is"
+  },
+  "isolated": {
+   "definition": "Set apart or separated from others, as for safety, quarantine, or purity; also occurring singly or only once, as in an i",
+   "form_of": "isolate",
+   "frequency_rank": 4,
+   "hyphenation": "iso·lat·ed",
+   "ipa": "/ˈaɪsəˌleɪtɪd/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; adjective",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "isolated"
+  },
+  "it": {
+   "definition": "The third-person singular pronoun used to refer to a thing, animal, or idea previously mentioned, or as a grammatical pl",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "it",
+   "ipa": "/ɪt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "pronoun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [
+    "sick"
+   ],
+   "word": "it"
+  },
+  "itself": {
+   "definition": "Refers back to a thing already mentioned as the same one acted upon, as in the cat washed itself. It can also add emphas",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "it·self",
+   "ipa": "/ɪtˈsɛlf/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "pronoun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [],
+   "word": "itself"
+  },
+  "joy": {
+   "definition": "A feeling of great happiness, or anything that brings it about. As a verb, to feel or take delight; as an interjection, ",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "joy",
+   "ipa": "/dʒɔɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "destroy"
+   ],
+   "pos": "noun; verb; interjection",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "joy"
+  },
+  "kept": {
+   "definition": null,
+   "form_of": "keep",
+   "frequency_rank": 5,
+   "hyphenation": null,
+   "ipa": "/kɛpt/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [
+    "connect"
+   ],
+   "word": "kept"
+  },
+  "leaves": {
+   "definition": null,
+   "form_of": "leaf",
+   "frequency_rank": 5,
+   "hyphenation": null,
+   "ipa": "/livz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [
+    "she"
+   ],
+   "word": "leaves"
+  },
+  "life": {
+   "definition": "The condition of being alive, growing, and eventually dying, shared by animals, plants, and other organisms; also the sp",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "life",
+   "ipa": "/laɪf/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "life"
+  },
+  "little": {
+   "definition": "Small in size, amount, or degree; as an adverb and determiner, not much or hardly any. As a noun, a small quantity or, i",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "lit·tle",
+   "ipa": "/ˈlɪtəl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective; adverb; determiner; pronoun; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "little"
+  },
+  "lives": {
+   "definition": null,
+   "form_of": "life",
+   "frequency_rank": 5,
+   "hyphenation": null,
+   "ipa": "/lɪvz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [
+    "his"
+   ],
+   "word": "lives"
+  },
+  "love": {
+   "definition": "A deep affection or caring for someone or something, or the verb of feeling that way; in tennis scoring, zero.",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "love",
+   "ipa": "/lʌv/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "of"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "was",
+    "does"
+   ],
+   "word": "love"
+  },
+  "make": {
+   "definition": "To build, produce, or bring something into being; to cause something to happen or to be in a certain state; to earn or a",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "make",
+   "ipa": "/meɪk/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "make"
+  },
+  "many": {
+   "definition": "A large, indefinite number of people or things, whether placed before a noun, standing alone, or used to compare amounts",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "many",
+   "ipa": "/ˈmɛni/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "determiner; pronoun; adjective; noun",
+   "pos_primary": "determiner",
+   "slant_rhymes": [],
+   "word": "many"
+  },
+  "me": {
+   "definition": "The objective case of the first-person singular pronoun I, used as the object of a verb or preposition, as in give it to",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "me",
+   "ipa": "/mi/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "be",
+    "she"
+   ],
+   "pos": "pronoun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [
+    "need"
+   ],
+   "word": "me"
+  },
+  "measureless": {
+   "definition": "So vast that it cannot practically be measured, as of a distance, a darkness, or a quality like patience.",
+   "form_of": null,
+   "frequency_rank": 2,
+   "hyphenation": "meas·ure·less",
+   "ipa": "/ˈmɛʒərləs/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "measureless"
+  },
+  "mine": {
+   "definition": "A possessive pronoun meaning belonging to me, as in that one is mine. As a noun it separately names an excavation for ex",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "mine",
+   "ipa": "/maɪn/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "pronoun; noun; verb",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [],
+   "word": "mine"
+  },
+  "musing": {
+   "definition": "Careful, prolonged thought or reflection, or a thought or remark arising from it. As an adjective, it means absorbed in ",
+   "form_of": "muse",
+   "frequency_rank": 3,
+   "hyphenation": "mus·ing",
+   "ipa": "/ˈmjuzɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "musing"
+  },
+  "must": {
+   "definition": "An auxiliary verb marking obligation or near-certainty: what must happen is required, and what must be true seems beyond",
+   "form_of": "musth",
+   "frequency_rank": 6,
+   "hyphenation": "must",
+   "ipa": "/mʌst/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "must"
+  },
+  "my": {
+   "definition": "The possessive form of I, used before a noun to show that something belongs to or is associated with the speaker, as in ",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "my",
+   "ipa": "/maɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "i"
+   ],
+   "pos": "determiner",
+   "pos_primary": "determiner",
+   "slant_rhymes": [
+    "life",
+    "night"
+   ],
+   "word": "my"
+  },
+  "need": {
+   "definition": "A requirement for something; a lack of something essential, or the urgent want it creates. As a verb, to require or be o",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "need",
+   "ipa": "/nid/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "need"
+  },
+  "needlework": {
+   "definition": "Work done with a needle, especially embroidery or needlepoint, and also the finished product of such work. It can name t",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "nee·dle·work",
+   "ipa": "/ˈnidəlˌwɜrk/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "shirt"
+   ],
+   "word": "needlework"
+  },
+  "never": {
+   "definition": "At no time at all; not ever. It can also simply negate a past-tense verb in casual speech, as in \"I never said that,\" an",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "nev·er",
+   "ipa": "/ˈnɛvər/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "ever"
+   ],
+   "pos": "adverb; interjection",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "never"
+  },
+  "night": {
+   "definition": "The hours of darkness when the sun is below the horizon, or more loosely an evening given over to some occasion, as in a",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "night",
+   "ipa": "/naɪt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; interjection; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "night"
+  },
+  "no": {
+   "definition": "A word used to give a negative reply, deny something, or refuse, as in no, I won't. As a determiner, not any, as in no m",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "no",
+   "ipa": "/noʊ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "so"
+   ],
+   "pos": "adverb; determiner",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "hope",
+    "hold"
+   ],
+   "word": "no"
+  },
+  "noiseless": {
+   "definition": "Making no sound at all, or so quiet as to seem silent.",
+   "form_of": null,
+   "frequency_rank": 2,
+   "hyphenation": "noise·less",
+   "ipa": "/ˈnɔɪzləs/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "noiseless"
+  },
+  "nor": {
+   "definition": "A conjunction joining negative clauses, continuing a negation begun by neither or not, as in neither this nor that. It c",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "nor",
+   "ipa": "/nɔr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "for",
+    "explore",
+    "sore"
+   ],
+   "pos": "conjunction",
+   "pos_primary": "conjunction",
+   "slant_rhymes": [
+    "all"
+   ],
+   "word": "nor"
+  },
+  "oceans": {
+   "definition": null,
+   "form_of": "ocean",
+   "frequency_rank": 4,
+   "hyphenation": null,
+   "ipa": "/ˈoʊʃənz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "oceans"
+  },
+  "of": {
+   "definition": "A preposition indicating possession, origin, material, or a part-to-whole relationship, as in the roof of the house, a f",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "of",
+   "ipa": "/ʌv/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "love"
+   ],
+   "pos": "preposition",
+   "pos_primary": "preposition",
+   "slant_rhymes": [
+    "was",
+    "does"
+   ],
+   "word": "of"
+  },
+  "on": {
+   "definition": "As a preposition, indicating position on a surface, a day or topic, as in on the table, on Monday, or a book on birds. A",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "on",
+   "ipa": "/ɑn/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "preposition; adverb",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "on"
+  },
+  "once": {
+   "definition": "On one occasion only; formerly, at some time in the past. As a conjunction, as soon as or from the moment that, as in on",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "once",
+   "ipa": "/wʌns/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adverb; conjunction; noun",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "once"
+  },
+  "one": {
+   "definition": "The number after zero, denoting a single unit; also a pronoun standing in for a person or thing already mentioned or for",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "one",
+   "ipa": "/wʌn/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "numeral; pronoun; noun; adjective",
+   "pos_primary": "numeral",
+   "slant_rhymes": [],
+   "word": "one"
+  },
+  "out": {
+   "definition": "Away from the inside, center, or one's usual place, as in stepping out or being out of town. As a noun it can mean an es",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "out",
+   "ipa": "/aʊt/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "without"
+   ],
+   "pos": "adverb; preposition; noun; verb",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "out"
+  },
+  "parsley": {
+   "definition": "A bright green biennial herb used fresh or dried to season and garnish food. Curly and flat-leaf varieties are the most ",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "pars·ley",
+   "ipa": "/ˈpɑrsli/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "parsley"
+  },
+  "patient": {
+   "definition": "As an adjective, able to wait or endure without losing composure; as a noun, someone under medical care. Grammarians als",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "pa·tient",
+   "ipa": "/ˈpeɪʃənt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "patient"
+  },
+  "perches": {
+   "definition": null,
+   "form_of": "perch",
+   "frequency_rank": 3,
+   "hyphenation": null,
+   "ipa": "/ˈpɜrtʃɪz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "perches"
+  },
+  "promontory": {
+   "definition": "A high point of land jutting out into the sea; a headland. In anatomy, a similarly projecting ridge, such as one in the ",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "prom·on·to·ry",
+   "ipa": "/ˈprɑməntɔri/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "promontory"
+  },
+  "remember": {
+   "definition": "To bring something back to mind, to hold it there without losing it, or to make sure not to forget an obligation.",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "re·mem·ber",
+   "ipa": "/rɪˈmɛmbər/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "remember"
+  },
+  "rose": {
+   "definition": "A thorny shrub prized for its fragrant flower, or the flower itself, in colours from white to deep red. As an adjective ",
+   "form_of": "rise",
+   "frequency_rank": 5,
+   "hyphenation": "rose",
+   "ipa": "/roʊz/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "rose"
+  },
+  "rosemary": {
+   "definition": "A fragrant Mediterranean shrub whose needle-like leaves season roasted meats, breads, and oils. Its name has nothing to ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "rose·mary",
+   "ipa": "/ˈroʊzˌmɛri/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "rosemary"
+  },
+  "sage": {
+   "definition": "A person of great wisdom and sound judgment; as an adjective, wise and grave in manner. Also, in an unrelated sense, the",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "sage",
+   "ipa": "/seɪdʒ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "sage"
+  },
+  "seams": {
+   "definition": null,
+   "form_of": "seam",
+   "frequency_rank": 3,
+   "hyphenation": null,
+   "ipa": "/simz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "seams"
+  },
+  "secret": {
+   "definition": "Something deliberately kept hidden from others; as an adjective, kept from general knowledge. It can also mean the key t",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "se·cret",
+   "ipa": "/ˈsikrət/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "secret"
+  },
+  "seeking": {
+   "definition": "Searching for something, trying to find, reach, or acquire it, or attempting something, as in seeking to understand.",
+   "form_of": "seek",
+   "frequency_rank": 5,
+   "hyphenation": "seek·ing",
+   "ipa": "/ˈsikɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "seeking"
+  },
+  "shall": {
+   "definition": "An auxiliary verb marking simple future action, especially with I and we, or expressing obligation and determination wit",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "shall",
+   "ipa": "/ʃæl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "shall"
+  },
+  "she": {
+   "definition": "Used to refer to a female person or animal previously mentioned, and traditionally to ships, countries, or machines; as ",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "she",
+   "ipa": "/ʃi/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "be",
+    "me"
+   ],
+   "pos": "pronoun; noun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [
+    "need"
+   ],
+   "word": "she"
+  },
+  "shirt": {
+   "definition": "A garment worn on the upper body, typically with sleeves and a collar. As a verb, to clothe with a shirt.",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "shirt",
+   "ipa": "/ʃɜrt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "shirt"
+  },
+  "sick": {
+   "definition": "Unwell, or affected by nausea; also, informally, mentally disturbed or, in slang, impressively good. In British and Aust",
+   "form_of": "sic",
+   "frequency_rank": 5,
+   "hyphenation": "sick",
+   "ipa": "/sɪk/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective; noun; verb",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "sick"
+  },
+  "sings": {
+   "definition": null,
+   "form_of": "sing",
+   "frequency_rank": 4,
+   "hyphenation": null,
+   "ipa": "/sɪŋz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "sings"
+  },
+  "so": {
+   "definition": "As an adverb, to such an extent, as in so tired; also in that manner, as in do it so. As a conjunction, introducing a re",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "so",
+   "ipa": "/soʊ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "no"
+   ],
+   "pos": "adverb; conjunction; noun",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "hope",
+    "hold"
+   ],
+   "word": "so"
+  },
+  "somewhere": {
+   "definition": "In, at, or to an unspecified place, as in it's somewhere in the house. As a noun, an unnamed or indefinite place.",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "some·where",
+   "ipa": "/ˈsʌmˌwɛr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "there",
+    "where",
+    "fair"
+   ],
+   "pos": "adverb; noun",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "tell"
+   ],
+   "word": "somewhere"
+  },
+  "songs": {
+   "definition": null,
+   "form_of": "song",
+   "frequency_rank": 5,
+   "hyphenation": null,
+   "ipa": "/sɔŋz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "songs"
+  },
+  "sore": {
+   "definition": "Painful or tender, as an aching muscle; or, informally, angry and resentful. As a noun it names the tender injured spot ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "sore",
+   "ipa": "/sɔr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "for",
+    "nor",
+    "explore"
+   ],
+   "pos": "adjective; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [
+    "all"
+   ],
+   "word": "sore"
+  },
+  "soul": {
+   "definition": "The spiritual essence of a person, often held to survive death and to embody character and feeling; the animating spirit",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "soul",
+   "ipa": "/soʊl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; adjective",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "hold"
+   ],
+   "word": "soul"
+  },
+  "space": {
+   "definition": "The extent or area available or between things; a gap or interval; the boundless region beyond Earth's atmosphere contai",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "space",
+   "ipa": "/speɪs/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "space"
+  },
+  "speeding": {
+   "definition": "Moving quickly, or driving faster than the legal limit; also the offence of doing so, as in a speeding ticket.",
+   "form_of": "speed",
+   "frequency_rank": 4,
+   "hyphenation": "speed·ing",
+   "ipa": "/ˈspidɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; adjective; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "seeking"
+   ],
+   "word": "speeding"
+  },
+  "spheres": {
+   "definition": null,
+   "form_of": "sphere",
+   "frequency_rank": 3,
+   "hyphenation": null,
+   "ipa": "/sfɪrz/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "spheres"
+  },
+  "spider": {
+   "definition": "An eight-legged arthropod, many of which spin silk webs to trap prey; also a program that crawls the web to gather infor",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "spi·der",
+   "ipa": "/ˈspaɪdər/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "spider"
+  },
+  "stand": {
+   "definition": "To support oneself upright on the feet, or to remain in place without moving; as a noun, a position taken, a piece of fu",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "stand",
+   "ipa": "/stænd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "and"
+   ],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "stand"
+  },
+  "stood": {
+   "definition": null,
+   "form_of": "stand",
+   "frequency_rank": 5,
+   "hyphenation": null,
+   "ipa": "/stʊd/",
+   "is_headword": 0,
+   "perfect_rhymes": [
+    "could"
+   ],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "stood"
+  },
+  "stops": {
+   "definition": null,
+   "form_of": "stop",
+   "frequency_rank": 4,
+   "hyphenation": null,
+   "ipa": "/stɑps/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "stops"
+  },
+  "storm": {
+   "definition": "A violent disturbance of the atmosphere bringing strong wind, rain, snow, or lightning, or more loosely any of these alo",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "storm",
+   "ipa": "/stɔrm/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "warm"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "storm"
+  },
+  "surrounded": {
+   "definition": null,
+   "form_of": "surround",
+   "frequency_rank": 4,
+   "hyphenation": null,
+   "ipa": "/sərˈaʊndɪd/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [
+    "surrounding"
+   ],
+   "word": "surrounded"
+  },
+  "surrounding": {
+   "definition": "Encircling something on all sides; also the adjacent area or environment.",
+   "form_of": "surround",
+   "frequency_rank": 4,
+   "hyphenation": "sur·round·ing",
+   "ipa": "/sərˈaʊndɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; adjective; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "surrounding"
+  },
+  "sweetest": {
+   "definition": null,
+   "form_of": "sweet",
+   "frequency_rank": 3,
+   "hyphenation": null,
+   "ipa": "/ˈswitəst/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "sweetest"
+  },
+  "tell": {
+   "definition": "To say or communicate something to someone, as in telling a story; to determine or perceive, as in telling the time or t",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "tell",
+   "ipa": "/tɛl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "there",
+    "where",
+    "fair",
+    "somewhere"
+   ],
+   "word": "tell"
+  },
+  "that": {
+   "definition": "Indicating a person or thing more distant, already mentioned, or understood from context, as determiner or pronoun; also",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "that",
+   "ipa": "/ðæt/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "at"
+   ],
+   "pos": "determiner; pronoun; conjunction",
+   "pos_primary": "determiner",
+   "slant_rhymes": [],
+   "word": "that"
+  },
+  "the": {
+   "definition": "The definite article, used before a noun to indicate a specific or already identified thing; also used with comparatives",
+   "form_of": null,
+   "frequency_rank": 8,
+   "hyphenation": "the",
+   "ipa": "/ðə/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "article; adverb",
+   "pos_primary": "article",
+   "slant_rhymes": [
+    "was",
+    "one",
+    "love",
+    "does",
+    "must",
+    "once"
+   ],
+   "word": "the"
+  },
+  "them": {
+   "definition": "The object form of they, used for people, animals, or things previously mentioned; also used nonstandardly for those, as",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "them",
+   "ipa": "/ðɛm/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "pronoun; determiner",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [
+    "then"
+   ],
+   "word": "them"
+  },
+  "then": {
+   "definition": "At that time, or next in a sequence of events; it can also mean therefore or in addition. As an adjective, it means exis",
+   "form_of": "than",
+   "frequency_rank": 6,
+   "hyphenation": "then",
+   "ipa": "/ðɛn/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adverb; adjective; conjunction",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "them"
+   ],
+   "word": "then"
+  },
+  "there": {
+   "definition": "In, at, or to a place away from the speaker, or figuratively at a point in an argument or situation. It also serves as a",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "there",
+   "ipa": "/ðɛr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "where",
+    "fair",
+    "somewhere"
+   ],
+   "pos": "adverb; pronoun; interjection",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "tell"
+   ],
+   "word": "there"
+  },
+  "thing": {
+   "definition": "Any object, entity, quality, or matter treated as separate and namable, from a physical item to a vague affair.",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "thing",
+   "ipa": "/θɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "fling"
+   ],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "thing"
+  },
+  "thou": {
+   "definition": "An old singular form of you, once the familiar counterpart to the more formal ye, now surviving mainly in scripture and ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "thou",
+   "ipa": "/ðaʊ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "how"
+   ],
+   "pos": "pronoun; noun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [
+    "out",
+    "found"
+   ],
+   "word": "thou"
+  },
+  "thread": {
+   "definition": "A thin strand of spun fiber used in sewing or weaving, or any slender filament resembling it, like a thread of water or ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "thread",
+   "ipa": "/θrɛd/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "bed"
+   ],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "thread"
+  },
+  "throwing": {
+   "definition": "The action of hurling something through the air; also, the shaping of pottery on a wheel.",
+   "form_of": "throw",
+   "frequency_rank": 4,
+   "hyphenation": "throw·ing",
+   "ipa": "/ˈθroʊɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "going"
+   ],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "throwing"
+  },
+  "thy": {
+   "definition": "Archaic possessive form of thou, meaning your, used before a consonant sound as in thy house.",
+   "form_of": "thou",
+   "frequency_rank": 4,
+   "hyphenation": "thy",
+   "ipa": "/ðaɪ/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "i",
+    "my"
+   ],
+   "pos": "determiner",
+   "pos_primary": "determiner",
+   "slant_rhymes": [
+    "life",
+    "night"
+   ],
+   "word": "thy"
+  },
+  "thyme": {
+   "definition": "A small aromatic herb of the mint family, prized for its warm, earthy flavor in cooking.",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "thyme",
+   "ipa": "/taɪm/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [
+    "mine"
+   ],
+   "word": "thyme"
+  },
+  "till": {
+   "definition": "Until, in time or in extent, as in working till dawn. As a noun it means a cash register or its drawer of money; as a ve",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "till",
+   "ipa": "/tɪl/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "will"
+   ],
+   "pos": "preposition; conjunction; noun; verb",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "till"
+  },
+  "tirelessly": {
+   "definition": "Without ever slowing, flagging, or needing rest.",
+   "form_of": null,
+   "frequency_rank": 3,
+   "hyphenation": "tire·less·ly",
+   "ipa": "/ˈtaɪrləsli/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adverb",
+   "pos_primary": "adverb",
+   "slant_rhymes": [],
+   "word": "tirelessly"
+  },
+  "to": {
+   "definition": "As a preposition, indicating direction, destination, or a recipient, as in go to the store or give it to her; it also ma",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "to",
+   "ipa": "/tu/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "you",
+    "who",
+    "true"
+   ],
+   "pos": "preposition; adverb",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "to"
+  },
+  "traditional": {
+   "definition": "Relating to or handed down through tradition; following long-established custom rather than newer practice. Of a song or",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "tra·di·tion·al",
+   "ipa": "/trəˈdɪʃənəl/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "traditional"
+  },
+  "true": {
+   "definition": "In accordance with fact or reality; accurate, exact, or faithful to a standard, as a true copy or a true friend. As a ve",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "true",
+   "ipa": "/tru/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "to",
+    "you",
+    "who"
+   ],
+   "pos": "adjective; adverb; verb; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "true"
+  },
+  "tune": {
+   "definition": "A melody or air; also, the act or state of being adjusted to the correct pitch, or, of a device, to correct working orde",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "tune",
+   "ipa": "/tun/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "tune"
+  },
+  "unreeling": {
+   "definition": null,
+   "form_of": "unreel",
+   "frequency_rank": 0,
+   "hyphenation": null,
+   "ipa": "/ənˈrilɪŋ/",
+   "is_headword": 0,
+   "perfect_rhymes": [],
+   "pos": null,
+   "pos_primary": null,
+   "slant_rhymes": [],
+   "word": "unreeling"
+  },
+  "vacant": {
+   "definition": "Empty or unoccupied, whether describing a room, a job, or an expression that shows no thought behind it.",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "va·cant",
+   "ipa": "/ˈveɪkənt/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "vacant"
+  },
+  "vast": {
+   "definition": "Extremely large in size, extent, or degree, whether describing a landscape, a sum of money, or a difference of opinion.",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "vast",
+   "ipa": "/væst/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "adjective; noun",
+   "pos_primary": "adjective",
+   "slant_rhymes": [
+    "detached"
+   ],
+   "word": "vast"
+  },
+  "venturing": {
+   "definition": "Daring to attempt something risky or uncertain, or embarking on an undertaking without guarantee of success.",
+   "form_of": "venture",
+   "frequency_rank": 3,
+   "hyphenation": "ven·tur·ing",
+   "ipa": "/ˈvɛntʃərɪŋ/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "venturing"
+  },
+  "warm": {
+   "definition": "Having a pleasant or moderate heat, or, of people, showing friendliness and affection; as a verb, to make or become heat",
+   "form_of": null,
+   "frequency_rank": 5,
+   "hyphenation": "warm",
+   "ipa": "/wɔrm/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "storm"
+   ],
+   "pos": "adjective; verb",
+   "pos_primary": "adjective",
+   "slant_rhymes": [],
+   "word": "warm"
+  },
+  "was": {
+   "definition": "The past-tense form of be used with I, he, she, and it, as in \"I was tired\".",
+   "form_of": "be",
+   "frequency_rank": 7,
+   "hyphenation": "was",
+   "ipa": "/wʌz/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "does"
+   ],
+   "pos": "verb",
+   "pos_primary": "verb",
+   "slant_rhymes": [
+    "love"
+   ],
+   "word": "was"
+  },
+  "where": {
+   "definition": "A word asking or naming a place, as in where do you live, or joining clauses to mean in, at, or to which place. It can a",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "where",
+   "ipa": "/wɛr/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "there",
+    "fair",
+    "somewhere"
+   ],
+   "pos": "adverb; conjunction; pronoun; noun",
+   "pos_primary": "adverb",
+   "slant_rhymes": [
+    "tell"
+   ],
+   "word": "where"
+  },
+  "who": {
+   "definition": "Which person or persons, used in questions such as who is there, and as a relative pronoun referring to people, as in th",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "who",
+   "ipa": "/hu/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "to",
+    "you",
+    "true"
+   ],
+   "pos": "pronoun; noun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [],
+   "word": "who"
+  },
+  "will": {
+   "definition": "As an auxiliary verb, marks the future tense or expresses willingness, capability, or habit; as a main verb, it means to",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "will",
+   "ipa": "/wɪl/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "till"
+   ],
+   "pos": "verb; noun",
+   "pos_primary": "verb",
+   "slant_rhymes": [],
+   "word": "will"
+  },
+  "with": {
+   "definition": "Accompanied by; by means of; having or carrying; in relation to or in opposition to, as in fight with. As an adverb, alo",
+   "form_of": "withe",
+   "frequency_rank": 7,
+   "hyphenation": "with",
+   "ipa": "/wɪð/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "preposition; adverb",
+   "pos_primary": "preposition",
+   "slant_rhymes": [
+    "his",
+    "bridge"
+   ],
+   "word": "with"
+  },
+  "without": {
+   "definition": "Lacking or not having something, as in without money; also, in older or literary use, outside of a place. As an archaic ",
+   "form_of": null,
+   "frequency_rank": 6,
+   "hyphenation": "with·out",
+   "ipa": "/wɪˈðaʊt/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "out"
+   ],
+   "pos": "preposition; adverb; conjunction; noun",
+   "pos_primary": "preposition",
+   "slant_rhymes": [],
+   "word": "without"
+  },
+  "words": {
+   "definition": "The smallest units of language carrying distinct meaning, or angry debate and argument.",
+   "form_of": "word",
+   "frequency_rank": 5,
+   "hyphenation": "words",
+   "ipa": "/wɜrdz/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "words"
+  },
+  "worm": {
+   "definition": "A long, soft-bodied, legless invertebrate such as an earthworm, or loosely any similarly shaped crawling creature. As a ",
+   "form_of": null,
+   "frequency_rank": 4,
+   "hyphenation": "worm",
+   "ipa": "/wɜrm/",
+   "is_headword": 1,
+   "perfect_rhymes": [],
+   "pos": "noun; verb",
+   "pos_primary": "noun",
+   "slant_rhymes": [],
+   "word": "worm"
+  },
+  "you": {
+   "definition": "The pronoun used for the person or people addressed, serving as both subject and object, singular or plural. It has repl",
+   "form_of": null,
+   "frequency_rank": 7,
+   "hyphenation": "you",
+   "ipa": "/ju/",
+   "is_headword": 1,
+   "perfect_rhymes": [
+    "to",
+    "who",
+    "true"
+   ],
+   "pos": "pronoun",
+   "pos_primary": "pronoun",
+   "slant_rhymes": [],
+   "word": "you"
+  }
+ }
+}

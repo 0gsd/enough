@@ -120,8 +120,8 @@ def runs_dir() -> Path:
 # ---------------------------------------------------------------------------
 
 def test_registered_and_traced_under_the_universal_toggle():
-    assert TT.TOOL_NAMES == ("thym_check", "thym_run")
-    for name in TT.TOOL_NAMES:
+    assert TT.TOOL_NAMES == ("thym_check", "thym_run", "thym_moves")
+    for name in [n for n in TT.TOOL_NAMES if TT.documented(n)]:
         assert T._DISPATCH[name] is TT._RUNNERS[name]
         assert T._TRACE_TOGGLE[name] == "trace_log_enabled"
     assert TT.SKILL_NAME == CT.SKILL_NAME
@@ -131,7 +131,7 @@ def test_the_block_names_both_tools_says_they_need_the_skill_and_stays_under_the
     block = prompt.CANON_TOOL_INSTRUCTIONS
     assert len(block) < 1_000, len(block)
     assert '<tool name="thym_check">' in block and '<tool name="thym_run">' in block
-    assert "both need the\nmacrocosm-oes skill on" in block
+    assert "`thym_run` runs one, `thym_moves` lists\nmoves (macrocosm-oes skill on)" in block
 
 
 def test_the_documented_examples_run(project: Path):
@@ -190,8 +190,9 @@ def test_check_answers_ok_and_the_plan_line_exactly_as_the_command_line_prints_i
     printed = capsys.readouterr().out.strip()
     r = run(project, tool("thym_check", path="orchard/publish-story.thym", inputs="story=orchard/notes.md"))
     assert r.ok, r.body
-    assert r.body.splitlines() == ["ok", printed, "takes story: text; gives out: package"]
-    assert printed == "publish-story: 7 nodes, 3 ask a model; largest prompt 307 tokens, output budget 0 words"
+    assert r.body.splitlines() == ["ok", *printed.splitlines(), "takes story: text; gives out: package"]
+    assert printed.splitlines() == ["publish-story: 7 nodes, 3 ask a model; largest prompt 307 tokens, output budget 0 "
+                                    "words", "3 model calls, at most 9, on this machine (g40-04)"]
     assert not runs_dir().exists(), "a check writes nothing"
 
 
@@ -199,9 +200,10 @@ def test_check_without_inputs_plans_on_the_programs_takes_and_says_the_prompt_is
     r = run(project, tool("thym_check", path="read-my-way"))                  # a name reaches a shipped program
     assert r.ok, r.body
     lines = r.body.splitlines()
-    assert lines[:3] == ["ok", "read-my-way: 5 nodes, 3 ask a model; largest prompt 0 tokens, output budget 300 words",
+    assert lines[:4] == ["ok", "read-my-way: 5 nodes, 3 ask a model; largest prompt 0 tokens, output budget 300 words",
+                         "3 model calls, at most 9, on this machine (g40-04)",
                          "takes p: package, mine: morph, now: context; gives r: short"]
-    assert "not measured" in lines[3] and "<inputs>" in lines[3]
+    assert "not measured" in lines[4] and "<inputs>" in lines[4]
 
 
 def test_check_refusal_names_the_file_the_line_and_the_check(project: Path):
@@ -224,7 +226,8 @@ def test_check_works_while_agent_free(project: Path):
 def test_check_of_an_unknown_program_lists_the_names(project: Path):
     r = run(project, tool("thym_check", path="nope.thym"))
     assert not r.ok and "no program 'nope.thym'" in r.body
-    assert "the programs here: a-story, leaky, publish-story, open-house, read-my-way." in r.body, r.body
+    assert "the programs here: a-story, leaky, publish-story, " in r.body, r.body          # the project's first
+    assert "open-house" in r.body and "read-my-way" in r.body, "then the shipped ones (their number grows)"
 
 
 # ---------------------------------------------------------------------------
@@ -234,7 +237,8 @@ def test_check_of_an_unknown_program_lists_the_names(project: Path):
 def test_run_refuses_a_plan_that_asks_when_no_model_runs(project: Path):
     r = run(project, tool("thym_run", program="publish-story", path="orchard/notes.md"))
     assert not r.ok and not r.side_effects
-    assert ("orchard/publish-story.thym:12: refused at plan (rules): 3 steps ask a model; no model is running. "
+    assert ("orchard/publish-story.thym:12: refused at plan (rules): 3 steps ask a model on the local route, the "
+            "first `let f = derive story` (line 12); no model is running. "
             "Start the model") in r.body, r.body
     assert not runs_dir().exists()
 
@@ -243,7 +247,8 @@ def test_run_refuses_a_plan_that_asks_while_agent_free_and_runs_one_that_does_no
     set_agent_free(True)
     r = TT.run_thym_run(project, call(tool("thym_run", program="publish-story", path="orchard/notes.md")))
     assert not r.ok
-    assert ("orchard/publish-story.thym:12: refused at plan (agent-free): 3 steps ask a model; agent-free is on. "
+    assert ("orchard/publish-story.thym:12: refused at plan (agent-free): 3 steps ask a model on the local route, "
+            "the first `let f = derive story` (line 12); agent-free is on. "
             "Turn agent-free off") in r.body, r.body
     assert not runs_dir().exists()
     r = TT.run_thym_run(project, call(tool("thym_run", program="open-house", path="meadow")))
@@ -255,8 +260,9 @@ def test_run_refuses_a_plan_that_asks_while_agent_free_and_runs_one_that_does_no
 def test_run_of_an_unknown_program_lists_the_names_and_runs_nothing(project: Path):
     r = run(project, tool("thym_run", program="nope", path="orchard/notes.md"))
     assert not r.ok
-    assert r.body == ("error: no program 'nope': give a program's name or the path of a .thym file; the programs "
-                      "here: a-story, leaky, publish-story, open-house, read-my-way.")
+    assert r.body.startswith("error: no program 'nope': give a program's name or the path of a .thym file; the "
+                             "programs here: a-story, leaky, publish-story, "), r.body
+    assert "open-house" in r.body and "read-my-way" in r.body
     assert not runs_dir().exists()
 
 
@@ -312,7 +318,8 @@ def test_further_inputs_come_as_inputs_lines(project: Path):
     """With all three inputs given, the plan is made, and its asking steps are what refuses (no model here)."""
     lines = "mine=orchard/plain-letter.morph.cosm\nnow=orchard/on-the-train.context.cosm"
     r = run(project, tool("thym_run", program="read-my-way", path="orchard/orchard-notes.thym", inputs=lines))
-    assert not r.ok and "refused at plan (rules): 3 steps ask a model; no model is running" in r.body, r.body
+    assert not r.ok and ("refused at plan (rules): 3 steps ask a model on the local route, the first `give expand "
+                         "(atem f) with f to 300 words` (line 20); no model is running") in r.body, r.body
     r = run(project, tool("thym_run", program="read-my-way", path="orchard/orchard-notes.thym", inputs="mine"))
     assert not r.ok and "an <inputs> line is name=path" in r.body
 
@@ -331,3 +338,92 @@ def test_a_program_by_path_and_an_input_by_its_full_path(project: Path):
     """A model often echoes a file's full path; one inside the project is read as project-relative."""
     r = run(project, tool("thym_run", program=str(project / "a.thym"), path=str(project / "orchard" / "notes.md")))
     assert not r.ok and r.body.startswith("error: a.thym:12: refused at plan (rules): 3 steps ask a model"), r.body
+
+
+# ---------------------------------------------------------------------------
+# 0.6: the route, the ceiling, folders and several outputs, thym_moves
+# ---------------------------------------------------------------------------
+
+def gate(monkeypatch: pytest.MonkeyPatch, open_: bool) -> list:
+    from enough import cloud
+    asked: list = []
+
+    def status() -> dict:
+        asked.append(1)
+        return {"open": open_, "reason": None if open_ else "'local models only' is on in the broker",
+                "denial": None, "model_id": "vendor/large-model" if open_ else None}
+    monkeypatch.setattr(cloud, "gate_status", status)
+    monkeypatch.setattr(cloud, "chat_completion", lambda *a, **kw: (_ for _ in ()).throw(AssertionError("asked")))
+    return asked
+
+
+def test_check_on_the_cloud_shows_the_route_and_a_shut_gate(project: Path, monkeypatch):
+    gate(monkeypatch, True)
+    r = run(project, tool("thym_check", path="orchard/publish-story.thym", inputs="story=orchard/notes.md",
+                          model="cloud"))
+    assert r.ok and r.body.splitlines()[2] == "3 model calls, at most 9, on the cloud (openrouter: vendor/large-model)"
+    gate(monkeypatch, False)
+    r = run(project, tool("thym_check", path="orchard/publish-story.thym", model="cloud"))
+    assert r.ok and ("orchard/publish-story.thym:12: refused at plan (cloud): the cloud is not open for this run: "
+                     "'local models only' is on in the broker") in r.body, r.body
+    r = run(project, tool("thym_check", path="orchard/publish-story.thym", model="sky"))
+    assert not r.ok and "<model> is local, cloud or cloud:<model id>" in r.body
+
+
+def test_run_on_the_cloud_refuses_a_shut_gate_and_never_falls_back(project: Path, model: list, monkeypatch):
+    asked = gate(monkeypatch, False)
+    r = run(project, tool("thym_run", program="publish-story", path="orchard/notes.md", model="cloud"))
+    assert not r.ok and "refused at plan (cloud): the cloud is not open for this run" in r.body, r.body
+    assert asked and model == [] and not runs_dir().exists(), "never the local model instead"
+    r = run(project, tool("thym_run", program="publish-story", path="orchard/notes.md", calls="none"))
+    assert not r.ok and "<calls> is a ceiling of at least 1 model call" in r.body
+
+
+def test_run_takes_a_folder_and_lists_every_output(project: Path):
+    shutil.copytree(SUITE / "inputs" / "little-tool", project / "tool")
+    shutil.copyfile(SUITE / "programs" / "split-a-folder.thym", project / "split.thym")
+    r = run(project, tool("thym_run", program="split.thym", path="tool"))
+    assert r.ok, r.body
+    out = r.body.splitlines()
+    assert out[1].startswith("code: ") and out[1].endswith("/ (a folder of 3 files)")
+    assert out[2].startswith("prose: ") and out[3].startswith("size: ")
+    r = run(project, tool("thym_run", program="split.thym", path="orchard/notes.md"))
+    assert not r.ok and "notes.md is a file; repo takes a folder" in r.body
+    r = run(project, tool("thym_check", path="split.thym"))
+    assert "gives code: folder, prose: folder, size: number" in r.body
+
+
+def moves_call(project: Path, text: str) -> T.ToolResult:
+    """`thym_moves` through its runner: it is dispatched once the block names it (`TT.documented`)."""
+    return TT.run_thym_moves(project, call(text))
+
+
+def test_thym_moves_lists_what_a_program_of_a_version_may_use(project: Path):
+    run = moves_call                                                    # noqa: F811 - the runner, as above
+    r = run(project, tool("thym_moves"))
+    assert r.ok and r.key == "thym 1"
+    lines = r.body.splitlines()
+    assert lines[0].startswith("the moves a thym 1 program may use (")
+    tell = next(ln for ln in lines if ln.startswith("- tell "))
+    assert tell.startswith("- tell <fabula | item | volume") and "[with <morph>] gives short" in tell, tell
+    assert "; asks a model, scaffold outline; contract coverage, no-invention" in tell, tell
+    assert "- context of <text | package> gives context; asks nothing." in r.body
+    zero = run(project, tool("thym_moves", version="0"))
+    assert zero.ok and len(zero.body.splitlines()) < len(lines), "a thym 0 program sees fewer moves"
+    one = run(project, tool("thym_moves", move="derive"))
+    assert one.ok and one.body.startswith("- derive <")
+    assert not run(project, tool("thym_moves", move="dance")).ok
+    assert not run(project, tool("thym_moves", version="2")).ok
+    set_skill(project, False)
+    off = run(project, tool("thym_moves"))
+    assert not off.ok and "macrocosm-oes" in off.body
+
+
+def test_thym_moves_is_registered_and_the_block_stays_under_its_cap():
+    """The MacroCOSM block shown to the model is capped at 1,000 characters (tests/test_prompt_weight.py
+    `CANON_BLOCK_MAX`); it names `thym_moves` now, so the tool is dispatched (the prompt-weight guard: a tool is
+    callable only while a prompt names it, `TT.documented`)."""
+    assert len(prompt.CANON_TOOL_INSTRUCTIONS) <= 1_000
+    assert TT._RUNNERS["thym_moves"] is TT.run_thym_moves
+    assert TT.documented("thym_moves")
+    assert T._DISPATCH["thym_moves"] is TT.run_thym_moves

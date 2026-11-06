@@ -1,0 +1,9 @@
+-- refused: compile type line 8
+thym 1
+
+program join-the-counts
+  why: join makes a short of strings, lines or shorts; a number is said first.
+  gives s: short
+
+  give join [1, 2, 3]
+end

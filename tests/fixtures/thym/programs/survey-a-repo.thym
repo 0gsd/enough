@@ -1,0 +1,12 @@
+thym 1
+
+program survey-a-repo
+  why: a folder of Python read by its syntax into the outline of a fabulac, before any model reads a
+       line.
+  must: nothing in the folder is run, imported or installed.
+
+  takes repo: folder
+  gives f: fabula
+
+  give survey repo                                 -- files, parts, interfaces, settings, licence: rules only
+end

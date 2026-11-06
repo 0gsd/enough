@@ -158,14 +158,19 @@ def _with_covers(cat: dict, story: Value) -> dict:
 
 
 @implements("derive")
-def derive(ctx: Any, story: Value, **_: Any) -> Request:
-    """A text decompiled into its fabula (THYM.md 6.3), by Canon's derivation over the coprocessor."""
+def derive(ctx: Any, story: Value, **mods: Any) -> Request:
+    """A text decompiled into its fabula (THYM.md 6.3), by Canon's derivation over the coprocessor. A text read `as
+    code` and a folder folded are the fabulac's (`code.py`, THYM 20.6)."""
+    branch = _code.derive_branch(ctx, story, mods)
+    if branch is not None:
+        return branch
     canon = engine(ctx, "canon")
     feed = ctx.engines.get("feed")
     text = story.text()
     name, sha, size = _text_facts(story)
     adapter = EngineAdapter(ctx, "derive")
-    got = canon.derive_passages(text, source_name=name, complete=adapter, lookup=feed)
+    verse = _verse_args(ctx, mods)
+    got = canon.derive_passages(text, source_name=name, complete=adapter, lookup=feed, **verse)
 
     def parse(out: Any) -> Value:
         reply = out if isinstance(out, str) else mc.dump(out) if isinstance(out, dict) else str(out or "")
@@ -178,13 +183,13 @@ def derive(ctx: Any, story: Value, **_: Any) -> Request:
         model = adapter.model or got.get("model") or model_of(out if isinstance(out, dict) else {})
         cat = canon.derive_finish(text, nodes=copy.deepcopy(got["nodes"]), atem_reply=reply, source_name=name,
                                   sha256=sha, size=size, model=model, chunks=got["chunks"], dropped=got["dropped"],
-                                  now=ctx.now)
+                                  now=ctx.now, **{k: v for k, v in verse.items() if k == "flavour"})
         return Value("fabula", _with_covers(cat, story))
 
     def repair(value: Value, failed: list) -> Value | None:
         read = None
         if "coverage" in {f.get("name") for f in failed}:
-            read = _read_gaps(ctx, canon, value, story, adapter, name)
+            read = _read_gaps(ctx, canon, value, story, adapter, name, verse.get("flavour"))
             if read is not None:
                 got["nodes"] = list(fabula_doc(read)[1])                # a later attempt keeps what was read
         return _repair_fabula(ctx, read or value, failed, story) or read
@@ -192,6 +197,15 @@ def derive(ctx: Any, story: Value, **_: Any) -> Request:
     return Request(contract={"schema": DERIVE_SCHEMA, "repair": ["drop-unresolved-spans", "normalise-stance",
                                                                  "ground-terms"]},
                    inputs={"messages": messages_value(got["messages"])}, parse=parse, repair=repair)
+
+
+def _verse_args(ctx: Any, mods: dict) -> dict:
+    """What the engine is told of a `derive … as verse` (THYM 20.5): the flavour `fabulap` and the pronunciations
+    its verse rules read (the `pron` engine, recorded like FEED's). `as prose`, or no `as`, is a fabulan, told as
+    before (nothing added)."""
+    if mods.get("as") != "verse":
+        return {}
+    return {"flavour": "fabulap", "pron": ctx.engines.get("pron")}
 
 
 def _atem_unread(atem: Any) -> str | None:
@@ -207,7 +221,8 @@ def _atem_unread(atem: Any) -> str | None:
     return "no line"
 
 
-def _read_gaps(ctx: Any, canon: Any, value: Value, story: Value, adapter: EngineAdapter, name: str) -> Value | None:
+def _read_gaps(ctx: Any, canon: Any, value: Value, story: Value, adapter: EngineAdapter, name: str,
+               flavour: str | None = None) -> Value | None:
     """`coverage`'s narrow repair: the lines no item covers, read once more as one passage through the coprocessor
     (one more recorded candidate), the items found merged in. None when every sentence is covered already."""
     cm = cover_map(value, story)
@@ -216,7 +231,8 @@ def _read_gaps(ctx: Any, canon: Any, value: Value, story: Value, adapter: Engine
         return None
     cat, items = fabula_doc(value)
     nodes = canon.derive_gaps(story.text(), nodes=copy.deepcopy(items), spans=spans, source_name=name,
-                              complete=adapter, lookup=ctx.engines.get("feed"))
+                              complete=adapter, lookup=ctx.engines.get("feed"),
+                              **({"flavour": flavour} if flavour else {}))
     return Value("fabula", _with_covers({**copy.deepcopy(cat), "nodes": nodes}, story))
 
 
@@ -278,12 +294,16 @@ def _unlink(it: dict, gone: set[str]) -> None:
 
 @implements("derive.scaffold")
 @implements("rules-twin")
-def derive_rules(ctx: Any, story: Value, **_: Any) -> Value:
+def derive_rules(ctx: Any, story: Value, **mods: Any) -> Value:
     """`rules-twin`: Canon's rules-mode twin, as Canon makes one without a model (MacroCOSM 18.4.3): the words the
-    text leans on, grounded in FEED, and the names it uses, each with the line of its first use; no claims."""
+    text leans on, grounded in FEED, and the names it uses, each with the line of its first use; no claims. A text
+    read `as code` takes `file-outline`, and a folder has no scaffold (`code.py`)."""
+    branch = _code.derive_scaffold_branch(ctx, story, mods)
+    if branch is not None:
+        return branch
     name, sha, size = _text_facts(story)
     cat = engine(ctx, "canon").derive_rules(story.text(), source_name=name, sha256=sha, size=size,
-                                            lookup=ctx.engines.get("feed"), now=ctx.now)
+                                            lookup=ctx.engines.get("feed"), now=ctx.now, **_verse_args(ctx, mods))
     return Value("fabula", cat)
 
 
@@ -293,7 +313,11 @@ def derive_rules(ctx: Any, story: Value, **_: Any) -> Value:
 
 @implements("tell")
 def tell(ctx: Any, x: Value, **mods: Any) -> Request:
-    """A telling of a fabula, in an order, in a morph (THYM.md 6.3), cited sentence by sentence."""
+    """A telling of a fabula, in an order, in a morph (THYM.md 6.3), cited sentence by sentence. `as code` and a
+    catem's depths are the fabulac's (`code.py`, THYM 20.7)."""
+    branch = _code.tell_branch(ctx, x, mods)
+    if branch is not None:
+        return branch
     fab = as_fabula(x)
     cat, items = fabula_doc(fab)
     order = mods.get("as") or mods.get("by") or default_order(cat, items)
@@ -317,7 +341,11 @@ def tell(ctx: Any, x: Value, **mods: Any) -> Request:
 @implements("outline")
 def tell_outline(ctx: Any, x: Value, **mods: Any) -> Value:
     """`outline`: Canon's rules-mode short, the ordered outline said in the items' own sentences with the footer that
-    says "by rules, without a model". A morph cannot be kept by rules, and is not."""
+    says "by rules, without a model". A morph cannot be kept by rules, and is not. A catem's depth takes
+    `uses-outline`, and `as code` has no scaffold (`code.py`)."""
+    branch = _code.tell_scaffold_branch(ctx, x, mods)
+    if branch is not None:
+        return branch
     fab = as_fabula(x)
     cat, items = fabula_doc(fab)
     order = mods.get("as") or mods.get("by") or default_order(cat, items)
@@ -414,7 +442,7 @@ def expand(ctx: Any, a: Value, **mods: Any) -> Request:
     def foot(model: str | None) -> str:
         who = f"by {model or 'a model'}"
         src = cat.get("source") if isinstance(cat.get("source"), dict) else None
-        tail = "compiled from its EMF twin" if src and src.get("path") else "a standalone EMF, compiled"
+        tail = "compiled from its fabula" if src and src.get("path") else "a standalone fabula, compiled"
         return f"*a short of {source_name(cat, fab)}, expanded from its atem to about {n} words, {tail} on " \
                f"{utc_day(ctx)} {who}*"
 
@@ -442,6 +470,8 @@ def _coverage(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> t
     as a condition, `f covers t`. The map (`cover_map`) is the one `derived.covers` records, and on success the
     verdict's why is the map itself, so the trace records it. A scaffold's output promises no coverage: rules cannot
     read claims, and say so."""
+    if output.type == "fabula" and _code.flavour_of(fabula_doc(output)[0]) == "fabulac":
+        return _code.code_coverage(output, inputs)          # a file read as code (THYM 20.6)
     fab, tel = _pair(output, inputs)
     if fab is None or tel is None:
         return False, "no fabula and telling to lay over each other" if fab is None else "no telling to cover"
@@ -526,15 +556,20 @@ def _stance_kept(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
     return True, ""
 
 
-_FOOTER = re.compile(r"^\*a short of .+?, (?:a standalone EMF, )?(?:told as the author told it|told by weight), "
-                     r"compiled (?:from its EMF twin )?on \d{4}-\d{2}-\d{2} by .+\*$")
+# MacroCOSM OES 18.4.4: "compiled from its fabula" / "a standalone fabula"; a footer an earlier edition wrote ("from
+# its EMF twin", "a standalone EMF") reads the same, so a short on disk or in a recorded run still holds.
+_FOOTER = re.compile(r"^\*a short of .+?, (?:a standalone (?:fabula|EMF), )?(?:told as the author told it|told by weight), "
+                     r"compiled (?:from its (?:fabula|EMF twin) )?on \d{4}-\d{2}-\d{2} by .+\*$")
 
 
 @check("footer")
 def _footer(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """A short ends with MacroCOSM 18.4.4's footer line: what it is a short of, in which order, when, and by which
-    model or by rules (`*a short of notes.md, told as the author told it, compiled from its EMF twin on 2026-10-23 by
-    g40-04*`)."""
+    model or by rules (`*a short of notes.md, told as the author told it, compiled from its fabula on 2026-10-23 by
+    g40-04*`; the earlier edition's "from its EMF twin" reads the same). A cshort's and a catem's footers are MacroCOSM 18.4.7's (`code.py`)."""
+    if _code.is_code_telling(output):
+        why = _code.footer_problem(output, inputs, ctx)
+        return (why is None), (why or "")
     lines = [ln.strip() for ln in output.text().replace("\r\n", "\n").split("\n") if ln.strip()]
     if not lines:
         return False, "the short is empty"
@@ -643,6 +678,8 @@ def _atem_shape(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) ->
     """The line is 15 to 25 words; the focus at most two sentences; push one; pull one (MacroCOSM 18.3.5). A scaffold
     (THYM.md 19) promises less: a line of at most 25 words, the parts it cannot give as open questions."""
     a = output.mapping() if isinstance(output.payload, dict) else {"line": output.text()}
+    if output.type == "fabula":
+        a = _code.atem_of(output)                          # the fold's fabulac: its catalog's atem (THYM 20.6)
     a = a or {}
     pending = output.state == "pending"
     line = a.get("line")
@@ -691,5 +728,7 @@ def _span_inside(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
         return False, f"the short does not say {', '.join(lost)}, which the atem centres on"
     return True, ""
 
+
+from enough.thym.moves import code as _code  # noqa: E402 - the fabulac's branches of derive and tell
 
 __all__ = ["as_fabula", "atem", "cited_outline", "default_order", "derive", "expand", "ordered", "tell"]

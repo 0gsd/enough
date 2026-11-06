@@ -165,6 +165,14 @@
     var cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') return null;
     if (parseFloat(cs.opacity) === 0) return null;
+    // Inside a card the browser is not drawing (`content-visibility: auto`,
+    // scrolled out of its scroller) nothing paints and nothing can be
+    // clicked. Asking such an element for its rect still lays it out, inside
+    // the card's placeholder height, so a long list spills over the cards
+    // that ARE drawn and reads as covered by them (0.6: the specification's
+    // terms gained longer "mentioned in" lists and a term card just above
+    // the fold reported six of its links as covered by the card in view).
+    if (el.checkVisibility && !el.checkVisibility({ contentVisibilityAuto: true })) return null;
     var r = el.getBoundingClientRect();
     if (r.width < 1 || r.height < 1) return null;
     var cx = r.left + r.width / 2, cy = r.top + r.height / 2;

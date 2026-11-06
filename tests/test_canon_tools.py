@@ -63,7 +63,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     (proj / "pic.png").write_bytes(b"\x89PNG\r\n\x1a\n\x00\x00")
     (proj / "report.pdf").write_bytes(b"%PDF-1.4\n\x00\x01\x02")
     (proj / "other.md").write_text("Some text.\n", encoding="utf-8")
-    (proj / "other.md.cosm").write_text("oes: canon/1\nid: canon/x\nname: x\nnodes: []\n", encoding="utf-8")
+    (proj / "other.md.fabulan.cosm").write_text("oes: canon/1\nid: canon/x\nname: x\nnodes: []\n", encoding="utf-8")
     (proj / "odd.cosm").write_text("oes: nonesuch/9\nid: x\nnodes: []\n", encoding="utf-8")
     (proj / "folder").mkdir()
     # A package's folder form (0.5.0, THYM.md 15): kept whole, its text never derived in place.
@@ -156,7 +156,7 @@ def test_every_documented_example_runs(project: Path):
     assert r.ok and r.body.startswith("# macrocosm-oes"), r.body[:80]
     r = run(project, derive)
     assert r.ok, r.body
-    assert (project / "notes.md.cosm").is_file()
+    assert (project / "notes.md.fabulan.cosm").is_file()
     r = run(project, lint)
     assert r.ok and "0 errors" in r.body, r.body
     r = run(project, atem)
@@ -180,7 +180,7 @@ def test_a_tool_turn_announces_the_write_as_a_canon_event(project: Path, monkeyp
     asyncio.run(server._handle_tool(session, call, []))
     assert [e for e, _d in seen] == ["tool", "tool", "canon"]
     assert seen[1][1]["status"] == "ok"
-    assert seen[2][1]["state"] == "done" and seen[2][1]["result"]["twin_path"] == "hello.md.cosm"
+    assert seen[2][1]["state"] == "done" and seen[2][1]["result"]["twin_path"] == "hello.md.fabulan.cosm"
     assert session.history[-1]["content"].startswith('<tool_result name="emf_derive"')
 
 
@@ -330,30 +330,30 @@ def test_derive_in_rules_mode(project: Path):
     ui.write_text(json.dumps({"chief_readvisor_name": "Mo"}), encoding="utf-8")
     r = run(project, tool("emf_derive", path="notes.md"))
     assert r.ok, r.body
-    twin = project / "notes.md.cosm"
+    twin = project / "notes.md.fabulan.cosm"
     data = twin_data(twin)
-    assert data["oes"] == "emf/1" and data["derived"]["mode"] == "rules"
+    assert data["oes"] == "fabula/1" and data["derived"]["mode"] == "rules"
     assert data["derived"]["by"] == "Mo" and data["derived"]["completeness"] == "full"
     assert lint_errors(twin) == []
     assert "mode: rules — a scaffold, no model read it" in r.body and "by Mo" in r.body
-    assert "items: L Lexicon" in r.body and "atem: " in r.body
+    assert "items: I " in r.body and " · L Lexicon " in r.body and "atem: " in r.body   # all ten modules, I first
     snap = r.side_effects[CT.SIDE_EFFECT]
     assert snap["kind"] == "emf" and snap["state"] == "done" and snap["by"] == "Mo"
-    assert snap["result"]["twin_path"] == "notes.md.cosm" and snap["result"]["state"] == "fresh"
+    assert snap["result"]["twin_path"] == "notes.md.fabulan.cosm" and snap["result"]["state"] == "fresh"
     assert set(snap) >= {"id", "path", "phase", "chunk", "chunks", "message", "mode", "error",
                          "started_at", "finished_at"}
     # The project catalog now lists the twin on its text.
-    assert "notes.md.cosm" in (project / canon.PROJECT_CATALOG).read_text(encoding="utf-8")
+    assert "notes.md.fabulan.cosm" in (project / canon.PROJECT_CATALOG).read_text(encoding="utf-8")
 
 
 def test_derive_in_model_mode(project: Path, model: list):
     r = run(project, tool("emf_derive", path="notes.md"))
     assert r.ok, r.body
-    data = twin_data(project / "notes.md.cosm")
+    data = twin_data(project / "notes.md.fabulan.cosm")
     assert data["derived"]["mode"] == "model" and data["derived"]["model"] == "fake-model"
     assert data["derived"]["by"] == prompt.chief_name() == "Ed"
     assert any(n["id"].startswith("P:claim/") for n in data["nodes"])
-    assert lint_errors(project / "notes.md.cosm") == []
+    assert lint_errors(project / "notes.md.fabulan.cosm") == []
     assert "mode: model (fake-model)" in r.body
     assert all(kw.get("llm_url") == "http://127.0.0.1:9" for _m, kw in model)
     assert r.side_effects[CT.SIDE_EFFECT]["mode"] == "model"
@@ -383,10 +383,10 @@ def test_a_model_that_dies_writes_nothing(project: Path, monkeypatch: pytest.Mon
     CT.configure(llm_url="http://127.0.0.1:9")
     r = run(project, tool("emf_derive", path="notes.md"))
     assert not r.ok and "the model became unavailable (the gate closed); nothing was written" in r.body, r.body
-    assert not (project / "notes.md.cosm").exists()
+    assert not (project / "notes.md.fabulan.cosm").exists()
     r = run(project, tool("atem", path="notes.md"))
     assert not r.ok and "nothing was written" in r.body
-    assert not (project / "notes.md.cosm").exists()
+    assert not (project / "notes.md.fabulan.cosm").exists()
 
 
 def test_a_model_reads_only_short_texts_in_a_chat_turn(project: Path, model: list):
@@ -396,7 +396,7 @@ def test_a_model_reads_only_short_texts_in_a_chat_turn(project: Path, model: lis
     r = run(project, tool("emf_derive", path="mid.md"))
     assert r.ok, r.body
     assert model == [], "no model call for a long text inside a chat turn"
-    data = twin_data(project / "mid.md.cosm")
+    data = twin_data(project / "mid.md.fabulan.cosm")
     assert data["derived"]["mode"] == "rules" and "model" not in data["derived"]
     assert f"{len(MID):,} characters: {CT.LONG_FOR_A_TURN}" in r.body
     assert "a full model pass on a text this long belongs in the reader's decompile, which runs in the " \
@@ -422,12 +422,12 @@ def test_the_length_refusal(project: Path):
     assert not r.ok and "that's long for a chat turn — use atem in the reader instead" in r.body
     r = run(project, tool("atem", text=LONG))
     assert not r.ok and "long for a chat turn" in r.body
-    assert not (project / "long.md.cosm").exists()
+    assert not (project / "long.md.fabulan.cosm").exists()
 
 
 def test_an_absolute_path_inside_the_project_is_taken(project: Path):
     r = run(project, tool("emf_derive", path=str(project / "hello.md")))
-    assert r.ok and (project / "hello.md.cosm").is_file(), r.body
+    assert r.ok and (project / "hello.md.fabulan.cosm").is_file(), r.body
     # Anything else stays inside the project, as the routes read it: the leading slash is dropped.
     r = run(project, tool("emf_derive", path="/etc/hosts"))
     assert not r.ok and "no such file: etc/hosts" in r.body
@@ -442,7 +442,7 @@ def test_a_job_holding_the_file_wins(project: Path):
         assert not r.ok and "is being derived right now" in r.body, r.body
         r = run(project, tool("atem", path="notes.md"))
         assert not r.ok and "is being derived right now" in r.body
-    assert not (project / "notes.md.cosm").exists()
+    assert not (project / "notes.md.fabulan.cosm").exists()
     assert run(project, tool("emf_derive", path="notes.md")).ok
 
 
@@ -457,16 +457,16 @@ def test_a_file_atem_makes_a_minimal_twin(project: Path):
     assert [ln.split(":")[0] for ln in lines[:4]] == ["line", "focus", "push", "pull"]
     assert "(open: a model has not read this passage)" in lines[2]
     assert "a new minimal twin (completeness: atem" in r.body and "by Ed" in r.body
-    data = twin_data(project / "hello.md.cosm")
+    data = twin_data(project / "hello.md.fabulan.cosm")
     assert data["derived"]["completeness"] == "atem" and data["derived"]["by"] == "Ed" and data["nodes"] == []
     snap = r.side_effects[CT.SIDE_EFFECT]
     assert snap["kind"] == "atem" and snap["result"]["written"] is True
     # A second atem keeps a full twin's items and changes only its atem: block.
     assert run(project, tool("emf_derive", path="notes.md")).ok
-    before = twin_data(project / "notes.md.cosm")
+    before = twin_data(project / "notes.md.fabulan.cosm")
     r = run(project, tool("atem", path="notes.md"))
     assert r.ok and "the twin's items are kept" in r.body
-    after = twin_data(project / "notes.md.cosm")
+    after = twin_data(project / "notes.md.fabulan.cosm")
     assert after["nodes"] == before["nodes"] and after["derived"] == before["derived"]
 
 
@@ -478,7 +478,7 @@ def test_an_inline_atem_writes_nothing(project: Path):
     assert sorted(p.name for p in project.iterdir()) == before
     # With a path too, the file is the passage's context and the refusals still apply.
     r = run(project, tool("atem", path="hello.md", text="A short note."))
-    assert r.ok and not (project / "hello.md.cosm").exists()
+    assert r.ok and not (project / "hello.md.fabulan.cosm").exists()
     r = run(project, tool("atem", path="meadow/NOTES.md", text="A short note."))
     assert not r.ok and "Holotype is browsed" in r.body
 
@@ -487,7 +487,7 @@ def test_a_model_atem(project: Path, model: list):
     r = run(project, tool("atem", path="hello.md"))
     assert r.ok and "line: The orchard pressed more juice this year" in r.body, r.body
     assert "stances: axiom 1 · hearsay 1" in r.body and "mode: model (fake-model)" in r.body
-    data = twin_data(project / "hello.md.cosm")
+    data = twin_data(project / "hello.md.fabulan.cosm")
     assert data["derived"]["mode"] == "model" and data["atem"]["push"].startswith("Ask the parish")
     r = run(project, tool("atem", text="Some passage to reduce."))
     assert r.ok and "written: nowhere" in r.body
@@ -509,7 +509,7 @@ def test_store_writes_answer_to_canon_enabled(project: Path):
     for text in (tool("emf_derive", path="canon:lib/guide.md"), tool("atem", path="canon:lib/guide.md")):
         r = run(project, text)
         assert not r.ok and r.body == broker.denial_canon_disabled(), r.body
-    assert not (canon.volume_dir("lib") / "guide.md.cosm").exists()
+    assert not (canon.volume_dir("lib") / "guide.md.fabulan.cosm").exists()
     # Reads, project writes and inline atems never ask.
     assert run(project, tool("cosm_read", path="canon:lib")).ok
     assert run(project, tool("atem", text="A passage.")).ok
@@ -520,13 +520,13 @@ def test_a_store_write_regenerates_the_volume_catalog(project: Path):
     set_toggle("canon_enabled", True)
     r = run(project, tool("emf_derive", path="canon:lib/guide.md"))
     assert r.ok, r.body
-    assert "wrote canon:lib/guide.md.cosm" in r.body
-    twin = canon.volume_dir("lib") / "guide.md.cosm"
+    assert "wrote canon:lib/guide.md.fabulan.cosm" in r.body
+    twin = canon.volume_dir("lib") / "guide.md.fabulan.cosm"
     data = twin_data(twin)
-    assert data["id"] == "emf/guide-md" and data["derived"]["by"] == "Ed"
+    assert data["id"] == "fabula/guide-md" and data["derived"]["by"] == "Ed"
     vol = macrocosm.load_volume(canon.volume_dir("lib") / canon.CATALOG_NAME)
     guide = next(it for it in vol.items.values() if it.data.get("path") == "guide.md")
-    assert guide.data["emf"]["path"] == "guide.md.cosm" and guide.data["emf"]["state"] == "fresh"
+    assert guide.data["fabula"]["path"] == "guide.md.fabulan.cosm" and guide.data["fabula"]["state"] == "fresh"
     assert r.side_effects[CT.SIDE_EFFECT]["path"] == "canon:lib/guide.md"
 
 
@@ -551,7 +551,7 @@ REFUSED = [
     ("report.pdf", 400, "convert it first"),
     ("data.csv", 400, "markdown and plain text"),
     ("empty.md", 400, "empty"),
-    ("other.md", 409, "not an EMF twin"),
+    ("other.md", 409, "is not a fabula"),
     ("../outside.md", 400, "invalid path"),
 ]
 
@@ -565,7 +565,7 @@ def test_tools_refuse_what_the_routes_refuse(project: Path, path: str, status: i
     for name in ("emf_derive", "atem"):
         r = run(project, tool(name, path=path))
         assert not r.ok and words in r.body, (name, r.body)
-    assert (project / "other.md.cosm").read_text(encoding="utf-8").startswith("oes: canon/1")
+    assert (project / "other.md.fabulan.cosm").read_text(encoding="utf-8").startswith("oes: canon/1")
 
 
 def test_the_routes_still_refuse_identically(project: Path):
@@ -587,3 +587,29 @@ def test_the_routes_still_refuse_identically(project: Path):
         # ...and a text it accepts still derives.
         r = c.post("/api/canon/derive", json={"path": "hello.md", "what": "emf"})
         assert r.status_code == 200, r.text
+
+
+def test_emf_derive_tool_takes_copyable_for_a_fabulap(project: Path):
+    """0.6 (lane C2b): `<copyable>yes</copyable>` keeps a fabulap's lines' words; without it, a line is its place."""
+    poem = (REPO / "tests" / "fixtures" / "fabula" / "verse" / "hope.txt").read_text(encoding="utf-8")
+    (project / "hope.txt").write_text(poem, encoding="utf-8")
+    r = run(project, tool("emf_derive", path="hope.txt", flavour="fabulap"))
+    assert r.ok, r.body
+    twin = project / "hope.txt.fabulap.cosm"
+    nodes = {n["id"]: n for n in twin_data(twin)["nodes"]}
+    assert "text" not in nodes["C:line/2"] and lint_errors(twin) == []
+    r = run(project, tool("emf_derive", path="hope.txt", flavour="fabulap", copyable="yes", force="yes"))
+    assert r.ok, r.body
+    nodes = {n["id"]: n for n in twin_data(twin)["nodes"]}
+    assert nodes["C:line/2"]["text"] == "That perches in the soul -"
+
+
+def test_the_report_counts_every_module_of_a_fabula_and_d_when_there_are_questions():
+    """The tools' report of a twin counts all ten modules in the fabula's order (MacroCOSM OES 18.4), not the first
+    edition's six, and the dialectic's D only when the volume carries questions."""
+    from enough import canon_tools as CT2
+    line = CT2._module_counts({"L": 3, "C": 2, "R": 1})
+    assert [part.split(" ")[0] for part in line.split(" · ")] == list("ILEKNCRPTX")
+    assert line.startswith("I ") and "L Lexicon 3" in line and " D " not in f" {line}"
+    with_d = CT2._module_counts({"D": 4})
+    assert with_d.split(" · ")[-1].startswith("D ") and with_d.endswith(" 4")

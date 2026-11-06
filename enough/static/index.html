@@ -31321,7 +31321,7 @@
     const COSM_SKIP = new Set(['id', 'type', 'name', 'summary', 'status', 'visibility', 'body']);
     const COSM_STANCES = ['axiom', 'observed', 'deduced', 'opinion', 'assumed', 'hearsay'];
     // "about this format": each MiniCOSM's section of the spec.
-    const COSM_SPEC_SECTION = { comprise: '19.1', cosm: '18.2', canon: '18.3', fabula: '18.4', doc: '18.5', ascribe: '19.2' };
+    const COSM_SPEC_SECTION = { comprise: '19.1', cosm: '18.2', canon: '18.3', fabula: '18.4', doc: '18.5', thym: '18.7', ascribe: '19.2' };
     const COSM = {
       path: null,          // what was asked for
       data: null,          // the /api/cosm payload
@@ -31876,7 +31876,7 @@
           return cosmPathHTML(v, ctx.holotype ? 'holotype' : (ctx.kind || 'file'), host);
         }
         // A Canon file's twins: their own path opens the twin itself.
-        if (canon && (k === 'twin' || k === 'emf') && cosmIsMap(v)) {
+        if (canon && (k === 'twin' || k === 'fabula' || k === 'emf') && cosmIsMap(v)) {
           return '<dl class="cosm-fields">' + Object.entries(v).map(([kk, vv]) => '<dt>' + cosmEsc(kk)
             + '</dt><dd>' + (kk === 'path' && typeof vv === 'string' ? cosmPathHTML(vv, 'file', host)
               : cosmValue(vv, ctx, 2)) + '</dd>').join('') + '</dl>';
@@ -32293,7 +32293,8 @@
     // A SHORT's file name (plan §15): `<stem>.short-YYYY-MM-DD-HHMM[-n].md`
     // beside its text. Which sibling it is a short of, by canon.py's
     // short_text_name rule: a text with that stem (one with an EMF twin
-    // first, then .md), else `<stem>.cosm` (a standalone EMF), else a file
+    // first, then .md), else `<stem>.fabulan.cosm` (`.fabulap`, `.fabulac`,
+    // the old `<stem>.cosm`: a standalone fabula), else a file
     // named just the stem (a converted original). null: not a short's name,
     // or its text is not there. A short is an ordinary file; this only lets
     // a tile or a row wear the quiet "short" tag.
@@ -32317,7 +32318,9 @@
         texts.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || (a[3] < b[3] ? -1 : a[3] > b[3] ? 1 : 0));
         return texts[0][3];
       }
-      if (names.has(stem + '.cosm')) return stem + '.cosm';
+      for (const sfx of ['.fabulan.cosm', '.fabulap.cosm', '.fabulac.cosm', '.cosm']) {
+        if (names.has(stem + sfx)) return stem + sfx;
+      }
       return names.has(stem) ? stem : null;
     }
     window.canonShortOf = canonShortOf;
@@ -32380,7 +32383,7 @@
         const derived = data && data.catalog && data.catalog.derived;
         Object.assign(doc, {
           state: r.data.state === 'stale' ? 'stale' : 'fresh',
-          twin: r.data.twin_path || doc.path + '.cosm', data,
+          twin: r.data.twin_path || doc.path + '.fabulan.cosm', data,
           completeness: (derived && typeof derived === 'object' && derived.completeness) || 'full',
         });
       } else {
@@ -33259,7 +33262,7 @@
       }
       const d = r.data || {};
       if (ATEM.token === token) { ATEM.pinned = d.item_id || true; atemCardPaint(); }
-      convertNotice(canonBase(d.twin_path || res.path + '.cosm'),
+      convertNotice(canonBase(d.twin_path || res.path + '.fabulan.cosm'),
         t('atem.card.pinnedAs', 'pinned to the twin as {id}').replace('{id}', () => d.item_id || ''),
         'done', { icon: 'atem', ttl: 6000 });
       const snap = d.job || { id: 'pin:' + Date.now(), kind: 'pin', state: 'done', path: res.path,
@@ -34016,8 +34019,9 @@
       // program, not a package's folder form); a sealed one `kind: sealed`.
       const pkg = d.kind === 'package' || /\.package\.cosm$/i.test(full);
       const sealed = d.kind === 'sealed' || THYM_SEALED_RE.test(full);
-      const twin = text && (cosmIsMap(d.emf) || cosmIsMap(d.twin));
-      const tw = twin ? (cosmIsMap(d.emf) ? d.emf : d.twin) : null;
+      const fab = cosmIsMap(d.fabula) ? d.fabula : d.emf;     // the catalog's field; `emf` before 0.6
+      const twin = text && (cosmIsMap(fab) || cosmIsMap(d.twin));
+      const tw = twin ? (cosmIsMap(fab) ? fab : d.twin) : null;
       const fresh = !!tw && !/^(stale|missing)$/.test(String(tw.state || ''));
       if (!text && !pkg && !sealed && !THYM_PROGRAM_RE.test(full)) return '';
       let h = '<div class="thym-acts">';
@@ -34981,7 +34985,9 @@
       for (const suffix of ['.package.cosm', '.thym.enc', '.thym']) {
         if (name.toLowerCase().endsWith(suffix) && name.length > suffix.length) return name.slice(0, -suffix.length);
       }
-      if (/\.cosm$/i.test(name) && name.length > 5) name = name.slice(0, -5);
+      const fab = /^(.+)\.fabula[npc]\.cosm$/i.exec(name);       // notes.md.fabulan.cosm -> notes.md
+      if (fab) name = fab[1];
+      else if (/\.cosm$/i.test(name) && name.length > 5) name = name.slice(0, -5);
       const dot = name.lastIndexOf('.');
       return dot > 0 ? name.slice(0, dot) : name;
     }

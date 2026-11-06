@@ -1,0 +1,274 @@
+oes: thym/1
+kind: program
+id: thym/tighten
+name: tighten
+source:
+  path: tighten.thym
+  sha256: ba1bc98e06a6b7661eed42214e1449cfbee74ac5e2709448b8acd4cb59335632
+  size: 616
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:check/shorter
+  type: check
+  name: shorter
+  summary: A reworded line says less in fewer words, never more.
+  why: a reworded line says less in fewer words, never more.
+  params:
+  - name: new
+    type: line
+  - name: old
+    type: line
+  lines: 3-7
+  order: 1
+  body: |+
+    contract shorter(new: line, old: line)
+      why: a reworded line says less in fewer words, never more.
+
+      assert words new < words old else "the reworded line is not shorter than the line it replaces"
+    end
+
+  steps:
+  - P:step/shorter.1
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L3-L7
+    confidence: 1
+- id: P:step/shorter.1
+  type: step
+  name: assert words new < words old else "the reworded line is not shorter than the line it replaces"
+  summary: assert words new < words old else "the reworded line is not shorter than the line it replaces"
+  of: P:check/shorter
+  n: 1
+  text: '  assert words new < words old else "the reworded line is not shorter than the line it replaces"'
+  line: 6
+  form: assert
+  move: assert
+  calls:
+  - words
+  uses:
+  - new
+  - old
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L6
+    confidence: 1
+- id: P:program/tighten
+  type: program
+  name: tighten
+  summary: Every line of a short that runs past thirty words is said again in thirty or fewer, and no other line
+    moves.
+  why: every line of a short that runs past thirty words is said again in thirty or fewer, and no other line moves.
+  must: []
+  decided: []
+  takes:
+  - name: s
+    type: short
+  gives:
+  - name: t
+    type: short
+  lines: 9-25
+  order: 2
+  body: |
+    program tighten
+      why: every line of a short that runs past thirty words is said again in thirty or fewer, and no
+           other line moves.
+
+      takes s: short
+      gives t: short
+
+      move tightened(l: line): line
+        keeps shorter against l
+        give reword l to 30 words
+      end
+
+      let changes = for each l in lines of s where words l > 30
+        keep replace l with tightened l
+      end
+      give edit s with changes
+    end
+  moves:
+  - P:move/tighten.tightened
+  steps:
+  - P:step/tighten.1
+  - P:step/tighten.3
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L9-L25
+    confidence: 1
+- id: P:move/tighten.tightened
+  type: move
+  name: tightened
+  summary: 'move tightened(l: line): line'
+  params:
+  - name: l
+    type: line
+  gives:
+  - name: tightened
+    type: line
+  keeps:
+  - shorter
+  lines: 16-19
+  body: |2
+      move tightened(l: line): line
+        keeps shorter against l
+        give reword l to 30 words
+      end
+  steps:
+  - P:step/tighten.tightened.1
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L16-L19
+    confidence: 1
+- id: P:step/tighten.tightened.1
+  type: step
+  name: give reword l to 30 words
+  summary: give reword l to 30 words
+  of: P:move/tighten.tightened
+  n: 1
+  text: '    give reword l to 30 words'
+  line: 18
+  form: give
+  move: reword
+  calls:
+  - reword
+  uses:
+  - l
+  asks: true
+  contracts:
+  - P:contract/tighten.tightened.1
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L18
+    confidence: 1
+- id: P:step/tighten.1
+  type: step
+  name: let changes = for each l in lines of s where words l > 30
+  summary: let changes = for each l in lines of s where words l > 30
+  of: P:program/tighten
+  n: 1
+  text: '  let changes = for each l in lines of s where words l > 30'
+  line: 21
+  lines: 21-23
+  form: for
+  calls:
+  - lines
+  - words
+  binds: changes
+  uses:
+  - s
+  asks: false
+  steps:
+  - P:step/tighten.2
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L21-L23
+    confidence: 1
+- id: P:step/tighten.2
+  type: step
+  name: keep replace l with tightened l
+  summary: keep replace l with tightened l
+  of: P:program/tighten
+  n: 2
+  text: '    keep replace l with tightened l'
+  line: 22
+  form: keep
+  move: replace
+  calls:
+  - replace
+  - tightened
+  - reword
+  uses:
+  - l
+  asks: true
+  contracts:
+  - P:contract/tighten.2.1
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L22
+    confidence: 1
+- id: P:step/tighten.3
+  type: step
+  name: give edit s with changes
+  summary: give edit s with changes
+  of: P:program/tighten
+  n: 3
+  text: '  give edit s with changes'
+  line: 24
+  form: give
+  move: edit
+  calls:
+  - edit
+  uses:
+  - s
+  - changes
+  asks: false
+  contracts:
+  - P:contract/tighten.3
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L24
+    confidence: 1
+- id: P:contract/tighten.tightened.1
+  type: contract
+  name: reword
+  summary: What reword must leave true of what it gives.
+  of: P:step/tighten.tightened.1
+  move: reword
+  checks:
+  - length
+  - one-line
+  - nothing-added
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L18
+    confidence: 1
+- id: P:contract/tighten.2.1
+  type: contract
+  name: tightened
+  summary: What tightened must leave true of what it gives.
+  of: P:step/tighten.2
+  move: tightened
+  checks:
+  - length
+  - one-line
+  - nothing-added
+  - provenance
+  - shorter
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L22
+    confidence: 1
+- id: P:contract/tighten.3
+  type: contract
+  name: edit
+  summary: What edit must leave true of what it gives.
+  of: P:step/tighten.3
+  move: edit
+  checks:
+  - only-the-changed
+  - never-source
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L24
+    confidence: 1

@@ -107,11 +107,12 @@ before anything runs, and every run leaves a trace that can be replayed.
   input, others as `<inputs>` lines (`name=path`). It answers with the trace's
   line and the outputs' paths; the reader's "run with…" puts them beside the
   text, so point the user there to keep them.
-- Programs come from the project, then the Canon store, then the three enough
-  ships: `publish-story`, `read-my-way`, `open-house`.
+- Programs come from the project, then the Canon store, then the ones enough
+  ships (`open-house`, `tighten`, `decompile-prose`, …). `thym_moves` lists
+  the moves a program may use (`<version>` 1 or 0, `<move>` for one).
 - A step that asks a model needs one: with agent-free on or no model running,
   `thym_run` refuses such a plan; `open-house` asks none and still runs.
-- Both tools need this skill on. Say what a refusal refused and what would
+- The three tools need this skill on. Say what a refusal refused and what would
   make it run; never present it as a result.
 
 ## The tools, in order
@@ -122,10 +123,11 @@ is one `cosm_guide` call away.
 1. `cosm_read` — the volume's tree, cut to fit with "(N more)" markers, or one
    item's fields with `<item>`. Start here.
 2. `cosm_lint` — the checks: errors, warnings, notes, open questions.
-3. `emf_derive` (a text → its EMF twin) or `atem` (the four parts, written
+3. `emf_derive` (a text → its fabula twin) or `atem` (the four parts, written
    into the twin; an inline `<text>` writes nothing) — only on request.
-4. `thym_check` (a program → its plan's line, or the refusal), then
-   `thym_run` (a program on a file → the trace's line) — runs only on request.
+4. `thym_moves` (what a program may use), `thym_check` (a program → its plan's
+   line, or the refusal), then `thym_run` (a program on a file → the trace's
+   line) — runs only on request.
 
 For "what is X" about the format or the app, `doc_lookup` answers from the
 spec and the manual.

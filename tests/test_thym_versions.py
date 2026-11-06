@@ -87,9 +87,21 @@ def test_a_thym_0_program_relabelled_thym_1_plans_and_enumerates_the_same(name, 
     other.write_text("thym 1\n" + text[len("thym 0\n"):], encoding="utf-8")
     want = mc.yaml_load(mc.read_text(SUITE / "expected" / name / "plan.cosm"))
     a, b = (pl.plan(thym.check_file(p), want["inputs"]) for p in (src, other))
-    assert a["nodes"][1:] == b["nodes"][1:]
+    # ruling 7: each version spells the fabula's checks its own way, emf-checks in thym 0 and fabula-checks in thym 1
+    assert "fabula-checks" not in repr(a) and "emf-checks" not in repr(b)
+    assert _respelled(a["nodes"][1:]) == b["nodes"][1:]
     ia, ib = en.enumerate_file(src), en.enumerate_file(other)
-    assert ia["nodes"] == ib["nodes"] and ib["front"] == ia["front"].replace("thym 0", "thym 1", 1)
+    assert "fabula-checks" not in repr(ia["nodes"]) and "emf-checks" not in repr(ib["nodes"])
+    assert _respelled(ia["nodes"]) == ib["nodes"] and ib["front"] == ia["front"].replace("thym 0", "thym 1", 1)
+
+
+def _respelled(x):
+    """A thym 0 plan's or enumeration's `emf-checks`, as thym 1 spells it (ruling 7)."""
+    if isinstance(x, dict):
+        return {k: _respelled(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_respelled(v) for v in x]
+    return "fabula-checks" if x == "emf-checks" else x
 
 
 # ---------------------------------------------------------------------------
@@ -164,7 +176,7 @@ def test_the_thym_1_types_are_read_and_need_thym_1():
 
 SIDECAR = """moves-of: testing/1
 moves:
-  - {name: survey, takes: [text], gives: fabula, since: 1, contract: [fabula-checks]}
+  - {name: scry-two, takes: [text], gives: fabula, since: 1, contract: [fabula-checks]}
   - {name: derive-two, takes: [text], gives: fabula, contract: [coverage, emf-checks],
      thym-1: {contract: [coverage, fabula-checks]}}
   - {name: tell-two, takes: [fabula], gives: short, modifiers: {as: order},
@@ -187,7 +199,7 @@ def scratch_decls(tmp_path):
 def test_since_and_thym_1_are_read_into_two_views(scratch_decls):
     d = scratch_decls
     assert "broken" not in d and any("since names a grammar version" in p for p in d.problems)
-    assert d["survey"].since == 1 and d["survey"].view(0) is None and d["survey"].view(1).name == "survey"
+    assert d["scry-two"].since == 1 and d["scry-two"].view(0) is None and d["scry-two"].view(1).name == "scry-two"
     two = d["derive-two"]
     assert two.contract == ("coverage", "emf-checks")                       # as written: the thym 0 keys
     assert two.view(0).contract == ("coverage", "emf-checks")
@@ -195,21 +207,22 @@ def test_since_and_thym_1_are_read_into_two_views(scratch_decls):
     assert two.view(1).frozen_view().contract == ("coverage", "emf-checks")
     assert two.view(1).view(0) == two.view(0)
     zero, one = d.view(0), d.view(1)
-    assert "survey" not in zero and "survey" in one and isinstance(zero, dc.Declarations)
+    assert "scry-two" not in zero and "scry-two" in one and isinstance(zero, dc.Declarations)
     assert dc.view_of({"name": "x", "since": 1}, 0) is None
     assert dc.view_of({"name": "x", "contract": ["a"], "thym-1": {"contract": ["b"]}}, 1)["contract"] == ["b"]
-    assert "survey" not in dc.names(version=0) or dc.load()["survey"].since == 0
+    assert "scry-two" not in dc.names(version=0)
 
 
 def test_a_move_only_thym_1_sees_is_free_in_thym_0_and_needs_thym_1_when_called(scratch_decls):
     d = scratch_decls
-    ok(prog(0, "  let survey = words t\n"), decls=d)                       # a name, not a reserved move, in thym 0
-    r = refused(prog(1, "  let survey = words t\n"), decls=d)
+    ok(prog(0, "  let scry-two = words t\n"), decls=d)                     # a name, not a reserved move, in thym 0
+    r = refused(prog(1, "  let scry-two = words t\n"), decls=d)
     assert r.check == "type"                                                 # reserved: thym 1 sees the move
-    text = prog(0, "  let f = survey t\n", give="give words t")
+    text = prog(0, "  let f = scry-two t\n", give="give words t")
     r = refused(text, decls=d)
     assert (r.check, r.line) == ("version", 6)
-    assert r.message == "this needs `thym 1`: the move survey, which thym 1 declares at line 6; the first line says thym 0"
+    assert r.message == ("this needs `thym 1`: the move scry-two, which thym 1 declares at line 6; the first line says "
+                         "thym 0")
     ok(text.replace("thym 0", "thym 1", 1), decls=d)
 
 

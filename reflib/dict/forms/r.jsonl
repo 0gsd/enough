@@ -896,6 +896,7 @@
 {"headword": "readorn", "form": "readorning", "position": 2, "pronunciation": "/ˌriəˈdɔrnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "readorn", "form": "readorns", "position": 3, "pronunciation": "/ˌriəˈdɔrnz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "readout", "form": "readouts", "position": 1, "pronunciation": "/ˈriˌdaʊts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "readvisor", "form": "readvisors", "position": 1, "pronunciation": "/ˌriədˈvaɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ready", "form": "readied", "position": 1, "pronunciation": "/ˈrɛdid/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "ready", "form": "readier", "position": 2, "pronunciation": "/ˈrɛdiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "ready", "form": "readies", "position": 3, "pronunciation": "/ˈrɛdiz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -3426,6 +3427,7 @@
 {"headword": "render", "form": "rendering", "position": 2, "pronunciation": "/ˈrɛndərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"rendition\", \"interpretation\", \"interpreting\", \"translation\", \"version\"]"}
 {"headword": "render", "form": "renders", "position": 3, "pronunciation": "/ˈrɛndərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "renderer", "form": "renderers", "position": 1, "pronunciation": "/ˈrɛndərərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "rendering", "form": "renderings", "position": 1, "pronunciation": "/ˈrɛndərɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "rendezvous", "form": "rendezvoused", "position": 1, "pronunciation": "/ˈrɑndɪˌvuzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "rendezvous", "form": "rendezvouses", "position": 2, "pronunciation": "/ˈrɑndɪˌvuzɪz/", "labels": "[\"3rd sing.\", \"pl.\"]", "synonyms": null}
 {"headword": "rendezvous", "form": "rendezvousing", "position": 3, "pronunciation": "/ˈrɑndɪˌvuzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -5171,6 +5173,7 @@
 {"headword": "rewriteman", "form": "rewritemen", "position": 1, "pronunciation": "/ˈriˌraɪtˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "rewriteperson", "form": "rewritepersons", "position": 1, "pronunciation": "/ˈriˌraɪtˌpɜrsənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "rewriter", "form": "rewriters", "position": 1, "pronunciation": "/riˈraɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "rewriting", "form": "rewritings", "position": 1, "pronunciation": "/riˈraɪtɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "rex", "form": "reges", "position": 1, "pronunciation": "/ˈreɪdʒəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "rex", "form": "rexes", "position": 2, "pronunciation": "/ˈrɛksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "reynard", "form": "reynards", "position": 1, "pronunciation": "/ˈreɪnərdz/", "labels": "[\"pl.\"]", "synonyms": null}

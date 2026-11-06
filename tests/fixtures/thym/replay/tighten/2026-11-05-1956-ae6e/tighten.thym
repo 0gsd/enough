@@ -1,0 +1,25 @@
+thym 1
+
+contract shorter(new: line, old: line)
+  why: a reworded line says less in fewer words, never more.
+
+  assert words new < words old else "the reworded line is not shorter than the line it replaces"
+end
+
+program tighten
+  why: every line of a short that runs past thirty words is said again in thirty or fewer, and no
+       other line moves.
+
+  takes s: short
+  gives t: short
+
+  move tightened(l: line): line
+    keeps shorter against l
+    give reword l to 30 words
+  end
+
+  let changes = for each l in lines of s where words l > 30
+    keep replace l with tightened l
+  end
+  give edit s with changes
+end

@@ -88,6 +88,7 @@ from enough.thym import trace as _trace
 from enough.thym.coprocessor import RecordingCoprocessor, RefusingCoprocessor, ReplayCoprocessor
 from enough.thym.coprocessor import ask as _ask
 from enough.thym.coprocessor import prose_problem
+from enough.thym.coprocessor import where as _coproc_where
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
@@ -2071,6 +2072,7 @@ class _Run:
             raise _Stop(cand)
         frame["asked"] += 1
         frame["engine"] = str(cand.get("engine") or frame["engine"])
+        frame["cand"] = cand
         self.cur.tokens += int(cand.get("tokens") or 0)
         return cand
 
@@ -2078,11 +2080,12 @@ class _Run:
         self.trace.records = list(self.records)
         return self.trace.to_volume()
 
-    def _made(self, move: str, engine: str) -> dict:
+    def _made(self, move: str, engine: str, cand: Any = None) -> dict:
         step = self.cur.node.get("step")
         n = step.get("n") if isinstance(step, dict) else None
+        # the candidate's route and provider stand beside the engine when it carried them (THYM 23.1)
         return {"move": move, "run": self.made_run, "step": n, "node": node_number(self.cur.node.get("id")),
-                "engine": engine}
+                "engine": engine, **_coproc_where(cand)}
 
     def _engine(self, engine: str) -> None:
         """The node's engine is the strongest of its calls': a model over a scaffold over code."""
@@ -2143,7 +2146,7 @@ class _Run:
             self.cur.state = "pending"
             self._settle(move, decl, v, inputs, check_node, "rules")
             return v
-        fn = self.moves.lookup(move)
+        fn = _kind_code(decl, mods) or self.moves.lookup(move)
         if fn is None:
             raise _Stop(Refusal("run", "move", f"the move {move} has no implementation here"))
         frame = {"move": move, "decl": decl, "failed": [], "asked": 0, "engine": "model:unknown"}
@@ -2181,7 +2184,7 @@ class _Run:
                                                    "asks one way"))
             self._engine(frame["engine"])
             self.cur.attempts += 1
-            value = stamp(self._as_value(r, decl), self._made(move, frame["engine"]))
+            value = stamp(self._as_value(r, decl), self._made(move, frame["engine"], frame.get("cand")))
             verdicts = self._verdicts(decl, value, inputs, node)
             failed = [x for x in verdicts if not x["ok"]]
             if not failed:
@@ -2315,7 +2318,7 @@ class _Run:
             self.cur.tokens += int(cand.get("tokens") or 0)
             value, failed = self._read(req, decl, cand)
             if value is not None:
-                value = stamp(value, self._made(move, engine))
+                value = stamp(value, self._made(move, engine, cand))
                 verdicts = self._verdicts(decl, value, inputs, node)
                 failed = [x for x in verdicts if not x["ok"]]
                 if failed and req.repair is not None:
@@ -2326,7 +2329,7 @@ class _Run:
                     except Exception:  # noqa: BLE001 - a repair that breaks is no repair; ask again
                         fixed = None
                     if fixed is not None:
-                        value = stamp(self._as_value(fixed, decl), self._made(move, engine))
+                        value = stamp(self._as_value(fixed, decl), self._made(move, engine, cand))
                         verdicts = self._verdicts(decl, value, inputs, node)
                         failed = [x for x in verdicts if not x["ok"]]
                 if not failed:
@@ -2603,6 +2606,20 @@ def _views(decls: Any, version: int) -> Any:
             d = {**{k: v for k, v in d.items() if k != "thym-1"}, **over}
         out[name] = d
     return out
+
+
+def _kind_code(decl: Any, mods: dict) -> Callable | None:
+    """The code another owner gave a kind of this move (`extends: true`, THYM 6.2), when the call's `as` word is one
+    of its kinds: `project h as isograph` runs Ascribe's projection, `as isotype` Comprise's. None otherwise."""
+    word = mods.get("as")
+    for words, code, _owner in decl_get(decl, "code_when") or ():
+        if isinstance(word, str) and word in words:
+            fn = _registry.resolve(code)
+            if fn is None:
+                raise _Stop(Refusal("run", "move", f"the {word} kind of {decl_get(decl, 'name')} ({code}) has no "
+                                                   "implementation here"))
+            return fn
+    return None
 
 
 def _chosen_decl(decl: Any, operands: list, mods: dict) -> Any:

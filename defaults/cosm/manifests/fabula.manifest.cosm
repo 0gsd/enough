@@ -325,6 +325,15 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     scaffold: rules-twin
     code: enough.thym.moves.emf:derive
     says: a text decompiled into its fabula, the EMF twin
+    thym-1:                             # thym 1: a text as prose, verse or code, and a folder folded (THYM 6.3, 20.5, 20.6)
+      takes: ['text | folder']
+      modifiers: {as: 'prose | verse | code', with: fabula}
+      contract: [span-resolves, stance-closed, terms-grounded, coverage, fabula-checks, provenance]
+      contract-when:
+        - {as: [code], contract: [code-span, outline-cited, coverage, terms-grounded, stance-closed, fabula-checks, provenance]}
+        - {takes: folder, contract: [fold-grounded, atem-shape, licence-recorded, fabula-checks, provenance]}
+      scaffold-when:                    # a folder has none: nothing but a model reads intent, and --rules refuses it
+        - {as: [code], scaffold: file-outline}
   - name: tell
     takes: ['fabula | item | volume']
     gives: short
@@ -334,6 +343,15 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     scaffold: outline
     code: enough.thym.moves.emf:tell
     says: a telling of the fabula, in an order, in a morph
+    thym-1:                             # thym 1: a fabulac told as code (a cshort, a folder) or as a catem (THYM 6.3, 20.7)
+      modifiers: {as: 'order | code | line | overview | manual', by: order, with: morph}
+      gives-when:
+        - {as: [code], gives: folder}
+      contract-when:
+        - {as: [code], contract: [parses, interfaces-present, files-present, footer, provenance]}
+        - {as: [line, overview, manual], contract: [coverage, no-invention, uses-told, footer, provenance]}
+      scaffold-when:                    # code has none: --rules refuses it
+        - {as: [line, overview, manual], scaffold: uses-outline}
   - name: atem
     takes: ['text | fabula | short | item']
     gives: atem
@@ -350,6 +368,22 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     contract: [coverage, no-invention, stance-kept, length, span-inside, provenance]
     code: enough.thym.moves.emf:expand
     says: an atem opened out into a short of a given length, from its fabula
+  # thym 1 only (since: 1; THYM 6.3, 20.6): the two rules-only stages of a fabulac's build
+  - name: survey
+    takes: [folder]
+    gives: fabula
+    contract: [files-found, code-span, licence-recorded, fabula-checks, provenance]
+    code: enough.thym.moves.code:survey
+    says: a folder of Python read by its syntax into the outline of a fabulac, nothing run
+    since: 1
+  - name: history
+    takes: [folder]
+    gives: fabula
+    modifiers: {with: fabula}
+    contract: [history-grounded, fabula-checks, provenance]
+    code: enough.thym.moves.code:history
+    says: the fabula so far with a clone's history, its changes in episodes, its releases and its makers
+    since: 1
 
 # The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
 # about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
@@ -358,40 +392,40 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes]
   banks:
     fabulan:
       for: {flavour: fabulan}
       to: author
       questions:
-        - {id: occasion, about: I, asks: "What prompted this text: an event, a request, a need?", kind: text, why: missing}
-        - {id: influence, about: I, asks: "Which writers, works or traditions shaped it?", kind: text, why: missing}
+        - {id: occasion, about: I, asks: "What prompted this text: an event, a request, a need?", kind: text, why: missing, writes: occasion}
+        - {id: influence, about: I, asks: "Which writers, works or traditions shaped it?", kind: text, why: missing, writes: influence}
         - {id: allusion, about: I:allusion, asks: "Did you mean the echo of {name} here?", kind: yes-no, why: intent}
-        - {id: aim, about: N, asks: "What should a reader know, believe or do after reading it?", kind: text, why: intent}
-        - {id: audience, about: N, asks: "Whom did you write it for?", kind: text, why: missing}
-        - {id: exclusion, about: N, asks: "What did you choose to leave out, and why?", kind: text, why: intent}
-        - {id: decision, about: N, asks: "Which choice in it was hardest to make?", kind: text, why: intent}
+        - {id: aim, about: N, asks: "What should a reader know, believe or do after reading it?", kind: text, why: intent, writes: aim}
+        - {id: audience, about: N, asks: "Whom did you write it for?", kind: text, why: missing, writes: audience}
+        - {id: exclusion, about: N, asks: "What did you choose to leave out, and why?", kind: text, why: intent, writes: exclusion}
+        - {id: decision, about: N, asks: "Which choice in it was hardest to make?", kind: text, why: intent, writes: decision}
         - {id: voice, about: C:voice, asks: "Who is speaking here, and to whom?", kind: text, why: unsure}
-        - {id: parts, about: C, asks: "Why is it divided the way it is?", kind: text, why: intent}
-        - {id: maker, about: R, asks: "Who wrote it, and who else had a hand in it?", kind: text, why: missing}
-        - {id: release, about: R, asks: "Where and when was it first published?", kind: text, why: missing}
-        - {id: drafts, about: R, asks: "What changed between drafts?", kind: text, why: missing}
-        - {id: licence, about: R, asks: "May others copy it, and on what terms?", kind: text, why: missing}
+        - {id: parts, about: C, asks: "Why is it divided the way it is?", kind: text, why: intent, writes: N:decision}
+        - {id: maker, about: R, asks: "Who wrote it, and who else had a hand in it?", kind: text, why: missing, writes: maker}
+        - {id: release, about: R, asks: "Where and when was it first published?", kind: text, why: missing, writes: release}
+        - {id: drafts, about: R, asks: "What changed between drafts?", kind: text, why: missing, writes: change}
+        - {id: licence, about: R, asks: "May others copy it, and on what terms?", kind: text, why: missing, writes: licence}
         - {id: weight, about: P, asks: "Which claim matters most to you?", kind: ref, why: intent}
         - {id: stand-by, about: P:claim, asks: "Would you still stand behind this: {name}?", kind: yes-no, why: unsure}
-        - {id: refuse, about: P, asks: "Is there a reading of it you would refuse?", kind: text, why: intent}
+        - {id: refuse, about: P, asks: "Is there a reading of it you would refuse?", kind: text, why: intent, writes: reading}
         - {id: sense, about: L:term#sense, asks: "Do you use {name} in a sense of your own? Which?", kind: text, why: unsure}
     fabulap:
       for: {flavour: fabulap}
       to: author                  # an expert in the poet's work when the author cannot be asked
       questions:
-        - {id: spark, about: I, asks: "What set the poem going: something seen, heard, read, or a line that came first?", kind: text, why: missing}
-        - {id: ear, about: I, asks: "Which poets or poems were in your ear while you wrote it?", kind: text, why: missing}
+        - {id: spark, about: I, asks: "What set the poem going: something seen, heard, read, or a line that came first?", kind: text, why: missing, writes: occasion}
+        - {id: ear, about: I, asks: "Which poets or poems were in your ear while you wrote it?", kind: text, why: missing, writes: influence}
         - {id: echo, about: I:allusion, asks: "Does {name} echo another text on purpose?", kind: yes-no, why: intent}
-        - {id: for-whom, about: I, asks: "Was it written for a person or an occasion?", kind: text, why: missing}
-        - {id: last-line, about: N, asks: "What did you want a reader to feel by the last line?", kind: text, why: intent}
-        - {id: listener, about: N, asks: "Whom did you imagine reading it, or hearing it?", kind: text, why: missing}
-        - {id: unsaid, about: N, asks: "Is there something the poem is careful not to say?", kind: text, why: intent}
+        - {id: for-whom, about: I, asks: "Was it written for a person or an occasion?", kind: text, why: missing, writes: occasion}
+        - {id: last-line, about: N, asks: "What did you want a reader to feel by the last line?", kind: text, why: intent, writes: aim}
+        - {id: listener, about: N, asks: "Whom did you imagine reading it, or hearing it?", kind: text, why: missing, writes: audience}
+        - {id: unsaid, about: N, asks: "Is there something the poem is careful not to say?", kind: text, why: intent, writes: exclusion}
         - {id: speaker, about: C:voice#roles.speaker, asks: "Who speaks the poem: you, a character, or no one in particular?", kind: text, why: unsure}
         - {id: addressee, about: C:voice#roles.addressee, asks: "Whom does the poem address, and is that one listening?", kind: text, why: unsure}
         - {id: shift, about: C:voice, asks: "Does the speaker or the tone change anywhere? Where?", kind: span, why: unsure}
@@ -403,22 +437,22 @@ dialectic:
         - {id: image, about: C:device, asks: "Which image carries the most weight for you?", kind: ref, why: intent}
         - {id: stands-for, about: C:device, asks: "Is {name} meant to stand for something beyond itself? What?", kind: text, why: ambiguous}
         - {id: both, about: P:reading#intended, asks: "Is this reading one you meant: {name}?", kind: yes-no, why: ambiguous}
-        - {id: refuse, about: P, asks: "Is there a reading of the poem you would refuse?", kind: text, why: intent}
-        - {id: title, about: P, asks: "How does the title change the way the poem reads?", kind: text, why: intent}
-        - {id: cut, about: R, asks: "What did you cut from earlier drafts, and why?", kind: text, why: missing}
-        - {id: drafts, about: R, asks: "How many drafts did it go through, and what changed most?", kind: text, why: missing}
-        - {id: published, about: R, asks: "Where and when was it first published or performed?", kind: text, why: missing}
+        - {id: refuse, about: P, asks: "Is there a reading of the poem you would refuse?", kind: text, why: intent, writes: reading}
+        - {id: title, about: P, asks: "How does the title change the way the poem reads?", kind: text, why: intent, writes: reading}
+        - {id: cut, about: R, asks: "What did you cut from earlier drafts, and why?", kind: text, why: missing, writes: change}
+        - {id: drafts, about: R, asks: "How many drafts did it go through, and what changed most?", kind: text, why: missing, writes: change}
+        - {id: published, about: R, asks: "Where and when was it first published or performed?", kind: text, why: missing, writes: release}
         - {id: music, about: R, asks: "Is it set to music, or meant to be?", kind: yes-no, why: missing}
         - {id: word, about: L:term#sense, asks: "Is {name} used in an old, regional or private sense?", kind: text, why: unsure}
     fabulac:
       for: {flavour: fabulac}
       to: maker
       questions:
-        - {id: modelled-on, about: I, asks: "What existing tool or program was this modelled on, or made to replace?", kind: text, why: missing}
-        - {id: prompted, about: I, asks: "What problem or moment set it going?", kind: text, why: missing}
-        - {id: for-whom, about: N, asks: "Who is it for, and what do they already know?", kind: text, why: missing}
-        - {id: never, about: N, asks: "What must it never do, whatever a user asks?", kind: text, why: intent}
-        - {id: left-out, about: N, asks: "What is deliberately left out, for now or for good?", kind: text, why: intent}
+        - {id: modelled-on, about: I, asks: "What existing tool or program was this modelled on, or made to replace?", kind: text, why: missing, writes: influence}
+        - {id: prompted, about: I, asks: "What problem or moment set it going?", kind: text, why: missing, writes: occasion}
+        - {id: for-whom, about: N, asks: "Who is it for, and what do they already know?", kind: text, why: missing, writes: audience}
+        - {id: never, about: N, asks: "What must it never do, whatever a user asks?", kind: text, why: intent, writes: requirement}
+        - {id: left-out, about: N, asks: "What is deliberately left out, for now or for good?", kind: text, why: intent, writes: exclusion}
         - {id: why-this, about: N:decision#because, asks: "Why was {name} chosen over the alternatives?", kind: text, why: intent}
         - {id: tried, about: N:decision#over, asks: "What else was tried for {name} and dropped?", kind: text, why: missing}
         - {id: intended, about: C:behaviour#intended, asks: "Is this behaviour intended, or an accident users now rely on: {name}?", kind: yes-no, why: intent}
@@ -427,9 +461,9 @@ dialectic:
         - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure}
         - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
         - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing}
-        - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing}
+        - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing, writes: maker}
         - {id: licence, about: R:licence, asks: "Under which licence may it be used?", kind: text, why: missing}
-        - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent}
+        - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}
         - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most?", kind: ref, why: intent}
 
 extension:

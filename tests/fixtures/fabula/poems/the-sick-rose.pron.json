@@ -1,0 +1,204 @@
+{
+ "and": {
+  "ipa": "/ænd/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "and"
+ },
+ "art": {
+  "ipa": "/ɑrt/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "dark"
+  ],
+  "word": "art"
+ },
+ "bed": {
+  "ipa": "/bɛd/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "bed"
+ },
+ "crimson": {
+  "ipa": "/ˈkrɪmzən/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "crimson"
+ },
+ "dark": {
+  "ipa": "/dɑrk/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "art"
+  ],
+  "word": "dark"
+ },
+ "destroy": {
+  "ipa": "/dɪˈstrɔɪ/",
+  "perfect_rhymes": [
+   "joy"
+  ],
+  "slant_rhymes": [],
+  "word": "destroy"
+ },
+ "does": {
+  "ipa": "/dʌz/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "love"
+  ],
+  "word": "does"
+ },
+ "flies": {
+  "ipa": "/flaɪz/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "flies"
+ },
+ "found": {
+  "ipa": "/faʊnd/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "found"
+ },
+ "has": {
+  "ipa": "/hæz/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "has"
+ },
+ "his": {
+  "ipa": "/hɪz/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "his"
+ },
+ "howling": {
+  "ipa": "/ˈhaʊlɪŋ/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "howling"
+ },
+ "in": {
+  "ipa": "/ɪn/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "in"
+ },
+ "invisible": {
+  "ipa": "/ɪnˈvɪzəbəl/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "invisible"
+ },
+ "joy": {
+  "ipa": "/dʒɔɪ/",
+  "perfect_rhymes": [
+   "destroy"
+  ],
+  "slant_rhymes": [],
+  "word": "joy"
+ },
+ "life": {
+  "ipa": "/laɪf/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "life"
+ },
+ "love": {
+  "ipa": "/lʌv/",
+  "perfect_rhymes": [
+   "of"
+  ],
+  "slant_rhymes": [
+   "does"
+  ],
+  "word": "love"
+ },
+ "night": {
+  "ipa": "/naɪt/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "night"
+ },
+ "o": null,
+ "of": {
+  "ipa": "/ʌv/",
+  "perfect_rhymes": [
+   "love"
+  ],
+  "slant_rhymes": [
+   "does"
+  ],
+  "word": "of"
+ },
+ "out": {
+  "ipa": "/aʊt/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "out"
+ },
+ "rose": {
+  "ipa": "/roʊz/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "rose"
+ },
+ "secret": {
+  "ipa": "/ˈsikrət/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "secret"
+ },
+ "sick": {
+  "ipa": "/sɪk/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "sick"
+ },
+ "storm": {
+  "ipa": "/stɔrm/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "storm"
+ },
+ "that": {
+  "ipa": "/ðæt/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "that"
+ },
+ "the": {
+  "ipa": "/ðə/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "love",
+   "does"
+  ],
+  "word": "the"
+ },
+ "thou": {
+  "ipa": "/ðaʊ/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "out",
+   "found"
+  ],
+  "word": "thou"
+ },
+ "thy": {
+  "ipa": "/ðaɪ/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [
+   "life",
+   "night"
+  ],
+  "word": "thy"
+ },
+ "worm": {
+  "ipa": "/wɜrm/",
+  "perfect_rhymes": [],
+  "slant_rhymes": [],
+  "word": "worm"
+ }
+}

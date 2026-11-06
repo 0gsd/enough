@@ -1,0 +1,114 @@
+engine: syntax.outline
+inputs:
+  call: ef4670d70e00c589a521207638d5bdb0c0480ac18d8e97d431871bba9c733a86
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  lines: 39
+  doc: 'The command line: tiny count FILE [--lines], tiny top FILE [-n N].'
+  imports:
+  - module: __future__
+    level: 0
+    names:
+    - annotations
+    line: 2
+    stdlib: true
+  - module: argparse
+    line: 4
+    stdlib: true
+  - module: sys
+    line: 5
+    stdlib: true
+  - module: ''
+    level: 1
+    names:
+    - __version__
+    line: 7
+  - module: counting
+    level: 1
+    names:
+    - CountError
+    - count_words
+    - read_text
+    - top_words
+    line: 8
+  defs:
+  - name: build_parser
+    qual: build_parser
+    kind: function
+    line: 11
+    end: 21
+    signature: def build_parser() -> argparse.ArgumentParser
+    params: []
+    returns: argparse.ArgumentParser
+  - name: main
+    qual: main
+    kind: function
+    line: 24
+    end: 35
+    signature: 'def main(argv: list[str] | None = None) -> int'
+    params:
+    - name: argv
+      kind: positional
+      annotation: list[str] | None
+      default: None
+    returns: int
+    words:
+    - kind: print
+      stream: stderr
+      text: 'tiny: {e}'
+      line: 33
+      exit: 1
+    returns_int:
+    - 0
+    - 1
+  constants: []
+  env: []
+  main: 38
+  main_calls:
+  - main
+  argparse:
+  - var: p
+    prog: tiny
+    help: Count the words of a text file.
+    line: 12
+    args:
+    - names:
+      - --version
+      line: 13
+      action: version
+    subcommands:
+      dest: command
+      required: 'True'
+  - var: c
+    parent: p
+    command: count
+    help: count the words, or the lines, of a file
+    line: 15
+    args:
+    - names:
+      - file
+      line: 16
+    - names:
+      - --lines
+      line: 17
+      action: store_true
+      help: count lines instead of words
+  - var: t
+    parent: p
+    command: top
+    help: list the commonest words
+    line: 18
+    args:
+    - names:
+      - file
+      line: 19
+    - names:
+      - -n
+      line: 20
+      type: int
+      default: '3'
+      help: how many words to list

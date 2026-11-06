@@ -9,14 +9,17 @@
 # where the form is one word that FEED has, with the polyforms that combine them and the relations an author declares.
 # The rest is the author's to shape as they go: hierarchies, branches and flat lists by parts and of, typed links from
 # a short starter list or from relations they declare, a when, a valence and a strength. The dialectic: block holds
-# the opening questions a guided process or an agent asks to help a person fill it in.
+# the bank of opening questions the core's dialectic asks the holder (module D, beside the containers: the holder's
+# own words, which never leave); the moves: block declares propose, which reads the holder's own text for candidate
+# nodes that become the holder's only by their answer.
 #
 # The prose is Ascribe, the canonical edition at https://ascribe.cosmoes.org/ (bundled as docs/ASCRIBE.md); this
 # file is its machine-readable declaration. The reference reader is enough/macrocosm.py; Ascribe's own checks are
 # enough/ascribe.py. Where this file and the reader disagree, one of them is in error and is corrected.
 #
-# No personal data, three ways: the schema has no kind or field for it; the no-pii check warns, and never refuses, on
-# what reads like it; and the filter: block keeps private files and restricted nodes out of ingest and transfer.
+# No personal data, three ways: the schema has no kind or field for it; the no-pii check warns, and never refuses
+# inside the holograph, on what reads like it (at a projection it is an error); and the filter: block keeps private
+# files, restricted items and module D out of everything that leaves.
 #
 # Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
 # booleans (on, off, yes, no) are quoted.
@@ -54,13 +57,13 @@ format:
 # to its own module's folder (check id-module), and the catalog may carry a few nodes of any module in its own nodes:.
 volume:
   catalog: holograph.cosm
-  modules: <module>/              # A/ B/ C/ E/ I/ O/ Q/ S/ U/ Y/ for the ten kinds; F/ for forms, polyforms, relations
+  modules: <module>/              # A/ B/ C/ E/ I/ O/ Q/ S/ U/ Y/ for the ten kinds; F/ for forms, polyforms, relations; D/ for the dialectic's questions and sessions
   module-files: '<module folder>/**/*.cosm'
   module-folder-case: read either, write the capital
   private-marker: .ascribe-private  # see filter: below
 
 catalog:
-  keys: [oes, macrocosm, id, handle, summary, sample, visibility, pseudonyms, nodes]
+  keys: [oes, macrocosm, id, handle, summary, sample, visibility, pseudonyms, releases, morphs, nodes]
   id: ascribe/<hid>               # ascribe/aej6l5qrka6c6btarfiy2f7vnj
   hid: '[a-z2-7]{26}'             # 26 characters of lowercase base32, as Connect's hid; checked by enough/ascribe.py
   handle: 'a pseudonymous handle: lowercase words joined by hyphens (salt-and-crumb); never a name'
@@ -70,6 +73,13 @@ catalog:
   visibility-absent: internal
   pseudonyms: 'the stand-in names the author uses for the people in their life ("Wren", "the Captain"), so the
                no-pii check reads them as declared, not as personal names'
+  releases: 'optional: every release the holder has made, oldest first, appended and never rewritten; each {epoch,
+             as, program: {name, sha256}, trace: {run, sha256}, at, sha256, items} and, for a package''s graph.cosm,
+             for: {path, sha256}; never what was withheld, a key, or the party a cryptograph was handed to (check
+             release-shape)'
+  release-as: [isograph, cryptograph, tokens, isomorph]
+  morphs: 'optional: the file names of the holder''s morph volumes, each a bare name ending .morph.cosm, kept beside
+           the holograph''s folder and never inside it'
   never: [the person's name, an email address, a phone number, a postal address, a birth date, a government id,
           an employer's legal name]
 
@@ -121,8 +131,10 @@ envelope:
     states: [known, pending, not-disclosed, stale]
     state-default: known
     confidence: a number from 0 to 1, how sure the person is
-    sources: 'a dialectic session (session-3), a text the author wrote (notes.md#L3-L7), or self for what they
-              wrote down directly'
+    sources: 'a dialectic session (D:session/session-3, or the earlier spelling session-3), a text the author wrote
+              (notes.md#L3-L7, or notes.md#sha256:<digest> for a candidate read from it), or self for what they wrote
+              down directly'
+    answered: 'kept like any unknown field: the session and confidence of each field an answer filled'
   span: '{lines: "12-18"} or {start: "<up to 60 characters>", end: "<up to 60 characters>"}, optional: where in a
          text the node was read'
   form: 'F:form/<slug> or F:polyform/<slug>: what the node is about; every node of the ten kinds carries one (check
@@ -137,6 +149,7 @@ envelope:
          5.3); a generic reader keeps it as an unknown field'
   metadata: on a form it is global, shared by every node anchored to it; on a node it belongs to that node alone
   open-question: '{pending: "<the question>"}'
+  withheld: 'kept like any unknown field: the fields the holder declined to answer'
   sentinels: [none, self]
   unknown-fields: allowed and kept
 
@@ -232,12 +245,16 @@ checks:
   own: 'Ascribe''s own checks, run by enough/ascribe.py (lint_holograph) after the generic ones; a generic reader does not run
         them. form-anchored: every node of the ten kinds names a form or a polyform that exists. relation-declared: every
         link''s rel is a starter word or a relation the holograph declares. when-shape: a when is a date, a year or an
-        era word. strength-range: a strength is a whole number from 1 to 5. no-pii: an email address, a phone number, an
-        id-like run of digits, a street address, a date that reads as a birth, a field for any of these, or a capitalised
-        pair in a prose field that reads as a personal name, anywhere in the volume, comments included; a warning, never
-        an error. private-marker: what a .ascribe-private marker would keep out of ingest and transfer, a note. The same
+        era word. strength-range: a strength is a whole number from 1 to 5. release-shape: every releases entry has the
+        fields a release requires, its as, epoch and digests in their shape, and every morphs entry is a bare file name
+        ending .morph.cosm. no-pii: an email address, a phone number, an id-like run of digits, a street address, a date
+        that reads as a birth, a field for any of these, or a capitalised pair in a prose field that reads as a personal
+        name, anywhere in the volume, comments included; a warning inside the holograph, never an error there, and an
+        error at a projection, which is refused while it stands. private-marker: what a .ascribe-private marker would
+        keep out of everything that leaves, a note. form-anchored holds the ten kinds only, never an item of D. The same
         code also holds id-module to the module folders and catalog-key to the hid and the handle, which the generic
-        reader cannot read from this file.'
+        reader cannot read from this file. A holograph that carries module D also passes the dialectic''s checks
+        (enough/fabula.py).'
   severity: {no-pii: warning}
 
 open-questions:
@@ -259,11 +276,32 @@ renderers:
            shape: {form: '([ ])', polyform: '{{ }}', relation: '[/ /]'}}
   - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
 
-# The opening questions, three to five for each module, in plain words and in no one's voice. A guided process or an
-# agent asks them and writes what the person says as nodes; the process that asks them is reserved for a later edition.
+# The bank ascribe: four opening questions for each module of the self and four for the forms, in plain words and in
+# no one's voice, each asked of the holograph once (about: <letter>, kind: text, to: holder, why: missing; entry ids
+# A1, A2 … by position, so a question raised from the first says raised.from: ascribe/A1). The core's dialectic asks
+# them (module D, enough/dialectic.py, through enough/ascribe.py); settle writes an answer as a node in the question's
+# container, or for a question of the forms a form, anchored as follow-ups: and writes: say.
 dialectic:
-  status: questions only; the process that asks them is reserved for a later edition
-  writes: 'nodes with provenance {mode: dialectic, sources: [session-<n>], confidence: <how sure the person is>}'
+  status: applied; the core's questions and sessions in module D, D/ beside the containers (Ascribe, section 8)
+  to: holder
+  writes: {A: 'A:affinity', B: 'B:belief', C: 'C:concern', E: 'E:experience', I: 'I:interest', O: 'O:opinion',
+           Q: 'Q:quale', S: 'S:skill', U: 'U:understanding', Y: 'Y:yearning', F: 'F:form'}
+  provenance: '{mode: dialectic, sources: [D:session/<id>], confidence: <how sure the person is; 1 when they gave none
+               and stated it plainly>}; the earlier spelling session-<n> names D:session/session-<n> and stays valid'
+  form-discovery: 'a form or polyform of the holograph the answer is plainly about; else a new form for one word FEED
+                   has, feed: {word, pos, origin: feed}; else a new form whose feed is {pending: "not in FEED"}, named
+                   in the holder''s words; an answer that names no thing at all writes no node, and a follow-up asks
+                   what it is about'
+  follow-ups:
+    - {about: '#form', asks: 'What is this about, in a word or two?', kind: text}
+    - {about: '#when', asks: 'When was this, roughly: a date, a year, or a time of life?', kind: date}
+    - {about: '#valence', asks: 'Does this draw you, put you off, or both?', kind: choice, options: [for, against, mixed]}
+    - {about: '#strength', asks: 'How strongly, from 1 to 5?', kind: number, range: [1, 5]}
+  not-knowing: '"I don''t know" on a field leaves {pending: "<their words>"}; a refusal adds the field to withheld and
+                sets provenance.state: not-disclosed; on a bank question neither writes anything, and a declined entry
+                is not put again unless the holder asks'
+  never-written: 'a name, an address or a government identifier: the answer is refused in plain words and the question
+                  stays open'
   questions:
     A:
       - What do you go back to, again and again?
@@ -321,22 +359,71 @@ dialectic:
       - Which subject deserves an article that nobody has written yet?
       - Which things belong together for you, though others keep them apart?
 
-# What ingest and transfer leave out of a holograph. The rule is declared here; the filter that applies it is
-# reserved for a later edition. enough/ascribe.py's private-marker check reports what a marker would drop, and drops nothing.
+# What leaves a holograph and what stays (Ascribe, section 11). enough/ascribe.py's private_filter applies it, a pure
+# function of the folder, before anything else in each use reads the holograph; its private-marker check reports what
+# a marker withholds, and withholds nothing.
 filter:
-  status: declared; the filter that applies it is reserved for a later edition
-  applies-to: [ingest, transfer]
+  status: declared and applied (enough/ascribe.py private_filter)
+  applies-to: [ingest, package, transfer, projection]
   marker: .ascribe-private
   drops:
-    - every file and folder beside a .ascribe-private marker, with everything below them
-    - every node with visibility restricted
-  keeps: everything else, unchanged; a reference to a dropped node keeps its id and gains no name
+    - every file and folder beside a .ascribe-private marker, with everything below them, the marker included; a marker beside the catalog withholds the whole holograph
+    - every node, form, polyform, relation and dialectic item with visibility restricted, wherever it is written; a kept file that holds one is written out again without it, as its nodes in the COSM YAML subset, without its comments
+    - module D, in every use but a transfer of the whole holograph into the holder's own keeping
+  keeps: everything else, unchanged and byte for byte when its file holds nothing restricted; a reference to a withheld item keeps its id and gains no name; no placeholder or count; the catalog unless a marker sits beside it
 
+# What may leave, by a Thym program the holder runs, after the filter, recorded as a release (Ascribe, sections 13
+# and 14): default-deny; withhold, never falsify; nothing of the dialectic and nothing pending; no personal data, no-pii
+# an error here. There is no paratype of a person.
 public-projection:
-  status: not built
+  status: 'the isograph, built (enough/ascribe.py project_isograph); the registry, signing, an index of isographs and
+           further opt-in fields are reserved for a later edition'
   isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (Thym, https://thym.cosmoes.org/)
+  schema: ascribe-isograph/0
+  fields: [isograph, hid, handle, epoch, sample, program, run, self]
+  self-fields: [kind, form, valence, strength, when, marking]
+  marking: stated                 # verified is reserved for what a registry attests; a reader refuses an isograph carrying it
+  derivable: []                   # Ascribe lists nothing as derivable, so mark ... as verified is refused over a holograph
+  strength-bands: {slight: [1, 2], moderate: [3], strong: [4, 5]}
+  when: the decade of a date or a year (2010s), or an era word already in that shape; any other era word is left out
+  may-appear: 'a node of the ten kinds whose visibility is public, whose status is absent or active, whose provenance is
+               known at confidence 0.5 or more, that the filter keeps, and whose form, or every form of whose polyform
+               (at most eight), is grounded in FEED with origin feed'
+  limits: {per-kind: 20, bytes: 65536}
+  sorted: [module, form, valence, strength, when]
+  per-epoch: 1
+  canonical: JSON, keys sorted, no space between tokens, UTF-8 without a byte-order mark
+  cryptograph: 'a Thym package in its encrypted form of the filtered holograph (one holograph row per kept file, D left
+                out) or of a projection (projection.json, program.thym, trace.cosm); a random hid; the key shown once'
+  tokens: 'ascribe-tokens/0: {tokens, of, epoch, entries: [{about, token}]}, token the lowercase hex HMAC-SHA256 of
+           about, a line feed and the value, under a key made for one cryptograph; made only for forms the holder
+           chooses; serving them is reserved for a later edition'
   outsiders: no outsider's graph of a person exists
 
 extension:
-  status: not built
+  status: 'the isograph, the cryptograph, match tokens and isomorphs are specified (Ascribe, section 14); the bridge to
+           Comprise is reserved for a later edition'
   note: an isograph is a Thym projection of the holograph; no outsider's graph of a person exists
+
+# The moves Ascribe declares for Thym (Thym, https://thym.cosmoes.org/, sections 6.2, 6.3 and 17.6), for thym 1 only:
+# propose, and the kind it adds to project (isograph; isotype and paratype stay Comprise OES's). propose
+# asks the model; nothing it proposes is the holder's until they answer yes; a program lands it with gather.
+moves:
+  - name: propose
+    takes: [fabula]
+    gives: list of item
+    modifiers: {with: volume}
+    asks: true
+    contract: [no-invention, provenance]
+    code: enough.thym.moves.ascribe:propose
+    says: candidate nodes a holder's own text suggests, each with the question that asks whether it is so
+    since: 1
+  - name: project
+    extends: true
+    takes: [volume]
+    gives: volume
+    modifiers: {as: isograph}
+    contract: [default-deny, no-counts, no-mark, epoch, provenance]
+    code: enough.thym.moves.ascribe:isograph
+    says: a holograph projected as an isograph, from what the program emitted and withheld
+    since: 1

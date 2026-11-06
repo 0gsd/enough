@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 1
+
+program edit-by-hand
+  why: edit applies changes that replace, drop and insert made, never strings.
+  takes draft: text
+  gives clean: text
+
+  give edit draft with ["drop line 3"]
+end

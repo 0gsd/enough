@@ -258,3 +258,18 @@ def test_cosm_payload_carries_the_checks_panel_and_files(client: TestClient):
     assert "holotype.cosm" in p["files"]
     items = [it for m in p["modules"] for k in m["kinds"] for it in k["items"]]
     assert items and all(it["part"] == "atom/meadow" for it in items)
+
+
+def test_cosm_holograph_report_is_ascribes_with_its_advice(client: TestClient):
+    """An `oes: ascribe/1` volume is checked by Ascribe's own one report (`ascribe.lint_holograph`): the generic
+    checks, the dialectic's and Ascribe's seven, each finding with its advice line (`ascribe.report_dict`)."""
+    from enough import ascribe
+    asc = Path(__file__).parent / "fixtures" / "ascribe"
+    shutil.copytree(asc / "sample-self", client._project / "self")  # type: ignore[attr-defined]
+    p = client.get("/api/cosm", params={"path": "self"}).json()
+    assert p["minicosm"] == "ascribe" and p["report"]["ok"] and p["report"]["not_run"] == []
+    shutil.copytree(asc / "bad" / "pii", client._project / "pii")  # type: ignore[attr-defined]
+    bad = client.get("/api/cosm", params={"path": "pii"}).json()
+    assert bad["report"]["warnings"] and all(w["advice"] == ascribe.ADVICE for w in bad["report"]["warnings"])
+    assert bad["report"] == {k: v for k, v in ascribe.report_dict(ascribe.lint_holograph(asc / "bad" / "pii")).items()
+                             if k in ("ok", "errors", "warnings", "notes", "not_run")}

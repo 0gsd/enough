@@ -21,10 +21,12 @@ module D, whatever its format:
 
 - `question-about` (error): a question's `about` names an item, an item and a field path that parses, a span that fits
   the source, or a module or a kind the format declares. A question that has `settled` is skipped: its own answer may
-  have removed what it was about.
+  have removed what it was about; so is a question that has ended (`stale` or `withdrawn`): its item being gone is
+  why it ended, not an error (the conductor's ruling 1 on docs/fabula-landed-D1.md).
 - `question-shape` (error): a `choice` lists its `options`; an `answered`, `unknown` or `declined` question has an
-  answer, and its last answer agrees with the state; an `open` question has no `settled`; a `stale` or `withdrawn`
-  question carries `ended`.
+  answer, and its last answer agrees with the state; an `open` question has no `settled` unless it was asked again
+  (it holds an answer: the earlier `settled` stays as the record of the earlier write, 18.6.3; ruling 2); a `stale` or
+  `withdrawn` question carries `ended`.
 - `session-declared` (warning): a source `D:session/<id>`, in provenance or in an answer, names a session of the
   volume. A bare `session-<n>` or `elicit-…` with no such item is accepted, with a note.
 
@@ -230,6 +232,8 @@ class _Own:
     def question_about(self, it: mc.Item) -> None:
         if it.data.get("settled"):
             return                                  # its own answer may have removed what it was about (18.6.3)
+        if it.data.get("state") in ("stale", "withdrawn"):
+            return                                  # it ended: its item being gone is why, not an error (ruling 1)
         if "about" not in it.data:
             return                                  # identity-min has it
         why = self._about_why(it, it.data["about"])
@@ -258,7 +262,7 @@ class _Own:
                                                    "\"I don't know\"", fld)
                 elif state == "declined" and not declined:
                     self.add("question-shape", it, "a declined question's last answer says declined: true", fld)
-        if state == "open" and d.get("settled"):
+        if state == "open" and d.get("settled") and not answers:     # asked again keeps its settled (ruling 2)
             self.add("question-shape", it, "an open question has nothing settled: settled is written only when an "
                                            "answer is folded in", "settled")
         if state in ("stale", "withdrawn") and not isinstance(d.get("ended"), dict):

@@ -1,0 +1,11 @@
+-- refused: compile version line 9
+thym 0
+
+program ask-the-author
+  why: the questions a fabula raises, asked by a thym 0 program, which has no question move.
+  takes f: fabula
+  gives g: fabula
+
+  let asked = question f
+  give f
+end

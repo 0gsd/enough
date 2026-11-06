@@ -480,7 +480,7 @@ cache.
 | The project catalog | `rness/canon.cosm` (`scope: project`, structure only) | none — written by `canon.project_catalog()` | no (`cosm_read rness/canon.cosm`) |
 | EMF twins and atems | `<dir>/<text>.cosm` beside `<text>` (`notes.md` ↔ `notes.md.cosm`), hidden behind it in both trees; atems live inside it; a compile writes a SHORT, a new visible `<stem>.short-<YYYY-MM-DD-HHMM>.md` beside the text, and appends it to the twin's `shorts:` list | none — written only on request (a click or a tool call) | no (`cosm_read`, `emf_derive`, `atem`) |
 | MiniCOSM manifests | — (install-wide) | `defaults/cosm/manifests/*.manifest.cosm` | only `CANON_TOOL_INSTRUCTIONS`; the `macrocosm-oes` skill when on |
-| Thym programs | `<anywhere>/<name>.thym` (the file is the truth; `<name>.thym.cosm` only when enumerated on request) | `defaults/thym/*.thym` (the three shipped programs, read in place) | no — `thym_check`/`thym_run` read them on demand |
+| Thym programs | `<anywhere>/<name>.thym` (the file is the truth; `<name>.thym.cosm` only when enumerated on request) | `defaults/thym/*.thym` (the shipped programs, read in place) | no — `thym_check`/`thym_run` read them on demand |
 | Thym runs | `~/enough/thym/runs/<run-id>/` (plan, trace, candidates, outputs; seam `ENOUGH_THYM_ROOT`); a run with… copies its outputs beside the first input (`<stem>.<gives>.<ext>`) | none — written by `thym.run` | no |
 | Packages and readings | `<dir>/<stem>.thym/` + `<stem>.package.cosm` (+ `<stem>.thym.enc` sealed) beside the text; `<dir>/<stem>.read-<morph>-YYYY-MM-DD-HHMM.md` | none — written by the runtime | no |
 | Holographs | `<anywhere>/<folder>/holograph.cosm` + module folders (read only; nothing in enough writes one) | none | no |
@@ -2811,7 +2811,7 @@ then `canon.cosm` is written, because a missing catalog always regenerates.
 **Volume catalogs.** `regenerate_catalog(name)` writes `canon.cosm` (the
 pure text is `build_catalog(name)`) with `macrocosm.dump`, tmp +
 `os.replace`, **only when the bytes differ**, under a module lock. Keys:
-`oes: canon/1`, `macrocosm: 0.0.1`, `id: canon/<slug(name)>`, `name`,
+`oes: canon/1`, `macrocosm: 0.5.4`, `id: canon/<slug(name)>`, `name`,
 `scope: volume`, `origin` (None fields dropped), `status`, `created`,
 `updated`, `counts {folders, files, articles, twins, atems}` (`twins` =
 files with an EMF twin, `atems` = files carrying an atem), `nodes`.
@@ -3042,11 +3042,13 @@ first key names it (`oes: <minicosm>/<major>`). Items are mappings in a
 `nodes:` list with a stable id `<module>:<kind>/<slug>` and a `type`;
 references are fields and typed links (`{rel, to}`), never operator glyphs;
 an unknown value is an open question (`{pending: "<the question, for whoever can answer it>"}`),
-never a guess. The spec is [docs/MACROCOSM_OES.md](MACROCOSM_OES.md), v0.0.1:
+never a guess. The spec is [docs/MACROCOSM_OES.md](MACROCOSM_OES.md), synced
+from cosmoes.org (its edition is in `docs/specs.json`):
 §2 is the model on one page, §4 the file format, §5 the declaration, §11
 ids/paths/URIs, §12 the checks, §13 the manifest, §14 renderers and lenses,
-§18 the seven MiniCOSMs enough ships, each with an example (complete files
-for cosm, canon, emf, doc, ascribe and thym; a Holotype is a folder, so comprise's is a
+§18 the core and its five built-in formats and §19 the two MiniCOSMs, the seven
+formats enough ships, each with an example (complete files
+for cosm, canon, fabula, doc, ascribe and thym; a Holotype is a folder, so comprise's is a
 fragment). This
 section summarizes and points; read the spec before you change the format, a
 manifest or the reader. User-facing doc: HELP_CENTER §13 (the dialects; §13.1–13.2 the docs viewer)
@@ -3163,11 +3165,11 @@ the registry takes explicit dirs only. The folder, like the spec, is all
 rights reserved (`defaults/cosm/NOTICE.md`; see "License").
 
 **To add a MiniCOSM**: write `<name>.manifest.cosm` in the `minicosm/0` key
-shape (copy `canon.manifest.cosm`), give it a subsection of spec §18 with at
+shape (copy `canon.manifest.cosm`), give it a subsection of spec §19 with at
 least one complete ```` ```cosm ```` example (so `test_macrocosm_spec.py`
 holds it; give `_file_name` there its catalog name, and raise the example
 count in `tests/test_docoes.py`), and add fixtures and tests beside the others in
-`tests/test_macrocosm.py` (the registry tests count the manifests: seven in 0.5.0). Nothing below the manifest needs code — the
+`tests/test_macrocosm.py` (the registry tests count the manifests: seven, the core's five and the two MiniCOSMs). Nothing below the manifest needs code — the
 checks, paths, the viewer, the lenses and the tools are generic.
 
 ### Fixtures, and the syncs
@@ -3240,7 +3242,7 @@ read/edit's edit face; there is no highlighter yet.
 
 ## DocOES (documents enumerated in their own grammar, 0.4.4)
 
-**DocOES** (`oes: doc/1`, "Documentation OES") is the fifth MiniCOSM: one
+**DocOES** (`oes: doc/1`, "Documentation OES") is one of the core's five built-in formats: one
 markdown document taken apart into items — its sections (`S:section/<n>`,
 numbered by the document's own numbering, `root`, `front`, or a slug), the
 terms it defines (`T:term/<slug>`), its complete ```` ```cosm ```` examples
@@ -3490,7 +3492,7 @@ state and refreshed only on request. A converted original reads through its
 markdown twin: `report.pdf` → `report.pdf.md` → `report.pdf.md.cosm` (no
 markdown twin yet → 400 "convert it first"). An `emf/1` file with no sibling
 text is a standalone EMF, an ordinary `.cosm` item. A twin's catalog, in
-order: `oes: emf/1`, `macrocosm: 0.0.1`, `id: emf/<slug>` (the text's path
+order: `oes: emf/1`, `macrocosm: 0.5.4`, `id: emf/<slug>` (the text's path
 in its project or volume, by Canon's slug rule: `guides/close.md` →
 `emf/guides--close-md`), `name` (the text's first heading, else its file
 name), `source: {path (relative to the twin), sha256, size, mtime_ns}`
@@ -3894,7 +3896,7 @@ twin, in `HOME_PATHS`, English only; a `static/i18n/<lang>/THYM.md` would win).
 | `enough/thym_tools.py` | `thym_check`, `thym_run` (see "The readvisor tools" below) |
 | `defaults/cosm/manifests/thym.manifest.cosm` | the `thym/1` MiniCOSM: one file of six kinds (`program`, `morph`, `context`, `plan`, `trace`, `package`), modules P M C R K, and the `moves:` it owns |
 | `moves:` in `emf.manifest.cosm`, `doc.manifest.cosm`; `comprise.moves.cosm` | the other MiniCOSMs' moves; the sidecar because Comprise's manifest is a byte copy |
-| `defaults/thym/` | the three shipped programs, `publish-story` (text → package; three nodes ask), `read-my-way` (package, morph, context → short; asks), `open-house` (Holotype → isotype; deterministic) |
+| `defaults/thym/` | the shipped programs: `publish-story` (text → package; three nodes ask), `read-my-way` (package, morph, context → short; asks), `open-house` (Holotype → isotype; deterministic), and since 0.6 `decompile-python`, `compile-python`, `decompile-prose`, `decompile-verse`, `settle` and `tighten` |
 | `tests/fixtures/thym/` | the conformance suite (below) |
 
 **The CLI.** `python -m enough.thym check|plan|run|trace|enumerate|compile|conform`

@@ -3,7 +3,7 @@
 Both transcode, byte for byte (THYM.md 7.2, law 4).
 
 - `enumerate` reads a text into a volume: a Thym program (a `.thym` file, or a text whose first line that is not blank
-  or a comment is `thym 0`) through the compiler's own enumerator, into a `thym/1` program volume (THYM.md 10); any
+  or a comment is a version line of either grammar, `thym 0` or `thym 1`; THYM.md 4.9) through the compiler's own enumerator, into a `thym/1` program volume (THYM.md 10); any
   other markdown through DocOES (`ctx.engines["docoes"]`), into a `doc/1` volume. The move compiles the volume back
   before it gives it and refuses when the bytes differ. A doc volume records its markdown in `document:`; the move
   the `byte-exact` check reads the volume's `document` block (a doc/1 volume names its text there).
@@ -27,7 +27,9 @@ _VERSION = re.compile(r"^\s*thym\s+\d+\s*(?:--.*)?$")
 
 
 def is_program(text: str, path: Any = None) -> bool:
-    """A Thym program: a `.thym` file, or a text whose first line that is neither blank nor a comment is `thym 0`."""
+    """A Thym program: a `.thym` file, or a text whose first line that is neither blank nor a comment is a version line,
+    `thym 0` or `thym 1` (either grammar; a later number is still a program, which the compiler refuses by its
+    version)."""
     if path is not None and str(path).endswith(".thym"):
         return True
     for line in text.lstrip("﻿").replace("\r\n", "\n").split("\n"):

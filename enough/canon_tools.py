@@ -216,25 +216,39 @@ def inside_package(project_dir: Path, target: Path) -> bool:
     return False
 
 
-def text_target(project_dir: Path, path: str) -> dict[str, Any]:
+def text_target(project_dir: Path, path: str, flavour: str | None = None) -> dict[str, Any]:
     """Resolve and vet the text a derive, an atem or a pin names (blocking).
 
     Refusals (`TextTargetError`, with the routes' statuses and words): a
     missing file (404), a folder, a Holotype or anything in one (owner:
     browsed, not decompiled), a catalog or meta enough keeps, any `.cosm`
     (already enumerated), binaries, kinds that aren't markdown or plain text,
-    an empty file, and a `X.cosm` beside the text that is not an EMF twin
-    (409: deriving would overwrite it). A converted original (`report.pdf`)
-    is read through its markdown twin (`report.pdf.md`), or refused with
-    "convert it first".
+    an empty file, a `flavour` other than fabulan or fabulap (400; fabulac is
+    a folder's, in plain words), and a `X.<flavour>.cosm` beside the text
+    that is not a fabula (409: deriving would overwrite it). A converted
+    original (`report.pdf`) is read through its markdown twin
+    (`report.pdf.md`), or refused with "convert it first".
 
-    Returns `{path, target, text_rel, twin, twin_rel, volume, id_rel, key}`:
-    the tidied request path, the text read, its path as the routes report it,
-    its twin and the twin's path, the Canon volume (None for a project path),
-    the catalog id's path, and the claim key (the resolved text)."""
+    The flavour: the one asked for; else the flavour of the twin the text
+    already has (the one derived last), so a refresh refreshes what is
+    there; else the one `fabula_names.suggest_flavour` suggests for the text.
+
+    Returns `{path, target, text_rel, twin, twin_rel, new_twin, new_twin_rel,
+    flavour, suggested, twins, volume, id_rel, key}`: the tidied request path,
+    the text read, its path as the routes report it, its twin of that flavour
+    (an existing one, the old-named `X.cosm` included, else the name a new one
+    takes) and the twin's path, where a decompile writes (always the
+    flavour's name), the flavour, the suggestion, `{flavour: path}` of the
+    twins the text has, the Canon volume (None for a project path), the
+    catalog id's path, and the claim key (the resolved text)."""
     from . import canon as _canon
     from . import canon_derive as _canon_derive
     from . import convert as _convert
+    from . import fabula_names as _names
+    try:
+        asked = _names.check_text_flavour(flavour)
+    except _names.FlavourError as e:
+        raise TextTargetError(400, str(e)) from None
     rel = tidy_rel(path)
     if not rel or rel in STORE_PREFIXES:
         raise TextTargetError(400, "missing path")
@@ -268,17 +282,29 @@ def text_target(project_dir: Path, path: str) -> dict[str, Any]:
         raise TextTargetError(400, f"derive reads markdown and plain text, not {suffix} files")
     elif _canon.looks_binary(target):
         raise TextTargetError(400, f"{name} looks binary; derive reads markdown and plain text")
-    twin = _canon_derive.twin_path(target)
-    if twin.exists() and not _canon.is_emf_twin(twin):
-        raise TextTargetError(409, f"{twin.name} already exists and is not an EMF twin; move or rename it first")
     try:
-        if not target.read_bytes().strip():
-            raise TextTargetError(400, f"{target.name} is empty: there is nothing to derive")
+        data = target.read_bytes()
     except OSError as e:
         raise TextTargetError(400, f"{target.name} could not be read ({e})") from None
+    if not data.strip():
+        raise TextTargetError(400, f"{target.name} is empty: there is nothing to derive")
+    suggested = _names.suggest_flavour(data.decode("utf-8-sig", errors="replace"))
+    twins = _names.text_twins(target)
+    chosen = asked or (_names.primary(twins) or (None,))[0] or suggested
+    new_twin = _names.twin_path(target, chosen)
+    if new_twin.exists() and not (new_twin.is_file() and _names.declares_fabula(new_twin)):
+        raise TextTargetError(409, f"{new_twin.name} already exists and is not a fabula; move or rename it first")
+    twin = twins.get(chosen) or new_twin
+    head = text_rel[: len(text_rel) - len(target.name)]
+
+    def beside(p: Path) -> str:
+        return head + p.name
+
     volume, id_rel = where(text_rel)
-    return {"path": rel, "target": target, "text_rel": text_rel, "twin": twin,
-            "twin_rel": text_rel + ".cosm", "volume": volume, "id_rel": id_rel, "key": str(target)}
+    return {"path": rel, "target": target, "text_rel": text_rel, "twin": twin, "twin_rel": beside(twin),
+            "new_twin": new_twin, "new_twin_rel": beside(new_twin), "flavour": chosen, "suggested": suggested,
+            "twins": {fl: beside(p) for fl, p in twins.items()}, "volume": volume, "id_rel": id_rel,
+            "key": str(target)}
 
 
 def catalog_after(project_dir: Path, rel: str) -> None:
@@ -336,13 +362,58 @@ def _store_write_denied(path: str) -> bool:
 CompleteFn = Callable[[list], tuple]
 
 
-def model() -> tuple[CompleteFn | None, str]:
+class RouteError(Exception):
+    """A route the call asked for cannot be used (the cloud gate is shut): the gate's own words."""
+
+
+def check_route(route: Any) -> str | None:
+    """The `route` a call or a request asks for: None (not said), `local` or `cloud`; anything else a ValueError."""
+    if route is None:
+        return None
+    r = str(route).strip().lower()
+    if not r:
+        return None
+    if r not in ("local", "cloud"):
+        raise ValueError(f"route must be local or cloud, not {route!r}")
+    return r
+
+
+def model(route: str | None = None, project_dir: Path | None = None) -> tuple[CompleteFn | None, str]:
     """`(complete, "model")` when this session's model answers, else
     `(None, why)`: rules mode, a labelled scaffold. Decided once per call, like
     the routes; a model that stops answering mid-call fails the call in words
-    and nothing is written."""
+    and nothing is written.
+
+    `route`: None is today's way (the session's model, `llm.complete`);
+    `local` asks llama-server even when the chat runs on the cloud slot;
+    `cloud` asks the cloud model through `model_route` (cached and journalled
+    in `project_dir`), and raises `RouteError` with the gate's own words when
+    the gate is shut. Agent-free is rules, whatever the route."""
     from . import llm as _llm
+    from . import agent_free as _agent_free
+    if route == "cloud":
+        from . import cloud as _cloud
+        from . import model_route as _model_route
+        if _agent_free.enabled():
+            return None, _agent_free.REASON
+        try:
+            gate = _cloud.gate_status()
+        except Exception as e:  # noqa: BLE001
+            raise RouteError(f"the cloud gate could not be read ({e})") from None
+        if not gate.get("open"):
+            raise RouteError(gate.get("denial") or gate.get("reason") or "the cloud gate is shut")
+        if project_dir is None:
+            return None, "no project to record a cloud call in"
+        return _wrap(_model_route.make_complete("cloud", project_dir=project_dir, source="fabula")), "model"
     url = _llm_url
+    if route == "local" and url and _llm._current_slot() == "opro-api":
+        from . import model_route as _model_route
+        if _agent_free.enabled():
+            return None, _agent_free.REASON
+        ok, why = _llm.check_llm_reachable(url)
+        if not ok or why == "loading":
+            return None, ("the model is still loading" if ok else why) or "the local model is not answering"
+        return _wrap(_model_route.make_complete("local", llm_url=url)), "model"
     if not url:
         return None, "no model is wired to the tools here"
     try:
@@ -361,6 +432,32 @@ def model() -> tuple[CompleteFn | None, str]:
             raise RuntimeError(f"the model stopped answering ({e}); nothing was written") from e
 
     return complete, "model"
+
+
+def _said_route(route: str | None, complete: Any) -> str | None:
+    """The route a write records when the answers' meta does not say: none by rules; the one asked; else
+    today's (`cloud` while the chat runs on the cloud slot, else `local`)."""
+    if complete is None:
+        return None
+    if route:
+        return route
+    from . import llm as _llm
+    return "cloud" if _llm._current_slot() == "opro-api" else "local"
+
+
+def _wrap(inner: CompleteFn) -> CompleteFn:
+    """A route's `complete`, failing in words as `model()`'s does (a refusal shows the gate's own words)."""
+    from . import llm as _llm
+
+    def complete(messages: list, **kw: Any) -> tuple:
+        try:
+            return inner(messages, **kw)
+        except _llm.LLMUnavailable as e:
+            raise RuntimeError(f"{e}; nothing was written") from e
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"the model stopped answering ({e}); nothing was written") from e
+
+    return complete
 
 
 def readvisor_name() -> str:
@@ -782,7 +879,9 @@ def _module_counts(counts: dict) -> str:
             names = {m: str(man.module(m).get("name") or m) for m in man.modules()}
     except Exception:  # noqa: BLE001 — names are a nicety
         pass
-    return " · ".join(f"{m} {names.get(m, m)} {counts.get(m, 0)}" for m in _canon_derive.MODULE_ORDER)
+    # every module a fabula has (I L E K N C R P T X), and D when the volume carries questions
+    mods = [m for m in _canon_derive.MODULES_ALL if m != "D" or counts.get("D")]
+    return " · ".join(f"{m} {names.get(m, m)} {counts.get(m, 0)}" for m in mods)
 
 
 def run_emf_derive(project_dir: Path, call: Any) -> Any:
@@ -803,7 +902,11 @@ def run_emf_derive(project_dir: Path, call: Any) -> Any:
         from . import broker
         return _err("emf_derive", raw, broker.denial_canon_disabled())
     try:
-        t = text_target(project_dir, path)
+        route = check_route(call.extra.get("route"))
+    except ValueError as e:
+        return _err("emf_derive", raw, str(e))
+    try:
+        t = text_target(project_dir, path, call.extra.get("flavour"))
     except TextTargetError as e:
         return _refusal("emf_derive", raw, e)
     started = _stamp()
@@ -813,12 +916,15 @@ def run_emf_derive(project_dir: Path, call: Any) -> Any:
         return _err("emf_derive", raw, f"{t['target'].name} could not be read ({e})")
     if size > TEXT_MAX:
         return _err("emf_derive", raw, _too_long(t["target"].name, size, "decompile"))
-    complete, why = model()
+    try:
+        complete, why = model(route, project_dir)
+    except RouteError as e:
+        return _err("emf_derive", raw, str(e))
     if complete is not None and size > EMF_MODEL_MAX:
         complete, why = None, f"{size:,} characters: {LONG_FOR_A_TURN}"
     mode = "model" if complete is not None else "rules"
     force = (call.extra.get("force") or "").strip().lower() in ("yes", "true", "1")
-    if not force and _canon_derive.twin_state(t["target"]) == "fresh":
+    if not force and _canon_derive.twin_state(t["target"], t["flavour"]) == "fresh":
         derived = _canon.twin_header(t["twin"]).get("derived")
         derived = derived if isinstance(derived, dict) else {}
         if derived.get("completeness") == "full" and (derived.get("mode") == "model" or mode == "rules"):
@@ -838,31 +944,35 @@ def run_emf_derive(project_dir: Path, call: Any) -> Any:
             previous = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm, info = _canon_derive.derive_emf(
                 text, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
-                complete=complete, by=by, previous=previous)
-            _canon_derive.write_twin(twin, cosm)
+                complete=complete, by=by, previous=previous, flavour=t["flavour"], route=_said_route(route, complete),
+                copyable=(call.extra.get("copyable") or "").strip().lower() in ("yes", "true", "1"))
+            wrote = _canon_derive.replace_twin(t["target"], t["flavour"], cosm)
+            twin = wrote["path"]
     except _canon_jobs.CanonJobError as e:
         return _err("emf_derive", raw, str(e))
     except Exception as e:  # noqa: BLE001 — a model that died, a file that vanished: words, nothing written
         log.warning("emf_derive failed: %s", e)
         return _err("emf_derive", raw, f"the decompile failed: {e}")
     catalog_after(project_dir, t["text_rel"])
-    state = _canon_derive.twin_state(t["target"])
+    state = _canon_derive.twin_state(t["target"], t["flavour"])
     atem = info.get("atem") or {}
     n = info["chunks"]
-    lines = [f"ok — wrote {t['twin_rel']}, the EMF twin of {t['text_rel']} ({n} passage{'' if n == 1 else 's'}; "
-             f"by {by}).",
+    lines = [f"ok — wrote {t['new_twin_rel']}, the {t['flavour']} twin of {t['text_rel']} "
+             f"({n} passage{'' if n == 1 else 's'}; by {by})."
+             + (f" It replaces {wrote['removed']}, the old-named twin." if wrote["removed"] else ""),
              f"mode: {_mode_note(info['mode'], info.get('model'), why)}",
              f"items: {_module_counts(info.get('counts') or {})} — {info['items']} in all"
              + (f", {info['dropped']} dropped (failed the checks)" if info.get("dropped") else "")]
     if info["mode"] == "rules":
         lines.append("a scaffold holds terms and names only; concepts, claims and events need a model.")
     lines.append(f"atem: {_part_text(atem.get('line'))}")
-    lines.append(f"read it with cosm_read on {t['twin_rel']}.")
+    lines.append(f"read it with cosm_read on {t['new_twin_rel']}.")
     message = f"wrote {twin.name}" + (" (a scaffold: no model read it)" if info["mode"] == "rules" else "")
-    result = {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
+    result = {"twin_path": t["new_twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
               "model": info.get("model"), "chunks": info["chunks"], "items": info["items"],
               "counts": info.get("counts") or {}, "dropped": info.get("dropped", 0), "atem": atem,
-              "state": state}
+              "state": state, "flavour": t["flavour"], "suggested": t["suggested"], "route": info.get("route"),
+              "replaced": wrote["removed"]}
     snap = snapshot(kind="emf", path=t["text_rel"], mode=info["mode"], result=result, message=message,
                     started=started, chunks=info["chunks"], by=by)
     return _result("emf_derive", raw, True, "\n".join(lines), {SIDE_EFFECT: snap})
@@ -881,7 +991,11 @@ def run_atem(project_dir: Path, call: Any) -> Any:
     if not raw and not inline:
         return _err("atem", "", "atem needs a <path> (a text file) or a <text> (the passage itself).")
     path = _tool_path(project_dir, raw)
-    complete, why = model()
+    try:
+        route = check_route(call.extra.get("route"))
+        complete, why = model(route, project_dir)
+    except (ValueError, RouteError) as e:
+        return _err("atem", raw, str(e))
 
     if inline:
         if len(inline) > TEXT_MAX:
@@ -906,7 +1020,7 @@ def run_atem(project_dir: Path, call: Any) -> Any:
         from . import broker
         return _err("atem", raw, broker.denial_canon_disabled())
     try:
-        t = text_target(project_dir, path)
+        t = text_target(project_dir, path, call.extra.get("flavour"))
     except TextTargetError as e:
         return _refusal("atem", raw, e)
     started = _stamp()
@@ -922,7 +1036,8 @@ def run_atem(project_dir: Path, call: Any) -> Any:
             existing = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm = _canon_derive.set_file_atem(
                 existing, atem, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
-                by=by, model=atem.get("model"), title=title)
+                by=by, model=atem.get("model"), title=title, flavour=t["flavour"],
+                route=atem.get("route") or _said_route(route, complete), provider=atem.get("provider"))
             _canon_derive.write_twin(twin, cosm)
     except _canon_jobs.CanonJobError as e:
         return _err("atem", raw, str(e))
@@ -939,7 +1054,8 @@ def run_atem(project_dir: Path, call: Any) -> Any:
     block = _canon_derive.atem_block(atem)
     result = {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": atem["mode"],
               "model": atem.get("model"), "atem": block, "stance_profile": atem.get("stance_profile") or {},
-              "written": True, "state": _canon_derive.twin_state(t["target"])}
+              "written": True, "state": _canon_derive.twin_state(t["target"], t["flavour"]),
+              "flavour": t["flavour"], "suggested": t["suggested"]}
     snap = snapshot(kind="atem", path=t["text_rel"], mode=atem["mode"], result=result,
                     message=f"wrote the atem into {twin.name}", started=started, by=by)
     return _result("atem", raw, True, "\n".join(lines), {SIDE_EFFECT: snap})
@@ -1321,7 +1437,7 @@ def register() -> None:
 
 
 __all__ = ["DOC_LOOKUP_DOCS", "EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
-           "TOOL_NAMES", "TextTargetError", "atem_lines", "capped_tree", "catalog_after", "configure",
+           "TOOL_NAMES", "RouteError", "TextTargetError", "atem_lines", "check_route", "capped_tree", "catalog_after", "configure",
            "declaration_text", "guide_text", "inside_holotype", "inside_package", "load", "model", "readvisor_name", "register",
            "report_lines", "resolve", "run_atem", "run_cosm_guide", "run_cosm_lint", "run_cosm_read",
            "run_doc_lookup", "run_emf_derive", "snapshot", "store_prefix", "text_target", "tidy_rel",

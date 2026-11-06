@@ -353,7 +353,7 @@ def step_call_names(st: ps.Stmt) -> list[str]:
 def known_checks(decls: Mapping[str, Any]) -> set[str]:
     """Every named check a `keeps` may name (THYM 7.5): the checks of section 7.3, every check a declaration's
     contract names (its `contract` and `contract-when` lists), and every check the registry implements here."""
-    out = set(ct.CHECKS) | set(_checks.CHECKS.names()) | {"fabula-checks"}
+    out = set(ct.CHECKS) | set(ct.OLD_NAMES) | set(_checks.CHECKS.names())
     for d in (decls or {}).values():
         out.update(str(c) for c in getattr(d, "contract", ()) or ())
         for rule in getattr(d, "contract_when", ()) or ():
@@ -1213,6 +1213,11 @@ class _Checker:
             self.modifier(c, m, list(target.modifiers[m.word]), scope, ctx)
         if not takes and "of" in target.modifiers and c.mod("of") is None:
             self.fail("type", f"{c.move} takes its argument through of: {c.move} of …", c.line)
+        # `before` and `after` place a call: a move that takes both takes exactly one of them (THYM 4.5, 21)
+        if {"before", "after"} <= set(target.modifiers) and (c.mod("before") is None) == (c.mod("after") is None):
+            said = "both" if c.mod("before") is not None else "neither"
+            self.fail("type", f"{c.move} takes before <line> or after <line>, exactly one of the two; "
+                              f"{ps.render(c)} says {said}", c.line)
         self.thym1_use(c, target)
         self.flavour(c)
         chosen = self.chosen(c, target)

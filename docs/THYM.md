@@ -2,15 +2,17 @@
 
 *Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://thym.cosmoes.org/*
 
-*This edition describes the `thym/1` MiniCOSM and defines the language; a program's version line, `thym 0`, names the grammar as this edition defines it.*
+*This edition describes the `thym/1` built-in and defines the language in two grammars; a program's version line, `thym 0` or `thym 1`, names the grammar it is written in.*
 
-Thym is the MacroCOSM language, its compiler and its runtime: programs compose named moves over values typed by density,
-a compiler checks and plans a whole program before anything runs, and a runtime walks the plan, asks a model only behind
-a contract, and traces every run so that it replays. Thym is folded into MacroCOSM OES (https://macro.cosmoes.org/), and
-MacroCOSM's words (item, kind, volume, catalog, module, check, lens, atem) keep their meaning here.
+Thym is the transcognition language that connects OESes, with its compiler and its runtime: programs compose named
+moves over values typed by density, carrying meaning from one volume to another, whether the volume is a text's fabula,
+a folder of code, a document, a company's Holotype or a person's holograph. A compiler checks and plans a whole program
+before anything runs, and a runtime walks the plan, asks a model only behind a contract, and traces every run so that it
+replays. Thym's own volumes, `thym/1`, are a built-in of the core of MacroCOSM OES (https://macro.cosmoes.org/),
+specified here, and MacroCOSM's words (item, kind, volume, catalog, module, check, lens, atem) keep their meaning here.
 
 enough (https://github.com/0gsd/enough) is the reference implementation of the language, its compiler and its runtime.
-Where an implementation and this text disagree, one of them is in error; the Changes appendix (section 21) records which
+Where an implementation and this text disagree, one of them is in error; the Changes appendix (section 25) records which
 was corrected.
 
 ## Contents
@@ -32,12 +34,16 @@ was corrected.
 14. Readings
 15. Packages
 16. Context
-17. The `thym/1` MiniCOSM and the `moves:` block
+17. The `thym/1` volumes and the `moves:` block
 18. Projections: the dial as a program
 19. Agent-free
-20. Conformance
-21. Changes
-22. Withdrawn
+20. Folders and code
+21. Editing
+22. The dialectic in a program
+23. Models in a run
+24. Conformance
+25. Changes
+26. Withdrawn
 
 Colophon
 
@@ -57,10 +63,15 @@ the checks do not enforce.
 *holo-* the whole; *iso-* an equal, verified; *para-* beside, by another hand; *crypto-* hidden, by the owner. Crypto-
 means encrypted everywhere, and there is no outsider's graph of a person.
 
-**The words of a text.** A text's meaning has MacroCOSM's three densities: the **fabula** (the EMF twin: order-free
+**The words of a text.** A text's meaning has MacroCOSM's three densities: the **fabula** (the text's twin: order-free
 material with stances and spans), the **short** (a telling) and the **atem** (one line, with focus, push and pull).
 The author's text is a telling too, and is never called a short. Thym counts the text as a density as well, so a text
-has four (section 5.2). Thym adds three nouns and three verbs:
+has four (section 5.2). To decompile is to make a fabula from an input, and to compile is to tell a short from a fabula:
+those are the plain words, and in a program the moves are `derive` and `tell` (DocOES's byte-exact `enumerate` and
+`compile` keep their names). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for prose,
+`fabulap` for verse, `fabulac` for code (MacroCOSM OES, its section 18.4). A fabulac's short is a `cshort`, source code
+rebuilt from it and never run, and its atem at depth is a `catem`, a text saying what a person can do with the program
+(section 20). Thym adds three nouns and three verbs:
 
 - a **reading** is a telling of someone else's fabula in your morph, local and labelled (section 14);
 - the **null morph** is the plainest telling that conforms, Thym's reference (section 13);
@@ -71,15 +82,18 @@ has four (section 5.2). Thym adds three nouns and three verbs:
   contract (`derive`, `tell`, `atem`, `expand`, `null`, `morph`, `read`); the heavy lifting of re-cognition;
 - to **transconceptualize** is to transcognize with a change of frame: another morph, language, audience or occasion.
 
-Move, program, plan, trace and coprocessor are the words of the model itself; section 2 says what each one is.
+Move, program, plan, trace and coprocessor are the words of the model itself; section 2 says what each one is. The
+second grammar, `thym 1`, adds a few more: a `folder` (a directory tree read under one fixed rule, section 20), a
+`line` and a `change` (section 21), a contract block (a check a program defines, section 7.5), and the dialectic's
+questions and answers (section 22).
 
 **Words on screen.** As in the MacroCOSM specification, the word a person reads comes first, and the word the files use
 follows in parentheses where they differ. Thym's words are mostly the files' own: a statement of a program is a *step*
 (`P:step`), a part of a plan is a *node* (`R:node`), and an entry of a trace is a *record* (`R:record`). A plan's node
 is an item of kind `node`; it is not MacroCOSM's file word for an item.
 
-**Blocks.** A block marked `thym` is one complete program file: it starts with its version line, it compiles under a
-conforming compiler with the standard moves, and its plan is well formed. A block marked `cosm` is one complete `.cosm`
+**Blocks.** A block marked `thym` is one complete program file: it starts with its version line (`thym 0` or `thym 1`),
+it compiles under a conforming compiler with the standard moves, and its plan is well formed. A block marked `cosm` is one complete `.cosm`
 file that loads and lints clean. A block marked `yaml` is a fragment and may point outside itself. A block marked
 `python` sketches an interface. A block marked `text` is grammar, a transcript or a picture.
 
@@ -91,11 +105,12 @@ file that loads and lints clean. A block marked `yaml` is a fragment and may poi
 
 ### 1.1 Lineage
 
-MacroCOSM OES (https://macro.cosmoes.org/) gives one grammar for volumes of items: Comprise's Holotypes, Canon's
-catalogs, EMF twins, documents. Everything a reader does with them (load, check, draw) is generic. Before Thym,
-everything that *moves* meaning between them was not: deriving a twin, compiling a short, writing an atem and projecting
-an isotype were each a function or a model prompt standing outside the format. Thym makes those moves first-class
-(section 2).
+MacroCOSM OES (https://macro.cosmoes.org/) gives one grammar for volumes of items: Comprise's Holotypes, the home file
+system's catalogs (Canon), fabulas, documents. Everything a reader does with them (load, check, draw) is generic. Before
+Thym, everything that *moves* meaning between them was not: deriving a twin, compiling a short, writing an atem and
+projecting an isotype were each a function or a model prompt standing outside the format. Thym makes those moves
+first-class (section 2), and so connects one OES to another: a program reads a company's Holotype and writes its
+isotype, or reads a folder of code and writes its fabula.
 
 Three precedents shaped it.
 
@@ -116,11 +131,12 @@ name.
 
 ### 1.3 Stewardship
 
-This specification is kept by its copyright holder (see the colophon) and revised at its home, https://thym.cosmoes.org/;
-each revision is an edition, and the Changes appendix (section 21) records what each edition changed. A program's version
-line, `thym 0`, pins the grammar of this document: a program written under it must compile under every later conforming
-compiler. The language grows by moves, which MiniCOSMs declare (section 17.6), and never by syntax within a grammar
-version.
+Thym is stewarded by Verroes (Graham Smith). The specification is revised at its home, https://thym.cosmoes.org/; each
+revision is an edition, and the Changes appendix (section 25) records what each edition changed. A program's version
+line pins the grammar it is written in, `thym 0` or `thym 1` (section 4.9): a program written under a grammar version
+must compile under every later conforming compiler, and compile the same way. The language grows by moves, which the
+core's built-ins and the MiniCOSMs declare (section 17.6), and never by syntax within a grammar version. `thym 1` is the
+next grammar version, and every `thym 0` program compiles under every later compiler exactly as it did.
 
 ---
 
@@ -135,6 +151,10 @@ version.
         └── derive ── tell ── atem ─────┘      └── read ── expand ── cut ─────┘
                  (moves, each with a signature and a contract)
 
+   a folder of code ── derive ──▶ fabula (a fabulac) ── tell ──▶ cshort (code, never run) · catem (what it does)
+   a fabula ── question ──▶ open questions ⇢ a person answers ⇢ record · settle ──▶ the fabula, settled
+                 (two runs with a person between them; no run waits)
+
    program.thym ──compile──▶ items (thym/1) + plan (R:plan) ──run──▶ outputs + trace (R:trace)
                               ▲ inspectable before anything runs      ▲ replayable from its records
                                      a model-backed step ──▶ coprocessor (behind the contract)
@@ -143,15 +163,16 @@ version.
 - A **value** is a document that knows its type and its provenance: which move made it, from what, in which run. A
   text's type is its density (section 5).
 - A **move** is one named step. It has a signature (what it takes and gives), a flag saying whether it **asks** the
-  model, and a **contract**: the named checks that must hold on its output. The MiniCOSMs that own the standard moves
-  declare them; a program may define its own.
+  model, and a **contract**: the named checks that must hold on its output. The manifests that own the standard moves
+  declare them, the core's built-ins and the MiniCOSMs alike; a program may define its own moves, and its own checks.
 - A **program** composes moves with bindings, choices and loops, and carries its reason in prose heads.
 - The **compiler** parses, resolves, type-checks, contract-checks, estimates, enumerates the program into items, and
   plans it. It refuses whole: a program compiles entirely or not at all, and the refusal names the line.
 - A **plan** is what a program will do, before it does it: a graph of nodes a person can read.
 - The **runtime** checks the plan against the machine (a model present and large enough; agent-free or not; the inputs
   present), walks it in order, runs deterministic moves in code, and sends model-backed moves to the **coprocessor**:
-  the model, behind the move's contract. A run lands all of its outputs or none.
+  the model, behind the move's contract. The model is chosen for the run: a local one, or a cloud model through a
+  broker (section 23). A run lands all of its outputs or none.
 - A **trace** is what a run did, one record per node. With the answers it recorded, it replays.
 - Six **laws** bind every implementation (section 7.2).
 
@@ -162,13 +183,15 @@ version.
 <!-- atem: seven rules every choice in this document answers to -->
 
 1. **It reads.** Every keyword and every standard move is a FEED headword, or an inflected form of one (`takes`,
-   `gives`, `has`, `covers`). A program can be read aloud to someone who
+   `gives`, `has`, `covers`, `keeps`, `lines`). A program can be read aloud to someone who
    has never seen one, and they follow it. People learn Thym for years the way they learn a craft: more moves, more
    morph scales, more contexts, never more syntax.
 2. **Typed by density.** Every meaning value knows its density and its provenance. A move declares what it takes and
    gives, so an atem of a morph is a compile-time error.
-3. **Moves are the primitives, and MiniCOSMs declare them.** `thym/1` declares the core; `emf/1`, `doc/1` and
-   `comprise/1` declare their own (section 6.2). The language grows by MiniCOSM.
+3. **Moves are the primitives, and the built-ins and the MiniCOSMs declare them.** `thym/1` declares the language's own
+   moves; the built-ins `fabula/1` and `doc/1` and the MiniCOSMs `comprise/1` and `ascribe/1` declare
+   theirs (section 6.2). The language
+   grows by moves, never by syntax within a grammar version.
 4. **Transcode by default; transcognize when marked.** A move that transcodes is mechanical and deterministic. A move
    that transcognizes asks a mind to choose how to re-represent; it is marked `asks` in its declaration, carries a
    contract, and is the only place a run can vary. Everything a model produces is checked against the contract before
@@ -190,8 +213,9 @@ version.
 ### 4.1 The file
 
 A program file has the extension `.thym`. It is UTF-8 (a byte-order mark is tolerated), with LF or CRLF newlines. Its
-first line that is neither blank nor a comment is the **version line**, `thym 0`. After it come `use` lines and blocks,
-in any order. A comment runs from `--` to the end of the line. Blank lines are free. Indentation is free too: the
+first line that is neither blank nor a comment is the **version line**, `thym 0` or `thym 1`. The compiler reads the
+version line first and then reads the whole file by that version's grammar; nothing else in the file chooses the
+version (section 4.9). After it come `use` lines and blocks, in any order. A comment runs from `--` to the end of the line. Blank lines are free. Indentation is free too: the
 examples indent for the eye, and a compiler must read the same file with none.
 
 A complete program, which packages a story with its fabula and its author's morph (section 15):
@@ -227,9 +251,10 @@ A file holds four kinds of top-level block, each closed by `end`:
 | move | `move <name>(<params>): <type>` | heads, then statements: a named program with parameters, called like a move (section 8.3) |
 | morph | `morph <name>` | heads, then one line per scale, `<scale> <1-5>`; the `formality` line also gives its direction (section 13.5) |
 | context | `context <name>` | heads, then one line per field, `<field> <value>` (section 16.2) |
+| contract | `contract <name>(<params>)` | `thym 1`: prose heads, then `let`, `assert` and `for each` lines: a check the program defines (section 7.5) |
 
-A `move` block may also stand inside a `program` block, before the program's statements; it is then local to that
-program. Names are lowercase, `[a-z][a-z0-9-]*`. A name is unique among the blocks of its file, and differs from every
+A `move` block, and in `thym 1` a `contract` block, may also stand inside a `program` block, before the program's
+statements; it is then local to that program. Names are lowercase, `[a-z][a-z0-9-]*`. A name is unique among the blocks of its file, and differs from every
 keyword and every move the file can see.
 
 ### 4.3 Heads
@@ -243,10 +268,13 @@ signature heads carry its types.
 | `must:` | `must: <prose>` | a constraint the program keeps; stated, not checked (a checked constraint is an `assert`) |
 | `decided` | `decided <YYYY-MM-DD>: <prose>` | a decision and its date; any number, in date order |
 | `takes` | `takes <name>: <type>, <name>: <type> …` | the inputs; one line, or none for a program that takes nothing |
-| `gives` | `gives <name>: <type>` | the output's name and type; one line; every path must then reach a `give` |
+| `gives` | `gives <name>: <type>` | the output's name and type; one line; every path must then reach a `give`. In `thym 1` a program may give several outputs, `gives code: folder, manual: short`, and every path gives each of them once, by name (section 8.2) |
+| `keeps` | `keeps <name> [of <output>] [against <name>, …]` | `thym 1`: the block's output passes the contract block or named check `<name>`; `of` names the output in a program of several (section 7.5) |
+| `depth:` | `depth: <1-64>` | `thym 1`: how deep a move that calls itself may go (section 8.3) |
 
 **Prose.** A prose head begins after its colon and runs to the end of its paragraph. It continues on the following
-lines until a blank line, a line whose first word is a head keyword (`why` `must` `decided` `takes` `gives`), or `end`.
+lines until a blank line, a line whose first word is a head keyword (`why` `must` `decided` `takes` `gives`, and in
+`thym 1` also `keeps` and `depth`), or `end`.
 Inside the paragraph any word may begin a line. A blank line, or a `takes` or `gives` line, separates the last prose
 head from the first statement. A compiler warns when a prose paragraph holds a line that begins with a statement
 keyword, since the writer probably forgot the blank line.
@@ -260,7 +288,9 @@ keyword, since the writer probably forgot the blank line.
 | `if` | `if <cond> then <stmts> [else <stmts>] end` | a choice |
 | `for each` | `for each <name> in <expr> [where <cond>] <stmts> end` | a loop (section 8.1) |
 | `emit` | `emit [<slot>:] <expr>` | adds an item to the program's output volume, or, with a slot (`emit employees: …`), puts a value into that field of the projection; `project` consumes both (sections 8.2, 18) |
-| `give` | `give <expr>` | gives the block's output; nothing after it on that path runs |
+| `give` | `give <expr>` | gives the block's output, once on each path; a path ends when its last output is given, and nothing after that runs. In `thym 1`, `give <output>: <expr>` names which output it gives (section 8.2) |
+| collecting `let` | `let <name> = for each <name> in <expr> [where <cond>] <stmts> end` | `thym 1`: a loop that collects; binds the list of what its `keep` lines kept (section 8.1) |
+| `keep` | `keep <expr>` | `thym 1`: adds a value to the list the nearest enclosing loop that collects is making |
 | `withhold` | `withhold <expr> [where <cond>]` | calls the move `withhold`: the items leave the output volume without a trace (section 18) |
 | effect | `<expr>` | a move run for its effect (`lint v`, `trace`); its value is dropped |
 
@@ -282,7 +312,7 @@ project h as isotype
 
 | modifier | after it | used by |
 |---|---|---|
-| `as` | a word or a list of words: an order (`told`, `weight`), a kind (`isotype`, `paratype`), a marking (`verified`, `stated`), the words of a band | `tell`, `project`, `mark`, `band` |
+| `as` | a word or a list of words: an order (`told`, `weight`), a kind (`isotype`, `paratype`, `isograph`), a marking (`verified`, `stated`), the words of a band | `tell`, `project`, `mark`, `band` |
 | `by` | an order | `tell` |
 | `with` | a value: a morph, or a fabula | `tell`, `morph`, `read` (a morph); `expand` (a fabula) |
 | `to` | a number and a unit: `300 words`, `12 sentences` | `cut` (words or sentences); `expand` (words) |
@@ -291,6 +321,11 @@ project h as isotype
 | `in` | a context | `read` |
 | `where` | a condition over items | `withhold`; and a filter on a volume or a list (`h where module is employees`) |
 | `marked` | a marking: `verified`, `stated` | any expression that gives an item or a word; short for `mark … as …` |
+| `before`, `after` | a line | `thym 1`: `insert` (exactly one of the two, section 21) |
+
+In `thym 1`, `as` also takes a flavour's word: `derive t as prose`, `derive t as verse`, `derive t as code`; and `tell`
+takes `as code` and the catem's depths `as line`, `as overview`, `as manual` (section 20). The flavour names themselves
+are never keywords or moves.
 
 A modifier's argument that begins with a move name is itself a call, and takes every modifier after it: `measure story
 against null of f` is `measure(story, against: null(of: f))`. Parentheses group where the eye would otherwise misread.
@@ -298,7 +333,21 @@ A field is read with a dot: `now.medium`, `o.kind`.
 
 **Conditions** join terms with `and`, `or` and `not`. A term compares two values with `is`, `is not`, `in` (membership
 in a list), `<`, `>` or `=`; tests a field with `has` (the field is present); tests coverage with `covers` (section
-7.3); or is a bare value of type `bool`.
+7.3); or is a bare value of type `bool`. In `thym 0` a call inside a condition goes in parentheses:
+`assert (words x) > 0`.
+
+In `thym 1`, three things change in conditions and loops:
+
+- **A call on either side of a comparison needs no parentheses**: `assert words new < words old`, `where count parts is
+  0`. A call in a condition ends at `is`, `<`, `>`, `=`, `has`, `covers`, `and`, `or`, `then`, `else`, a closing
+  parenthesis or the end of the line. `in` ends it too, unless the move declares an `in` modifier, in which case `in` is
+  the modifier (`read f with m in now`); write membership in parentheses then: `(read f with m) in xs`. Parentheses
+  still work everywhere. A move's name on a side begins a call only when an operand, or a modifier other than `in`,
+  `where` or `marked`, follows it; otherwise it is a field or a word, so `where count is 3` reads the field `count`.
+- **`in` with a text on its right**: `"TODO" in l` holds when the line, string, short or text on the right contains the
+  characters on the left exactly. Membership in a list is unchanged.
+- **A `where` after a call in a `for each` header belongs to the loop**, unless the move declares a `where` modifier:
+  in `for each l in lines of s where words l > 30`, the `where` filters the lines.
 
 **Bare words.** A bare word stands for itself, without quotes, wherever only a word can stand: inside a list literal,
 after `as`, `by` and `marked`, and on the right of `is` and `is not`. In a `where` clause over items, a bare field name
@@ -320,14 +369,14 @@ compile error, so a typo never becomes a word.
 | density | `text` `fabula` `short` `atem` | |
 | order | `told` `weight` | |
 | marking | `verified` `stated` | |
-| stance | `axiom` `observed` `deduced` `opinion` `assumed` `hearsay` | EMF's closed list |
+| stance | `axiom` `observed` `deduced` `opinion` `assumed` `hearsay` | the fabula's closed list |
 | bool, nothing | `true` `false` `nothing` | `nothing` is the absent value an accessor may give |
-| URI | `oes:<minicosm>/<database>[/<path>]`, as MacroCOSM OES writes it in its grammar of URIs (https://macro.cosmoes.org/), or a relative file path | `oes:emf/notes-md`, `oes:thym/house/M/morph/rosa`, `notes.md` |
+| URI | `oes:<format>/<database>[/<path>]`, as MacroCOSM OES writes it in its grammar of URIs (https://macro.cosmoes.org/), or a relative file path; `oes:emf/…`, the old spelling, names the same thing as `oes:fabula/…` | `oes:fabula/notes-md`, `oes:thym/house/M/morph/rosa`, `notes.md` |
 
 ### 4.7 Keywords
 
-Every keyword is a FEED headword or a form of one (`takes`, `gives`, `has` and `covers` are forms of `take`, `give`,
-`have` and `cover`). The keywords are:
+Every keyword is a FEED headword or a form of one (`takes`, `gives`, `has`, `covers` and `keeps` are forms of `take`,
+`give`, `have`, `cover` and `keep`). The keywords of `thym 0` are:
 
 ```text
 thym use program move morph context end
@@ -338,11 +387,21 @@ is not and or has covers
 true false nothing
 ```
 
-The standard moves (section 6.3), the densities, the orders, the markings and the stances are reserved too: no block,
-binding or user move may take one of these names. A few words are both a keyword or a type and a move (`morph`,
+`thym 1` keeps every one of them and adds six:
+
+```text
+keep keeps contract depth before after
+```
+
+`contract` opens a block, `keeps` and `depth` are heads, `keep` is a statement, and `before` and `after` are
+modifiers. `depth` is the head only where a `:` follows it; anywhere else it is a value, the field of a folder's file
+(section 20.1), so `repo where depth is 0` holds the files at the folder's top. The standard moves a program sees (section 6.3), the densities, the orders, the markings and the stances
+are reserved too: no block, binding or user move may take one of these names. A few words are both a keyword or a type and a move (`morph`,
 `context`, `package`, `graph`, `fabula`, `trace`); where the word stands decides which it is.
 
 ### 4.8 The grammar in full
+
+The grammar of `thym 0`:
 
 ```text
 file      := blank* "thym" INT NEWLINE { use | block }
@@ -371,7 +430,7 @@ stmt      := "let" NAME "=" expr
 
 expr      := call | filter | primary
 filter    := primary "where" cond                  -- the items of a volume, or the members of a list, that satisfy cond
-call      := MOVENAME operand { "," operand } { modifier }
+call      := MOVENAME [ operand { "," operand } ] { modifier }   -- no operand when the move takes none: fabula of p
 operand   := primary
 primary   := NAME | literal | URI | primary "." FIELD | "(" expr ")"
 modifier  := "as" ( WORD | list ) | "by" WORD | "with" primary | "to" INT UNIT | "against" primary
@@ -398,6 +457,77 @@ rest of a line. Comments count as blank. A statement ends at the end of its line
 and a statement may not span lines except inside parentheses or a list. There are no semicolons, no braces and no
 indentation rules.
 
+The grammar of `thym 1` is the grammar above with these productions added. `+=` adds alternatives to a rule, and `:=`
+on a rule the grammar above already has replaces it, for `thym 1` only:
+
+```text
+block     += contract
+program   := "program" NAME NEWLINE { head } { move | contract } { stmt } "end"
+contract  := "contract" NAME "(" param { "," param } ")" NEWLINE { prosehead } { cstmt } "end"
+cstmt     := "let" NAME "=" expr | "assert" cond [ "else" STRING ]
+           | "for" "each" NAME "in" coll [ "where" cond ] NEWLINE { cstmt } "end"
+head      += "keeps" NAME [ "of" NAME ] [ "against" NAME { "," NAME } ] NEWLINE   -- "of": which output
+           | "depth:" INT NEWLINE
+           | "gives" param { "," param } NEWLINE                 -- several outputs
+prosehead := "why:" prose | "must:" prose | "decided" DATE ":" prose
+type      += "folder" | "line" | "change"
+stmt      += "let" NAME "=" "for" "each" NAME "in" coll [ "where" cond ] NEWLINE { stmt } "end"
+           | "keep" expr
+           | "give" NAME ":" expr                                -- a labelled give
+           | "for" "each" NAME "in" coll [ "where" cond ] NEWLINE { stmt } "end"
+coll      := expr                -- a "where" after a call belongs to the loop unless the move declares where
+modifier  += "before" primary | "after" primary
+term      := [ "not" ] ( side cmp side | side "has" FIELD | side "covers" side | side )
+side      := call | primary      -- a call needs no parentheses here
+```
+
+### 4.9 Two grammars
+
+A conforming compiler reads both versions. The version line switches the tables the whole file is read by:
+
+| what the version line switches | `thym 0` | `thym 1` |
+|---|---|---|
+| keywords (section 4.7) | as `thym 0` lists them | adds `keep` `keeps` `contract` `depth` `before` `after` |
+| head words, at which a prose head stops (section 4.3) | `why must decided takes gives` | adds `keeps` and `depth` |
+| blocks (section 4.2) | `program move morph context` | adds `contract` |
+| types (section 5.1) | as `thym 0` lists them | adds `folder`, `line`, `change` |
+| modifiers (section 4.5) | `as by with to against of in where marked` | adds `before`, `after` |
+| grammar | section 4.8, the first block | section 4.8, with the `thym 1` productions |
+| the moves a program sees | each declaration's `thym 0` view | each declaration whole |
+| how a `for each` over a collection known only at run time plans | one node per statement (section 11.1) | one node for the loop (section 11.1) |
+
+A `thym 0` file is read by the `thym 0` tables exactly, so a `thym 0` paragraph whose second line begins with "keeps"
+stays prose, and every `thym 0` program compiles to the same items and the same plan under every later compiler.
+
+**This needs `thym 1`.** When a `thym 0` file is refused, the compiler compiles the same text again as `thym 1`. If
+that second compile succeeds, the refusal becomes a `version` refusal at the first line of the file that holds a
+`thym 1` feature: "this needs `thym 1`: a loop that collects (let readings = for each …) at line 14; the first line
+says thym 0". Otherwise the `thym 0` refusal stands unchanged. The second compile never changes what a `thym 0` program
+means: it runs only on a file the first refused, and it only chooses the message.
+
+**What a `thym 0` program sees.** A move declaration may say `since: 1`, and then only `thym 1` programs see the move;
+and it may carry a `thym-1:` mapping of what a `thym 1` program sees in addition to, or in place of, its own keys
+(section 17.6). A `thym 0` program sees each declaration without its `thym-1:` mapping and no declaration that says
+`since: 1`: its view is frozen. So a `thym 0` program that binds a name such as `record` or `lines` still compiles,
+and a `thym 0` program that calls a move only `thym 1` sees is told it needs `thym 1`. The language still grows by
+moves: a later edition or a manifest may add a move to `thym 0` by declaring it without `since`.
+
+**`use` across versions.** A used file is read by its own version line, and its blocks mean what they meant there. A
+`thym 1` program may `use` a `thym 0` file, a `thym 1` file, a program volume of either version, and any morph or
+context volume. A `thym 0` program may `use` a `thym 0` file and any morph or context volume; a used `.thym` file or
+program volume whose version line (in a volume, the first line of its `front` that is neither blank nor a
+comment) says `thym 1` is refused at the `use` line, check `version`.
+
+**Enumeration and round trip** hold in both versions: `compile` on a program volume gives the `.thym` file back byte
+for byte (section 10). A `thym 0` file enumerates to exactly the items edition 0.5.4 gave it; new fields appear only on
+the new constructs of `thym 1`.
+
+**Relabelling has one cost.** Changing a `thym 0` program's version line to `thym 1` can change the order of the items
+that a loop of several statements emits when it goes over a collection known only at run time. Under `thym 0` each
+statement of such a loop is a node of its own and runs over every member before the next statement starts, so the
+items come in statement order. Under `thym 1` the loop is one node whose body runs member by member, so they come in
+pass order. The items are the same; their order in the output volume may differ.
+
 ---
 
 ## 5. Values and types
@@ -409,20 +539,30 @@ indentation rules.
 | type | what it is | carries |
 |---|---|---|
 | `text` | a markdown text | path or bytes, sha256 |
-| `fabula` | an `emf/1` volume | its text's sha256 (spans resolve against it) |
+| `fabula` | a `fabula/1` volume of one flavour; an `emf/1` volume, the old spelling, is read as a fabulan | its source's sha256 (spans resolve against it); for a fabulac, the folder's tree digest |
 | `short` | a telling | its fabula's sha256, its order, its morph (the null's when none was given) |
 | `atem` | line + focus + push + pull | its source's sha256 and span |
-| `item`, `volume` | any OES item or volume | URI, MiniCOSM, kind |
+| `item`, `volume` | any OES item or volume | URI, format, kind |
 | `morph` | a `thym/1` morph: the ten scales | derived-from (text digests) or declared (a `morph` block) |
 | `context` | surrounding (a catalog excerpt) or occasional (a `thym/1` context item) | |
-| `graph` | an isograph or cryptograph excerpt | the release it came from |
+| `graph` | an isograph made for one text (Ascribe, https://ascribe.cosmoes.org/, its section 14.1) | the release it came from |
 | `package` | section 15 | contents and digests |
 | `plan`, `trace`, `report` | sections 11 and 12; a `lint` report | |
 | `number`, `string`, `bool`, `date`, `word`, `list of T` | plain values | |
+| `folder` | `thym 1`: a directory tree read under one fixed rule (section 20.1) | its path and its tree digest; each file walked from it carries `source: {folder, path}` |
+| `line` | `thym 1`: one line of a text or a short, with its place (section 21.1) | its number, and the sha256 of its source and of itself |
+| `change` | `thym 1`: one edit to a line (section 21.1) | the line's number and digest, and its source's digest |
 
 The nine **meaning types** are `text fabula short atem item volume morph graph package`; a `context` is a meaning value
 too when it is an occasional context item. Every meaning value carries **provenance** (section 5.3). The plain types
-carry none.
+carry none. A `folder` is not a density: it is an input a move reads, and its provenance is its tree digest. A `line`
+fits wherever a `string` is taken: it is a string with a place.
+
+**Flavour is a property, not a type.** A fabula's flavour (`fabulan`, `fabulap` or `fabulac`) is a property of the
+value, read as `f.flavour`. The compiler carries it as a note on the `fabula` type where it knows it: a fabula from
+`derive … as verse` is a fabulap, one from `derive <folder>` or `survey` a fabulac, and a `fabula` input's flavour is
+unknown until run time. It refuses at compile time what it can prove wrong ("f is a fabulan, the fabula of a text; only
+a fabulac is told as code"), and the runtime refuses the rest with the check `flavour`.
 
 ### 5.2 Densities and what fits where
 
@@ -435,15 +575,20 @@ type error, and the message gives the fix ("derive it first").
 Every meaning value a move makes carries the move, its inputs' digests, the run (its trace's id), the step and the
 node. Written
 into a `.cosm`, this becomes the item's envelope provenance plus one field, `made`, which `thym/1` lists in its envelope
-and every other MiniCOSM keeps as an unknown field:
+and every other format keeps as an unknown field:
 
 ```yaml
 provenance: {mode: derived, sources: ["notes.md#sha256:54055e8…", "oes:thym/2026-11-01-1042-7f3a/R/record/3"], confidence: 0.9}
-made: {move: tell, run: 2026-11-01-1042-7f3a, step: 3, node: R:node/4, engine: "model:g40-04"}
+made: {move: tell, run: 2026-11-01-1042-7f3a, step: 3, node: R:node/4, engine: "model:g40-04", route: local}
 ```
 
-`made` is the law of provenance (section 7.2) in one field: Canon never holds a telling that does not say what it is a
-telling of. A value a person wrote by hand has `made: {move: none}`, and a value read from disk without `made` is
+`engine` is `model:<id>` for a model-backed value, where the id is the model's own: the name a local model is known by,
+or the provider's resolved id for a cloud model. A model-backed value also says its `route`, `local` or `cloud`, and a
+cloud one its `provider` (section 23). A value made before this edition has neither key, and a replay of it writes
+none.
+
+`made` is the law of provenance (section 7.2) in one field: the home file system (Canon) never holds a telling that
+does not say what it is a telling of. A value a person wrote by hand has `made: {move: none}`, and a value read from disk without `made` is
 treated as hand-made.
 
 ### 5.4 Bindings
@@ -463,28 +608,35 @@ that calls it: it is called with values, never with the caller's scope.
 
 A move is one step, a transcoding or a transcognition, with four parts: a **signature** (its operands and modifiers with their types, and the
 type it gives); an **asks** flag (true when the move needs the model); a **contract** (the named checks that must hold
-on its output, section 7); and an **owner**, the MiniCOSM whose manifest declares it (section 17.6). A move
+on its output, section 7); and an **owner**, the built-in or the MiniCOSM whose manifest declares it (section 17.6). A move
 transcodes unless its declaration says `asks: true`, in which case it transcognizes. A model-backed move may have a **scaffold**: a deterministic
 stand-in with a weaker output, which a run with `--rules` uses instead (section 19).
 
 ### 6.2 Who declares what
 
-| MiniCOSM | moves |
-|---|---|
-| `thym/1` | `cut`, `count`, `words`, `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace`, and the accessors `fabula`, `context`, `graph`, `isomorph` |
-| `emf/1` | `derive`, `tell`, `atem`, `expand` |
-| `doc/1` | `enumerate`, `compile` |
-| `comprise/1` | `project`, `band`, `mark`, `withhold`, in a sidecar (section 17.6), since `comprise/1`'s manifest belongs to Comprise OES |
+| owner | what it is | moves |
+|---|---|---|
+| `thym/1` | a built-in of the core | `cut`, `count`, `words`, `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace`, and the accessors `fabula`, `context`, `graph`, `isomorph`; for `thym 1`, the dialectic's `question`, `record` and `settle`, the editing moves `lines`, `replace`, `drop`, `insert`, `edit`, `reword`, and `gather`, `join`, `say`, `folders` |
+| `fabula/1` | a built-in of the core | `derive`, `tell`, `atem`, `expand`; for `thym 1`, `survey` and `history` |
+| `doc/1` | a built-in of the core | `enumerate`, `compile` |
+| `comprise/1` | a MiniCOSM | `project`, `band`, `mark`, `withhold`, in a sidecar (section 17.6), since `comprise/1`'s manifest belongs to Comprise OES |
+| `ascribe/1` | a MiniCOSM | for `thym 1`, `propose`, in its own manifest (Ascribe, https://ascribe.cosmoes.org/) |
 
-Section 17.6 gives the `moves:` block that declares them.
+`fabula/1`'s manifest declares the four moves that `emf/1`'s declared under the old name, unchanged in their `thym 0`
+view. The dialectic's moves sit with `thym/1`'s because any volume may carry the dialectic's questions, so no single
+format owns them. Section 17.6 gives the `moves:` block that declares them all.
+`project` takes as its kind what each MiniCOSM declares that it projects: `isotype` and `paratype` are Comprise OES's,
+and `isograph` is Ascribe's (section 18).
 
 ### 6.3 The standard moves
 
-Each contract below is the `contract:` list of the move's declaration; section 7.3 says what each check holds.
+Each contract below is the `contract:` list of the move's declaration; section 7.3 says what each check holds. The
+first table is every program's: it is what a `thym 0` program sees, and a `thym 1` program sees it too, with the
+additions of the second table.
 
 | move | signature | asks | contract |
 |---|---|---|---|
-| `derive` | text → fabula | yes | `span-resolves` `stance-closed` `terms-grounded` `coverage` `emf-checks` `provenance` |
+| `derive` | text → fabula | yes | `span-resolves` `stance-closed` `terms-grounded` `coverage` `fabula-checks` `provenance` (in the `thym 0` view the fifth check keeps its old name, `emf-checks`; it is the same check) |
 | `tell` | fabula \| item \| volume → short; `as` order or `by` order; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` (with a morph) `footer` `provenance` |
 | `atem` | text \| fabula \| short \| item → atem | yes | `atem-shape` `span-resolves` `provenance` |
 | `expand` | atem → short; `with` fabula; `to` N words | yes | `coverage` `no-invention` `stance-kept` `length` `span-inside` `provenance` |
@@ -493,7 +645,7 @@ Each contract below is the `contract:` list of the move's declaration; section 7
 | `measure` | text → morph; `against` short (the null) | yes | `scale-range` `scale-evidence` `provenance` |
 | `morph` | short → short; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` `provenance` |
 | `read` | fabula → short; `with` morph; `in` context | yes | `coverage` `no-invention` `stance-kept` `scales-met` `labelled` `never-source` `provenance` |
-| `project` | volume → volume; `as` kind (`isotype` or `paratype`) | no | the target schema's rules: `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance` |
+| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance` |
 | `band` | number → word; `as` a list of words (`[none, some]`: 0 is `none`; any other list: equal steps of ten) | no | `banded` |
 | `mark` | item \| word → the same; `as` marking | no | `verified-only-where-derived` |
 | `withhold` | item \| volume → nothing; `where` condition | no | `no-mark` |
@@ -501,7 +653,7 @@ Each contract below is the `contract:` list of the move's declaration; section 7
 | `compile` | volume → text | no | `byte-exact` |
 | `package` | text, fabula, morph, context, graph → package; the last three may be `nothing` | no | `digests` `released` `provenance` |
 | `unpack` | package → text (the rest by accessor) | no | `digests` |
-| `lint` | volume → report | no | none; the report holds the MiniCOSM's checks |
+| `lint` | volume → report | no | none; the report holds the checks of the volume's format |
 | `trace` | → trace | no | none; it gives the current run's trace so far |
 | `fabula` | → fabula; `of` package | no | none |
 | `context` | → context; `of` text \| package | no | none |
@@ -514,11 +666,47 @@ Each contract below is the `contract:` list of the move's declaration; section 7
 The accessors are read-only and may give `nothing`. `context of` a text gives the surrounding volume's catalog around it
 (section 16.1), and of a package the context the package carries; `isomorph of` a package gives the author's shared
 morph. `measure` asks the model only for its three judgement scales; the other seven are statistics, computed in code
-(section 13.2), and its scaffold gives those seven with the three pending.
+(section 13.2), and its scaffold gives those seven with the three pending. `compile` given a fabula is refused with the
+fix: "to compile a fabula into a short, use tell".
+
+The moves `thym 1` adds or extends. Every move in this table carries `since: 1` except `derive`, `tell`, `count` and
+`words`, which carry their additions under `thym-1:` (section 17.6):
+
+| move | signature | asks | contract | scaffold |
+|---|---|---|---|---|
+| `derive` | text \| folder → fabula; `as` prose \| verse \| code; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · a folder: none |
+| `tell` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview` or `manual`; `by` order; `with` morph; `as code` gives a folder | yes | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `provenance` · as line, overview or manual: `coverage` `no-invention` `uses-told` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` |
+| `survey` | folder → fabula (a fabulac outline) | no | `files-found` `code-span` `licence-recorded` `fabula-checks` `provenance` | — |
+| `history` | folder → fabula; `with` fabula | no | `history-grounded` `fabula-checks` `provenance` | — |
+| `gather` | list of fabula \| list of item → the type of `with`; `with` fabula \| volume | no | `nothing-lost` `ids-unique` `fabula-checks` `provenance` | — |
+| `question` | fabula \| volume → list of item (questions) | yes | `addressed` `no-duplicate` `provenance` | `bank` |
+| `record` | volume → the type of `in`; `in` fabula \| volume | no | `addressed` `only-the-asked` `provenance` | — |
+| `settle` | fabula \| volume → the same | yes, only where an item must be read again | `addressed` `only-the-asked` `fabula-checks` `provenance` | `direct` |
+| `lines` | → list of line; `of` text \| short | no | none | — |
+| `replace` | line → change; `with` string \| line \| short | no | none | — |
+| `drop` | line → change | no | none | — |
+| `insert` | string \| line \| short → change; `before` line or `after` line, exactly one | no | none | — |
+| `edit` | text \| short → the same; `with` list of change | no | `only-the-changed` `never-source` `provenance` | — |
+| `reword` | line \| string \| short → the same; `to` N words; `with` morph | yes | `length` `one-line` `nothing-added` `provenance` | — |
+| `join` | list of string \| list of line \| list of short → short; `with` string | no | `provenance` | — |
+| `say` | number \| date \| word \| bool \| string → string | no | none | — |
+| `propose` | fabula → list of item (candidate nodes and their questions); `with` volume (the holograph) | yes | `no-invention` `provenance`, and Ascribe's own checks | — |
+| `folders` | → list of folder; `of` folder | no | none | — |
+| `count` | adds folder (its text files) | no | none | — |
+| `words` | adds line \| string | no | none | — |
+
+`propose` is Ascribe's: it reads the holder's own text, decompiled to a fabulan, and gives candidate nodes of the
+holograph, each with the question that asks the holder whether it is so; a program lands them with `gather`.
+`atem`, `expand`, `null`, `measure`, `morph`, `read`, `cut`, `package` and the rest are the same in both versions.
+`atem f` of a fabulac is the catem at depth `line`, under the same contract. The compiler picks the `gives`, the
+contract and the scaffold of a call from the call as written (its `as` word, or its first operand's type), and the
+plan's `P:contract` item lists the chosen contract, so a plan says exactly which checks a node keeps. Sections 20, 21
+and 22 say what these moves do.
 
 ### 6.4 Signatures in the manifest
 
-A move's declaration is one mapping in a `moves:` list (section 17.6). `tell`'s, from `emf/1`'s manifest:
+A move's declaration is one mapping in a `moves:` list (section 17.6). `tell`'s `thym 0` view, from `fabula/1`'s
+manifest:
 
 ```yaml
 moves:
@@ -536,6 +724,11 @@ moves:
 The compiler reads every manifest's moves when it resolves names. A program that names a move no manifest declares is
 refused with the nearest name: "unknown move `summarise`; did you mean `tell`?" (check `unknown-move`).
 
+A declaration may also say `since: 1` (only `thym 1` programs see the move) and carry a `thym-1:` mapping of the keys a
+`thym 1` program sees in addition to its own; inside it, `gives-when`, `contract-when` and `scaffold-when` choose a
+call's type, contract and scaffold by its `as` word or its first operand's type. Section 17.6 lists the keys, and
+section 4.9 says what each version sees.
+
 ---
 
 ## 7. Contracts and the six laws
@@ -548,7 +741,9 @@ A contract is a list of named checks that must hold on a move's output before th
 compiler checks the **static** part: it refuses a composition that cannot satisfy a contract, such as a `tell` whose
 input is a `text`, or a `project … as isotype` that emits a bare count. The runtime checks the **dynamic** part on every
 output. A model-backed output that fails is repaired narrowly, retried within its budget, and then refuses the run
-(section 9). Most checks exist as code in enough and Comprise; Thym names them and attaches them to moves.
+(section 9). Most checks exist as code in enough and Comprise; Thym names them and attaches them to moves. In `thym 1`
+a program may also define a check of its own, as a contract block, and promise that a move's output keeps it (section
+7.5).
 
 ### 7.2 The six laws
 
@@ -568,7 +763,7 @@ output. A model-backed output that fails is repaired narrowly, retried within it
 | check | holds when | where it comes from |
 |---|---|---|
 | `span-resolves` | every `span` names lines or quotes that exist in the source text | enough (Canon's derivation) |
-| `stance-closed` | every claim's stance is in EMF's closed list | MacroCOSM's generic `closed-list` check |
+| `stance-closed` | every claim's stance is in the fabula's closed list | MacroCOSM's generic `closed-list` check |
 | `terms-grounded` | every `L:term` is in FEED, or carries `{pending: "not in FEED"}`, or is a named entity | enough (the lexicon floor) |
 | `coverage` | every sentence of a telling traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | Thym's own; the trace records the sentence → item map |
 | `no-invention` | the telling names no entity, claim or event the fabula lacks | Thym's own |
@@ -591,19 +786,120 @@ output. A model-backed output that fails is repaired narrowly, retried within it
 | `banded` | a number leaves only as a word from the declared list, and a band changes only after the value has stayed past the boundary for 90 days | Comprise (bands) |
 | `no-mark` | a withheld item leaves no placeholder, count or gap | Comprise |
 | `verified-derived` | `verified` only on fields the target schema derives (identity, shape, offers); `stated` on the subject's own words (aims) | Comprise |
-| `verified-only-where-derived` | `mark … as verified` only on an item whose MiniCOSM lists it as derivable | Thym's own |
+| `verified-only-where-derived` | `mark … as verified` only on an item whose format lists it as derivable | Thym's own |
 | `standing-gate` | a release as the subject needs first-party standing, or `sample: true` | Comprise (the standing gate) |
 | `epoch` | the date shown is the epoch, never the edit day; lists keep a fixed order that file order cannot change | Comprise |
 | `digests` | every file in a package's catalog has the sha256 the catalog says | Thym's own |
 | `released` | nothing is in `graph.cosm` without a release recorded in the holograph | Thym's own; the release is Ascribe's (https://ascribe.cosmoes.org/) |
 | `provenance` | every output carries `made` | Thym's own |
-| `emf-checks` | the volume passes `emf/1`'s checks | the MacroCOSM reader's lint |
+| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
+
+The checks the moves of `thym 1` add:
+
+| check | holds when | where it comes from |
+|---|---|---|
+| `flavour` | the fabula's flavour is one the move takes: only a fabulac is told `as code` or at a catem's depth | MacroCOSM OES, its section 18.4.8 |
+| `files-found` | every file the folder rule keeps (section 20.1) has a `C:file` item whose sha256 is the file's, and no `C:file` names a file the tree lacks | Thym's own |
+| `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it | MacroCOSM OES, its section 18.4.8 |
+| `licence-recorded` | the fabulac's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
+| `outline-cited` | every behaviour, structure and case a file's reading gives names the interfaces or components of the outline it is about, and they belong to that file | Thym's own |
+| `fold-grounded` | every intent and inspiration item the fold gives (aim, audience, use, requirement, decision, exclusion; influence, allusion, occasion) cites at least one item of the fabula so far, and the atem's line cites at least one use | Thym's own |
+| `history-grounded` | every change cites commits the clone's log answered, every release a tag it answered, every maker a name in those commits | Thym's own |
+| `parses` | every file of a cshort in a language the fabulac names is read by that language's parser without a syntax error; parsing is not running, and nothing is imported or executed | Thym's own; the host's syntax engine |
+| `interfaces-present` | every interface of the fabulac is defined in the cshort's file its span names, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
+| `files-present` | the cshort holds every file it is required to rebuild, at its path (every `C:file` in a programming language that is not a test, and the README; MacroCOSM OES, its section 18.4.7), with `CSHORT.md`, and the digests `CSHORT.md` lists are the files' | Thym's own |
+| `uses-told` | a catem tells everything its depth asks for: at `overview` every use, at `manual` every use and every interface a person reaches | Thym's own |
+| `nothing-lost` | every item of every part gathered, and of the `with` volume, is in the output, byte-equal | Thym's own |
+| `ids-unique` | no two different items share an id (two byte-equal ones are one) | Thym's own |
+| `addressed` | every question's `about` resolves (an item, an `<item>#<field>`, a span of the source, or a module or kind the format declares), and every answer names a question that is `open` or `answered` and fits the question's `kind` | Thym's own; the dialectic is MacroCOSM OES's, its section 18.6 |
+| `no-duplicate` | no two open questions about the same address ask the same thing, nor does a new one repeat a question already in the volume | Thym's own |
+| `only-the-asked` | only the questions' answers, states and `settled` fields, the new session, and the fields that answered questions are about (with their provenance) differ from the input | Thym's own |
+| `only-the-changed` | every change names the value being edited and a line it holds with that digest; no line is replaced or dropped twice; and the output is the input with exactly those changes (section 21.3) | Thym's own |
+| `one-line` | a reworded `line` is one line; an answer of several lines is repaired by joining them with a space, then checked again | Thym's own |
+| `nothing-added` | every name, number and word outside FEED in the output is in the input | Thym's own |
 
 ### 7.4 `assert`
 
 An `assert` line adds a check of the program's own. Its condition is evaluated at run time with the values at hand, and
 false refuses the run with the message. `assert f covers story` is the usual one; its step's contract names the check
 the condition uses (`covers` is `coverage`). A user move's `assert` lines become contracts of the move (section 8.3).
+An `assert` refuses at once: use it where asking again cannot help, as with an input outside the band a program
+reads or a coverage law. Where a model's answer can be better on the next try, use `keeps` (section 7.5).
+
+### 7.5 Contract blocks and `keeps`
+
+In `thym 1` a program may define a check of its own. A **contract block** is a named, reusable set of conditions over
+a value: `contract <name>(<value>: T, <other>: U, …)`, its prose heads, then `let`, `assert` and `for each` lines,
+then `end`. It stands at the top level, or inside a program before the program's statements, as a move does. In the
+terms of section 7.1, it defines one named check.
+
+```text
+contract shorter(new: line, old: line)
+  why: a reworded line says less in fewer words, never more.
+
+  assert words new < words old else "the reworded line is not shorter than the line it replaces"
+end
+```
+
+The head **`keeps <name> [of <output>] [against <name>, …]`** stands in a `move` or a `program` that gives, and promises that the
+block's output passes the check. The kept value is the block's output and fills the contract's first parameter; the
+names after `against` are the block's own parameters (in a move) or its `takes` names (in a program), and they fill
+the second and later parameters, in order. `<name>` is a contract block the file can see (its own, a program's local
+one, or one a `use`d file declares) or a named check of section 7.3; for a named check, the `against` names are its
+inputs. A program of several outputs says which one it keeps: `keeps tidy of manual`.
+
+**The static rules.**
+
+- A contract's body asks no model, directly or through a move it calls: a contract checks, and never asks.
+- Its body holds `let`, `assert` and `for each` lines only.
+- Its name is unique among the file's blocks, and differs from every keyword, every move the file sees and every
+  check of section 7.3.
+- `keeps` names a contract or a check that exists; otherwise check `unknown-check`, with the nearest name.
+- The kept value's type fits the contract's first parameter, and each `against` name the next one, in count and in
+  type.
+- `keeps` stands only in a block that gives.
+
+**How it is checked.** When a user move's body gives its value, each contract it keeps runs: its parameters are bound,
+its lines run in order, and the first false `assert` gives the verdict `{name, ok: false, why: <the assert's
+message>}`. If the move asks (section 8.3: a move asks when any move it calls asks), a failed kept contract runs the
+move's body again, within the node's attempts (3, counting the first). On every re-run, each model request the body
+makes carries the failed contract's verdicts among its repairs, so the model is told which checks its last answer
+failed and why; nothing else reaches the model. After the attempts, the run is refused with the contract's name as its
+check. A move that does not ask is refused at once, since running a deterministic body again gives the same answer. A
+program that keeps a contract has its output checked before anything lands, and a failure refuses the run, without a
+re-ask: a program is not one node.
+
+A manifest's `contract:` list names checks the registry implements, and a contract block is a check a program
+implements. Both kinds of name stand in the same places: a plan node's contract item, a record's `checks`, a refusal's
+`check`. A manifest cannot name a contract block, because a manifest's checks are code.
+
+```thym
+thym 1
+
+contract plain-enough(s: short)
+  why: a telling for the help pages stays short and never shouts.
+
+  assert words s < 301 else "over three hundred words"
+  for each l in lines of s
+    assert not "!" in l else "an exclamation mark"
+  end
+end
+
+program help-telling
+  why: a guide told plainly for the help pages, asked again until it is plain enough.
+
+  takes guide: text
+  gives page: short
+
+  move told-plainly(f: fabula): short
+    keeps plain-enough
+    keeps no-invention against f
+    give tell f as told
+  end
+
+  give told-plainly (derive guide)
+end
+```
 
 ---
 
@@ -618,7 +914,51 @@ Bindings are section 5.4.
 `if … then … else … end` chooses. `for each … in … where … end` goes through the items of a volume or a fabula (in
 `told` order: by span, then by id), the lines of a short, or the members of a list. `where` filters before the body
 runs. The loop variable is bound for the body. The body may `emit`, `assert`, `let` new names and run moves for their
-effect. It may not `give`: a program gives once, after its loops.
+effect. It may not `give`: a program gives once, after its loops (refused as `type`, section 9). In `thym 1` a loop
+also goes through the text files of a folder, in path order (section 20.2), and `lines of s` gives the lines of a text
+or a short as `line` values (section 21).
+
+**How a loop runs.** A loop over a list written in the program runs its statements once per member, as written. Over a
+collection known only at run time, `thym 0` runs each statement of the body over every member before the next statement
+starts, and `thym 1` runs the body member by member, as a unit, as a user move's body runs: a name the body binds, an
+`if` inside it and a nested call all take this pass's values (section 11.1 says how each plans). In `thym 0`, three
+such loops are refused at run with the fix, write `thym 1`, where a loop's body runs member by member: one holding an
+`if` whose condition reads the loop's variable or a name the body binds (the condition is read once, before the loop,
+and the refusal keeps the check that failed); one holding a `let` read later in the same loop (check `loop`); and one
+holding a `for each` nested inside it (check `loop`).
+
+**A loop that collects** (`thym 1`) is a `for each` that is the value of a `let`:
+
+```text
+let readings = for each t in repo where suffix is py
+  keep read-file t, f
+end
+```
+
+It reads aloud: let readings be, for each Python file of the repository, its reading kept. `keep <expr>` belongs to
+the nearest enclosing loop that collects. It may stand inside an `if` or a plain `for each` within that loop's body (an
+inner loop then keeps several per pass), and never in a user move's body unless that body holds the loop. Every `keep`
+of one loop keeps one type T, and the loop binds `list of T`; a loop that collects has at least one `keep`. The body may
+`let`, `assert`, `emit`, `withhold`, run moves for effect, and nest `if` and `for each`, and it may not `give`. The
+names the body binds are bound for one pass, and the loop's own name is bound after its `end`, never inside it. The
+list is bound when the last pass ends, and a refusal in any pass refuses the run.
+
+```thym
+thym 1
+
+program aims-in-brief
+  why: every aim of a house, told in one line, in the order the holotype keeps them.
+
+  takes h: volume
+  gives brief: short
+
+  let lines-of-aims = for each a in h where kind is aim
+    let s = atem a
+    keep s.line
+  end
+  give join lines-of-aims
+end
+```
 
 ### 8.2 Three ways out
 
@@ -627,12 +967,53 @@ program's output volume, or, with a slot (`emit employees: band …`), sets a fi
 `project` consumes them, so a program that emits and never projects is refused, because the emitted items go nowhere. `withhold` marks items of a volume as withheld, and `project` leaves them out without a
 mark.
 
+**Several outputs** (`thym 1`). A program may give several outputs, `gives code: folder, manual: short`, and gives each
+with a labelled `give`, shaped like the labelled `emit`: `give code: tell f as code`. Every path gives each output
+exactly once, by name; a path that misses one is refused (`no-give`), and a second `give` of the same output on one
+path, or a `give` naming no output of the program, is refused (`type`). A block with one output may label its `give` or not. A user move gives one value, since its signature
+says one type. All of a program's outputs land at once, or none do.
+
 ### 8.3 User moves
 
 A `move` block is a named program with parameters. It is called like a standard move, with its operands in parameter
 order. It has a declared signature and inherits the contracts of the moves it uses, and its `assert` lines become
-contracts of its own. A move may call other moves. A move that calls itself, directly or through another, is refused
-(`recursion`, section 9); recursion is reserved for a later edition. A move sees only its parameters.
+contracts of its own. A move may call other moves. A move sees only its parameters.
+
+**Recursion.** In `thym 0`, a move that calls itself, directly or through another, is refused (`recursion`, section 9).
+In `thym 1` a move may call itself when it says how deep it may go: the head `depth: <N>`, with N from 1 to 64,
+under its `why`. Every move on a cycle of calls says `depth:`, and a move that says it and never calls itself is
+refused, as is a depth outside 1 to 64 (`type`). A program cannot call itself, since programs are not called, and cannot
+say `depth:`. A depth is one number that a person can read, a plan can show and every runtime keeps the same way; a
+rule of "a strictly smaller input" would need a measure the compiler can prove falls, which Thym's values do not have.
+A recursive move's contract and `asks` are those of every move on its cycle.
+
+A call of a recursive move is one node, as any call of a user move is (section 11.1): its body is never expanded into
+the plan, so the plan is as finite as the program text. The node's budget holds the move's `depth`. At run, the
+runtime counts the move's calls on its stack, and a call that would nest the move one deeper than its depth refuses the run,
+check `recursion`, naming the pass in the person's terms: "`give tree-of d` (line 17): tree-of went 13 deep; its
+depth is 12". A depth bounds how deep a move goes, not how many calls it makes, so a plan with a recursive move that
+asks has an open count of model calls (section 23).
+
+```thym
+thym 1
+
+program folder-outline
+  why: a tree of folders, one line per folder, every folder under its parent.
+
+  takes d: folder
+  gives outline: short
+
+  move tree-of(d: folder): short
+    depth: 12
+    let below = for each sub in folders of d
+      keep tree-of sub
+    end
+    give join [(join [d.path]), (join below)]
+  end
+
+  give tree-of d
+end
+```
 
 ```thym
 thym 0
@@ -659,7 +1040,9 @@ end
 A `use` line stands outside every block, usually just after the version line. It brings another file's moves, morphs
 and contexts into scope: `use oes:thym/house` names everything the install's `thym/1` volume `house` declares (its
 morphs and contexts, `rosa` among them), and `use house.thym` names everything a file beside this one declares. Two names that clash are a compile error, and the
-refusal names both files.
+refusal names both files. A `use`d path is relative to the program's folder and stays inside it: an absolute path, a
+`..` step, or a link that leads out of the folder is an unknown URI, and the file is not read. A used file is read by
+its own version line, and a `thym 0` program may not use a `thym 1` file (section 4.9).
 
 ```thym
 thym 0
@@ -684,13 +1067,31 @@ end
 
 | time | what is refused | with |
 |---|---|---|
-| **compile** | a parse error (`parse`); a version line that is not `thym 0` (`version`); an unknown move (`unknown-move`); an unknown URI or `use`d file (`unknown-uri`); two `use`d names that clash (`use-clash`); an unbound name (`unbound`); a type error (`type`); a name bound twice (`rebound`); recursion (`recursion`); a `give` inside a loop (`type`); a block that `gives`, with a path that never reaches a `give`, refused at the block's first line (`no-give`); emitted items with no `project` (`emit-without-project`); a static contract that cannot hold (the contract's check, such as `no-counts`) | the file and line, the check, and the fix where one is known |
-| **plan** | a model-backed node while agent-free (`agent-free`, section 19); a prompt the machine's model cannot hold (`preflight`, the 16 GB rule, section 12.5); a missing or changed input (`input`: its digest differs from the plan's); a plan whose program cannot be read (`no-program`); a move with no implementation here (`move`), or none under `--rules` (`rules`) | the node, the count or the size, and what would make it run |
-| **run** | a model-backed output that still fails its contract after narrow repair and its budget of attempts (the check's name), or that never fits the contract's schema (`schema`); a check the runtime lacks (the check's name, "not implemented"); a failed `assert`; a deterministic move that raises | the trace, which says the node, the check and the attempts; nothing is written |
+| **compile** | a parse error (`parse`); a version line that names a grammar the compiler does not know, `thym 1` syntax or a move only `thym 1` sees under a `thym 0` line ("this needs `thym 1`", section 4.9), or a `thym 0` program that uses a `thym 1` file (`version`); an unknown move (`unknown-move`); an unknown URI or `use`d file (`unknown-uri`); two `use`d names that clash (`use-clash`); an unbound name (`unbound`); a type error (`type`); a name bound twice (`rebound`); recursion in `thym 0`, or in `thym 1` a move on a cycle without `depth:` (`recursion`); a `give` inside a loop (`type`); a `keep` outside a loop that collects, a loop that collects nothing or keeps two types, a contract that asks, a `depth:` out of range or on a move that never calls itself (`type`); a `keeps` naming no contract and no check (`unknown-check`); a block that `gives`, with a path that never reaches a `give` of each output, refused at the block's first line (`no-give`); emitted items with no `project` (`emit-without-project`); a static contract that cannot hold (the contract's check, such as `no-counts`), a fabula known to be of a flavour the move does not take among them (`flavour`) | the file and line, the check, and the fix where one is known |
+| **plan** | a model-backed node while agent-free (`agent-free`, section 19); a prompt the machine's model cannot hold (`preflight`, the 16 GB rule, section 12.5); a missing or changed input (`input`: its digest, or a folder's tree digest, differs from the plan's); a plan whose program cannot be read (`no-program`); a move with no implementation here (`move`), or none under `--rules` (`rules`); a cloud route whose gate is closed (`cloud`); a cloud plan whose count of model calls is open and that was given no ceiling (`calls`, section 23) | the node, the count or the size, and what would make it run |
+| **run** | a model-backed output that still fails its contract after narrow repair and its budget of attempts (the check's name, a kept contract's included), or that never fits the contract's schema (`schema`); a check the runtime lacks (the check's name, "not implemented"); a failed `assert`; a deterministic move that raises; a move that went deeper than its depth (`recursion`); a `thym 0` loop that section 8.1 refuses at run (`loop`); a fabula of a flavour the move does not take (`flavour`); a run that reached its ceiling of model calls (`calls`) | the trace, which says the node, the check and the attempts; nothing is written |
 
 A refusal is a value, not an exception: the CLI prints it and exits non-zero, the server returns it as the response,
 and the viewer shows it in place of the plan or the outputs. It carries `stage` (`compile`, `plan` or `run`), `line`,
 `check` and `message`, and like MacroCOSM's refusal it reads as a plain no.
+
+**A refusal speaks in the person's words**, at every stage and in both versions. It names the statement as the person
+wrote it: the line without indentation or comment, cut to 60 characters with "…". It names that statement's line,
+and, inside a loop, the pass in the person's terms: `for o = M:offer/seed-boxes` (the item's id),
+`for t = tool/cli.py` (the file's path), `for l = line 7` (the line's number), `for x = the second member` (a member
+of a written list, by its place; the plan's node names the same pass by the member as written, section 11.1). It names a value by the expression the person wrote, such as `(count staff)`. It never shows a
+temporary (`t3`), a node's number, a node's id, an implementation's exception or the inside of a value as the
+implementation prints it. The shape is:
+
+```text
+<statement> (line N[, for <var> = <member>]): <what failed, in the program's names>[: the fix]
+```
+
+For example: "`let f = derive story` (line 11): derive still fails coverage after 3 attempts: sentence 4 is not
+covered". The one exception is a fault of the runtime itself: that refusal says so, as a fault of the runtime and not
+of the program, and its record keeps the detail for whoever maintains the runtime. A plan keeps its temporaries in its
+nodes' names, since plans are for reading the graph; a refusal never quotes a node's name, and quotes the statement,
+which the runtime has because it runs with the program beside the plan (section 12.1).
 
 ---
 
@@ -720,7 +1121,13 @@ program's name, or `<program>.<move>` for a move local to a program.
 - **One item per contracted call.** A `P:contract` names a call's move and the checks it carries:
   `P:contract/<block>.<n>` for the step's own move, and `<block>.<n>.<m>` for each contracted call nested inside it,
   `marked` included. An `assert` step's contract names the check its condition uses. A call of a user move carries the
-  contracts the move inherits.
+  contracts the move inherits, and, in `thym 1`, the contracts the move keeps, after the inherited ones.
+- **What `thym 1` adds.** A contract block gives `P:check/<name>`, or `P:check/<program>.<name>` for one local to a
+  program, with `why`, `params`, `body`, `lines`, `order` and `steps` (its lines as steps, `P:step/<name>.<n>`). A
+  `keep` is a step of form `keep`; a loop that collects is a step of form `for` whose `binds` is the loop's name. A labelled
+  `give` holds its output's name in `slot`. A block that keeps a contract lists it in `keeps`, a move that may call
+  itself holds its `depth`, and a program of several outputs lists each in `gives`. A `thym 0` file enumerates exactly
+  as before: no field is new on any of its items.
 
 `compile` on the items gives the file back byte for byte: the catalog's `front` (everything before the first block),
 then each top-level item's `body` in `order`, is the file. enough's docs viewer shows a program at three densities like any
@@ -738,8 +1145,8 @@ of a program is the one line a listing shows.
 
 ### 11.1 The stages
 
-1. **Parse** the file into a tree, by recursive descent over the grammar of section 4.8. The tree keeps each
-   statement's line and source text.
+1. **Parse** the file into a tree, by recursive descent over the grammar of section 4.8 for the version its line
+   names. The tree keeps each statement's line and source text.
 2. **Resolve** names, URIs, `use`d files, and the moves every manifest in the registry declares (section 17.6).
 3. **Type-check** by density. Every expression gets a type, every call is matched to a signature, and the provenance
    of each value (what it will be made from, by which move) is worked out.
@@ -751,13 +1158,26 @@ of a program is the one line a listing shows.
 
 The nodes of a plan come in evaluation order, a nested call before the call that takes its value:
 
-- one node per move call, a `marked` modifier included (it is a `mark` node of its own), and one per `assert`; a call
-  of a user move is one node;
+- outside a loop's body, one node per move call, a `marked` modifier included (it is a `mark` node of its own), and one
+  per `assert`; a call of a user move is one node;
 - one node per `if`, for its condition; each node of a branch says which branch it is in (`then` or `else`) and waits
   on the condition;
-- for a `for each`, a node per member for each call in its body when the collection is known at plan time; otherwise
-  one node per call, marked `repeats`, that takes the collection;
+- for a `for each`, one node per statement of its body: for each member when the collection is a list written in the
+  program, otherwise once, marked `repeats`, taking the collection. A call nested inside a statement of a loop's body,
+  `marked` included, is part of that statement's node and is evaluated with each member; it is never a node of its
+  own. Under `thym 1`, a loop over a collection known only at run time is one node, and its body runs member by member
+  as a unit; a loop that collects is one node too;
 - no node for a `let` whose value is not a call; a filter (`h where …`) folds into the node that takes it.
+
+A statement's node in a loop is named by its statement, with `, for each …` or `, for x = <member>` after it; it asks
+when any of its calls asks, and it takes every name the statement and the loop's `where` read. Under `thym 1`, a loop
+over a run-time collection whose body is one plain statement (neither an `if` nor a `for each`) gives exactly the
+`thym 0` node; any other gives a node named by the loop's own line, with move `for`, `repeats: true`, `members` where
+known, and `calls`, the moves its header and its body call, in written order, once each. A loop that collects gives
+such a node, which also `gives` the loop's name. `members: {at_most: n}` is given only where the plan alone knows the
+collection's size: a list written in the program, or a folder input (its files, counted before the `where`); a count
+is never read from a volume or fabula input, so a plan does not depend on where it was planned. A call of a user move that keeps contracts carries `keeps`, and one that may call itself
+carries `depth` in its budget.
 
 A node takes names (inputs, bindings, or a temporary `t<n>` made by the nested call at node `n`) and gives at most one:
 its binding, the block's `gives` name, or a temporary. A node runs after the nodes whose outputs it takes. The node that
@@ -773,7 +1193,8 @@ In the reference implementation, enough (https://github.com/0gsd/enough), the co
 package, with the moves implemented by subject (`emf`, `doc`, `project`, `edit`, `morph`, `pack`) as the manifests'
 `code` keys name them. The package depends on the standard library, PyYAML and the MacroCOSM reader, and on nothing else
 of enough. The engines (Canon's derivation, DocOES, the model client, preflight) plug in from outside, through the
-coprocessor and the moves' registration, so the compiler is vendorable, as the reader is.
+coprocessor and the moves' registration, so another program can carry a copy of the compiler and run it, as it can
+the reader.
 
 ### 11.3 The command line
 
@@ -789,6 +1210,14 @@ python -m enough.thym enumerate <program.thym>                     write <name>.
 python -m enough.thym compile   <name.thym.cosm>                   the file again, byte for byte
 python -m enough.thym conform   [<suite folder>]                   run the conformance suite
 ```
+
+`plan` and `run` also take `--model local` (the default: the local model), `--model cloud` (the cloud model the host
+names) or `--model cloud:<the provider's model id>`, and `--calls <N>`, a ceiling on the run's model requests (section
+23). An input is given as `name=path`, a folder's path included (`repo=tool/`); when the program takes exactly one
+input, a bare path will do (`python -m enough.thym run tidy.thym notes.md`). An argument is `name=path` when the text
+before its first `=` is a name the program takes, and a bare path otherwise; a program of several inputs refuses a bare
+path ("tidy takes story and voice; give each as name=path"). The bare path is the command line's rule, not the
+grammar's, so it holds for both versions, and the plan it makes is the plan `name=path` makes.
 
 Every enough command reads `ENOUGH_THYM_ROOT` (default `~/enough/thym/`) for where runs live, and writes nowhere else
 unless it is told the path.
@@ -814,6 +1243,10 @@ builds the coprocessor call from the move's contract and the node's inputs. A fa
 already made are discarded, nothing is written to the target paths, and the trace records how far the run got. Outputs
 are written only when every node has succeeded, all at once, with the trace beside them.
 
+A run snapshots every folder it takes (section 20.3), so that its replay needs no repository. A program of several
+outputs lands them all in the same step, or none. A folder output lands as a directory, `outputs/<name>/`, holding
+exactly the folder's files, and is renamed into place with every other output in that one step (section 20.4).
+
 ### 12.2 The coprocessor
 
 One interface; three implementations in enough; any number elsewhere.
@@ -825,10 +1258,15 @@ class Coprocessor(Protocol):
 Contract  = {move, schema, checks, repair}                         # what the move needs back and what must hold
 Inputs    = {name: (value, digest)}                                # the node's operands, by name
 Budget    = {attempts, output_words, prompt_tokens_max, seconds}   # the node's budget and the machine's limits
-Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}]}
+Candidate = {output, engine, route, provider, attempts, tokens, seconds, checks: [{name, ok, why}]}
 ```
 
-- **`ModelCoprocessor`** is enough's: its model client with the machinery of Canon's derivation, generalised. It asks for
+A candidate's `route` and `provider` say where its model ran (section 23); a candidate recorded before this edition
+has neither. A kept contract that failed (section 7.5) reaches the next request under `repair`, as the move's own failed
+checks do.
+
+- **`ModelCoprocessor`** is enough's: its model client with the machinery of Canon's derivation, generalised, on the
+  run's route, a local model or a cloud model through a broker. It asks for
   schema'd output; makes the narrow repairs the contract allows (drop an item whose span does not resolve, normalise a
   stance word, re-ask once with the failed checks listed); keeps within its attempts; and applies the lexicon floor and
   the span checks. An answer that is to be YAML and has prose before, after or instead of it (a narration, a heading,
@@ -846,8 +1284,10 @@ Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}
 ### 12.3 Traces
 
 A run writes one `thym/1` volume of kind `trace`. Its catalog names the run; the program (name and sha256); the plan's
-sha256; the environment (the implementation and its version, the model's id and context size, agent-free or not, the
-machine's memory band); when the run started and ended; and its outcome. One `R:record` item per node holds the node, the move, the
+sha256; the environment (the implementation and its version, the id of the model that ran and its context size, the
+route and the provider, agent-free or not, the machine's memory band); when the run started and ended; and its outcome.
+A record of a loop that runs as one node says how many `passes` it made, and holds a row `<name>.<k>` per value a loop
+that collects kept. One `R:record` item per node holds the node, the move, the
 digests of the inputs and outputs, and the candidate's fields: the engine (`code` for a deterministic node, `rules`
 for a scaffold, `model:<id>`, or `skipped` for a node on the branch not taken), attempts, tokens, seconds, and every
 check with its verdict and, for a failed check, why; a node asked more than once also keeps `tries`, each failed
@@ -880,20 +1320,28 @@ from its record and runs no engine, so it needs no dictionary and no engine; it 
 prompt whose digest differs from the record's, before any engine or model work. A run whose trace names no `engines`
 was recorded before engine calls were, and replays with the host's live engines.
 
+A replay reads a folder input from the run's snapshot of it (section 20.3), never from the disk, so it needs no
+repository. A candidate recorded without a route replays without one: the outputs it gives carry no `route` in `made`,
+as they did when they were recorded. Model calls inside a loop or a recursion are keyed on the node's one counter in
+the order they were made (pass order, depth first), so a replay meets them in the same order.
+
 ### 12.5 Budgets and the 16 GB rule
 
 A plan carries the largest prompt it will build. At plan time the runtime asks `preflight` whether the machine's model
 holds it; on a small machine a program may be refused with the number and the fix, as enough refuses a chat the machine cannot
 hold. Every node has an
 `attempts` budget (3 for a model-backed node, 1 otherwise) and an output budget in words (the call's `to N words`, or
-else the machine's). The trace records what each node cost.
+else the machine's). The trace records what each node cost. The rule reads the window of the run's model: a local
+model's, or a cloud model's context length. A recursive move's node carries its `depth`, and a run may be given a
+ceiling on its model requests, `--calls N`, which a cloud plan with an open count of calls must be given (section 23).
 
 ### 12.6 Portability
 
 No Python-only semantics. No reliance on mapping order beyond what the COSM YAML subset fixes. No floats in contracts:
 bands and scales are integers, and the ratios of section 13.3 are integers per hundred or per thousand. Digests are
-sha256: a text's over its bytes, a volume's over its catalog file, a file's always over its bytes, and a mapping's
-over the reader's canonical dump (keys in file order, LF newlines, UTF-8); the compiler's own
+sha256: a text's over its bytes, a volume's over its catalog file, a file's always over its bytes, a folder's over its
+files as the tree digest (section 20.1), and a mapping's over the reader's canonical dump (keys in file order, LF
+newlines, UTF-8). The folder rule is the same in every language and uses no ignore-file semantics; the compiler's own
 `dump` writes program volumes for people, with block scalars, and is never a digest's form. File paths are URIs. Time is UTC in traces and local only in file names. A JavaScript
 runtime that passes the conformance suite is a conforming runtime, and the docs viewer could then make readings in the
 page.
@@ -940,11 +1388,11 @@ formal` or `toward: casual`.
 ### 13.3 Measurement
 
 Ratios are per hundred or per thousand words, compared as integers. The thresholds are this edition's. The conformance
-suite pins them, and a later edition may move them only with an entry in the Changes appendix (section 21).
+suite pins them, and a later edition may move them only with an entry in the Changes appendix (section 25).
 
 | scale | measure | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|---|
-| `register` | the share of distinct words outside FEED's common band (FEED's bands 4 and up are common; a word with no band counts as common when it has eight letters or fewer; names never count; the null telling's register also exempts every word its fabula's items use, since it must say them), per hundred | < 2 | < 5 | < 10 | < 20 | ≥ 20 |
+| `register` | the share of distinct words outside FEED's common band (FEED's bands 4 and up are common; a word with no band is rare when it has nine letters or more and common when it has eight or fewer, the nine-letter rule; names never count; the null telling's register also exempts every word its fabula's items use, since it must say them), per hundred | < 2 | < 5 | < 10 | < 20 | ≥ 20 |
 | `sentence-length` | mean words per sentence | ≤ 10 | ≤ 15 | ≤ 20 | ≤ 27 | > 27 |
 | `paragraph-rhythm` | the spread of sentences per paragraph: standard deviation over mean, per hundred; needs three paragraphs, else 1 with confidence 30 | < 15 | < 30 | < 50 | < 75 | ≥ 75 |
 | `analytical-depth` | the fabula's reason links (`supports`, `depends-on`, `resolves`) per claim, per hundred | < 10 | < 30 | < 60 | < 100 | ≥ 100 |
@@ -959,7 +1407,7 @@ For every scale, `measure` gives a `value`; a `basis` (`statistics` or `judgemen
 of the text that moved it; and a `confidence` as an integer per hundred (no floats reach a `.cosm`). Below 300 words
 or three paragraphs, a statistics scale reports a confidence of at most 50, and a judgement scale at most 40. The word lists above are this edition's seed; the
 reference implementation keeps them beside its measures. The statistics read English: the lists, the honorifics, the
-stance phrases, FEED's bands and the rule of nine letters are English's, so a text in another language is measured
+stance phrases, FEED's bands and the nine-letter rule are English's, so a text in another language is measured
 as if it were English (its judgement scales still hold, since the model reads the language); lists per language are
 reserved for a later edition.
 
@@ -1047,20 +1495,25 @@ the one being a folder with a `package.cosm` inside):
 
 ```text
 text.md            the author's text, exactly as published
-fabula.cosm        emf/1; every span resolves into text.md
+<twin's name>      the text's fabula, fabula/1, under the name its twin had (notes.md.fabulan.cosm); every span
+                   resolves into text.md. A package made before this edition holds it as fabula.cosm, emf/1 read as a fabulan
 morph.cosm         thym/1, kind morph (optional: the author's isomorph for this text)
 context.cosm       thym/1, kind context (optional: the occasional context, and the surrounding volume's catalog excerpt)
-graph.cosm         an isograph or cryptograph excerpt (optional; only what the holograph released for this text)
+graph.cosm         an isograph made for this text (optional; only what the holograph released for this text)
 package.cosm       the catalog: contents with digests, the program and the trace that made it, the notice
 ```
 
-`<name>` is the stem of the text the package was made from, and a package is saved beside that text: `notes.md` gives
-`notes.thym/`, `notes.package.cosm` and `notes.thym.enc`. A reader of a library lists each form as one thing (Canon:
-`kind: package`, `kind: sealed`) and never opens the folder up as texts. enough's export makes a package by running a
-program over the text and its fresh EMF twin (`package story, f, m, c, g`, with `context of story` and `graph of
-story`), so the package's catalog names that program and run; it derives nothing. Unpacking verifies every digest and
-every span before it writes anything, then writes the text beside the package as `<name>.md` and its fabula as that
-text's twin, `<name>.md.cosm`, whose `source.path` and locators say the text's name again, with the morph, context and
+A package has three forms, each saved beside the text it was made from and named by that text's stem, `<name>`: the
+folder form `<name>.thym/`, the single-file form `<name>.package.cosm` and the encrypted form `<name>.thym.enc`
+(`notes.md` gives `notes.thym/`, `notes.package.cosm` and `notes.thym.enc`). Section 15.3 is the rule for which of
+them `package` lands. A reader of a library lists each form as one thing (the home file system's `kind: package` and
+`kind: sealed`) and never opens the folder up as texts. enough's export makes a package by running a
+program over the text and its fresh fabula (`package story, f, m, c, g`, with `context of story` and `graph of
+story`), so the package's catalog names that program and run; it derives nothing. A package finds its fabula by its role in the catalog, `role: fabula`, never by the file's name, and
+nothing is renamed on the way in or out. Unpacking verifies every digest and every span before it writes anything,
+then writes the text beside the package as `<name>.md` and its fabula under the name the package carries it by
+(`<name>.md.fabulan.cosm`; from a package that holds `fabula.cosm`, the text's twin `<name>.md.cosm`), whose
+`source.path` and locators say the text's name again, with the morph, context and
 graph as `<name>.morph.cosm`, `<name>.context.cosm` and `<name>.graph.cosm`; it writes nothing on a failure, and never
 over a file that differs.
 
@@ -1084,7 +1537,8 @@ nodes: []
 
 ### 15.3 Single-file and encrypted forms
 
-`package` lands the single-file form, with the folder form `<name>.thym/` beside it. The **single-file form**,
+`package` lands the single-file form, with the folder form `<name>.thym/` beside it; it makes the encrypted form only
+when sealing is asked for. The **single-file form**,
 `<name>.package.cosm`, is the same catalog with each file's bytes as a block scalar under
 `contents[].text`, so that one file travels. The **encrypted form**, `<name>.thym.enc`, is the single-file form
 encrypted on the owner's machine and handed, with a key, to a chosen party: this is what a cryptotype and a cryptograph
@@ -1104,6 +1558,10 @@ vendored runtime without that package), the same layout is sealed with an encryp
 hmac-sha256-ctr`: an HMAC keystream in counter mode, then a 16-byte HMAC tag, under keys split from the one key by
 HKDF), and the file says so; a package sealed with AES-256-GCM opens only where AES-256-GCM is available.
 
+A conforming reader of a sealed package refuses a file larger than its size cap before parsing it, refuses YAML
+anchors and aliases in the file's clear part, and bounds what its list of chunks may open to. The limits are the
+implementation's; that they exist is the rule, and each refusal is whole: nothing is opened and nothing is written.
+
 ### 15.4 The laws of a package
 
 The author's text is the package's telling as told: `unpack` gives it back byte for byte, and what is checked is that
@@ -1120,7 +1578,7 @@ text.
 
 ### 16.1 Surrounding context
 
-The **surrounding context** is the volume a text sits in: its Canon volume's `canon.cosm`, the project's catalog, or a
+The **surrounding context** is the volume a text sits in: its volume's catalog in the home file system (Canon's `canon.cosm`), the project's catalog, or a
 site's served catalog when a website serves packages. It is read, never written. `context of story` gives the catalog
 excerpt around the text: its neighbours, the volume's name and scope, and the terms the volume defines. A program may
 use it to link terms, to choose a morph the volume prefers, or to tell a text in the light of its neighbours.
@@ -1163,13 +1621,15 @@ end
 
 ---
 
-## 17. The `thym/1` MiniCOSM and the `moves:` block
+## 17. The `thym/1` volumes and the `moves:` block
 
-<!-- atem: programs, morphs, contexts, plans, traces, packages; how any MiniCOSM declares moves -->
+<!-- atem: programs, morphs, contexts, plans, traces, packages; how any manifest declares moves -->
+
+`thym/1` is a built-in of the core of MacroCOSM OES (its section 18.7), and this section specifies it.
 
 ### 17.1 The catalog
 
-A `thym/1` volume is one file. Its catalog declares `oes: thym/1` and says which of six kinds of volume it is:
+A `thym/1` volume is one file. Its catalog declares `oes: thym/1` and says which of seven kinds of volume it is:
 
 | `kind` | file | holds |
 |---|---|---|
@@ -1179,22 +1639,24 @@ A `thym/1` volume is one file. Its catalog declares `oes: thym/1` and says which
 | `plan` | `<run-id>.plan.cosm` | `program`, `inputs`, `estimate`, the `R:plan` item and its `R:node` items |
 | `trace` | `<run-id>.trace.cosm` | `program`, `plan`, `environment`, `started`, `ended`, `outcome`, the `R:trace` item, its `R:record` items, and a copy of the plan's `R:node` items |
 | `package` | `package.cosm` or `<name>.package.cosm` | `contents`, `made`, `notice` (section 15) |
+| `folder` | `inputs/<name>.folder.cosm` in a run | a run's snapshot of a folder it took: `name`, `path`, `tree`, `commit`, `origin`, `files` (each `{path, sha256, size}`, with `binary: true` for a file that is not text) and `texts` (each text file's bytes as a block scalar) (section 20.3) |
 
 Catalog keys: `oes`, `macrocosm`, `id`, `name`, `kind`, `source`, `front`, `built`, `program`, `plan`, `inputs`,
-`estimate`, `environment`, `started`, `ended`, `outcome`, `contents`, `made`, `notice`, `encrypted`, `nodes`. The id
-is `thym/<slug>`.
+`estimate`, `models`, `environment`, `started`, `ended`, `outcome`, `contents`, `made`, `notice`, `encrypted`, `path`,
+`tree`, `commit`, `origin`, `files`, `texts`, `nodes`. The id is `thym/<slug>`. A plan whose nodes ask carries
+`models`, the route and the count of model calls (section 23).
 
 ### 17.2 The modules and their kinds
 
 | module | kinds | what |
 |---|---|---|
-| **P** Programs | `program`, `move`, `step`, `contract` | a block, a user move, a statement, a step's contract |
+| **P** Programs | `program`, `move`, `step`, `contract`, `check` | a block, a user move, a statement, a step's contract, a contract block (`thym 1`) |
 | **M** Morphs | `morph` | ten scales with evidence |
 | **C** Contexts | `context` | an occasion |
 | **R** Runs | `plan`, `node`, `trace`, `record` | a plan and its nodes; a trace and its records |
 | **K** Packages | `package`, `reading` | a package's catalog entry; a saved reading's record |
 
-Kinds are unique across the modules, as in every MiniCOSM. Every item has the envelope (id, type, name, summary,
+Kinds are unique across the modules, as in every format. Every item has the envelope (id, type, name, summary,
 status, visibility, provenance, pending, links) and may carry `made` (section 5.3).
 
 ### 17.3 Ids and the fields of each kind
@@ -1204,15 +1666,16 @@ status, visibility, provenance, pending, links) and may carry `made` (section 5.
 | kind | id | fields beyond the envelope |
 |---|---|---|
 | `program` | `P:program/<name>` | `why`, `must` (a list), `decided` (a list of `{date, what}`), `takes`, `gives` (lists of `{name, type}`), `body` (verbatim), `lines`, `order`, `steps` (refs to its top-level steps), `moves` (refs to its local moves) |
-| `move` | `P:move/<name>` or `P:move/<program>.<name>` | as `program` (`order` for a top-level move only), plus `params` |
-| `step` | `P:step/<program>.<n>` | `of` (ref), `n`, `text` (the line verbatim), `line`, `form` (`let`, `assert`, `if`, `for`, `emit`, `give`, `withhold`, `effect`), `move`, `calls` (every move the line calls), `binds`, `uses` (names), `asks`, `contracts` (refs), `slot` (a labelled emit's field); an `if` adds `lines` and `branches` (`{then, else}`, refs); a `for each` adds `lines` and `steps` (refs) |
+| `move` | `P:move/<name>` or `P:move/<program>.<name>` | as `program` (`order` for a top-level move only), plus `params`; in `thym 1`, `keeps` and `depth` |
+| `step` | `P:step/<program>.<n>` | `of` (ref), `n`, `text` (the line verbatim), `line`, `form` (`let`, `assert`, `if`, `for`, `emit`, `give`, `withhold`, `effect`), `move`, `calls` (every move the line calls), `binds`, `uses` (names), `asks`, `contracts` (refs), `slot` (a labelled emit's field, or a labelled give's output); `thym 1` adds the form `keep`; an `if` adds `lines` and `branches` (`{then, else}`, refs); a `for each` adds `lines` and `steps` (refs) |
 | `contract` | `P:contract/<program>.<n>` | `of` (ref), `move`, `checks` (a list of check names) |
+| `check` | `P:check/<name>` or `P:check/<program>.<name>` | `thym 1`: a contract block: `why`, `params`, `body` (verbatim), `lines`, `order`, `steps` (refs to `P:step/<name>.<n>`) |
 | `morph` | `M:morph/<slug>` | `scales`, `toward`, `evidence`, `basis`, `confidence`, `pinned`, `derived` or `declared`, `shared` |
 | `context` | `C:context/<slug>` | `purpose`, `audience`, `medium`, `moment`, `hurry`, `words`, `minutes`, `language`, and any field |
 | `plan` | `R:plan/<run-id>` | `nodes` (refs, in order), `asks` (a count), `largest_prompt` (tokens) |
-| `node` | `R:node/<n>` | `step` (`{program, n}`), `move`, `asks`, `takes` (names), `gives` (a name), `after` (refs), `budget`, `line`, `repeats`, `branch` (`then` or `else`), `slot` (a labelled `emit`'s field) |
+| `node` | `R:node/<n>` | `step` (`{program, n}`), `move`, `asks`, `takes` (names), `gives` (a name), `after` (refs), `budget` (with `depth` for a move that may call itself), `line`, `repeats`, `branch` (`then` or `else`), `slot` (a labelled `emit`'s field); in `thym 1` plans, `calls` (the moves a loop's header and body call), `members` (`{at_most: n}`), `keeps` (the contracts a called move keeps) |
 | `trace` | `R:trace/<run-id>` | `records` (refs), `outcome` (`landed`, `refused`), `stopped_at` (a ref, when refused) |
-| `record` | `R:record/<n>` | `node` (ref), `move`, `inputs`, `outputs` (lists of `{name, sha256, path}`), `engine`, `attempts`, `tokens`, `seconds`, `checks` (a list of `{name, ok, why}`) |
+| `record` | `R:record/<n>` | `node` (ref), `move`, `inputs`, `outputs` (lists of `{name, sha256, path}`), `engine`, `attempts`, `tokens`, `seconds`, `checks` (a list of `{name, ok, why}`), `tries`; `passes` for a loop run as one node |
 | `package` | `K:package/<slug>` | as the catalog's `contents` and `made`, for an index that lists packages |
 | `reading` | `K:reading/<slug>` | `of` (the package or text), `read_through`, `path`, `at`, `by` |
 
@@ -1224,7 +1687,7 @@ Steps are numbered from 1 in the order they are written. In a move local to a pr
 
 The envelope checks the generic reader runs, and six of `thym/1`'s own, which a Thym compiler and runtime run; the manifest states
 them as prose under `checks.own`, so a generic reader neither runs nor lists them, and lints a Thym volume on the
-envelope alone: `program-compiles` (a `program` volume's `source` compiles to these items), `plan-acyclic`,
+envelope alone: `program-compiles` (a `program` volume's `source` compiles to these items, by its own version line), `plan-acyclic`,
 `trace-complete` (every node has a record, or the trace is `refused` with `stopped_at`), `scale-range`, `digests` (a
 package's files match its catalog), `reading-labelled`.
 
@@ -1235,8 +1698,8 @@ package's files match its catalog), `reading-labelled`.
 
 ### 17.6 The `moves:` block
 
-Any MiniCOSM's manifest may carry a `moves:` list. A MiniCOSM whose manifest another specification keeps declares its moves in
-a sidecar `<name>.moves.cosm` beside the manifest, a mapping `{moves-of: <minicosm>/<major>, moves: [...]}`; Comprise's
+Any manifest, a built-in's or a MiniCOSM's, may carry a `moves:` list. A format whose manifest another specification keeps declares its moves in
+a sidecar `<name>.moves.cosm` beside the manifest, a mapping `{moves-of: <format>/<major>, moves: [...]}`; Comprise's
 is `comprise.moves.cosm`. When both exist, the manifest's list wins and the sidecar is reported. The generic reader
 keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 
@@ -1251,6 +1714,13 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 | `scaffold` | the name of the rules-mode stand-in, when one exists |
 | `code` | the reference implementation, informative: `enough.thym.moves.emf:tell` |
 | `says` | one line, in FEED words, for the viewer and the readvisor |
+| `since` | `1`: the move exists for `thym 1` programs only (section 4.9) |
+| `thym-1` | a mapping of the keys a `thym 1` program sees in addition to, or in place of, the entry's own: `takes`, `gives`, `modifiers`, `contract`, `scaffold`, and the three below; a `thym 0` program sees the entry without it |
+| `gives-when` | a list of `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}`: the type a call gives when its `as` word, or its first operand's type, is one of these |
+| `contract-when` | the same shape, with `contract: [...]`: the call's contract when its `as` word or first operand's type matches; else `contract` |
+| `scaffold-when` | the same shape for `scaffold` |
+
+`gives` may also say `same-as-with` or `same-as-in`: the call gives the type of its `with` (or `in`) value.
 
 ---
 
@@ -1265,7 +1735,10 @@ only where derived, the standing gate) are the contract of `project` (section 6.
 ceiling and becomes the law. The isotype's draft step is three preset programs (minimal, fuller, house), and a verified
 owner may write their own. A release carries the digests of the program and the trace that made it. The Comprise side
 is a specification of its own, Comprise OES (https://comprise.cosmoes.org/); Thym defines none of it, and a Thym
-implementation reads what Comprise produces.
+implementation reads what Comprise produces. A person's dial is the same move over a holograph, `project h as
+isograph`, to the schema of Ascribe's isograph (Ascribe (https://ascribe.cosmoes.org/), its section 14.1), whose rules
+are then the contract. Each MiniCOSM declares the kinds it projects: `isotype` and `paratype` are Comprise OES's, and
+`isograph` is Ascribe's.
 
 The example program, deterministic end to end:
 
@@ -1310,22 +1783,609 @@ the holotype holds people or says it has none, and always fills `shape.markets`;
 <!-- atem: the agent off: only deterministic plans run; scaffolds where they are honest -->
 
 In agent-free mode the coprocessor is the refusing one: a plan with model-backed nodes is refused at plan time with
-their count and the first one's line ("3 steps ask a model; agent-free is on"). A plan with none runs. With `--rules`,
+their count and the first one's statement and line ("3 steps ask a model, the first `let f = derive story` (line 11);
+agent-free is on"). A cloud model is a model too: agent-free refuses a plan on the cloud route exactly as it refuses one
+on the local route, at plan time, before any broker is asked. A plan with no model-backed node runs. With `--rules`,
 each model-backed move that declares a `scaffold` runs it instead: `derive` gives the rules twin, `atem` the labelled
 scaffold, `tell` and `null` the ordered outline, and `measure` the seven statistics scales with the three judgement
-scales pending. A move with no scaffold (`expand`, `morph`, `read`) still refuses. The trace says `engine: rules` for
-each scaffold, and every output is marked `state: pending`, as EMF's rules mode marks a twin. The viewer offers only
+scales pending; in `thym 1`, `derive … as code` gives its file's outline marked pending, `tell` at a catem's depth
+the uses and interfaces in told order, `question` the bank's questions only, and `settle` its rules part, leaving the
+re-reads as open questions. A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder,
+`tell … as code`) still refuses. `survey`, `history`, `record` and the editing moves other than `reword` ask nothing, and run. The trace says `engine: rules` for
+each scaffold, and every output is marked `state: pending`, as a fabula's rules mode marks a twin. The viewer offers only
 plans that can run.
 
 ---
 
-## 20. Conformance
+## 20. Folders and code
+
+<!-- atem: a folder of code decompiled to a fabulac, and told back -->
+
+`thym 1` reads a folder of code as a value, decompiles it into a fabulac, and compiles a fabulac back into a cshort and
+its catems. The fabulac, the cshort and the catem are MacroCOSM OES's (its section 18.4.7); this section says how a
+program reaches them.
+
+### 20.1 The folder type
+
+A **folder** is a directory tree read under one fixed rule, with a digest. Its value is the list of the files the rule
+keeps, each `{path, sha256, size, binary}`, where `path` is relative to the folder, written with forward slashes and
+without a leading `./`. The text of a text file is read when something walks or reads it.
+
+**The rule** has no options. A folder holds every regular file under its root except:
+
+1. any path one of whose parts begins with `.` (so `.git/`, `.venv/`, `.env`);
+2. any path one of whose parts is `__pycache__` or `node_modules`;
+3. symbolic links, which are never followed: a link is left out.
+
+A file is **text** when its bytes are UTF-8 (a byte-order mark is tolerated), hold no zero byte, and number at most
+1,000,000 bytes. Any other file is binary: it is counted and listed, and it is never read as text. A text's `lines`
+are its line feeds, and one more when its last line has none. The rule uses no ignore-file semantics, on purpose:
+those semantics are a program, not a rule, and the rule must be the same in every runtime.
+
+The **tree digest** is MacroCOSM's, computed exactly as MacroCOSM OES, its section 18.4.1, gives it: over the files
+that section's rule reads, in the order of their paths' UTF-8 bytes, the sha256 of each file's relative path, a zero
+byte, its sha256 in hexadecimal and a line feed. A binary file is among them only when its only zero bytes lie past
+its first 8,192 bytes. It is a fabulac's `source.tree`, and a fabulac is fresh while its folder's tree digest still matches. Everywhere a digest is asked for (`digest repo`, a plan's input
+row, a record's inputs and outputs, `made`), a folder's digest is its tree digest.
+
+Its fields, read with a dot, and as bare names in a `where` over the folder:
+
+| field | of a folder | of a member (a text walked from it) |
+|---|---|---|
+| `path` | the path as given | relative to the folder walked |
+| `name` | the last part | the file name |
+| `files` | how many files the rule kept | — |
+| `bytes` | their total size | — |
+| `lines` | total lines of its text files | the file's lines |
+| `tree` | the tree digest | — |
+| `commit` | the clone's `HEAD` commit, read from its files (no `git` is run, so it says nothing of uncommitted changes), else `nothing` | — |
+| `origin` | the clone's `origin` remote, else `nothing` | — |
+| `suffix` | — | the part of the name after its last `.`, without the dot (`py`, `md`); `""` for none |
+| `depth` | — | how many folders stand above it inside the folder walked (0 at the top) |
+| `size` | — | bytes |
+| `sha256` | — | the file's |
+| `binary` | — | `true` for a file that is not text |
+
+### 20.2 Walking and filtering
+
+`for each t in repo` gives the folder's text files as `text` values, in path order. Binary files are not walked; they
+are counted. Each member's provenance is hand-made, with `source: {folder: <tree>, path}`.
+
+`repo where suffix is py` is a **folder**: the same root, only the files whose fields satisfy the condition, and a tree
+digest of its own over the files it kept that MacroCOSM's rule reads. The same condition may stand on a loop,
+`for each t in repo where suffix is py`. A `where` over a folder reads the member fields of the table above, over
+binary files too, so `repo where binary` gives the binary files. `folders of d` gives a `list of folder`: the folders directly below `d` that the rule
+keeps, in path order, each with its own fields and tree digest. `count` of a folder counts its text files.
+
+```thym
+thym 1
+
+program python-files
+  why: the Python files of a folder, one line each with its length in lines.
+
+  takes repo: folder
+  gives listing: short
+
+  let rows = for each t in repo where suffix is py
+    keep join [t.path, (say t.lines)] with " · "
+  end
+  give join rows
+end
+```
+
+### 20.3 A folder as an input
+
+A program takes a folder as `takes repo: folder`, and the person gives its path as the input (`repo=tool/`). A folder
+needs no catalog. The plan records the input as `{name, type: folder, path, sha256: <tree digest>, files, bytes}`. At
+run time the tree is read again, and a changed digest is the usual refusal (check `input`): "repo changed since it was
+planned: tool/ has tree 3f2a…, the plan recorded 91c0…; plan it again".
+
+A text input is a file the person keeps, and a replay needs it present. A folder is usually a working tree that moves
+on, so **a run snapshots every folder it takes**: it writes `inputs/<name>.folder.cosm`, a `thym/1` volume of kind
+`folder` (section 17.1) that lists every file with its digest and holds the bytes of each text file as a block scalar,
+as the single-file package does (section 15.3). The catalog's shape:
+
+```yaml
+oes: thym/1
+kind: folder
+id: thym/2026-11-05-1530-a1b2.repo
+name: tool/
+path: tool/
+tree: 91c0e3…
+commit: 4b1f0c2…
+origin: https://github.com/someone/tool
+files:
+  - {path: LICENSE, sha256: …, size: 1071}
+  - {path: tool/cli.py, sha256: …, size: 4312}
+  - {path: docs/logo.png, sha256: …, size: 20480, binary: true}
+texts:
+  - path: tool/cli.py
+    text: |
+      …
+nodes: []
+```
+
+A replay reads a folder input from this snapshot and never from the disk, so it needs no repository (section 12.4).
+A snapshot keeps no binary file's bytes, so a replay of a run whose folder output held a binary file is refused.
+The cost is the text of the walked tree, once per run, and one row per binary file: a folder of about sixty files and
+six thousand lines takes a few hundred kilobytes per snapshot. Sharing one snapshot across the runs of a job, by its
+digest, is reserved for a later edition.
+
+### 20.4 A folder as an output
+
+A move may give a folder (`tell f as code`, section 20.7). A program that `gives code: folder` lands it as
+`outputs/code/`, a directory holding exactly the folder's files, written into the run's stage and renamed into place
+with every other output in one step: all or none (section 12.1). The trace's output row is `{name: code, sha256: <tree
+digest>, path: outputs/code/}`. Where the host copies it next follows the kind of the value: a cshort lands beside its
+fabulac as `<name>.cshort-<YYYY-MM-DD-HHMM>/` (MacroCOSM OES, its section 18.4.7). A folder has no catalog of its own,
+so its `made` lives in the trace's record and in whatever file the move writes into it (for a cshort, the footer of its
+`CSHORT.md`).
+
+### 20.5 The flavour of a decompile
+
+A fabula's flavour is said with `as`, the modifier every program already has: `derive t as prose` gives a fabulan,
+`derive t as verse` a fabulap, and `derive t as code` the fabulac's reading of one file. With no `as`, a text derives as
+it always has, to a fabulan: `derive t` and `derive t as prose` are the same call. A fabula from `derive <folder>` or
+`survey` is a fabulac. `tell f as told` of a fabulan or a fabulap keeps its contract; `as code` and a catem's depths are
+refused of either (check `flavour`): "f is a fabulap, a poem's fabula; a catem is told from a fabulac".
+
+```thym
+thym 1
+
+program decompile-verse
+  why: a poem decompiled into its fabula, line by line, with its metre and its rhymes, and a
+       question for its author wherever a reading is a guess.
+  must: nothing is fetched; the poem is the person's own copy.
+
+  takes poem: text
+  gives f: fabula
+
+  let found = derive poem as verse
+  assert found covers poem else "a line of the poem is in no item"
+  let asked = question found
+  give gather asked with found
+end
+```
+
+`covers` of a fabulap reads the poem's lines rather than its sentences: every line that is not blank is in the span of
+at least one item. That is `coverage` read for verse, defined with the fabulap's kinds (MacroCOSM OES, its section
+18.4.6).
+
+### 20.6 Decompiling a folder of code
+
+A fabulac is built in stages, each one atomic run, so that a build that stops can take up again after the last stage
+that landed. The stages, and the moves that make them:
+
+| stage | the move | asks | what it gives, and what its contract holds |
+|---|---|---|---|
+| survey | `survey repo`, rules only | no | a fabulac outline: a `C:file` per file (language, lines, sha256), a `C:component` per module, package and class, a `C:interface` per public function, class, method, constant and command-line entry point, with its name and parameters from the syntax tree, a `C:dependency` per import from outside the tree and per declared requirement, a `C:setting` per environment variable read and per command-line option, the licence and the means. `files-found`, `code-span`, `licence-recorded` |
+| history | `history repo with f`, rules only | no | the fabula so far, with the clone's history: changes grouped into episodes (the commits between two tags, split again where two commits stand more than fourteen days apart), a release per tag with its date, a maker per author's name (never an address). `history-grounded` |
+| read | `derive t as code with f`, once per file, in a loop that collects | yes | that file's behaviours, structures, cases, terms, claims and events, read against the outline. `code-span`, `outline-cited`, `coverage` (every interface and component the outline lists for the file is the subject of a behaviour or a structure), `terms-grounded`, `stance-closed`. Its scaffold gives the outline's own items for the file, marked pending |
+| (join) | `gather readings with f` | no | the fabula so far with every reading in it. `nothing-lost`, `ids-unique` |
+| fold | `derive repo with f` | yes | read as a whole: aims, audience, uses, requirements, decisions, exclusions, inspiration, and the atem. `fold-grounded`, `atem-shape`, `licence-recorded`. It has no scaffold: nothing but a model reads intent. A `derive` of a folder without `with` is refused: "derive of a folder folds what the stages found: derive repo with f" |
+| question | `question f`, landed with `gather` | yes | the dialectic's questions where the build was unsure (section 22) |
+
+Every stage's contract ends with `fabula-checks` and `provenance`, and the last program `keeps fabula-checks`. A
+reading is `derive` because a file read as code is a text decompiled, and the fold is `derive` because a folder
+decompiled with what is known of it is a decompile too; `read` keeps its meaning (section 14). `gather` takes a list
+of fabulas or of items and gives the `with` volume with every one of them in it.
+
+```thym
+thym 1
+
+-- The fabulac of a small Python repository, built in five runs. A host runs the programs of this file
+-- in the order they are written, as one job: each lands the fabulac so far beside the folder, and a
+-- job that stops takes up again after the last one that landed.
+
+contract its-own-file(r: fabula, t: text)
+  why: a file's reading speaks of that file and of no other.
+
+  assert count r > 0 else "the reading found nothing in the file"
+  for each i in r where i has span
+    assert i.span.file is t.path else "an item points into another file"
+  end
+end
+
+program survey-the-repo
+  why: a repository's files, parts and interfaces are found from its syntax alone, before any
+       model reads a line.
+  must: nothing in the repository is run, imported or installed.
+  decided 2026-11-05: this build reads pure Python a person could read in an afternoon: sixty
+       files, six thousand lines.
+
+  takes repo: folder
+  gives f: fabula
+
+  let code = repo where suffix is py
+  assert count code > 0 else "there is no Python file here"
+  assert count code < 61 else "more than sixty Python files: past what this build reads"
+  assert code.lines < 6001 else "more than six thousand lines of Python: past what this build reads"
+  give survey repo                                 -- files, parts, interfaces, licence: rules only
+end
+
+program read-the-history
+  why: the clone's log and its tags say how the code came to be.
+  decided 2026-11-05: history is the clone; issues and pull requests are reserved.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  give history repo with f                         -- changes in episodes, releases from tags: rules only
+end
+
+program read-every-file
+  why: each Python file is read once by a model, against the outline, for what it does and how.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  move read-file(t: text, so-far: fabula): fabula
+    keeps its-own-file against t
+    give derive t as code with so-far              -- behaviours, structures, cases, terms, claims, events
+  end
+
+  let readings = for each t in repo where suffix is py
+    keep read-file t, f
+  end
+  give gather readings with f
+end
+
+program fold-the-whole
+  why: read as a whole, the code says what it is for, for whom, and what it will not do.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  give derive repo with f                          -- aims, uses, requirements, decisions, exclusions, the atem
+end
+
+program raise-the-questions
+  why: where the build was unsure it asks the person who knows, and the questions land with the
+       fabulac.
+  decided 2026-11-05: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end
+```
+
+**A file of several programs.** Thym's grammar describes each program of such a file and what it takes and gives; it
+does not run them in sequence. Running a file whose programs each give one fabula as one build, in order, filling each
+`fabula` input with the fabula the run before landed and taking up again after the last that landed, is the host's job,
+specified with the fabulac (MacroCOSM OES, its section 18.4.7). A fabula built in several runs records every one of
+them: its catalog's `derived` describes the last run that derived it, and `derived.runs` holds one entry per run that
+wrote into the volume, a settle run included, with its program, its run, its model and its route (MacroCOSM OES,
+its section 18.4.1).
+
+### 20.7 Compiling a fabulac
+
+**`tell f as code`** gives a folder, the **cshort**: source code rebuilt from the fabulac, file by file, one model
+request per file it rebuilds: every `C:file` in a programming language that is not a test, and the README (MacroCOSM
+OES, its section 18.4.7). Each request carries the file's items: its components, its interfaces with their
+parameters, the behaviours and cases about them, and the settings and dependencies it touches. The move assembles the
+files and writes `CSHORT.md`: the cshort's footer line first (MacroCOSM OES, its section 18.4.7), then the file list
+with digests, then the source's licence line. Its contract is checked without executing anything: `parses`,
+`interfaces-present`, `files-present`, `footer` (`CSHORT.md`'s first line is the footer, naming the fabulac's file,
+the language, the UTC day of the run and the model; its last line is the licence line, equal to `source.licence`) and
+`provenance`. A failed check asks again only for the files it names, within the node's attempts. `tell … as code` has
+no scaffold, so `--rules` refuses it.
+
+**`tell f as line`, `as overview` and `as manual`** give a short, the **catem** at that depth. `line` is the atem's
+line, the same as `atem f`'s; `overview` names every use; `manual` names every use and every interface a person
+reaches (the command-line entry points and the public interface), with what they do. The contract is `coverage`
+(every sentence traces to behaviours, uses or events), `no-invention`, `uses-told`, `footer` (the catem's footer names
+its depth) and `provenance`, and the scaffold `uses-outline` lists the uses and interfaces in told order, in their own
+words. The host saves a catem as `<name>.catem-<YYYY-MM-DD-HHMM>.md` beside the fabulac.
+
+```thym
+thym 1
+
+program compile-python
+  why: a fabulac told back into Python, file by file, with the manual of everything a person can do
+       with the program.
+  must: nothing told is run, imported or installed.
+  decided 2026-11-05: a cshort is read in enough and never run there; the rebuild test runs outside.
+
+  takes f: fabula
+  gives code: folder, manual: short
+
+  give code: tell f as code                        -- one file at a time; it parses, and every interface is there
+  give manual: tell f as manual                    -- the catem at its deepest
+end
+```
+
+### 20.8 What is never run
+
+Nothing a program reads or makes from code is executed by Thym. `survey` reads syntax trees; `history` reads the
+clone's log and tags through the host's engine, which answers only each commit's id, date, author's name, subject and
+paths, and each tag's name, commit and date; `parses` and `interfaces-present` ask the host's syntax engine, whose
+answer per file is recorded as an engine call (section 12.4), so a replay, and a runtime in another language, needs no
+parser. Parsing is not running: nothing is imported, compiled into files on disk, or run. A cshort is viewed, never
+run; whether it behaves as its source did is a test that runs outside Thym, in a sandbox of its own.
+
+---
+
+## 21. Editing
+
+<!-- atem: edits as values: lines, changes, and one edit that applies them -->
+
+In `thym 1`, edits are values. A program reads a text or a short as numbered lines, makes **changes**, each naming the
+line it is about by number and digest, and then applies all its changes at once with one deterministic move, `edit`,
+under a contract that no other line moved. A model is asked only for the wording of a replacement, inside a move that
+asks (`reword`), and under that move's contract.
+
+### 21.1 Lines and changes
+
+A **line** is one line of a text or a short: the line's bytes without its line break, its `number` (from 1, in its
+source), and the sha256 of its source and of itself. Its fields are `number`; `level` (the heading level, 1 to 6, of a
+heading written with `#` marks, 0 otherwise); `title` (a heading's words without its `#` marks and without a leading section number such
+as `3.` or `3.2`, `nothing` for other lines); and `blank` (a bool). A line fits wherever a string is taken.
+
+A **change** is one edit: `{at: <line number>, was: <sha256 of that line>, of: <sha256 of the source>, do: replace |
+drop | insert-before | insert-after, lines: [<new lines>]}`. It is plain data, and a program makes one only with the
+moves below.
+
+### 21.2 The moves
+
+| move | reads aloud | gives |
+|---|---|---|
+| `lines of s` | "the lines of s" | every line of the text or short, blank ones included, numbered |
+| `replace l with v` | "replace l with v" | a change: l's line becomes v (a string, a line, or a short of several lines) |
+| `drop l` | "drop l" | a change: l's line goes |
+| `insert v before l`, `insert v after l` | "insert v before l" | a change: v's lines go before or after l's; `insert` takes exactly one of `before` and `after` |
+| `edit s with changes` | "edit s with the changes" | s with every change applied, of the same type as s |
+| `reword l to 30 words` | "reword l to thirty words" | asks: l said again in at most N words, of the same type as l |
+| `join xs`, `join xs with "…"` | "join the rows" | a short: the members one per line, or joined by the string |
+| `say n` | "say n" | a string of a number, a date, a word or a bool |
+
+The loops that build a list of changes are loops that collect (section 8.1), and `edit` is one deterministic node. A
+text edited is a new value: it lands in the run's outputs and goes where the person names, never over its source
+(`never-source` holds on `edit`, as on a reading).
+
+### 21.3 Only the changed
+
+`edit`'s contract, `only-the-changed`, holds when:
+
+1. every change names its source: its `of` is the digest of the value being edited ("a change names line 3 of another
+   text");
+2. every change's line exists there with that digest ("line 12 changed since it was read");
+3. no two `replace` or `drop` changes name one line, and inserts at one place keep their written order ("lines 7 and
+   7 are both replaced");
+4. the output is the input with exactly those changes: every input line no change names appears byte for byte and in
+   order, and the output holds no line that neither the input nor a change gave.
+
+The first three check the program's changes, and the fourth checks the implementation. All four are deterministic.
+
+### 21.4 `reword`
+
+`reword` is the one editing move that asks. Its contract is `length` (at most N words, and at least 80 per hundred of
+N), `one-line` (a `line` gives one line; an answer of several lines is repaired by joining them with a space, then
+checked again), `nothing-added` (a narrow `no-invention` that needs no fabula: every name, number and word outside
+FEED in the output is in the input) and `provenance`. A move that rewords may keep a contract of its own as well
+(section 7.5), and is asked again until it holds or its attempts run out.
+
+### 21.5 Two programs
+
+`tighten` is the editing program people copy. It says every line of a short that runs past thirty words again in thirty
+or fewer, and moves no other line:
+
+```thym
+thym 1
+
+contract shorter(new: line, old: line)
+  why: a reworded line says less in fewer words, never more.
+
+  assert words new < words old else "the reworded line is not shorter than the line it replaces"
+end
+
+program tighten
+  why: every line of a short that runs past thirty words is said again in thirty or fewer, and no
+       other line moves.
+
+  takes s: short
+  gives t: short
+
+  move tightened(l: line): line
+    keeps shorter against l
+    give reword l to 30 words
+  end
+
+  let changes = for each l in lines of s where words l > 30
+    keep replace l with tightened l
+  end
+  give edit s with changes
+end
+```
+
+Read aloud: contract shorter, a reworded line says less in fewer words. Program tighten takes s, a short, and gives t.
+Move tightened, of a line, keeps shorter against the line, and gives the line reworded to thirty words. Let changes be:
+for each line of s with more than thirty words, keep a replacement of the line with the tightened line. Give s, edited
+with the changes. The `where words l > 30` belongs to the loop, since `lines` declares no `where` (section 4.5).
+
+A deterministic editor, which asks nothing:
+
+```thym
+thym 1
+
+program drop-the-todos
+  why: every line that still says TODO leaves the draft, and nothing else changes.
+
+  takes draft: text
+  gives clean: text
+
+  let changes = for each l in lines of draft where "TODO" in l
+    keep drop l
+  end
+  give edit draft with changes
+end
+```
+
+---
+
+## 22. The dialectic in a program
+
+<!-- atem: questions land in one run; answers settle in another -->
+
+The dialectic is MacroCOSM's one way of asking a person what a source means and recording what they say (MacroCOSM
+OES, its section 18.6): any volume may carry its questions and sessions. In a program it is three moves of `thym/1`,
+`question`, `record` and `settle`, in **two atomic runs with a person between them**. The first run lands questions
+with the volume. The person answers them, in a page or through an agent. The second run records the answers and
+settles them into the items they are about. No run waits on a person, so "nothing partial" and replay hold as they
+always have, and a replay of either run needs neither the person nor the model.
+
+### 22.1 `question`
+
+`question v` takes a fabula or a volume and gives a list of question items. It asks the model, with the scaffold
+`bank`. Its rules part always runs first: it gives the opening questions of the manifest's bank for the volume's
+flavour or format, and a question for every `{pending: …}` field and every item marked unsure (a confidence below 0.5).
+When the run asks the model, the model adds questions where the volume is unsure, ambiguous, in conflict or silent on
+intent, and only there. Under `--rules` the bank part alone runs. Each question says who raised it and is `open`. Its
+contract is `addressed`, `no-duplicate` and `provenance`. `question` gives a list, and a program lands the questions with
+the volume through `gather asked with f`.
+
+### 22.2 `record` and the answers volume
+
+A person's answers reach a program as an **answers volume**, which the page or an agent writes beside the volume it
+answers, `<the twin's name without .cosm>.answers-<YYYY-MM-DD-HHMM>.cosm`. It is a delta: the session's record, and for
+each question answered, only its id, its new state and its new answers. Its catalog declares the format of the volume it
+answers and carries that volume's `id`; its `nodes:` hold the `D:session` item and, for each question answered, a
+mapping of the question's `id`, its new `state` and its new `answers`. It is read only as a delta, never checked as a
+volume of that format on its own. To Thym it is a `volume`.
+
+`record said in f` is code: it appends each answer to its question's answers (never rewriting one), sets the
+question's state to `answered`, `unknown` or `declined`, and adds the session. Its contract is `addressed`,
+`only-the-asked` and `provenance`.
+
+### 22.3 `settle`
+
+`settle f` takes a fabula or a volume and gives the same, with every answered question folded into the item it is
+about. It asks the model only where an answer means an item must be read again (an answer about intent or a conflict
+over a claim, an answer about a span). Every other answer (a field filled from a text, a choice, a number, a date or a
+reference) is written by rules, and a call that needs no reading asks nothing. An answer that the person does not know (`unknown`) leaves the field
+`{pending: "<the person's own words>"}`, and a refusal to say lists the field in the item's `withheld` and writes `provenance.state: not-disclosed`. Its scaffold,
+`direct`, runs the rules part only and leaves the re-reads as open questions. Its contract is `addressed`;
+`only-the-asked` (the fields that change are exactly those the answered questions are about, with their provenance and
+the questions' `settled` field); `fabula-checks`; and `provenance`: every field written carries
+`provenance: {mode: dialectic, sources: [D:session/<id>], confidence}`. In a fabula the settle run joins
+`derived.runs`, and `derived`'s single keys stay those of the run that derived it.
+
+### 22.4 The two runs, read as a pair
+
+The first run decompiles and lands the questions:
+
+```thym
+thym 1
+
+program decompile-prose
+  why: an essay decompiled into its fabula, with a question for its author wherever the reading
+       was unsure.
+  decided 2026-11-05: the questions land with the fabula; the answers come back in a second run.
+
+  takes essay: text
+  gives f: fabula
+
+  let found = derive essay as prose
+  assert found covers essay else "the fabula does not cover the essay"
+  let asked = question found
+  give gather asked with found
+end
+```
+
+The person answers. The second run takes the fabula and the answers volume, and lands the settled fabula:
+
+```thym
+thym 1
+
+program settle-the-answers
+  why: what a person said is written into the fabula, each answer where its question pointed, and
+       nothing else in it moves.
+  decided 2026-11-05: a second run, never a run that waits; "I don't know" leaves the field open
+       in the person's own words.
+
+  takes f: fabula, said: volume
+  gives g: fabula
+  keeps only-the-asked against f
+
+  let answered = record said in f
+  give settle answered
+end
+```
+
+---
+
+## 23. Models in a run
+
+<!-- atem: one program, one contract, a local or a cloud model -->
+
+A model-backed step runs on the model chosen for its run, and the program does not change with the choice. The same
+program, plan nodes, contracts, repairs, attempts and output budgets hold on every route; the route changes only the
+model's id, the provider, the window (and so the verdict of preflight) and the cost. There is no tier of checks per
+route: a local model at best effort fails more often, and is refused honestly; it is never let through.
+
+### 23.1 The route
+
+The **route** is chosen per run, and nowhere else: `local` (the default: the host's local model) or `cloud` (a cloud
+model through a broker, the host's named one or one the person names by the provider's id). On the command line it is
+`--model local`, `--model cloud` or `--model cloud:<id>` (section 11.3). A cloud route whose gate is closed is refused at
+plan time, check `cloud`, in the gate's own words: "the cloud is not open for this run: local models only is on".
+Nothing reaches a cloud model that the person did not choose for that run.
+
+### 23.2 What the plan shows
+
+A plan with a node that asks carries the catalog key `models` before anything runs:
+
+```yaml
+models: {route: cloud, provider: broker-name, model: vendor/large-model, calls: 61, at_most: 183, calls_open: [], window: 200000}
+```
+
+`calls` is the number of model requests the plan makes when every check passes the first time: a plain node that asks
+counts one, and a node with calls in a loop counts its asking calls times its `members.at_most`. `at_most` is `calls`
+times each node's attempts. `calls_open` lists the nodes whose count cannot be known at plan time: a recursive move
+that asks, a loop over a collection of unknown size. A command line prints it under the plan's atem:
+`61 model calls, at most 183, on the cloud (broker-name: vendor/large-model)`. The plan's root summary is the same in both versions. A
+plan compared by the conformance suite is compared without `models`, since the route is the run's choice, not the
+program's.
+
+### 23.3 What a run records
+
+- `made` gains `route` and `provider` (section 5.3), and `engine` stays `model:<id>`, the model's own id.
+- A candidate gains `route` and `provider` (section 12.2). A candidate recorded without them replays without them, so
+  an older recorded run replays to the same bytes.
+- The trace's environment holds the id of the model that ran, the route, the provider, and the window of that model
+  (section 12.3).
+- A fabula a program builds records which model made it, in its catalog's `derived`: `model`, `route`, `provider`,
+  `program` and `run` for the last run that derived it, and one entry in `derived.runs` per run that wrote into it,
+  a settle run included (section 20.6).
+
+### 23.4 Budgets
+
+Preflight (section 12.5) is unchanged in its rule, and reads the window of the route's model. `--calls N` sets a
+ceiling on a run's model requests: the runtime counts every request, re-asks included, and the request past N refuses
+the run, check `calls`: "`keep read-file t, f` (line 55, for t = `tool/cli.py`): this run reached its ceiling of 120 model
+calls; nothing landed". A cloud plan whose `calls_open` is not empty is refused at plan time without `--calls` (check
+`calls`): "this plan may ask the cloud model a number of times nobody can know before it runs (tree-of calls itself and
+asks); give a ceiling with --calls". A local run needs no ceiling: it costs time, not money.
+
+### 23.5 Agent-free
+
+Agent-free refuses every model, local or cloud, at plan time (section 19). With `--rules`, the scaffolds run, on no
+route at all.
+
+---
+
+## 24. Conformance
 
 <!-- atem: what compilers and runtimes must do, and the suite that shows it -->
 
-### 20.1 A compiler must
+### 24.1 A compiler must
 
-1. Read the grammar of section 4.8 exactly, and refuse a file whose version line is not `thym 0`.
+1. Read the grammar of section 4.8 for the version its line names, exactly, and refuse a version line it does not
+   know. Compile a `thym 0` program against the `thym 0` view of every declaration, to the items and the plan it has
+   always had, and refuse `thym 1` syntax under a `thym 0` line as "this needs `thym 1`" (section 4.9).
 2. Resolve moves from every manifest's `moves:` block and every `*.moves.cosm` sidecar in the registry's folders, and
    refuse an unknown move with the nearest name.
 3. Type every expression by section 5, refuse every type error with its line, and work out provenance.
@@ -1334,16 +2394,20 @@ plans that can run.
    nodes by section 11.1.
 6. Return refusals as values with `stage`, `line`, `check` and `message`.
 
-### 20.2 A runtime must
+### 24.2 A runtime must
 
 1. Refuse a plan at plan time when the environment cannot run it (section 9), with the count or the size.
 2. Walk the plan in a topological order; run deterministic moves by their reference semantics; send model-backed moves
    to a coprocessor under their contracts; check every output against its contract before it becomes a value.
-3. Land every output or none; write the trace with every record; name the run in every output's `made`.
-4. Replay a recorded run to byte-identical outputs with the replay coprocessor.
-5. Keep the six laws.
+3. Land every output or none, several outputs and folder outputs included; write the trace with every record; name
+   the run, and for a model-backed value the route, in every output's `made`.
+4. Snapshot every folder a run takes, and replay a recorded run to byte-identical outputs with the replay
+   coprocessor, reading folder inputs from their snapshots.
+5. Refuse in the person's words (section 9), keep the run's ceiling of model calls, and refuse every model, local or
+   cloud, when agent-free.
+6. Keep the six laws.
 
-### 20.3 The suite
+### 24.3 The suite
 
 The suite is a folder, portable together with MacroCOSM's own corpus, which holds the sample Holotype that `open-house`
 runs on; the reference implementation carries both (https://github.com/0gsd/enough):
@@ -1367,17 +2431,78 @@ the clock pinned to 2026-11-01T12:00:00Z, so an epoch in a recorded output stays
 (sections 4.1, 16.2 and 18) are the suite's first three, byte for byte, and the suite's test compiles every block marked
 `thym` here.
 
-### 20.4 Where an implementation and this text disagree
+The suite reads each file by its own version line. Its `thym 0` files are those of edition 0.5.4, unchanged, but for
+one: `bad/version.thym` names `thym 2`, since `thym 1` is a grammar. Beside them it holds `thym 1` programs with their
+expected items, plans and outputs (among them `python-files` and `folder-outline` over a small folder of code with a
+binary file, `aims-in-brief`, `drop-the-todos` and a deterministic contract block); a `thym 0` program whose loop
+folds a nested call into one node; `bad/` files for every refusal sections 4.9, 7.5, 8 and 21 add, each read by the
+version its own line names; and recorded runs of `tighten`, with one re-ask a kept contract forced, and of
+`decompile-prose`.
+
+### 24.4 Where an implementation and this text disagree
 
 Where an implementation and this text disagree, one of them is in error: either the implementation does not conform, or
-the text is corrected in a later edition. The Changes appendix (section 21) records which was corrected, with the
+the text is corrected in a later edition. The Changes appendix (section 25) records which was corrected, with the
 section it touched.
 
 ---
 
-## 21. Changes
+## 25. Changes
 
 <!-- atem: what each edition changed, newest first -->
+
+**Edition 0.6.0 · 2026-11-05.** The language gains a second grammar, and the text follows MacroCOSM's new taxonomy.
+
+1. **`thym 1`, the second grammar, is a superset of `thym 0`'s syntax** (section 4.9). A `thym 0` program compiles and
+   runs unchanged, against the `thym 0` view of every declaration; new syntax, or a move only `thym 1` sees, under a
+   `thym 0` line is refused with "this needs `thym 1`". This edition's moves carry `since: 1`. A `thym 0` program may not
+   `use` a `thym 1` file. Relabelling a `thym 0` program as `thym 1` can change the order of the items a loop of several
+   statements emits.
+2. **Corrected in both versions:** a call nested inside a statement of a loop's body is part of that statement's node
+   and is evaluated with each member (section 11.1). Two kinds of program that compiled clean under edition 0.5.4 and
+   ran wrong run right in this edition. Under `thym 1` a loop over a collection known only at run time is one node;
+   under `thym 0` the three such loops that would still run wrong are refused at run, with the fix (section 8.1).
+3. **`folder` is a type** (section 20), read under one fixed rule, with MacroCOSM's tree digest. A run snapshots every folder it
+   takes, so a replay needs no repository.
+4. **A loop collects** with `let … = for each … keep … end` (section 8.1).
+5. **A program may define a check as a `contract` block**, and a move or a program `keeps` it (section 7.5). A failed
+   kept contract asks the model again within the node's attempts. Its items are `P:check`.
+6. **A user move may call itself** under a declared `depth:` (section 8.3); recursion is no longer reserved.
+7. **Edits are values** (section 21): lines and changes, applied at once by `edit` under `only-the-changed`.
+8. **A program may give several outputs**, each named on its `give` (section 8.2). All land or none.
+9. **The dialectic is two atomic runs** (section 22): `question` lands questions, and `record` and `settle` land the
+   answers. No run waits on a person.
+10. **A model-backed step runs on the route chosen for its run** (section 23). `made`, the candidate and the trace say
+    which route, provider and model; a plan says how many model calls it will make; `--model` and `--calls` choose and
+    bound them; agent-free refuses a cloud model as it refuses a local one (section 19). The contract is one.
+11. **Refusals name the statement as written and the person's names** (section 9), never a node or a temporary.
+12. **`emf-checks` is `fabula-checks`.** The old name is read wherever it is written, and a `thym 0` program's
+    enumeration keeps it. The moves `derive`, `tell`, `atem` and `expand` are declared by `fabula/1`, which replaces
+    `emf/1`; `derive` and `tell` gain the flavours (`as prose`, `as verse`, `as code`, a catem's depths), and `survey`,
+    `history`, `gather`, `question`, `record`, `settle`, the editing moves, `join`, `say` and `folders` are new, and
+    so is Ascribe's `propose` (section 6.3). `in` takes a text on its right, a call needs no parentheses in a condition, and a bare path names the
+    one input of a program that takes one (sections 4.5 and 11.3).
+13. **Sections 20 to 23 are new.** Conformance, Changes and Withdrawn, sections 20, 21 and 22 of edition 0.5.4, are
+    sections 24, 25 and 26, and the entry below names them by their numbers in this edition.
+14. **The taxonomy.** Thym is the transcognition language that connects OESes; `thym/1` is a built-in of MacroCOSM's
+    core, specified here, and is no longer called a MiniCOSM (section 17); the built-ins and the MiniCOSMs declare moves
+    (sections 3 and 6.2). The name EMF is retired: a text's fabula, its twin, is a `fabula/1` volume, and `oes: emf/1`
+    reads as a fabulan.
+15. **Section 13.3 states one nine-letter rule**: a word with no band is rare at nine letters or more, and common at
+    eight or fewer.
+16. **A `give` inside a loop stays the check `type`**, and section 8.1 says so.
+17. **Section 15.1 names the three forms of a package**, and a package carries its fabula under the name its twin
+    had, which `unpack` keeps; a package made before this edition keeps `fabula.cosm`. `graph.cosm` is an isograph made
+    for one text (sections 5.1 and 15.1). Section 15.3 is the rule for what `package` lands: the
+    single-file form, with the folder form beside it, and the encrypted form only when sealing is asked for. A reader
+    of a sealed package refuses a file over its size cap, YAML anchors and aliases in the clear part, and a list of
+    chunks that opens past its bounds.
+18. **A `use`d path stays inside the program's folder** (section 8.4).
+19. **Section 1.3 says who stewards the specification**, in the sentence all five texts share.
+20. **`project` takes `as isograph`**, Ascribe's kind, beside Comprise OES's `isotype` and `paratype`: each MiniCOSM
+    declares the kinds it projects (sections 4.5, 6.2, 6.3 and 18).
+21. **The grammar's `call` may have no operand**, as `fabula of p` and every accessor have always been written
+    (section 4.8).
 
 **Edition 0.5.4 · 2026-11-03.** The canonical edition at cosmoes.org (https://thym.cosmoes.org/).
 
@@ -1385,12 +2510,12 @@ section it touched.
   `thym 0`, is unchanged and names the same grammar.
 - The reference implementation is named (enough, https://github.com/0gsd/enough) rather than located by path;
   cross-references to MacroCOSM OES, Ascribe and Comprise OES are their cosmoes.org homes.
-- Section 20.4 states the rule of disagreement: where an implementation and this text disagree, one of them is in error,
+- Section 24.4 states the rule of disagreement: where an implementation and this text disagree, one of them is in error,
   and this appendix records which was corrected.
-- Section 22 (open questions and roadmap) is withdrawn. The gaps it listed are stated where they fall: recursion in user
+- The section of open questions and the roadmap is withdrawn (section 26). The gaps it listed are stated where they fall: recursion in user
   moves (section 8.3), the thresholds and the word lists of measurement (section 13.3), the Comprise side of projection
   (section 18); its settled items are recorded under version 0 below.
-- Section 21 (decisions in this version) is this appendix.
+- The section of decisions in this version is this appendix.
 - Section 1.3 states how the specification is kept and revised; section 11.2 describes the reference implementation's
   package without its file list; the third column of the check table (section 7.3) names where each check comes from by
   product rather than by module.
@@ -1440,15 +2565,18 @@ where AES-256-GCM is absent (section 15.3).
 
 ---
 
-## 22. Withdrawn
+## 26. Withdrawn
 
-<!-- atem: withdrawn in this edition; what survives of it is in Changes -->
+<!-- atem: withdrawn sections; what survives of them is in Changes -->
 
-Section 22 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 21).
+The open questions and roadmap, numbered section 22 before edition 0.5.4, were withdrawn in edition 0.5.4; their
+content, where it survives, is in the Changes appendix (section 25). From this edition, the number 22 names the dialectic
+in a program.
 
 ---
 
 ## Colophon
 
+<!-- atem: copyright, the canonical edition and its source -->
 Thym — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
 https://thym.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

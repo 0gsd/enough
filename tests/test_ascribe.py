@@ -95,7 +95,9 @@ def test_links_closed_lists_checks_and_renderers():
     assert {s["id"]: (s["kind"], s.get("diagram")) for s in m.lenses()} == {
         "self": ("mermaid", "mindmap"), "timeline": ("table", None), "graph": ("mermaid", "flowchart")}
     assert m.data["filter"]["marker"] == A.PRIVATE_MARKER and m.data["filter"]["status"].startswith("declared")
-    assert "moves" not in m.data
+    assert m.data["filter"]["applies-to"] == ["ingest", "package", "transfer", "projection"]   # 0.6.0: applied
+    # 0.6.0: Ascribe declares propose, and adds the kind isograph to Comprise's project (THYM 6.2, 18)
+    assert [(mv["name"], mv.get("extends", False)) for mv in m.data["moves"]] == [("propose", False), ("project", True)]
     for key in ("public-projection", "extension"):
         text = " ".join(str(v) for v in m.data[key].values())
         assert "Thym projection of the holograph" in text and "no outsider's graph of a person exists" in text
@@ -114,12 +116,12 @@ def test_the_schema_has_no_place_for_personal_data():
     assert [f for f in fields if any(w in f for w in words)] == []
 
 
-def test_the_dialectic_asks_three_to_five_plain_questions_per_module():
+def test_the_dialectic_asks_four_plain_questions_per_module():
     m = _ascribe()
     qs = m.data["dialectic"]["questions"]
     assert list(qs) == [L for L in m.modules() if L != "D"]
     for letter, questions in qs.items():
-        assert 3 <= len(questions) <= 5, letter
+        assert len(questions) == 4, letter                     # Ascribe 8.1: four for each module, forty-four in all
         assert len(set(questions)) == len(questions)
         assert all(isinstance(q, str) and q[0].isupper() and q.endswith("?") for q in questions), letter
     for letter, kind in NODE_KINDS.items():                # no definitions: a module's questions never name its kind
@@ -417,7 +419,7 @@ def test_no_pii_is_never_an_error(tmp_path):
     assert rep.ok and len(rep.warnings) == 7 and rep.errors == []
 
 
-def test_the_private_marker_is_reported_never_applied(tmp_path):
+def test_the_private_marker_is_reported_by_lint_and_applied_only_by_the_filter(tmp_path):
     root = _holograph(tmp_path, {"A/drafts/old.cosm": _nodes(_node("A:affinity/old-draft")),
                                  f"A/drafts/{A.PRIVATE_MARKER}": ""})
     rep = A.lint_holograph(root)

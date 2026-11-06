@@ -216,7 +216,7 @@ def test_catalog_items_folders_files_articles_twins_atems(store: Path):
     assert "guides/close.md.cosm" not in items and "guides/payroll.docx.md" not in items
     close = items["guides/close.md"]
     assert close["id"] == "V:file/guides--close-md" and close["parent"] == "V:folder/guides"
-    assert close["emf"] == {"path": "guides/close.md.cosm", "state": "fresh"}
+    assert close["fabula"] == {"path": "guides/close.md.cosm", "state": "fresh"}   # 0.6: the field is `fabula`
     assert close["atem"]["line"].startswith("The orchard's juice rose")
     assert close["kind"] == "markdown" and close["size"] == (box / "guides/close.md").stat().st_size
     assert items["guides/payroll.docx"]["twin"]["path"] == "guides/payroll.docx.md"
@@ -237,7 +237,7 @@ def test_catalog_items_folders_files_articles_twins_atems(store: Path):
     (box / "guides" / "close.md").write_text("rewritten", encoding="utf-8")
     canon.reconcile("meadow handbook")
     vol = _lint_clean(box / canon.CATALOG_NAME)
-    assert vol.item("V:file/guides--close-md").data["emf"]["state"] == "stale"
+    assert vol.item("V:file/guides--close-md").data["fabula"]["state"] == "stale"
 
 
 def test_short_text_name_rule():
@@ -339,7 +339,7 @@ def test_volume_tree_flags(store: Path):
     shutil.copytree(FIX / "holotypes" / "meadow", box / "meadow")
     flat = _flat(canon.volume_tree("v")["tree"])
     assert "docs/notes.md.cosm" not in flat
-    assert flat["docs/notes.md"]["emf"] == {"path": "docs/notes.md.cosm", "state": "fresh"}
+    assert flat["docs/notes.md"]["emf"] == {"path": "docs/notes.md.cosm", "state": "fresh", "flavour": "fabulan"}
     assert flat["docs/rain.cosm"]["cosm"] is True
     assert flat[canon.CATALOG_NAME]["catalog"] is True and "cosm" not in flat[canon.CATALOG_NAME]
     assert flat["meadow"]["holotype"] is True and flat["meadow"]["children"] == []
@@ -656,7 +656,7 @@ def test_project_catalog_enumerates_what_the_sidebar_shows(project: Path):
     assert not any(p == "rness" or p.startswith("rness/") for p in items)
     assert "drafts/orchard.md.cosm" not in items and "drafts/letter.docx.md" not in items
     assert ".hidden.md" not in items
-    assert items["drafts/orchard.md"]["emf"] == {"path": "drafts/orchard.md.cosm"}   # no state
+    assert items["drafts/orchard.md"]["fabula"] == {"path": "drafts/orchard.md.cosm"}   # no state
     assert items["drafts/orchard.md"]["atem"]["line"]
     assert items["drafts/letter.docx"]["twin"] == {"path": "drafts/letter.docx.md"}
     assert items["research/meadow"]["holotype"] is True

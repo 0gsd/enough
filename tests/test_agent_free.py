@@ -349,7 +349,7 @@ def test_derive_atem_and_compile_run_by_rules(client: TestClient, free: Path, mo
     assert done["state"] == "done", done
     assert done["result"]["mode"] == "rules" and done["result"]["reason"] == "agent-free"
     assert "agent-free" in done["message"]
-    assert (free / "notes.md.cosm").is_file()
+    assert (free / "notes.md.fabulan.cosm").is_file()
 
     r = client.post("/api/canon/atem", json={"text": "The orchard keeps a record of every tree."})
     job = r.json()["job"]
@@ -362,7 +362,7 @@ def test_derive_atem_and_compile_run_by_rules(client: TestClient, free: Path, mo
     assert done["state"] == "done" and (done["result"]["mode"], done["result"]["reason"]) == \
         ("rules", "agent-free")
 
-    r = client.post("/api/canon/compile", json={"path": "notes.md.cosm"})
+    r = client.post("/api/canon/compile", json={"path": "notes.md.fabulan.cosm"})
     assert r.status_code == 200, r.text
     job = r.json()["job"]
     assert (job["mode"], job["reason"]) == ("rules", "agent-free")

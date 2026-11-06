@@ -1,0 +1,1099 @@
+oes: fabula/1
+macrocosm: 0.5.4
+flavour: fabulac
+id: fabula/tiny-tool
+name: tiny-tool
+source:
+  path: tiny-tool/
+  kind: folder
+  language: python
+  files: 9
+  bytes: 5717
+  skipped: 0
+  tree: 936073408dfbe6f8d5ebcb03f207b3a2012744d1d5064949b4bd543bbd5e904f
+  licence: MIT
+derived:
+  at: '2026-11-01T12:00:00Z'
+  by: person
+  program: survey-a-repo
+  run: 2026-11-05-2046-2166
+  mode: rules
+  completeness: outline
+  chunks: 0
+  runs:
+  - program: survey-a-repo
+    run: 2026-11-05-2046-2166
+    at: '2026-11-01T12:00:00Z'
+atem:
+  line:
+    pending: 'a model has not read this program as a whole: what is its line?'
+  focus:
+    pending: 'a model has not read this program as a whole: what is its focus?'
+  push:
+    pending: 'a model has not read this program as a whole: what is its push?'
+  pull:
+    pending: 'a model has not read this program as a whole: what is its pull?'
+nodes:
+- id: C:file/changes-md
+  type: file
+  name: CHANGES.md
+  summary: 'CHANGES.md: the change log.'
+  stance: observed
+  path: CHANGES.md
+  language: markdown
+  holds: the change log
+  length:
+    lines: 10
+    bytes: 166
+  span:
+    file: CHANGES.md
+    lines: 1-10
+  sha256: 4eb78dd96d855d7cd4cbe03078a9491c1ea6197daadbf97924926941c4797248
+  provenance:
+    mode: derived
+    sources:
+    - CHANGES.md
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/license
+  type: file
+  name: LICENSE
+  summary: 'LICENSE: the licence.'
+  stance: observed
+  path: LICENSE
+  language: text
+  holds: the licence
+  length:
+    lines: 16
+    bytes: 1070
+  span:
+    file: LICENSE
+    lines: 1-16
+  sha256: 09263ad6f9b944faa2045474de5214d6896425053e9e3e76ddf1cec49cb52c15
+  provenance:
+    mode: derived
+    sources:
+    - LICENSE
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/readme-md
+  type: file
+  name: README.md
+  summary: 'README.md: the user''s introduction.'
+  stance: observed
+  path: README.md
+  language: markdown
+  holds: the user's introduction
+  length:
+    lines: 12
+    bytes: 444
+  span:
+    file: README.md
+    lines: 1-12
+  sha256: feaadfd275158b70ed7241ca5af0c2e4c3a5933e86d787614cc131e5be96fa3d
+  provenance:
+    mode: derived
+    sources:
+    - README.md
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/pyproject-toml
+  type: file
+  name: pyproject.toml
+  summary: 'pyproject.toml: packaging metadata.'
+  stance: observed
+  path: pyproject.toml
+  language: toml
+  holds: packaging metadata
+  length:
+    lines: 17
+    bytes: 338
+  span:
+    file: pyproject.toml
+    lines: 1-17
+  sha256: ec971f9b34b554a9d1a7d7b547159af61adca28395d745739458fc8ab9fe8e1c
+  provenance:
+    mode: derived
+    sources:
+    - pyproject.toml
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/tests--test-counting-py
+  type: file
+  name: tests/test_counting.py
+  summary: 'tests/test_counting.py: tests.'
+  stance: observed
+  path: tests/test_counting.py
+  language: python
+  holds: tests
+  length:
+    lines: 16
+    bytes: 404
+  span:
+    file: tests/test_counting.py
+    lines: 1-16
+  sha256: a1bd0e883d85d0d617b476d4c933acba157b6e44bd13547164783a464b8f67ae
+  provenance:
+    mode: derived
+    sources:
+    - tests/test_counting.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/tiny----init---py
+  type: file
+  name: tiny/__init__.py
+  summary: 'tiny/__init__.py: tiny: count the words of a text file.'
+  stance: observed
+  path: tiny/__init__.py
+  language: python
+  holds: __version__
+  length:
+    lines: 2
+    bytes: 66
+  span:
+    file: tiny/__init__.py
+    lines: 1-2
+  sha256: e34b7f505dc98cb28163684424e88fab42a8a477dd1f3b4b7f05b53f7f5fba6c
+  component: C:component/tiny
+  provenance:
+    mode: derived
+    sources:
+    - tiny/__init__.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/tiny----main---py
+  type: file
+  name: tiny/__main__.py
+  summary: 'tiny/__main__.py: no definitions.'
+  stance: observed
+  path: tiny/__main__.py
+  language: python
+  holds: no definitions
+  length:
+    lines: 5
+    bytes: 52
+  span:
+    file: tiny/__main__.py
+    lines: 1-5
+  sha256: 13a1a5b340cdcfc1902b62be90e508c7c71886000d5bf087e7854aadf09fb35e
+  entry: true
+  component: C:component/tiny.__main__
+  provenance:
+    mode: derived
+    sources:
+    - tiny/__main__.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/tiny--cli-py
+  type: file
+  name: tiny/cli.py
+  summary: 'tiny/cli.py: The command line: tiny count FILE [--lines], tiny top FILE [-n N].'
+  stance: observed
+  path: tiny/cli.py
+  language: python
+  holds: build_parser, main
+  length:
+    lines: 39
+    bytes: 1385
+  span:
+    file: tiny/cli.py
+    lines: 1-39
+  sha256: a0bfa45a2aa178873e46e38cd6be4624d29b71fb9aeeab61d10d61c308e9a91a
+  entry: true
+  component: C:component/tiny.cli
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:file/tiny--counting-py
+  type: file
+  name: tiny/counting.py
+  summary: 'tiny/counting.py: Words, counted: what a word is, how many a text holds, and which come most often.'
+  stance: observed
+  path: tiny/counting.py
+  language: python
+  holds: CountError, Summary, read_text, words, count_words, top_words, summarise, DEFAULT_TOP
+  length:
+    lines: 56
+    bytes: 1792
+  span:
+    file: tiny/counting.py
+    lines: 1-56
+  sha256: 2a8293afb70e83d4cc9570028adbbef03ebaf8dbffe4114a66954d0670059353
+  component: C:component/tiny.counting
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:component/tiny
+  type: component
+  name: tiny
+  summary: 'The Python module tiny: tiny: count the words of a text file.'
+  stance: observed
+  files:
+  - C:file/tiny----init---py
+  does:
+    pending: what is tiny responsible for? (a model has not read this file)
+  span:
+    file: tiny/__init__.py
+    lines: 1-2
+  provenance:
+    mode: derived
+    sources:
+    - tiny/__init__.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:setting/tiny.__version__
+  type: setting
+  name: __version__
+  summary: The constant __version__ of tiny, set to "0.2.0".
+  stance: observed
+  key: __version__
+  set-in: constant
+  default: '"0.2.0"'
+  span:
+    file: tiny/__init__.py
+    lines: '2'
+  provenance:
+    mode: derived
+    sources:
+    - tiny/__init__.py#L2
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:component/tiny.__main__
+  type: component
+  name: tiny.__main__
+  summary: The Python module tiny.__main__.
+  stance: observed
+  files:
+  - C:file/tiny----main---py
+  does:
+    pending: what is tiny.__main__ responsible for? (a model has not read this file)
+  span:
+    file: tiny/__main__.py
+    lines: 1-5
+  of: C:component/tiny
+  uses:
+  - C:component/tiny.cli
+  - C:dependency/python
+  provenance:
+    mode: derived
+    sources:
+    - tiny/__main__.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:component/tiny.cli
+  type: component
+  name: tiny.cli
+  summary: 'The Python module tiny.cli: The command line: tiny count FILE [--lines], tiny top FILE [-n N].'
+  stance: observed
+  files:
+  - C:file/tiny--cli-py
+  does:
+    pending: what is tiny.cli responsible for? (a model has not read this file)
+  span:
+    file: tiny/cli.py
+    lines: 1-39
+  exposes:
+  - C:interface/tiny.cli.build_parser
+  - C:interface/tiny.cli.main
+  of: C:component/tiny
+  uses:
+  - C:component/tiny
+  - C:component/tiny.counting
+  - C:dependency/python
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.cli.build_parser
+  type: interface
+  name: build_parser
+  summary: The function build_parser of tiny.cli.
+  stance: observed
+  surface: function
+  signature: def build_parser() -> argparse.ArgumentParser
+  defined-in: C:file/tiny--cli-py
+  gives:
+    type: argparse.ArgumentParser
+  exported: true
+  span:
+    file: tiny/cli.py
+    lines: 11-21
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L11-L21
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.cli.main
+  type: interface
+  name: main
+  summary: The function main of tiny.cli.
+  stance: observed
+  surface: function
+  signature: 'def main(argv: list[str] | None = None) -> int'
+  defined-in: C:file/tiny--cli-py
+  takes:
+  - name: argv
+    type: list[str] | None
+    default: None
+    required: false
+  gives:
+    type: int
+  exported: true
+  span:
+    file: tiny/cli.py
+    lines: 24-35
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L24-L35
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:behaviour/tiny.cli.main.words
+  type: behaviour
+  name: What main says
+  summary: The words main of tiny.cli shows a user, as written.
+  stance: observed
+  of:
+  - C:interface/tiny.cli.main
+  does: main shows these words when something goes wrong, as its code writes them.
+  errors:
+  - when: main, line 33
+    message: 'tiny: {e}'
+    exit: 1
+  span:
+    file: tiny/cli.py
+    lines: 24-35
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L24-L35
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/command.tiny
+  type: interface
+  name: tiny
+  summary: Count the words of a text file.
+  stance: observed
+  surface: command
+  signature: tiny [-h] [--version] {count,top} ...
+  defined-in: C:file/tiny--cli-py
+  takes:
+  - name: --version
+    means: print the version and exit
+  - name: command
+    required: true
+    means: count or top
+  gives:
+    exit: 0, 1 (what main returns or exits with)
+  exported: true
+  span:
+    file: tiny/cli.py
+    lines: 12-20
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L12-L20
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/command.tiny.count
+  type: interface
+  name: tiny count
+  summary: count the words, or the lines, of a file
+  stance: observed
+  surface: command
+  signature: tiny count [-h] [--lines] file
+  defined-in: C:file/tiny--cli-py
+  takes:
+  - name: file
+    required: true
+  - name: --lines
+    type: flag
+    means: count lines instead of words
+  exported: true
+  span:
+    file: tiny/cli.py
+    lines: 15-17
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L15-L17
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:setting/option.tiny-count.lines
+  type: setting
+  name: tiny count --lines
+  summary: count lines instead of words
+  stance: observed
+  key: --lines
+  set-in: option
+  default: 'False'
+  means: count lines instead of words
+  read-by:
+  - C:interface/command.tiny.count
+  span:
+    file: tiny/cli.py
+    lines: '17'
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L17
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/command.tiny.top
+  type: interface
+  name: tiny top
+  summary: list the commonest words
+  stance: observed
+  surface: command
+  signature: tiny top [-h] [-n N] file
+  defined-in: C:file/tiny--cli-py
+  takes:
+  - name: file
+    required: true
+  - name: -n
+    type: int
+    default: '3'
+    means: how many words to list
+  exported: true
+  span:
+    file: tiny/cli.py
+    lines: 18-20
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L18-L20
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:setting/option.tiny-top.n
+  type: setting
+  name: tiny top -n
+  summary: how many words to list
+  stance: observed
+  key: -n
+  set-in: option
+  default: '3'
+  means: how many words to list
+  read-by:
+  - C:interface/command.tiny.top
+  span:
+    file: tiny/cli.py
+    lines: '20'
+  provenance:
+    mode: derived
+    sources:
+    - tiny/cli.py#L20
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:component/tiny.counting
+  type: component
+  name: tiny.counting
+  summary: 'The Python module tiny.counting: Words, counted: what a word is, how many a text holds, and which come
+    most often.'
+  stance: observed
+  files:
+  - C:file/tiny--counting-py
+  does:
+    pending: what is tiny.counting responsible for? (a model has not read this file)
+  span:
+    file: tiny/counting.py
+    lines: 1-56
+  exposes:
+  - C:interface/tiny.counting.CountError
+  - C:interface/tiny.counting.Summary
+  - C:interface/tiny.counting.read_text
+  - C:interface/tiny.counting.words
+  - C:interface/tiny.counting.count_words
+  - C:interface/tiny.counting.top_words
+  - C:interface/tiny.counting.summarise
+  of: C:component/tiny
+  uses:
+  - C:dependency/python
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.CountError
+  type: interface
+  name: CountError
+  summary: A file that cannot be counted; its message is shown to the user as it is.
+  stance: observed
+  surface: class
+  signature: class CountError(Exception)
+  defined-in: C:file/tiny--counting-py
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 14-15
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L14-L15
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.Summary
+  type: interface
+  name: Summary
+  summary: What a text holds, counted.
+  stance: observed
+  surface: class
+  signature: class Summary
+  defined-in: C:file/tiny--counting-py
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 19-23
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L19-L23
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:structure/tiny.counting.Summary
+  type: structure
+  name: Summary
+  summary: What a text holds, counted.
+  stance: observed
+  defined-in: C:file/tiny--counting-py
+  shape: a dataclass whose instances cannot change
+  fields:
+  - name: words
+    type: int
+    required: true
+  - name: lines
+    type: int
+    required: true
+  - name: encoding
+    type: str
+    default: '"utf-8"'
+    required: false
+  span:
+    file: tiny/counting.py
+    lines: 19-23
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L19-L23
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.read_text
+  type: interface
+  name: read_text
+  summary: The text of a file, read in the encoding TINY_ENCODING names (UTF-8 when unset).
+  stance: observed
+  surface: function
+  signature: 'def read_text(path: Path, env: dict | None = None) -> str'
+  defined-in: C:file/tiny--counting-py
+  takes:
+  - name: path
+    type: Path
+    required: true
+  - name: env
+    type: dict | None
+    default: None
+    required: false
+  gives:
+    type: str
+  raises:
+  - error: CountError
+    message: 'cannot read {path}: {e.__class__.__name__}'
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 26-33
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L26-L33
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.words
+  type: interface
+  name: words
+  summary: The words of a text, lowercased, in order.
+  stance: observed
+  surface: function
+  signature: 'def words(text: str) -> list[str]'
+  defined-in: C:file/tiny--counting-py
+  takes:
+  - name: text
+    type: str
+    required: true
+  gives:
+    type: list[str]
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 36-38
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L36-L38
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.count_words
+  type: interface
+  name: count_words
+  summary: How many words a text holds.
+  stance: observed
+  surface: function
+  signature: 'def count_words(text: str) -> int'
+  defined-in: C:file/tiny--counting-py
+  takes:
+  - name: text
+    type: str
+    required: true
+  gives:
+    type: int
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 41-43
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L41-L43
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.top_words
+  type: interface
+  name: top_words
+  summary: The n commonest words with their counts, commonest first; ties in alphabetical order.
+  stance: observed
+  surface: function
+  signature: 'def top_words(text: str, n: int = DEFAULT_TOP) -> list[tuple[str, int]]'
+  defined-in: C:file/tiny--counting-py
+  takes:
+  - name: text
+    type: str
+    required: true
+  - name: n
+    type: int
+    default: DEFAULT_TOP
+    required: false
+  gives:
+    type: list[tuple[str, int]]
+  raises:
+  - error: CountError
+    message: n must be 1 or more
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 46-51
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L46-L51
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:interface/tiny.counting.summarise
+  type: interface
+  name: summarise
+  summary: The words and lines of a text, with the encoding it was read in.
+  stance: observed
+  surface: function
+  signature: 'def summarise(text: str, encoding: str = "utf-8") -> Summary'
+  defined-in: C:file/tiny--counting-py
+  takes:
+  - name: text
+    type: str
+    required: true
+  - name: encoding
+    type: str
+    default: '"utf-8"'
+    required: false
+  gives:
+    type: Summary
+  exported: true
+  span:
+    file: tiny/counting.py
+    lines: 54-56
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L54-L56
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:setting/env.TINY_ENCODING
+  type: setting
+  name: TINY_ENCODING
+  summary: The environment variable TINY_ENCODING, read by tiny.counting.
+  stance: observed
+  key: TINY_ENCODING
+  set-in: environment
+  default: '"utf-8"'
+  read-by:
+  - C:interface/tiny.counting.read_text
+  span:
+    file: tiny/counting.py
+    lines: '29'
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L29
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:setting/tiny.counting.DEFAULT_TOP
+  type: setting
+  name: DEFAULT_TOP
+  summary: The constant DEFAULT_TOP of tiny.counting, set to 3.
+  stance: observed
+  key: DEFAULT_TOP
+  set-in: constant
+  default: '3'
+  span:
+    file: tiny/counting.py
+    lines: '11'
+  provenance:
+    mode: derived
+    sources:
+    - tiny/counting.py#L11
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:dependency/python
+  type: dependency
+  name: Python and its standard library
+  summary: 'The program needs Python >=3.10 and uses, from its standard library: argparse, collections, dataclasses,
+    os, pathlib, re, sys.'
+  stance: observed
+  package: python
+  version: '>=3.10'
+  scope: standard
+  needed-for: everything
+  used-by:
+  - C:component/tiny.__main__
+  - C:component/tiny.cli
+  - C:component/tiny.counting
+  span:
+    file: tiny/__main__.py
+    lines: '1'
+  provenance:
+    mode: derived
+    sources:
+    - tests/test_counting.py
+    - tiny/__init__.py
+    - tiny/__main__.py
+    - tiny/cli.py
+    - tiny/counting.py
+    - pyproject.toml
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: C:dependency/pytest
+  type: dependency
+  name: pytest
+  summary: pytest, a package from outside the tree.
+  stance: observed
+  package: pytest
+  scope: test
+  version: '>=8'
+  needed-for: the tests
+  span:
+    file: tests/test_counting.py
+    lines: '1'
+  provenance:
+    mode: derived
+    sources:
+    - pyproject.toml#L10
+    - tests/test_counting.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- type: licence
+  stance: observed
+  file: LICENSE
+  id: R:licence/mit
+  name: MIT
+  summary: tiny-tool is under the licence MIT, copyright 2026 Orchard Tools.
+  identifier: MIT
+  holder: Orchard Tools
+  year: '2026'
+  first-line: MIT License
+  span:
+    file: LICENSE
+    lines: 1-3
+  provenance:
+    mode: derived
+    sources:
+    - LICENSE#L1-L3
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: R:means/python
+  type: means
+  name: Python
+  summary: The program is written in Python.
+  stance: observed
+  what: Python
+  used-for: the program
+  version: '>=3.10'
+  provenance:
+    mode: derived
+    sources:
+    - tests/test_counting.py
+    - tiny/__init__.py
+    - tiny/__main__.py
+    - pyproject.toml
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: R:means/setuptools
+  type: means
+  name: setuptools
+  summary: The package is built with setuptools.
+  stance: observed
+  what: setuptools
+  used-for: building the package
+  provenance:
+    mode: derived
+    sources:
+    - pyproject.toml
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code
+- id: R:means/pytest
+  type: means
+  name: pytest
+  summary: The tests are written for pytest.
+  stance: observed
+  what: pytest
+  used-for: tests
+  provenance:
+    mode: derived
+    sources:
+    - tests/test_counting.py
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-05-2046-2166
+    step: 1
+    node: '1'
+    engine: code

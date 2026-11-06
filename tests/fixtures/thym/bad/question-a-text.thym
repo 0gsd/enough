@@ -1,0 +1,9 @@
+-- refused: compile type line 8
+thym 1
+
+program ask-the-essay
+  why: question reads a fabula or a volume, never the text it was decompiled from.
+  takes essay: text
+
+  let asked = question essay
+end

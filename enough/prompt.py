@@ -644,7 +644,7 @@ Skills, call `dict_guide` (no tags) for the column guide before writing.
 CANON_TOOL_INSTRUCTIONS = """\
 ## MacroCOSM
 
-`.cosm` files are MacroCOSM volumes: Holotypes, catalogs, EMF twins.
+`.cosm` files are MacroCOSM volumes: Holotypes, catalogs, fabulas.
 Paths are project-relative or `canon:<volume>/...`.
 
 <tool name="cosm_read">
@@ -653,7 +653,7 @@ Paths are project-relative or `canon:<volume>/...`.
 </tool>
 
 <tool name="cosm_lint">
-<path>notes.md.cosm</path>
+<path>notes.md</path>
 </tool>
 
 <tool name="emf_derive">
@@ -679,11 +679,11 @@ Paths are project-relative or `canon:<volume>/...`.
 <path>meadow</path>
 </tool>
 
-`cosm_read` shows the tree or one `<item>`. `emf_derive` makes a text's EMF
-twin, only when asked. `atem` writes line, focus, push and pull into the twin;
+`cosm_read` shows the tree or one `<item>`. `emf_derive` makes a text's
+fabula, only when asked. `atem` writes line, focus, push and pull into the twin;
 `<text>` for a passage, kept nowhere. `doc_lookup` explains a spec or manual
-term. `thym_check` checks a Thym program, `thym_run` runs one; both need the
-macrocosm-oes skill on. Without it, read `cosm_guide` before you derive.
+term. `thym_check` checks a Thym program, `thym_run` runs one, `thym_moves` lists
+moves (macrocosm-oes skill on). Without it, read `cosm_guide` before you derive.
 """
 
 

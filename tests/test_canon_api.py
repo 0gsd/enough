@@ -182,7 +182,7 @@ def test_project_catalog_route_reconciles_first(client: TestClient, project: Pat
     assert p["problems"] == []
     paths = {it["path"]: it for it in p["parsed"]["items"]}
     assert "later.md" in paths and "notes.md.cosm" not in paths
-    assert paths["notes.md"]["emf"] == {"path": "notes.md.cosm"}
+    assert paths["notes.md"]["fabula"] == {"path": "notes.md.cosm"}
     assert paths["meadow"]["holotype"] is True
     assert not any(k.startswith("rness") for k in paths)
 

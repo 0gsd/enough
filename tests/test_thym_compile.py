@@ -562,7 +562,11 @@ def _table_rows(section: str, until: str) -> list[str]:
 def test_declarations_load_from_the_real_manifests():
     decls = dc.load()
     assert decls.problems == []
-    assert set(decls) == set(_table_rows("### 6.3 The standard moves", "The accessors are read-only"))
+    # the first table of 6.3 is what a thym 0 program sees; thym 1 adds the round's moves (since: 1)
+    assert set(decls.view(0)) == set(_table_rows("### 6.3 The standard moves", "The accessors are read-only"))
+    assert set(decls) - set(decls.view(0)) == {"survey", "history", "gather", "question", "record", "settle", "lines",
+                                               "replace", "drop", "insert", "edit", "reword", "join", "say",
+                                               "folders", "propose"}
     tell = decls["tell"]
     assert tell.owner == "fabula" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)
     assert list(tell.modifiers) == ["as", "by", "with"] and tell.modifiers["with"] == ("morph",)
@@ -620,11 +624,28 @@ def test_types_accept_by_density_and_never_coerce():
 
 def test_the_contracts_constant_equals_the_table_of_section_7_3():
     assert list(ct.CHECKS) == _table_rows("### 7.3 The named checks", "### 7.4")
-    every = {c for d in dc.load().values() for c in d.contract}
-    assert every <= set(ct.CHECKS)
+    decls = dc.load()
+    # every check a real declaration names, in either version's view, is a row of 7.3 (or its old name)
+    views = [w for d in decls.values() for w in (d, d.view(0), d.view(1)) if w is not None]
+    every = {c for w in views for c in w.contract}
+    every |= {c for w in views for rule in (w.contract_when or ()) for c in (rule[2] or ())}
+    assert every <= set(ct.CHECKS) | set(ct.OLD_NAMES)
+    assert set(ct.OLD_NAMES.values()) <= set(ct.CHECKS)
     compile_row = next(ln for ln in _text(SPEC).splitlines() if ln.startswith("| **compile** |"))
     named = re.findall(r"\(`([a-z-]+)`\)", compile_row)
     assert set(ct.COMPILE) == set(named) and set(ct.STATIC) <= set(ct.CHECKS)
+
+
+def test_a_keeps_may_name_any_registered_or_declared_check_not_only_the_table():
+    """`contracts.CHECKS` mirrors the text's table; what a `keeps` may name is read from the registry and the
+    declarations, so a move lane's new check needs no line in the core (and `emf-checks` stays known)."""
+    from enough.thym import checks as C
+    from enough.thym.declarations import MoveDecl
+    known = ck.known_checks({})
+    assert set(C.CHECKS.names()) <= known and set(ct.CHECKS) <= known and "emf-checks" in known
+    scratch = MoveDecl(name="scry", owner="scratch", takes=(("text",),), gives=("text",), modifiers={},
+                       contract=("a-lanes-own-check",))
+    assert "a-lanes-own-check" in ck.known_checks({"scry": scratch})
 
 
 def test_bad_input_never_raises():

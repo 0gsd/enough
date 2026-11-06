@@ -1,0 +1,30 @@
+oes: fabula/1
+macrocosm: 0.5.4
+flavour: fabulan
+id: fabula/journal-md
+name: Notes from the harbour
+source: {path: journal.md, sha256: 374a3eab498d6e46b7dbe3bdb1153f092681344350656591f024290aa5be6464, size: 314}
+nodes:
+  # An invented holder's own journal, decompiled by hand for tests/test_ascribe_module.py (Ascribe, section 9):
+  # the fabulan propose reads. Nobody here is real; people appear by role.
+  - id: P:claim/spliced-an-eye
+    type: claim
+    name: An eye spliced into the mooring line
+    summary: The author spliced a new eye into the mooring line by hand, as a retired harbour pilot once showed them.
+    stance: observed
+    span: {lines: "3"}
+    provenance: {mode: derived, sources: ['journal.md#L3'], confidence: 0.9, state: known}
+  - id: P:claim/baked-instead
+    type: claim
+    name: Baked instead of sailing
+    summary: The tide was wrong for going out, so the author baked rye bread instead.
+    stance: observed
+    span: {lines: "4"}
+    provenance: {mode: derived, sources: ['journal.md#L4'], confidence: 0.9, state: known}
+  - id: P:claim/learn-the-weather
+    type: claim
+    name: Learning to read the weather
+    summary: The author keeps meaning to learn to read the weather from the clouds.
+    stance: observed
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['journal.md#L5'], confidence: 0.8, state: known}

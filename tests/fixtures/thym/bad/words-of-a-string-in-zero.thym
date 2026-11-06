@@ -1,0 +1,9 @@
+-- refused: compile version line 8
+thym 0
+
+program count-a-string
+  why: the words of a string, which only thym 1's words reads.
+  gives n: number
+
+  give words "the apples came in early"
+end

@@ -1,0 +1,87 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-05-1956-17b1
+name: tighten on long-lines.md
+program:
+  name: tighten
+  sha256: ba1bc98e06a6b7661eed42214e1449cfbee74ac5e2709448b8acd4cb59335632
+inputs:
+- name: s
+  type: short
+  path: inputs/long-lines.md
+  sha256: e9bd30b30dff63910455020cd13f2017a51c55c8ef9639cbcc5379b9cef6f264
+estimate:
+  steps: 2
+  asks: 1
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-05-1956-17b1
+  type: plan
+  name: tighten on long-lines.md
+  summary: Two nodes, one of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 1
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: let changes = for each l in lines of s where words l > 30
+  summary: let changes = for each l in lines of s where words l > 30
+  step:
+    program: tighten
+    n: 1
+  move: for
+  asks: true
+  takes:
+  - s
+  repeats: true
+  gives: changes
+  calls:
+  - lines
+  - words
+  - replace
+  - tightened
+  - reword
+  keeps:
+  - shorter
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 21
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L21-L23
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: edit s with changes
+  summary: edit s with changes
+  step:
+    program: tighten
+    n: 3
+  move: edit
+  asks: false
+  takes:
+  - s
+  - changes
+  gives: t
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 24
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L24
+    confidence: 1

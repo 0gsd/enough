@@ -69,6 +69,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any, Callable
 
+from . import fabula_names as _names
 from . import macrocosm
 
 log = logging.getLogger("enough.canon")
@@ -91,7 +92,10 @@ LEGACY_MIRROR_NAME = "_cachebox.merirmaid"
 MIRROR_NAME = LEGACY_MIRROR_NAME
 
 OES = "canon/1"
-EMF_OES = "emf/1"
+# A text's fabula declares `fabula/1`; `emf/1` is its old spelling, read and never written (MacroCOSM OES 18.4).
+FABULA_OES = _names.OES
+EMF_OES = _names.OLD_OES
+FABULA_DECLARATIONS = _names.DECLARATIONS
 
 # Presentation depth cap for the mirror. A subtree deeper than this
 # collapses into a single "[N items]" node so a huge volume can't produce a
@@ -397,49 +401,34 @@ def save_meta(name: str, meta: dict[str, Any], *, touch: bool = True) -> None:
 # EMF twins, Holotypes, kinds — what listings and catalogs need to know
 # ---------------------------------------------------------------------------
 
-def emf_twin_path(text: Path) -> Path:
-    """`notes.md` → `notes.md.cosm`. Pairing is by name, like convert's
-    `twin_path`: the twin's name is the text's whole name plus ``.cosm``."""
-    return text.parent / f"{text.name}.cosm"
-
-
-def _is_emf_twin_of(twin: Path, text: Path) -> bool:
-    try:
-        if not (twin.is_file() and text.is_file()):
-            return False
-    except OSError:
-        return False
-    return macrocosm.sniff_declaration(twin) == EMF_OES
+def emf_twin_path(text: Path, flavour: str | None = None) -> Path:
+    """The twin of `text`: the one of `flavour` when given, else the one derived last, when it exists; else the
+    name a new twin of that flavour takes (`notes.md` -> `notes.md.fabulan.cosm`). The names are
+    `enough.fabula_names`'s; the first edition's `notes.md.cosm` is found while it is the text's fabulan."""
+    found = _names.find_twin(text, flavour)
+    if found is not None:
+        return found
+    return _names.twin_path(text, flavour or _names.OLD_FLAVOUR)
 
 
 def is_emf_twin(path: Path) -> bool:
-    """True iff ``path`` is ``X.cosm`` beside an existing file ``X`` and its
-    first lines declare ``oes: emf/1`` (a sniff — no YAML load). A standalone
-    EMF (no sibling text) is an ordinary ``.cosm`` file, not a twin."""
-    if not path.name.endswith(".cosm") or len(path.name) <= len(".cosm"):
-        return False
-    return _is_emf_twin_of(path, path.parent / path.name[: -len(".cosm")])
+    """True iff ``path`` is a text's twin: ``X.fabulan.cosm``, ``X.fabulap.cosm`` or the old ``X.cosm`` beside an
+    existing file ``X``, whose first lines declare ``oes: fabula/1`` or ``oes: emf/1`` (a sniff, no YAML load), and,
+    for the old name, with no ``X.fabulan.cosm`` beside it. A standalone fabula (no sibling text) and an old twin a
+    flavour-named one has superseded are ordinary ``.cosm`` files, not twins."""
+    return _names.is_twin(path)
+
+
+def fabula_twins(entries: list[Path]) -> "_names.FolderTwins":
+    """Every twin among one folder's entries, by flavour, with the one each text shows and the superseded old
+    twins (`fabula_names.folder_twins`)."""
+    return _names.folder_twins(entries)
 
 
 def emf_twins(entries: list[Path]) -> dict[str, Path]:
-    """``{text name: twin path}`` for the EMF twins among one folder's
-    entries — what listings hide behind their texts."""
-    files = set()
-    for p in entries:
-        try:
-            if p.is_file():
-                files.add(p.name)
-        except OSError:
-            continue
-    out: dict[str, Path] = {}
-    for p in entries:
-        n = p.name
-        if not n.endswith(".cosm") or len(n) <= len(".cosm") or n not in files:
-            continue
-        text = n[: -len(".cosm")]
-        if text in files and macrocosm.sniff_declaration(p) == EMF_OES:
-            out[text] = p
-    return out
+    """``{text name: twin path}`` for the twins among one folder's entries, the one derived last for a text with
+    two — what a listing's single slot shows. Every twin (both flavours) is hidden: `fabula_twins(...).hidden`."""
+    return dict(_names.folder_twins(entries).primary)
 
 
 # A SHORT: a telling compiled from an EMF twin, written beside its text as
@@ -458,8 +447,9 @@ def short_text_name(name: str, siblings: Any, *, with_emf: Any = (),
     files beside it, or None (not a short's name, or its text is not there).
     ``notes.short-2026-10-23-1042.md`` → ``notes.md`` (or ``notes.txt`` …: a
     text whose name less its extension is the stem; one with an EMF twin, in
-    ``with_emf``, first, then ``.md``), else ``notes.cosm`` when
-    ``is_standalone`` says it is a standalone EMF, else a file named just
+    ``with_emf``, first, then ``.md``), else ``notes.fabulan.cosm`` (then
+    ``.fabulap.cosm``, ``.fabulac.cosm``, the old ``notes.cosm``) when
+    ``is_standalone`` says it is a standalone fabula, else a file named just
     ``notes`` (a converted original: ``report.pdf.short-….md`` is a short of
     ``report.pdf``, read through its ``report.pdf.md``)."""
     m = SHORT_RE.match(name)
@@ -475,9 +465,9 @@ def short_text_name(name: str, siblings: Any, *, with_emf: Any = (),
             texts.append((n not in emf, ext.lower() != "md", SHORT_TEXT_SUFFIXES.index(f".{ext.lower()}"), n))
     if texts:
         return min(texts)[-1]
-    cosm = f"{stem}.cosm"
-    if cosm in names and (is_standalone is None or is_standalone(cosm)):
-        return cosm
+    for cosm in _names.standalone_names(stem):      # rain.fabulan.cosm, …, the old rain.cosm
+        if cosm in names and (is_standalone is None or is_standalone(cosm)):
+            return cosm
     return stem if stem in names else None
 
 
@@ -555,13 +545,45 @@ def _atem_line(header: dict[str, Any]) -> str | None:
 
 def emf_entry(text: Path, rel_twin: str, *, with_state: bool = True,
               twin: Path | None = None) -> dict[str, Any]:
-    """The ``emf`` field a listing node or a catalog item carries for a text
-    with an EMF twin: ``{path, state}`` (``{path}`` for a project catalog)."""
+    """The ``emf`` field a listing node carries for a text with a twin:
+    ``{path, state}`` (``{path}`` without state). A catalog item writes the
+    same mapping as its ``fabula`` field (`_enumerate`)."""
     tw = twin if twin is not None else emf_twin_path(text)
     out: dict[str, Any] = {"path": rel_twin}
     if with_state:
         out["state"] = emf_state(text, tw)
     return out
+
+
+def listing_entry(text: Path, folder_rel: str, ft: "_names.FolderTwins") -> dict[str, Any] | None:
+    """A listing node's ``emf`` field for `text` (wire name, kept): ``{path, state, flavour}`` for the twin a single
+    slot shows (the one derived last), plus ``others: [{path, state, flavour}]`` when the text has a twin of the other
+    flavour too. Paths are relative like ``folder_rel``. None when the text has no twin."""
+    tw = ft.primary.get(text.name)
+    if tw is None:
+        return None
+
+    def rel(p: Path) -> str:
+        return f"{folder_rel}/{p.name}" if folder_rel else p.name
+
+    out = emf_entry(text, rel(tw), twin=tw)
+    out["flavour"] = ft.flavour(text.name) or _names.flavour_of_twin(tw)
+    others = [{"path": rel(p), "state": emf_state(text, p), "flavour": fl}
+              for fl, p in ft.twins.get(text.name, {}).items() if p != tw]
+    if others:
+        out["others"] = others
+    return out
+
+
+def superseded_entry(name: str, folder_rel: str, ft: "_names.FolderTwins") -> dict[str, str] | None:
+    """For an old-named twin a flavour-named one has superseded (listed as an ordinary file): ``{of, twin}``, the
+    text and its twin, relative like ``folder_rel``; None for any other file."""
+    got = ft.superseded.get(name)
+    if got is None:
+        return None
+    text, twin = got
+    return {"of": f"{folder_rel}/{text}" if folder_rel else text,
+            "twin": f"{folder_rel}/{twin}" if folder_rel else twin}
 
 
 # A PACKAGE (Thym, docs/THYM.md 15): the self-contained export of a text, with its fabula, morph, context and
@@ -728,8 +750,9 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
         )
     except OSError:
         return []
-    twins = emf_twins(entries)
-    hidden = {t.name for t in twins.values()}
+    ft = fabula_twins(entries)
+    twins = ft.primary
+    hidden = ft.hidden
     packages = packages_beside(entries, with_emf=twins)
     out: list[dict[str, Any]] = []
     for p in entries:
@@ -770,9 +793,12 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
                     pass
             if is_package_file(p) or is_sealed_package(p):
                 node["kind"] = file_kind(p)         # package, or sealed
-            twin = twins.get(p.name)
-            if twin is not None:
-                node["emf"] = emf_entry(p, "/".join(rel_parts + (twin.name,)), twin=twin)
+            entry = listing_entry(p, "/".join(rel_parts), ft)
+            if entry is not None:
+                node["emf"] = entry
+            old_twin = superseded_entry(p.name, "/".join(rel_parts), ft)
+            if old_twin is not None:
+                node["old_twin"] = old_twin             # an old-named twin, listed as an ordinary file
             if p.name in packages:
                 node["package"] = _package_rel(packages[p.name], "/".join(rel_parts))
         out.append(node)
@@ -961,7 +987,7 @@ def _volume_skip(box: Path) -> Callable[[Path], bool]:
             return True
         if p == catalog:
             return True
-        return p.suffix == ".cosm" and is_emf_twin(p)
+        return p.suffix == ".cosm" and is_emf_twin(p)       # every flavour's twin; not a superseded old one
 
     return skip
 
@@ -1196,8 +1222,9 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
         except OSError:
             children[rel] = []
             continue
-        twins = emf_twins(entries)
-        hide = {t.name for t in twins.values()}
+        ft = fabula_twins(entries)
+        twins = ft.primary
+        hide = ft.hidden
         packages = packages_beside(entries, with_emf=twins)
         shown = [p for p in entries if p.name not in hide and not skip(p)]
         if rel and count + len(shown) > cap:
@@ -1245,14 +1272,21 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
                     it["twin"] = twin
                 tw = twins.get(p.name)
                 if tw is not None:
+                    # The field is `fabula` (MacroCOSM OES 18.3.2); catalogs written before 0.6 said `emf`, which
+                    # every reader of a catalog still reads (`item_fabula`). The twin derived last, for a text
+                    # with two.
                     hdr = twin_header(tw)
-                    emf: dict[str, Any] = {"path": f"{rel}/{tw.name}" if rel else tw.name}
+                    fab: dict[str, Any] = {"path": f"{rel}/{tw.name}" if rel else tw.name}
                     if not project:
-                        emf["state"] = emf_state(p, tw, hdr)
-                    it["emf"] = emf
+                        fab["state"] = emf_state(p, tw, hdr)
+                    it["fabula"] = fab
                     line = _atem_line(hdr)
                     if line:
                         it["atem"] = {"line": line}
+                old_twin = superseded_entry(p.name, rel, ft)
+                if old_twin is not None:
+                    it["note"] = (f"an old-named twin, kept as an ordinary file: the twin of {old_twin['of']} "
+                                  f"is {old_twin['twin']}")
                 if p.name in packages:
                     it["package"] = _package_rel(packages[p.name], rel)
             raw[crel] = it
@@ -1269,7 +1303,7 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
                 continue
             text = short_text_name(
                 it["name"], files, with_emf=twins,
-                is_standalone=lambda n, folder=folder: macrocosm.sniff_declaration(folder / n) == EMF_OES)
+                is_standalone=lambda n, folder=folder: _names.declares_fabula(folder / n))
             if text is not None:
                 it["short_of"] = files[text]
                 raw[files[text]].setdefault("shorts", []).append(k)
@@ -1292,8 +1326,8 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
         node: dict[str, Any] = {"id": ids[rel], "type": it["type"], "name": it["name"], "path": rel}
         if it["parent"]:
             node["parent"] = ids[it["parent"]]
-        for key in ("holotype", "size", "kind", "twin", "emf", "atem", "package", "short_of", "shorts", "title",
-                    "source"):
+        for key in ("holotype", "size", "kind", "twin", "fabula", "atem", "package", "short_of", "shorts", "title",
+                    "source", "note"):
             if key in it:
                 node[key] = it[key]
         if it["type"] == "folder" and not it.get("holotype") and it.get("kind") != "package":
@@ -1304,7 +1338,7 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
                 node["pending"] = it["pending"]
         nodes.append(node)
         counts[{"folder": "folders", "file": "files", "article": "articles"}[it["type"]]] += 1
-        if "emf" in it:
+        if "fabula" in it:
             counts["twins"] += 1
         if "atem" in it:
             counts["atems"] += 1
@@ -1468,7 +1502,16 @@ def project_catalog(project_dir: Path, *, write: bool = True) -> str:
 
 
 EXCERPT_NEIGHBOURS = 40
-_EXCERPT_KEYS = ("id", "type", "name", "path", "kind", "atem", "emf", "package")
+_EXCERPT_KEYS = ("id", "type", "name", "path", "kind", "atem", "fabula", "emf", "package")   # emf: a catalog before 0.6
+
+
+def item_fabula(item: Any) -> Any:
+    """A Canon catalog item's fabula field: `fabula`, or `emf`, its spelling in catalogs written before 0.6
+    (MacroCOSM OES 18.3.2: a reader reads `emf` as `fabula`). None when it has neither."""
+    if not isinstance(item, dict):
+        return None
+    got = item.get("fabula")
+    return got if got is not None else item.get("emf")
 
 
 def catalog_excerpt(target: Path, project_dir: Path | None = None, *,

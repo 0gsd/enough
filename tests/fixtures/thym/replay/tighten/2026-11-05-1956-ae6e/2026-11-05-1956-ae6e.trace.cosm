@@ -1,0 +1,174 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-05-1956-ae6e
+name: tighten run 2026-11-05-1956-ae6e
+program:
+  name: tighten
+  sha256: ba1bc98e06a6b7661eed42214e1449cfbee74ac5e2709448b8acd4cb59335632
+plan:
+  sha256: ed0754960b7f4a2c3911a6423505dc94419ec969b9c190aaeeee7a4412897bd9
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-05T15:30:00Z'
+ended: '2026-11-06T00:56:50Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-05-1956-ae6e
+  type: trace
+  name: tighten run 2026-11-05-1956-ae6e
+  summary: 'ran tighten on long-lines.md in 34010 s on scripted: 2 steps, all checks green'
+  records:
+  - R:record/1
+  - R:record/2
+  outcome: landed
+  inputs_root: /Users/m3u/METMcloud/METMroot/enough-dev/tests/fixtures/thym
+  engines:
+  - canon
+  - docoes
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-05-1956-ae6e.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: let changes = for each l in lines of s where words l > 30
+  summary: model:scripted, 12 attempts, 5 checks green.
+  node: R:node/1
+  move: for
+  inputs:
+  - name: s
+    sha256: e9bd30b30dff63910455020cd13f2017a51c55c8ef9639cbcc5379b9cef6f264
+    path: inputs/long-lines.md
+  outputs:
+  - name: changes
+    sha256: 23482991ffff8007607fac34a53d6091a3297142c85a629e5ead37c0ff874867
+  - name: changes.1
+    sha256: dd2d7a90862d785ec7268aedd8dab37617d8ded1ca5ee81dad0189c86096c764
+  - name: changes.2
+    sha256: eba1c2930481edc1f38cac305b5a58e7172404cd0ddbbd02ab2aaf0468299fe4
+  engine: model:scripted
+  attempts: 12
+  tokens: 120
+  seconds: 0
+  checks:
+  - name: length
+    ok: true
+    why: ''
+  - name: one-line
+    ok: true
+    why: ''
+  - name: nothing-added
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  - name: shorter
+    ok: true
+    why: ''
+  tries:
+  - attempt: 1
+    failed:
+    - name: length
+      why: 34 words, more than 30
+  passes: 2
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-05-1956-ae6e.plan.cosm#R:node/1
+    confidence: 1
+- id: R:record/2
+  type: record
+  name: edit s with changes
+  summary: code, 1 attempt, 3 checks green.
+  node: R:node/2
+  move: edit
+  inputs:
+  - name: s
+    sha256: e9bd30b30dff63910455020cd13f2017a51c55c8ef9639cbcc5379b9cef6f264
+    path: inputs/long-lines.md
+  - name: changes
+    sha256: 23482991ffff8007607fac34a53d6091a3297142c85a629e5ead37c0ff874867
+  outputs:
+  - name: t
+    sha256: 3f7778764ceb2c9c973c0d235f979494b5efdb36163bdbcfa90adc1fe5ffaf5f
+    path: outputs/t.md
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: only-the-changed
+    ok: true
+    why: ''
+  - name: never-source
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-05-1956-ae6e.plan.cosm#R:node/2
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: let changes = for each l in lines of s where words l > 30
+  summary: let changes = for each l in lines of s where words l > 30
+  step:
+    program: tighten
+    n: 1
+  move: for
+  asks: true
+  takes:
+  - s
+  repeats: true
+  gives: changes
+  calls:
+  - lines
+  - words
+  - replace
+  - tightened
+  - reword
+  keeps:
+  - shorter
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 21
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L21-L23
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: edit s with changes
+  summary: edit s with changes
+  step:
+    program: tighten
+    n: 3
+  move: edit
+  asks: false
+  takes:
+  - s
+  - changes
+  gives: t
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 24
+  provenance:
+    mode: derived
+    sources:
+    - tighten.thym#L24
+    confidence: 1

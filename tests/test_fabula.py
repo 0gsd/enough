@@ -6,8 +6,7 @@ What is held here: the thirteen things the reader learned (docs/fabula-pins-sche
 fabula's own checks on a clean and a broken volume; the three worked examples of the schema file (a fabulan, a
 fabulap, a fabulac and its program, byte for byte as the schema's appendices B to F give them) through the real
 reader; every `oes: emf/1` file the repository keeps, read as a fabula by its old spelling; and every `cosm` block of
-the 0.6 draft of MacroCOSM OES (a copy kept as tests/fixtures/fabula/macrocosm-oes-0.6-draft.md until the synced
-copies are updated).
+MacroCOSM OES as synced into docs/MACROCOSM_OES.md (the 0.6 text; the draft copy earlier lanes kept is gone).
 """
 from __future__ import annotations
 
@@ -25,7 +24,9 @@ REPO = Path(__file__).resolve().parents[1]
 FIX = REPO / "tests" / "fixtures"
 FAB = FIX / "fabula"
 MANIFESTS = REPO / "defaults" / "cosm" / "manifests"
-DRAFT = FAB / "macrocosm-oes-0.6-draft.md"
+DRAFT = REPO / "docs" / "MACROCOSM_OES.md"              # the synced text (scripts/sync_specs.py)
+#: The tables of the edition before 0.6, excerpted: the overlay still reads a text synced before the round.
+OLD_SHAPES = FAB / "macrocosm-oes-0.5.4-shapes.md"
 CLOSE = FAB / "guides" / "close.md.fabulan.cosm"
 ROSE = FAB / "poems" / "the-sick-rose.txt.fabulap.cosm"
 TALLY = FAB / "tally.fabulac.cosm"
@@ -434,8 +435,10 @@ def test_the_fabula_manifest():
     for L in "LEKX":
         for k, spec in m.kinds(L).items():
             assert spec["flavours"] == list(fabula.FLAVOURS), (L, k)
-    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "tell", "atem", "expand"]
-    assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"])
+    # the four emf/1 declared, and the fabulac's two stages, thym 1 only (THYM 6.2, 6.3)
+    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "tell", "atem", "expand", "survey", "history"]
+    assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
+    assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:])
     assert "emf-checks" in m.data["moves"][0]["contract"]
     assert all(m.matches_catalog(n) for n in ("close.md.fabulan.cosm", "rose.txt.fabulap.cosm",
                                                "tool.fabulac.cosm", "close.md.cosm"))
@@ -543,6 +546,34 @@ def test_question_about():
                        "question-about")
 
 
+@pytest.mark.parametrize("state", ["stale", "withdrawn"])
+def test_question_about_skips_a_question_that_has_ended(state):
+    """The conductor's ruling 1 (docs/fabula-landed-D1.md, 3.1): a stale or withdrawn question whose item is gone is
+    not an error, since that is why it ended; an open one about the same nothing still is."""
+    t = _text(CLOSE)
+    occ = "    about: I:occasion/why-written#roles.event\n"
+    gone = t.replace(occ, "    about: I:occasion/gone#roles.event\n", 1)
+    assert _checks(_own(gone, "x.fabulan.cosm"), "question-about")
+    ended = gone.replace("    state: open\n", f"    state: {state}\n    ended: {{at: 2026-11-05T11:00:00Z, by: "
+                                                 "derive, because: its item is gone}\n", 1)
+    assert not _checks(_own(ended, "x.fabulan.cosm"), "question-about")
+    assert not _checks(_own(ended, "x.fabulan.cosm"), "question-shape")
+
+
+def test_question_shape_lets_a_question_asked_again_keep_its_settled():
+    """The conductor's ruling 2 (18.6.3: "an earlier `settled` stays as the record of the earlier write"): an open
+    question that holds an answer may keep `settled`; an open question with `settled` and no answer is still an
+    error."""
+    t = _text(CLOSE)
+    asked_again = t.replace("    state: answered\n", "    state: open\n", 1)
+    assert "    state: open\n    answers:\n" in asked_again
+    assert not _checks(_own(asked_again, "x.fabulan.cosm"), "question-shape")
+    never = t.replace("    state: open\n", "    state: open\n    settled: {at: 2026-11-05T10:31:02Z, run: x, wrote: "
+                                         "[]}\n", 1)
+    errs = _checks(_own(never, "x.fabulan.cosm"), "question-shape")
+    assert errs and "nothing settled" in errs[0].message
+
+
 def test_question_shape():
     t = _text(CLOSE)
     occ = "    state: open\n"
@@ -623,7 +654,7 @@ def test_every_emf_file_reads_as_a_fabula_by_its_old_spelling(path):
 
 
 # ---------------------------------------------------------------------------
-# The 0.6 draft of MacroCOSM OES: every cosm block loads and passes its checks
+# MacroCOSM OES (the synced 0.6 text): every cosm block loads and passes its checks
 # ---------------------------------------------------------------------------
 
 _BLOCK = re.compile(r"^```cosm\n(.*?)^```", re.S | re.M)
@@ -692,7 +723,7 @@ def test_the_overlay_reads_the_draft_shapes():
     assert t.kinds[("ascribe", "affinity")] == "something the person is drawn to, or turns from"
     assert {"flavour", "flavour-kind"} <= set(t.checks)
     # the text before 0.6 still reads: emf's rows, MiniCOSM headers
-    old = D.spec_tables(_text(REPO / "docs" / "MACROCOSM_OES.md"))
+    old = D.spec_tables(_text(OLD_SHAPES))
     assert "emf" in old.minicosms and ("emf", "claims") in old.lenses
 
 

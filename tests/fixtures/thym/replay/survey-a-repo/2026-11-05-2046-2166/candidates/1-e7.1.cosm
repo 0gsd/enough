@@ -1,0 +1,26 @@
+engine: syntax.manifest
+inputs:
+  call: a2cbfbfe9c042e75f50f3d62633a1dc77d7ac55c13003a24efb729c9efe0a3b8
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  kind: pyproject
+  name: tiny-tool
+  version: 0.2.0
+  requires_python: '>=3.10'
+  licence: MIT
+  build:
+    backend: setuptools.build_meta
+    requires:
+    - setuptools>=68
+  dependencies:
+  - package: pytest
+    version: '>=8'
+    scope: test
+    line: 10
+  scripts:
+  - name: tiny
+    target: tiny.cli:main
+    line: 13

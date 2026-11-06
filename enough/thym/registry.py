@@ -157,6 +157,16 @@ def load_all(decls: dict | Iterable, *, moves: Moves | None = None) -> list[str]
     problems: list[str] = []
     for d in items:
         name, code = decl_get(d, "name"), decl_get(d, "code")
+        for _words, kind_code, _owner in decl_get(d, "code_when") or ():
+            kmod = str(kind_code).partition(":")[0]      # a kind another owner added: its module registers its checks
+            if kmod and kmod not in _TRIED:
+                try:
+                    importlib.import_module(kmod)
+                    _TRIED[kmod] = None
+                except Exception as e:  # noqa: BLE001
+                    _TRIED[kmod] = f"{type(e).__name__}: {e}"
+            if kmod and _TRIED.get(kmod) is not None:
+                problems.append(f"{name}: {kmod}: {_TRIED[kmod]}")
         if not isinstance(code, str) or ":" not in code:
             continue
         mod, _, fn = code.partition(":")
@@ -199,7 +209,9 @@ def read_declarations(dirs: list[Path] | None = None) -> dict[str, dict]:
             owner = str(data.get("moves-of") or f"{data.get('name')}/{data.get('version')}")
             target = sidecar if is_sidecar else found
             for m in data["moves"]:
-                if isinstance(m, dict) and isinstance(m.get("name"), str):
+                # an entry that adds kinds to another owner's move (`extends: true`) declares no move of its own;
+                # only the compiler's reader merges it (`declarations._extend`)
+                if isinstance(m, dict) and isinstance(m.get("name"), str) and m.get("extends") is not True:
                     target.setdefault(m["name"], {**m, "owner": owner})
     for name, m in sidecar.items():
         found.setdefault(name, m)

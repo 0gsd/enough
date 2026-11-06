@@ -288,26 +288,41 @@ def test_the_spec_every_heading_is_a_section(built):
 
 
 def test_the_spec_examples_are_items_that_load(built, tmp_path):
+    from enough import ascribe as _ascribe
+    from enough import fabula as _fabula
     vol = built["vols"][("macrocosm-oes", "en")]
     blocks = re.findall(r"^```cosm\n(.*?)^```", SPEC.read_text(encoding="utf-8"), re.S | re.M)
     examples = [it for it in vol.items.values() if it.data.get("type") == "example"]
-    assert len(examples) == len(blocks) == 8                    # §18.6 ascribe and §18.7 thym added theirs (0.5.0)
+    # 0.6: the fabula's three flavours, its old spelling, the dialectic's question and the holograph joined the
+    # examples (18.4.5 to 18.4.7, 18.6.9, 19.2)
+    assert len(examples) == len(blocks) == 11
     assert [it.data["body"] for it in examples] == blocks
     # an `emf/1` example declares the fabula, the format its old spelling names (0.6)
     assert [it.data["declares"] for it in examples] == ["R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/canon",
-                                                        "R:minicosm/fabula", "R:minicosm/fabula", "R:minicosm/doc",
-                                                        "R:minicosm/ascribe", "R:minicosm/thym"]
-    assert vol.item("S:example/6").data["in"] == "S:section/18.5.5"
+                                                        "R:minicosm/fabula", "R:minicosm/fabula", "R:minicosm/fabula",
+                                                        "R:minicosm/fabula", "R:minicosm/doc", "R:minicosm/fabula",
+                                                        "R:minicosm/thym", "R:minicosm/ascribe"]
+    assert sum(1 for it in examples if it.data["body"].startswith("oes: emf/1\n")) == 1
+    assert vol.item("S:example/8").data["in"] == "S:section/18.5.5"
     for it in examples:
-        decl = it.data["declaration"]
-        name = {"canon/1": "canon.cosm", "emf/1": "x.md.cosm", "doc/1": "x.en.doc.cosm"}.get(decl, "brand.cosm")
+        data = mc.yaml_load(it.data["body"])
+        oes = data.get("oes")
+        if oes in ("fabula/1", "emf/1"):
+            src = str((data.get("source") or {}).get("path") or "text.md").rstrip("/")
+            name = Path(src).name + (f".{data['flavour']}.cosm" if data.get("flavour") else ".cosm")
+        elif oes == "thym/1":
+            name = f"{str(data.get('id', 'thym/x')).split('/', 1)[-1]}.{data.get('kind') or 'morph'}.cosm"
+        else:
+            name = {"canon/1": "canon.cosm", "doc/1": "x.en.doc.cosm", "ascribe/1": "holograph.cosm"}.get(oes,
+                                                                                                    "brand.cosm")
         p = tmp_path / it.id.split("/")[-1] / name
         p.parent.mkdir()
         p.write_text(it.data["body"], encoding="utf-8")
         ex = mc.load_volume(p)
-        assert ex.refused is None and mc.lint(ex).ok, it.id
+        rep = _ascribe.lint_holograph(ex) if oes == "ascribe/1" else _fabula.lint(ex)
+        assert ex.refused is None and rep.ok, (it.id, [str(x) for x in rep.problems()])
     # the doc example is a doc volume that compiles to the handbook it shows
-    doc_ex = mc.yaml_load(vol.item("S:example/6").data["body"])
+    doc_ex = mc.yaml_load(vol.item("S:example/8").data["body"])
     handbook = re.search(r"^```markdown\n(# The Meadow handbook\n.*?)^```", SPEC.read_text(encoding="utf-8"),
                          re.S | re.M).group(1)
     assert D.compile_doc(doc_ex) == handbook
@@ -338,16 +353,18 @@ def test_the_spec_terms_and_decisions(built):
     assert vol.item("T:term/part").data["convention"] == "glossary"
     assert vol.item("T:term/stance") is None or vol.item("T:term/stance").data["defined_in"].startswith("S:section/")
     assert "T:term/kind" in vol.item("S:section/7.4").data["mentions"]
-    # 0.5.4: the decisions come from the "Changes" section — every item of every edition's list, numbered through
-    # the section, each carrying its edition and date: 8 for 0.5.4, 3 for 0.0.2, the 27 old decisions under 0.0.1.
+    # The decisions come from the "Changes" section — every item of every edition's list, numbered through the
+    # section, each carrying its edition and date: 14 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
     decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
-    assert len(decisions) == 38 and decisions[-1].data["name"] == "A document is enumerated in its own grammar"
-    assert Counter(d.data.get("edition") for d in decisions) == {"0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
+    assert len(decisions) == 52
+    assert decisions[-1].data["name"] == "All rights reserved for the specification and the manifests;"
+    assert decisions[26].data["name"] == "A document is enumerated in its own grammar"
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.6.0": 14, "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first["edition"], first["dated"]) == \
-        ("S:decision/1", "Names carry no number", "0.5.4", "2026-11-03")
-    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 39)]
-    assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/20"
+        ("S:decision/1", "The taxonomy", "0.6.0", "2026-11-05")
+    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 53)]
+    assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/21"           # 0.6: Changes is 21
 
 
 def test_no_document_carries_chapters(built):
@@ -377,7 +394,7 @@ def test_manifests_become_reference_items():
     assert [(count[("module", m)], count[("kind", m)])
             for m in ("comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym")] == \
         [(9, 73), (2, 11), (2, 5), (11, 42), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check
-    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 4, 24]
+    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 5, 24]   # canon: fabula.state
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
         ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc",
          "R:minicosm/ascribe", "R:minicosm/thym"]
@@ -386,7 +403,19 @@ def test_manifests_become_reference_items():
     assert by["R:minicosm/fabula"]["old"] == ["emf/1"] and "old" not in by["R:minicosm/canon"]
     assert by["R:module/cosm.D"]["provenance"]["sources"] == ["defaults/cosm/manifests/core.modules.cosm#modules.D"]
     checks = [it["id"].split("/", 1)[1] for it in items if it["type"] == "check"]
-    assert checks == list(mc.CHECKS) + list(D.DOC_CHECKS)
+    # 0.6: the reference joins the fabula's own checks (18.4.8) and the core's dialectic's (18.6.8) to the generic ones
+    from enough import fabula as _fabula
+    own = [c for c in _fabula.OWN_CHECKS if c not in mc.CORE_CHECKS]
+    assert checks == list(dict.fromkeys(list(mc.CHECKS) + list(D.DOC_CHECKS) + own + list(mc.CORE_CHECKS)))
+    assert by["R:check/question-about"]["atem"].startswith("an about that names nothing in the volume")
+    assert by["R:check/question-about"]["selected_by"] == by["R:check/ref-unresolved"]["selected_by"]
+    assert by["R:check/code-span"]["selected_by"] == ["R:minicosm/fabula"]
+    assert by["R:check/licence-recorded"]["severity"] == "error"
+    # and module D's kinds carry 18.6.2's lines and fields, in every format (the core's module)
+    for fmt in ("fabula", "comprise", "thym"):
+        q = by[f"R:kind/{fmt}.D.question"]
+        assert q["atem"] == "one question about one thing" and q["holds"]["about"].startswith("what the question is")
+    assert set(by["R:kind/fabula.D.session"]["holds"]) >= {"at"}
     claim = by["R:kind/fabula.P.claim"]
     assert claim["refs"] == ["links", "roles.*"] and claim["required"][-1] == "stance"
     assert "R:list/fabula.stance" in claim["lists"] and claim["of"] == "R:module/fabula.P"
@@ -400,7 +429,7 @@ def test_manifests_become_reference_items():
                                                                                          "thym")]
     assert by["R:check/module-none"]["selected_by"] == ["R:minicosm/comprise"]
     assert by["R:check/atem-shape"]["severity"] == "error" and by["R:check/atem-shape"]["atem"] == "an item with no atem"
-    # the bundled text still says emf where the reader says fabula: its overlay still reaches the fabula's items
+    # the fabula's lists and lenses take the text's lines (a text synced before 0.6 says emf: test_fabula's old shapes)
     assert by["R:list/fabula.stance"]["meanings"]["assumed"].startswith("taken for granted")
     assert by["R:lens/fabula.claims"]["atem"].startswith("entities, concepts and claims")
     assert by["R:lens/comprise.map"]["lens"]["generic"] is True
@@ -546,12 +575,13 @@ def test_the_five_documents():
 
 
 def test_the_three_minicosm_specifications_enumerate(built):
-    """The counts of the 0.5.4 editions (the decisions are the Changes sections' items: 7 + 18, 1 + 11, 2 + 19),
+    """The counts of the 0.6.0 editions (the decisions are the Changes sections' items: 21 + 7 + 18, 10 + 1 + 11,
+    7 + 2 + 20),
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
-    for slug, counts in (("thym", {"section": 83, "term": 12, "example": 1, "decision": 25}),
-                         ("ascribe", {"section": 27, "term": 2, "example": 1, "decision": 12}),
-                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 21})):
+    for slug, counts in (("thym", {"section": 111, "term": 20, "example": 1, "decision": 46}),
+                         ("ascribe", {"section": 45, "term": 15, "example": 1, "decision": 22}),
+                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 29})):
         vol = built["vols"][(slug, "en")]
         assert vol.refused is None and vol.id == f"doc/{slug}"
         got = Counter(it.data.get("type") for it in vol.items.values())
@@ -570,7 +600,7 @@ def test_the_three_minicosm_specifications_enumerate(built):
         assert rows and all(r["inventory"] == slug and r["version"] == edition for r in rows)
         decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
         assert decisions and all(d.data.get("edition") for d in decisions), slug
-        assert decisions[0].data["edition"] == "0.5.4" and decisions[0].data["dated"] == "2026-11-03", slug
+        assert decisions[0].data["edition"] == "0.6.0" and decisions[0].data["dated"] == "2026-11-05", slug
 
 
 # ---------------------------------------------------------------------------

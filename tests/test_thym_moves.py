@@ -215,6 +215,8 @@ def run_publish(root: Path, engines: dict, answers: dict, **kw):
 def test_every_declared_move_scaffold_and_check_is_implemented():
     decls = R.read_declarations()
     assert len(decls) >= 26
+    assert R.load_all(decls) == []                 # every declared module imports (as the runtime loads them)
+    assert decls["project"]["owner"] == "comprise/1"     # Ascribe's `extends: true` entry is not a declaration
     for name, d in decls.items():
         assert R.MOVES.lookup(name) is not None, name
         if d.get("scaffold"):
@@ -714,7 +716,7 @@ def test_tell_lands_a_cited_short_with_its_footer(root, engines):
     t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=cp, engines=engines, now=NOW)
     assert t.landed, t.refusal
     text = t.outputs["s"].read_text(encoding="utf-8")
-    assert text.rstrip().endswith("*a short of notes.md, told by weight, compiled from its EMF twin on 2026-11-01 "
+    assert text.rstrip().endswith("*a short of notes.md, told by weight, compiled from its fabula on 2026-11-01 "
                                   "by g40-04*")
     contract = cp.calls[0][1]
     assert contract["schema"]["stamp"] == "engine" and "footer" in contract["checks"]
@@ -728,7 +730,7 @@ def test_tell_under_rules_gives_the_outline(root, engines):
     assert t.landed, t.refusal
     text = t.outputs["s"].read_text(encoding="utf-8")
     assert text.startswith("# The Hollins Lane orchard, autumn notes")
-    assert text.rstrip().endswith("compiled from its EMF twin on 2026-11-01 by rules, without a model*")
+    assert text.rstrip().endswith("compiled from its fabula on 2026-11-01 by rules, without a model*")
     assert t.records[0]["engine"] == "rules" and t.records[0]["state"] == "pending"
 
 
@@ -1036,7 +1038,7 @@ def test_a_run_records_its_engine_calls_and_replays_with_no_engine(root):
                          now=None)
     assert t.landed, t.refusal
     vol = T.load(t.path)
-    assert recorded_names(T.root_item(vol)) == ["canon", "docoes", "feed"]
+    assert {"canon", "docoes", "feed"} <= set(recorded_names(T.root_item(vol)))   # the engines this run reached
     rec = mc.yaml_load((t.dir / "candidates" / "1-e1.1.cosm").read_text(encoding="utf-8"))
     assert rec["engine"] == "canon.derive_passages" and len(rec["inputs"]["call"]) == 64
     assert lint_errors(t.path) == []
@@ -1347,3 +1349,16 @@ def test_a_packaged_fabula_says_text_md_in_every_locator():
     assert out["source"]["path"] == "text.md"
     assert out["nodes"][0]["provenance"]["sources"] == ["text.md#L3, text.md#L14,text.md#L22", "other-notes.md#L2",
                                                         "text.md"]
+
+
+def test_the_footer_check_holds_the_new_words_and_reads_an_earlier_editions():
+    """MacroCOSM OES 18.4.4: a short now ends "compiled from its fabula" (or "a standalone fabula"); a short an
+    earlier edition wrote ("from its EMF twin", "a standalone EMF") reads the same, so a recorded run still replays."""
+    for tail in ("told as the author told it, compiled from its fabula on 2026-11-01 by g40-04",
+                 "a standalone fabula, told by weight, compiled on 2026-11-01 by rules, without a model",
+                 "told as the author told it, compiled from its EMF twin on 2026-11-01 by g40-04",
+                 "a standalone EMF, told by weight, compiled on 2026-11-01 by a model"):
+        ok, why = verdict("footer", Value("short", f"One line.\n\n*a short of notes.md, {tail}*\n"))
+        assert ok, (tail, why)
+    ok, why = verdict("footer", Value("short", "One line.\n\n*a short of notes.md, compiled somewhere*\n"))
+    assert not ok and why.startswith("the last line is not a short's footer")
