@@ -372,6 +372,34 @@ was ein fabulac kompiliert, hier gelesen. ein <strong>cshort</strong> ist ein Or
 - lies zuerst <code>CSHORT.md</code>: es sagt, aus welchem Teil des fabulac jede Datei geschrieben wurde.
 - leg einen cshort neben das Original und vergleiche: was dem fabulac fehlte, fehlt dem cshort.
 
+## dialectic-card
+name: die Fragen
+path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
+
+### what
+was ein Band von einem Menschen wissen will: was seine Quelle nicht sagen konnte, jeweils eine <strong>Frage</strong> zu einer Stelle darin, von einer Art (Worte, eine Auswahl, ja oder nein, eine Zahl, ein Datum, ein Eintrag, die Zeilen, die es zeigen), gestellt an jemanden: den Autor, jemanden, der das Werk kennt, die Leute, die es gemacht haben, alle, die es wissen. die Karte zeigt eine oder zwei auf einmal, prüft eine Antwort, während du tippst, und hält, was du sagst, in einer <strong>Sitzung</strong> fest, die du als Ganzes abschickst. die Sitzung eines Zwillings wird als Antwortdatei neben ihn geschrieben; der Band selbst ändert sich erst, wenn die Antworten <strong>eingearbeitet</strong> sind.
+
+### how
+<strong>Fragen</strong> in der Werkzeugleiste des cosm-Betrachters öffnet sie, mit der Zahl der offenen; ebenso die fabula-Karte und die Meldung einer Dekompilierung oder eines Baus, der Fragen mitgebracht hat. antworte, oder sag <strong>ich weiß es nicht</strong> (auch eine Antwort: die Stelle bleibt offen, in deinen Worten), <strong>das sage ich lieber nicht</strong> (bleibt als Tatsache stehen) oder <strong>vorerst überspringen</strong>. <strong>diese behalten, und die nächsten</strong> geht weiter; <strong>die Sitzung abschicken</strong> hält alles fest und sagt Frage für Frage, was festgehalten, übersprungen oder abgelehnt wurde, und eine abgelehnte Antwort kommt mit dem zurück, was du getippt hast. <strong>die Antworten einarbeiten</strong> bringt sie in den Band, mit dem Modell hier, außer du wählst für diesen einen Auftrag die Cloud; was darauf wartet, dass ein Modell seinen Eintrag neu liest, wird aufgelistet, und eine Frage, die eine Prüfung gegen eine Antwort aufgeworfen hat, kommt als Nächstes. <strong>erneut fragen</strong> öffnet eine eingearbeitete oder abgelehnte Frage wieder; ein Band ohne Fragen kann <strong>die Fragen stellen</strong>, nach Regeln.
+
+### ideas
+- „ich weiß es nicht, aber die Support-Leitung wüsste es“ ist eine gute Antwort: das Feld bleibt in diesen Worten offen, damit die nächste Person gefragt wird.
+- zwei beantworten, abschicken, einarbeiten: auch eine kurze Sitzung ist eine Sitzung.
+
+## holograph
+name: die Fragen eines holograph
+path: self/ → self/D/questions.cosm
+
+### what
+ein <strong>holograph</strong> (Ascribe) beschreibt einen Menschen ohne Namen und wird gefüllt, indem du über dich selbst gefragt wirst. seine Fragen sind <strong>nur für den Inhaber</strong>; was du sagst, wird in seinem eigenen Modul D festgehalten, in deinen Worten, und verlässt es nie. eine Antwort, die wie persönliche Daten aussieht (eine E-Mail-Adresse, eine Telefonnummer, ein Geburtsdatum, eine Anschrift, der Name eines Menschen), wird abgelehnt, mit Worten, die sagen warum, und nichts davon wird geschrieben. eine Lektüre deines eigenen Textes schlägt <em>Kandidaten</em> vor, zu denen jeweils <strong>ja</strong>, <strong>teilweise</strong> oder <strong>nein</strong> gefragt wird. eine Zeile für das Modell gibt es hier nicht: nichts von einem holograph geht an ein Cloud-Modell.
+
+### how
+öffne sie mit <strong>Fragen</strong> im cosm-Betrachter auf dem holograph; der dünnste Teil des Selbst wird zuerst gefragt, und ein holograph wird sofort eingearbeitet, nach Regeln. <strong>der isograph …</strong> macht seine öffentliche Projektion mit einem Programm von dir, das den holograph allein nimmt: Arten, FEED-Wörter, Stufen und Jahrzehnte, jedes als stated markiert, und kein Name, keine Worte von dir, nichts aus der Dialektik. die Freigabe wird im holograph festgehalten, bevor der isograph daneben geschrieben wird, einer je Epoche.
+
+### ideas
+- beschreib Menschen über das, was sie für dich sind („ein Lotse im Ruhestand“), oder über ein Pseudonym, das du im Katalog erklärst.
+- sag <strong>teilweise</strong> zu einem Kandidaten, der fast stimmt, und sag es dann auf deine Weise.
+
 ## atem-card
 name: atem-Karte
 path: (the atem of a text or a passage)

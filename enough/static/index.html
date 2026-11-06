@@ -6736,10 +6736,10 @@
     }
 
     /* Not wide enough for the name and every tool on one row (a longer
-       language needs ~950px): the toolbar takes two — the name and its
-       declaration, then the tools — rather than squeezing the name to
-       nothing. */
-    @container cosmmode (max-width: 980px) {
+       language needs ~950px, ~1150px since 0.6 added questions and the
+       isograph…): the toolbar takes two — the name and its declaration,
+       then the tools — rather than squeezing the name to nothing. */
+    @container cosmmode (max-width: 1180px) {
       :is(#cosm-mode, .emf-face) .cosm-toolbar {
         flex-wrap: wrap;
         row-gap: 6px;
@@ -8508,21 +8508,21 @@
     }
 
     /* The run / read card, and (U2) the package / unpack card. */
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .modal-panel {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-panel {
       max-width: 620px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .modal-head img.thym-mast-icon {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-head img.thym-mast-icon {
       width: 22px;
       height: 22px;
       object-fit: contain;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .modal-head h3 {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-head h3 {
       flex: 0 0 auto;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-source {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-source {
       flex: 1 1 auto;
       min-width: 0;
       color: var(--fg-muted);
@@ -8532,26 +8532,26 @@
       text-overflow: ellipsis;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .modal-close {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .modal-close {
       margin-left: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-body {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-body {
       color: var(--fg);
       font-size: 13px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-sec-h {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-sec-h {
       margin: 12px 0 6px;
       color: var(--fg-muted);
       font-size: 11px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-sec-h:first-child {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-sec-h:first-child {
       margin-top: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-list {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-list {
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -8559,7 +8559,7 @@
       overflow-y: auto;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) label.thym-opt {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
       column-gap: 8px;
@@ -8569,16 +8569,16 @@
       cursor: pointer;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) label.thym-opt:has(input:checked) {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt:has(input:checked) {
       border-color: var(--accent-tool);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) label.thym-opt.problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt.problem {
       cursor: default;
       opacity: 0.6;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) label.thym-opt input {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) label.thym-opt input {
       grid-row: 1 / span 3;
       align-self: start;
       width: 16px;
@@ -8586,7 +8586,7 @@
       margin: 2px 0 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-main {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-main {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
@@ -8594,54 +8594,54 @@
       min-width: 0;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-name {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-name {
       font-weight: 600;
       overflow-wrap: anywhere;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-where {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-where {
       font-size: 11px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-meta,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-why,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-meta,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-why,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-problem {
       grid-column: 2;
       font-size: 11.5px;
       color: var(--fg-muted);
       overflow-wrap: anywhere;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-opt-problem {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-opt-problem {
       font-style: italic;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-note,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-meta {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-note,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-meta {
       margin: 6px 0;
       font-size: 11.5px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-note[hidden] {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-note[hidden] {
       display: none;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-row {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-row label {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row label {
       flex-shrink: 0;
       color: var(--fg-muted);
       font-size: 11px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-row input {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-row input {
       flex: 1 1 auto;
       min-width: 0;
       font: inherit;
@@ -8654,62 +8654,62 @@
       padding: 4px 7px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) p.thym-atem-line {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) p.thym-atem-line {
       font-size: 16px;
       color: var(--fg);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-fits,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-refusal,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-unavail,
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-wait {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-fits,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-refusal,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-unavail,
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-wait {
       margin: 4px 0;
       font-size: 12px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-refusal {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-refusal {
       color: var(--accent-error, #c0392b);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-unavail {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-unavail {
       color: var(--fg-muted);
       font-style: italic;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-wait {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-wait {
       display: flex;
       align-items: center;
       gap: 8px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) ol.thym-plan-nodes {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) ol.thym-plan-nodes {
       margin: 6px 0 0;
       padding-left: 1.8em;
       font-size: 12px;
       color: var(--fg-muted);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) ol.thym-plan-nodes code {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) ol.thym-plan-nodes code {
       color: var(--fg);
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-status[hidden] {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-status[hidden] {
       display: none;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-status {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-status {
       margin-top: 10px;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-bar {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-bar {
       height: 4px;
       border-radius: 2px;
       background: var(--border);
       overflow: hidden;
     }
 
-    :is(#thym-modal, #thym-pack-modal, #fabula-modal) .thym-bar span {
+    :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal) .thym-bar span {
       display: block;
       height: 100%;
       background: var(--accent-tool);
@@ -8900,6 +8900,385 @@
       font-size: 11px;
       color: var(--fg-muted);
       overflow-wrap: anywhere;
+    }
+
+    /* 0.6 (U1b): the dialectic card (#dialectic-modal): the questions in
+       hand, each with an input fit to its kind and its live check, the
+       three other answers, the sitting, settling and what waits, what was
+       answered before; a holograph's rules; the isograph face. */
+    #dialectic-modal .thym-list {
+      max-height: none;
+      overflow: visible;
+    }
+
+    #dialectic-modal p.fab-model-line {
+      margin: 2px 0 4px;
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .fab-calls {
+      margin: 8px 0 0;
+    }
+
+    #dialectic-modal .fab-calls input {
+      flex: 0 1 8em;
+    }
+
+    #dialectic-modal .fab-calls .thym-meta {
+      margin: 0;
+    }
+
+    #dialectic-modal .dlg-progress p {
+      margin: 0 0 6px;
+    }
+
+    #dialectic-modal p.dlg-count {
+      font-size: 12.5px;
+      color: var(--fg);
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-holo {
+      margin: 0 0 10px;
+      padding: 6px 10px;
+      border-left: 3px solid var(--accent-tool);
+      background: var(--bg-alt, transparent);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-holo p {
+      margin: 3px 0;
+    }
+
+    #dialectic-modal .dlg-q {
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 0;
+    }
+
+    #dialectic-modal p.dlg-asks {
+      margin: 0 0 3px;
+      font-size: 13.5px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal p.dlg-meta,
+    #dialectic-modal p.dlg-hint {
+      margin: 2px 0;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal p.dlg-hint[hidden] {
+      display: none;
+    }
+
+    #dialectic-modal button.dlg-about {
+      display: inline;
+      min-height: 16px;
+      padding: 0;
+      font: inherit;
+      color: var(--accent-tool);
+      background: none;
+      border: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+      text-align: start;
+    }
+
+    #dialectic-modal .dlg-field {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-in {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 26px;
+      margin: 4px 0 0;
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 7px;
+    }
+
+    #dialectic-modal textarea.dlg-in {
+      resize: vertical;
+      min-height: 3.2em;
+    }
+
+    #dialectic-modal .dlg-in[aria-invalid="true"] {
+      border-color: var(--accent-error, #c0392b);
+    }
+
+    #dialectic-modal .dlg-in:disabled {
+      opacity: 0.55;
+    }
+
+    #dialectic-modal .dlg-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+    }
+
+    #dialectic-modal .dlg-row .dlg-in {
+      flex: 1 1 12em;
+      width: auto;
+      min-width: 0;
+    }
+
+    #dialectic-modal .dlg-row .dlg-num {
+      flex: 0 1 8em;
+    }
+
+    #dialectic-modal .dlg-row .thym-meta {
+      margin: 4px 0 0;
+    }
+
+    #dialectic-modal .dlg-opts {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+      margin: 4px 0 0;
+    }
+
+    #dialectic-modal .dlg-opts-cand {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    #dialectic-modal label.dlg-opt {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 2px 6px;
+      min-height: 24px;
+      min-width: 0;
+      padding: 2px 9px 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal label.dlg-opt:has(input:checked) {
+      border-color: var(--accent-tool);
+    }
+
+    #dialectic-modal label.dlg-opt input {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    #dialectic-modal .dlg-opt-why {
+      flex: 1 1 100%;
+      padding-left: 22px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #dialectic-modal .dlg-opts .dlg-other {
+      flex: 1 1 10em;
+      width: auto;
+      margin: 0;
+    }
+
+    #dialectic-modal .dlg-cand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin: 4px 0;
+      padding: 4px 8px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-cand-h {
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #dialectic-modal p.dlg-check {
+      min-height: 0;
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal p.dlg-check:empty {
+      display: none;
+    }
+
+    #dialectic-modal p.dlg-check.bad {
+      color: var(--accent-error, #c0392b);
+    }
+
+    #dialectic-modal .dlg-alts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0 0;
+    }
+
+    #dialectic-modal .dlg-alts button,
+    #dialectic-modal .fab-row button,
+    #dialectic-modal ul.dlg-rows button {
+      font: inherit;
+      font-size: 12px;
+      min-height: 24px;
+      padding: 2px 10px;
+      color: var(--fg);
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-alts button[aria-pressed="true"] {
+      border-color: var(--accent-tool);
+      box-shadow: inset 0 0 0 1px var(--accent-tool);
+    }
+
+    #dialectic-modal .fab-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #dialectic-modal .fab-row button:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    #dialectic-modal .fab-row .thym-meta,
+    #dialectic-modal .fab-row .fab-say {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal p.dlg-none {
+      margin: 6px 0;
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    #dialectic-modal ul.dlg-rows,
+    #dialectic-modal ul.dlg-files {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #dialectic-modal ul.dlg-files li {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal ul.dlg-rows li {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 8px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    #dialectic-modal ul.dlg-rows li.refused {
+      border-color: var(--accent-error, #c0392b);
+    }
+
+    #dialectic-modal .dlg-row-asks {
+      grid-column: 1;
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal .dlg-row-what {
+      grid-column: 1;
+      font-size: 11px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #dialectic-modal li.refused .dlg-row-what,
+    #dialectic-modal .dlg-row-what.bad {
+      color: var(--accent-error, #c0392b);
+    }
+
+    #dialectic-modal ul.dlg-rows li button {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+    }
+
+    #dialectic-modal details.dlg-before {
+      margin-top: 12px;
+    }
+
+    #dialectic-modal details.dlg-before summary {
+      min-height: 18px;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      cursor: pointer;
+    }
+
+    #dialectic-modal details.dlg-before ul {
+      margin-top: 6px;
+    }
+
+    #fabula-modal #fab-dialectic .fab-row button {
+      flex: 0 0 auto;
+    }
+
+    /* The cosm viewer's toolbar: how many questions are open; a finding's advice. */
+    #cosm-dlg-btn .cosm-dlg-n {
+      display: inline-block;
+      min-width: 1.4em;
+      margin-left: 5px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: var(--accent-tool);
+      color: var(--bg);
+      font-size: 10.5px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    #cosm-dlg-btn .cosm-dlg-n[hidden] {
+      display: none;
+    }
+
+    :is(#cosm-mode, .emf-face, .docs-fab) .cosm-checks .cosm-advice {
+      display: block;
+      margin-top: 2px;
+      font-size: 11px;
+      font-style: italic;
+      color: var(--fg-muted);
     }
 
     #fabula-modal ul.fab-made-list li button {
@@ -17869,6 +18248,13 @@
           <button type="button" class="cosm-tool-btn" id="cosm-fab-btn" hidden onclick="fabFolderOpen(COSM.path)"
             title="this fabulac's build, stage by stage, and what it compiles into" data-i18n-title="fab.cosm.title"
             data-i18n="fab.cosm.label">build and compile…</button>
+          <button type="button" class="cosm-tool-btn" id="cosm-dlg-btn" hidden onclick="dlgOpen(COSM.path)"
+            title="what this volume asks of a person: answer its questions, settle the answers"
+            data-i18n-title="dlg.cosm.title"><span data-i18n="dlg.cosm.label">questions</span><span
+            class="cosm-dlg-n" id="cosm-dlg-n" hidden></span></button>
+          <button type="button" class="cosm-tool-btn" id="cosm-iso-btn" hidden onclick="dlgIsoOpen(COSM.path)"
+            title="make this holograph’s isograph, by a program of yours"
+            data-i18n-title="dlg.iso.title" data-i18n="dlg.iso.label">the isograph…</button>
           <button type="button" class="cosm-tool-btn" id="cosm-rail-btn" aria-controls="cosm-rail"
             aria-expanded="true" onclick="cosmRailToggle()"
             title="show or hide the outline" data-i18n-title="cosm.rail.title"
@@ -19367,6 +19753,7 @@
         <div id="fab-main"></div>
         <div id="fab-route-box"></div>
         <div id="fab-compile"></div>
+        <div id="fab-dialectic"></div>
         <div class="thym-status" id="fab-status" role="status" hidden></div>
       </div>
       <div class="modal-foot">
@@ -19396,6 +19783,40 @@
       <div class="modal-body fabv-body" id="fabv-body"></div>
       <div class="modal-foot">
         <button type="button" id="fabv-close" data-i18n="atem.card.close">close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 0.6 (the fabula round, U1b): the dialectic card. One card for every
+       volume (a text's twin, a fabulac, a Canon or MacroCOSM volume, a
+       holograph): what it asks, one or two questions at a time, each with
+       an input fit to its kind and a live check; "I don't know", "I'd rather
+       not say", "skip for now"; the answers collected into one sitting and
+       sent together; then settling, what waits and what a check asked back.
+       A holograph's card says Ascribe's rules and offers no model line. Its
+       second face makes a holograph's isograph. Filled by dlgPaint(). -->
+  <div id="dialectic-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="dlgClose()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+      <div class="modal-head">
+        <img class="svg-icon thym-mast-icon" data-icon="cosm" alt="" draggable="false">
+        <h3 id="dlg-title"></h3>
+        <span class="thym-source" id="dlg-source"></span>
+        <span class="mode-help-anchor" data-help="dialectic-card"></span>
+        <button class="modal-close" onclick="dlgClose()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
+      </div>
+      <div class="modal-body thym-body" id="dlg-body">
+        <div id="dlg-rules"></div>
+        <div id="dlg-progress" class="dlg-progress"></div>
+        <div id="dlg-main"></div>
+        <div id="dlg-sitting"></div>
+        <div id="dlg-settle"></div>
+        <div id="dlg-before"></div>
+        <div class="thym-status" id="dlg-status" role="status" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="primary" id="dlg-send" hidden></button>
+        <button type="button" id="dlg-close" data-i18n="atem.card.close">close</button>
       </div>
     </div>
   </div>
@@ -19684,6 +20105,7 @@
       if (window.dictOnLanguage) window.dictOnLanguage();
       if (window.canonOnLanguage) window.canonOnLanguage();
       if (window.fabOnLanguage) window.fabOnLanguage();
+      if (window.dlgOnLanguage) window.dlgOnLanguage();
       if (window.ctxNoticeOnLanguage) window.ctxNoticeOnLanguage();
       if (window.agentFreeOnLanguage) window.agentFreeOnLanguage();
       if (window.docsOnLanguage) window.docsOnLanguage();
@@ -26049,6 +26471,9 @@
           }
         }
       }
+      // 0.6 (U1b): the readvisor recorded a sitting (or raised, or settled)
+      // through its `dialectic` tool: an open card and the viewer's count catch up.
+      if (status === 'ok' && name === 'dialectic' && window.__dlgReady) dlgOnAgent(key);
       // Side effects on the filesystem should refresh ambient views.
       if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
         // File tree: refetch (don't wait for the next poll tick).
@@ -31933,6 +32358,8 @@
       cosmEl('cosm-lens').hidden = true;
       cosmEl('cosm-about-btn').hidden = true;
       cosmEl('cosm-fab-btn').hidden = true;
+      cosmEl('cosm-dlg-btn').hidden = true;
+      cosmEl('cosm-iso-btn').hidden = true;
       cosmEl('cosm-rail').innerHTML = '';
       cosmRailApply();
       const body = cosmEl('cosm-body');
@@ -31999,6 +32426,9 @@
       cosmEl('cosm-about-btn').hidden = refused || !COSM_SPEC_SECTION[data.minicosm];
       // 0.6 (U1a): a fabulac in the project offers its build and its compiles.
       cosmEl('cosm-fab-btn').hidden = !(window.__fabReady && !refused && !IS_HOME && fabIsFabulac(COSM.path, data));
+      // 0.6 (U1b): any volume of the project: its questions (with a count of
+      // the open ones), and a holograph's isograph.
+      if (window.__dlgReady) dlgCosmPaint(data);
       cosmEl('cosm-rail').innerHTML = refused ? '' : cosmRailHTML(data);
       const body = cosmEl('cosm-body');
       body.innerHTML = refused ? cosmRefusalHTML(data) : cosmBodyHTML(data);
@@ -32153,7 +32583,16 @@
         + '" aria-label="' + cosmEsc(label) + '"></span><code>' + cosmEsc(p.check || '') + '</code> '
         + (key ? '<a href="#" data-go="' + cosmEsc(key) + '">' + cosmEsc(cosmName(key, host)) + '</a> '
           : (p.item ? '<span class="cosm-pf">' + cosmEsc(p.item) + '</span> ' : ''))
-        + cosmEsc(p.message || '') + '</li>';
+        + cosmEsc(cosmAdviceTrim(p)) + (p.advice ? '<span class="cosm-advice">' + cosmEsc(t('dlg.advice', 'advice: {advice}')
+          .replace('{advice}', () => String(p.advice))) + '</span>' : '') + '</li>';
+    }
+
+    // 0.6 (U1b): a holograph's finding carries its advice (Ascribe 10.3),
+    // shown on a line of its own; the message's own copy of it is cut.
+    function cosmAdviceTrim(p) {
+      const m = String(p.message || ''), a = String(p.advice || '');
+      if (a && m.endsWith('; ' + a)) return m.slice(0, m.length - a.length - 2);
+      return m;
     }
 
     function cosmPendingHTML(q, host = COSM) {
@@ -33127,6 +33566,8 @@
       if ((e.kind === 'thym' || e.kind === 'read') && window.__thymReady) thymJobOnSnap(e, snap);
       // 0.6: a fabulac's build, or its compile, that the fabula card follows.
       if (e.want === 'fabulac' && window.__fabReady) fabJobOnSnap(e, snap);
+      // 0.6 (U1b): a settle the dialectic card follows.
+      if (e.want === 'dialectic' && window.__dlgReady) dlgJobOnSnap(e, snap);
       if (end) {
         if (snap.state === 'done') canonAfterWrite(snap);
         setTimeout(() => CANON.jobs.delete(e.id), 60000);
@@ -33143,6 +33584,8 @@
       const res = (snap && snap.result) || {};
       // 0.5.0: a run landed its outputs, or a reading was written beside its text.
       if (snap && (snap.kind === 'thym' || snap.kind === 'read')) { if (window.__thymReady) thymAfterWrite(snap); return; }
+      // 0.6 (U1b): answers settled into a volume.
+      if (snap && snap.kind === 'dialectic') { if (window.__dlgReady) dlgAfterWrite(snap); return; }
       const wrote = snap.kind === 'emf' || snap.kind === 'pin' || snap.kind === 'compile' || snap.kind === 'fabulac'
         || (snap.kind === 'atem' && res.written);
       if (!wrote) return;
@@ -33201,7 +33644,7 @@
       const thym = (e.kind === 'thym' || e.kind === 'read') && window.__thymReady;
       // 0.6: a fabulac's build or compile (fabIsFabulacSnap), told from its progress.
       const fab = window.__fabReady && fabIsFabulacSnap(snap, e);
-      const icon = e.kind === 'emf' || e.kind === 'compile' || e.kind === 'thym' || e.kind === 'fabulac' ? 'cosm'
+      const icon = e.kind === 'emf' || e.kind === 'compile' || e.kind === 'thym' || e.kind === 'fabulac' || e.kind === 'dialectic' ? 'cosm'
         : (e.kind === 'read' ? 'short' : 'atem');
       const dismiss = { label: t('canon.job.dismiss', 'dismiss'), run: () => convertToastClose(id) };
       // 0.5.0: the run / read card shows its own progress while it is open.
@@ -33209,6 +33652,8 @@
       // 0.6: so does the fabula card.
       if (fab && fabCardShowing(e.id)) { convertToastClose(id); return; }
       if (fab && CANON_TERMINAL.has(snap.state)) { fabToastEnd(e, snap, id, icon, dismiss); return; }
+      // 0.6 (U1b): and so does the dialectic card, while it shows its settle.
+      if (e.kind === 'dialectic' && window.__dlgReady && dlgCardShowing(e.id)) { convertToastClose(id); return; }
       if (!CANON_TERMINAL.has(snap.state)) {
         if (e.want === 'card') return;                    // the card shows its own progress
         convertToast(id, {
@@ -33254,6 +33699,13 @@
               convertToastClose(id); openReadEdit(res.reading, { size: 'full', face: 'read' });
             } }, dismiss];
           }
+        } else if (e.kind === 'dialectic') {
+          // 0.6 (U1b): a settle, in the job's own words, and the way back to the card.
+          message = res.message || snap.message || '';
+          const vol = res.path || e.path;
+          if (vol && window.__dlgReady) {
+            actions = [{ label: t('dlg.toast.open', 'the questions'), run: () => { convertToastClose(id); void dlgOpen(vol); } }, dismiss];
+          }
         } else if (e.kind === 'compile') {
           message = t('canon.job.compiled', 'wrote {name}').replace('{name}', () => canonBase(res.written || ''));
           if (res.written) {
@@ -33272,6 +33724,10 @@
         }
         convertToast(id, { state: 'done', icon, square: true, title: e.label, message, actions,
           ttl: actions.length > 1 ? 15000 : 6000 });
+        // 0.6 (U1b): a decompile that landed questions offers them.
+        if (e.kind === 'emf' && window.__dlgReady) {
+          dlgToastOffer(id, res.twin_path || res.text_path || e.path, { state: 'done', icon, square: true, title: e.label, message, actions });
+        }
         return;
       }
       if (e.want === 'card' && atemCardShowing(e.id)) { convertToastClose(id); return; }
@@ -33303,6 +33759,7 @@
       const name = canonBase(busy.path || '');
       const what = busy.kind === 'emf' ? t('canon.busy.emf', 'decompiling {name}').replace('{name}', () => name)
         : busy.kind === 'fabulac' ? t('fab.busy.build', 'building the fabulac of {name}').replace('{name}', () => name)
+        : busy.kind === 'dialectic' ? t('dlg.busy', 'settling the answers into {name}').replace('{name}', () => name)
         : (busy.kind === 'compile' ? t('canon.busy.compile', 'compiling {name}').replace('{name}', () => name)
           : (busy.kind === 'thym' ? t('thym.busy.run', 'running a program on {name}').replace('{name}', () => name)
             : (busy.kind === 'read' ? t('thym.busy.read', 'reading {name} through a morph').replace('{name}', () => name)
@@ -35913,19 +36370,22 @@
     }
 
     // ---- the model line: where this job's model runs (pins P6) ----
-    // `/api/pal/status` is the gate's one answer (cloud.gate_status); it is
-    // asked when a card that offers the cloud opens, never per keystroke.
-    const FAB_ROUTE = { gate: null, ui: {} };
+    // `GET /api/fabula/models` (S2) is the one answer for the model line:
+    // this machine's model and its window, the cloud's model while its gate
+    // is open, and agent-free. It is asked when a card that offers the cloud
+    // opens, never per keystroke.
+    const FAB_ROUTE = { gate: null, models: null, ui: {} };
 
     async function fabGateLoad() {
-      if (AGENT_FREE) { FAB_ROUTE.gate = { available: false, reason: 'agent-free', model_id: null }; return FAB_ROUTE.gate; }
-      let g = { available: false, reason: '', model_id: null };
+      if (AGENT_FREE) { FAB_ROUTE.gate = { available: false, reason: 'agent-free', model_id: null }; FAB_ROUTE.models = null; return FAB_ROUTE.gate; }
+      let g = { available: false, reason: '', model_id: null }, m = null;
       try {
-        const r = await fetch('/api/pal/status');
-        if (r.ok) g = await r.json();
+        const r = await fetch('/api/fabula/models');
+        if (r.ok) m = await r.json();
       } catch (_e) { /* shut: here only */ }
+      if (m && cosmIsMap(m.cloud)) g = { available: !!m.cloud.open, reason: m.cloud.reason || '', model_id: m.cloud.model || null };
+      FAB_ROUTE.models = m;
       FAB_ROUTE.gate = g;
-      if (typeof PAL === 'object' && PAL) PAL.status = g;
       return g;
     }
     function fabCloudOpen() { return !!(FAB_ROUTE.gate && FAB_ROUTE.gate.available && !AGENT_FREE); }
@@ -35937,6 +36397,13 @@
       if (route === 'cloud') {
         const id = FAB_ROUTE.gate && FAB_ROUTE.gate.model_id;
         return t('fab.route.cloud', 'cloud ({model})').replace('{model}', () => id || t('fab.route.cloudModel', 'the cloud’s model'));
+      }
+      // The local model by its name, and its window when it is running (S2's /api/fabula/models).
+      const loc = FAB_ROUTE.models && cosmIsMap(FAB_ROUTE.models.local) ? FAB_ROUTE.models.local : null;
+      if (loc && loc.running && loc.model) {
+        return loc.window ? t('fab.route.hereWindow', 'here ({model}, a {window}-token window)').replace('{model}', () => String(loc.model))
+          .replace('{window}', () => Number(loc.window).toLocaleString(I18N.lang))
+          : t('fab.route.here', 'here ({model})').replace('{model}', () => String(loc.model));
       }
       const s = (typeof LLM_STATUS === 'object' && LLM_STATUS) ? LLM_STATUS : null;
       if (s && s.mode !== 'cloud' && s.mode !== 'off' && s.cute) {
@@ -36030,34 +36497,11 @@
 
     // ---- the suggestion, when the server has no twin to answer with ----
     // GET /api/fabula/twin says `suggested` beside a twin; for a text with
-    // none it answers 404, so the page reads the text and applies the same
-    // rule (fabula_names.suggest_flavour; docs/fabula-landed-C2a.md 5): verse
-    // when at least 4 non-blank lines, three in four at most 60 characters,
-    // two stanzas or more averaging two lines, and no heading, fence or table.
-    function fabSuggestFlavour(text) {
-      const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
-      const full = lines.filter((l) => l.trim());
-      if (full.length < 4) return 'fabulan';
-      for (let i = 0; i < lines.length; i++) {
-        const l = lines[i];
-        if (/^\s{0,3}#{1,6}(\s|$)/.test(l) || /^\s{0,3}(```|~~~)/.test(l) || /^\s*\|.*\|\s*$/.test(l)) return 'fabulan';
-        if (i > 0 && lines[i - 1].trim() && /^\s{0,3}(=+|-+)\s*$/.test(l)) return 'fabulan';
-      }
-      if (full.filter((l) => l.trim().length <= 60).length / full.length < 0.75) return 'fabulan';
-      const stanzas = [];
-      let n = 0;
-      for (const l of lines) {
-        if (l.trim()) n++;
-        else if (n) { stanzas.push(n); n = 0; }
-      }
-      if (n) stanzas.push(n);
-      return stanzas.length >= 2 && full.length / stanzas.length >= 2 ? 'fabulap' : 'fabulan';
-    }
+    // none it answers 404, and GET /api/fabula/suggest (S2) gives the one
+    // rule's answer (fabula_names.suggest_flavour).
     async function fabSuggestOf(path) {
-      try {
-        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
-        return r.ok ? fabSuggestFlavour(await r.text()) : null;
-      } catch (_e) { return null; }
+      const r = await canonJSON('/api/fabula/suggest?path=' + encodeURIComponent(path));
+      return r.ok && r.data && (r.data.suggested === 'fabulap' || r.data.suggested === 'fabulan') ? r.data.suggested : null;
     }
 
     // ---- names ----
@@ -36071,7 +36515,9 @@
       if (snap.kind === 'fabulac') return true;
       if (snap.kind !== 'compile') return false;
       const res = snap.result || {};
-      return (e && e.want === 'fabulac') || FAB_FABULAC_RE.test(String(snap.path || '')) || 'cshort' in res || Array.isArray(res.catems);
+      // S2: a compile's snapshot says its `flavour` from the first one on.
+      if (snap.flavour) return snap.flavour === 'fabulac';
+      return (e && e.want === 'fabulac') || 'cshort' in res || Array.isArray(res.catems);
     }
     function fabFlavourName(fl) {
       return fl === 'fabulap' ? t('fab.fl.verse', 'verse') : t('fab.fl.prose', 'prose');
@@ -36098,7 +36544,7 @@
         target: null, build: null, compiled: null, what: 'code', job: null, snap: null, result: null, cjob: null,
         csnap: null, cresult: null, busy: false, error: null, cerror: null });
       fabRouteReset('fab');
-      ['fab-main', 'fab-route-box', 'fab-compile', 'fab-status'].forEach((id) => {
+      ['fab-main', 'fab-route-box', 'fab-compile', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
       });
@@ -36253,6 +36699,11 @@
         fabSet(fabEl('fab-route-box'), fabRouteHTML('fab'));
       }
       fabSet(fabEl('fab-compile'), '');
+      // 0.6 (U1b): the twin of the chosen flavour, when it has one: its questions.
+      if (window.__dlgReady) {
+        const tw = FAB.twin && cosmIsMap(FAB.twin.twins) && cosmIsMap(FAB.twin.twins[FAB.flavour]) ? FAB.twin.twins[FAB.flavour] : null;
+        dlgFabLine(tw && tw.path ? tw.path : null);
+      }
       fabStatusPaint(FAB.error ? '<p class="thym-refusal">' + cosmEsc(FAB.error) + '</p>'
         : (FAB.busy ? '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('canon.phase.starting', 'starting…')) + '</p>' : ''));
       const go = fabEl('fab-go');
@@ -36362,6 +36813,8 @@
       fabSet(fabEl('fab-main'), h);
       fabSet(fabEl('fab-route-box'), b && !b.error ? fabRouteHTML('fab', { ceiling: 'cloud', unit: t('fab.calls.stage', 'model calls a stage') }) : '');
       fabSet(fabEl('fab-compile'), b && !b.error && b.exists ? fabCompileHTML(crunning) : '');
+      // 0.6 (U1b): the fabulac's questions, once it exists.
+      if (window.__dlgReady) dlgFabLine(b && !b.error && b.exists && b.fabulac && !running ? b.fabulac : null);
       fabStatusPaint('');
       const go = fabEl('fab-go');
       const resumable = fabResumable(b);
@@ -36516,6 +36969,8 @@
           message = res.message || t('fab.job.built', 'the fabulac is built');
           if (res.fabulac) {
             actions = [{ label: t('canon.job.open', 'open'), run: () => { convertToastClose(id); void enterCosmMode(res.fabulac); } }, dismiss];
+            // 0.6 (U1b): a build whose question stage landed questions offers them.
+            if (window.__dlgReady) dlgToastOffer(id, res.fabulac, { state: 'done', icon, square: true, title: e.label, message, actions });
           }
         } else {
           message = res.message || t('fab.job.compiled', 'compiled');
@@ -36734,17 +37189,13 @@
     function fabDecorateTree() {
       const tree = document.getElementById('tree');
       if (!tree || IS_HOME) return;
-      // An old-named twin beside its new one: an ordinary file, with its note.
-      const twins = new Map();
-      tree.querySelectorAll('li.file[data-path][data-emf]').forEach((li) => twins.set(li.dataset.path, li.dataset.emf));
-      tree.querySelectorAll('li.file[data-path$=".cosm" i]').forEach((li) => {
-        const p = li.dataset.path || '';
-        if (!fabIsOldName(p)) return;
-        const text = p.replace(/\.cosm$/i, '');
-        const twin = twins.get(text);
-        if (!twin || twin === p || fabIsOldName(twin)) return;
+      // An old-named twin beside its new one: an ordinary file, with its note
+      // (the row says so itself since S2: data-old-twin, data-old-twin-of).
+      tree.querySelectorAll('li.file[data-old-twin]').forEach((li) => {
+        const twin = li.dataset.oldTwin || '';
+        const text = li.dataset.oldTwinOf || String(li.dataset.path || '').replace(/\.cosm$/i, '');
         const row = li.querySelector(':scope > .file-row');
-        if (!row || row.querySelector('.tree-fab-tag')) return;
+        if (!row || !twin || row.querySelector('.tree-fab-tag')) return;
         const tag = document.createElement('span');
         tag.className = 'tree-fab-tag';
         tag.textContent = t('fab.tag.old', 'old twin');
@@ -36772,6 +37223,973 @@
     // The hooks in the Canon, cosm, Thym and tree code call in here only once this block has run.
     window.__fabReady = true;
     fabDecorateTree();
+
+
+    // ================================================================
+    // The dialectic in the page (0.6, U1b)
+    // ================================================================
+    // A volume asks a person what its source could not say (MacroCOSM OES
+    // 18.6): its open questions, each about one place, of one kind, put to
+    // someone. The card lists them from GET /api/dialectic/questions (one
+    // family of routes for every volume, dispatching on its format: SV 1.3),
+    // one or two at a time, each with an input fit to its kind and a live
+    // check (POST /api/dialectic/check); every answer, "I don't know", "I'd
+    // rather not say" and "skip for now" is kept in a sitting the person
+    // sends whole (POST /api/dialectic/answers); then settling (POST
+    // /api/dialectic/settle, a CanonJob of kind `dialectic`, `want:
+    // 'dialectic'`), what waits for a model, and what a check asked back,
+    // which is put next. A holograph's card says Ascribe's rules (the holder
+    // alone; personal data refused, in the server's words), sends no `who`
+    // and offers no model line: nothing of a holograph goes to a cloud model.
+    // Its second face makes the holograph's isograph (POST
+    // /api/ascribe/isograph). What is typed lives in DLG.drafts per volume
+    // until it is recorded, so a closed card, a refused answer or an agent's
+    // sitting landing meanwhile loses none of it.
+    const dlgEl = (id) => document.getElementById(id);
+    const DLG_SHOWN = 2;                        // one or two questions at a time (MacroCOSM OES 18.6.1)
+    const DLG_CANDIDATE = ['yes', 'partly', 'no'];
+    const DLG_OTHER = '__other__';      // the "other:" choice's value
+    const DLG = {
+      open: false, seq: 0, face: 'q', path: null, vol: null, data: null, error: null, cosm: null,
+      drafts: new Map(), putNext: [], sent: null, sending: false,
+      job: null, snap: null, result: null, jerror: null,
+      raising: false, raised: null, rerror: null, again: null, agentNote: null,
+      iso: { programs: null, chosen: null, busy: false, result: null, error: null },
+      mainKey: null, timers: new Map(), checkSeq: 0,
+    };
+
+    function dlgDrafts() {
+      const v = DLG.vol || DLG.path || '';
+      if (!DLG.drafts.has(v)) DLG.drafts.set(v, new Map());
+      return DLG.drafts.get(v);
+    }
+    function dlgKey(c) { return String((c && (c.id || c.about)) || ''); }
+    function dlgDraft(c) {
+      const m = dlgDrafts(), k = dlgKey(c);
+      let d = m.get(k);
+      if (!d) { d = { card: c, value: '', other: '', mode: null, check: null, refused: null, held: false }; m.set(k, d); }
+      else d.card = c;
+      return d;
+    }
+    function dlgHolo() { return !!(DLG.data && DLG.data.holograph); }
+    function dlgIsCandidate(c) {
+      const o = Array.isArray(c.options) ? c.options.map(String) : [];
+      return c.kind === 'choice' && o.length === 3 && DLG_CANDIDATE.every((x) => o.includes(x)) && !!(c.item && c.item.id);
+    }
+
+    // Who may answer it, in words (MacroCOSM OES 18.6.2 `to`).
+    function dlgWho(to) {
+      const w = String(to || (DLG.data && DLG.data.to) || 'anyone');
+      const words = {
+        author: t('dlg.to.author', 'the author'), expert: t('dlg.to.expert', 'an expert in the work'),
+        maker: t('dlg.to.maker', 'the people who made it'), holder: t('dlg.to.holder', 'the holder: you, about yourself'),
+        owner: t('dlg.to.owner', 'the item’s owner'), anyone: t('dlg.to.anyone', 'anyone who knows'),
+      };
+      return words[w] || w;
+    }
+    function dlgWhy(why) {
+      const words = {
+        missing: t('dlg.why.missing', 'nobody has said'), unsure: t('dlg.why.unsure', 'the reading is unsure'),
+        ambiguous: t('dlg.why.ambiguous', 'two readings stand'), intent: t('dlg.why.intent', 'was it meant?'),
+        conflict: t('dlg.why.conflict', 'two answers disagree'), counter: t('dlg.why.counter', 'a check refused an answer: asked again'),
+      };
+      return words[why] || String(why || '');
+    }
+    function dlgModuleName(letter) {
+      const m = DLG.cosm && Array.isArray(DLG.cosm.modules) ? DLG.cosm.modules.find((x) => x.letter === letter) : null;
+      return m && m.name ? m.name : '';
+    }
+
+    // ---- opening, loading ----
+    async function dlgOpen(path, opts = {}) {
+      if (IS_HOME || !path) return;
+      const same = DLG.path === path;
+      DLG.seq++;
+      Object.assign(DLG, { face: 'q', path: String(path), data: same ? DLG.data : null, error: null,
+        cosm: same ? DLG.cosm : null, sent: null, sending: false, job: null, snap: null, result: null, jerror: null,
+        raising: false, raised: null, rerror: null, again: null, agentNote: null, mainKey: null });
+      if (!same) DLG.vol = null;
+      fabRouteReset('dlg');
+      dlgModal(true);
+      dlgPaint();
+      const seq = DLG.seq;
+      await Promise.all([dlgLoad(seq), fabGateLoad()]);
+      if (seq !== DLG.seq) return;
+      dlgPaint();
+      if (!opts.keepFocus) dlgFocusFirst();
+    }
+    window.dlgOpen = dlgOpen;
+
+    function dlgModal(on) {
+      const m = dlgEl('dialectic-modal');
+      if (on) {
+        m.classList.remove('hidden');
+        m.setAttribute('aria-hidden', 'false');
+        DLG.open = true;
+        applyHelpBubbles();
+        return;
+      }
+      if (m.classList.contains('hidden')) return;
+      m.classList.add('hidden');
+      m.setAttribute('aria-hidden', 'true');
+      DLG.open = false;
+    }
+
+    function dlgClose() {
+      if (!DLG.open) return;
+      dlgModal(false);
+      // A settle still running carries on in a toast.
+      const e = DLG.job && DLG.job !== 'pending' ? CANON.jobs.get(DLG.job) : null;
+      if (e && !e.terminal) { e.want = 'toast'; canonToast(e, e.snap || { state: 'running', kind: 'dialectic' }); }
+      DLG.seq++;
+      DLG.mainKey = null;
+      for (const tm of DLG.timers.values()) clearTimeout(tm);
+      DLG.timers.clear();
+    }
+    window.dlgClose = dlgClose;
+
+    function dlgCardShowing(id) { return !!(DLG.open && id && DLG.job === id); }
+
+    async function dlgLoad(seq = DLG.seq) {
+      const r = await canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(DLG.vol || DLG.path));
+      if (seq !== DLG.seq) return;
+      if (!r.ok || !r.data) { DLG.error = r.error || t('canon.job.failed', 'that did not work'); return; }
+      const moved = DLG.vol && DLG.vol !== r.data.path;
+      DLG.error = null;
+      DLG.data = r.data;
+      if (!DLG.vol || moved) {
+        // The drafts begun under the path as asked follow the volume it names.
+        const before = DLG.drafts.get(DLG.vol || DLG.path);
+        DLG.vol = r.data.path;
+        if (before && !DLG.drafts.has(DLG.vol)) DLG.drafts.set(DLG.vol, before);
+      }
+      // The volume as the viewer reads it: the items a `ref` names, the questions settled before.
+      const c = await canonJSON('/api/cosm?path=' + encodeURIComponent(DLG.vol));
+      if (seq !== DLG.seq) return;
+      DLG.cosm = c.ok && c.data && !c.data.refused ? c.data : null;
+    }
+
+    // The queue, in the server's order, with what a settle or a refusal put
+    // next at its head, and nothing already kept in this sitting.
+    function dlgQueue() {
+      const d = DLG.data;
+      if (!d) return [];
+      const held = dlgDrafts();
+      const first = new Set(DLG.putNext.concat((d.counters || []).map(dlgKey)));
+      const open = (d.open || []).filter((c) => { const x = held.get(dlgKey(c)); return !(x && x.held); });
+      return open.filter((c) => first.has(dlgKey(c))).concat(open.filter((c) => !first.has(dlgKey(c))));
+    }
+    function dlgShown() { return dlgQueue().slice(0, DLG_SHOWN); }
+    function dlgHeld() { return Array.from(dlgDrafts().values()).filter((d) => d.held); }
+    function dlgQuestionItems() {
+      const n = DLG.data && DLG.data.counts ? DLG.data.counts : {};
+      return ['open', 'answered', 'unknown', 'declined', 'stale', 'withdrawn'].reduce((a, k) => a + (Number(n[k]) || 0), 0);
+    }
+
+    // ---- painting ----
+    function dlgPaint() {
+      if (!DLG.open) return;
+      if (DLG.face === 'iso') { dlgIsoPaint(); return; }
+      dlgEl('dlg-title').textContent = t('dlg.title', 'the questions');
+      const src = dlgEl('dlg-source');
+      src.textContent = canonBase(String(DLG.vol || DLG.path || '').replace(/\/$/, ''));
+      src.title = DLG.vol || DLG.path || '';
+      if (!DLG.data) {
+        dlgSet('dlg-rules', '');
+        dlgSet('dlg-progress', DLG.error ? '<p class="thym-refusal">' + cosmEsc(DLG.error) + '</p>'
+          : '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>');
+        ['dlg-main', 'dlg-sitting', 'dlg-settle', 'dlg-before'].forEach((id) => dlgSet(id, ''));
+        DLG.mainKey = null;
+        dlgStatus('');
+        dlgFoot();
+        return;
+      }
+      dlgSet('dlg-rules', dlgRulesHTML());
+      dlgSet('dlg-progress', dlgProgressHTML());
+      dlgMainPaint();
+      dlgSet('dlg-sitting', dlgSittingHTML());
+      dlgSet('dlg-settle', dlgSettleHTML());
+      dlgSet('dlg-before', dlgBeforeHTML());
+      dlgStatus(dlgStatusHTML());
+      dlgFoot();
+      applyHelpBubbles();
+    }
+
+    function dlgSet(id, html) { fabSet(dlgEl(id), html); }
+    function dlgStatus(html) { const el = dlgEl('dlg-status'); fabSet(el, html); el.hidden = !html; }
+
+    // A holograph's rules, said before anything is asked (Ascribe 8.2, 8.6, 10.3).
+    function dlgRulesHTML() {
+      if (!dlgHolo()) return '';
+      return '<div class="dlg-holo"><p><strong>' + cosmEsc(t('dlg.holo.alone', 'for the holder alone.')) + '</strong> '
+        + cosmEsc(t('dlg.holo.yours', 'these questions are yours to answer, about yourself: no one answers for a self.'))
+        + ' <span class="mode-help-anchor" data-help="holograph"></span></p>'
+        + '<p>' + cosmEsc(t('dlg.holo.pii', 'an answer that reads like personal data (an email address, a phone number, a birth date, a street address, a person’s name) is refused, and nothing of it is written: describe people by what they are to you, or by a pseudonym you declare.')) + '</p>'
+        + '<p>' + cosmEsc(t('dlg.holo.stays', 'what you say stays in the holograph’s own module D, and nothing here goes to a cloud model.')) + '</p></div>';
+    }
+
+    function dlgProgressHTML() {
+      const d = DLG.data, n = d.counts || {};
+      const answered = (Number(n.answered) || 0) + (Number(n.unknown) || 0) + (Number(n.declined) || 0);
+      const line = t('dlg.progress', '{open} open · {answered} answered · {waiting} waiting to be settled')
+        .replace('{open}', String((d.open || []).length)).replace('{answered}', String(answered))
+        .replace('{waiting}', String((d.waiting || []).length));
+      let h = '<p class="dlg-count">' + cosmEsc(line) + '</p>';
+      if (!dlgHolo() && d.to) {
+        h += '<p class="thym-meta">' + cosmEsc(t('dlg.askedOf', 'asked of {who}').replace('{who}', () => dlgWho(d.to))) + '</p>';
+      }
+      return h;
+    }
+
+    // The one or two questions in hand. Repainted only when what is shown
+    // changes (a mode, a refusal, the next pair), never as the person types.
+    function dlgMainPaint() {
+      const shown = dlgShown();
+      const key = shown.map((c) => { const d = dlgDraft(c); return dlgKey(c) + '\u0001' + (d.mode || '') + '\u0001' + (d.refused || ''); }).join('\u0002')
+        + '|' + (DLG.cosm ? 1 : 0) + '|' + I18N.lang + '|' + (DLG.raising ? 1 : 0) + '|' + dlgQuestionItems() + '|' + (DLG.raised ? 1 : 0)
+        + '|' + (DLG.rerror || '');
+      if (key === DLG.mainKey) return;
+      DLG.mainKey = key;
+      let h = '';
+      if (!dlgQuestionItems()) h += dlgRaiseHTML();
+      if (!shown.length) {
+        if (dlgQuestionItems() || (DLG.data.open || []).length === 0) {
+          h += '<p class="dlg-none">' + cosmEsc(dlgHeld().length ? t('dlg.none.held', 'every open question is in this sitting: send it')
+            : t('dlg.none', 'no question is open')) + '</p>';
+        }
+      } else {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.now', 'now')) + '</div>';
+        h += shown.map((c, i) => dlgQuestionHTML(c, i)).join('');
+        const more = dlgQueue().length - shown.length;
+        h += '<div class="fab-row dlg-next-row"><button type="button" id="dlg-next" data-dlg="next">'
+          + cosmEsc(more > 0 ? t('dlg.next', 'keep these, and the next') : t('dlg.keep', 'keep these')) + '</button>'
+          + '<span class="thym-meta">' + cosmEsc(more > 0 ? t('dlg.more', '{n} more after these').replace('{n}', String(more))
+            : t('dlg.last', 'the last open ones')) + '</span></div>';
+      }
+      fabSet(dlgEl('dlg-main'), h);
+      shown.forEach((c, i) => dlgCheckPaint(i, dlgDraft(c)));
+    }
+
+    function dlgRaiseHTML() {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.raise.head', 'no questions yet')) + '</div>'
+        + '<p class="thym-note">' + cosmEsc(dlgHolo()
+          ? t('dlg.raise.holo', 'raising them asks Ascribe’s opening questions, four for each part of the self and four for its forms, all of the holder alone, and one for each open field or unsure node; by rules, no model.')
+          : t('dlg.raise.why', 'raising them asks the format’s opening questions, and one for each open field and each unsure item; by rules, no model.')) + '</p>'
+        + '<div class="fab-row"><button type="button" id="dlg-raise" data-dlg="raise"' + (DLG.raising ? ' disabled' : '') + '>'
+        + cosmEsc(t('dlg.raise.go', 'raise the questions')) + '</button></div>';
+      if (DLG.rerror) h += '<p class="thym-refusal">' + cosmEsc(DLG.rerror) + '</p>';
+      return h;
+    }
+
+    function dlgQuestionHTML(c, i) {
+      const d = dlgDraft(c);
+      const off = d.mode === 'declined' || d.mode === 'skip';
+      const desc = 'dlg-hint-' + i + ' dlg-chk-' + i;
+      let about = '';
+      if (c.item && c.item.id) {
+        about = '<button type="button" class="dlg-about" data-dlg="about" data-dlg-item="' + cosmEsc(String(c.item.id)) + '">'
+          + cosmEsc(String(c.item.name || c.item.id)) + '</button>' + (c.field ? '<span class="dlg-field"> · ' + cosmEsc(String(c.field)) + '</span>' : '');
+      } else if (typeof c.about === 'string' && /^[A-Z]$/.test(c.about)) {
+        const nm = dlgModuleName(c.about);
+        about = '<span class="dlg-field">' + cosmEsc(c.about + (nm ? ' · ' + nm : '')) + '</span>';
+      } else if (c.about != null) {
+        about = '<span class="dlg-field">' + cosmEsc(typeof c.about === 'string' ? c.about : cosmCompact(c.about)) + '</span>';
+      }
+      let h = '<div class="dlg-q" role="group" aria-labelledby="dlg-asks-' + i + '" data-dlg-q="' + i + '" data-dlg-key="' + cosmEsc(dlgKey(c)) + '">'
+        + '<p class="dlg-asks" id="dlg-asks-' + i + '">' + cosmEsc(String(c.asks || '')) + '</p>'
+        + '<p class="dlg-meta">' + cosmEsc(c.form === 'pending' ? t('dlg.pending', 'an open field') : dlgWhy(c.why))
+        + ' · ' + cosmEsc(t('dlg.to', 'for {who}').replace('{who}', () => dlgWho(c.to)))
+        + (about ? ' · ' + cosmEsc(t('dlg.about', 'about')) + ' ' + about : '') + '</p>';
+      h += '<p class="dlg-hint" id="dlg-hint-' + i + '"' + (c.hint ? '' : ' hidden') + '>' + cosmEsc(String(c.hint || '')) + '</p>';
+      h += dlgInputHTML(c, d, i, desc, off);
+      h += '<p class="dlg-check" id="dlg-chk-' + i + '" aria-live="polite"></p>';
+      const alt = (m, label) => '<button type="button" class="dlg-alt" id="dlg-alt-' + m + '-' + i + '" data-dlg="' + m + '" data-dlg-i="' + i
+        + '" aria-pressed="' + (d.mode === m ? 'true' : 'false') + '">' + cosmEsc(label) + '</button>';
+      h += '<div class="dlg-alts">' + alt('dont_know', t('dlg.dontKnow', 'I don’t know')) + alt('declined', t('dlg.declined', 'I’d rather not say'))
+        + alt('skip', t('dlg.skip', 'skip for now')) + '</div>';
+      if (d.mode === 'dont_know') h += '<p class="thym-meta">' + cosmEsc(t('dlg.dontKnow.note', 'an answer too: the place stays open, in your own words if you wrote any above')) + '</p>';
+      else if (d.mode === 'declined') h += '<p class="thym-meta">' + cosmEsc(t('dlg.declined.note', 'a refusal is kept as a fact, and no one asks again unless someone opens the question again')) + '</p>';
+      else if (d.mode === 'skip') h += '<p class="thym-meta">' + cosmEsc(t('dlg.skip.note', 'it stays open; the sitting notes that it was skipped')) + '</p>';
+      return h + '</div>';
+    }
+
+    function dlgInputHTML(c, d, i, desc, off) {
+      const dis = off ? ' disabled' : '';
+      const id = 'dlg-in-' + i;
+      const v = Array.isArray(d.value) ? d.value : String(d.value || '');
+      if (c.kind === 'choice' || c.kind === 'yes-no') {
+        const many = !!c.many && c.kind === 'choice';
+        const cand = dlgIsCandidate(c);
+        const opts = c.kind === 'yes-no' ? ['yes', 'no'] : (cand ? DLG_CANDIDATE : (Array.isArray(c.options) ? c.options.map(String) : []));
+        const words = { yes: t('dlg.yes', 'yes'), no: t('dlg.no', 'no'), partly: t('dlg.partly', 'partly') };
+        const cwhy = { yes: t('dlg.cand.yes', 'it is so: it becomes part of your holograph'),
+          partly: t('dlg.cand.partly', 'keep it, and say it your way in the question that follows'),
+          no: t('dlg.cand.no', 'it is not so: it is removed') };
+        const chosen = (o) => (many ? (Array.isArray(v) && v.includes(o)) : v === o);
+        let h = '';
+        if (cand) {
+          h += '<div class="dlg-cand"><span class="dlg-cand-h">' + cosmEsc(t('dlg.cand.head', 'a reading of your own text proposes this; it is not yours until you say so')) + '</span>'
+            + (c.item.summary ? '<span class="dlg-cand-sum">' + cosmEsc(String(c.item.summary)) + '</span>' : '') + '</div>';
+        }
+        h += '<div class="dlg-opts' + (cand ? ' dlg-opts-cand' : '') + '" role="' + (many ? 'group' : 'radiogroup') + '" aria-labelledby="dlg-asks-' + i + '" aria-describedby="' + desc + '">';
+        h += opts.map((o) => '<label class="dlg-opt"><input type="' + (many ? 'checkbox' : 'radio') + '" name="dlg-r-' + i + '" value="' + cosmEsc(o) + '"'
+          + (chosen(o) ? ' checked' : '') + dis + '><span>' + cosmEsc(words[o] && (cand || c.kind === 'yes-no') ? words[o] : o) + '</span>'
+          + (cand ? '<span class="dlg-opt-why">' + cosmEsc(cwhy[o]) + '</span>' : '') + '</label>').join('');
+        if (c.kind === 'choice' && c.options_open && !cand) {
+          const on = many ? (Array.isArray(v) && v.includes(DLG_OTHER)) : v === DLG_OTHER;
+          h += '<label class="dlg-opt"><input type="' + (many ? 'checkbox' : 'radio') + '" name="dlg-r-' + i + '" value="__other__"' + (on ? ' checked' : '') + dis
+            + '><span>' + cosmEsc(t('dlg.other', 'other:')) + '</span></label><input type="text" class="dlg-in dlg-other" id="dlg-other-' + i
+            + '" aria-label="' + cosmEsc(t('dlg.other.aria', 'another answer, in your own words')) + '" value="' + cosmEsc(d.other || '') + '"' + dis + '>';
+        }
+        return h + '</div>';
+      }
+      const lab = ' aria-labelledby="dlg-asks-' + i + '" aria-describedby="' + desc + '"';
+      if (c.kind === 'number') {
+        const r = Array.isArray(c.range) && c.range.length === 2 ? c.range : null;
+        return '<div class="dlg-row"><input type="number" class="dlg-in dlg-num" id="' + id + '" step="any" inputmode="decimal"'
+          + (r ? ' min="' + cosmEsc(String(r[0])) + '" max="' + cosmEsc(String(r[1])) + '"' : '') + lab + ' value="' + cosmEsc(String(v)) + '"' + dis + '>'
+          + (r ? '<span class="thym-meta">' + cosmEsc(t('dlg.range', 'from {low} to {high}').replace('{low}', String(r[0])).replace('{high}', String(r[1]))) + '</span>' : '')
+          + '</div>';
+      }
+      if (c.kind === 'date') {
+        return '<div class="dlg-row"><input type="text" class="dlg-in" id="' + id + '" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="'
+          + cosmEsc(t('dlg.date.ph', '2014-06-03, 2014-06 or 2014')) + '"' + lab + ' value="' + cosmEsc(String(v)) + '"' + dis + '></div>';
+      }
+      if (c.kind === 'ref') {
+        const pre = Array.isArray(c.options) ? c.options.map(String) : [];
+        const ids = dlgItemIds().filter((x) => !pre.length || pre.some((p) => x.id.startsWith(p)));
+        return '<div class="dlg-row"><input type="text" class="dlg-in" id="' + id + '" list="dlg-list-' + i + '" autocomplete="off" spellcheck="false"'
+          + lab + ' value="' + cosmEsc(String(v)) + '"' + dis + '><datalist id="dlg-list-' + i + '">'
+          + ids.map((x) => '<option value="' + cosmEsc(x.id) + '">' + cosmEsc(x.name || '') + '</option>').join('') + '</datalist></div>'
+          + '<p class="thym-meta">' + cosmEsc(pre.length ? t('dlg.ref.pre', 'an item’s id, starting with {prefix}').replace('{prefix}', () => pre.join(', '))
+            : t('dlg.ref', 'an item’s id')) + '</p>';
+      }
+      if (c.kind === 'span') {
+        return '<div class="dlg-row"><input type="text" class="dlg-in" id="' + id + '" autocomplete="off" spellcheck="false" placeholder="'
+          + cosmEsc(t('dlg.span.ph', '12, or 12-18')) + '"' + lab + ' value="' + cosmEsc(String(v)) + '"' + dis + '></div>'
+          + '<p class="thym-meta">' + cosmEsc(t('dlg.span', 'the lines of the source that show it')) + '</p>';
+      }
+      return '<textarea class="dlg-in dlg-text" id="' + id + '" rows="2"' + lab + dis + '>' + cosmEsc(Array.isArray(v) ? v.join('\n') : v) + '</textarea>'
+        + (c.many ? '<p class="thym-meta">' + cosmEsc(t('dlg.many', 'one to a line')) + '</p>' : '');
+    }
+
+    function dlgItemIds() {
+      const out = [];
+      for (const m of (DLG.cosm && DLG.cosm.modules) || []) {
+        if (m.letter === 'D') continue;
+        for (const k of m.kinds || []) for (const it of k.items || []) if (it.id) out.push({ id: String(it.id), name: it.name || '' });
+      }
+      return out;
+    }
+
+    // The value a question holds, as typed or chosen.
+    function dlgRead(i) {
+      const box = dlgEl('dlg-main').querySelector('.dlg-q[data-dlg-q="' + i + '"]');
+      if (!box) return null;
+      const d = dlgDrafts().get(box.dataset.dlgKey);
+      if (!d) return null;
+      const marks = Array.from(box.querySelectorAll('input[name="dlg-r-' + i + '"]'));
+      const other = box.querySelector('.dlg-other');
+      if (other) d.other = other.value;
+      if (marks.length) {
+        if (marks[0].type === 'checkbox') d.value = marks.filter((x) => x.checked).map((x) => x.value);
+        else { const on = marks.find((x) => x.checked); d.value = on ? on.value : ''; }
+      } else {
+        const inp = box.querySelector('#dlg-in-' + i);
+        if (inp) d.value = inp.value;
+      }
+      return d;
+    }
+
+    // What is sent for a value: the option, or the other word in its place.
+    function dlgValueOf(d) {
+      const c = d.card;
+      if (Array.isArray(d.value)) {
+        const v = d.value.map((x) => (x === DLG_OTHER ? String(d.other || '').trim() : x)).filter((x) => x);
+        return v.length ? v : null;
+      }
+      let v = d.value === DLG_OTHER ? String(d.other || '') : String(d.value || '');
+      v = v.trim();
+      if (!v) return null;
+      if (c.many && c.kind !== 'choice') {
+        const parts = v.split(/\n|;/).map((x) => x.trim()).filter(Boolean);
+        return parts.length ? parts : null;
+      }
+      return v;
+    }
+
+    // The live check (POST /api/dialectic/check), a moment after typing stops.
+    function dlgCheckSoon(i, d, wait) {
+      const k = dlgKey(d.card);
+      clearTimeout(DLG.timers.get(k));
+      d.refused = null;
+      DLG.timers.set(k, setTimeout(() => { DLG.timers.delete(k); void dlgCheck(i, d); }, wait));
+    }
+    async function dlgCheck(i, d) {
+      const value = dlgValueOf(d);
+      if (value == null || d.mode === 'declined' || d.mode === 'skip') { d.check = null; dlgCheckPaint(i, d); return; }
+      const seq = ++DLG.checkSeq, open = DLG.seq;
+      const r = await canonPost('/api/dialectic/check', { path: DLG.vol, question: dlgKey(d.card), value });
+      if (open !== DLG.seq || seq !== DLG.checkSeq) return;
+      d.check = r.ok && r.data ? { ok: !!r.data.ok, refusal: r.data.refusal || null, value: r.data.value, of: JSON.stringify(value) }
+        : { ok: false, refusal: r.error || t('canon.job.failed', 'that did not work'), value: null, of: JSON.stringify(value) };
+      dlgCheckPaint(i, d);
+      dlgFoot();
+    }
+    function dlgCheckPaint(i, d) {
+      const el = dlgEl('dlg-chk-' + i);
+      if (!el || el.closest('.dlg-q').dataset.dlgKey !== dlgKey(d.card)) return;
+      const box = el.closest('.dlg-q');
+      const v = dlgValueOf(d);
+      let text = '', bad = false;
+      if (d.refused) { text = d.refused; bad = true; }
+      else if (d.check && d.check.of === JSON.stringify(v) && v != null) {
+        if (!d.check.ok) { text = d.check.refusal || ''; bad = true; }
+        else if (JSON.stringify(d.check.value) !== JSON.stringify(v) && String(d.check.value) !== String(v)) {
+          text = t('dlg.written', 'written as: {value}').replace('{value}', () => (typeof d.check.value === 'string' ? d.check.value : cosmCompact(d.check.value)));
+        }
+      }
+      el.textContent = text;
+      el.classList.toggle('bad', bad);
+      box.querySelectorAll('.dlg-in, input[type=radio], input[type=checkbox]').forEach((x) => {
+        if (bad) x.setAttribute('aria-invalid', 'true'); else x.removeAttribute('aria-invalid');
+      });
+    }
+
+    // ---- the sitting ----
+    function dlgStateWords(d) {
+      if (d.mode === 'skip' || (!d.mode && dlgValueOf(d) == null)) return t('dlg.s.skip', 'skipped');
+      if (d.mode === 'declined') return t('dlg.s.declined', 'rather not say');
+      if (d.mode === 'dont_know') return t('dlg.s.dontKnow', 'I don’t know');
+      const v = dlgValueOf(d);
+      return Array.isArray(v) ? v.join('; ') : String(v);
+    }
+
+    function dlgSittingHTML() {
+      const held = dlgHeld();
+      let h = '';
+      if (held.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sitting.head', 'this sitting: {n}').replace('{n}', String(held.length))) + '</div>'
+          + '<ul class="dlg-rows">' + held.map((d) => '<li><span class="dlg-row-asks">' + cosmEsc(String(d.card.asks || '')) + '</span>'
+            + '<span class="dlg-row-what">' + cosmEsc(dlgStateWords(d)) + '</span>'
+            + '<button type="button" data-dlg="unhold" data-dlg-key="' + cosmEsc(dlgKey(d.card)) + '">' + cosmEsc(t('dlg.change', 'change')) + '</button></li>').join('')
+          + '</ul><p class="thym-meta">' + cosmEsc(t('dlg.sitting.note', 'nothing is written until you send the sitting; the volume itself is not touched until the answers are settled')) + '</p>';
+      }
+      const s = DLG.sent;
+      if (s) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sent.head', 'the sitting you sent')) + '</div>';
+        if (s.error) h += '<p class="thym-refusal">' + cosmEsc(s.error) + '</p>';
+        if (s.written) h += '<p class="thym-fits">' + cosmEsc(t('dlg.sent.where', 'recorded in {file}').replace('{file}', () => canonBase(String(s.written).replace(/\/$/, '')))) + '</p>';
+        if (s.rows && s.rows.length) {
+          h += '<ul class="dlg-rows">' + s.rows.map((r) => '<li class="' + (r.refused ? 'refused' : '') + '"><span class="dlg-row-asks">' + cosmEsc(r.asks) + '</span>'
+            + '<span class="dlg-row-what">' + cosmEsc(r.what) + '</span></li>').join('') + '</ul>';
+        }
+      }
+      return h;
+    }
+
+    function dlgFoot() {
+      const send = dlgEl('dlg-send');
+      if (!DLG.open || DLG.face !== 'q' || !DLG.data) { send.hidden = true; return; }
+      const n = dlgHeld().length + dlgShown().filter((c) => { const d = dlgDraft(c); return !!d.mode || dlgValueOf(d) != null; }).length;
+      send.hidden = false;
+      send.textContent = t('dlg.send', 'send the sitting ({n})').replace('{n}', String(n));
+      send.disabled = !n || DLG.sending;
+    }
+
+    function dlgNext() {
+      dlgShown().forEach((c, i) => {
+        const d = dlgRead(i) || dlgDraft(c);
+        d.held = true;
+        DLG.putNext = DLG.putNext.filter((k) => k !== dlgKey(c));
+      });
+      dlgPaint();
+      dlgFocusFirst();
+    }
+
+    async function dlgSend() {
+      const shown = dlgShown();
+      shown.forEach((c, i) => { dlgRead(i); });
+      const take = dlgHeld().concat(shown.map(dlgDraft).filter((d) => !d.held && (d.mode || dlgValueOf(d) != null)));
+      if (!take.length || DLG.sending) return;
+      const answers = take.map((d) => {
+        const q = dlgKey(d.card);
+        if (d.mode === 'skip' || (!d.mode && dlgValueOf(d) == null)) return { question: q, skip: true };
+        if (d.mode === 'declined') return { question: q, declined: true };
+        const v = dlgValueOf(d);
+        const says = v == null ? null : (Array.isArray(v) ? v.join('; ') : v);
+        if (d.mode === 'dont_know') return says ? { question: q, dont_know: true, says } : { question: q, dont_know: true };
+        return { question: q, value: v, says };
+      });
+      // A holograph's sitting is the holder's: no `who` is ever sent (Ascribe 8.2).
+      const body = { path: DLG.vol, answers, through: 'person' };
+      DLG.sending = true;
+      DLG.sent = null;
+      dlgFoot();
+      const seq = DLG.seq;
+      const r = await canonPost('/api/dialectic/answers', body);
+      DLG.sending = false;
+      if (seq !== DLG.seq) return;
+      const byKey = new Map(take.map((d) => [dlgKey(d.card), d]));
+      if (!r.ok || !r.data) {
+        // Nothing was kept: every answer goes back where it was, as typed.
+        take.forEach((d) => { d.held = false; });
+        DLG.sent = { error: r.error || t('canon.job.failed', 'that did not work'), rows: [] };
+        DLG.putNext = take.map((d) => dlgKey(d.card)).concat(DLG.putNext);
+      } else {
+        const out = r.data, rows = [];
+        for (const x of out.recorded || []) {
+          const d = byKey.get(x.question);
+          rows.push({ asks: d ? String(d.card.asks || x.question) : x.question, what: t('dlg.sent.recorded', 'recorded: {state}').replace('{state}', () => String(x.state)) });
+          dlgDrafts().delete(x.question);
+        }
+        for (const q of out.skipped || []) {
+          const d = byKey.get(q);
+          rows.push({ asks: d ? String(d.card.asks || q) : q, what: t('dlg.sent.skipped', 'skipped: it stays open') });
+          dlgDrafts().delete(q);
+        }
+        const back = [];
+        for (const x of out.refused || []) {
+          const d = byKey.get(x.question);
+          rows.push({ asks: d ? String(d.card.asks || x.question) : x.question, what: String(x.why || ''), refused: true });
+          if (d) { d.held = false; d.refused = String(x.why || ''); back.push(x.question); }
+        }
+        DLG.putNext = back.concat(DLG.putNext);
+        DLG.sent = { written: out.written, rows };
+      }
+      DLG.mainKey = null;
+      await dlgLoad(seq);
+      if (seq !== DLG.seq) return;
+      dlgPaint();
+      dlgCosmRefresh();
+      dlgFocusFirst();
+    }
+
+    // ---- settling ----
+    function dlgSettleHTML() {
+      const d = DLG.data;
+      const sittings = d.sittings || [];
+      const waiting = d.waiting || [];
+      const running = !!(DLG.job && (DLG.job === 'pending' || (DLG.snap && !CANON_TERMINAL.has(DLG.snap.state))));
+      const atOnce = !d.fabula || d.holograph;
+      const can = atOnce ? waiting.length > 0 : sittings.length > 0;
+      let h = '';
+      if (can || running || DLG.result || DLG.jerror) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.settle.head', 'settle')) + '</div>';
+        if (!atOnce && sittings.length) {
+          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.why', 'settling folds the answers into the volume, one run for each sitting; a model reads an item again only where an answer needs it')) + '</p>'
+            + '<ul class="dlg-files">' + sittings.map((s) => '<li>' + cosmEsc(canonBase(String(s.path || ''))) + '</li>').join('') + '</ul>';
+        } else if (atOnce && can) {
+          h += '<p class="thym-note">' + cosmEsc(d.holograph
+            ? t('dlg.settle.holo', 'a holograph is settled at once, by rules, here: no model reads a holograph, and what would need one waits')
+            : t('dlg.settle.rules', 'this volume is settled at once, by rules: what a model would have to read again waits')) + '</p>';
+        }
+        if (!atOnce && (sittings.length || running)) h += fabRouteHTML('dlg', { ceiling: 'cloud' });
+        if (can) {
+          h += '<div class="fab-row"><button type="button" id="dlg-settle-go" data-dlg="settle"' + (running ? ' disabled' : '') + '>'
+            + cosmEsc(t('dlg.settle.go', 'settle the answers')) + '</button></div>';
+        }
+        if (running) {
+          const s = DLG.snap || {};
+          h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(s.state === 'queued' || s.phase === 'waiting'
+            ? t('canon.phase.waiting', 'waiting for the model') : (s.message || t('canon.phase.starting', 'starting…'))) + '</span></p>';
+        } else if (DLG.result) {
+          const res = DLG.result;
+          if (res.message) h += '<p class="thym-fits">' + cosmEsc(String(res.message)) + '</p>';
+          const next = (res.counters || []).length + (res.follow_ups || []).length;
+          if (next) h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.next', '{n} questions the answers raised are put next, at the head of the card').replace('{n}', String(next))) + '</p>';
+        }
+        if (DLG.jerror) h += '<p class="thym-refusal">' + cosmEsc(DLG.jerror) + '</p>';
+      }
+      if (waiting.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.waiting.head', 'waiting')) + '</div><ul class="dlg-rows">'
+          + waiting.map((c) => {
+            const last = c.last || {};
+            const where = c.waiting_in ? t('dlg.waiting.in', 'in the sitting {file}, not settled yet').replace('{file}', () => String(c.waiting_in))
+              : t('dlg.waiting.model', 'waits for a model to read {item} again').replace('{item}', () => String((c.item && (c.item.name || c.item.id)) || c.about || ''));
+            const said = last.declined ? t('dlg.s.declined', 'rather not say') : (last.says != null ? String(last.says) : '');
+            return '<li><span class="dlg-row-asks">' + cosmEsc(String(c.asks || '')) + '</span><span class="dlg-row-what">'
+              + cosmEsc((said ? '“' + said + '” · ' : '') + where) + '</span></li>';
+          }).join('') + '</ul>';
+      }
+      return h;
+    }
+
+    async function dlgSettle() {
+      const d = DLG.data;
+      if (!d) return;
+      // A holograph and a volume settled at once by rules take no route: nothing to choose, nothing sent.
+      const body = (!d.fabula || d.holograph) ? { path: DLG.vol } : fabRouteBody('dlg', { path: DLG.vol });
+      const seq = DLG.seq;
+      Object.assign(DLG, { job: 'pending', snap: null, result: null, jerror: null });
+      dlgPaint();
+      const r = await canonPost('/api/dialectic/settle', body);
+      if (seq !== DLG.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { DLG.job = null; DLG.jerror = r.error || t('canon.job.failed', 'that did not work'); dlgPaint(); return; }
+      DLG.job = r.data.job.id;
+      DLG.snap = r.data.job;
+      canonTrack(r.data.job, { want: 'dialectic', label: canonBase(String(DLG.vol).replace(/\/$/, '')), writes: true });
+      dlgPaint();
+    }
+
+    function dlgJobOnSnap(e, snap) {
+      if (!DLG.open || DLG.job !== e.id) return;
+      DLG.snap = snap;
+      if (CANON_TERMINAL.has(snap.state)) {
+        const res = snap.state === 'done' ? (snap.result || {}) : null;
+        Object.assign(DLG, { job: null, result: res, jerror: res ? null : (snap.message || snap.error || t('canon.job.failed', 'that did not work')) });
+        if (res) DLG.putNext = (res.counters || []).concat(res.follow_ups || []).concat(DLG.putNext);
+        DLG.mainKey = null;
+        const seq = DLG.seq;
+        void dlgLoad(seq).then(() => { if (seq === DLG.seq) dlgPaint(); });
+      }
+      dlgPaint();
+    }
+
+    function dlgAfterWrite(snap) {
+      if (!IS_HOME) htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      if (document.getElementById('canon-mode')?.classList.contains('open')) cnLoadTree();
+      dlgCosmRefresh(true);
+    }
+
+    // ---- what was settled or declined before: ask again ----
+    function dlgClosed() {
+      const out = [];
+      for (const m of (DLG.cosm && DLG.cosm.modules) || []) {
+        if (m.letter !== 'D') continue;
+        for (const k of m.kinds || []) for (const it of k.items || []) {
+          const q = it.data || {};
+          if (!it.id || !/^D:question\//.test(String(it.id))) continue;
+          if ((q.settled && ['answered', 'unknown', 'declined'].includes(q.state)) || q.state === 'declined') out.push(Object.assign({ id: String(it.id) }, q));
+        }
+      }
+      return out;
+    }
+
+    function dlgBeforeHTML() {
+      const rows = dlgClosed();
+      if (!rows.length) return '';
+      const words = { answered: t('dlg.st.answered', 'answered'), unknown: t('dlg.st.unknown', 'not known'), declined: t('dlg.st.declined', 'declined') };
+      let h = '<details class="dlg-before"' + (DLG.again ? ' open' : '') + '><summary>' + cosmEsc(t('dlg.before.head', 'answered before ({n})').replace('{n}', String(rows.length)))
+        + '</summary><ul class="dlg-rows">' + rows.map((q) => {
+          const answers = Array.isArray(q.answers) ? q.answers : [];
+          const last = answers.length ? answers[answers.length - 1] : {};
+          const said = last.declined ? '' : (last.says != null ? '“' + String(last.says) + '” · ' : '');
+          const note = DLG.again && DLG.again.id === q.id ? '<span class="dlg-row-what ' + (DLG.again.error ? 'bad' : '') + '">' + cosmEsc(DLG.again.error || t('dlg.again.done', 'asked again: it is open')) + '</span>' : '';
+          return '<li><span class="dlg-row-asks">' + cosmEsc(String(q.asks || q.id)) + '</span><span class="dlg-row-what">' + cosmEsc(said + (words[q.state] || q.state)
+            + (q.settled ? ' · ' + t('dlg.st.settled', 'settled') : '')) + '</span>' + note
+            + '<button type="button" data-dlg="again" data-dlg-key="' + cosmEsc(q.id) + '">' + cosmEsc(t('dlg.again', 'ask again')) + '</button></li>';
+        }).join('') + '</ul></details>';
+      return h;
+    }
+
+    async function dlgAgain(id) {
+      const seq = DLG.seq;
+      const r = await canonPost('/api/dialectic/ask-again', { path: DLG.vol, question: id });
+      if (seq !== DLG.seq) return;
+      DLG.again = { id, error: r.ok ? null : (r.error || t('canon.job.failed', 'that did not work')) };
+      if (r.ok) DLG.putNext = [id].concat(DLG.putNext.filter((k) => k !== id));
+      DLG.mainKey = null;
+      await dlgLoad(seq);
+      if (seq !== DLG.seq) return;
+      dlgPaint();
+      dlgCosmRefresh();
+      if (r.ok) dlgFocusFirst();
+    }
+
+    async function dlgRaise() {
+      const seq = DLG.seq;
+      DLG.raising = true;
+      DLG.rerror = null;
+      dlgPaint();
+      const r = await canonPost('/api/dialectic/raise', { path: DLG.vol });
+      if (seq !== DLG.seq) return;
+      DLG.raising = false;
+      if (!r.ok || !r.data) DLG.rerror = r.error || t('canon.job.failed', 'that did not work');
+      else DLG.raised = r.data;
+      DLG.mainKey = null;
+      await dlgLoad(seq);
+      if (seq !== DLG.seq) return;
+      dlgPaint();
+      dlgCosmRefresh(true);
+      dlgFocusFirst();
+    }
+
+    function dlgStatusHTML() {
+      let h = '';
+      if (DLG.raised) h += '<p class="thym-fits">' + cosmEsc(t('dlg.raised', 'raised {n} questions').replace('{n}', String(DLG.raised.count != null ? DLG.raised.count : (DLG.raised.raised || []).length))) + '</p>';
+      if (DLG.agentNote) h += '<p class="thym-note">' + cosmEsc(DLG.agentNote) + '</p>';
+      // Words typed for a question someone else answered meanwhile: kept, and said.
+      const open = new Set(((DLG.data && DLG.data.open) || []).map(dlgKey));
+      const gone = Array.from(dlgDrafts().values()).filter((d) => !open.has(dlgKey(d.card)) && (dlgValueOf(d) != null));
+      if (gone.length) {
+        h += '<p class="thym-note">' + cosmEsc(t('dlg.gone', 'answered meanwhile, elsewhere: {asks}; what you typed is kept here: {words}')
+          .replace('{asks}', () => gone.map((d) => String(d.card.asks || '')).join(' / '))
+          .replace('{words}', () => gone.map((d) => { const v = dlgValueOf(d); return Array.isArray(v) ? v.join('; ') : String(v); }).join(' / '))) + '</p>';
+      }
+      return h;
+    }
+
+    function dlgFocusFirst() {
+      if (!DLG.open) return;
+      const main = dlgEl('dlg-main');
+      const first = main.querySelector('.dlg-q .dlg-in:not([disabled]), .dlg-q input:not([disabled])')
+        || main.querySelector('.dlg-q .dlg-alt') || main.querySelector('button:not([disabled])') || dlgEl('dlg-body').querySelector('button:not([disabled])');
+      if (first) first.focus({ preventScroll: false });
+    }
+
+    // ---- the card's controls ----
+    dlgEl('dlg-body').addEventListener('input', (e) => {
+      if (DLG.face === 'iso') return;
+      if (fabRouteOnEvent(e, 'dlg', () => {})) return;
+      const box = e.target.closest('.dlg-q');
+      if (!box) return;
+      const i = Number(box.dataset.dlgQ);
+      const d = dlgRead(i);
+      if (!d) return;
+      if (e.target.classList.contains('dlg-other')) {
+        const r = box.querySelector('input[value="__other__"]');
+        if (r && !r.checked && e.target.value.trim()) { r.checked = true; dlgRead(i); }
+      }
+      dlgCheckSoon(i, d, e.target.type === 'radio' || e.target.type === 'checkbox' ? 0 : 450);
+      dlgFoot();
+    });
+    dlgEl('dlg-body').addEventListener('change', (e) => {
+      if (DLG.face === 'iso') {
+        if (e.target.name === 'dlg-prog') { DLG.iso.chosen = e.target.value; DLG.iso.error = null; dlgIsoPaint(); }
+        return;
+      }
+      fabRouteOnEvent(e, 'dlg', () => { dlgSet('dlg-settle', dlgSettleHTML()); });
+    });
+    dlgEl('dlg-body').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-dlg]');
+      if (!b || b.disabled) return;
+      const act = b.dataset.dlg;
+      if (act === 'dont_know' || act === 'declined' || act === 'skip') {
+        const i = Number(b.dataset.dlgI);
+        const d = dlgRead(i);
+        if (!d) return;
+        d.mode = d.mode === act ? null : act;
+        d.refused = null;
+        dlgMainPaint();
+        dlgFoot();
+        const again = dlgEl('dlg-alt-' + act + '-' + i);
+        if (again) again.focus({ preventScroll: true });
+        if (d.mode !== 'declined' && d.mode !== 'skip') dlgCheckSoon(i, d, 0);
+        return;
+      }
+      if (act === 'next') { dlgNext(); return; }
+      if (act === 'unhold') {
+        const d = dlgDrafts().get(b.dataset.dlgKey);
+        if (d) { d.held = false; DLG.putNext = [b.dataset.dlgKey].concat(DLG.putNext.filter((k) => k !== b.dataset.dlgKey)); }
+        dlgPaint();
+        dlgFocusFirst();
+        return;
+      }
+      if (act === 'about') { void dlgShowItem(b.dataset.dlgItem); return; }
+      if (act === 'settle') { void dlgSettle(); return; }
+      if (act === 'again') { void dlgAgain(b.dataset.dlgKey); return; }
+      if (act === 'raise') { void dlgRaise(); return; }
+      if (act === 'iso-go') { void dlgIsoGo(); return; }
+      if (act === 'iso-open') { const p = DLG.iso.result && DLG.iso.result.isograph; dlgClose(); if (p) void openReadEdit(p, { size: 'full', face: 'read' }); }
+    });
+    dlgEl('dlg-send').addEventListener('click', () => { void dlgSend(); });
+    dlgEl('dlg-close').addEventListener('click', dlgClose);
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || dlgEl('dialectic-modal').classList.contains('hidden')) return;
+      const top = modalStackTop();
+      if (top && top.el.id !== 'dialectic-modal') return;
+      e.stopPropagation();
+      e.preventDefault();
+      dlgClose();
+    }, true);
+
+    // "about": the item in the cosm viewer (the card closes; what was typed is kept).
+    async function dlgShowItem(id) {
+      const vol = DLG.vol;
+      if (!vol || !id) return;
+      dlgClose();
+      await enterCosmMode(vol);
+      if (COSM.ix) { const k = cosmResolve(String(id)); if (k) cosmFocus(k, { back: false }); }
+    }
+
+    // ---- the holograph's isograph (Ascribe 14.1) ----
+    async function dlgIsoOpen(path) {
+      if (IS_HOME || !path) return;
+      DLG.seq++;
+      Object.assign(DLG, { face: 'iso', path: String(path), vol: String(path), data: null, error: null, mainKey: null });
+      DLG.iso = { programs: null, chosen: null, busy: false, result: null, error: null };
+      dlgModal(true);
+      dlgIsoPaint();
+      const seq = DLG.seq;
+      const [q, p] = await Promise.all([canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)), canonJSON('/api/thym/programs')]);
+      if (seq !== DLG.seq) return;
+      if (q.ok && q.data) { DLG.data = q.data; DLG.vol = q.data.path; }
+      if (!p.ok || !p.data) DLG.iso.error = p.error || t('canon.job.failed', 'that did not work');
+      else {
+        // The holder's own programs: in the project, taking one volume, asking no model.
+        DLG.iso.programs = (p.data.programs || []).filter((x) => x && x.where === 'project' && !x.problem && Array.isArray(x.takes)
+          && x.takes.length === 1 && x.takes[0].type === 'volume' && !x.asks);
+        if (DLG.iso.programs.length === 1) DLG.iso.chosen = DLG.iso.programs[0].rel;
+      }
+      dlgIsoPaint();
+      const first = dlgEl('dlg-main').querySelector('input[name="dlg-prog"]:checked, input[name="dlg-prog"], button:not([disabled])');
+      if (first) first.focus({ preventScroll: true });
+    }
+    window.dlgIsoOpen = dlgIsoOpen;
+
+    function dlgIsoPaint() {
+      if (!DLG.open) return;
+      const I = DLG.iso;
+      dlgEl('dlg-title').textContent = t('dlg.iso.head', 'the isograph');
+      const src = dlgEl('dlg-source');
+      src.textContent = canonBase(String(DLG.vol || DLG.path || '').replace(/\/$/, ''));
+      src.title = DLG.vol || '';
+      dlgSet('dlg-rules', '<div class="dlg-holo"><p>' + cosmEsc(t('dlg.iso.what', 'an isograph is your holograph’s public projection: for each node you made public, its kind, the FEED word of its form, its valence, a band of its strength and the decade of when, every one marked stated.'))
+        + ' <span class="mode-help-anchor" data-help="holograph"></span></p><p><strong>' + cosmEsc(t('dlg.iso.noname', 'it leaves no name:')) + '</strong> '
+        + cosmEsc(t('dlg.iso.nothing', 'no summary, no words of yours, no ids, nothing of the dialectic and nothing pending. it is made by rules, here, by a program of yours; the release is recorded in the holograph before the isograph is written, one in each epoch.')) + '</p></div>');
+      dlgSet('dlg-progress', '');
+      let h = '<div class="thym-sec-h dict-sc" id="dlg-prog-h">' + cosmEsc(t('dlg.iso.prog', 'by which program')) + '</div>';
+      if (I.programs == null && !I.error) {
+        h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else if (I.programs && !I.programs.length) {
+        h += '<p class="thym-note">' + cosmEsc(t('dlg.iso.none', 'no program of yours takes the holograph alone: write a .thym in the project whose one input is a volume and whose output is project h as isograph')) + '</p>';
+      } else if (I.programs) {
+        h += '<div class="thym-list" role="radiogroup" aria-labelledby="dlg-prog-h">' + I.programs.map((p) => '<label class="thym-opt"><input type="radio" name="dlg-prog" value="'
+          + cosmEsc(p.rel) + '"' + (I.chosen === p.rel ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">' + cosmEsc(String(p.name || p.rel))
+          + '</span><span class="thym-where">' + cosmEsc(p.rel) + '</span></span>' + (p.why ? '<span class="thym-opt-meta">' + cosmEsc(String(p.why)) + '</span>' : '') + '</label>').join('') + '</div>';
+        h += '<div class="fab-row"><button type="button" id="dlg-iso-go" data-dlg="iso-go"' + (!I.chosen || I.busy ? ' disabled' : '') + '>'
+          + cosmEsc(t('dlg.iso.go', 'make the isograph')) + '</button></div>';
+      }
+      if (I.busy) h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('dlg.iso.busy', 'running the program by rules…')) + '</p>';
+      if (I.error) h += '<p class="thym-refusal">' + cosmEsc(I.error) + '</p>';
+      if (I.result) {
+        const rel = I.result.release || {};
+        h += '<p class="thym-fits">' + cosmEsc(t('dlg.iso.written', 'written: {file}').replace('{file}', () => String(I.result.isograph || ''))) + '</p>'
+          + '<p class="thym-note">' + cosmEsc(t('dlg.iso.release', 'the release was recorded in the holograph first: epoch {epoch}, run {run}, {n} items left')
+            .replace('{epoch}', () => String(rel.epoch || '')).replace('{run}', () => String(I.result.run || (rel.trace || {}).run || ''))
+            .replace('{n}', String(Array.isArray(rel.items) ? rel.items.length : 0))) + '</p>'
+          + '<div class="fab-row"><button type="button" data-dlg="iso-open">' + cosmEsc(t('canon.job.open', 'open')) + '</button></div>';
+      }
+      DLG.mainKey = null;
+      dlgSet('dlg-main', h);
+      ['dlg-sitting', 'dlg-settle', 'dlg-before'].forEach((id) => dlgSet(id, ''));
+      dlgStatus('');
+      dlgEl('dlg-send').hidden = true;
+      applyHelpBubbles();
+    }
+
+    async function dlgIsoGo() {
+      const I = DLG.iso;
+      if (!I.chosen || I.busy) return;
+      const seq = DLG.seq;
+      Object.assign(I, { busy: true, error: null, result: null });
+      dlgIsoPaint();
+      const r = await canonPost('/api/ascribe/isograph', { path: DLG.vol, program: I.chosen });
+      if (seq !== DLG.seq) return;
+      I.busy = false;
+      if (!r.ok || !r.data) I.error = r.error || t('canon.job.failed', 'that did not work');
+      else I.result = r.data;
+      dlgIsoPaint();
+      if (I.result) {
+        if (!IS_HOME) htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        dlgCosmRefresh(true);
+      }
+    }
+
+    // ---- the cosm viewer's toolbar: questions (n), isograph… ----
+    let DLG_COSM_SEQ = 0;
+    function dlgCosmPaint(data) {
+      const btn = cosmEl('cosm-dlg-btn'), iso = cosmEl('cosm-iso-btn'), n = cosmEl('cosm-dlg-n');
+      const path = String(COSM.path || '');
+      const ok = !!data && !data.refused && !IS_HOME && path && !/^(canon:|thym-run:)/.test(path) && !COSM_INLINE.has(path);
+      btn.hidden = true;
+      iso.hidden = !(ok && data.minicosm === 'ascribe');
+      if (!ok) return;
+      const seq = ++DLG_COSM_SEQ;
+      void canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)).then((r) => {
+        if (seq !== DLG_COSM_SEQ || COSM.path !== path) return;
+        if (!r.ok || !r.data) return;
+        const k = (r.data.open || []).length;
+        btn.hidden = false;
+        n.hidden = !k;
+        n.textContent = k ? String(k) : '';
+        btn.setAttribute('aria-label', k ? t('dlg.cosm.aria', 'questions: {n} open').replace('{n}', String(k)) : t('dlg.cosm.label', 'questions'));
+      });
+    }
+    function dlgCosmRefresh(reload) {
+      if (!cosmEl('cosm-mode').classList.contains('open') || !COSM.data) return;
+      if (reload) { void cosmLoad(COSM.path); return; }
+      dlgCosmPaint(COSM.data);
+    }
+
+    // ---- the fabula card's line, and a finished job's toast ----
+    const DLG_FAB = { path: null, data: null, seq: 0 };
+    function dlgFabLine(path) {
+      const el = fabEl('fab-dialectic');
+      if (!el) return;
+      if (!path) { fabSet(el, ''); DLG_FAB.path = null; return; }
+      const paint = () => {
+        const d = DLG_FAB.data;
+        if (!d) { fabSet(el, ''); return; }
+        const k = (d.open || []).length;
+        const none = !['open', 'answered', 'unknown', 'declined', 'stale', 'withdrawn'].some((s) => Number((d.counts || {})[s]) > 0);
+        fabSet(el, '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.fab.head', 'its questions')) + '</div><div class="fab-row"><span class="fab-say">'
+          + cosmEsc(k ? t('dlg.fab.open', '{n} open questions, for {who}').replace('{n}', String(k)).replace('{who}', () => dlgWho(d.to))
+            : (none ? t('dlg.fab.none', 'no questions yet') : t('dlg.none', 'no question is open'))) + '</span>'
+          + '<button type="button" id="fab-dlg-open">' + cosmEsc(k ? t('dlg.fab.answer', 'answer them…') : t('dlg.fab.see', 'the questions…')) + '</button></div>');
+      };
+      const key = path + '|' + FAB.seq + '|' + (FAB.build ? FAB.build.landed : '') + '|' + (FAB.result ? 1 : 0);
+      if (DLG_FAB.path === key) { paint(); return; }
+      DLG_FAB.path = key;
+      DLG_FAB.data = null;
+      paint();
+      const seq = ++DLG_FAB.seq;
+      void canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)).then((r) => {
+        if (seq !== DLG_FAB.seq) return;
+        DLG_FAB.data = r.ok && r.data ? r.data : null;
+        DLG_FAB.target = path;
+        paint();
+      });
+    }
+    fabEl('fab-body').addEventListener('click', (e) => {
+      if (!e.target.closest('#fab-dlg-open')) return;
+      const p = DLG_FAB.target;
+      fabCardClose();
+      if (p) void dlgOpen(p);
+    });
+
+    // A decompile or a build whose result landed questions: its toast offers them.
+    function dlgToastOffer(id, path, opts) {
+      if (!path) return;
+      void canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)).then((r) => {
+        if (!r.ok || !r.data || !(r.data.open || []).length || !CONVERT_TOASTS.has(id)) return;
+        const k = r.data.open.length;
+        const acts = (opts.actions || []).slice();
+        acts.splice(Math.max(0, acts.length - 1), 0, { label: t('dlg.toast.answer', 'answer its questions ({n})').replace('{n}', String(k)),
+          run: () => { convertToastClose(id); void dlgOpen(path); } });
+        convertToast(id, Object.assign({}, opts, { actions: acts, ttl: 15000 }));
+      });
+    }
+
+    // ---- what the agent did; coming back to the window ----
+    function dlgOnAgent(_key) {
+      dlgCosmRefresh();
+      if (!DLG.open || DLG.face !== 'q') return;
+      DLG.agentNote = t('dlg.agent', 'the readvisor recorded answers beside this volume (through its dialectic tool); the card has caught up');
+      const seq = DLG.seq;
+      void dlgLoad(seq).then(() => { if (seq === DLG.seq) dlgPaint(); });
+    }
+    window.addEventListener('focus', () => {
+      if (!DLG.open || DLG.face !== 'q' || DLG.sending) return;
+      const seq = DLG.seq;
+      void dlgLoad(seq).then(() => { if (seq === DLG.seq) dlgPaint(); });
+    });
+    document.addEventListener('agent-free', () => { if (DLG.open) void fabGateLoad().then(() => { DLG.mainKey = null; dlgPaint(); }); });
+    window.dlgOnLanguage = () => { DLG.mainKey = null; if (DLG.open) dlgPaint(); if (COSM.data) dlgCosmRefresh(); };
+
+    // The hooks in the Canon, cosm, fabula and chat code call in here only once this block has run.
+    window.__dlgReady = true;
 
 
     // ---------- Phase 2: selection toolbar ----------

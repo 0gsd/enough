@@ -31,6 +31,7 @@ sealed at seed time, whose key lives only in this process.
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -245,6 +246,133 @@ and let the day.
 FABULA_LETTER = "letter.md"
 FABULA_RUNS = ("survey-the-repo", "read-the-history", "read-every-file", "fold-the-whole", "raise-the-questions")
 
+# The dialectic in the page (0.6, U1b), seeded by _seed_dialectic() into
+# `talks/`, each in a folder of its own so a scenario that writes a sitting or
+# settles one never changes what a screen draws:
+# - `kinds/`: the morning-close guide and its fabulan (tests/fixtures/fabula/
+#   guides/), whose one open question is joined by six more, one of each other
+#   kind an answer takes (choice with "other", yes-no, number in a range, date,
+#   ref, span) — for the card's screens;
+# - `answer-<lang>/`: the same pair again, one for each language the matrix
+#   runs (scenarios run once per language, and a sitting sent and settled
+#   stays sent), for the scenario that answers one of each kind by keyboard,
+#   sends the sitting and settles it by rules; an eighth question, about the
+#   whole of an item, is answered there so that something waits for a model;
+# - `sitting/`: the same pair with the sitting of tests/fixtures/dialectic/
+#   beside it, written and not yet settled (its question shows as waiting);
+# - `self/`: the sample holograph with Ascribe's bank raised and the journal's
+#   two good candidates landed (each asked yes / partly / no), one affinity
+#   public, and the holder's program `talks/open-self.thym` (for the isograph);
+# - `self-ask-<lang>/`: a copy with its bank raised for each language, for the
+#   scenario that sees a personal-data refusal and proves no cloud is offered;
+# - `self-pii/`: tests/fixtures/ascribe/bad/pii, whose checks warn with advice;
+# - `bare/`: the guide and its fabulan with module D cut away: a volume with
+#   no questions yet (raise the questions).
+DIALECTIC_DIR = "talks"
+DIALECTIC_FIXTURES = REPO / "tests" / "fixtures" / "dialectic"
+ASCRIBE_FIXTURES = REPO / "tests" / "fixtures" / "ascribe"
+DIALECTIC_KINDS = """  - id: D:question/tone
+    type: question
+    about: C:voice/meadow-we#tone
+    asks: How would you name the guide's tone?
+    why: ambiguous
+    kind: choice
+    options: [plain, warm, formal]
+    options-open: true
+    hint: Pick one, or say it in a word of your own.
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/meant-to-reassure
+    type: question
+    about: P:claim/daily-summary-keeps-owners#intended
+    asks: Did you mean the last sentence to reassure the owners?
+    why: intent
+    kind: yes-no
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/retry-hour
+    type: question
+    about: T:event/close-runs#retry-hour
+    asks: At what hour is a failed close tried again?
+    why: missing
+    kind: number
+    range: [0, 23]
+    hint: An hour of the day, from 0 to 23.
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/published
+    type: question
+    about: R:release/handbook#at
+    asks: When was the guide first published?
+    why: missing
+    kind: date
+    hint: A date, a year-month or a year.
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/feed-source
+    type: question
+    about: P:claim/every-customer-has-a-feed#source
+    asks: Who says that every customer has a bank feed?
+    why: missing
+    kind: ref
+    options: ['E:']
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/retry-lines
+    type: question
+    about: P:claim/late-feed-delays-summary#grounds
+    asks: Which lines say what happens when the close waits?
+    why: missing
+    kind: span
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+  - id: D:question/close-runs-right
+    type: question
+    about: T:event/close-runs
+    asks: Is this right, and if not, what is? "Meadow runs the close for every customer once the bank feeds have arrived."
+    why: unsure
+    kind: text
+    to: author
+    raised: {by: person, from: person, at: 2026-11-05T10:05:00Z}
+    state: open
+"""
+DIALECTIC_LANGS = ("en", "de", "fr", "es", "ja", "zh")
+OPEN_SELF = """thym 1
+
+program open-self
+  why: what a person says they like, as they say it, and nothing more.
+  takes h: volume
+  gives i: volume
+
+  for each a in h where kind is affinity
+    emit a
+  end
+  give project h as isograph
+end
+"""
+JOURNAL_PROPOSALS = """candidates:
+  - kind: skill
+    name: Splicing an eye by hand
+    summary: Splices a new eye into a mooring line by hand, as a retired harbour pilot once showed.
+    form: knots
+    span: {lines: "3"}
+    confidence: 0.8
+    cites: [P:claim/spliced-an-eye]
+  - kind: yearning
+    name: Reading the weather
+    summary: Wants to learn to read the weather from the clouds.
+    about: the weather
+    span: {lines: "5"}
+    confidence: 0.7
+    cites: [P:claim/learn-the-weather]
+"""
+
 
 def _seed_cosm(dest: Path, emf_dir: str) -> None:
     """A text with its EMF twin (in `dest/emf_dir`), and the meadow Holotype,
@@ -281,6 +409,51 @@ def seed_project(project: Path) -> None:
     (emf / f"{PRESS}.cosm").write_text(twin, encoding="utf-8")
     _seed_thym(emf)
     _seed_fabula(project / FABULA_DIR)
+    _seed_dialectic(project / DIALECTIC_DIR)
+
+
+def _seed_dialectic(talks: Path) -> None:
+    """The dialectic's volumes (see DIALECTIC_* above), all copies."""
+    import datetime as _dt
+    from enough import ascribe as _a
+    from enough import macrocosm as _mc
+    guides = FABULA_FIXTURES / "guides"
+    twin = (THYM_FIXTURES / "inputs" / "close.md.fabulan.cosm").read_text(encoding="utf-8")
+    for name in ("kinds", "sitting", "bare") + tuple(f"answer-{lang}" for lang in DIALECTIC_LANGS):
+        d = talks / name
+        d.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(guides / "close.md", d / "close.md")
+        text = twin
+        if name == "kinds" or name.startswith("answer-"):
+            # the six questions go after the open one, before the session item
+            text = text.replace("  - id: D:session/session-1\n", DIALECTIC_KINDS + "  - id: D:session/session-1\n", 1)
+        elif name == "bare":
+            # module D cut away, and what cited its session with it
+            text = text[:text.index("  # --- D: the dialectic")]
+            text = text.replace(", D:session/session-1]", "]").replace(
+                "\n      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: "
+                "[D:session/session-1], confidence: 1}}", "")
+        (d / "close.md.fabulan.cosm").write_text(text, encoding="utf-8")
+    shutil.copyfile(DIALECTIC_FIXTURES / "close.md.fabulan.answers-2026-11-05-1200.cosm",
+                    talks / "sitting" / "close.md.fabulan.answers-2026-11-05-1200.cosm")
+    shutil.copytree(ASCRIBE_FIXTURES / "bad" / "pii", talks / "self-pii", dirs_exist_ok=True)
+    at = _dt.datetime(2026, 11, 5, 19, 30, tzinfo=_dt.timezone.utc)
+    for name in ("self",) + tuple(f"self-ask-{lang}" for lang in DIALECTIC_LANGS):
+        holo = talks / name
+        shutil.copytree(ASCRIBE_FIXTURES / "sample-self", holo, dirs_exist_ok=True)
+        if name == "self":
+            journal = (ASCRIBE_FIXTURES / "journal" / "journal.md").read_bytes()
+            props = _mc.yaml_load(JOURNAL_PROPOSALS)["candidates"]
+            got, _refused = _a.candidates(holo, props, text="journal.md", sha256=hashlib.sha256(journal).hexdigest(),
+                                          feed=None, at=at, made={"move": "propose", "run": "seed"})
+            _a.land_candidates(holo, got)
+            aff = holo / "A" / "affinities.cosm"
+            src = aff.read_text(encoding="utf-8")
+            if "visibility: public" not in src:
+                src = src.replace("    type: affinity\n", "    type: affinity\n    visibility: public\n", 1)
+                aff.write_text(src, encoding="utf-8")
+        _a.raise_bank(holo, at=at)
+    (talks / "open-self.thym").write_text(OPEN_SELF, encoding="utf-8")
 
 
 def _seed_fabula(works: Path) -> None:

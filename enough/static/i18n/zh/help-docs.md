@@ -372,6 +372,34 @@ fabulac 编译出来的东西，在这里阅读。<strong>cshort</strong> 是一
 - 先读 <code>CSHORT.md</code>：它说明每个文件是根据 fabulac 的哪一部分写的。
 - 把 cshort 放在原代码旁边比较：fabulac 漏掉的，cshort 也会缺。
 
+## dialectic-card
+name: 问题
+path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
+
+### what
+一个卷要向人询问的事：它的原文说不出的东西，每一条都是关于卷中某一处的<strong>问题</strong>，答案只有一种类型（文字、选项、是或否、数字、日期、条目、能说明它的行），问某个人：作者、熟悉这部作品的人、做出它的人、任何知道的人。卡片一次显示一两个问题，在你输入时检查回答，并把你说的话放进一<strong>轮</strong>回答里，整轮一起发送。孪生文件的一轮回答会作为回答文件写在它旁边；只有在回答<strong>并入</strong>之后，卷本身才会改变。
+
+### how
+cosm 查看器工具栏里的<strong>问题</strong>会打开它，并显示待答的数量；fabula 卡片，以及带来了问题的反编译或构建的通知，也能打开它。回答，或者说<strong>我不知道</strong>（这也是回答：这一处用你的话保持开放）、<strong>我不想说</strong>（作为事实保留）或<strong>先跳过</strong>。<strong>保留这些，看下一组</strong>继续往下；<strong>发送这一轮</strong>把它们全部记录下来，并逐个问题说明哪些已记录、已跳过或被拒绝，被拒绝的回答会连同你输入的内容一起退回。<strong>并入回答</strong>把它们写进卷里，默认用本机的模型，除非你为这一次任务选择云端；等待模型重读其条目的内容会列出来，检查针对某个回答提出的问题会排在下一组。<strong>再问一次</strong>会重新打开已并入或已拒答的问题；没有问题的卷可以按规则<strong>提出问题</strong>。
+
+### ideas
+- “我不知道，但客服主管知道”是个好回答：这个字段会用这句话保持开放，好去问下一个人。
+- 答两个，发送，并入：短短一轮也是一轮。
+
+## holograph
+name: holograph 的问题
+path: self/ → self/D/questions.cosm
+
+### what
+<strong>holograph</strong>（Ascribe）描述一个没有名字的人，通过询问你关于你自己的事来填写。它的问题<strong>只问持有者本人</strong>；你说的话会用你的原话记录在它自己的模块 D 中，永远不会离开它。看起来像个人数据的回答（电子邮件地址、电话号码、出生日期、街道地址、某人的名字）会被拒绝，并说明原因，不会写入任何内容。对你自己文本的一次阅读会提出<em>候选</em>，每一条都问你<strong>是</strong>、<strong>部分是</strong>还是<strong>否</strong>。这里不提供模型选项：holograph 的任何内容都不会发给云端模型。
+
+### how
+在打开 holograph 的 cosm 查看器里点<strong>问题</strong>打开它；自我中最单薄的部分先问，holograph 会立即按规则并入。<strong>制作 isograph…</strong>用你自己的、只接收 holograph 的程序生成它的公开投影：种类、FEED 词、档位和年代，每一项都标为 stated，不含名字、不含你的原话、不含问答记录。在 isograph 写到旁边之前，这次发布会先记录在 holograph 里，每个周期一次。
+
+### ideas
+- 用此人对你而言是谁来描述（“一位退休的港口引航员”），或用你在目录中声明的化名。
+- 对差不多对的候选回答<strong>部分是</strong>，然后用你的话重说一遍。
+
 ## atem-card
 name: atem 卡片
 path: (the atem of a text or a passage)

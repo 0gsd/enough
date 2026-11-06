@@ -125,6 +125,7 @@ COGNATES: dict[str, frozenset[str]] = {
         "holotype",         # the French term (taxonomy, and Comprise's word)
         "agent",            # "un agent" — the slider's word (agentmode.agent, 0.4.4)
         "prose",            # "la prose" — a text's flavour, fabulan (fab.fl.prose, 0.6)
+        "questions",        # "des questions" — the cosm viewer's dialectic button (dlg.cosm.label, 0.6)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"
@@ -132,6 +133,7 @@ COGNATES: dict[str, frozenset[str]] = {
         "wip · editable",   # "editable" is the Spanish word too
         "error",            # the Spanish word, spelled the same
         "ideas",            # the Spanish plural of "idea" (docs.bubble.ideas, 0.4.4)
+        "no",               # the Spanish "no", a yes-no answer (dlg.no, 0.6)
     )),
     "de": frozenset((
         "pink",             # German for pink

@@ -373,6 +373,34 @@ ouvrez-en un depuis la liste de la carte du fabulac, depuis une notification qua
 - lisez d'abord <code>CSHORT.md</code> : il dit de quelle partie du fabulac chaque fichier a été écrit.
 - posez un cshort à côté de l'original et comparez : ce qui manque au fabulac manque au cshort.
 
+## dialectic-card
+name: les questions
+path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
+
+### what
+ce qu’un volume demande à une personne : ce que sa source ne pouvait pas dire, chaque fois une <strong>question</strong> sur un endroit précis, d’un seul genre (des mots, un choix, oui ou non, un nombre, une date, un élément, les lignes qui le montrent), posée à quelqu’un : l’auteur, un connaisseur de l’œuvre, les gens qui l’ont fait, quiconque sait. la carte en montre une ou deux à la fois, vérifie une réponse pendant que vous tapez, et garde ce que vous dites dans une <strong>séance</strong> que vous envoyez en entier. la séance d’un jumeau est écrite à côté de lui, dans un fichier de réponses ; le volume lui-même ne change que lorsque les réponses sont <strong>intégrées</strong>.
+
+### how
+<strong>questions</strong> dans la barre d’outils de la visionneuse cosm l’ouvre, avec le nombre de questions ouvertes ; la carte fabula et la notification d’une décompilation ou d’une construction qui a apporté des questions l’ouvrent aussi. répondez, ou dites <strong>je ne sais pas</strong> (c’est aussi une réponse : l’endroit reste ouvert, dans vos mots), <strong>je préfère ne pas le dire</strong> (gardé comme un fait) ou <strong>passer pour l’instant</strong>. <strong>garder celles-ci, et les suivantes</strong> avance ; <strong>envoyer la séance</strong> les consigne toutes et dit, question par question, ce qui a été consigné, passé ou refusé, une réponse refusée revenant avec ce que vous aviez tapé. <strong>intégrer les réponses</strong> les verse dans le volume, avec le modèle d’ici sauf si vous choisissez le cloud pour cette seule tâche ; ce qui attend qu’un modèle relise son élément est listé, et une question qu’une vérification a soulevée contre une réponse passe en premier. <strong>redemander</strong> rouvre une question intégrée ou déclinée ; un volume qui n’en a pas peut <strong>poser les questions</strong>, selon les règles.
+
+### ideas
+- « je ne sais pas, mais la responsable du support le saurait » est une bonne réponse : le champ reste ouvert avec ces mots, pour que la personne suivante soit interrogée.
+- répondez à deux, envoyez, intégrez : une courte séance reste une séance.
+
+## holograph
+name: les questions d’un holograph
+path: self/ → self/D/questions.cosm
+
+### what
+un <strong>holograph</strong> (Ascribe) décrit une personne sans nom, et se remplit en vous interrogeant sur vous-même. ses questions sont pour le <strong>titulaire seul</strong> ; ce que vous dites est consigné dans son propre module D, dans vos mots, et n’en sort jamais. une réponse qui ressemble à des données personnelles (une adresse e-mail, un numéro de téléphone, une date de naissance, une adresse postale, le nom d’une personne) est refusée, avec des mots qui disent pourquoi, et rien n’en est écrit. une lecture de votre propre texte propose des <em>candidats</em>, chacun demandé <strong>oui</strong>, <strong>en partie</strong> ou <strong>non</strong>. aucune ligne de modèle n’est proposée : rien d’un holograph ne part vers un modèle du cloud.
+
+### how
+ouvrez-la avec <strong>questions</strong> dans la visionneuse cosm, sur le holograph ; la part la plus mince du soi est interrogée d’abord, et un holograph est intégré tout de suite, selon les règles. <strong>l’isograph…</strong> en fait la projection publique par un programme à vous qui prend le holograph seul : genres, mots FEED, paliers et décennies, chacun marqué stated, et aucun nom, aucun de vos mots, rien de la dialectique. la publication est consignée dans le holograph avant que l’isograph ne soit écrit à côté, un par époque.
+
+### ideas
+- décrivez les gens par ce qu’ils sont pour vous (« un pilote du port à la retraite »), ou par un pseudonyme que vous déclarez dans le catalogue.
+- dites <strong>en partie</strong> à un candidat presque juste, puis dites-le à votre façon.
+
 ## atem-card
 name: carte atem
 path: (the atem of a text or a passage)

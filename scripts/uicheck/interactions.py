@@ -38,7 +38,8 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       GIRRAPH, HARVEST, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS,
                       THYM_BAND_READY, THYM_MORPH, THYM_READING, THYM_READING_FOOTER,
                       THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY,
-                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL, FAB_READY, FABV_READY)
+                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL, FAB_READY, FABV_READY,
+                      DLG_ANSWER, DLG_KINDS, DLG_READY, DLG_SELF_ASK)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -61,6 +62,7 @@ def _reset(d: Driver) -> None:
     d.js("(() => { try { thymPickClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
     d.js("(() => { try { fabCardClose(); fabViewClose(); } catch (e) {} return true; })()")
+    d.js("(() => { try { dlgClose(); DLG.drafts.clear(); DLG.putNext = []; } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
          "(m) => m.classList.add('hidden'));"
          " document.getElementById('confirm-cancel')?.click();"
@@ -3724,6 +3726,298 @@ def scenario_cshort_read(d: Driver) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# 0.6 (U1b): the dialectic card — every kind answered by keyboard, a refusal
+# in the server's words, a sitting sent and settled by rules; a holograph's
+# card offers no cloud and never sends `who`
+# ---------------------------------------------------------------------------
+
+#: Every request the page makes, with its body, from here on (window.__dlgCalls).
+_DLG_WIRE = ("(() => { window.__dlgCalls = []; if (!window.__dlgFetch) { window.__dlgFetch = window.fetch;"
+             " window.fetch = (u, o) => { try { (window.__dlgCalls || []).push([String(u), o && o.body ? String(o.body) : '']); }"
+             " catch (e) {} return window.__dlgFetch(u, o); }; } return true; })()")
+
+
+def _dlg_lang(d: Driver) -> str:
+    return d.js("I18N.lang") or "en"
+
+
+def _tab_to(d: Driver, cond: str, most: int = 14) -> bool:
+    """Tab (the keyboard, nothing else) until the focused element matches `cond`
+    (a JS expression over `a`, the active element)."""
+    for _ in range(most):
+        if d.js(f"(() => {{ const a = document.activeElement; return !!a && ({cond}); }})()"):
+            return True
+        d.key("Tab")
+    return bool(d.js(f"(() => {{ const a = document.activeElement; return !!a && ({cond}); }})()"))
+
+
+def _dlg_check_text(d: Driver, i: int, want: str | None, ms: int = 6000) -> str:
+    """The words beside question i once the live check has answered (`want` in them, or empty)."""
+    cond = (f"((document.getElementById('dlg-chk-{i}') || {{}}).textContent || '').includes({json.dumps(want)})"
+            if want else f"!((document.getElementById('dlg-chk-{i}') || {{}}).textContent || '').trim()"
+                         f" && !DLG.timers.size")
+    _wait_js(d, cond, ms)
+    return d.js(f"(document.getElementById('dlg-chk-{i}') || {{}}).textContent || ''") or ""
+
+
+def _dlg_shown(d: Driver) -> list[str]:
+    return d.js("Array.from(document.querySelectorAll('#dlg-main .dlg-q')).map((q) => q.dataset.dlgKey)") or []
+
+
+def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
+    """A fabulan with an open question of every kind, from the cosm viewer:
+    questions (with its count) opens the card → each kind answered by keyboard
+    alone (Tab, typing, arrows, Enter): text, a choice and its "other:", yes-no,
+    a number (30 refused out of its range, in the server's words, then 5), a
+    date (2019-13 refused, then 2019-06), a ref, a span, a whole item's
+    question, and an open field answered "I don't know" → send the sitting:
+    each question recorded in the server's words, written beside the twin →
+    settle by rules: the job's message, and the item a model must read again
+    listed as waiting → the wire: no `who`, the settle's route local."""
+    fails: list[str] = []
+    _reset(d)
+    vol = DLG_ANSWER.format(lang=_dlg_lang(d))
+    d.js(_DLG_WIRE)
+    d.js(f"enterCosmMode({json.dumps(vol)})")
+    d.wait_for("#cosm-mode.open")
+    d.js_await(COSM_READY[1])
+    if not _wait_js(d, "!document.getElementById('cosm-dlg-btn').hidden", 8000):
+        fails.append("the cosm viewer offers no questions button on a fabulan")
+        _reset(d)
+        return fails
+    n = d.js("document.getElementById('cosm-dlg-n').textContent")
+    if n != "9":
+        fails.append(f"the toolbar should count 9 open questions, not {n!r}")
+    d.focus("#cosm-dlg-btn")
+    d.key("Enter")
+    d.wait_for("#dialectic-modal:not(.hidden)")
+    d.js_await(DLG_READY[1])
+    if not _focus_inside(d, "#dialectic-modal"):
+        fails.append(f"the card did not take the focus: {_active(d)}")
+
+    def step(name: str, cond: str) -> bool:
+        if _tab_to(d, cond):
+            return True
+        fails.append(f"Tab never reached {name} (focus on {_active(d)})")
+        return False
+
+    # 1. text, and a choice with other:
+    if step("the first answer", "a.id === 'dlg-in-0'"):
+        d.type_text("An owner rang support twice in a week.")
+    if step("the choice", "a.name === 'dlg-r-1'"):
+        for _ in range(3):
+            d.key("ArrowDown")                 # plain → warm → formal → other:
+    if step("the other: field", "a.id === 'dlg-other-1'"):
+        d.type_text("dry")
+    _sleep(d, 600)
+    v = d.js("(() => { const x = DLG.drafts.get(DLG.vol).get('D:question/tone'); return x ? dlgValueOf(x) : null; })()")
+    if v != "dry":
+        fails.append(f"the choice's other: did not take the word typed: {v!r}")
+    if step("keep these, and the next", "a.id === 'dlg-next'"):
+        d.key("Enter")
+    _sleep(d, 200)
+    # 2. yes-no, and a number refused then right
+    if _dlg_shown(d)[:2] != ["D:question/meant-to-reassure", "D:question/retry-hour"]:
+        fails.append(f"the next pair is not yes-no and number: {_dlg_shown(d)}")
+    if step("yes / no", "a.name === 'dlg-r-0'"):
+        d.key("ArrowDown")
+        d.key("ArrowLeft")                     # no → yes
+    said = _dlg_check_text(d, 0, "true")
+    if "true" not in said:
+        fails.append(f"yes should be said back as written: true, not {said!r}")
+    if step("the number", "a.id === 'dlg-in-1'"):
+        d.type_text("30")
+    said = _dlg_check_text(d, 1, "0 to 23")
+    if "is not from 0 to 23" not in said:
+        fails.append(f"30 should be refused in the server's words beside the field: {said!r}")
+    if not d.js("document.getElementById('dlg-in-1').getAttribute('aria-invalid') === 'true'"):
+        fails.append("the refused number is not marked aria-invalid")
+    if d.js("!document.getElementById('dlg-chk-1').closest('[aria-live]') && document.getElementById('dlg-chk-1').getAttribute('aria-live') !== 'polite'"):
+        fails.append("the check's words are not in a live region")
+    d.focus("#dlg-in-1")
+    d.key("Backspace")
+    d.key("Backspace")
+    d.type_text("5")
+    _wait_js(d, "!(document.getElementById('dlg-chk-1').textContent || '').trim()", 6000)
+    if (d.js("document.getElementById('dlg-chk-1').textContent") or "").strip():
+        fails.append("5 is inside the range and should clear the refusal: "
+                     + repr(d.js("[document.getElementById('dlg-in-1').value, document.getElementById('dlg-chk-1').textContent]")))
+    if step("keep these, and the next", "a.id === 'dlg-next'"):
+        d.key("Enter")
+    _sleep(d, 200)
+    # 3. a date refused then right, and a ref
+    if step("the date", "a.id === 'dlg-in-0'"):
+        d.type_text("2019-13")
+    said = _dlg_check_text(d, 0, "not a date")
+    if "not a date" not in said:
+        fails.append(f"2019-13 should be refused as not a date: {said!r}")
+    d.key("Backspace")
+    d.key("Backspace")
+    d.type_text("06")
+    if step("the ref", "a.id === 'dlg-in-1'"):
+        d.type_text("E:person/support-lead")
+    _dlg_check_text(d, 1, None)
+    if step("keep these, and the next", "a.id === 'dlg-next'"):
+        d.key("Enter")
+    _sleep(d, 200)
+    # 4. a span, and a whole item's question
+    if step("the span", "a.id === 'dlg-in-0'"):
+        d.type_text("7")
+    if step("the item's question", "a.id === 'dlg-in-1'"):
+        d.type_text("Right, but the retry at five is part of it.")
+    if step("keep these, and the next", "a.id === 'dlg-next'"):
+        d.key("Enter")
+    _sleep(d, 200)
+    # 5. an open field, "I don't know"
+    if step("I don't know", "a.id === 'dlg-alt-dont_know-0'"):
+        d.key("Enter")
+    if d.js("document.getElementById('dlg-alt-dont_know-0').getAttribute('aria-pressed')") != "true":
+        fails.append("I don't know is not pressed")
+    # send
+    if step("send the sitting", "a.id === 'dlg-send'"):
+        d.key("Enter")
+    if not _wait_js(d, "DLG.sent !== null && !DLG.sending"
+                       " && !document.querySelector('#dlg-sitting button[data-dlg=unhold]')", 15000):
+        fails.append("the sitting was not sent")
+        _reset(d)
+        return fails
+    sent = d.js("DLG.sent") or {}
+    if sent.get("error"):
+        fails.append(f"the sitting was refused: {sent.get('error')}")
+    rows = sent.get("rows") or []
+    if len(rows) != 9 or any(r.get("refused") for r in rows):
+        fails.append(f"nine answers should be recorded, none refused: {rows}")
+    shown = d.js("Array.from(document.querySelectorAll('#dlg-sitting .dlg-row-what')).map((x) => x.textContent)") or []
+    # (An open field answered by its address comes back "answered" whatever was
+    # said: the reply's entry for an address carries no state; see the lane note.)
+    if len(shown) != 9 or not all("answered" in x or "unknown" in x for x in shown):
+        fails.append(f"the card should say per question what was recorded, in the server's words: {shown}")
+    written = sent.get("written") or ""
+    if ".answers-" not in written or not _raw(d, written):
+        fails.append(f"no answers volume was written beside the twin: {written!r}")
+    # settle, by rules (no model here)
+    if not _wait_js(d, "!!document.getElementById('dlg-settle-go')", 8000):
+        fails.append("settle is not offered after the sitting")
+        _reset(d)
+        return fails
+    if not d.js("!!document.querySelector('#dlg-settle .fab-model-line')"):
+        fails.append("a fabula's settle should show the model line (here)")
+    if step("settle the answers", "a.id === 'dlg-settle-go'"):
+        d.key("Enter")
+    if not _wait_js(d, "DLG.result !== null || DLG.jerror !== null", 30000):
+        fails.append("the settle did not finish")
+        _reset(d)
+        return fails
+    st = d.js("({res: DLG.result, err: DLG.jerror, settle: document.getElementById('dlg-settle').textContent})") or {}
+    if st.get("err"):
+        fails.append(f"the settle failed: {st.get('err')}")
+    msg = (st.get("res") or {}).get("message") or ""
+    if "settled" not in msg or msg not in (st.get("settle") or ""):
+        fails.append(f"the card should say the settle's message: {msg!r}")
+    _wait_js(d, "(DLG.data.sittings || []).length === 0 && (DLG.data.waiting || []).length > 0"
+                " && !document.getElementById('dlg-settle-go')", 8000)
+    wt = d.js("Array.from(document.querySelectorAll('#dlg-settle .dlg-row-what')).map((x) => x.textContent)") or []
+    if not any("The close runs" in x for x in wt):
+        fails.append(f"the whole item's answer should wait for a model to read The close runs again: {wt}")
+    calls = d.js("window.__dlgCalls") or []
+    ans = [b for u, b in calls if "/api/dialectic/answers" in u]
+    if not ans or '"dont_know":true' not in ans[-1]:
+        fails.append(f"I don't know was not sent as such: {ans[-1:]}")
+    if not ans or '"who"' in ans[-1] or '"through":"person"' not in ans[-1]:
+        fails.append(f"the sitting should go through person, with no who: {ans[-1:] }")
+    stl = [b for u, b in calls if "/api/dialectic/settle" in u]
+    if not stl or '"route":"local"' not in stl[-1]:
+        fails.append(f"the settle should say route local: {stl}")
+    _reset(d)
+    return fails
+
+
+def scenario_dialectic_holograph_no_cloud(d: Driver) -> list[str]:
+    """With the cloud gate made to read open: a fabula's card offers the cloud
+    for its settle (so the probe can see it) and a holograph's card never does —
+    no model line, no route radio, before and after a sitting → the card says
+    the questions are for the holder alone → an email address typed as an
+    answer is refused in the server's words, beside the field, while typing and
+    again when sent (the rest of the sitting kept) → nothing sent names a
+    `who`, a `route` or a `model`."""
+    fails: list[str] = []
+    _reset(d)
+    lang = _dlg_lang(d)
+    holo = DLG_SELF_ASK.format(lang=lang)
+    d.js(_DLG_WIRE)
+    gate = ("(() => { const f = window.fetch; if (!window.__dlgGate) { window.__dlgGate = true;"
+            " window.fetch = (u, o) => window.__dlgGate && String(u).startsWith('/api/fabula/models')"
+            " ? Promise.resolve(new Response(JSON.stringify({agent_free: false, local: {running: false, model: 'g40-04', window: null},"
+            " cloud: {open: true, model: 'cloud/test-model', window: 32768, reason: null}}),"
+            " {headers: {'Content-Type': 'application/json'}})) : f(u, o); } return true; })()")
+    d.js(gate)
+    # the probe can see a cloud offer: a fabula with a sitting waiting
+    d.js_await(f"(async () => {{ await dlgOpen({json.dumps(DLG_ANSWER.format(lang=lang))}); return true; }})()")
+    d.js_await(DLG_READY[1])
+    d.js("(() => { DLG.result = {message: 'probe'}; DLG.mainKey = null; dlgPaint(); return true; })()")
+    sitting = d.js("(DLG.data.sittings || []).length")
+    if sitting and not d.js("!!document.querySelector('#dlg-settle input[name=\"dlg-route\"][value=\"cloud\"]')"):
+        fails.append("with the gate open a fabula's settle should offer the cloud (the probe sees nothing)")
+    d.js("dlgClose()")
+    d.js_await(f"(async () => {{ await dlgOpen({json.dumps(holo)}); return true; }})()")
+    d.js_await(DLG_READY[1])
+
+    def no_cloud(when: str) -> None:
+        bad = d.js("(() => { const m = document.getElementById('dialectic-modal');"
+                   " return {route: m.querySelectorAll('input[name=\"dlg-route\"]').length,"
+                   " line: m.querySelectorAll('.fab-model-line').length,"
+                   " cloud: /test-model/.test(m.textContent)}; })()") or {}
+        if bad.get("route") or bad.get("line") or bad.get("cloud"):
+            fails.append(f"a holograph's card offered a model or the cloud ({when}): {bad}")
+
+    no_cloud("on opening")
+    if not d.js("!!document.querySelector('#dlg-rules .dlg-holo strong')"):
+        fails.append("a holograph's card does not say its questions are for the holder alone")
+    if not _tab_to(d, "a.id === 'dlg-in-0'"):
+        fails.append(f"Tab never reached the first answer (focus on {_active(d)})")
+        _reset(d)
+        return fails
+    d.type_text("write to me at wren@example.com")
+    said = _dlg_check_text(d, 0, "personal data")
+    if "reads like personal data" not in said:
+        fails.append(f"an email address should be refused in the server's words beside the field: {said!r}")
+    if not _tab_to(d, "a.id === 'dlg-in-1'"):
+        fails.append("Tab never reached the second answer")
+    d.type_text("How the tides turn at the harbour mouth.")
+    _sleep(d, 600)
+    if _tab_to(d, "a.id === 'dlg-send'"):
+        d.key("Enter")
+    if not _wait_js(d, "DLG.sent !== null && !DLG.sending"
+                       " && !document.querySelector('#dlg-sitting button[data-dlg=unhold]')", 15000):
+        fails.append("the sitting was not sent")
+        _reset(d)
+        return fails
+    rows = (d.js("DLG.sent") or {}).get("rows") or []
+    if not any(r.get("refused") and "personal data" in (r.get("what") or "") for r in rows):
+        fails.append(f"the email should come back refused in the server's words: {rows}")
+    if not any(not r.get("refused") for r in rows):
+        fails.append(f"the other answer should be kept: {rows}")
+    kept = d.js("(() => { const x = DLG.drafts.get(DLG.vol); const k = x && Array.from(x.values()).find((y) => y.refused);"
+                " return k ? dlgValueOf(k) : null; })()")
+    if kept != "write to me at wren@example.com":
+        fails.append(f"what was typed in the refused answer was lost: {kept!r}")
+    no_cloud("after the sitting")
+    if d.js("!!document.getElementById('dlg-settle-go')"):
+        d.focus("#dlg-settle-go")
+        d.key("Enter")
+        _wait_js(d, "DLG.result !== null || DLG.jerror !== null", 15000)
+    no_cloud("after settling")
+    calls = d.js("window.__dlgCalls") or []
+    for u, b in calls:
+        if "/api/dialectic/" in u and any(k in b for k in ('"who"', '"route"', '"model"')):
+            fails.append(f"a holograph's request named a who, a route or a model: {u} {b[:160]}")
+    d.js("(() => { window.__dlgGate = false; return true; })()")
+    _reset(d)
+    d.reload()
+    return fails
+
+
+# ---------------------------------------------------------------------------
 # 0.5.0: Thym — a run lands and its trace opens; a reading wears its label
 # ---------------------------------------------------------------------------
 
@@ -4230,4 +4524,7 @@ SCENARIOS: dict[str, Scenario] = {
     "fabula-decompile-card": scenario_fabula_decompile_card,
     "fabulac-build-outline": scenario_fabulac_build_outline,
     "cshort-read": scenario_cshort_read,
+    # --- 0.6: the fabula round (U1b): the dialectic card ---
+    "dialectic-answer-kinds": scenario_dialectic_answer_kinds,
+    "dialectic-holograph-no-cloud": scenario_dialectic_holograph_no_cloud,
 }

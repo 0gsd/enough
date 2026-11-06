@@ -373,6 +373,34 @@ abre uno desde la lista de la tarjeta del fabulac, desde un aviso cuando termina
 - lee primero <code>CSHORT.md</code>: dice de qué parte del fabulac se escribió cada archivo.
 - pon un cshort junto al original y compáralos: lo que le faltó al fabulac le falta al cshort.
 
+## dialectic-card
+name: las preguntas
+path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
+
+### what
+lo que un volumen pregunta a una persona: lo que su fuente no podía decir, cada cosa una <strong>pregunta</strong> sobre un lugar concreto, de una sola clase (palabras, una elección, sí o no, un número, una fecha, un elemento, las líneas que lo muestran), hecha a alguien: el autor, alguien experto en la obra, quienes lo hicieron, quien lo sepa. la tarjeta muestra una o dos a la vez, comprueba la respuesta mientras escribes y guarda lo que dices en una <strong>sesión</strong> que envías entera. la sesión de un gemelo se escribe a su lado como un archivo de respuestas; el volumen solo cambia cuando las respuestas se <strong>incorporan</strong>.
+
+### how
+<strong>preguntas</strong> en la barra del visor cosm la abre, con cuántas están abiertas; también la abren la tarjeta fabula y el aviso de una descompilación o una construcción que trajo preguntas. responde, o di <strong>no lo sé</strong> (también es una respuesta: el lugar queda abierto, con tus palabras), <strong>prefiero no decirlo</strong> (se guarda como un hecho) o <strong>saltar por ahora</strong>. <strong>guardar estas, y las siguientes</strong> avanza; <strong>enviar la sesión</strong> las anota todas y dice, pregunta por pregunta, qué se anotó, qué se saltó y qué se rechazó, y una respuesta rechazada vuelve con lo que escribiste. <strong>incorporar las respuestas</strong> las lleva al volumen, con el modelo de aquí salvo que elijas la nube para ese único trabajo; lo que espera a que un modelo relea su elemento se lista, y una pregunta que una comprobación planteó contra una respuesta va primero. <strong>volver a preguntar</strong> reabre una pregunta incorporada o rechazada; un volumen sin preguntas puede <strong>plantear las preguntas</strong>, por reglas.
+
+### ideas
+- «no lo sé, pero la responsable de soporte lo sabría» es una buena respuesta: el campo queda abierto con esas palabras, para preguntar a la siguiente persona.
+- responde dos, envía, incorpora: una sesión corta también es una sesión.
+
+## holograph
+name: las preguntas de un holograph
+path: self/ → self/D/questions.cosm
+
+### what
+un <strong>holograph</strong> (Ascribe) describe a una persona sin nombre, y se llena preguntándote sobre ti. sus preguntas son <strong>solo para el titular</strong>; lo que dices se anota en su propio módulo D, con tus palabras, y nunca sale de él. una respuesta que parece un dato personal (una dirección de correo, un número de teléfono, una fecha de nacimiento, una dirección postal, el nombre de una persona) se rechaza, con palabras que dicen por qué, y no se escribe nada de ella. una lectura de tu propio texto propone <em>candidatos</em>, y de cada uno se pregunta <strong>sí</strong>, <strong>en parte</strong> o <strong>no</strong>. no se ofrece ninguna línea de modelo: nada de un holograph va a un modelo en la nube.
+
+### how
+ábrela con <strong>preguntas</strong> en el visor cosm sobre el holograph; primero se pregunta por la parte más delgada del yo, y un holograph se incorpora enseguida, por reglas. <strong>el isograph…</strong> hace su proyección pública con un programa tuyo que toma el holograph solo: clases, palabras FEED, franjas y décadas, cada una marcada stated, y ningún nombre, ninguna palabra tuya, nada de la dialéctica. la publicación se anota en el holograph antes de escribir el isograph a su lado, uno por época.
+
+### ideas
+- describe a las personas por lo que son para ti («un práctico del puerto jubilado»), o con un seudónimo que declares en el catálogo.
+- di <strong>en parte</strong> a un candidato que casi acierta, y luego dilo a tu manera.
+
 ## atem-card
 name: tarjeta del atem
 path: (the atem of a text or a passage)

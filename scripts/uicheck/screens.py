@@ -86,6 +86,19 @@ FAB_CATEM = "works/tally.catem-2026-11-05-1415.md"
 FAB_TINY = "works/tiny-tool"
 FAB_POEM = "works/rain.md"
 FAB_LETTER = "works/letter.md"
+# The dialectic (0.6, U1b), seeded by server._seed_dialectic() in talks/: the
+# morning-close guide's fabulan with one open question of every kind, the same
+# with a sitting written and not settled, the same with no questions at all,
+# the sample holograph with its bank raised and two candidates landed (and the
+# holder's program beside it), the holograph whose checks warn with advice, and
+# one copy per language of the fabulan and of the holograph for the scenarios.
+DLG_KINDS = "talks/kinds/close.md.fabulan.cosm"
+DLG_SITTING = "talks/sitting/close.md.fabulan.cosm"
+DLG_BARE = "talks/bare/close.md.fabulan.cosm"
+DLG_SELF = "talks/self"
+DLG_SELF_PII = "talks/self-pii"
+DLG_ANSWER = "talks/answer-{lang}/close.md.fabulan.cosm"
+DLG_SELF_ASK = "talks/self-ask-{lang}"
 
 Step = tuple[str, str]
 
@@ -296,6 +309,21 @@ FABV_READY: Step = ("eval_await", """(async () => {
   }
   return true; })()""")
 FABV_CLOSE: Step = ("eval", "(() => { try { fabViewClose(); } catch (e) {} return true; })()")
+#: The dialectic card (0.6, U1b) has read its volume (the questions and the viewer's
+#: read of it), or, on its isograph face, the holder's programs.
+DLG_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(DLG.open && (DLG.face === 'iso' ? (DLG.iso.programs !== null || DLG.iso.error)
+       : ((DLG.data && DLG.cosm !== null) || DLG.error))); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  await new Promise((r) => setTimeout(r, 120));
+  return true; })()""")
+DLG_CLOSE: Step = ("eval", "(() => { try { dlgClose(); DLG.drafts.clear(); DLG.putNext = []; } catch (e) {} return true; })()")
+
+
+def _dlg_put(*keys: str) -> Step:
+    """Put these questions in hand (as a settle or a refusal would), and repaint."""
+    return ("eval", f"(() => {{ DLG.putNext = {json.dumps(list(keys))}; DLG.mainKey = null; dlgPaint(); return true; }})()")
 #: The Canon chip knows the text's twin state (GET /api/fabula/twin answered).
 CANON_CHIP_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
@@ -945,6 +973,112 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
            teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
            note="a catem at depth overview: its depth line, the markdown, its footer"),
+
+    # --- 0.6, the fabula round (U1b): the dialectic card, a holograph, its isograph ---
+    Screen("dialectic-card", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY, ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="the dialectic card on a fabulan with one open question of every kind: the "
+                "progress line, who is asked, the first two (a text, a choice with other:), "
+                "each with what it is about, its hint, I don't know / I'd rather not say / "
+                "skip for now, keep these and the next, send the sitting"),
+
+    Screen("dialectic-kinds-yes-number", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY,
+                  _dlg_put("D:question/meant-to-reassure", "D:question/retry-hour"), ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a yes-no question and a number with its range"),
+
+    Screen("dialectic-kinds-date-ref", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY,
+                  _dlg_put("D:question/published", "D:question/feed-source"), ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a date (a year or year-month too) and a reference to an item, with its prefix"),
+
+    Screen("dialectic-kinds-span-pending", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY,
+                  _dlg_put("D:question/retry-lines", "L:term/morning-summary#feed"),
+                  ("eval", "(() => { const b = document.getElementById('dlg-alt-dont_know-1'); if (b) b.click(); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a span of lines, and an open field asked by its address, answered I don't know"),
+
+    Screen("dialectic-sitting", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY,
+                  ("eval", "(() => { const a = document.getElementById('dlg-in-0'); a.value = 'An owner rang support twice in a week.';"
+                           " a.dispatchEvent(new Event('input', {bubbles: true}));"
+                           " const r = document.querySelector('input[name=\"dlg-r-1\"][value=\"warm\"]'); r.checked = true;"
+                           " r.dispatchEvent(new Event('input', {bubbles: true})); document.getElementById('dlg-next').click();"
+                           " const n = document.getElementById('dlg-in-1'); n.value = '30';"
+                           " n.dispatchEvent(new Event('input', {bubbles: true})); return true; })()"),
+                  ("eval_await", "(async () => { for (let i = 0; i < 100 && !(document.getElementById('dlg-chk-1') || {}).textContent; i++)"
+                                 " await new Promise((r) => setTimeout(r, 50)); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="two answers kept in the sitting (with change), the next two in hand, a number "
+                "out of its range refused in the server's words beside its field"),
+
+    Screen("dialectic-waiting", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_SITTING}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY, ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a sitting written and not settled: the open fields still to answer, settle with "
+                "its sitting file and the model line (here), the question waiting in that sitting, "
+                "answered before (one settled question) with ask again"),
+
+    Screen("dialectic-raise", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_BARE}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY, ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a volume with no questions yet: what raising them asks, raise the questions, "
+                "and its open fields answerable meanwhile"),
+
+    Screen("dialectic-holograph", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_SELF}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY, ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="a holograph's card: for the holder alone, personal data refused, nothing to a "
+                "cloud model (and no model line), the thinnest part of the self asked first"),
+
+    Screen("dialectic-candidate", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_SELF}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY,
+                  _dlg_put("D:question/splicing-an-eye-by-hand-candidate", "D:question/reading-the-weather-candidate"),
+                  ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="two candidates a reading of the holder's own text proposed, each with what it "
+                "says and yes / partly / no, what each does said under it"),
+
+    Screen("dialectic-isograph", "project",
+           setup=(("eval_await", f"(async () => {{ await dlgIsoOpen('{DLG_SELF}'); return true; }})()"),
+                  ("wait_for", "#dialectic-modal:not(.hidden)"), DLG_READY, ("wait_idle", "")),
+           teardown=(DLG_CLOSE,) + EXIT_ALL_MODES,
+           note="the isograph face: what an isograph is and that it leaves no name, the holder's "
+                "program, make the isograph"),
+
+    Screen("dialectic-holograph-cosm", "project",
+           setup=(("eval", f"enterCosmMode('{DLG_SELF_PII}')"), ("wait_for", "#cosm-mode.open"), COSM_READY,
+                  ("eval_await", "(async () => { for (let i = 0; i < 100 && document.getElementById('cosm-dlg-btn').hidden; i++)"
+                                 " await new Promise((r) => setTimeout(r, 50));"
+                                 " const d = document.querySelector('#cosm-rail details.cosm-problems'); if (d) d.open = true;"
+                                 " return true; })()"),
+                  ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a holograph in the cosm viewer: questions (with its count) and the isograph… in the "
+                "toolbar, the checks' personal-data warnings each with its advice on a line"),
+
+    Screen("dialectic-cosm-count", "project",
+           setup=(("eval", f"enterCosmMode('{DLG_KINDS}')"), ("wait_for", "#cosm-mode.open"), COSM_READY,
+                  ("eval_await", "(async () => { for (let i = 0; i < 100 && document.getElementById('cosm-dlg-btn').hidden; i++)"
+                                 " await new Promise((r) => setTimeout(r, 50)); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a fabulan in the cosm viewer: questions with the count of the open ones in the toolbar"),
 
     # --- 0.5.0, Thym (U1): programs, plans, traces, the run card, readings ---
     Screen("thym-program", "project",

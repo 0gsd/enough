@@ -372,6 +372,34 @@ open one from the fabulac card's list, from a toast when a compile lands, or fro
 - read <code>CSHORT.md</code> first: it says which part of the fabulac every file was written from.
 - set a cshort beside the original and compare: what the fabulac missed is what the cshort lacks.
 
+## dialectic-card
+name: the questions
+path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
+
+### what
+what a volume asks of a person: what its source could not say, each a <strong>question</strong> about one place in it, of one kind (words, a choice, yes or no, a number, a date, an item, the lines that show it), put to someone: the author, an expert, the makers, anyone who knows. the card shows one or two at a time, checks an answer as you type, and keeps what you say in a <strong>sitting</strong> you send whole. a twin's sitting is written beside it as an answers file; the volume itself changes only when the answers are <strong>settled</strong>.
+
+### how
+<strong>questions</strong> in the cosm viewer's toolbar opens it, with how many are open; so do the fabula card and the toast of a decompile or a build that landed questions. answer, or say <strong>I don't know</strong> (an answer too: the place stays open, in your words), <strong>I'd rather not say</strong> (kept as a fact) or <strong>skip for now</strong>. <strong>keep these, and the next</strong> moves on; <strong>send the sitting</strong> records them all and says, question by question, what was recorded, skipped or refused, a refused answer coming back with what you typed. <strong>settle the answers</strong> folds them in, with the model here unless you choose the cloud for that one job; what waits for a model to read its item again is listed, and a question a check raised against an answer is put next. <strong>ask again</strong> reopens a settled or declined question; a volume with none can <strong>raise the questions</strong>, by rules.
+
+### ideas
+- "I don't know, but the support lead would" is a good answer: the field stays open in those words, for the next person to be asked.
+- answer two, send, settle: a short sitting is still a sitting.
+
+## holograph
+name: a holograph's questions
+path: self/ → self/D/questions.cosm
+
+### what
+a <strong>holograph</strong> (Ascribe) describes a person with no name, and is filled in by being asked about yourself. its questions are for the <strong>holder alone</strong>; what you say is recorded in its own module D, in your words, and never leaves it. an answer that reads like personal data (an email address, a phone number, a birth date, a street address, a person's name) is refused, in words that say why, and nothing of it is written. a reading of your own text proposes <em>candidates</em>, each asked <strong>yes</strong>, <strong>partly</strong> or <strong>no</strong>. no model line is offered: nothing of a holograph goes to a cloud model.
+
+### how
+open it with <strong>questions</strong> in the cosm viewer on the holograph; the thinnest part of the self is asked first, and a holograph is settled at once, by rules. <strong>the isograph…</strong> makes its public projection by a program of yours that takes the holograph alone: kinds, FEED words, bands and decades, every one marked stated, and no name, no words of yours, nothing of the dialectic. the release is recorded in the holograph before the isograph is written beside it, one in each epoch.
+
+### ideas
+- describe people by what they are to you ("a retired harbour pilot"), or by a pseudonym you declare in the catalog.
+- say <strong>partly</strong> to a candidate that is nearly right, then say it your way.
+
 ## atem-card
 name: atem card
 path: (the atem of a text or a passage)
