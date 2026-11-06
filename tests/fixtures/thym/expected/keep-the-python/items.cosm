@@ -1,0 +1,157 @@
+oes: thym/1
+kind: program
+id: thym/keep-the-python
+name: keep-the-python
+source:
+  path: keep-the-python.thym
+  sha256: 7103413bd6db2a31a6f4759da667a2c636c3a5e65c9f74c59030378026617b6e
+  size: 357
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/keep-the-python
+  type: program
+  name: keep-the-python
+  summary: The Python files of a folder, kept as a folder of their own, each one holding some words.
+  why: the Python files of a folder, kept as a folder of their own, each one holding some words.
+  must: []
+  decided: []
+  takes:
+  - name: repo
+    type: folder
+  gives:
+  - name: code
+    type: folder
+  lines: 3-15
+  order: 1
+  body: |
+    program keep-the-python
+      why: the Python files of a folder, kept as a folder of their own, each one holding some words.
+
+      takes repo: folder
+      gives code: folder
+
+      let python = repo where suffix is py
+      assert python.lines < 6001 else "more than six thousand lines of Python"
+      for each t in python
+        assert words t > 0
+      end
+      give python
+    end
+  steps:
+  - P:step/keep-the-python.1
+  - P:step/keep-the-python.2
+  - P:step/keep-the-python.3
+  - P:step/keep-the-python.5
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L3-L15
+    confidence: 1
+- id: P:step/keep-the-python.1
+  type: step
+  name: let python = repo where suffix is py
+  summary: let python = repo where suffix is py
+  of: P:program/keep-the-python
+  n: 1
+  text: '  let python = repo where suffix is py'
+  line: 9
+  form: let
+  calls: []
+  binds: python
+  uses:
+  - repo
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L9
+    confidence: 1
+- id: P:step/keep-the-python.2
+  type: step
+  name: assert python.lines < 6001 else "more than six thousand lines of Python"
+  summary: assert python.lines < 6001 else "more than six thousand lines of Python"
+  of: P:program/keep-the-python
+  n: 2
+  text: '  assert python.lines < 6001 else "more than six thousand lines of Python"'
+  line: 10
+  form: assert
+  move: assert
+  calls: []
+  uses:
+  - python
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L10
+    confidence: 1
+- id: P:step/keep-the-python.3
+  type: step
+  name: for each t in python
+  summary: for each t in python
+  of: P:program/keep-the-python
+  n: 3
+  text: '  for each t in python'
+  line: 11
+  lines: 11-13
+  form: for
+  calls: []
+  binds: t
+  uses:
+  - python
+  asks: false
+  steps:
+  - P:step/keep-the-python.4
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L11-L13
+    confidence: 1
+- id: P:step/keep-the-python.4
+  type: step
+  name: assert words t > 0
+  summary: assert words t > 0
+  of: P:program/keep-the-python
+  n: 4
+  text: '    assert words t > 0'
+  line: 12
+  form: assert
+  move: assert
+  calls:
+  - words
+  uses:
+  - t
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L12
+    confidence: 1
+- id: P:step/keep-the-python.5
+  type: step
+  name: give python
+  summary: give python
+  of: P:program/keep-the-python
+  n: 5
+  text: '  give python'
+  line: 14
+  form: give
+  calls: []
+  uses:
+  - python
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L14
+    confidence: 1

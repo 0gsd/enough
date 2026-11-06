@@ -1,0 +1,102 @@
+oes: thym/1
+kind: plan
+id: thym/plan.keep-the-python
+name: keep-the-python on little-tool
+program:
+  name: keep-the-python
+  sha256: 7103413bd6db2a31a6f4759da667a2c636c3a5e65c9f74c59030378026617b6e
+inputs:
+- name: repo
+  type: folder
+  path: inputs/little-tool
+  sha256: dfef659dbe23efd61025ed62c67ec01c82ee0d7d5c68effa940584dbc96b48ea
+  files: 7
+  bytes: 640
+estimate:
+  steps: 3
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: keep-the-python on little-tool
+  summary: Three nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  - R:node/3
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: assert python.lines < 6001
+  summary: assert python.lines < 6001
+  step:
+    program: keep-the-python
+    n: 2
+  move: assert
+  asks: false
+  takes:
+  - repo
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 10
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L9-L10
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: assert words t > 0, for each t in python
+  summary: assert words t > 0, for each t in python
+  step:
+    program: keep-the-python
+    n: 4
+  move: assert
+  asks: false
+  takes:
+  - repo
+  repeats: true
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L9-L13
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: give python
+  summary: give python
+  step:
+    program: keep-the-python
+    n: 5
+  move: give
+  asks: false
+  takes:
+  - repo
+  gives: code
+  after:
+  - R:node/1
+  - R:node/2
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - keep-the-python.thym#L9-L14
+    confidence: 1

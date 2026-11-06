@@ -16,6 +16,9 @@ block, verbatim) and says when and by what it was built. Its items are:
   call nested inside it, in evaluation order, `marked` included; an `assert` step's contract names the check its
   condition uses, and a call of a user move carries the contracts the move inherits.
 
+What `thym 1` adds here (THYM 10): a program of several outputs lists each in `gives`, and a labelled give holds its
+output's name in `slot`, as a labelled emit does. A `thym 0` file enumerates exactly as before.
+
 `compile_volume` gives `front` and then every top-level item's `body` in `order`: the file, byte for byte (law 4 of
 section 7.2). `dump` writes a volume as canonical `.cosm` text, keys in insertion order, LF, UTF-8, block scalars for
 multi-line strings (with an indentation indicator when the first line begins with a space), such that
@@ -169,6 +172,8 @@ class _Enumerator:
             }
             if isinstance(st, ps.Emit) and st.slot:
                 item["slot"] = st.slot
+            elif isinstance(st, ps.Give) and st.label:
+                item["slot"] = st.label
             item["line"] = st.line
             if multi:
                 item["lines"] = f"{st.line}-{last}"
@@ -242,7 +247,7 @@ class _Enumerator:
         item = {"id": f"P:program/{b.name}", "type": "program", "name": b.name, "summary": block_summary(b, self.lines)}
         _heads(b, item, always=True)
         item["takes"] = [{"name": p.name, "type": p.type} for p in b.takes]
-        item["gives"] = [{"name": b.gives.name, "type": b.gives.type}] if b.gives else []
+        item["gives"] = [{"name": o.name, "type": o.type} for o in (b.outputs or [b.gives])] if b.gives else []
         item.update({"lines": lines, "order": order, "body": body})
         if b.moves:
             item["moves"] = [f"P:move/{b.name}.{lm.name}" for lm in b.moves]

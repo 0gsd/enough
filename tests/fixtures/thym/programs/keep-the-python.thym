@@ -1,0 +1,15 @@
+thym 1
+
+program keep-the-python
+  why: the Python files of a folder, kept as a folder of their own, each one holding some words.
+
+  takes repo: folder
+  gives code: folder
+
+  let python = repo where suffix is py
+  assert python.lines < 6001 else "more than six thousand lines of Python"
+  for each t in python
+    assert words t > 0
+  end
+  give python
+end

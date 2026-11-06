@@ -75,7 +75,8 @@ def test_the_tables_of_the_two_grammars():
     assert not zero.features and one.admits("side-call")
 
 
-@pytest.mark.parametrize("name", sorted(p.stem for p in SUITE.glob("programs/*.thym")))
+@pytest.mark.parametrize("name", sorted(p.stem for p in SUITE.glob("programs/*.thym")
+                                          if p.read_text(encoding="utf-8").startswith("thym 0\n")))
 def test_a_thym_0_program_relabelled_thym_1_plans_and_enumerates_the_same(name, tmp_path):
     """Every program of the suite is valid `thym 1` too, and compiles the same way under it: the same plan nodes and
     the same items, but for the version line in `front` and the file's digest."""
@@ -144,11 +145,12 @@ def test_thym_1_syntax_not_read_yet_is_refused_saying_so(body, what):
     assert r.check == "parse" and "this compiler does not read yet" in r.message, str(r)
 
 
-def test_a_type_not_read_yet_is_refused_saying_so():
-    r = refused("thym 1\n\nprogram p\n  takes repo: folder\n  gives n: number\n  give 0\nend\n")
-    assert (r.check, r.line) == ("parse", 4) and r.message.startswith("`folder` begins the type folder")
+def test_the_thym_1_types_are_read_and_need_thym_1():
+    # part b wrote the productions of folder, line and change (they left PENDING): thym 1 reads them, and the same
+    # text under thym 0 is told it needs thym 1, at the type's line (it was a pending refusal in part a)
+    assert ok("thym 1\n\nprogram p\n  takes repo: folder\n  gives n: number\n  give 0\nend\n")
     r = refused("thym 0\n\nprogram p\n  takes repo: folder\n  gives n: number\n  give 0\nend\n")
-    assert (r.check, r.line) == ("parse", 4) and r.message.startswith("`folder` is not a type")
+    assert (r.check, r.line) == ("version", 4) and "the type folder at line 4" in r.message
 
 
 # ---------------------------------------------------------------------------

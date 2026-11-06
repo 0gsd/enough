@@ -1,0 +1,10 @@
+-- refused: compile version line 6
+thym 0
+
+program list-a-folder
+  why: a folder taken by a thym 0 program, which has no folder type.
+  takes r: folder
+  gives n: number
+
+  give 0
+end

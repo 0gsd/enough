@@ -17,9 +17,11 @@ logs `(line, phrase)` in `Module.features` each time it reads one, the phrase na
 did. When a `thym 0` file is refused, `parse` (for a parse refusal) and `check.check` (for a check refusal) compile the
 same text again as `thym 1` (`check.needs_thym1`); if that compile succeeds, the refusal becomes `version` at the
 first `thym 1` feature it met ("this needs `thym 1`: …"), and otherwise the first refusal stands (THYM 4.9). The
-`thym 1` productions written so far: a call on either side of a comparison without parentheses (THYM 4.5). The words
-of `PENDING` are in the `thym 1` tables and their productions are not read yet: a `thym 1` file that writes one is
-refused, saying so.
+`thym 1` productions written so far: a call on either side of a comparison without parentheses (THYM 4.5); the types
+`folder`, `line` and `change` (THYM 5.1); a program that gives several outputs, `gives code: folder, manual: short`, and
+the labelled give, `give code: …` (THYM 8.2); a `where` after a call in a `for each` header, which belongs to the loop
+unless the move declares a `where` modifier (THYM 4.5). The words of `PENDING` are in the `thym 1` tables and their
+productions are not read yet: a `thym 1` file that writes one is refused, saying so.
 
 Calls are read with the names of the moves the file can see: the declared moves (`declarations.names()`), the file's
 own `move` blocks, and the `move` blocks of the `.thym` files it `use`s. A modifier's argument that begins with a
@@ -105,7 +107,6 @@ FEATURES = {
 PENDING = {
     "contract": "a contract block", "keeps": "a keeps line", "depth": "a depth: line",
     "keep": "a loop that collects (let … = for each … keep … end)",
-    "folder": "the type folder", "line": "the type line", "change": "the type change",
 }
 
 THYM0 = Grammar(0, KEYWORDS, HEAD_WORDS, STATEMENT_WORDS, MODIFIER_WORDS, BLOCK_WORDS, ty.SIMPLE)
@@ -117,7 +118,8 @@ THYM1 = Grammar(
     MODIFIER_WORDS + ("before", "after"),
     BLOCK_WORDS + ("contract",),
     ty.SIMPLE + ("folder", "line", "change"),
-    frozenset(("side-call", "since-move", "thym1-word", "thym1-operand")),
+    frozenset(("side-call", "since-move", "thym1-word", "thym1-operand", "type-folder", "type-line", "type-change",
+               "several-gives", "labelled-give", "in-text", "loop-where")),
 )
 #: The grammars this compiler reads, by the number on the version line.
 GRAMMARS = {0: THYM0, 1: THYM1}
@@ -229,6 +231,9 @@ class Call(Expr):
     mods: list[Mod] = field(default_factory=list)
     known: bool = True
     target: Any = None
+    #: the contract the checker chose for this call from its declaration (`contract-when`, THYM 17.6); None until
+    #: checked, and for a user move
+    contract: tuple[str, ...] | None = None
 
     def mod(self, word: str) -> Mod | None:
         return next((m for m in self.mods if m.word == word), None)
@@ -345,7 +350,9 @@ class Emit(Stmt):
 
 @dataclass(eq=False, kw_only=True)
 class Give(Stmt):
+    """`give <expr>`, or in `thym 1` `give <output>: <expr>`, which names the output it gives (`label`)."""
     expr: Expr
+    label: str | None = None
 
 
 @dataclass(eq=False, kw_only=True)
@@ -400,7 +407,9 @@ class FieldLine(Node):
 @dataclass(eq=False, kw_only=True)
 class Block(Node):
     """One block. `end` is its `end` line. A program's inputs are `takes`, a move's `params`; both may have
-    `gives` (a move's is named after the move). `parent` names the program a local move stands in."""
+    `gives` (a move's is named after the move); `outputs` is every output a program gives, in the order its gives
+    line names them (`thym 1` may name several; `gives` is the first). `parent` names the program a local move stands
+    in."""
     kind: str
     name: str
     end: int = 0
@@ -410,6 +419,7 @@ class Block(Node):
     takes: list[Param] = field(default_factory=list)
     params: list[Param] = field(default_factory=list)
     gives: Param | None = None
+    outputs: list[Param] = field(default_factory=list)
     moves: list["Block"] = field(default_factory=list)
     stmts: list[Stmt] = field(default_factory=list)
     scales: list[ScaleLine] = field(default_factory=list)
@@ -651,6 +661,8 @@ class _Parser:
         self.text, self.path, self.given_moves, self.override = text, path, moves, version
         self.moves: frozenset[str] = moves or frozenset()
         self.in_moves: frozenset[str] = frozenset()
+        self.where_moves: frozenset[str] = frozenset()
+        self.loop_where = False                       # reading a for each's collection, in thym 1
         self.g: Grammar = THYM0
         self.written: int | None = None
         self.features: list[tuple[int, str]] = []
@@ -717,6 +729,7 @@ class _Parser:
             self.moves, self.in_moves = _known_moves(self.text, self.path, self.g.version)
         else:
             self.in_moves = _in_moves(self.g.version) & self.moves
+        self.where_moves = _in_moves(self.g.version, "where") & self.moves
         version_line = i + 1
         i += 1
         uses: list[Use] = []
@@ -767,6 +780,7 @@ class _Parser:
             ts.expect_punct(")", "a move's parameters close with )")
             ts.expect_punct(":", f"a move declares what it gives: move {name}(…): <type>")
             b.gives = Param(line=i + 1, name=name, type=self.type_(ts))
+            b.outputs = [b.gives]
         ts.end()
         i = j + 1
         i = self.heads(b, i)
@@ -808,6 +822,8 @@ class _Parser:
                         "<type>", t.line)
         self.pending(t.text, t.line)
         ts.next()
+        if t.text in ty.THYM1:
+            self.features.append((t.line, feature(f"type-{t.text}")))
         return t.text
 
     def heads(self, b: Block, i: int) -> int:
@@ -858,8 +874,11 @@ class _Parser:
                     if b.gives is not None:
                         raise _Fail("parse", f"program {b.name} has one gives line", i + 1)
                     if len(params) != 1:
-                        raise _Fail("parse", "gives names one output: gives <name>: <type>", i + 1)
+                        if not self.g.admits("several-gives"):
+                            raise _Fail("parse", "gives names one output: gives <name>: <type>", i + 1)
+                        self.features.append((i + 1, feature("several-gives")))
                     b.gives = params[0]
+                    b.outputs = params
                 i = j + 1
             else:
                 self.pending(fw if fw in self.g.head_words else None, i + 1)
@@ -999,7 +1018,13 @@ class _Parser:
             ts.expect_word("each", "a loop reads for each <name> in <expression>")
             var = ts.name("a loop names its variable: for each <name> in <expression>").text
             ts.expect_word("in", f"a loop reads for each {var} in <expression>")
-            coll = self.expr(ts, filter_ok=False)
+            was, self.loop_where = self.loop_where, self.g.admits("loop-where")
+            try:
+                coll = self.expr(ts, filter_ok=False)
+            finally:
+                self.loop_where = was
+            if ts.is_word("where") and isinstance(coll, (Call, Marked)):
+                self.features.append((line, feature("loop-where")))
             where = None
             if ts.take_word("where"):
                 where = self.cond(ts)
@@ -1019,9 +1044,16 @@ class _Parser:
             return Emit(slot=slot, expr=expr, **common), j + 1
         if word == "give":
             ts.next()
+            label = None
+            t0, t1 = ts.peek(), ts.peek(1)
+            if (self.g.admits("labelled-give") and t0 is not None and t0.kind == "name" and t1 is not None
+                    and t1.kind == "punct" and t1.text == ":"):
+                label = ts.name("a labelled give names an output: give <output>: <expression>").text
+                ts.next()
+                self.features.append((line, feature("labelled-give", label)))
             expr = self.expr(ts)
             ts.end()
-            return Give(expr=expr, **common), j + 1
+            return Give(expr=expr, label=label, **common), j + 1
         if word == "withhold":
             head = ts.next()
             target = self.expr(ts, filter_ok=False)
@@ -1081,6 +1113,8 @@ class _Parser:
                 return c
             if side and t.text == "in" and c.move not in self.in_moves:
                 return c
+            if self.loop_where and t.text == "where" and c.move not in self.where_moves:
+                return c                                # the loop's where, not the call's (THYM 4.5)
             ts.next()
             w = t.text
             if w == "marked":
@@ -1148,6 +1182,8 @@ class _Parser:
                 e = Lit(line=t.line, kind="bool", value=t.text == "true")
             elif t.text == "nothing":
                 e = Lit(line=t.line, kind="nothing", value=None)
+            elif t.text == "depth" and self.g.version >= 1 and not ts.is_punct(":"):
+                e = Name(line=t.line, name=t.text)      # a folder member's field (THYM 20.1), never a binding
             elif t.text in self.g.keywords:
                 raise _Fail("parse", f"`{t.text}` is a keyword, and a value is expected here", t.line)
             else:
@@ -1161,7 +1197,11 @@ class _Parser:
         elif t.kind == "uri":
             e = Uri(line=t.line, uri=t.text)
         elif t.text == "(":
-            inner = self.expr(ts)
+            was, self.loop_where = self.loop_where, False      # inside parentheses a where is the call's again
+            try:
+                inner = self.expr(ts)
+            finally:
+                self.loop_where = was
             ts.expect_punct(")", "a parenthesis opened here is never closed")
             e = Paren(line=t.line, inner=inner)
         elif t.text == "[":
@@ -1258,11 +1298,12 @@ class _Parser:
 # Entry points
 # ---------------------------------------------------------------------------
 
-def _in_moves(version: int) -> frozenset[str]:
-    """The declared moves a program of this version sees that take an `in` modifier: in a condition, `in` after
-    one of them is the modifier, never membership (THYM 4.5)."""
+def _in_moves(version: int, word: str = "in") -> frozenset[str]:
+    """The declared moves a program of this version sees that take an `in` modifier (or another `word`): in a
+    condition, `in` after one of them is the modifier, never membership; in a `for each` header, a `where` after a call
+    of one that declares `where` is the call's, never the loop's (THYM 4.5)."""
     from . import declarations
-    return frozenset(n for n, d in declarations.load().view(version).items() if "in" in (d.modifiers or {}))
+    return frozenset(n for n, d in declarations.load().view(version).items() if word in (d.modifiers or {}))
 
 
 def _known_moves(text: str, path: str | None, version: int = 0) -> tuple[frozenset[str], frozenset[str]]:

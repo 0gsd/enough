@@ -2,13 +2,17 @@
 
 A type is a plain string: one of the simple types of the grammar (`text`, `fabula`, `short`, `atem`, `item`,
 `volume`, `morph`, `context`, `graph`, `package`, `plan`, `trace`, `report`, `number`, `string`, `bool`, `date`,
-`word`), or `list of T`. Two more stand only inside the compiler: `nothing`, the absent value an accessor may give,
+`word`), `thym 1`'s three (`folder`, `line`, `change`, THYM 5.1), or `list of T`. Two more stand only inside the
+compiler: `nothing`, the absent value an accessor may give,
 and `any`, the type of a value the compiler cannot know before the run (a field read off a context or an item).
 
 A declaration in a manifest's `moves:` block writes a type as a string of alternatives, `'fabula | item | volume'`,
 and may name a class of words instead of a type (`order`, `marking`), the words themselves (`'isotype | paratype'`),
 a unit (`words`, `sentences`) or `condition`. `alternatives` reads those strings and `accepts` says whether a value
 fits one.
+
+A `line` fits wherever a `string` is taken: it is a string with a place (THYM 5.1). A `folder` is not a density: a
+`for each` walks its text files as `text` values, and a `where` over it gives a folder (`member`, `filtered`).
 
 A value of one density is never read as another (section 5.2): `accepts` has no coercions between `text`, `fabula`,
 `short` and `atem`, and `hint` gives the fix when a program tries ("derive it first").
@@ -20,6 +24,10 @@ MEANING = ("text", "fabula", "short", "atem", "item", "volume", "morph", "graph"
 SIMPLE = ("text", "fabula", "short", "atem", "item", "volume", "morph", "context", "graph", "package", "plan", "trace",
           "report", "number", "string", "bool", "date", "word")
 PLAIN = ("number", "string", "bool", "date", "word")
+#: The types `thym 1` adds (THYM 4.9, 5.1); a `thym 0` file's grammar does not know them (`SIMPLE` stays `thym 0`'s).
+THYM1 = ("folder", "line", "change")
+#: Every simple type some grammar version knows.
+ALL_SIMPLE = SIMPLE + THYM1
 
 ORDERS = ("told", "weight")
 MARKINGS = ("verified", "stated")
@@ -59,7 +67,7 @@ def element(t: str) -> str:
 def parse_type(words: str) -> str | None:
     """A type as the grammar writes it (`fabula`, `list of word`), in canonical spacing; None when it is not one."""
     parts = words.split()
-    if len(parts) == 1 and parts[0] in SIMPLE:
+    if len(parts) == 1 and parts[0] in ALL_SIMPLE:
         return parts[0]
     if len(parts) >= 3 and parts[0] == "list" and parts[1] == "of":
         inner = parse_type(" ".join(parts[2:]))
@@ -81,7 +89,7 @@ def alternatives(spec) -> list[str]:
 
 def is_word_choice(alts: list[str]) -> bool:
     """True when a declaration names words rather than types (`'isotype | paratype'`, `order`, `marking`)."""
-    return bool(alts) and all(a not in SIMPLE and not is_list(a) and a not in (ANY, NOTHING, CONDITION)
+    return bool(alts) and all(a not in ALL_SIMPLE and not is_list(a) and a not in (ANY, NOTHING, CONDITION)
                               and a not in UNITS for a in alts)
 
 
@@ -95,6 +103,8 @@ def accepts(alts: list[str], actual: str | None, *, word: str | None = None) -> 
     for a in alts:
         if a == actual:
             return True
+        if a == "string" and actual == "line":          # a line is a string with a place (THYM 5.1)
+            return True
         if a == "list" and is_list(actual):
             return True
         if is_list(a) and is_list(actual):
@@ -104,7 +114,7 @@ def accepts(alts: list[str], actual: str | None, *, word: str | None = None) -> 
         if actual == WORD and word is not None:
             if a in WORD_CLASSES and word in WORD_CLASSES[a]:
                 return True
-            if a == word and a not in SIMPLE:
+            if a == word and a not in ALL_SIMPLE:
                 return True
         if actual == NOTHING and a in OPTIONAL:
             return True
@@ -124,7 +134,7 @@ def show(alts: list[str]) -> str:
 def _article(t: str) -> str:
     if t in WORD_CLASSES:
         return f"an {t} ({', '.join(WORD_CLASSES[t])})" if t[0] in "aeiou" else f"a {t} ({', '.join(WORD_CLASSES[t])})"
-    if t not in SIMPLE and not is_list(t) and t not in (ANY, NOTHING, CONDITION):
+    if t not in ALL_SIMPLE and not is_list(t) and t not in (ANY, NOTHING, CONDITION):
         return f"`{t}`"
     return f"{'an' if t[0] in 'aeiou' else 'a'} {t}"
 
@@ -154,6 +164,22 @@ def hint(actual: str | None, alts: list[str]) -> str | None:
 def literal_type(kind: str) -> str:
     """The type of a literal of the parser's kind."""
     return {"number": "number", "string": "string", "date": "date", "bool": "bool", "nothing": NOTHING}[kind]
+
+
+def member(t: str | None) -> str | None:
+    """What a `for each` over a value of type `t` binds its variable to: a volume's or a fabula's items, a short's
+    lines (as strings), a list's members, a folder's text files (as texts, THYM 20.2); None when `t` is not walked."""
+    if t in ("volume", "fabula"):
+        return "item"
+    if t == "short":
+        return "string"
+    if t == "folder":
+        return "text"
+    if t and is_list(t):
+        return element(t)
+    if t == ANY:
+        return ANY
+    return None
 
 
 def uri_type(uri: str) -> str:

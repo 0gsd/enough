@@ -1,0 +1,16 @@
+thym 1
+
+program split-a-folder
+  why: a folder split in two, its Python and its prose, with the lines of its Python counted.
+
+  takes repo: folder
+  gives code: folder, prose: folder, size: number
+
+  let docs = repo where suffix is md
+  for each d in docs where "Run" in d
+    assert words d > 3          -- the page that says how to run it is more than a title
+  end
+  give code: repo where suffix is py
+  give prose: docs
+  give size: (repo where suffix is py).lines
+end

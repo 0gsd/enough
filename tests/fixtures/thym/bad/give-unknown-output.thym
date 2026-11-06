@@ -1,0 +1,12 @@
+-- refused: compile type line 11
+thym 1
+
+program code-and-manual
+  why: a labelled give that names an output the program does not give.
+
+  takes repo: folder, manual: short
+  gives code: folder, guide: short
+
+  give code: repo where suffix is py
+  give manuel: manual
+end

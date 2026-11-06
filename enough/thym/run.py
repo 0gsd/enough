@@ -40,6 +40,14 @@ back as the expression it stands for), cut to 60 characters, then its line and, 
 node's number or id, an implementation's exception or a value as Python prints it; a fault of the runtime itself says
 so, and its record keeps the detail under `fault`.
 
+**Folders and several outputs** (`thym 1`, THYM 12.1, 20.3, 20.4). A folder input is read under the folder rule and
+held to its tree digest; the run snapshots it as `inputs/<name>.folder.cosm` before any node runs, and a replay reads it
+from that snapshot and never from the disk (`replay` passes `snapshots`). A `for each` walks a folder's text files
+(a pass is named by the file's path, `for t = little/cli.py`), a `where` over a folder gives a folder, and `in` finds
+a string in a text. A program of several outputs lands them all in one step or none; a folder output lands as the
+directory `outputs/<name>/`, its row in the trace `{name, sha256: <tree digest>, path: outputs/<name>/}`. A move whose
+declaration chooses its `gives`, contract or scaffold by the call (`gives-when`, …) is held to the chosen one.
+
 Two `thym 0` loops still run wrong, and are refused at run with the fix, write `thym 1` (THYM 8.1): an `if` inside a
 loop over a collection known only at run time (its condition is evaluated once, before the loop), and a `let` inside
 such a loop read later in the same loop (it holds every pass's value at once). The `thym 1` loop node, whose body
@@ -63,6 +71,7 @@ from typing import Any, Callable
 from enough import macrocosm as mc
 from enough.thym import Refusal
 from enough.thym import checks as _checks
+from enough.thym import folder as _folder
 from enough.thym import registry as _registry
 from enough.thym import trace as _trace
 from enough.thym.coprocessor import RecordingCoprocessor, RefusingCoprocessor, ReplayCoprocessor
@@ -71,8 +80,8 @@ from enough.thym.coprocessor import prose_problem
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
-from enough.thym.values import (NOTHING, Value, canonical, item_id, item_key, load_input, members, plain,
-                                 posix_path, sha256_bytes, stamp, wrap)
+from enough.thym.values import (NOTHING, Value, canonical, filter_folder, item_id, item_key, load_input, members,
+                                 plain, posix_path, sha256_bytes, stamp, wrap, write_snapshot)
 
 MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked")
 UNITS = ("words", "sentences")
@@ -231,12 +240,14 @@ class Stmt:
 
 
 class _Reader:
-    def __init__(self, text: str, moves: set[str], in_moves: frozenset[str] = frozenset()) -> None:
+    def __init__(self, text: str, moves: set[str], in_moves: frozenset[str] = frozenset(),
+                 where_moves: frozenset[str] = frozenset()) -> None:
         self.text = text
         self.toks = _tokenize(text)
         self.i = 0
         self.moves = moves
         self.in_moves = in_moves
+        self.where_moves = where_moves
 
     # -- tokens --
     def peek(self, k: int = 0) -> tuple[str, str]:
@@ -328,7 +339,11 @@ class _Reader:
             return Stmt("emit", expr=self.expr(), slot=slot)
         if self.at("give"):
             self.take()
-            return Stmt("give", expr=self.expr())
+            label = None
+            if self.peek()[0] == "name" and self.at(":", 1):      # a labelled give (THYM 8.2)
+                label = self.name()
+                self.take()
+            return Stmt("give", expr=self.expr(), slot=label)
         if self.at("let"):
             self.take()
             nm = self.name()
@@ -360,7 +375,7 @@ class _Reader:
         self.expect("each")
         var = self.name()
         self.expect("in")
-        coll = self.primary()
+        coll = self.call(loop=True) if self.at_move() else self.primary()
         cond = None
         if self.at("where"):
             self.take()
@@ -383,7 +398,9 @@ class _Reader:
             p = Call("mark", [p], {"as": self.name()})
         return p
 
-    def call(self, side: bool = False) -> Call:
+    def call(self, side: bool = False, loop: bool = False) -> Call:
+        """A call. On a side of a comparison (`side`) `in` ends it unless the move declares `in`; as a `for each`'s
+        collection (`loop`) `where` ends it unless the move declares `where` (THYM 4.5)."""
         move = self.name()
         operands: list = []
         if not (self.at_end() or self.at_modifier() or self.at(")") or self.at("]") or self.at(",")
@@ -396,6 +413,8 @@ class _Reader:
         while self.at_modifier():
             if side and self.at("in") and move not in self.in_moves:
                 break                               # membership, not the modifier (THYM 4.5)
+            if loop and self.at("where") and move not in self.where_moves:
+                break                               # the loop's where, not the call's (THYM 4.5)
             w = self.take()[1]
             if w == "as":
                 mods["as"] = self.word_or_list()
@@ -414,7 +433,7 @@ class _Reader:
                 cond = self.cond()
                 mods["where"] = (cond, self.span(c0, self.i))
             else:
-                mods[w] = self.call() if self.at_move() else self.primary()
+                mods[w] = self.call(loop=loop) if self.at_move() else self.primary()
         return Call(move, operands, mods)
 
     def word_or_list(self) -> Any:
@@ -544,10 +563,12 @@ def _name_of(e: Any) -> str:
     return e.name if isinstance(e, Name) else str(e)
 
 
-def read_statement(text: str, moves: set[str] | frozenset[str], in_moves: frozenset[str] = frozenset()) -> Stmt:
-    """One statement, read with the names of the moves in scope (a name that is a move begins a call), and of those
-    that take an `in` modifier (in a condition, `in` after one of them is the modifier). Raises `ReadError`."""
-    return _Reader(text, set(moves), frozenset(in_moves)).statement()
+def read_statement(text: str, moves: set[str] | frozenset[str], in_moves: frozenset[str] = frozenset(),
+                   where_moves: frozenset[str] = frozenset()) -> Stmt:
+    """One statement, read with the names of the moves in scope (a name that is a move begins a call), of those
+    that take an `in` modifier (in a condition, `in` after one of them is the modifier), and of those that take a
+    `where` (in a `for each` header, a `where` after a call of one of them is the call's). Raises `ReadError`."""
+    return _Reader(text, set(moves), frozenset(in_moves), frozenset(where_moves)).statement()
 
 
 def read_expression(text: str, moves: set[str] | frozenset[str]) -> Any:
@@ -691,6 +712,8 @@ class ProgramInfo:
     statements: dict = field(default_factory=dict)
     #: the grammar version its version line names (`thym 0` or `thym 1`), None when it was not read
     version: int | None = None
+    #: every output the program gives, `(name, type)`, in the order its gives line names them (THYM 8.2)
+    outputs: list = field(default_factory=list)
 
     @classmethod
     def from_any(cls, program: Any) -> "ProgramInfo":
@@ -726,6 +749,7 @@ class ProgramInfo:
             info.takes = [(t.get("name"), t.get("type")) for t in prog.get("takes") or [] if isinstance(t, dict)]
             gv = [g for g in prog.get("gives") or [] if isinstance(g, dict)]
             info.gives = (gv[0].get("name"), gv[0].get("type")) if gv else None
+            info.outputs = [(g.get("name"), g.get("type")) for g in gv]
         for st in nodes:
             if st.get("type") != "step":
                 continue
@@ -819,6 +843,7 @@ class ProgramInfo:
                 if top["kind"] == "program":
                     g = _params(s[len("gives"):])
                     info.gives = g[0] if g else None
+                    info.outputs = list(g)
                 continue
             if first == "move":
                 mt = _MOVE_HEAD.match(s)
@@ -1116,6 +1141,10 @@ class _Run:
         self._move_stack: list[str] = []
         self._sides: list[tuple[str, Value]] = []      # the sides the last comparison compared, for an assert's words
         self.in_moves: frozenset[str] = frozenset()
+        self.where_moves: frozenset[str] = frozenset()
+        #: a replay's snapshots of the folders the recorded run took (its `inputs/`), read in place of the disk
+        self.snapshots = Path(kw["snapshots"]) if kw.get("snapshots") else None
+        self.folders: dict[str, Value] = {}
 
     # -- plan time ------------------------------------------------------------------------------------------------
 
@@ -1142,6 +1171,7 @@ class _Run:
         # the moves a program of its version sees (THYM 4.9); a plan run without its program sees every move whole
         self.decls = _views(self.decls, self.info.version if self.info.version is not None else 1)
         self.in_moves = frozenset(n for n, d in self.decls.items() if "in" in (decl_get(d, "modifiers") or {}))
+        self.where_moves = frozenset(n for n, d in self.decls.items() if "where" in (decl_get(d, "modifiers") or {}))
         self.move_names = frozenset(set(self.decls) | set(self.info.moves))
         est = self.plan.get("estimate") if isinstance(self.plan.get("estimate"), dict) else {}
         self.largest_prompt = int(self.head.get("largest_prompt") or est.get("largest_prompt") or 0)
@@ -1157,7 +1187,7 @@ class _Run:
         def walk(body: list) -> None:
             for part in body:
                 try:
-                    st = read_statement(part[2], self.move_names, self.in_moves)
+                    st = read_statement(part[2], self.move_names, self.in_moves, self.where_moves)
                 except ReadError:
                     continue
                 for m in calls_in(st):
@@ -1199,11 +1229,19 @@ class _Run:
         for spec in self.plan.get("inputs") or []:
             if not isinstance(spec, dict):
                 continue
-            v = load_input(spec, self.inputs_root)
+            name = str(spec.get("name"))
+            snap = None
+            if spec.get("type") == "folder" and self.snapshots is not None:
+                snap = self.snapshots / f"{name}.folder.cosm"
+                if not snap.is_file():
+                    return Refusal("plan", "input", f"input {name}: the recorded run kept no snapshot of "
+                                                    f"{spec.get('path') or name}, so it cannot be replayed")
+            v = load_input(spec, self.inputs_root, snapshot=snap)
             if isinstance(v, Refusal):
                 return v
-            name = str(spec.get("name"))
             self.inputs[name] = v
+            if v.type == "folder":
+                self.folders[name] = v
             self.input_paths[name] = posix_path(spec.get("path"))
         if (self.preflight is not None and asks and not self.rules
                 and not isinstance(self.coproc, (RefusingCoprocessor, ReplayCoprocessor))):
@@ -1261,6 +1299,8 @@ class _Run:
         plan_bytes = canonical(self.plan)
         write_atomic(self.dir / f"{rid}.plan.cosm", plan_bytes)
         self._keep_program()
+        for name, v in self.folders.items():          # a run snapshots every folder it takes (THYM 20.3)
+            write_snapshot(v, self.dir / "inputs" / f"{name}.folder.cosm", id=f"thym/{rid}.{name}")
         if self.record and not isinstance(self.coproc, (ReplayCoprocessor, RefusingCoprocessor, RecordingCoprocessor)):
             self.coproc = RecordingCoprocessor(self.coproc, self.dir)
         recorded_engines = self._engines()
@@ -1287,7 +1327,7 @@ class _Run:
                                   "made_run": self.made_run if self.made_run != rid else None,
                                   "engines": recorded_engines})
         self.env.update(self.inputs)
-        self.output_name = self._output_name()
+        self.output_names = self._output_names()
         refusal: Refusal | None = None
         stopped: str | None = None
         total = len(self.order)
@@ -1369,6 +1409,14 @@ class _Run:
         elif isinstance(p, str):
             write_atomic(self.dir / f"{name}.thym", p.encode("utf-8"))
 
+    def _output_names(self) -> list[str]:
+        """Every output the program gives (THYM 8.2), from the program; without it, the plan's one output."""
+        names = [str(o[0]) for o in self.info.outputs if o and o[0]]
+        if names:
+            return names
+        one = self._output_name()
+        return [one] if one else []
+
     def _output_name(self) -> str | None:
         if self.info.gives and self.info.gives[0]:
             return str(self.info.gives[0])
@@ -1411,7 +1459,7 @@ class _Run:
             return None
         text = str(node.get("name") or "").strip() or " ".join([str(node.get("move"))] + list(node.get("takes") or []))
         try:
-            st = read_statement(text, self.move_names, self.in_moves)
+            st = read_statement(text, self.move_names, self.in_moves, self.where_moves)
         except ReadError as e:
             self.cur.fault = f"{text}: {e}"
             r = Refusal("run", "parse", f"{self._at(node)}: the runtime could not read this statement; that is "
@@ -1500,8 +1548,8 @@ class _Run:
             raise _Stop(Refusal("run", "type", f"{head} (line {at}): a for each goes through a volume, a fabula, a "
                                                f"short or a list, and {_expr_text(loop.coll)} is a {coll.type}"),
                         worded=True)
-        if loop.cond is not None:
-            rows = [r for r in rows if self._cond(loop.cond, scope, item=r)]
+        if loop.cond is not None:                     # the where sees the loop's variable bound to the member
+            rows = [r for r in rows if self._cond(loop.cond, scope.child({loop.var: r}), item=r)]
         outs = []
         for k, r in enumerate(rows, 1):
             self.cur.passing = self._pass(loop.var, r, k, coll)
@@ -1572,7 +1620,9 @@ class _Run:
     def _pass(self, var: str, row: Any, k: int, coll: Value) -> str:
         """A pass of a loop in the person's terms (THYM 9): an item by its id, a line of a short by its number, a
         member of a list by its place."""
-        if isinstance(row, Value) and row.type == "item":
+        if isinstance(row, Value) and isinstance((row.origin or {}).get("member"), dict):
+            label = str(row.origin["member"].get("path") or _ordinal(k))        # a folder's file, by its path
+        elif isinstance(row, Value) and row.type == "item":
             label = item_id(row) or _ordinal(k)
         elif coll.type in ("short", "text"):
             label = f"line {k}"
@@ -1694,6 +1744,8 @@ class _Run:
             return wrap(self._eval(e.base, scope, item).field(e.name))
         if isinstance(e, Filter):
             base = self._eval(e.base, scope, item)
+            if base.type == "folder":                  # a folder filtered is a folder (THYM 20.2)
+                return filter_folder(base, lambda it: self._cond(e.cond, scope, item=it))
             rows = members(base)
             if rows is None:
                 raise _Stop(Refusal("run", "type", f"where filters a volume, a fabula, a short or a list, and "
@@ -1737,7 +1789,12 @@ class _Run:
             if c.op == "is not":
                 return not _eq(a, b)
             if c.op == "in":
-                return isinstance(b, list) and any(_eq(a, x) for x in b)
+                if isinstance(b, list):
+                    return any(_eq(a, x) for x in b)
+                if bv.type in ("text", "short", "string", "line"):      # thym 1: a string inside a text (THYM 4.5)
+                    needle = a if isinstance(a, str) else av.text()
+                    return needle in bv.text()
+                return False
             if c.op == "=":
                 return _eq(a, b)
             if isinstance(a, bool) or isinstance(b, bool) or not isinstance(a, int) or not isinstance(b, int):
@@ -1803,6 +1860,7 @@ class _Run:
         decl = self.decls.get(move)
         if decl is None:
             raise _Stop(Refusal("run", "unknown-move", f"the move {move} is not declared"))
+        decl = _chosen_decl(decl, operands, mods)
         declared = decl_get(decl, "modifiers") or {}
         if "where" in mods and "where" not in declared and operands:
             w = mods.pop("where")
@@ -2012,7 +2070,7 @@ class _Run:
                 coll = self._eval(st.loop.coll, scope)
                 rows = members(coll) or []
                 if st.loop.cond is not None:
-                    rows = [r for r in rows if self._cond(st.loop.cond, scope, item=r)]
+                    rows = [r for r in rows if self._cond(st.loop.cond, scope.child({st.loop.var: r}), item=r)]
                 for r in rows:
                     self._body(part[3], scope.child({st.loop.var: r}))
             else:
@@ -2032,7 +2090,7 @@ class _Run:
 
     def _read_stmt(self, text: str) -> Stmt:
         try:
-            return read_statement(text, self.move_names, self.in_moves)
+            return read_statement(text, self.move_names, self.in_moves, self.where_moves)
         except ReadError as e:
             raise _Stop(Refusal("run", "parse", f"the runtime could not read {_cut(text)}; that is {_RUNTIME_FAULT}"),
                         fault=f"{text}: {e}") from None
@@ -2040,29 +2098,42 @@ class _Run:
     # -- landing (THYM.md 12.1: every output or none) -------------------------------------------------------------
 
     def _land(self) -> Refusal | None:
-        name = self.output_name
+        """Every output into the stage, then the stage renamed into `outputs/` in one step: all or none (THYM
+        12.1). A folder lands as a directory holding exactly its files (THYM 20.4)."""
         landed: dict[str, Path] = {}
-        if name:
+        prog = self.info.name or (self.plan.get("program") or {}).get("name") or "the program"
+        for name in self.output_names:
             v = self.env.get(name)
             if v is None:
-                prog = self.info.name or (self.plan.get("program") or {}).get("name") or "the program"
                 missed = [n for n in self.nodes if n.get("gives") == name and n.get("id") in self.skipped]
                 why = (f": the give at line {missed[0].get('line')} is on the branch not taken" if missed else "")
-                return Refusal("run", "no-give", f"program {prog} gives {name}, and no give reached it{why}")
-            fname = f"{name}.{v.ext}"
-            target = self.stage / fname
-            if isinstance(v.payload, mc.Volume) and v.path is not None and Path(v.path).is_dir():
-                shutil.copytree(v.path, target)
+                return Refusal("run", "no-give", f"program {prog} gives {name}, and no give reached it{why}; "
+                                                 "nothing landed")
+            if isinstance(v.payload, _folder.Folder):
+                try:
+                    _folder.write_tree(v.payload, self.stage / name)
+                except _folder.FolderError as e:
+                    return Refusal("run", "output", f"program {prog} gives {name}, a folder, and it could not be "
+                                                    f"written: {e}; nothing landed")
+                landed[name] = Path("outputs") / name
             else:
-                write_atomic(target, v.write_bytes())
-            landed[name] = Path("outputs") / fname
+                fname = f"{name}.{v.ext}"
+                target = self.stage / fname
+                if isinstance(v.payload, mc.Volume) and v.path is not None and Path(v.path).is_dir():
+                    shutil.copytree(v.path, target)
+                else:
+                    write_atomic(target, v.write_bytes())
+                landed[name] = Path("outputs") / fname
             self.trace.values[name] = v
         out_dir = self.dir / "outputs"
         self.stage.replace(out_dir)
         for rec in self.records:
             for row in rec.get("outputs") or []:
-                if row.get("name") == name and name in landed:
-                    row["path"] = posix_path(landed[name])        # the same on every system (values.posix_path)
+                name = row.get("name")
+                if name in landed:
+                    folder = isinstance(self.trace.values[name].payload, _folder.Folder)
+                    # the same on every system (values.posix_path); a folder's path ends with a slash
+                    row["path"] = posix_path(landed[name]) + ("/" if folder else "")
         for n, rel in landed.items():
             self.trace.outputs[n] = self.dir / rel
             if self.destination is not None:
@@ -2095,6 +2166,29 @@ def _views(decls: Any, version: int) -> Any:
     return out
 
 
+def _chosen_decl(decl: Any, operands: list, mods: dict) -> Any:
+    """The declaration as this call is held to it: its `gives`, contract and scaffold chosen by the call's `as` word
+    or first operand's type (`gives-when`, `contract-when`, `scaffold-when`, `same-as-with`, THYM 17.6). A
+    declaration with no such key is returned as it is."""
+    keys = ("gives-when", "contract-when", "scaffold-when", "gives_when", "contract_when", "scaffold_when")
+    gives = _alternatives(decl_get(decl, "gives"))
+    if not any(decl_get(decl, k) for k in keys) and not (len(gives) == 1 and gives[0].startswith("same-as-")):
+        return decl
+    try:
+        from enough.thym import declarations as _decls     # the compiler's reader of the rules
+    except ImportError:
+        return decl
+    w, i = mods.get("with"), mods.get("in")
+    ch = _decls.chosen(decl, as_word=mods.get("as"), first_type=operands[0].type if operands else None,
+                       with_type=w.type if isinstance(w, Value) else None,
+                       in_type=i.type if isinstance(i, Value) else None)
+    if isinstance(decl, dict):
+        return {**decl, "gives": " | ".join(ch["gives"]), "contract": list(ch["contract"]), "scaffold": ch["scaffold"]}
+    import dataclasses
+    return dataclasses.replace(decl, gives=tuple(ch["gives"]), contract=tuple(ch["contract"]),
+                               scaffold=ch["scaffold"])
+
+
 def _alternatives(x: Any) -> list[str]:
     """A declaration's type alternatives, whether written `'item | word'` (a manifest) or `('item', 'word')` (the
     compiler's `MoveDecl`)."""
@@ -2102,6 +2196,11 @@ def _alternatives(x: Any) -> list[str]:
         return []
     parts = [x] if isinstance(x, str) else [str(p) for p in x] if isinstance(x, (list, tuple)) else [str(x)]
     return [a.strip() for p in parts for a in p.split("|") if a.strip()]
+
+
+def _tree_files(d: Path) -> dict:
+    """Every file under a landed folder output, by its path, with its bytes (a replay compares them)."""
+    return {p.relative_to(d).as_posix(): p.read_bytes() for p in sorted(d.rglob("*")) if p.is_file()}
 
 
 def _strip_fences(text: str) -> str:
@@ -2116,7 +2215,7 @@ def run(plan: dict, *, inputs_root: Path | str, coprocessor: Any = None, root: P
         record: bool = True, run_id: str | None = None, made_run: str | None = None,
         now: _dt.datetime | None = None, replay_of: str | None = None, engines: Any = None,
         progress: Callable[[dict], Any] | None = None,
-        should_stop: Callable[[], bool] | None = None) -> Trace | Refusal:
+        should_stop: Callable[[], bool] | None = None, snapshots: Path | str | None = None) -> Trace | Refusal:
     """Run a plan (THYM.md 12.1). `inputs_root` is the folder the plan's input paths are relative to; `program` the
     program's items or `.thym` source (needed for let filters and user moves); `coprocessor` answers model-backed
     nodes (default: refusing); `root` is where runs live (default `ENOUGH_THYM_ROOT`, else `~/enough/thym/`);
@@ -2126,12 +2225,13 @@ def run(plan: dict, *, inputs_root: Path | str, coprocessor: Any = None, root: P
     the host fills (`enough.thym_host.engines()`) and a test may fake; a recorded run records every engine call and a
     replay answers them from the record (`engines.py`). `progress({node, of, name, move, state})` hears each node start
     (`running`) and end (`done`, `skipped`, `refused`); `should_stop()`, asked before each node, cancels the run
-    (check `cancelled`), and nothing lands."""
+    (check `cancelled`), and nothing lands. `snapshots` is a recorded run's `inputs/` folder: its folder inputs are
+    read from their snapshots there, never from the disk (a replay's, THYM 20.3)."""
     return _Run(plan, inputs_root=inputs_root, coprocessor=coprocessor, root=root, rules=rules, agent_free=agent_free,
                 preflight=preflight, program=program, decls=decls, moves=moves, checks=checks,
                 environment=environment, destination=destination, record=record, run_id=run_id,
                 made_run=made_run, now=now, replay_of=replay_of, engines=engines, progress=progress,
-                should_stop=should_stop).go()
+                should_stop=should_stop, snapshots=snapshots).go()
 
 
 def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: Path | str | None = None,
@@ -2173,7 +2273,7 @@ def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: 
             coprocessor=ReplayCoprocessor(run_dir), root=root, rules=bool(head.get("rules")), program=program,
             decls=decls, moves=moves, checks=checks, environment=environment, record=False,
             made_run=str(head.get("made_run") or rid), now=_trace.parse_utc(tv.get("started")), replay_of=rid,
-            engines=eng)
+            engines=eng, snapshots=run_dir / "inputs")
     if isinstance(t, Refusal):
         return t
     diffs: list[str] = []
@@ -2195,5 +2295,7 @@ def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: 
         new = t.outputs.get(name)
         if old.is_file() and new is not None and Path(new).is_file() and old.read_bytes() != Path(new).read_bytes():
             diffs.append(f"{name}: {rel} differs byte for byte from the recorded file")
+        if old.is_dir() and new is not None and Path(new).is_dir() and _tree_files(old) != _tree_files(Path(new)):
+            diffs.append(f"{name}: {rel} differs from the recorded folder")
     t.replay = {"of": rid, "identical": not diffs, "differences": diffs}
     return t

@@ -1,0 +1,127 @@
+oes: thym/1
+kind: plan
+id: thym/plan.split-a-folder
+name: split-a-folder on little-tool
+program:
+  name: split-a-folder
+  sha256: 1498677c9dfd25c816ea62e131cd7a74e7be5bc237664de2b3f81651f2d48c6a
+inputs:
+- name: repo
+  type: folder
+  path: inputs/little-tool
+  sha256: dfef659dbe23efd61025ed62c67ec01c82ee0d7d5c68effa940584dbc96b48ea
+  files: 7
+  bytes: 640
+estimate:
+  steps: 4
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: split-a-folder on little-tool
+  summary: Four nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  - R:node/3
+  - R:node/4
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: assert words d > 3, for each d in docs where "Run" in d
+  summary: the page that says how to run it is more than a title
+  step:
+    program: split-a-folder
+    n: 3
+  move: assert
+  asks: false
+  takes:
+  - repo
+  repeats: true
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 11
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L9-L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: give repo where suffix is py
+  summary: give repo where suffix is py
+  step:
+    program: split-a-folder
+    n: 4
+  move: give
+  asks: false
+  takes:
+  - repo
+  gives: code
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L13
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: give docs
+  summary: give docs
+  step:
+    program: split-a-folder
+    n: 5
+  move: give
+  asks: false
+  takes:
+  - repo
+  gives: prose
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L9-L14
+    confidence: 1
+- id: R:node/4
+  type: node
+  name: give (repo where suffix is py).lines
+  summary: give (repo where suffix is py).lines
+  step:
+    program: split-a-folder
+    n: 6
+  move: give
+  asks: false
+  takes:
+  - repo
+  gives: size
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 15
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L15
+    confidence: 1

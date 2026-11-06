@@ -12,11 +12,18 @@ out, as the reader treats a bad manifest.
 
 **Two views** (THYM 4.9, 17.6). An entry may say `since: 1`, and then only `thym 1` programs see the move; and it may
 carry a `thym-1:` mapping of the keys a `thym 1` program sees in place of its own (`takes`, `gives`, `modifiers`,
-`contract`, `scaffold`). `load` gives each declaration as written (its own keys, `since` and `thym-1` kept beside
-them); `MoveDecl.view(version)` and `Declarations.view(version)` give what a program of that version sees: a
-`thym 0` program sees each entry without its `thym-1:` mapping and no entry that says `since: 1`, its view frozen; a
-`thym 1` program sees every entry whole, its `thym-1:` keys in place of its own. `view_of` does the same for a
-declaration written as a mapping (the runtime's own reader's).
+`contract`, `scaffold`, `gives-when`, `contract-when`, `scaffold-when`). `load` gives each declaration as written (its
+own keys, `since` and `thym-1` kept beside them); `MoveDecl.view(version)` and `Declarations.view(version)` give what a
+program of that version sees: a `thym 0` program sees each entry without its `thym-1:` mapping and no entry that says
+`since: 1`, its view frozen; a `thym 1` program sees every entry whole, its `thym-1:` keys in place of its own.
+`view_of` does the same for a declaration written as a mapping (the runtime's own reader's).
+
+**What a call gives and keeps, by the call** (THYM 17.6; the design's 3.1). `gives-when`, `contract-when` and
+`scaffold-when` are lists of rules, `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}` (and the same
+with `contract: [...]` or `scaffold: <name>`): the first rule whose `as` word is the call's, or whose type its first
+operand fits, chooses; else the entry's own key holds. `gives: same-as-with` (or `same-as-in`) gives the type of the
+call's `with` (or `in`) value. The compiler chooses statically, from the call as written (`chosen`), and the plan's
+`P:contract` lists the chosen contract.
 """
 from __future__ import annotations
 
@@ -34,10 +41,14 @@ from . import types as ty
 SIDECAR_GLOB = "*.moves.cosm"
 _NAME = re.compile(r"^[a-z][a-z0-9-]*$")
 _MOVES_OF = re.compile(r"^([a-z][a-z0-9-]*)/([0-9]+)$")
-#: The keys a `thym-1:` mapping may hold in this compiler, by the `MoveDecl` field each replaces (THYM 17.6). The
-#: table's other keys (`gives-when`, `contract-when`, `scaffold-when`) are read by a later part of the compiler.
+#: The keys a `thym-1:` mapping may hold, by the `MoveDecl` field each replaces (THYM 17.6).
 THYM1_KEYS = {"takes": "takes", "gives": "gives", "modifiers": "modifiers", "contract": "contract",
-              "scaffold": "scaffold"}
+              "scaffold": "scaffold", "gives-when": "gives_when", "contract-when": "contract_when",
+              "scaffold-when": "scaffold_when"}
+#: The keys of a declaration whose rules choose by the call (THYM 17.6), by the field each rule sets.
+WHEN_KEYS = {"gives-when": "gives", "contract-when": "contract", "scaffold-when": "scaffold"}
+#: `gives` values that give the type of a modifier's value: `same-as-with`, `same-as-in`.
+SAME_AS = {"same-as-with": "with", "same-as-in": "in"}
 #: The grammar versions a declaration may name in `since` (the versions this compiler reads, THYM 4.9).
 VERSIONS = (0, 1)
 
@@ -65,6 +76,11 @@ class MoveDecl:
     thym1: dict = field(default_factory=dict, hash=False, compare=False)
     #: which view this is: None for the entry as written, else the grammar version it was viewed for
     version: int | None = field(default=None, hash=False, compare=False)
+    #: the rules that choose what a call gives, keeps and scaffolds by its `as` word or its first operand's type:
+    #: each `(on, words or types, value)`, `on` being `as` or `takes` (THYM 17.6)
+    gives_when: tuple = field(default=(), hash=False, compare=False)
+    contract_when: tuple = field(default=(), hash=False, compare=False)
+    scaffold_when: tuple = field(default=(), hash=False, compare=False)
 
     def view(self, version: int) -> "MoveDecl | None":
         """What a program of grammar `version` sees of this move: None when the move is not there for it (`since`
@@ -91,6 +107,39 @@ class MoveDecl:
         """The `thym 0` view of this move, whichever view this is: what a `thym 0` program sees of it (None when it
         is not there for one)."""
         return self.base.view(0)
+
+
+def _matches(rule: tuple, as_word: Any, first_type: str | None) -> bool:
+    on, what, _ = rule
+    if on == "as":
+        words = as_word if isinstance(as_word, (list, tuple)) else [as_word]
+        return any(isinstance(w, str) and w in what for w in words)
+    return first_type is not None and ty.accepts(list(what), first_type)
+
+
+def chosen(decl: Any, *, as_word: Any = None, first_type: str | None = None, with_type: str | None = None,
+           in_type: str | None = None) -> dict:
+    """What a call of `decl` gives, keeps and scaffolds, chosen by the call (THYM 17.6): `{gives, contract,
+    scaffold}`, `gives` as a tuple of alternatives. `as_word` is the call's `as` word (or words), `first_type` its
+    first operand's type, `with_type` and `in_type` the types of its `with` and `in` values (for `same-as-with`,
+    `same-as-in`). A declaration written as a mapping is read the same way."""
+    def get(key: str, attr: str) -> Any:
+        return decl.get(key) if isinstance(decl, dict) else getattr(decl, attr, None)
+
+    out = {"gives": tuple(ty.alternatives(get("gives", "gives"))) if isinstance(decl, dict) else tuple(decl.gives),
+           "contract": tuple(get("contract", "contract") or ()), "scaffold": get("scaffold", "scaffold")}
+    for key, what in WHEN_KEYS.items():
+        rules = get(key, key.replace("-", "_"))
+        if isinstance(decl, dict):
+            rules = _rules(rules, what) or ()
+        for rule in rules or ():
+            if _matches(rule, as_word, first_type):
+                out[what] = rule[2]
+                break
+    if len(out["gives"]) == 1 and out["gives"][0] in SAME_AS:
+        t = with_type if SAME_AS[out["gives"][0]] == "with" else in_type
+        out["gives"] = (t,) if t else (ty.ANY,)
+    return out
 
 
 def view_of(decl: Any, version: int) -> Any:
@@ -168,7 +217,45 @@ def _signature(entry: dict, keys, what: str, problems: list[str]) -> dict | None
     if "scaffold" in keys:
         sc = entry.get("scaffold")
         out["scaffold"] = sc if isinstance(sc, str) else None
+    for key, sets in WHEN_KEYS.items():
+        if key in keys and key in entry:
+            rules = _rules(entry.get(key), sets)
+            if rules is None:
+                problems.append(f"{what}: {key} must be a list of {{as: <words>, {sets}: …}} or "
+                                f"{{takes: <type>, {sets}: …}}")
+                return None
+            out[key] = rules
     return out
+
+
+def _rules(raw: Any, what: str) -> tuple | None:
+    """A `gives-when`, `contract-when` or `scaffold-when` list read into `(on, words or types, value)` rules; None
+    when one is malformed."""
+    if not isinstance(raw, list):
+        return None
+    out = []
+    for r in raw:
+        if not isinstance(r, dict) or what not in r or len([k for k in ("as", "takes") if k in r]) != 1:
+            return None
+        on = "as" if "as" in r else "takes"
+        sel = r[on]
+        sel = tuple(ty.alternatives(sel)) if isinstance(sel, str) else (tuple(str(x) for x in sel)
+                                                                        if isinstance(sel, list) else None)
+        if not sel:
+            return None
+        v = r[what]
+        if what == "gives":
+            if not isinstance(v, str) or not v.strip():
+                return None
+            v = tuple(ty.alternatives(v))
+        elif what == "contract":
+            if not isinstance(v, list) or not all(isinstance(c, str) for c in v):
+                return None
+            v = tuple(v)
+        elif not isinstance(v, str):
+            return None
+        out.append((on, sel, v))
+    return tuple(out)
 
 
 def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | None:
@@ -180,8 +267,8 @@ def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | Non
     if not isinstance(name, str) or not _NAME.match(name):
         problems.append(f"{where}: a move's name must be a lowercase name, not {name!r}")
         return None
-    sig = _signature(entry, ("takes", "gives", "modifiers", "contract", "scaffold"), f"{where}: move {name}",
-                     problems)
+    sig = _signature(entry, ("takes", "gives", "modifiers", "contract", "scaffold") + tuple(WHEN_KEYS),
+                     f"{where}: move {name}", problems)
     if sig is None:
         return None
     asks = entry.get("asks", False)
@@ -210,7 +297,8 @@ def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | Non
         takes=sig["takes"], gives=sig["gives"], modifiers=sig["modifiers"],
         asks=bool(asks), contract=sig["contract"], scaffold=sig["scaffold"],
         code=entry.get("code") if isinstance(entry.get("code"), str) else None,
-        says=str(entry.get("says") or ""), source=source, since=since, thym1=thym1)
+        says=str(entry.get("says") or ""), source=source, since=since, thym1=thym1,
+        **{THYM1_KEYS[k]: sig[k] for k in WHEN_KEYS if k in sig})
 
 
 def _sidecars(reg: mc.Registry, problems: list[str]) -> list[tuple[str, str, list]]:

@@ -16,6 +16,11 @@ The nodes come in evaluation order, a nested call before the call that takes its
   then takes what the filter reads and spans its line. A call-less `emit` or `give` is a node of its own (`emit`,
   `give`), so that the plan says everything the run does.
 
+A `give` gives the output it names (`give code: …`) or the block's one output; a program of several outputs has a node
+giving each (THYM 8.2). A folder input's row is `{name, type: folder, path, sha256: <tree digest>, files, bytes}`
+(THYM 20.3). In `thym 1`, a loop whose collection is a call names its nodes with the call's temporary in the trailer
+(`, for each l in t2 where …`), so the runtime walks what that node gave and asks for nothing again.
+
 Both grammar versions plan by these rules. The `thym 1` rule for a loop over a collection known only at run time (one
 node for the loop, its body run member by member as a unit) is a later part of the compiler: `_Planner.loop` is the
 seam where it goes.
@@ -46,6 +51,7 @@ from typing import Any
 from . import MINICOSM, Refusal
 from . import check as ck
 from . import enumerate as en
+from . import folder as fd
 from . import parse as ps
 from .values import posix_path
 
@@ -123,6 +129,7 @@ class _Planner:
         order = list(ck.walk(block.stmts))
         self.num = {id(s): k + 1 for k, s in enumerate(order)}
         self.inputs = {p.name for p in block.takes}
+        self.loop_sub: dict[int, dict[int, str]] = {}      # a thym 1 loop over a call: the call's temporary
 
     # -- names -------------------------------------------------------------
 
@@ -287,7 +294,7 @@ class _Planner:
             else:
                 self.simple("emit", "emit", s, s.expr, env, emits=True, slot=s.slot)
         elif isinstance(s, ps.Give):
-            out = self.b.gives.name if self.b.gives else None
+            out = s.label or (self.b.gives.name if self.b.gives else None)
             if is_call:
                 self.expr(top, env, s, role=f"out:{out}")
             else:
@@ -312,6 +319,8 @@ class _Planner:
             names += more
             lines |= more_lines
         coll = ck.strip_paren(s.coll)
+        if self.c.module.version >= 1 and isinstance(coll, (ps.Call, ps.Marked)):
+            self.loop_sub[id(s)] = sub
         if isinstance(coll, ps.ListLit) and s.where is None:
             for member in coll.items:
                 self.stmts(s.body, env.child(loop=s, loop_names=None, member=member))
@@ -397,6 +406,10 @@ class _Planner:
         if nd.loop is not None:
             if nd.member is not None:
                 text += f", for {nd.loop.var} = {ps.render(nd.member)}"
+            elif id(nd.loop) in self.loop_sub:
+                lp, sub = nd.loop, self.loop_sub[id(nd.loop)]
+                text += f", for each {lp.var} in {ps.render(lp.coll, sub)}" + (
+                    f" where {ps.render_cond(lp.where, sub)}" if lp.where is not None else "")
             else:
                 text += ", " + ps.statement_name(nd.loop, self.c.module.lines)
         return text
@@ -448,9 +461,35 @@ def build(checked: ck.Checked, *, program: str | None = None) -> list[PlanNode] 
     return _Planner(checked, block).run()
 
 
+def _folder_row(i: dict) -> dict:
+    """A folder input's plan row (THYM 20.3): `{name, type: folder, path, sha256: <tree digest>, files, bytes}`,
+    the digest and the counts read from the folder when the caller did not give them."""
+    row = {"name": str(i.get("name")), "type": "folder", "path": posix_path(i.get("path")),
+           "sha256": str(i.get("sha256") or "")}
+    files, size = i.get("files"), i.get("bytes")
+    if not row["sha256"] or not isinstance(files, int) or not isinstance(size, int):
+        try:
+            f = fd.read(Path(str(i.get("path") or "")), path=row["path"])
+        except fd.FolderError:
+            f = None
+        if f is not None:
+            row["sha256"] = row["sha256"] or f.tree
+            files = files if isinstance(files, int) else f.files
+            size = size if isinstance(size, int) else f.bytes
+    row["files"] = files if isinstance(files, int) else 0
+    row["bytes"] = size if isinstance(size, int) else 0
+    return row
+
+
 def _size(inp: dict) -> int:
     if isinstance(inp.get("size"), int):
         return inp["size"]
+    if inp.get("type") == "folder":                # what a prompt could hold of it: its text files
+        try:
+            f = fd.read(Path(str(inp.get("path") or "")))
+            return sum(e.size for e in f.texts())
+        except fd.FolderError:
+            return 0
     try:
         p = Path(str(inp.get("path") or ""))
         if p.is_file():
@@ -508,7 +547,8 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
     unknown = [n for n in given if n not in {p.name for p in block.takes}]
     if unknown:
         return Refusal("plan", "input", f"program {block.name} takes no {unknown[0]}", None, m.path)
-    ins = [{"name": str(i.get("name")), "type": str(i.get("type")), "path": posix_path(i.get("path")),
+    ins = [_folder_row(i) if i.get("type") == "folder" else
+           {"name": str(i.get("name")), "type": str(i.get("type")), "path": posix_path(i.get("path")),
             "sha256": str(i.get("sha256"))} for i in inputs]
     program_sha = en.sha256(m.text.encode("utf-8"))
     rid = run_id(program_sha, ins, now)

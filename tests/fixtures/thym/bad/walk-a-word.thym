@@ -1,0 +1,14 @@
+-- refused: compile type line 10
+thym 1
+
+program walk-a-word
+  why: a loop over a folder's name, which is a string and not a collection.
+
+  takes repo: folder
+  gives n: number
+
+  for each t in repo.name
+    assert words t > 0
+  end
+  give 0
+end

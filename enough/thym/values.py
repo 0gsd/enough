@@ -9,6 +9,14 @@ walks (section 8.1: a volume's items in told order, a short's lines, a list's me
 loading of a plan's inputs from disk: a file, a volume folder or a package folder (section 15), each checked against the
 sha256 the plan recorded (a file's bytes, a volume's or a package's catalog file, as the suite's README says).
 
+`thym 1` adds three types (THYM 5.1). A **folder** (`folder.py`) is a value whose digest is its tree digest; a `for
+each` walks its text files as `text` values, each carrying its fields (`t.path`, `t.suffix`, …) and hand-made provenance
+with `source: {folder: <tree>, path}` (THYM 20.2); a folder input needs no catalog, is checked against its tree digest,
+and may be read from the snapshot a run made of it (`snapshot_value`), so that a replay needs no folder present (THYM
+20.3). A **line** is a string with a place: its text without the newline, its `number`, the sha256 of its source and of
+itself, and the fields `number`, `level`, `title`, `blank` (`make_line`). A **change** is plain data, `{at, was, of, do,
+lines}` (`make_change`).
+
 Standalone like the rest of the package: the standard library, PyYAML and `enough.macrocosm`.
 """
 from __future__ import annotations
@@ -24,6 +32,7 @@ from typing import Any
 
 from enough import macrocosm as mc
 from enough.thym import Refusal
+from enough.thym import folder as _folder
 
 #: The types whose values carry provenance (THYM.md 5.1); `context` is one too when it is an occasional context item.
 MEANING_TYPES = ("text", "fabula", "short", "atem", "item", "volume", "morph", "context", "graph", "package")
@@ -87,6 +96,8 @@ class Value:
         p = self.payload
         if self.type == "nothing" or p is None:
             return b""
+        if isinstance(p, _folder.Folder):         # its listing; its digest is the tree digest (`sha256`)
+            return "".join(f"{e.path}\0{e.sha256}\n" for e in p.entries).encode("utf-8")
         if isinstance(p, bytes):
             return p
         if isinstance(p, str):
@@ -102,6 +113,9 @@ class Value:
 
     @property
     def sha256(self) -> str:
+        """The value's digest: a folder's is its tree digest (THYM 12.6, 20.1); anything else's is over its bytes."""
+        if isinstance(self.payload, _folder.Folder):
+            return self.payload.tree
         return sha256_bytes(self.bytes())
 
     @property
@@ -109,6 +123,8 @@ class Value:
         """The extension the value is written with: `md` for a text or a short, `<kind>.cosm` or `cosm` for a mapping
         or a volume, `txt` for a plain value."""
         p = self.payload
+        if isinstance(p, _folder.Folder):
+            return ""                             # a folder lands as a directory (THYM 20.4)
         if self.type in ("text", "short") or (self.type == "atem" and isinstance(p, str)):
             return "md"
         if isinstance(p, (dict, mc.Volume)) or self.type in ("list",):
@@ -152,6 +168,8 @@ class Value:
             return None
         if self.type in ("word", "string", "number", "bool", "date"):
             return self.payload
+        if self.type == "line" and isinstance(self.payload, str):      # a string with a place (THYM 5.1)
+            return self.payload
         if self.type == "list":
             return [m.plain() if isinstance(m, Value) else m for m in (self.payload or [])]
         return self
@@ -162,6 +180,12 @@ class Value:
         `module` fall back to what the item's id says, `module` as the module's name (`employees`) where the
         MiniCOSM names it. None when there is no such field."""
         p = self.payload
+        if isinstance(p, _folder.Folder):
+            return p.field(name)
+        if self.origin and isinstance(self.origin.get("member"), dict):      # a file walked from a folder
+            return self.origin["member"].get(name)
+        if self.origin and isinstance(self.origin.get("line"), dict):        # a line of a text or a short
+            return self.origin["line"].get(name)
         if self.origin and "item" in self.origin and isinstance(p, dict):
             return item_field(p, name, self.origin)
         if isinstance(p, mc.Volume):
@@ -273,12 +297,83 @@ def _told_key(data: dict) -> tuple[int, str]:
     return line, str(data.get("id") or "")
 
 
+def folder_member(f: "_folder.Folder", e: "_folder.Entry") -> Value:
+    """One text file of a folder as a `text` value (THYM 20.2): its text (a byte-order mark dropped), its bytes kept,
+    its fields in `origin`, and hand-made provenance with `source: {folder: <tree>, path}`."""
+    raw = f.raw(e.path)
+    text = raw.decode("utf-8-sig")
+    return Value("text", text, raw=raw, made={"move": "none", "source": {"folder": f.tree, "path": e.path}},
+                 origin={"member": _folder.member_fields(e, f.text(e.path)), "folder": f.tree})
+
+
+def folder_value(f: "_folder.Folder", path: Path | None = None) -> Value:
+    """A folder as a value, hand-made."""
+    return Value("folder", f, path=path, made=dict(HAND_MADE))
+
+
+def entry_item(f: "_folder.Folder", e: "_folder.Entry") -> Value:
+    """A file of a folder as a `where` over the folder reads it: its fields, binary files included (THYM 20.2)."""
+    return Value("item", f.member_fields(e), origin={"item": True, "member": f.member_fields(e)})
+
+
+def filter_folder(value: Value, keep) -> Value:
+    """`<folder> where <cond>`: a folder with the same root and only the files `keep(item)` holds for (THYM 20.2)."""
+    f = value.payload
+    return folder_value(f.where(lambda e: bool(keep(entry_item(f, e)))), value.path)
+
+
+# Lines and changes (THYM 21.1): the types; the moves that make and apply them are the editor's.
+
+def _heading(text: str) -> tuple[int, str | None]:
+    """An ATX heading's level (1 to 6) and its words without the `#` marks and a leading section number (`3.`,
+    `3.2`); (0, None) for any other line."""
+    s = text.lstrip(" ")
+    if len(text) - len(s) > 3 or not s.startswith("#"):
+        return 0, None
+    level = len(s) - len(s.lstrip("#"))
+    rest = s[level:]
+    if level > 6 or (rest and not rest.startswith((" ", "\t"))):
+        return 0, None
+    words = rest.strip()
+    while words.endswith("#") and (words.rstrip("#") == "" or words.rstrip("#").endswith((" ", "\t"))):
+        words = words.rstrip("#").strip()
+    head = words.split(" ", 1)
+    if head and re.fullmatch(r"\d+(?:\.\d+)*\.?", head[0]):
+        words = head[1].strip() if len(head) > 1 else ""
+    return level, words
+
+
+def make_line(text: str, number: int, source: str) -> Value:
+    """One line of a text or a short as a `line` value: its text without the newline, its `number` (from 1, in its
+    source), the sha256 of its source and of itself, and its fields `number`, `level`, `title`, `blank`."""
+    level, title = _heading(text)
+    return Value("line", text, origin={"line": {"number": number, "level": level, "title": title,
+                                                "blank": text.strip() == "", "source": source,
+                                                "sha256": sha256_bytes(text.encode("utf-8"))}})
+
+
+#: What a change does to the line it names (THYM 21.1).
+CHANGE_DOES = ("replace", "drop", "insert-before", "insert-after")
+
+
+def make_change(at: int, was: str, of: str, do: str, lines: list[str] | None = None) -> Value:
+    """One edit as a `change` value: `{at: <line number>, was: <sha256 of that line>, of: <sha256 of the source>,
+    do: replace | drop | insert-before | insert-after, lines: [<new lines>]}`, plain data."""
+    if do not in CHANGE_DOES:
+        raise ValueError(f"a change does one of {', '.join(CHANGE_DOES)}, not {do}")
+    return Value("change", {"at": int(at), "was": str(was), "of": str(of), "do": do,
+                            "lines": [str(x) for x in (lines or [])]})
+
+
 def members(value: Value) -> list[Value] | None:
     """What a `for each` walks (THYM.md 8.1): the items of a volume or a fabula in told order (by span, then by id),
-    the lines of a short or a text, the members of a list. None when the value is not a collection."""
+    the lines of a short or a text, the members of a list, the text files of a folder in path order (THYM 20.2). None
+    when the value is not a collection."""
     p = value.payload
     if value.type == "list":
         return [m if isinstance(m, Value) else wrap(m) for m in (p or [])]
+    if isinstance(p, _folder.Folder):
+        return [folder_member(p, e) for e in p.texts()]
     if isinstance(p, mc.Volume):
         man = p.manifest
         rows = []
@@ -379,10 +474,13 @@ def folder_catalog(folder: Path) -> Path | None:
     return mc.default_registry().find_catalog(folder)
 
 
-def digest_path(path: Path) -> str | None:
+def digest_path(path: Path, typ: str | None = None) -> str | None:
     """An input's sha256 as a plan records it: a file's over its bytes, a volume's or a package's over its catalog
-    file. None when a folder holds no catalog."""
+    file, a `folder`'s its tree digest (THYM 20.3, when `typ` says folder). None when a folder holds no catalog and is
+    not taken as a folder."""
     path = Path(path)
+    if typ == "folder":
+        return _folder.read(path).tree if path.is_dir() else None
     if path.is_dir():
         cat = folder_catalog(path)
         return sha256_bytes(cat.read_bytes()) if cat is not None else None
@@ -400,12 +498,14 @@ def is_fabula(declaration: Any) -> bool:
 
 
 def guess_type(path: Path) -> str:
-    """A path's Thym type when the plan does not say: a folder with `package.cosm` is a package, any other folder a
-    volume; a `.md` file a text; a `.cosm` file by what it declares (a `fabula/1` or `emf/1` twin is a fabula, a
-    `thym/1` file is its kind)."""
+    """A path's Thym type when the plan does not say: a folder with `package.cosm` is a package, a folder with a
+    catalog a volume, a folder with none a `folder` (THYM 20.3); a `.md` file a text; a `.cosm` file by what it
+    declares (a `fabula/1` or `emf/1` twin is a fabula, a `thym/1` file is its kind)."""
     path = Path(path)
     if path.is_dir():
-        return "package" if (path / "package.cosm").is_file() else "volume"
+        if (path / "package.cosm").is_file():
+            return "package"
+        return "volume" if folder_catalog(path) is not None else "folder"
     if path.suffix == ".cosm":
         said = mc.sniff_declaration(path) or ""
         if is_fabula(said):
@@ -420,12 +520,19 @@ def guess_type(path: Path) -> str:
     return "text"
 
 
-def load_input(spec: dict, inputs_root: Path) -> Value | Refusal:
+def load_input(spec: dict, inputs_root: Path, *, snapshot: Path | None = None) -> Value | Refusal:
     """One input of a plan (`{name, type, path, sha256}`) as a value, read from `path` (relative to `inputs_root`),
     or a plan-time refusal when it is missing or its digest differs from the plan's (THYM.md 9: "a missing or changed
-    input")."""
+    input"). A `folder` input is read under the folder rule and held to its tree digest; with `snapshot` (the run's
+    `inputs/<name>.folder.cosm`, in a replay) it is read from there and never from the disk (THYM 20.3)."""
     name = str(spec.get("name") or "?")
     raw_path = spec.get("path")
+    typ = str(spec.get("type") or "")
+    if not typ and isinstance(raw_path, str) and raw_path:            # a plan that does not say: a folder with no
+        here = Path(raw_path) if Path(raw_path).is_absolute() else Path(inputs_root) / raw_path   # catalog is one
+        typ = "folder" if here.is_dir() and folder_catalog(here) is None else ""
+    if typ == "folder":
+        return _load_folder(spec, name, raw_path, inputs_root, snapshot)
     if not isinstance(raw_path, str) or not raw_path:
         return Refusal("plan", "input", f"input {name} has no path in the plan")
     path = Path(raw_path)
@@ -448,10 +555,56 @@ def load_input(spec: dict, inputs_root: Path) -> Value | Refusal:
         return Refusal("plan", "input", f"input {name}: {raw_path} could not be read: {e}")
 
 
+def _load_folder(spec: dict, name: str, raw_path: Any, inputs_root: Path, snapshot: Path | None) -> Value | Refusal:
+    want = spec.get("sha256")
+    label = raw_path if isinstance(raw_path, str) and raw_path else name
+    if snapshot is not None:
+        try:
+            v = snapshot_value(snapshot, label=label)
+        except (OSError, ValueError) as e:
+            return Refusal("plan", "input", f"input {name}: the run's snapshot of {label} could not be read: "
+                                            f"{getattr(e, 'strerror', None) or e}")
+    else:
+        if not isinstance(raw_path, str) or not raw_path:
+            return Refusal("plan", "input", f"input {name} has no path in the plan")
+        path = Path(raw_path)
+        if not path.is_absolute():
+            path = Path(inputs_root) / path
+        if not path.exists() and not path.is_symlink():
+            return Refusal("plan", "input", f"input {name}: {raw_path} is not there, and the plan needs it; give its "
+                                            "path or plan again")
+        try:
+            v = folder_value(_folder.read(path, path=raw_path), path.absolute())
+        except _folder.FolderError as e:
+            return Refusal("plan", "input", f"input {name}: {e}")
+    got = v.sha256
+    if isinstance(want, str) and want and got != want:
+        return Refusal("plan", "input", f"{name} changed since it was planned: {label} has tree {got[:4]}…, the plan "
+                                        f"recorded {want[:4]}…; plan it again")
+    return v
+
+
+def snapshot_value(path: Path, *, label: str | None = None) -> Value:
+    """A folder input read from a run's snapshot of it (`inputs/<name>.folder.cosm`, THYM 20.3), `label` the path the
+    plan gave. Raises ValueError for a snapshot that is not one, or whose texts do not match their digests."""
+    data = mc.yaml_load(Path(path).read_bytes().decode("utf-8"))
+    return folder_value(_folder.from_snapshot(data, path=label))
+
+
+def write_snapshot(value: Value, path: Path, *, id: str) -> int:
+    """Write a folder input's snapshot (THYM 20.3) and say how many bytes it took."""
+    text = _folder.snapshot_text(value.payload, id=id, name=value.payload.path).encode("utf-8")
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_bytes(text)
+    return len(text)
+
+
 def read_value(path: Path, typ: str) -> Value:
     """A file or folder as a value of type `typ`, hand-made, its bytes kept. Raises ValueError for a `.cosm` file
     that is not one mapping, or a volume the reader refuses."""
     path = Path(path).absolute()
+    if typ == "folder":
+        return folder_value(_folder.read(path), path)
     if path.is_dir():
         cat = folder_catalog(path)
         if cat is None:

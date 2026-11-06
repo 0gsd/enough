@@ -103,8 +103,11 @@ def test_program_compiles_back_byte_for_byte(program, tmp_path):
     assert report.ok and not report.warnings, "; ".join(str(e) for e in report.errors + report.warnings)
 
 
-def _true_digest(path: str) -> str:
+def _true_digest(path: str, typ: str | None = None) -> str:
     p = SUITE / path
+    if typ == "folder":                     # a folder input's digest is its tree digest (THYM 20.1)
+        from enough.thym import folder as fd
+        return fd.read(p).tree
     if p.is_dir():
         p = mc.default_registry().find_catalog(p)
     return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -114,7 +117,8 @@ def _true_digest(path: str) -> str:
 def test_program_plans_to_its_fixture(program):
     want = mc.yaml_load(_text(SUITE / "expected" / program / "plan.cosm"))
     for inp in want["inputs"]:
-        assert inp["sha256"] == _true_digest(inp["path"]), f"{program}: the fixture's digest of {inp['path']}"
+        assert inp["sha256"] == _true_digest(inp["path"], inp.get("type")), \
+            f"{program}: the fixture's digest of {inp['path']}"
     got = thym.plan_file(SUITE / "programs" / f"{program}.thym", want["inputs"])
     assert isinstance(got, dict), got
     assert re.fullmatch(r"thym/\d{4}-\d{2}-\d{2}-\d{4}-[0-9a-f]{4}", got["id"])

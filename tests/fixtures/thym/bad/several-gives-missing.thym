@@ -1,0 +1,16 @@
+-- refused: compile no-give line 4
+thym 1
+
+program code-and-manual
+  why: two outputs, and a path that gives only one of them.
+
+  takes repo: folder, manual: short
+  gives code: folder, guide: short
+
+  if repo.files > 3 then
+    give code: repo where suffix is py
+    give guide: manual
+  else
+    give code: repo
+  end
+end

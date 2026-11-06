@@ -1,0 +1,184 @@
+oes: thym/1
+kind: program
+id: thym/split-a-folder
+name: split-a-folder
+source:
+  path: split-a-folder.thym
+  sha256: 1498677c9dfd25c816ea62e131cd7a74e7be5bc237664de2b3f81651f2d48c6a
+  size: 473
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/split-a-folder
+  type: program
+  name: split-a-folder
+  summary: A folder split in two, its Python and its prose, with the lines of its Python counted.
+  why: a folder split in two, its Python and its prose, with the lines of its Python counted.
+  must: []
+  decided: []
+  takes:
+  - name: repo
+    type: folder
+  gives:
+  - name: code
+    type: folder
+  - name: prose
+    type: folder
+  - name: size
+    type: number
+  lines: 3-16
+  order: 1
+  body: |
+    program split-a-folder
+      why: a folder split in two, its Python and its prose, with the lines of its Python counted.
+
+      takes repo: folder
+      gives code: folder, prose: folder, size: number
+
+      let docs = repo where suffix is md
+      for each d in docs where "Run" in d
+        assert words d > 3          -- the page that says how to run it is more than a title
+      end
+      give code: repo where suffix is py
+      give prose: docs
+      give size: (repo where suffix is py).lines
+    end
+  steps:
+  - P:step/split-a-folder.1
+  - P:step/split-a-folder.2
+  - P:step/split-a-folder.4
+  - P:step/split-a-folder.5
+  - P:step/split-a-folder.6
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L3-L16
+    confidence: 1
+- id: P:step/split-a-folder.1
+  type: step
+  name: let docs = repo where suffix is md
+  summary: let docs = repo where suffix is md
+  of: P:program/split-a-folder
+  n: 1
+  text: '  let docs = repo where suffix is md'
+  line: 9
+  form: let
+  calls: []
+  binds: docs
+  uses:
+  - repo
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L9
+    confidence: 1
+- id: P:step/split-a-folder.2
+  type: step
+  name: for each d in docs where "Run" in d
+  summary: for each d in docs where "Run" in d
+  of: P:program/split-a-folder
+  n: 2
+  text: '  for each d in docs where "Run" in d'
+  line: 10
+  lines: 10-12
+  form: for
+  calls: []
+  binds: d
+  uses:
+  - docs
+  asks: false
+  steps:
+  - P:step/split-a-folder.3
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L10-L12
+    confidence: 1
+- id: P:step/split-a-folder.3
+  type: step
+  name: assert words d > 3
+  summary: the page that says how to run it is more than a title
+  of: P:program/split-a-folder
+  n: 3
+  text: '    assert words d > 3          -- the page that says how to run it is more than a title'
+  line: 11
+  form: assert
+  move: assert
+  calls:
+  - words
+  uses:
+  - d
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L11
+    confidence: 1
+- id: P:step/split-a-folder.4
+  type: step
+  name: 'give code: repo where suffix is py'
+  summary: 'give code: repo where suffix is py'
+  of: P:program/split-a-folder
+  n: 4
+  text: '  give code: repo where suffix is py'
+  slot: code
+  line: 13
+  form: give
+  calls: []
+  uses:
+  - repo
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L13
+    confidence: 1
+- id: P:step/split-a-folder.5
+  type: step
+  name: 'give prose: docs'
+  summary: 'give prose: docs'
+  of: P:program/split-a-folder
+  n: 5
+  text: '  give prose: docs'
+  slot: prose
+  line: 14
+  form: give
+  calls: []
+  uses:
+  - docs
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L14
+    confidence: 1
+- id: P:step/split-a-folder.6
+  type: step
+  name: 'give size: (repo where suffix is py).lines'
+  summary: 'give size: (repo where suffix is py).lines'
+  of: P:program/split-a-folder
+  n: 6
+  text: '  give size: (repo where suffix is py).lines'
+  slot: size
+  line: 15
+  form: give
+  calls: []
+  uses:
+  - repo
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - split-a-folder.thym#L15
+    confidence: 1

@@ -23,6 +23,15 @@ checker logs in `Module.features` each `thym 1` feature it meets (a move only `t
 only a move's `thym 1` view admits). A `thym 0` module refused here is compiled again as `thym 1` (`needs_thym1`):
 when that compile succeeds, the refusal becomes `version` at the first `thym 1` feature in the file. A used file is
 read by its own version line; a `thym 0` program may not use a `thym 1` file.
+
+**What `thym 1` adds here** (part b of the round). The types `folder`, `line` and `change`: a folder's fields are
+typed (`code.lines` is a number; a field a folder does not have is refused), a `where` over a folder gives a folder,
+and a `for each` walks a folder's text files as texts (THYM 20); a `line` fits wherever a `string` is taken (5.1). A
+program may give several outputs, each given once on every path by a labelled `give` (`no-give` names the output a path
+misses; `type` a give that names no output, 8.2). `in` with a text, a string, a short or a line on its right holds when
+it contains the left's characters (4.5). A call's `gives`, contract and scaffold may be chosen by its `as` word or its
+first operand's type (`gives-when`, `contract-when`, `scaffold-when`, `same-as-with`, `same-as-in`: 17.6), and the
+chosen contract is the call's (`Call.contract`).
 """
 from __future__ import annotations
 
@@ -37,6 +46,7 @@ from enough import macrocosm as mc
 from . import Refusal
 from . import contracts as ct
 from . import declarations as dc
+from . import folder as fd
 from . import parse as ps
 from . import types as ty
 
@@ -45,6 +55,8 @@ ENVELOPE_KEYS = frozenset(("id", "type", "name", "summary", "status", "visibilit
 _OES_THYM = re.compile(r"^oes:thym/([A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?)$")
 
 Volumes = Mapping[str, Any] | Callable[[str], Any] | None
+#: The types `in` finds a string in, in `thym 1` (THYM 4.5).
+TEXTUAL = ("text", "string", "short", "line")
 
 
 def _escapes(uri: str) -> str | None:
@@ -266,6 +278,10 @@ def move_name(c: Any) -> str:
 
 
 def call_checks(c: Any) -> list[str]:
+    """The checks a call keeps: the contract the checker chose for it (`contract-when`), else its target's."""
+    chosen = getattr(c, "contract", None)
+    if chosen is not None:
+        return list(chosen)
     return ct.checks_of(getattr(c, "target", None))
 
 
@@ -313,14 +329,34 @@ def names_used(st: ps.Stmt) -> list[str]:
     return out
 
 
-def reaches_give(stmts: list[ps.Stmt]) -> bool:
-    """True when every path through these statements reaches a `give` (THYM.md 8.2)."""
+def reaches_give(stmts: list[ps.Stmt], output: str | None = None) -> bool:
+    """True when every path through these statements reaches a `give` (THYM.md 8.2); with `output`, a `give` of that
+    output (a labelled one, `give <output>: …`)."""
     for s in stmts:
-        if isinstance(s, ps.Give):
+        if isinstance(s, ps.Give) and (output is None or s.label == output):
             return True
-        if isinstance(s, ps.If) and s.else_ is not None and reaches_give(s.then) and reaches_give(s.else_):
+        if (isinstance(s, ps.If) and s.else_ is not None and reaches_give(s.then, output)
+                and reaches_give(s.else_, output)):
             return True
     return False
+
+
+def missed_at(stmts: list[ps.Stmt], output: str) -> int | None:
+    """The line a path that never gives `output` goes through: the first line of a branch that misses it (the `if`'s
+    own line for an `if` with no `else`), else the last statement's line."""
+    for s in stmts:
+        if isinstance(s, ps.If):
+            then_ok = reaches_give(s.then, output)
+            else_ok = s.else_ is not None and reaches_give(s.else_, output)
+            if then_ok and not else_ok:
+                return s.else_[0].line if s.else_ else s.line
+            if else_ok and not then_ok:
+                return s.then[0].line if s.then else s.line
+    return stmts[-1].line if stmts else None
+
+
+def _and(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
 
 
 
@@ -634,12 +670,43 @@ class _Checker:
                 self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
             scope.add(Binding(p.name, p.type, "param" if b.kind == "move" else "takes", p.line, self.file))
         ctx = _Ctx(block=b, program=program)
+        outs = b.outputs or ([b.gives] if b.gives is not None else [])
+        seen_out: dict[str, int] = {}
+        for o in outs:
+            if o.name in seen_out:
+                self.fail("rebound", f"`{o.name}` already names an output of {b.kind} {b.name}, at line "
+                          f"{seen_out[o.name]}", o.line)
+            seen_out[o.name] = o.line
         self.stmts(b.stmts, scope, ctx)
-        if b.gives is not None and not reaches_give(b.stmts):
+        if len(outs) > 1:
+            names = [o.name for o in outs]
+            for o in outs:
+                if not reaches_give(b.stmts, o.name):
+                    at = missed_at(b.stmts, o.name)
+                    self.fail("no-give", f"{b.kind} {b.name} gives {_and(names)}; the path through line {at} never "
+                              f"gives {o.name}", b.line)
+            self.gives_once(b.stmts, set(), b)
+        elif b.gives is not None and not reaches_give(b.stmts):
             self.fail("no-give", f"{b.kind} {b.name} gives {b.gives.name}: {b.gives.type}, and a path through it "
                       "never reaches a give", b.line)
         if b.kind == "program":
             self.emits_and_counts(b, ctx)
+
+    def gives_once(self, stmts: list[ps.Stmt], given: set[str], b: ps.Block) -> set[str]:
+        """A program of several outputs gives each once on every path (THYM 8.2): a give of an output a path already
+        gave is refused."""
+        given = set(given)
+        for s in stmts:
+            if isinstance(s, ps.Give) and s.label is not None:
+                if s.label in given:
+                    self.fail("type", f"give {s.label}: … gives {s.label} a second time on this path; {b.kind} "
+                              f"{b.name} gives each of its outputs once", s.line)
+                given.add(s.label)
+            elif isinstance(s, ps.If):
+                a = self.gives_once(s.then, given, b)
+                c = self.gives_once(s.else_ or [], given, b)
+                given = a & c if s.else_ is not None else given
+        return given
 
     def emits_and_counts(self, b: ps.Block, ctx: _Ctx) -> None:
         emits, targets = self.reach(b.stmts, set())
@@ -726,15 +793,29 @@ class _Checker:
             b = ctx.block
             if b.gives is None:
                 self.fail("type", f"{b.kind} {b.name} gives nothing, so it cannot give: add a gives head", s.line)
+            out = self.output_of(s, b)
             t = self.expr(s.expr, scope, ctx)
-            if not ty.accepts([b.gives.type], t):
-                fix = ty.hint(t, [b.gives.type])
-                self.fail("type", f"{b.kind} {b.name} gives {b.gives.name}: {b.gives.type}, and "
+            if not ty.accepts([out.type], t):
+                fix = ty.hint(t, [out.type])
+                self.fail("type", f"{b.kind} {b.name} gives {out.name}: {out.type}, and "
                           f"{ps.render(s.expr)} is a {t}" + (f": {fix}" if fix else ""), s.line)
         elif isinstance(s, ps.Withhold):
             self.expr(s.call, scope, ctx)
         elif isinstance(s, ps.Effect):
             self.expr(s.expr, scope, ctx)
+
+    def output_of(self, s: ps.Give, b: ps.Block) -> ps.Param:
+        """The output a give gives: the one its label names; the block's one output when it has one (THYM 8.2)."""
+        outs = b.outputs or [b.gives]
+        names = [o.name for o in outs]
+        if s.label is not None:
+            found = next((o for o in outs if o.name == s.label), None)
+            if found is None:
+                self.fail("type", f"give {s.label}: … names no output of {b.name}; it gives {_and(names)}", s.line)
+            return found
+        if len(outs) > 1:
+            self.fail("type", f"{b.kind} {b.name} gives {_and(names)}; a give says which: give {names[0]}: …", s.line)
+        return outs[0]
 
     @staticmethod
     def emittable(e: ps.Expr, t: str) -> bool:
@@ -746,16 +827,12 @@ class _Checker:
         return False
 
     def member(self, t: str, e: ps.Expr) -> str:
-        if t in ("volume", "fabula"):
-            return "item"
-        if t == "short":
-            return "string"
-        if ty.is_list(t):
-            return ty.element(t)
-        if t == ty.ANY:
-            return ty.ANY
-        self.fail("type", f"for each goes through a volume, a fabula, a short or a list; {ps.render(e)} is a {t}",
-                  e.line)
+        m = ty.member(t)
+        if m is not None:
+            return m
+        what = "a volume, a fabula, a folder, a short or a list" if self.m.version >= 1 else \
+            "a volume, a fabula, a short or a list"
+        self.fail("type", f"for each goes through {what}; {ps.render(e)} is a {t}", e.line)
         return ty.ANY
 
     # -- expressions -------------------------------------------------------
@@ -795,6 +872,11 @@ class _Checker:
             tt = self.expr(e.target, scope, ctx, items=items)
             if tt in ty.PLAIN or tt == ty.NOTHING:
                 self.fail("type", f"a {tt} has no fields; {ps.render(e)} reads one", e.line)
+            if tt == "folder":
+                if e.field not in fd.FOLDER_FIELDS:
+                    self.fail("type", f"a folder has no field {e.field}; its fields are "
+                              f"{', '.join(fd.FOLDER_FIELDS)}", e.line)
+                return fd.FOLDER_FIELDS[e.field]
             target = e.target
             if isinstance(target, ps.Name) and isinstance(target.binding, Binding) and target.binding.fields:
                 return target.binding.fields.get(e.field, ty.ANY)
@@ -803,6 +885,9 @@ class _Checker:
             return self.expr(e.inner, scope, ctx, word_ok=word_ok, items=items)
         if isinstance(e, ps.Filter):
             tt = self.expr(e.target, scope, ctx, items=items)
+            if tt == "folder":                   # a folder filtered is a folder (THYM 20.2)
+                self.cond(e.cond, scope, ctx, items=True)
+                return "folder"
             if tt in ("volume", "fabula"):
                 member = "item"
             elif ty.is_list(tt):
@@ -905,12 +990,30 @@ class _Checker:
         if not takes and "of" in target.modifiers and c.mod("of") is None:
             self.fail("type", f"{c.move} takes its argument through of: {c.move} of …", c.line)
         self.thym1_use(c, target)
-        gives = list(target.gives)
+        chosen = self.chosen(c, target)
+        c.contract = tuple(chosen["contract"])
+        gives = list(chosen["gives"])
         if len(gives) == 1:
             return gives[0]
         if c.operands and c.operands[0].type in gives:
             return c.operands[0].type
         return ty.ANY
+
+    @staticmethod
+    def chosen(c: ps.Call, target: Any) -> dict:
+        """What this call gives and keeps, chosen from its declaration by the call as written (THYM 17.6)."""
+        as_mod = c.mod("as")
+        word: Any = None
+        if as_mod is not None:
+            if isinstance(as_mod.arg, ps.Word):
+                word = as_mod.arg.word
+            elif isinstance(as_mod.arg, ps.ListLit):
+                word = [x.word for x in as_mod.arg.items if isinstance(x, ps.Word)]
+        first = c.operands[0].type if c.operands else None
+        wm, im = c.mod("with"), c.mod("in")
+        return dc.chosen(target, as_word=word, first_type=first,
+                         with_type=getattr(wm.arg, "type", None) if wm is not None else None,
+                         in_type=getattr(im.arg, "type", None) if im is not None else None)
 
     def thym1_move(self, c: ps.Call, target: Any) -> None:
         """Log the `thym 1` features a call of a declared move meets (THYM 4.9): the move is one only `thym 1` sees
@@ -993,7 +1096,12 @@ class _Checker:
                 self.expr(c.right, scope, ctx, word_ok=True, items=items)
             elif c.op == "in":
                 rt = self.expr(c.right, scope, ctx, items=items)
-                if not (ty.is_list(rt) or rt == ty.ANY):
+                if rt in TEXTUAL and self.g.admits("in-text"):
+                    if lt not in ("string", "line", ty.WORD, ty.ANY):
+                        self.fail("type", f"in with a {rt} on its right finds a string in it; {ps.render(c.left)} "
+                                  f"is a {lt}", c.line)
+                    self.m.met(c.line, "in-text")
+                elif not (ty.is_list(rt) or rt == ty.ANY):
                     self.fail("type", f"in tests membership in a list; {ps.render(c.right)} is a {rt}", c.line)
             elif c.op in ("<", ">"):
                 rt = self.expr(c.right, scope, ctx, items=items)
@@ -1075,7 +1183,7 @@ class _Checker:
                     checks.extend(t.checks)
                     asks = asks or t.asks
                 elif t is not None:
-                    checks.extend(ct.checks_of(t))
+                    checks.extend(call_checks(c))
                     asks = asks or bool(getattr(t, "asks", False))
             if isinstance(s, ps.Assert):
                 checks.extend(ct.condition_checks(s.cond))
