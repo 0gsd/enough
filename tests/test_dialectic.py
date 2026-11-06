@@ -291,6 +291,60 @@ def test_ascribes_44_questions_as_the_reader_gives_them():
     assert {x["about"] for x in r.questions} == set("ABCEIOQSUYF")
 
 
+def _from(r, frm: str) -> list[dict]:
+    return [q for q in r.questions if q["raised"]["from"] == frm]
+
+
+def test_words_that_name_no_item_are_asked_once_about_the_module():
+    """The conductor's ruling on the question stage: a bank question whose words name no item is asked once of the
+    volume, about the module, when the volume holds an item it would be asked of; one that names `{name}` (or any
+    `{<field>}`) is still asked of each item."""
+    t = dl.open_twin(TALLY)
+    r = dl.raise_questions(t, at=AT, pending=False, unsure=False)
+    worry = _from(r, "fabulac/worry")
+    assert [(q["about"], q["id"], q["kind"]) for q in worry] == [("P", "D:question/worry", "ref")]
+    rose = dl.raise_questions(dl.open_twin(ROSE), at=AT, pending=False, unsure=False)
+    assert [q["about"] for q in _from(rose, "fabulap/breaks")] == ["C"]          # was one per line
+    assert len(_from(rose, "fabulap/stands-for")) == 2                           # names {name}: per device
+    # a volume with no item of the kind is not asked; one asked already is not asked again
+    no_cases = t.render().replace("P:case/", "P:claim/").replace("type: case", "type: claim")
+    assert not _from(dl.raise_questions(dl.twin_from_text(no_cases, filename=t.ledger.filename), at=AT),
+                     "fabulac/worry")
+    dl.land(t, worry)
+    assert not _from(dl.raise_questions(t, at=AT), "fabulac/worry")
+
+
+def test_a_bank_entry_bounds_itself():
+    """`only-with: <field>` (the unexpected-input question only of an interface that takes arguments), `at-most: <n>`
+    (why a change was made, of the five newest changes with no `because`), and a field asked only where it is absent
+    or pending (the licence only when its identifier is)."""
+    t = dl.open_twin(TALLY)
+    r = dl.raise_questions(t, at=AT, pending=False, unsure=False)
+    interfaces = [d for d in t.ledger.items if d["id"].startswith("C:interface/")]
+    assert [q["about"] for q in _from(r, "fabulac/bad-input")] == [d["id"] for d in interfaces if d.get("takes")]
+    assert len(_from(r, "fabulac/bad-input")) < len(interfaces)
+    assert not _from(r, "fabulac/licence")                                       # its identifier was read
+    lic = next(d for d in t.ledger.items if d["id"].startswith("R:licence/"))
+    text = t.render().replace(f"identifier: {lic['identifier']}",
+                              "identifier: {pending: 'which licence is it under'}", 1)
+    assert text != t.render()
+    pend = dl.raise_questions(dl.twin_from_text(text, filename=t.ledger.filename), at=AT, pending=False,
+                              unsure=False)
+    assert [q["about"] for q in _from(pend, "fabulac/licence")] == [f"{lic['id']}#identifier"]
+    changes = [{"id": f"R:change/c{k}", "type": "change", "name": f"Change {k}", "summary": f"Change {k}.",
+                "stance": "observed", "at": f"2026-01-{k:02d}"} for k in (3, 1, 7, 5, 2, 6, 4)]
+    kept = [d for d in t.ledger.items if not d["id"].startswith("R:change/")]
+    led = dl.ledger_from_items(t.ledger.manifest, kept + changes, catalog=t.ledger.catalog)
+    got = [q["about"] for q in _from(dl.raise_questions(led, at=AT, pending=False, unsure=False),
+                                     "fabulac/changed")]
+    assert got == ["R:change/c3#because", "R:change/c7#because", "R:change/c5#because", "R:change/c6#because",
+                   "R:change/c4#because"]                                        # the newest five, in volume order
+    assert dl._newest([{"id": "a"}, {"id": "b"}, {"id": "c"}], 2) == [{"id": "b"}, {"id": "c"}]
+    assert dl._entry_bound({"at-most": 0}) == "a bank entry's at-most is a whole number above 0"
+    assert dl._entry_bound({"only-with": ""}) == "a bank entry's only-with names a field"
+    assert dl._entry_bound({"only-with": "takes", "at-most": 5}) == ("takes", 5)
+
+
 def test_no_duplicate():
     t = mini()
     r1 = dl.raise_questions(t, at=AT)

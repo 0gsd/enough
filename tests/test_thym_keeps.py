@@ -393,6 +393,44 @@ def test_a_move_that_asks_several_times_is_called_again_with_what_failed(tmp_pat
     assert again.replay["identical"], again.replay
 
 
+def test_a_re_ask_carries_why_the_move_could_not_take_the_last_answer(tmp_path):
+    """`ctx.ask` takes a move's own failures (lane T2, item 5; G1's note 2.4): `repair` may be the list of repairs
+    allowed (as before, byte for byte: code.py's `repair: []` asks exactly what it asked), or the mapping
+    `{allowed, failed}`, whose failures (a `{name, why}` or the reason as a string) follow the runtime's own, so a
+    re-ask is never the same request again."""
+    def tell(ctx, f, **m):
+        first = ctx.ask({"schema": {"format": "markdown"}, "repair": ["drop-unresolved-refs"]}, {"f": f})["output"]
+        assert first == "not it\n"
+        again = ctx.ask({"schema": {"format": "markdown"},
+                         "repair": {"allowed": [], "failed": [{"name": "answer", "why": "it holds no footer"}]}},
+                        {"f": f})["output"]
+        last = ctx.ask({"schema": {"format": "markdown"}, "repair": {"failed": ["it still holds no footer"]}},
+                       {"f": f})["output"]
+        return thym.values.Value("short", again + last)
+
+    def moves() -> R.Moves:
+        mv = tell_moves()
+        mv.add("tell", tell)
+        return mv
+
+    p = tmp_path / "p.thym"
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give tell f as told\nend\n",
+                 encoding="utf-8")
+    plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
+    cp = Scripted(["not it\n", "Told.\n", "*a footer*\n"])
+    t = RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", program=p, coprocessor=cp, moves=moves(),
+                checks=easy_checks(), engines=H.engines(feed=None), now=NOW)
+    assert isinstance(t, T.Trace) and t.landed, getattr(t, "refusal", t)
+    assert [c["repair"] for c in cp.sent] == [
+        {"allowed": ["drop-unresolved-refs"], "failed": []},
+        {"allowed": [], "failed": [{"name": "answer", "ok": False, "why": "it holds no footer"}]},
+        {"allowed": [], "failed": [{"name": "answer", "ok": False, "why": "it still holds no footer"}]}]
+    # the host's prompt says why: the second request is not the first
+    msgs = [H.ModelCoprocessor(complete=lambda *a, **k: ("", {}), moves=R.Moves()).messages(c, {}) for c in cp.sent]
+    assert msgs[0] != msgs[1] and "it holds no footer" in msgs[1][-1]["content"]
+    assert RUN._move_repair([]) == ([], []) and RUN._move_repair(None) == ([], [])
+
+
 def test_the_plan_counts_its_model_calls_for_the_route_it_is_given():
     c = ok(BRIEF)
     rows = [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}]
@@ -418,4 +456,5 @@ def test_agent_free_refuses_a_loop_node_that_asks_at_plan_time(tmp_path):
     r = RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", program=p, agent_free=True,
                 engines=H.engines(feed=None), now=NOW)
     assert isinstance(r, Refusal) and (r.stage, r.check) == ("plan", "agent-free")
-    assert r.message == "1 step asks a model: let ts = for each x in [f, f] (line 8); agent-free is on"
+    assert r.message == ("1 step asks a model on the local route, the first `let ts = for each x in [f, f]` "
+                         "(line 8); agent-free is on")

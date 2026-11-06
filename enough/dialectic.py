@@ -1110,6 +1110,31 @@ def _unsure(d: dict) -> bool:
     return low or state == "pending"
 
 
+def _entry_bound(e: dict) -> tuple[str | None, int | None] | str:
+    """A bank entry's bounds (MacroCOSM 18.6.6): `only-with: <field>`, asked only of an item whose field holds a
+    value, and `at-most: <n>`, asked of at most n items, the newest. `(field or None, n or None)`, or why the entry
+    cannot be read."""
+    ow, am = e.get("only-with"), e.get("at-most")
+    if ow is not None and not (isinstance(ow, str) and ow.strip()):
+        return "a bank entry's only-with names a field"
+    if am is not None and (isinstance(am, bool) or not isinstance(am, int) or am < 1):
+        return "a bank entry's at-most is a whole number above 0"
+    return (ow.strip() if isinstance(ow, str) else None), am
+
+
+def _holds(d: dict, fpath: str) -> bool:
+    """Whether an item's field holds a value: present, not pending, and not empty."""
+    found, v = get_field(d, fpath)
+    return found and not mc.is_pending(v) and v not in (None, "", [], {})
+
+
+def _newest(items: list[dict], n: int) -> list[dict]:
+    """The newest n items, in the volume's order: by their `at` date where they carry one, then by their place in
+    the volume (a later item is newer)."""
+    ranked = sorted(range(len(items)), key=lambda i: (str(items[i].get("at") or ""), i), reverse=True)
+    return [items[i] for i in sorted(ranked[:n])]
+
+
 def default_to(src: Any) -> str:
     """Who answers a question raised by rule when nothing else says: the `to` of the first bank that applies (the
     fabula's author for prose and verse, maker for code; Ascribe's holder), else `anyone`."""
@@ -1129,10 +1154,14 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
     1. from the banks that apply (`banks_for`): an entry about a module is asked once of the volume (`about: I`; not
        again while any question raised from that entry stands, whatever it is about: appendix B's `fabulan/audience`
        question is about `N:audience/owners`); about a kind, of each item of it; about a kind's field, of each item
-       where the field is absent or pending. A kind entry with no item of its kind raises nothing. `{name}`
-       and `{<field>}` are filled from the item; an item that cannot fill a placeholder is skipped. `raised: {by:
-       bank, from: <bank>/<entry>}`. Ids: the entry's id (a module entry; `<bank>-<entry>` for a bank in the older
-       shape, Ascribe's `ascribe-a1`), else `<entry>-<item slug>`.
+       where the field is absent or pending. A kind entry with no item of its kind raises nothing, and one whose
+       words name no item (no `{name}`, no `{<field>}`) is asked once of the volume, about the kind's module (a
+       question asked of each test case alike is one question). An entry may bound itself: `only-with: <field>`
+       asks it only of an item whose field holds a value, and `at-most: <n>` of at most n items, the newest (by
+       their `at`, then the later in the volume). `{name}` and `{<field>}` are filled from the item; an item that
+       cannot fill a placeholder is skipped. `raised: {by: bank, from: <bank>/<entry>}`. Ids: the entry's id (a
+       module entry, or a kind entry asked once; `<bank>-<entry>` for a bank in the older shape, Ascribe's
+       `ascribe-a1`), else `<entry>-<item slug>`.
     2. (`pending`) from every `{pending: "…"}` value of an item that is not of D, and every `pending:` on a whole item:
        `about: <item>#<field>` (or the item), `why: missing`, `asks` the pending's own text (its first letter
        capitalised), `kind: text`. `raised: {by: move, from: question}`. Id `<item slug>-<field>`.
@@ -1204,14 +1233,35 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     add(_question_item(Q_PREFIX + slug, head, asks, why, e, who(e.get("to")), {**raised}), frm)
                     continue
                 module, _, kind = head.partition(":")
+                bound = _entry_bound(e)
+                if isinstance(bound, str):
+                    out.skipped.append((frm, bound))
+                    continue
+                only_with, at_most = bound
+                cands = []
                 for d in _items_of_kind(led, module, kind or None):
                     if sep:
                         found, v = get_field(d, fpath)
                         if found and not mc.is_pending(v):
                             continue
-                        q_about = f"{d['id']}#{fpath}"
-                    else:
-                        q_about = d["id"]
+                    if only_with is not None and not _holds(d, only_with):
+                        continue
+                    cands.append(d)
+                if not sep and not _PLACEHOLDER.search(e["asks"]):
+                    # words that name no item are asked once of the volume, about the module, when it holds an
+                    # item the entry would be asked of (the conductor's ruling on the question stage)
+                    if not cands:
+                        continue
+                    if frm in from_any:
+                        out.skipped.append((frm, f"{frm} was asked of this volume already"))
+                        continue
+                    slug = _unique_slug(eid, taken, led)
+                    add(_question_item(Q_PREFIX + slug, module, e["asks"], why, e, who(e.get("to")), {**raised}), frm)
+                    continue
+                if at_most is not None:
+                    cands = _newest(cands, at_most)
+                for d in cands:
+                    q_about = f"{d['id']}#{fpath}" if sep else d["id"]
                     asks = _fill(e["asks"], d, led)
                     if asks is None:
                         out.skipped.append((f"{frm} {d['id']}", "a placeholder the item cannot fill"))

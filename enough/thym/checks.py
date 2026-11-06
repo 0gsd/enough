@@ -22,7 +22,7 @@ from typing import Any, Callable
 
 from enough import macrocosm as mc
 from enough.thym import Refusal
-from enough.thym.values import Value, digest_path, is_fabula, item_id, plain, sha256_bytes
+from enough.thym.values import Value, digest_path, item_id, plain, sha256_bytes
 
 CheckFn = Callable[[Value, dict, dict, Any, Any], Any]
 
@@ -433,18 +433,22 @@ def _default_deny(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
 @check("emf-checks")
 @check("fabula-checks")
 def _fabula_checks(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """The volume passes its own manifest's checks (`macrocosm.lint`, no errors): a fabula, `fabula/1` or `emf/1`
-    (THYM 7.3). One check under two names: `fabula-checks`, and `emf-checks`, its old name, read wherever it is
-    written; a verdict keeps the name it was asked by."""
+    """The volume passes its own manifest's checks (`macrocosm.lint`, no errors), THYM 7.3: a fabula (`fabula/1` or
+    `emf/1`) by the fabula's manifest, and any other volume (`gather … with` a volume, `settle` of a volume) by its
+    own format's manifest; the conductor's ruling L5. One check under two names: `fabula-checks`, and `emf-checks`,
+    its old name, read wherever it is written; a verdict keeps the name it was asked by."""
     text = output.raw.decode("utf-8-sig") if output.raw is not None else (
         mc.dump(plain(output.payload)) if isinstance(output.payload, dict) else None)
     if text is None:
-        return False, "the output is not a fabula"
+        return False, "the output is not a volume"
     vol = mc.load_volume_text(text, filename="fabula.md.cosm")
+    if vol.refused is not None and output.path is not None and output.path.name != "fabula.md.cosm":
+        # a volume whose format is claimed by its file's name, not by a declaration, is read under that name
+        by_name = mc.load_volume_text(text, filename=output.path.name)
+        if by_name.refused is None:
+            vol = by_name
     if vol.refused is not None:
         return False, str(vol.refused)
-    if not is_fabula(vol.oes):
-        return False, f"the volume is {vol.oes}, not a fabula (fabula/1)"
     errs = mc.lint(vol).errors
     if errs:
         return False, "; ".join(str(p) for p in errs[:3]) + (f" (and {len(errs) - 3} more)" if len(errs) > 3 else "")

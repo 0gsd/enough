@@ -675,6 +675,30 @@ def calls_in(x: Any) -> list[str]:
     return out
 
 
+def _call_objects(x: Any) -> list[Call]:
+    """Every call a statement, an expression or a condition makes, outermost first, as `calls_in` finds them (a
+    `marked` modifier's `mark` is not a call written here, and is left out)."""
+    out: list[Call] = []
+    if isinstance(x, Stmt):
+        for part in (x.expr, x.cond, x.loop):
+            out += _call_objects(part)
+    elif isinstance(x, Loop):
+        out += _call_objects(x.coll) + _call_objects(x.cond)
+    elif isinstance(x, Call):
+        out.append(x)
+        for o in x.operands:
+            out += _call_objects(o)
+        for w, a in x.mods.items():
+            if w == "where":
+                out += _call_objects(a[0])
+            elif w != "marked" and not isinstance(a, (str, list, Amount)):
+                out += _call_objects(a)
+    elif isinstance(x, (Filter, Cmp, Covers, BoolOp, Not, Bare, Has, FieldRead, ListLit)):
+        for v in vars(x).values():
+            out += _call_objects(v) if not isinstance(v, list) else [c for i in v for c in _call_objects(i)]
+    return out
+
+
 def _has_covers(c: Any) -> bool:
     if isinstance(c, Covers):
         return True
@@ -1079,12 +1103,16 @@ class MoveContext:
     attempt: int = 1
 
     def ask(self, contract: dict, inputs: dict, *, budget: dict | None = None) -> dict:
-        """One model request the move makes itself (THYM 12.2, 12.4): `contract` holds `schema` and `repair` (the
-        narrow repairs it allows) as a `Request`'s does, `inputs` the values the model reads, by name. The request is
-        keyed on the node's counter, recorded and replayed as every request is, carries every failed verdict the
-        model should hear of (a kept contract's, and this move's last answer's) in `repair.failed`, and counts
-        toward the run's ceiling of calls. Returns the candidate (`output`, `engine`, `tokens`, …); a refusal (a
-        model the run may not ask, the ceiling reached, a replay that does not match) stops the move."""
+        """One model request the move makes itself (THYM 12.2, 12.4): `contract` holds `schema` and `repair` as a
+        `Request`'s does, `inputs` the values the model reads, by name. `repair` is the list of narrow repairs the
+        move allows, or the coprocessor's mapping `{allowed: [...], failed: [...]}`, whose `failed` names what the
+        move itself could not take in its last answer (`{name, why}` each, or the reason as a string), so that a
+        re-ask says why and is never the same request again. The request is keyed on the node's counter, recorded
+        and replayed as every request is, carries every failed verdict the model should hear of in
+        `repair.failed` (a kept contract's, the runtime's verdicts on this move's last output, then the move's
+        own), and counts toward the run's ceiling of calls. Returns the candidate (`output`, `engine`, `tokens`,
+        …); a refusal (a model the run may not ask, the ceiling reached, a replay that does not match) stops the
+        move."""
         if self.ask_fn is None:
             raise _Stop(Refusal("run", "asks", "this move asked a model, and the run has none to ask"))
         return self.ask_fn(contract, inputs, budget)
@@ -1345,28 +1373,119 @@ class _Run:
         """Whether a user move asks: any declared move its body calls, through the user moves it calls, asks."""
         return any(decl_get(self.decls.get(m), "asks") is True for m in self._body_moves(name))
 
+    def _route(self) -> str:
+        """The route a model would be asked on, as the host named it in the environment (THYM 23.1); `local` when
+        it named none (the runtime's own CLI, agent-free)."""
+        r = self.environment.get("route")
+        return r if isinstance(r, str) and r in ("local", "cloud") else "local"
+
+    def _unscaffolded(self, n: dict) -> bool:
+        """Whether a node that asks makes a call that asks and has no rules scaffold (THYM 19), each call's scaffold
+        chosen by the call where the plan can tell it (`scaffold-when`, THYM 17.6): a rule that says `none` leaves
+        the call with none, and `--rules` refuses it here, at plan time, not when it runs."""
+        return any(decl_get(self.decls.get(m), "asks") is True and not self._call_scaffold(m, c, params)
+                   for m, c, params in self._calls_of(n))
+
+    def _calls_of(self, n: dict) -> list[tuple[str, Any, dict]]:
+        """The declared moves a node calls, each `(move, call, types)`: the call as read (None when it cannot be
+        read) and the types of the names it is called with that the program states (a user move's parameters)."""
+        m = n.get("move")
+        if m == "for":
+            part = self.info.loops.get(n.get("line"))
+            return self._part_calls([part], {}) if part is not None else []
+        if m in self.info.moves:
+            return self._move_calls(m, frozenset())
+        try:
+            st = read_statement(_TRAILER.sub("", str(n.get("name") or "")), self.move_names, self.in_moves,
+                                self.where_moves)
+        except ReadError:
+            return [(m, None, {})]
+        own = next((c for c in _call_objects(st) if c.move == m), None)
+        return [(m, own, {})]
+
+    def _move_calls(self, name: str, seen: frozenset[str]) -> list[tuple[str, Any, dict]]:
+        um = self.info.moves.get(name)
+        if um is None or name in seen:
+            return []
+        return self._part_calls(um.body, dict(um.params), seen | {name})
+
+    def _part_calls(self, body: list, types: dict, seen: frozenset[str] = frozenset()) -> list[tuple[str, Any, dict]]:
+        out: list[tuple[str, Any, dict]] = []
+        for part in body:
+            try:
+                st = read_statement(part[2], self.move_names, self.in_moves, self.where_moves)
+            except ReadError:
+                continue
+            for c in _call_objects(st):
+                if c.move in self.info.moves:
+                    out += self._move_calls(c.move, seen)
+                else:
+                    out.append((c.move, c, types))
+            for sub in part[3:]:
+                if isinstance(sub, list):
+                    out += self._part_calls(sub, types, seen)
+        return out
+
+    def _call_scaffold(self, m: str, c: Any, types: dict) -> Any:
+        """The scaffold a call of the declared move `m` runs under `--rules`: its declaration's, or the one its
+        `scaffold-when` chooses from the call's `as` word or its first operand's type, where the plan can tell
+        that type; None when it has none."""
+        decl = self.decls.get(m)
+        if c is None or not any(decl_get(decl, k) for k in ("scaffold-when", "scaffold_when")):
+            return decl_get(decl, "scaffold")
+        try:
+            from enough.thym import declarations as _decls     # the compiler's reader of the rules
+        except ImportError:
+            return decl_get(decl, "scaffold")
+        w = c.mods.get("as")
+        first = self._static_type(c.operands[0], types) if c.operands else None
+        return _decls.chosen(decl, as_word=w if isinstance(w, (str, list)) else None, first_type=first)["scaffold"]
+
+    def _static_type(self, e: Any, types: dict) -> str | None:
+        """The type of an operand where the plan says it without running: a name the program types (an input, a
+        user move's parameter), a name a node gives whose move gives one type, a literal, a filter of one of
+        these; None otherwise."""
+        if isinstance(e, Lit):
+            return e.value.type
+        if isinstance(e, Filter):
+            return self._static_type(e.base, types)
+        if not isinstance(e, Name):
+            return None
+        if isinstance(types.get(e.name), str):
+            return types[e.name]
+        for spec in self.plan.get("inputs") or []:
+            if isinstance(spec, dict) and spec.get("name") == e.name and isinstance(spec.get("type"), str):
+                return spec["type"]
+        giver = next((n for n in self.nodes if n.get("gives") == e.name), None)
+        if giver is None or giver.get("move") in self.info.moves or giver.get("move") == "for":
+            return None
+        gives = _alternatives(decl_get(self.decls.get(giver.get("move")), "gives"))
+        return gives[0] if len(gives) == 1 and not gives[0].startswith("same-as-") else None
+
     def _environment(self) -> Refusal | None:
         asks = [n for n in self.nodes if n.get("asks") is True]
         if asks and (self.agent_free or self.rules):
             blocked = asks
             if self.rules:
-                def bare(m: Any) -> bool:
-                    return not decl_get(self.decls.get(m), "scaffold")
-
-                def unscaffolded(n: dict) -> bool:
-                    inner = any(decl_get(self.decls.get(m), "asks") is True and bare(m) for m in self._moves_of(n))
-                    own = n.get("move") not in self.info.moves and n.get("move") != "for"
-                    return inner or (own and bare(n.get("move")))
-                blocked = [n for n in asks if unscaffolded(n)]
+                blocked = [n for n in asks if self._unscaffolded(n)]
             if blocked:
                 k = len(blocked)
                 many = f"{k} step{'s' if k != 1 else ''} ask{'' if k != 1 else 's'} a model"
-                if self.rules:
-                    many += f" and {'have' if k != 1 else 'has'} no scaffold"
+                if self.agent_free:
+                    # the host's words (THYM 19; the conductor's ruling L11): the route, then "the first" and the
+                    # statement as written, in backticks when the program is to hand
+                    many += f" on the {self._route()} route"
+                    if self.rules:
+                        many += f" and {'have' if k != 1 else 'has'} no scaffold"
+                    line = blocked[0].get("line")
+                    stmt = self.info.statements.get(line) if isinstance(line, int) else None
+                    named = f"`{_cut(stmt)}`" if stmt else self._said(blocked[0])
+                    where = f" (line {line})" if isinstance(line, int) else ""
+                    return Refusal("plan", "agent-free", f"{many}, the first {named}{where}; agent-free is on",
+                                   line=line)
+                many += f" and {'have' if k != 1 else 'has'} no scaffold"
                 first = f", the first {self._at(blocked[0])}" if k > 1 else f": {self._at(blocked[0])}"
-                why = "agent-free is on" if self.agent_free else "--rules runs no model"
-                return Refusal("plan", "agent-free" if self.agent_free else "rules", f"{many}{first}; {why}",
-                               line=blocked[0].get("line"))
+                return Refusal("plan", "rules", f"{many}{first}; --rules runs no model", line=blocked[0].get("line"))
         for spec in self.plan.get("inputs") or []:
             if not isinstance(spec, dict):
                 continue
@@ -2057,10 +2176,11 @@ class _Run:
         self._count_request()
         nb = self.cur.node.get("budget") if isinstance(self.cur.node.get("budget"), dict) else {}
         rb = budget or {}
-        failed = [dict(x) for level in self._repairs for x in level] + [dict(x) for x in frame["failed"]]
+        allowed, own = _move_repair(contract.get("repair"))
+        failed = [dict(x) for level in self._repairs for x in level] + [dict(x) for x in frame["failed"]] + own
         c = {"move": frame["move"], "schema": plain(contract.get("schema")),
              "checks": [str(x) for x in decl_get(frame["decl"], "contract") or []],
-             "repair": {"allowed": list(contract.get("repair") or []), "failed": failed}}
+             "repair": {"allowed": allowed, "failed": failed}}
         ins = {}
         for k, v in (inputs or {}).items():
             v = v if isinstance(v, Value) else wrap(v)
@@ -2136,7 +2256,8 @@ class _Run:
         asks = decl_get(decl, "asks") is True
         ctx = self._ctx()
         if asks and self.rules:
-            fn = self.moves.scaffold(decl)
+            # a call whose scaffold-when says `none` has no scaffold, whatever `<move>.scaffold` the registry holds
+            fn = self.moves.scaffold(decl) if decl_get(decl, "scaffold") else None
             if fn is None:
                 raise _Stop(Refusal("run", "rules", f"{move} asks a model and has no scaffold; --rules runs no model"))
             r = self._invoke(move, fn, ctx, operands, mods)
@@ -2620,6 +2741,22 @@ def _kind_code(decl: Any, mods: dict) -> Callable | None:
                                                    "implementation here"))
             return fn
     return None
+
+
+def _move_repair(rep: Any) -> tuple[list, list[dict]]:
+    """A move's own `repair` as `ctx.ask` takes it: `(allowed, failed)`. A list (or nothing) is the narrow repairs
+    allowed and no failure; a mapping `{allowed, failed}` gives both, each failure a `{name, ok: false, why}` (a
+    string is the reason the move could not take its last answer, named `answer`)."""
+    if isinstance(rep, dict):
+        allowed = [str(x) for x in rep.get("allowed") or []]
+        out: list[dict] = []
+        for f in rep.get("failed") or []:
+            if isinstance(f, dict):
+                out.append({"name": str(f.get("name") or "answer"), "ok": False, "why": str(f.get("why") or "")})
+            elif isinstance(f, str) and f.strip():
+                out.append({"name": "answer", "ok": False, "why": f.strip()})
+        return allowed, out
+    return list(rep or []), []
 
 
 def _chosen_decl(decl: Any, operands: list, mods: dict) -> Any:

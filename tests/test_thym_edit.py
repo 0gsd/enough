@@ -144,9 +144,9 @@ def test_edit_keeps_every_line_break_and_a_last_line_without_one():
 
 @pytest.mark.parametrize("make, words", [
     (lambda ls, other: [E.drop(None, lines_of(other)[1])], "a change names line 2 of another text"),
-    (lambda ls, other: [E.drop(None, ls[1]), E.drop(None, ls[1])], "lines 2 and 2 are both dropped"),
+    (lambda ls, other: [E.drop(None, ls[1]), E.drop(None, ls[1])], "line 2 is dropped twice"),
     (lambda ls, other: [E.replace(None, ls[1], **{"with": Value("string", "x")}),
-                        E.replace(None, ls[1], **{"with": Value("string", "y")})], "lines 2 and 2 are both replaced"),
+                        E.replace(None, ls[1], **{"with": Value("string", "y")})], "line 2 is replaced twice"),
     (lambda ls, other: [E.replace(None, ls[1], **{"with": Value("string", "x")}), E.drop(None, ls[1])],
      "line 2 is both replaced and dropped"),
     (lambda ls, other: [make_change(9, "0" * 64, ls[0].origin["line"]["source"], "drop")],

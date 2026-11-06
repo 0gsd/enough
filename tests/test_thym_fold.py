@@ -233,7 +233,8 @@ def test_agent_free_names_the_first_step_that_asks(tmp_path):
     plan = thym.plan_file(prog, [{"name": "story", "type": "text", "path": str(NOTES), "sha256": digest_path(NOTES)}])
     r = _said(RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", agent_free=True, program=prog))
     assert (r.check, r.line) == ("agent-free", 12)
-    assert r.message == ("3 steps ask a model, the first let f = derive story (line 12); agent-free is on")
+    assert r.message == ("3 steps ask a model on the local route, the first `let f = derive story` (line 12); "
+                         "agent-free is on")
 
 
 def test_a_cancelled_run_names_the_statement_it_stopped_before(tmp_path):

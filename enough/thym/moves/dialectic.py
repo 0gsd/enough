@@ -34,8 +34,12 @@ A `volume` argument is `{text, filename}` (a single-file volume) or `{path}` (a 
 and `record` and `settle` refuse: a folder volume keeps its questions in its own layout). With no such engine, or one
 that lacks a function, the move refuses in plain words.
 
-**The model.** `question` asks, one keyed request per chunk of the volume's items (twelve at a time), for the
-questions only a person can answer, with one prompt per flavour (prose, verse, code); a proposal in the wrong shape,
+**The model.** `question` asks, one keyed request per chunk of the volume's items (fewer, fuller requests: up to
+forty items and about 24,000 characters of them at a time), for the questions only a person can answer, with one
+prompt per flavour (prose, verse, code). It reads only the items a person can say something about (`asked_of`): of a
+fabulac its aims, uses, requirements, decisions, exclusions, behaviours, interfaces, structures and claims; of any
+other flavour every item but its files, changes, releases, test cases and dependencies as such; in every flavour any
+item marked unsure or pending. A proposal in the wrong shape,
 about nothing read in that chunk, asking two things, in someone's voice, leading, or asking what the fabula already
 says surely, is dropped and counted, and so is one the core's hook refuses. A request whose answer gave nothing that
 could be kept (it did not read, or every proposal was dropped) is asked again once, with why. `settle` asks only for
@@ -62,7 +66,15 @@ from enough.thym.values import Value, plain
 
 ENGINE = "dialectic"
 FUNCTIONS = ("thym_question", "thym_record", "thym_settle")
-CHUNK_ITEMS = 12                     # items per request of `question`
+CHUNK_ITEMS = 40                     # at most this many items per request of `question`
+CHUNK_CHARS = 24000                  # and at most about this many characters of them (a lone larger item goes alone)
+#: what a model is asked about, of a fabulac: the items a person can say something about (the conductor's ruling on
+#: the question stage), and any item marked unsure or pending
+PERSON_KINDS = {"fabulac": frozenset({"aim", "use", "requirement", "decision", "exclusion", "behaviour", "interface",
+                                      "structure", "claim"})}
+#: what no flavour's model is asked about as such: a file, a change, a release, a test case or a dependency (asked of
+#: only when it is marked unsure or pending)
+NOT_ASKED = frozenset({"file", "change", "release", "case", "dependency"})
 ASKS_PER_REQUEST = 2                 # a request is asked again once when nothing could be kept
 MODEL_WHYS = ("unsure", "ambiguous", "conflict", "intent")
 ANSWER_KINDS = ("text", "choice", "yes-no", "number", "date", "ref", "span")
@@ -227,9 +239,56 @@ def _passage(v: Value, items: list[dict]) -> str:
     return "\n".join(f"{n:>4}  {lines[n - 1]}" for n in sorted(want) if 1 <= n <= len(lines))
 
 
-def _chunks(items: list[dict]) -> list[list[dict]]:
-    rows = [it for it in items if isinstance(it.get("id"), str) and not _is_d(it)]
-    return [rows[i:i + CHUNK_ITEMS] for i in range(0, len(rows), CHUNK_ITEMS)]
+def _kind(item: dict) -> str:
+    """An item's kind, from its id (`C:interface/x` → `interface`), else its `type`."""
+    head = _bare(str(item.get("id") or "")).partition("/")[0]
+    return head.partition(":")[2] or str(item.get("type") or "")
+
+
+def _marked(item: dict) -> bool:
+    """Whether an item is marked unsure (below confidence 0.5, or `provenance.state: pending`) or holds a pending."""
+    conf = _confidence(item)
+    prov = item.get("provenance")
+    if isinstance(conf, (int, float)) and not isinstance(conf, bool) and conf < 0.5:
+        return True
+    if isinstance(prov, dict) and prov.get("state") == "pending":
+        return True
+    return any(True for _ in mc.walk_pending(item))
+
+
+def asked_of(items: list[dict], flavour: str) -> list[dict]:
+    """The items the model is asked to raise questions over: of a fabulac, the kinds a person can say something
+    about (`PERSON_KINDS`); of any other flavour, every item but a file, a change, a release, a test case or a
+    dependency as such (`NOT_ASKED`); in every flavour, any item marked unsure or pending. Never a question or a
+    session."""
+    person = PERSON_KINDS.get(flavour)
+    out = []
+    for it in items:
+        if not isinstance(it.get("id"), str) or _is_d(it):
+            continue
+        k = _kind(it)
+        if _marked(it) or (k in person if person is not None else k not in NOT_ASKED):
+            out.append(it)
+    return out
+
+
+def _chunks(items: list[dict], flavour: str | None = None) -> list[list[dict]]:
+    """The items the model reads, in fewer, fuller requests: in the volume's order, at most `CHUNK_ITEMS` items and
+    about `CHUNK_CHARS` characters of them to a request (an item larger than that goes alone)."""
+    rows = asked_of(items, flavour or "")
+    out: list[list[dict]] = []
+    cur: list[dict] = []
+    size = 0
+    for it in rows:
+        n = len(mc.dump(_compact(it)))
+        if cur and (len(cur) >= CHUNK_ITEMS or size + n > CHUNK_CHARS):
+            out.append(cur)
+            cur, size = [], 0
+        cur.append(it)
+        size += n
+    if cur:
+        out.append(cur)
+    return out
 
 
 def _read_proposals(out: Any) -> list:
@@ -408,12 +467,12 @@ def question(ctx: Any, v: Value, **_: Any) -> Value:
     run, at = getattr(ctx, "run", None), getattr(ctx, "now", None)
     rules = qfn(vol, run=run, at=at)
     cat, items = _doc(v)
-    chunks = _chunks(items)
+    flavour = _flavour(cat)
+    chunks = _chunks(items, flavour)
     if not chunks:
         return _questions_value(rules)
     standing = [q for q in items if _is_question(q) and q.get("state") not in ENDED]
     asked = standing + [q for q in rules.get("questions") or [] if isinstance(q, dict)]
-    flavour = _flavour(cat)
     name = str(cat.get("name") or cat.get("id") or "the volume")
     proposals: list[dict] = []
     dropped: list[dict] = []

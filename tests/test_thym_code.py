@@ -26,6 +26,7 @@ from enough import thym
 from enough import thym_host as H
 from enough.thym import Refusal
 from enough.thym import checks as C
+from enough.thym import declarations as dc
 from enough.thym import plan as pl
 from enough.thym import registry as R
 from enough.thym import run as RUN
@@ -780,6 +781,30 @@ def test_rules_mode_refuses_code_and_tells_a_catem_by_its_outline(built, tmp_pat
     v = CODE.uses_outline(type("Ctx", (), {"now": NOW})(), Value("fabula", mc.yaml_load(f.read_text())),
                           **{"as": "manual"})
     assert v.state == "pending" and "## Count the words of a file" in v.text() and "## tiny top" in v.text()
+
+
+def test_rules_refuses_a_folder_derive_and_tell_as_code_at_plan_time(built, tmp_path):
+    """`scaffold-when` may say `none` (the conductor's ruling L6): `derive` of a folder and `tell … as code` have no
+    rules scaffold, so `--rules` refuses them at plan time, in the words a move without a scaffold gets, and asks
+    and writes nothing; `tell f as manual` keeps its scaffold, `uses-outline`."""
+    tmp, f, _runs = built
+    t = compile_run(tmp, f, Scripted({}), rules=True)
+    assert isinstance(t, Refusal) and (t.stage, t.check, t.line) == ("plan", "rules", 12), t
+    assert t.message == ("1 step asks a model and has no scaffold: give code: tell f as code (line 12); --rules runs "
+                         "no model")
+    rows = [{"name": "repo", "type": "folder", "path": "tiny-tool"},
+            {"name": "f", "type": "fabula", "path": str(f.relative_to(tmp)), "sha256": digest_path(f)}]
+    p = plan_stage(DECOMPILE, "fold-the-whole", rows)
+    r = RUN.run(p, inputs_root=tmp, root=tmp / "root", program=DECOMPILE, rules=True, engines=engines(), now=NOW)
+    assert isinstance(r, Refusal) and (r.stage, r.check) == ("plan", "rules"), r
+    assert r.message.startswith("1 step asks a model and has no scaffold: give derive repo with f (line ")
+    decl = R.declarations()["tell"]
+    assert dc.chosen(decl.view(1), as_word="code")["scaffold"] is None
+    assert dc.chosen(decl.view(1), as_word="manual")["scaffold"] == "uses-outline"
+    assert dc.chosen(R.declarations()["derive"].view(1), first_type="folder")["scaffold"] is None
+    assert dc.chosen(R.declarations()["derive"].view(1), as_word="code", first_type="text")["scaffold"] == \
+        "file-outline"
+    assert R.declarations()["derive"].view(0).scaffold_when == ()          # a thym 0 program sees nothing new
 
 
 # ---------------------------------------------------------------------------

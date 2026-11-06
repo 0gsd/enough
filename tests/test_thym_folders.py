@@ -412,8 +412,9 @@ def scratch_decls(tmp_path):
 def test_the_when_keys_are_read_into_the_views(scratch_decls):
     t = scratch_decls["tell-two"]
     assert t.gives_when == () and t.view(1).gives_when == (("as", ("code",), ("folder",)),)
+    # `scaffold: none` in a when-rule: the call has no rules scaffold (the conductor's ruling L6)
     assert dc.chosen(t.view(1), as_word="code") == {"gives": ("folder",), "contract": ("parses", "provenance"),
-                                                    "scaffold": "none"}
+                                                    "scaffold": None}
     assert dc.chosen(t.view(1), as_word="told") == {"gives": ("short",), "contract": ("coverage",),
                                                     "scaffold": "outline"}
     assert dc.chosen(t.view(0), as_word="code")["gives"] == ("short",)

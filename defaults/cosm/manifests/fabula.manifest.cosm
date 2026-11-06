@@ -334,6 +334,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {takes: folder, contract: [fold-grounded, atem-shape, licence-recorded, fabula-checks, provenance]}
       scaffold-when:                    # a folder has none: nothing but a model reads intent, and --rules refuses it
         - {as: [code], scaffold: file-outline}
+        - {takes: folder, scaffold: none}
   - name: tell
     takes: ['fabula | item | volume']
     gives: short
@@ -352,6 +353,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {as: [line, overview, manual], contract: [coverage, no-invention, uses-told, footer, provenance]}
       scaffold-when:                    # code has none: --rules refuses it
         - {as: [line, overview, manual], scaffold: uses-outline}
+        - {as: [code], scaffold: none}
   - name: atem
     takes: ['text | fabula | short | item']
     gives: atem
@@ -392,7 +394,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, only-with, at-most]
   banks:
     fabulan:
       for: {flavour: fabulan}
@@ -457,12 +459,12 @@ dialectic:
         - {id: tried, about: N:decision#over, asks: "What else was tried for {name} and dropped?", kind: text, why: missing}
         - {id: intended, about: C:behaviour#intended, asks: "Is this behaviour intended, or an accident users now rely on: {name}?", kind: yes-no, why: intent}
         - {id: public, about: C:interface#exported, asks: "Is {name} meant for others to call, or internal?", kind: yes-no, why: unsure}
-        - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing}
+        - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing, only-with: takes}
         - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure}
         - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
-        - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing}
+        - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing, at-most: 5}
         - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing, writes: maker}
-        - {id: licence, about: R:licence, asks: "Under which licence may it be used?", kind: text, why: missing}
+        - {id: licence, about: R:licence#identifier, asks: "Under which licence may it be used?", kind: text, why: missing}
         - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}
         - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most?", kind: ref, why: intent}
 

@@ -269,7 +269,7 @@ def test_agent_free_refuses_a_plan_that_asks_before_any_call(root):
     assert isinstance(r, Refusal)
     assert (r.stage, r.check, r.line) == ("plan", "agent-free", 12)
     # THYM 9: the first step that asks is named as the person wrote it; without the program, by the plan's words
-    assert r.message == "3 steps ask a model, the first derive story (line 12); agent-free is on"
+    assert r.message == "3 steps ask a model on the local route, the first derive story (line 12); agent-free is on"
     assert cp.calls == []
     assert not (root / "runs").exists()
 
@@ -440,8 +440,8 @@ def test_rules_refuses_a_plan_whose_model_steps_have_no_scaffold(root):
     assert r.message == "1 step asks a model and has no scaffold: expand f to 300 words (line 6); --rules runs no model"
     r = RUN.run(plan, inputs_root=SUITE, root=root, rules=True, agent_free=True, moves=fake_moves(),
                 checks=fake_checks())
-    assert (r.check, r.message) == ("agent-free", "1 step asks a model and has no scaffold: expand f to 300 words "
-                                                  "(line 6); agent-free is on")
+    assert (r.check, r.message) == ("agent-free", "1 step asks a model on the local route and has no scaffold, the "
+                                                  "first expand f to 300 words (line 6); agent-free is on")
 
 
 def test_an_if_takes_one_branch_and_skips_the_other(root):

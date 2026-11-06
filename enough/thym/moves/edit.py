@@ -357,10 +357,12 @@ def change_problems(of: str, rows: list[tuple[str, str]], changes: list[dict]) -
             continue
         at, do = c["at"], c["do"]
         if at in taken:
+            # one line changed twice the same way: "line 7 is replaced twice" (the conductor's ruling L7); two
+            # different lines are never met here, since a change names one line
             if taken[at] == do == "replace":
-                out.append(f"lines {at} and {at} are both replaced")
+                out.append(f"line {at} is replaced twice")
             elif taken[at] == do:
-                out.append(f"lines {at} and {at} are both dropped")
+                out.append(f"line {at} is dropped twice")
             else:
                 out.append(f"line {at} is both replaced and dropped")
         taken.setdefault(at, do)

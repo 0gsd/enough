@@ -231,16 +231,28 @@ def test_the_request_is_asked_again_when_nothing_valid_comes_back(tmp_path, monk
     assert [m.payload["asks"] for m in got.payload if m.payload["raised"]["by"] == "model"] == [GOOD["asks"]]
 
 
-def test_question_asks_one_request_per_chunk_of_items(tmp_path):
+def test_question_asks_one_request_per_chunk_of_items(tmp_path, monkeypatch):
     v = fabula(TALLY)
-    n = len([d for d in doc(v)["nodes"] if not d["id"].startswith("D:")])
-    chunks = -(-n // D.CHUNK_ITEMS)
+    read = D.asked_of(doc(v)["nodes"], "fabulac")
+    # of a fabulac, the model reads only what a person can say something about, and whatever is unsure or pending
+    assert read and {D._kind(i) for i in read} - set(D.PERSON_KINDS["fabulac"]) <= {"occasion", "dependency"}
+    assert all(D._marked(i) for i in read if D._kind(i) not in D.PERSON_KINDS["fabulac"])
+    assert not [i for i in read if D._kind(i) in ("file", "change", "release", "case") and not D._marked(i)]
+    asker = Asker(["questions: []\n"])
+    D.question(ctx_for(tmp_path, ask=asker), v)
+    assert len(asker.sent) == 1                                       # fewer, fuller: one request holds them all
+    assert len(mc.yaml_load(asker.sent[0]["inputs"]["items"].payload)["items"]) == len(read)
+    monkeypatch.setattr(D, "CHUNK_ITEMS", 10)
+    chunks = -(-len(read) // 10)
     asker = Asker(["questions: []\n"] * chunks)
     D.question(ctx_for(tmp_path, ask=asker), v)
     assert len(asker.sent) == chunks and chunks >= 2
     first = mc.yaml_load(asker.sent[0]["inputs"]["items"].payload)["items"]
-    assert len(first) == D.CHUNK_ITEMS and all("made" not in it for it in first)
+    assert len(first) == 10 and all("made" not in it for it in first)
     assert asker.sent[0]["inputs"]["flavour"].payload == "fabulac"
+    monkeypatch.setattr(D, "CHUNK_ITEMS", 100)
+    monkeypatch.setattr(D, "CHUNK_CHARS", 1)                          # a lone item larger than the budget goes alone
+    assert [len(c) for c in D._chunks(doc(v)["nodes"], "fabulac")] == [1] * len(read)
 
 
 def test_the_question_prompts_one_per_flavour():

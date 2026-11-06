@@ -1,39 +1,49 @@
 ---
 name: macrocosm-oes
-description: Reads, checks and explains MacroCOSM `.cosm` files — Comprise Holotypes, Canon catalogs, standalone COSM product trees and EMF twins — and, only when the user asks, decompiles a text into its EMF twin, writes its atem (the tightest fair, full, plain reduction of a text) or runs a Thym program on a file. Use for "what is this .cosm file", "read this Holotype", "explain this Holotype", "what does the Holotype say about X", "lint this .cosm", "check this .cosm", "decompile this text", "enumerate this document", "make an EMF twin", "make an atem of this", "summarize this tightly", "say it in one line", "what is MacroCOSM", "what is EMF", "what is an atem", "what does this stance mean", "check this Thym program", "run a Thym program on a file", "run publish-story on this", "what is Thym". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
+description: Reads, checks and explains MacroCOSM `.cosm` files — Holotypes, Canon catalogs, product trees, fabulas, holographs — and, only when the user asks, decompiles a text into its fabula, writes its atem (the tightest fair, full, plain reduction of a text), puts a volume's questions to the user and records their answers, builds a fabulac of a folder of Python, or runs a Thym program. Use for "what is this .cosm file", "read this Holotype", "lint this .cosm", "decompile this text", "make an atem of this", "say it in one line", "what is a fabula", "what does this stance mean", "ask me the questions", "build a fabulac", "run publish-story on this", "what is Thym". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
 ---
 
 # macrocosm-oes
 
-**MacroCOSM OES** is the shared grammar every MiniCOSM is written in. A domain
-is enumerated as plain-text `.cosm` files (a restricted YAML subset) that are
-at once a file system and a relational database, made to be rendered. A
-**volume** is a folder or one file whose **catalog** declares the MiniCOSM it
-speaks (`oes: emf/1`), and its **items** are rows with a stable `id`
-(`P:claim/apples-need-a-second-variety`) and a `type`. Items point at each
-other by id, as fields and typed links `{rel, to}`, and every item carries the
-same envelope: name, summary, status, visibility, provenance. A value nobody
-has given yet is an **open question**, `{pending: "the question"}`, never a
-guess.
+**MacroCOSM OES** is a shared grammar and its **core**: a domain written as
+plain-text `.cosm` files (a restricted YAML subset). A **volume** is a
+folder or one file whose **catalog** declares its format (`oes: fabula/1`);
+its **items** have a stable `id` (`P:claim/apples-need-a-second-variety`), a
+`type`, references by id, and one envelope: name, summary, status,
+visibility, provenance. A value nobody has given yet is an **open
+question**, `{pending: "the question"}`, never a guess.
 
-## The seven MiniCOSMs enough ships
+## The formats enough reads
 
-| MiniCOSM | Declaration | A volume is | Modules |
-|---|---|---|---|
-| `comprise` | `oes: comprise/1` | a Holotype: one company, a folder with `holotype.cosm` | C O M P R I S E |
-| `cosm` | `cosm: 0.2` or `0.3` | a standalone product tree: brand, suites, offerings | P |
-| `canon` | `oes: canon/1` | a Canon volume's or a project's catalog, `canon.cosm`, kept by enough | V |
-| `emf` | `oes: emf/1` | a text's EMF twin, `notes.md.cosm` beside `notes.md` | L E K P T X |
-| `doc` | `oes: doc/1` | a document enumerated (the spec, the manual), built by enough | S T R B |
-| `thym` | `oes: thym/1` | one file: a Thym program, morph, context, plan, trace or package | P M C R K |
-| `ascribe` | `oes: ascribe/1` | a holograph: a self described with no name, a folder with `holograph.cosm` | A B C E I O Q S U Y F |
+| Format | Declaration | A volume is |
+|---|---|---|
+| `cosm` | `cosm: 0.2` or `0.3` | a standalone product tree |
+| `canon` | `oes: canon/1` | a catalog, `canon.cosm`, kept by enough |
+| `fabula` | `oes: fabula/1` (old spelling `emf/1`) | a decompiled input: a text's twin, or a fabulac of code |
+| `doc` | `oes: doc/1` | a document enumerated (the specs, the manual) |
+| `thym` | `oes: thym/1` | a Thym program, morph, context, plan, trace or package |
+| `comprise` | `oes: comprise/1` | a Holotype: one company, a folder with `holotype.cosm` |
+| `ascribe` | `oes: ascribe/1` | a holograph: a self with no name, a folder with `holograph.cosm` |
 
-**EMF** (*enumerated meaning fabula*; "the fabula") takes a text apart: L terms
-grounded in FEED, E entities, K concepts, P claims, T events in order, X atems.
+The first five are the core's **built-ins**; `comprise` and `ascribe` are
+the two **MiniCOSMs**. Any volume may carry module D, the **dialectic**.
+
+## The fabula
+
+To **decompile** is to take an input apart into its **fabula**: everything
+found in it or derived from it — I inspiration, L terms (grounded in FEED),
+E entities, K concepts, N intent, C construction, R production, P claims
+(and readings or cases), T events, X atems. To **compile** is to tell a
+fabula back as a **short** (markdown). Its **flavour**: `fabulan` (prose),
+`fabulap` (verse), `fabulac` (code: its short is a **cshort**, source
+rebuilt; its deep atem a **catem**). A text's **twin** sits beside it:
+`notes.md.fabulan.cosm`. An old twin `notes.md.cosm` that says `oes: emf/1`
+is still read and is replaced only when the text is decompiled again.
+"EMF" is the fabula's retired name.
 
 ## The six stances
 
-Every EMF claim says how the text knows it:
+Every claim says how the text knows it:
 
 - `axiom` — given, or true by definition; the text does not argue for it
 - `observed` — seen, measured or done at first hand
@@ -44,8 +54,8 @@ Every EMF claim says how the text knows it:
 
 ## The atem
 
-An **atem** is the tightest fair, full, plain-English reduction of a text or a
-passage. It has four parts:
+An **atem** is the tightest fair, full, plain-English reduction of a text or
+a passage, in four parts:
 
 - **line** — one sentence of 15–25 words that says what the whole says:
   *fair* (the author would accept it), *full* (nothing the text depends on is
@@ -55,98 +65,104 @@ passage. It has four parts:
 - **pull** — what the reader should actually take away, naming hidden
   assumptions and dependencies.
 
-Push is the author's side and pull the reader's. Where they differ is the most
-useful thing an atem shows.
+Where push and pull differ is what an atem shows best.
 
 ## When to make one
 
-- **Decompile only when asked.** An EMF twin is made when the user asks for
-  one ("decompile", "enumerate", "make a twin"), never on your own initiative
-  and never as a side step of another task.
-- **An atem is often enough.** For the gist, the point, a one-line summary, or
-  "what is this really saying", make an atem, not a twin: `<text>` for a
-  passage the user pasted, `<path>` to write a file's atem into its twin.
-- **Without a model** both tools write a labelled **scaffold**: terms and
-  names, the first sentence as the line, push and pull left open. Say it is a
-  scaffold; never present it as a reading.
-- **Long texts.** In a chat turn `emf_derive` gives a model texts of up to
-  about 6,000 characters; a longer one gets the scaffold, because a full model
-  pass belongs in the reader's decompile, which runs in the background. Say
-  so. Both tools refuse texts over about 24,000 characters.
-- **Shorts.** "compile a short" in the reader turns an EMF twin (the fabula)
-  back into prose, a new `<text>.short-<date>.md` beside the text: *told*
-  follows the author's order by span, *by weight* puts the weightiest claims
-  first; you have no tool for it, so point the user at that button.
+- **Decompile only when asked** ("decompile", "make a twin"), never on your
+  own initiative. For the gist or a one-line summary, make an atem instead:
+  `<text>` for a pasted passage, `<path>` to write a file's atem.
+- `fabula_derive` takes `<flavour>` `fabulan` or `fabulap` (left out:
+  enough suggests). Without a model both tools write a **scaffold**: say so,
+  never present it as a reading.
+- In a chat turn a model reads up to about 6,000 characters (longer gets the
+  scaffold; the reader's decompile does a full pass); both refuse over about
+  24,000. Shorts are compiled in the reader; you have no tool for them.
 
 ## Reading a Holotype
 
-A Holotype describes one company at a moment: a folder of concerns, each with
-eight modules (Corporation, Organizations, Markets, Products,
-Representations, Inventories, Stacks, Employees).
+A Holotype describes one company: concerns of eight modules.
 
 - **People are never in files.** Employees live only in Comprise's sealed
-  local database; the E module holds a README or a `none` note instead. Never
-  infer or invent the people of a company.
-- **Open questions are pending.** Report each as a question, with the item
-  that holds it. Never answer one with a guess.
-- **Browsed, not decompiled.** No EMF twins or atems of a Holotype's files.
-- enough runs the generic checks only. Comprise's own rules show as "not run":
-  that is not a failure.
-- Quote ids and paths as the tools give them; an item's `provenance` says
-  where each fact came from.
+  database. Never infer or invent the people of a company.
+- Report each open question with the item that holds it; never answer one
+  with a guess. No twins or atems of a Holotype's files.
+- Comprise's own rules show as "not run": that is not a failure.
+
+## The dialectic
+
+Questions a volume asks about what its source means, answered by a person.
+
+- `dialectic` with a `<path>` shows the next one or two open questions.
+  **Put one or two at a time**, in your own words, to the person they are
+  for.
+- Record the person's words **verbatim** with `<question>` and `<says>`, or
+  `<state>` unknown (they don't know), declined, or skip. **Never answer for
+  them**, never guess, never fill one in from the text.
+- Answers wait in a sitting until `<do>settle</do>` folds them in (a job).
+  `<do>raise</do>` asks the format's opening questions when there are none.
+- A holograph: only its holder answers, and nothing that reads like
+  personal data is kept.
+
+## Fabulacs
+
+A **fabulac** is the fabula of a small folder of pure Python (up to 60
+files, 6,000 lines): `tool/` → `tool.fabulac.cosm`. Only when asked:
+
+- `fabulac` `<do>build</do>` runs five stages as a job after your turn
+  (without a model it stops at the outline). `status` says what landed;
+  `cancel` stops it; `build` again resumes it.
+- `<do>compile</do>` with `<what>` `code` (a cshort and the manual catem) or
+  a catem's depth: `line`, `overview`, `manual`.
+- Nothing read or told is ever run: a cshort is text to read.
 
 ## Thym programs
 
-A **Thym program** is a `.thym` file: a short recipe of moves over documents
-(derive a fabula, measure a morph, package a text). It is checked and planned
-before anything runs, and every run leaves a trace that can be replayed.
+A **Thym program** is a `.thym` file: a recipe of moves over documents. It
+is checked and planned before anything runs, and every run leaves a trace
+that replays. Its first line is `thym 0` or `thym 1`; `thym 1` adds folders,
+several outputs, editing moves, loops that collect (`keep`), contract blocks
+a move `keeps`, recursion under a `depth:`, and the dialectic's `question`,
+`record`, `settle`.
 
-- `thym_check`: "ok" and the plan's line (steps, how many ask a model, the
-  largest prompt), or the refusal with its line. Use it before a run.
-- `thym_run`, only when asked: `<program>` by name or path, `<path>` the first
-  input, others as `<inputs>` lines (`name=path`). It answers with the trace's
-  line and the outputs' paths; the reader's "run with…" puts them beside the
-  text, so point the user there to keep them.
-- Programs come from the project, then the Canon store, then the ones enough
-  ships (`open-house`, `tighten`, `decompile-prose`, …). `thym_moves` lists
-  the moves a program may use (`<version>` 1 or 0, `<move>` for one).
-- A step that asks a model needs one: with agent-free on or no model running,
-  `thym_run` refuses such a plan; `open-house` asks none and still runs.
-- The three tools need this skill on. Say what a refusal refused and what would
-  make it run; never present it as a result.
+- `thym_check`: "ok" and the plan's line (with which model, how many
+  calls), or the refusal with its line. Use it first.
+- `thym_run`, only when asked: `<program>`, `<path>` the first input,
+  others as `<inputs>` lines (`name=path`). It names the outputs and trace;
+  the reader's "run with…" puts them beside the text.
+- `thym_moves` lists the moves a program may use (`<version>` 1 or 0,
+  `<move>` for one).
+- Programs come from the project, then the Canon store, then enough's own
+  (`open-house`, `tighten`, `decompile-prose`, `settle`, …).
+
+**Models.** A step that asks a model runs on this machine unless the user
+chose the cloud for that job: `<model>cloud` (with `<calls>`, a ceiling,
+when the count is open) only then. A shut gate, agent-free mode or no model
+refuses the plan; say what was refused and what would make it run.
 
 ## The tools, in order
 
-Their tags are in the Tools section. With this skill switched off, this guide
-is one `cosm_guide` call away.
+Their tags are in the Tools section. With this skill off, this guide is one
+`cosm_guide` call away, and `dialectic`, `fabulac` and the Thym tools do not
+run.
 
-1. `cosm_read` — the volume's tree, cut to fit with "(N more)" markers, or one
-   item's fields with `<item>`. Start here.
-2. `cosm_lint` — the checks: errors, warnings, notes, open questions.
-3. `emf_derive` (a text → its fabula twin) or `atem` (the four parts, written
-   into the twin; an inline `<text>` writes nothing) — only on request.
-4. `thym_moves` (what a program may use), `thym_check` (a program → its plan's
-   line, or the refusal), then `thym_run` (a program on a file → the trace's
-   line) — runs only on request.
+1. `cosm_read` — the tree, or one item with `<item>`. Start here.
+2. `cosm_lint` — the checks: a fabula's and a holograph's own, else the
+   generic ones.
+3. `fabula_derive` or `atem` — only on request.
+4. `dialectic`, `fabulac` — only on request.
+5. `thym_moves`, `thym_check`, then `thym_run` — runs only on request.
 
-For "what is X" about the format or the app, `doc_lookup` answers from the
-spec and the manual.
-
-Then `cosm_read` the twin to talk about what it holds. Writing into the Canon
-store (`canon:` paths) needs the broker's canon tools switched on.
+`doc_lookup` answers "what is X" from the specs and the manual. Writing into
+the Canon store (`canon:` paths) needs the broker's canon tools on.
 
 ## More
 
-The full specification is `docs/MACROCOSM_OES.md` in enough, which the user
-can open in the app's docs viewer (the MacroCOSM button, a menu of the four
-specifications); Thym's is `docs/THYM.md`, Ascribe's `docs/ASCRIBE.md` and
-Comprise OES's `docs/COMPRISE_OES.md`. The four are the canonical editions
-published at cosmoes.org (macro., thym., ascribe. and comprise.cosmoes.org),
-which enough keeps current from there; `docs/specs.json` names each edition.
-`references/README.md` says where the specs, the seven manifests and the shipped
-programs live.
+The specifications, published at cosmoes.org and open in the app's docs
+viewer: `docs/MACROCOSM_OES.md` (the fabula §18.4, the dialectic §18.6),
+`docs/THYM.md`, `docs/ASCRIBE.md`, `docs/COMPRISE_OES.md`.
 
 MacroCOSM OES © 2026 Graham Smith; see defaults/cosm/NOTICE.md
 
 ---
-enough-tooltip-text: "use macrocosm-oes to read and check .cosm files — Holotypes, Canon catalogs, EMF twins — and, when you ask, to decompile a text into its EMF twin, make its atem, or run a Thym program on it."
+enough-tooltip-text: "use macrocosm-oes to read and check .cosm files — Holotypes, catalogs, fabulas — and, when you ask, to decompile a text, make its atem, answer a volume's questions, build a fabulac of Python, or run a Thym program."

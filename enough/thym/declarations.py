@@ -21,9 +21,11 @@ program of that version sees: a `thym 0` program sees each entry without its `th
 **What a call gives and keeps, by the call** (THYM 17.6; the design's 3.1). `gives-when`, `contract-when` and
 `scaffold-when` are lists of rules, `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}` (and the same
 with `contract: [...]` or `scaffold: <name>`): the first rule whose `as` word is the call's, or whose type its first
-operand fits, chooses; else the entry's own key holds. `gives: same-as-with` (or `same-as-in`) gives the type of the
-call's `with` (or `in`) value. The compiler chooses statically, from the call as written (`chosen`), and the plan's
-`P:contract` lists the chosen contract.
+operand fits, chooses; else the entry's own key holds. A `scaffold-when` rule may say `scaffold: none`: a call it
+matches has no rules scaffold (read as None), and `--rules` refuses it at plan time (the conductor's ruling L6).
+`gives: same-as-with` (or `same-as-in`) gives the type of the call's `with` (or `in`) value. The compiler chooses
+statically, from the call as written (`chosen`), and the plan's `P:contract` lists the chosen contract; the
+runtime's plan stage chooses a call's scaffold the same way, where the plan says its first operand's type.
 """
 from __future__ import annotations
 
@@ -257,8 +259,10 @@ def _rules(raw: Any, what: str) -> tuple | None:
             if not isinstance(v, list) or not all(isinstance(c, str) for c in v):
                 return None
             v = tuple(v)
-        elif not isinstance(v, str):
+        elif not isinstance(v, str) or not v.strip():
             return None
+        elif v.strip() == "none":
+            v = None                    # `scaffold: none`: a call the rule matches has no rules scaffold (THYM 17.6)
         out.append((on, sel, v))
     return tuple(out)
 

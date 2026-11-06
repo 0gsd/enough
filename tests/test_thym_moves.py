@@ -670,6 +670,18 @@ def test_the_derive_checks_hold_and_fail(tmp_path, engines):
                                                       "nodes": [{"id": "P:claim/x", "type": "claim"}]}))[0]
 
 
+def test_fabula_checks_holds_any_volume_to_its_own_manifest(tmp_path):
+    """THYM 7.3, the conductor's ruling L5: `fabula-checks` on a volume that is not a fabula (`gather … with` a
+    volume, `settle` of a volume) runs that volume's own manifest's checks; it no longer refuses the volume."""
+    plan = mc.yaml_load((SUITE / "expected" / "publish-story" / "plan.cosm").read_text(encoding="utf-8"))
+    for name in ("fabula-checks", "emf-checks"):
+        assert verdict(name, Value("volume", plan)) == (True, ""), name
+    plan["nodes"].append(dict(plan["nodes"][1]))                       # the same id twice: the plan's own check
+    ok, why = verdict("fabula-checks", Value("volume", plan))
+    assert not ok and "R:node/1" in why and "not a fabula" not in why
+    assert verdict("fabula-checks", Value("volume", ["not", "a", "volume"])) == (False, "the output is not a volume")
+
+
 # ---------------------------------------------------------------------------
 # tell, atem, expand: hand-made plans over the orchard twin
 # ---------------------------------------------------------------------------
