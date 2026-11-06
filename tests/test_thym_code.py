@@ -1085,18 +1085,23 @@ def test_a_coverage_fault_is_asked_again_only_of_the_part_that_holds_it(tmp_path
                                         for i in range(4)))
     first = READ["tiny/counting.py"]
     calls = {"n": 0}
+    told: list[str] = []
 
     def answer(inputs):
         if _t(inputs, "lines").startswith("1-"):
             calls["n"] += 1
             return first
+        told.append(_t(inputs, "failed"))
         return tail if _t(inputs, "failed") else tail.split("  - {slug: f3")[0]
     cp = Scripted(answers({("read", "tiny/counting.py"): answer}))
     build(tmp_path, repo, cp, upto=3)
     asked = cp.asked("read", "tiny/counting.py")
     assert len(asked) == 3 and calls["n"] == 1                       # part 1 once; part 2 twice
     again = [c for s, k, c in cp.sent if k == "tiny/counting.py"][2]
-    assert "tiny.counting.f3" in again["repair"]["failed"][0]["why"]
+    # the part asked again hears its own verdict, in its `failed` input, and not the whole list the runtime holds
+    # (lane S3: `replaces`); the first asks of both parts are as they were
+    assert "tiny.counting.f3" in told[-1] and again["repair"] == {"allowed": [], "failed": []}
+    assert [c["repair"] for c in asked[:2]] == [{"allowed": [], "failed": []}] * 2
 
 
 def test_what_a_file_reaches_elsewhere_is_what_it_imports():

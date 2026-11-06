@@ -51,6 +51,10 @@ JOB_KIND = "dialectic"
 CARD_FIELDS = ("hint", "options", "options-open", "many", "range")
 #: A question's states that stand (MacroCOSM OES 18.6.3).
 ANSWERED = ("answered", "unknown", "declined")
+#: The closed questions a listing carries (the newest; `closed_total` says how many there are).
+CLOSED_SHOWN = 50
+#: The server-sent event a recorded sitting or a landed settle sends (beside the jobs' `canon`).
+EVENT = "dialectic"
 
 
 class DialecticRouteError(Exception):
@@ -247,9 +251,49 @@ def card(led: Any, entry: dict, *, waiting_in: str | None = None) -> dict:
     if answers:
         last = answers[-1]
         out["last"] = {k: _macrocosm.jsonable(last.get(k)) for k in ("at", "says", "value", "declined") if k in last}
+    out["candidate"] = candidate_of(led.item(where.item_id) if where.item_id else None)
     if waiting_in:
         out["waiting_in"] = waiting_in
     return out
+
+
+def candidate_of(it: Any) -> dict | None:
+    """Where a candidate came from, as far as the holograph records it: `{text, sha256, span, confidence, made}`, the
+    text it was read from by name and digest (its `provenance.sources` entry `<name>#sha256:<digest>`), the span, the
+    reading's confidence and the run that proposed it; a field the node does not hold is null. None for anything that
+    is not a candidate (a node a reading proposed, `provenance: {mode: derived, state: pending}`). The words of the
+    span are not recorded in a holograph, so they are not given."""
+    if not isinstance(it, dict):
+        return None
+    prov = it.get("provenance")
+    if not (isinstance(prov, dict) and prov.get("state") == "pending" and prov.get("mode") == "derived"):
+        return None
+    text = sha = None
+    srcs = prov.get("sources") if isinstance(prov.get("sources"), list) else []
+    src = next((s for s in srcs if isinstance(s, str) and s.strip()), None)
+    if src is not None:
+        name, sep, digest = src.partition("#sha256:")
+        text, sha = (name or None), (digest or None) if sep else None
+    conf = prov.get("confidence")
+    return {"text": text, "sha256": sha, "span": _macrocosm.jsonable(it.get("span")),
+            "confidence": conf if isinstance(conf, (int, float)) and not isinstance(conf, bool) else None,
+            "made": _macrocosm.jsonable(it.get("made")) if isinstance(it.get("made"), dict) else None}
+
+
+def _last_at(q: dict) -> str:
+    answers = q.get("answers") if isinstance(q.get("answers"), list) else []
+    last = answers[-1] if answers and isinstance(answers[-1], dict) else {}
+    at = last.get("at")
+    return str(_macrocosm.jsonable(at)) if at is not None else ""
+
+
+def closed_questions(led: Any) -> list[dict]:
+    """The questions "ask again" is for: settled ones (answered, unknown or declined, then settled) and every
+    declined one, newest first by their last answer's `at` (written order breaks ties, the later first)."""
+    rows = [(n, q) for n, q in enumerate(led.questions())
+            if q.get("state") in ANSWERED and (q.get("settled") or q.get("state") == "declined")]
+    rows.sort(key=lambda r: (_last_at(r[1]), r[0]), reverse=True)
+    return [q for _n, q in rows]
 
 
 def listing(project_dir: Path, rel: str) -> dict:
@@ -287,9 +331,14 @@ def listing(project_dir: Path, rel: str) -> dict:
     counters = [card(led, {"form": "question", "id": q["id"], "about": q.get("about"), "asks": q.get("asks"),
                            "why": q.get("why"), "kind": q.get("kind"), "to": q.get("to")})
                 for q in led.questions() if q.get("why") == "counter" and q.get("state") == "open"]
+    shut = closed_questions(led)
+    closed = [card(led, {"form": "question", "id": q["id"], "about": q.get("about"), "asks": q.get("asks"),
+                         "why": q.get("why"), "kind": q.get("kind"), "to": q.get("to")},
+                   waiting_in=in_sitting.get(q["id"])) for q in shut[:CLOSED_SHOWN]]
     return {"path": t.rel, "format": f"{led.minicosm}/{led.major}" if led.minicosm else led.catalog.get("oes"),
             "holograph": t.holograph, "flavour": led.catalog.get("flavour") if t.is_fabula else None,
             "fabula": t.is_fabula, "open": opened, "waiting": after, "counters": counters,
+            "closed": closed, "closed_total": len(shut),
             "counts": {**counts, "settled": settled, "open_pendings": sum(1 for c in opened if c["form"] == "pending")},
             "sittings": [{"path": _rel(project_dir, p), "session": av.session.get("id"),
                           "answered": [e.get("id") or e.get("about") for e in av.entries]} for p, av in waiting],
@@ -405,13 +454,26 @@ def _recorded(project_dir: Path, rec: Any, *, written: str | None) -> dict:
             "skipped": list(rec.skipped), "refused": [{"question": q, "why": w} for q, w in rec.refused]}
 
 
+def _state_of_entry(e: dict) -> str:
+    """What an address entry of a sitting (`{about, answers}`, which carries no `state`) recorded, read from its last
+    answer as `record` wrote it: `declined` (the answer says so), `unknown` (no value: "I don't know"), else
+    `answered`."""
+    answers = e.get("answers") if isinstance(e.get("answers"), list) else []
+    last = answers[-1] if answers and isinstance(answers[-1], dict) else {}
+    if last.get("declined"):
+        return "declined"
+    if "value" in last and last.get("value") is None:
+        return "unknown"
+    return "answered"
+
+
 def _recorded_of_delta(led: Any, items: list[dict], av: Any, session: dict, when: Any) -> dict:
     """What a sitting written as an answers volume recorded, refused and skipped: the delta's entries and session,
     and the refusals `record` gives on a copy (strict off, so the rest are kept)."""
     dl = _dl()
     probe = dl.record(led.copy(), items, session={**session, "id": av.session.get("id")}, at=when)
     return {"session": av.session.get("id"),
-            "recorded": [{"question": e.get("id") or e.get("about"), "state": e.get("state") or "answered"}
+            "recorded": [{"question": e.get("id") or e.get("about"), "state": e.get("state") or _state_of_entry(e)}
                          for e in av.entries],
             "skipped": list(av.session.get("skipped") or []),
             "refused": [{"question": q, "why": w} for q, w in probe.refused]}
@@ -421,21 +483,40 @@ def _recorded_of_delta(led: Any, items: list[dict], av: Any, session: dict, when
 # Raising a bank, asking again
 # ---------------------------------------------------------------------------
 
-def raise_bank(project_dir: Path, rel: str, *, at: Any = None) -> dict:
+def _by_source(questions: list[dict]) -> dict[str, int]:
+    """How many questions each bank entry (`raised.from`) or rule (`missing`, one per open field; `unsure`, one per
+    unsure item) raised."""
+    out: dict[str, int] = {}
+    for q in questions:
+        raised = q.get("raised") if isinstance(q.get("raised"), dict) else {}
+        key = str(raised.get("from")) if raised.get("by") == "bank" and raised.get("from") else \
+            str(q.get("why") or raised.get("from") or "rule")
+        out[key] = out.get(key, 0) + 1
+    return out
+
+
+def raise_bank(project_dir: Path, rel: str, *, at: Any = None, dry: bool = False) -> dict:
     """`POST /api/dialectic/raise`: the format's bank (and the core's rule questions: one per pending field, one per
-    unsure item) raised on a volume that has no questions yet, by rules, and landed in it. 409 when it has some."""
+    unsure item) raised on a volume that has no questions yet, by rules, and landed in it. 409 when it has some.
+    `dry`: raised the same way and landed nowhere, nothing written: `{path, count, by: {<bank entry or rule>: n},
+    dry: true}`, so a card can say how many it would ask."""
     dl = _dl()
     t = target(project_dir, rel)
     if t.holograph:
         if _ascribe().Holograph(t.path).led.questions():
             raise DialecticRouteError("this holograph has its questions already; ask one again, or settle the "
                                       "answers", 409)
-        raised = _ascribe().raise_bank(t.path, at=at)
+        raised = _ascribe().raise_bank(t.path, at=at, dry=dry)
+        if dry:
+            return {"path": t.rel, "count": len(raised), "by": _by_source(raised), "dry": True}
         return {"path": t.rel, "raised": [q.get("id") for q in raised], "count": len(raised)}
     twin = dl.open_twin(t.path)
     if twin.ledger.questions():
         raise DialecticRouteError(f"{t.path.name} has its questions already; ask one again, or settle the answers",
                                   409)
+    if dry:
+        r = dl.raise_questions(twin.ledger.copy(), rules=True, at=at)
+        return {"path": t.rel, "count": len(r.questions), "by": _by_source(r.questions), "dry": True}
     r = dl.ask_by_bank(twin, rules=True, at=at)
     if r.questions:
         twin.save()
@@ -663,15 +744,30 @@ def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | No
 # The router
 # ---------------------------------------------------------------------------
 
+def notify(emit: Callable[[str, dict], None] | None, path: str, session: Any, what: str) -> None:
+    """The `dialectic` event (beside the jobs' `canon`, on the same stream): `{path, session, what: recorded |
+    settled}`, so a card open in another tab reads the volume again. Never fails what it reports."""
+    if emit is None:
+        return
+    try:
+        emit(EVENT, {"path": path, "session": session, "what": what})
+    except Exception:  # noqa: BLE001 - an event is a nicety; the write has landed
+        log.exception("dialectic event failed")
+
+
 def _http(e: DialecticRouteError) -> HTTPException:
     return HTTPException(e.status, str(e))
 
 
 def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                  canon_mode: Callable[..., Awaitable[tuple[str, str]]], start_job: Callable[..., dict],
-                 model_complete: Callable[..., Any], catalog_after: Callable[[str], None]) -> APIRouter:
+                 model_complete: Callable[..., Any], catalog_after: Callable[[str], None],
+                 emit: Callable[[str, dict], None] | None = None) -> APIRouter:
     router = APIRouter()
     project_dir = Path(project_dir)
+
+    def said(path: str, session: Any, what: str) -> None:
+        notify(emit, path, session, what)
 
     async def body_of(request: Request) -> dict:
         try:
@@ -719,17 +815,26 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
 
         def go() -> dict:
             t = target(project_dir, str(body.get("path") or ""))
-            return held(t, lambda: record(project_dir, str(body.get("path") or ""), body.get("answers"),
-                                          through=str(body.get("through") or "person"), who=body.get("who"),
-                                          to=body.get("to"), model=body.get("model")))
+            out = held(t, lambda: record(project_dir, str(body.get("path") or ""), body.get("answers"),
+                                         through=str(body.get("through") or "person"), who=body.get("who"),
+                                         to=body.get("to"), model=body.get("model")))
+            if out.get("recorded") or out.get("skipped"):
+                said(out.get("path") or t.rel, out.get("session"), "recorded")
+            return out
         return await run(go)
 
     @router.post("/api/dialectic/raise")
     async def dialectic_raise(request: Request) -> dict:
         body = await body_of(request)
 
+        dry = body.get("dry")
+        if dry is not None and not isinstance(dry, bool):
+            raise HTTPException(400, f"dry is true or false, not {dry!r}")
+
         def go() -> dict:
             t = target(project_dir, str(body.get("path") or ""))
+            if dry:
+                return raise_bank(project_dir, str(body.get("path") or ""), dry=True)
             out = held(t, lambda: raise_bank(project_dir, str(body.get("path") or "")))
             catalog_after(t.rel)
             return out
@@ -764,6 +869,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                 return held(t, lambda: settle_rules(project_dir, t))
             result = await run(at_once)
             catalog_after(t.rel)
+            said(t.rel, None, "settled")
             n = len(result.get("settled") or [])
             msg = f"settled {n} answer{'s' if n != 1 else ''} into {t.path.name}"
             if result.get("waiting"):
@@ -809,6 +915,8 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                                 llm_url=llm_url, scaffolds=scaffolds, complete=complete,
                                 should_stop=ctx.should_stop, progress=lambda f: ctx.progress(f))
             catalog_after(t.rel)
+            if out.get("runs"):
+                said(t.rel, None, "settled")
             n = len(out["runs"])
             msg = f"settled {n} sitting{'s' if n != 1 else ''} into {t.path.name}"
             if out.get("waiting"):
@@ -839,5 +947,6 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
     return router
 
 
-__all__ = ["DialecticRouteError", "Target", "ask_again", "build_router", "card", "check", "isograph", "ledger", "listing",
-           "raise_bank", "record", "settle_fabula", "settle_rules", "sittings", "target", "unsettled"]
+__all__ = ["DialecticRouteError", "Target", "ask_again", "build_router", "candidate_of", "card", "check",
+           "closed_questions", "isograph", "ledger", "listing", "notify", "raise_bank", "record", "settle_fabula",
+           "settle_rules", "sittings", "target", "unsettled"]

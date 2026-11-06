@@ -5564,6 +5564,7 @@ def create_app(
     _dialectic_router = _dialectic_api.build_router(
         project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
         start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
+        emit=_emit_threadsafe,
     )
     app.include_router(_dialectic_router)
 
@@ -5591,7 +5592,7 @@ def create_app(
         from . import fabula_tools as _fabula_tools
         _fabula_tools.configure(project_dir=project_dir, start=_start_from_tool,
                                 build=_fabula_router.start_build, compile=_fabula_router.start_compile,
-                                settle=_dialectic_router.start_settle, jobs=canon_jobs)
+                                settle=_dialectic_router.start_settle, jobs=canon_jobs, emit=_emit_threadsafe)
 
     @app.get("/api/canon/job/{job_id}")
     async def api_canon_job(job_id: str) -> dict[str, Any]:

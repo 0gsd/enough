@@ -1110,7 +1110,9 @@ class MoveContext:
         re-ask says why and is never the same request again. The request is keyed on the node's counter, recorded
         and replayed as every request is, carries every failed verdict the model should hear of in
         `repair.failed` (a kept contract's, the runtime's verdicts on this move's last output, then the move's
-        own), and counts toward the run's ceiling of calls. Returns the candidate (`output`, `engine`, `tokens`,
+        own; with `replaces: true` in the mapping the move's own `failed` stands instead of the runtime's verdicts,
+        so a move that asks for one part again carries that part's verdicts alone), and counts toward the run's
+        ceiling of calls. Returns the candidate (`output`, `engine`, `tokens`,
         …); a refusal (a model the run may not ask, the ceiling reached, a replay that does not match) stops the
         move."""
         if self.ask_fn is None:
@@ -2177,7 +2179,11 @@ class _Run:
         nb = self.cur.node.get("budget") if isinstance(self.cur.node.get("budget"), dict) else {}
         rb = budget or {}
         allowed, own = _move_repair(contract.get("repair"))
-        failed = [dict(x) for level in self._repairs for x in level] + [dict(x) for x in frame["failed"]] + own
+        # a move that says `replaces` names itself which of the runtime's verdicts on its last output this request
+        # carries (a long file's part asked again hears its own faults, not the other parts'); a kept contract's
+        # failures, which the move is not shown, ride as ever
+        mine = [] if _move_replaces(contract.get("repair")) else [dict(x) for x in frame["failed"]]
+        failed = [dict(x) for level in self._repairs for x in level] + mine + own
         c = {"move": frame["move"], "schema": plain(contract.get("schema")),
              "checks": [str(x) for x in decl_get(frame["decl"], "contract") or []],
              "repair": {"allowed": allowed, "failed": failed}}
@@ -2741,6 +2747,13 @@ def _kind_code(decl: Any, mods: dict) -> Callable | None:
                                                    "implementation here"))
             return fn
     return None
+
+
+def _move_replaces(rep: Any) -> bool:
+    """Whether a move's own `repair` mapping says `replaces: true`: its `failed` then stands instead of the runtime's
+    verdicts on the move's last output (not beside them), so the move chooses which of them a re-ask carries. A list,
+    nothing, or a mapping without it: the runtime's verdicts ride, as before."""
+    return isinstance(rep, dict) and rep.get("replaces") is True
 
 
 def _move_repair(rep: Any) -> tuple[list, list[dict]]:

@@ -2006,10 +2006,14 @@ def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     redo: dict[int, list[str]] = {i: [] for i in range(len(parts))}
     prev, failed = getattr(ctx, "previous", None), getattr(ctx, "failed", None) or []
     spans = ((prev.origin or {}).get("reading") or {}).get("parts") if isinstance(prev, Value) else None
+    # the repair a part's request carries: as ever, unless the failures were placed part by part, when a part asked
+    # again hears its own verdicts alone (they ride in its `failed` input) and not the other parts' (`replaces`)
+    repair: Any = []
     if failed and isinstance(spans, list) and len(spans) == len(parts):
         nodes = fabula_doc(prev)[1]
         per = [copy.deepcopy(nodes[s:e]) for s, e in spans]
         redo = _faulty_parts(failed, per, parts, local, path)
+        repair = {"allowed": [], "failed": [], "replaces": True}
     for k, (a, b) in enumerate(parts):
         if k not in redo:
             continue
@@ -2020,7 +2024,7 @@ def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
             ins = inputs(a, b, k == 0)
             if last_err:
                 ins["failed"] = Value("string", last_err)
-            cand = ctx.ask({"schema": schema, "repair": []}, ins)
+            cand = ctx.ask({"schema": schema, "repair": repair}, ins)
             try:
                 per[k] = read(cand.get("output"), used, k == 0)
                 break

@@ -431,6 +431,43 @@ def test_a_re_ask_carries_why_the_move_could_not_take_the_last_answer(tmp_path):
     assert RUN._move_repair([]) == ([], []) and RUN._move_repair(None) == ([], [])
 
 
+def test_a_move_may_say_which_verdicts_its_re_ask_carries(tmp_path):
+    """`replaces: true` in a move's own `repair` mapping (lane S3, item 7): its `failed` stands instead of the
+    runtime's verdicts on its last output, so a part asked again hears its own fault alone; without it (a list, or a
+    mapping that does not say it) the runtime's verdicts ride as before."""
+    def tell(ctx, f, **m):
+        if ctx.previous is None:
+            return thym.values.Value("short", ctx.ask({"schema": {"format": "markdown"}}, {"f": f})["output"])
+        mine = ctx.ask({"schema": {"format": "markdown"},
+                        "repair": {"allowed": [], "failed": ["part 2 only"], "replaces": True}}, {"f": f})["output"]
+        both = ctx.ask({"schema": {"format": "markdown"}, "repair": {"failed": ["part 2 only"]}}, {"f": f})["output"]
+        return thym.values.Value("short", ctx.previous.text() + mine + both)
+
+    def moves() -> R.Moves:
+        mv = tell_moves()
+        mv.add("tell", tell)
+        return mv
+
+    footer = lambda out, *a: (out.text().rstrip().endswith("*"), "the telling has no footer line")  # noqa: E731
+    p = tmp_path / "p.thym"
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give tell f as told\nend\n",
+                 encoding="utf-8")
+    plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
+    cp = Scripted(["One part.\n", "Two.\n", "*a footer*\n"])
+    t = RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", program=p, coprocessor=cp, moves=moves(),
+                checks=easy_checks(footer=footer), engines=H.engines(feed=None), now=NOW)
+    assert isinstance(t, T.Trace) and t.landed, getattr(t, "refusal", t)
+    footer_failed = {"name": "footer", "ok": False, "why": "the telling has no footer line"}
+    own = {"name": "answer", "ok": False, "why": "part 2 only"}
+    assert [c["repair"] for c in cp.sent] == [
+        {"allowed": [], "failed": []},
+        {"allowed": [], "failed": [own]},                     # replaces: the move's own alone
+        {"allowed": [], "failed": [footer_failed, own]}]      # as before: the runtime's, then the move's
+    assert all("replaces" not in c["repair"] for c in cp.sent)
+    assert RUN._move_replaces({"replaces": True}) and not RUN._move_replaces({"replaces": "yes"})
+    assert not RUN._move_replaces([]) and not RUN._move_replaces(None)
+
+
 def test_the_plan_counts_its_model_calls_for_the_route_it_is_given():
     c = ok(BRIEF)
     rows = [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}]

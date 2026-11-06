@@ -39,11 +39,13 @@ _conf: dict[str, Any] = {}
 
 
 def configure(*, project_dir: Path | None = None, start: Callable | None = None, build: Callable | None = None,
-              compile: Callable | None = None, settle: Callable | None = None, jobs: Any = None) -> None:
-    """Hand the tools the app's job starters (`configure()` with nothing resets them: tests)."""
+              compile: Callable | None = None, settle: Callable | None = None, jobs: Any = None,
+              emit: Callable | None = None) -> None:
+    """Hand the tools the app's job starters and its event sender (`emit(event, data)`, for the `dialectic` event a
+    recorded sitting sends); `configure()` with nothing resets them: tests."""
     _conf.clear()
     _conf.update({k: v for k, v in {"project_dir": project_dir, "start": start, "build": build, "compile": compile,
-                                     "settle": settle, "jobs": jobs}.items() if v is not None})
+                                     "settle": settle, "jobs": jobs, "emit": emit}.items() if v is not None})
 
 
 def _ct():
@@ -174,6 +176,8 @@ def _record(project_dir: Path, raw: str, q: str, extra: dict) -> Any:
         out = D.record(project_dir, raw, [a], through="agent", model=_model_id())
     except D.DialecticRouteError as e:
         return _err("dialectic", raw, str(e))
+    if out.get("recorded") or out.get("skipped"):
+        D.notify(_conf.get("emit"), out.get("path") or raw, out.get("session"), "recorded")
     if out["refused"]:
         return _err("dialectic", raw, "; ".join(f"{r['question']}: {r['why']}" for r in out["refused"]))
     done = ", ".join(f"{r['question']} {r['state']}" for r in out["recorded"]) or \

@@ -276,3 +276,170 @@ def test_an_isograph_is_made_by_the_holders_program_and_its_release_recorded_fir
     assert client.post("/api/ascribe/isograph", json={"path": "notes.md",
                                                       "program": "open-self.thym"}).status_code == 400
     assert client.post("/api/ascribe/isograph", json={"path": "spec-self", "program": "nope"}).status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Lane S3: the state recorded, a candidate's source, closed questions, a dry raise, the event, the refusal's words
+# ---------------------------------------------------------------------------
+
+def _events(client: TestClient):
+    """A queue on the app's server-sent stream, as a page's EventSource has one, and a reader of what reached it."""
+    import asyncio
+    q: asyncio.Queue = asyncio.Queue()
+    client.app.state.session.subscribers.append(q)
+
+    def seen(name: str, n: int = 1, timeout: float = 5.0) -> list[dict]:
+        got: list[dict] = []
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            while not q.empty():
+                ev = q.get_nowait()
+                if ev["event"] == name:
+                    got.append(json.loads(ev["data"]))
+            if len(got) >= n:
+                return got
+            time.sleep(0.02)
+        return got
+    return seen
+
+
+def test_an_address_answered_i_dont_know_or_declined_is_reported_as_it_was_recorded(client: TestClient,
+                                                                                     project: Path):
+    shutil.copyfile(project / "notes.md.cosm", project / "again.cosm")      # the same open field, twice
+    first = client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()
+    field = next(c["about"] for c in first["open"] if c["form"] == "pending" and "#" in c["about"])
+    r = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [
+        {"question": field, "dont_know": True, "says": "no idea"}]})
+    assert r.status_code == 200, r.text
+    assert r.json()["recorded"] == [{"question": field, "state": "unknown"}]
+    r = client.post("/api/dialectic/answers", json={"path": "again.cosm", "answers": [
+        {"question": field, "declined": True}]})
+    assert r.status_code == 200, r.text
+    assert r.json()["recorded"] == [{"question": field, "state": "declined"}]
+    assert D._state_of_entry({"about": field, "answers": [{"says": "compost", "value": "compost"}]}) == "answered"
+    # a question asked by its id: as it was (its entry carries its state)
+    client.post("/api/dialectic/raise", json={"path": "notes.md"})
+    cards = [c["id"] for c in client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()["open"]
+             if c["form"] == "question"]
+    r = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [
+        {"question": cards[0], "dont_know": True}, {"question": cards[1], "declined": True}]})
+    assert r.status_code == 200, r.text
+    assert {x["question"]: x["state"] for x in r.json()["recorded"]} == {cards[0]: "unknown", cards[1]: "declined"}
+
+
+def test_a_candidates_card_says_where_the_reading_saw_it(client: TestClient, project: Path):
+    from tests.test_ascribe_module import JOURNAL_SHA, _land_journal
+    assert client.post("/api/dialectic/raise", json={"path": "self"}).status_code == 200    # the bank's, beside
+    got = _land_journal(project / "self")
+    skill = next(i for i in got if i["id"] == "S:skill/splicing-an-eye-by-hand")
+    listed = client.get("/api/dialectic/questions", params={"path": "self"}).json()
+    card = next(c for c in listed["open"] if (c["item"] or {}).get("id") == skill["id"])
+    assert card["candidate"] == {"text": "journal.md", "sha256": JOURNAL_SHA, "span": skill["span"],
+                                 "confidence": skill["provenance"]["confidence"],
+                                 "made": {"move": "propose", "run": "r1"}}
+    from enough import ascribe as A
+    led = A.Holograph(project / "self").led
+    assert all((c["candidate"] is not None) == A._is_candidate(led.item((c["item"] or {}).get("id")) or {})
+               for c in listed["open"])
+    assert any(c["candidate"] is None for c in listed["open"])
+    # anything else: null
+    assert D.candidate_of({"id": "x", "provenance": {"mode": "manual", "state": "pending"}}) is None
+    assert D.candidate_of({"id": "x", "provenance": {"mode": "derived", "state": "pending"}}) == {
+        "text": None, "sha256": None, "span": None, "confidence": None, "made": None}
+
+
+def test_the_listing_carries_closed_questions_newest_first_and_bounded(client: TestClient, project: Path,
+                                                                       monkeypatch: pytest.MonkeyPatch):
+    client.post("/api/dialectic/raise", json={"path": "notes.md"})
+    listed = client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()
+    assert listed["closed"] == [] and listed["closed_total"] == 0
+    a, b, c = [x["id"] for x in listed["open"] if x["form"] == "question"][:3]
+    for q, extra in ((a, {"says": "the parish council"}), (b, {"dont_know": True})):
+        r = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [{"question": q, **extra}]})
+        assert r.status_code == 200, r.text
+        time.sleep(1.1)                    # each sitting its own stamp: the order is the answers' time
+    r = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [{"question": c,
+                                                                                     "declined": True}]})
+    assert r.status_code == 200, r.text
+    # declined: closed at once (it may be asked again); answered and unknown: once settled
+    mid = client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()
+    assert [x["id"] for x in mid["closed"]] == [c] and mid["closed"][0]["state"] == "declined"
+    assert wait_job(client, client.post("/api/dialectic/settle", json={"path": "notes.md"}).json()["job"]["id"]
+                    )["state"] == "done"
+    after = client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()
+    assert after["closed_total"] == 3 and [x["id"] for x in after["closed"]] == [c, b, a]
+    assert {x["state"] for x in after["closed"]} == {"answered", "unknown", "declined"}
+    monkeypatch.setattr(D, "CLOSED_SHOWN", 2)
+    cut = client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()
+    assert [x["id"] for x in cut["closed"]] == [c, b] and cut["closed_total"] == 3
+
+
+def test_a_dry_raise_counts_and_lands_nothing(client: TestClient, project: Path):
+    twin = project / "notes.md.cosm"
+    before = twin.read_bytes()
+    r = client.post("/api/dialectic/raise", json={"path": "notes.md", "dry": True})
+    assert r.status_code == 200, r.text
+    dry = r.json()
+    assert dry["dry"] is True and dry["count"] > 0 and sum(dry["by"].values()) == dry["count"]
+    assert "raised" not in dry and twin.read_bytes() == before
+    assert not list(project.glob("notes.md.answers-*"))
+    real = client.post("/api/dialectic/raise", json={"path": "notes.md"}).json()
+    assert real["count"] == dry["count"]
+    assert client.post("/api/dialectic/raise", json={"path": "notes.md", "dry": True}).status_code == 409
+    assert client.post("/api/dialectic/raise", json={"path": "notes.md", "dry": "yes"}).status_code == 400
+    # a holograph: Ascribe's bank, of the holder alone, counted by bank entry; nothing written
+    files = {p: p.read_bytes() for p in (project / "self").rglob("*") if p.is_file()}
+    h = client.post("/api/dialectic/raise", json={"path": "self", "dry": True}).json()
+    assert h["count"] >= 44 and sum(h["by"].values()) == h["count"]
+    assert sum(n for k, n in h["by"].items() if k.startswith("ascribe")) == 44, h["by"]
+    assert {p: p.read_bytes() for p in (project / "self").rglob("*") if p.is_file()} == files
+
+
+def test_a_recorded_sitting_and_a_landed_settle_send_the_dialectic_event(client: TestClient, project: Path):
+    seen = _events(client)
+    client.post("/api/dialectic/raise", json={"path": "notes.md"})
+    q = next(c["id"] for c in client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()["open"]
+             if c["form"] == "question")
+    out = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [
+        {"question": q, "says": "the parish council"}]}).json()
+    assert seen("dialectic") == [{"path": "notes.md.cosm", "session": out["session"], "what": "recorded"}]
+    # a refused sitting (nothing recorded) sends nothing
+    assert client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [
+        {"question": q, "says": "again"}]}).status_code == 422
+    assert seen("dialectic", timeout=0.3) == []
+    assert wait_job(client, client.post("/api/dialectic/settle", json={"path": "notes.md"}).json()["job"]["id"]
+                    )["state"] == "done"
+    assert seen("dialectic") == [{"path": "notes.md.cosm", "session": None, "what": "settled"}]
+    # a holograph's settle, at once by rules
+    client.post("/api/dialectic/raise", json={"path": "self"})
+    hq = next(c["id"] for c in client.get("/api/dialectic/questions", params={"path": "self"}).json()["open"])
+    rec = client.post("/api/dialectic/answers", json={"path": "self", "answers": [
+        {"question": hq, "says": "baking bread on a Sunday morning"}]}).json()
+    assert client.post("/api/dialectic/settle", json={"path": "self"}).status_code == 200
+    assert seen("dialectic", 2) == [{"path": "self", "session": rec["session"], "what": "recorded"},
+                                    {"path": "self", "session": None, "what": "settled"}]
+    # the agent's tool, recording through the app
+    enable_skill(project, "macrocosm-oes")
+    client.post("/api/dialectic/raise", json={"path": "notes.md"})
+    nxt = next((c["id"] for c in client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()["open"]
+                if c["form"] == "question"), None)
+    assert nxt is not None
+    r = run(project, tool("dialectic", path="notes.md", question=nxt, says="a parish in the hills"))
+    assert r.ok, r.body
+    got = seen("dialectic")
+    assert len(got) == 1 and got[0]["what"] == "recorded" and got[0]["path"] == "notes.md.cosm" and got[0]["session"]
+    assert D.notify(None, "x", None, "recorded") is None                   # no app: nothing sent, nothing fails
+
+
+def test_the_personal_data_refusal_says_how_to_name_people_without_the_retired_word(client: TestClient,
+                                                                                     project: Path):
+    from enough import ascribe as A
+    assert "role" not in A.REFUSED_PII.lower() and "describe people by what they are to you" in A.REFUSED_PII
+    assert "pseudonym" in A.REFUSED_PII and "nothing was written" in A.REFUSED_PII
+    listed = client.get("/api/dialectic/questions", params={"path": "self"}).json()
+    if not listed["open"]:
+        client.post("/api/dialectic/raise", json={"path": "self"})
+        listed = client.get("/api/dialectic/questions", params={"path": "self"}).json()
+    bad = client.post("/api/dialectic/check", json={"path": "self", "question": listed["open"][0]["id"],
+                                                    "value": "write to me at ann@example.org"}).json()
+    assert not bad["ok"] and "describe people by what they are to you" in bad["refusal"]

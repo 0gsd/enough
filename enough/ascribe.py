@@ -134,9 +134,12 @@ FOLLOW_UPS = {
                 "options": ["for", "against", "mixed"]},
     "strength": {"asks": "How strongly, from 1 to 5?", "kind": "number", "range": [1, 5]},
 }
-REFUSED_PII = ("this answer reads like personal data ({what}), which a holograph never holds: say it by role (\"a "
-               "retired harbour pilot\"), or by a pseudonym you declare; nothing was written and the question stays "
-               "open")
+#: The words an answer that reads like personal data is refused in (Ascribe 3, design rule 6: people appear by what they
+#: are to the holder, or by a declared pseudonym). Said in the page's own voice ("describe people by what they are to
+#: you"), never with the app's retired word for a readvisor.
+REFUSED_PII = ("this answer reads like personal data ({what}), which a holograph never holds: describe people by what "
+               "they are to you (\"my oldest friend\", \"a retired harbour pilot who taught me\"), or by a pseudonym "
+               "you declare; nothing was written and the question stays open")
 
 
 class AscribeError(Exception):
@@ -1020,13 +1023,16 @@ def _is_candidate(d: Any) -> bool:
     return isinstance(prov, dict) and prov.get("state") == "pending" and prov.get("mode") == "derived"
 
 
-def raise_bank(folder: Any, *, at: Any = None, run: str | None = None) -> list[dict]:
+def raise_bank(folder: Any, *, at: Any = None, run: str | None = None, dry: bool = False) -> list[dict]:
     """The bank's questions, and those the core raises by rule (one per `{pending: …}`, one per node pending or
     below confidence 0.5), raised for a holograph and landed in `D/questions.cosm`, every one `to: holder`. A bank
     entry is asked once of the holograph: never again while a question from it stands, a declined one included (the
-    holder may ask for it again: `ask_again`). Returns the questions landed."""
+    holder may ask for it again: `ask_again`). Returns the questions landed; `dry`: the questions it would land,
+    nothing written."""
     h = Holograph(folder)
     r = dl.raise_questions(h.led, to=HOLDER, run=run, at=at, checker=_checker(pii_error=False))
+    if dry:
+        return [copy.deepcopy(q) for q in r.questions]
     if r.questions:
         dl.land(h.led, r.questions)
         h.save()
