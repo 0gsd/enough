@@ -125,7 +125,7 @@ links:
   rels: [of, after, step, node, see]
 
 closed-lists:
-  form: [let, assert, if, for, emit, give, withhold, effect]   # a step's statement kind
+  form: [let, assert, if, for, emit, give, withhold, effect, keep]   # a step's statement kind (keep: thym 1)
   basis.*: [statistics, judgement]                              # how each scale was measured (a mapping, scale by scale)
   toward: [formal, casual]                                      # the direction of the formality scale
   outcome: [landed, refused]                                    # how a run ended
@@ -146,6 +146,7 @@ modules:
       move: {refs: [steps], checked: [params, body, lines, order]}          # order: a top-level move only
       step: {refs: [of, contracts, branches.then, branches.else, steps], checked: [n, text, line, lines, form, move, calls, binds, uses, asks, slot]}
       contract: {refs: [of], checked: [move, checks]}
+      check: {refs: [steps], checked: [params, body, lines, order]}         # a contract block of a thym 1 program
   M:
     name: Morphs
     subtitle: How a telling departs from the plainest one

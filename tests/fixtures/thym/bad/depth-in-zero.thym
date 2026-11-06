@@ -1,0 +1,13 @@
+-- refused: compile version line 8
+thym 0
+
+program depth-in-zero
+  why: a move that calls itself under a depth, under a thym 0 line.
+  takes t: text
+  gives s: short
+  move again(f: fabula): short
+    depth: 8
+    give again f
+  end
+  give again (derive t)
+end

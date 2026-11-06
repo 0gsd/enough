@@ -1,0 +1,16 @@
+-- refused: compile version line 4
+thym 0
+
+contract some(n: number)
+  why: a count finds some.
+
+  assert n > 0
+end
+
+program contract-in-zero
+  why: a contract block under a thym 0 line.
+  takes t: text
+  gives n: number
+
+  give words t
+end

@@ -1,0 +1,79 @@
+oes: thym/1
+kind: plan
+id: thym/plan.loop-as-a-unit
+name: loop-as-a-unit on meadow
+program:
+  name: loop-as-a-unit
+  sha256: e4003f87a777e12170eb4bb1fe2f0842f12a9b54b5ea2ce66043ab93cb2a7cfc
+inputs:
+- name: h
+  type: volume
+  path: ../cosm/holotypes/meadow
+  sha256: b27e86f12b2b2d588cbdaa47c82d160a60cc2056030050088bfc31a9e6f5a5d7
+estimate:
+  steps: 2
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: loop-as-a-unit on meadow
+  summary: Two nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - loop-as-a-unit.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: for each o in h where kind is service
+  summary: for each o in h where kind is service
+  step:
+    program: loop-as-a-unit
+    n: 1
+  move: for
+  asks: false
+  takes:
+  - h
+  repeats: true
+  calls:
+  - mark
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 10
+  provenance:
+    mode: derived
+    sources:
+    - loop-as-a-unit.thym#L10-L15
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: project h as isotype
+  summary: project h as isotype
+  step:
+    program: loop-as-a-unit
+    n: 5
+  move: project
+  asks: false
+  takes:
+  - h
+  gives: i
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 16
+  provenance:
+    mode: derived
+    sources:
+    - loop-as-a-unit.thym#L16
+    confidence: 1

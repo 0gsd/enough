@@ -1,0 +1,17 @@
+thym 1
+
+program collect-the-offers
+  why: count what the house sells, each offer kept once it is marked as the house says it; a loop that
+       collects, with a binding and a choice of its own on every pass.
+
+  takes h: volume                  -- the holotype
+  gives n: number                  -- how many offers
+
+  let offers = for each o in h where kind in [product, service, platform]
+    let m = mark o as stated       -- this pass's offer, marked
+    if m has name then
+      keep m
+    end
+  end
+  give count offers
+end

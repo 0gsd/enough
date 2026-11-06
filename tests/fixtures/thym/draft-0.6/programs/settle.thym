@@ -1,0 +1,15 @@
+thym 1
+
+program settle-the-answers
+  why: what a person said is written into the fabula, each answer where its question pointed, and
+       nothing else in it moves.
+  decided 2026-11-05: a second run, never a run that waits; "I don't know" leaves the field open
+       in the person's own words.
+
+  takes f: fabula, said: volume
+  gives g: fabula
+  keeps only-the-asked against f
+
+  let answered = record said in f
+  give settle answered
+end

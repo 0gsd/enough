@@ -1,0 +1,17 @@
+thym 1
+
+program loop-as-a-unit
+  why: every service the house sells, marked as the house says it and then as what it does now, one pass
+       at a time: under thym 1 the loop's body runs member by member as a unit.
+
+  takes h: volume                  -- the holotype
+  gives i: volume                  -- an isotype
+
+  for each o in h where kind is service
+    let s = mark o as stated       -- read later in the same pass, as written
+    if s has name then
+      emit mark s as verified
+    end
+  end
+  give project h as isotype
+end

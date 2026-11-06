@@ -1,0 +1,15 @@
+thym 1
+
+program decompile-prose
+  why: an essay decompiled into its fabula, with a question for its author wherever the reading
+       was unsure.
+  decided 2026-11-05: the questions land with the fabula; the answers come back in a second run.
+
+  takes essay: text
+  gives f: fabula
+
+  let found = derive essay as prose
+  assert found covers essay else "the fabula does not cover the essay"
+  let asked = question found
+  give gather asked with found
+end

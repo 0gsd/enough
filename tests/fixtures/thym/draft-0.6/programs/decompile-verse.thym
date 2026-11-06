@@ -1,0 +1,15 @@
+thym 1
+
+program decompile-verse
+  why: a poem decompiled into its fabula, line by line, with its metre and its rhymes, and a
+       question for its author wherever a reading is a guess.
+  must: nothing is fetched; the poem is the person's own copy.
+
+  takes poem: text
+  gives f: fabula
+
+  let found = derive poem as verse
+  assert found covers poem else "a line of the poem is in no item"
+  let asked = question found
+  give gather asked with found
+end

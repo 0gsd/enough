@@ -1,0 +1,54 @@
+oes: thym/1
+kind: plan
+id: thym/plan.bounded-recursion
+name: bounded-recursion on notes.md
+program:
+  name: bounded-recursion
+  sha256: 43fb01d03638d6bc4ac9500fee6a0b9bbfa1f6a2d731f43b8f23d055a890bfa4
+inputs:
+- name: t
+  type: text
+  path: inputs/notes.md
+  sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+estimate:
+  steps: 1
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: bounded-recursion on notes.md
+  summary: One node, none of which asks the model.
+  nodes:
+  - R:node/1
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: again t, true
+  summary: again t, true
+  step:
+    program: bounded-recursion
+    n: 1
+  move: again
+  asks: false
+  takes:
+  - t
+  gives: n
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+    depth: 2
+  line: 18
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L18
+    confidence: 1

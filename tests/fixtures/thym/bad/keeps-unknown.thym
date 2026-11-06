@@ -1,0 +1,17 @@
+-- refused: compile unknown-check line 14
+thym 1
+
+contract shorter(new: short, old: short)
+  why: a short that says less.
+
+  assert words new < words old else "not shorter"
+end
+
+program keeps-unknown
+  why: keep a contract by a name nothing has.
+  takes s: short
+  gives t: short
+  keeps shorten against s
+
+  give s
+end

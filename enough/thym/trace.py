@@ -78,9 +78,10 @@ def node_number(node_id: Any) -> str:
 def record(node: dict, *, run_id: str, move: str, engine: str, inputs: list | None = None,
            outputs: list | None = None, attempts: int = 0, tokens: int = 0, seconds: int = 0,
            checks: list | None = None, state: str | None = None, refusal: Refusal | None = None,
-           tries: list | None = None) -> dict:
+           tries: list | None = None, passes: int | None = None) -> dict:
     """One `R:record/<n>` item for node `n` of the plan (THYM.md 17.3); `refusal` when the run stopped here; `tries`
-    each attempt that failed its checks, kept so that a refused node explains all its tries (12.3)."""
+    each attempt that failed its checks, kept so that a refused node explains all its tries (12.3); `passes` how many
+    passes a loop run as one node made (`thym 1`)."""
     n = node_number(node.get("id"))
     checks = list(checks or [])
     failed = [c for c in checks if not c.get("ok")]
@@ -101,6 +102,8 @@ def record(node: dict, *, run_id: str, move: str, engine: str, inputs: list | No
         rec["state"] = state
     if tries:
         rec["tries"] = [dict(x) for x in tries]
+    if passes is not None:
+        rec["passes"] = int(passes)
     rec["provenance"] = {"mode": "derived", "sources": [f"{run_id}.plan.cosm#{node.get('id')}"], "confidence": 1}
     return rec
 

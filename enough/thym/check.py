@@ -32,6 +32,20 @@ misses; `type` a give that names no output, 8.2). `in` with a text, a string, a 
 it contains the left's characters (4.5). A call's `gives`, contract and scaffold may be chosen by its `as` word or its
 first operand's type (`gives-when`, `contract-when`, `scaffold-when`, `same-as-with`, `same-as-in`: 17.6), and the
 chosen contract is the call's (`Call.contract`).
+
+**What `thym 1` adds here** (part c). The loop that collects: `keep` belongs to the nearest enclosing loop that
+collects (inside an `if` or a plain `for each` of its body, never in a user move's body unless that body holds the
+loop); every `keep` of one loop keeps one type T, the loop binds `list of T` after its `end`, and a loop that collects
+keeps at least once (THYM 8.1). Contract blocks: their bodies hold `let`, `assert` and `for each` lines only and ask
+no model, directly or through a move; their names differ from every check of THYM 7.3. `keeps <name> [of <output>]
+[against <name>, …]` stands in a block that gives, names a contract block the file can see or a named check (else
+`unknown-check`, with the nearest name), and its kept value and `against` names fit the contract's parameters in count
+and type (THYM 7.5); a move's `checks` list its kept contracts after the inherited ones. Recursion: a move on a cycle of
+calls says `depth:` (1 to 64), as does every move on the cycle; a move that says it and never calls itself, and a
+program that says it, are refused (`type`); a recursive move's calls, checks and asks are those of its whole cycle
+(THYM 8.3). The flavour of a fabula, where the call that made it says it (`derive … as verse`, `derive` of a folder,
+`survey`), is a static note: `tell f as code` (or a catem's depth) of a fabula known to be a fabulan or a fabulap is
+refused, check `flavour` (THYM 20.5).
 """
 from __future__ import annotations
 
@@ -44,6 +58,7 @@ from typing import Any, Callable, Iterator, Mapping
 from enough import macrocosm as mc
 
 from . import Refusal
+from . import checks as _checks
 from . import contracts as ct
 from . import declarations as dc
 from . import folder as fd
@@ -57,6 +72,15 @@ _OES_THYM = re.compile(r"^oes:thym/([A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-]
 Volumes = Mapping[str, Any] | Callable[[str], Any] | None
 #: The types `in` finds a string in, in `thym 1` (THYM 4.5).
 TEXTUAL = ("text", "string", "short", "line")
+#: The depth a move that calls itself may say (THYM 8.3).
+DEPTHS = range(1, 65)
+#: A fabula's flavour, where the call that made it says it (THYM 20.5): `derive … as <word>`, `derive` of a folder,
+#: `survey`; and the depths `tell` gives only of a fabulac (a cshort, `as code`; a catem, `as line | overview |
+#: manual`).
+FLAVOUR_OF_AS = {"prose": "fabulan", "verse": "fabulap", "code": "fabulac"}
+FLAVOUR_MAKERS = {"survey": "fabulac"}
+FABULAC_ONLY = {"tell": ("code", "line", "overview", "manual")}
+_FLAVOUR_SAID = {"fabulan": "a fabulan, the fabula of a text", "fabulap": "a fabulap, a poem's fabula"}
 
 
 def _escapes(uri: str) -> str | None:
@@ -99,6 +123,8 @@ class Binding:
     file: str | None = None
     fields: dict[str, str] | None = None
     source: Any = None
+    #: a fabula's flavour where the call that made it says it (`fabulan`, `fabulap`, `fabulac`), else None
+    flavour: str | None = None
 
 
 @dataclass(eq=False)
@@ -119,6 +145,16 @@ class UserMove:
     inherited: bool = False
 
     @property
+    def keeps(self) -> list[str]:
+        """The contracts and checks the move keeps (`thym 1`, THYM 7.5), by name, in the order written."""
+        return _once([k.name for k in self.block.keeps])
+
+    @property
+    def depth(self) -> int | None:
+        """How deep the move may call itself (`thym 1`, THYM 8.3), or None."""
+        return self.block.depth
+
+    @property
     def id(self) -> str:
         return f"P:move/{self.block.qualified}"
 
@@ -136,6 +172,10 @@ class Checked:
     symbols: dict[str, dict[str, Binding]]
     used: list[dict]
     warnings: list
+    #: the contract blocks the file can see (its own, and those its `use`d files declare), and each program's local
+    #: ones (`thym 1`, THYM 7.5)
+    contracts: dict[str, ps.Block] = field(default_factory=dict)
+    local_contracts: dict[str, dict[str, ps.Block]] = field(default_factory=dict)
 
     def programs(self) -> list[ps.Block]:
         return self.module.programs()
@@ -176,6 +216,10 @@ class _Ctx:
     block: ps.Block
     program: str | None
     in_loop: bool = False
+    #: the loops that collect around the statement being checked, innermost last: `{name, line, end, kept}`
+    collect: list = field(default_factory=list)
+    #: every loop around it, innermost last
+    loops: list = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -195,7 +239,7 @@ def walk(stmts: list[ps.Stmt]) -> Iterator[ps.Stmt]:
 
 def parts(st: ps.Stmt) -> list[Any]:
     """A statement's own expressions and conditions, in source order (not its body's)."""
-    if isinstance(st, (ps.Let, ps.Emit, ps.Give, ps.Effect)):
+    if isinstance(st, (ps.Let, ps.Emit, ps.Give, ps.Effect, ps.Keep)):
         return [st.expr]
     if isinstance(st, ps.Assert):
         return [st.cond]
@@ -219,7 +263,7 @@ def own_call(st: ps.Stmt) -> Any:
     `marked` itself when it marks a plain value; None for `assert`, `if`, `for each` and a call-less expression."""
     if isinstance(st, ps.Withhold):
         return st.call
-    if isinstance(st, (ps.Let, ps.Emit, ps.Give, ps.Effect)):
+    if isinstance(st, (ps.Let, ps.Emit, ps.Give, ps.Effect, ps.Keep)):
         e = strip_paren(st.expr)
         if isinstance(e, ps.Marked):
             inner = strip_paren(e.inner)
@@ -306,6 +350,17 @@ def step_call_names(st: ps.Stmt) -> list[str]:
     return seen
 
 
+def known_checks(decls: Mapping[str, Any]) -> set[str]:
+    """Every named check a `keeps` may name (THYM 7.5): the checks of section 7.3, every check a declaration's
+    contract names (its `contract` and `contract-when` lists), and every check the registry implements here."""
+    out = set(ct.CHECKS) | set(_checks.CHECKS.names()) | {"fabula-checks"}
+    for d in (decls or {}).values():
+        out.update(str(c) for c in getattr(d, "contract", ()) or ())
+        for rule in getattr(d, "contract_when", ()) or ():
+            out.update(str(c) for c in (rule[2] or ()))
+    return out
+
+
 def step_asks(st: ps.Stmt) -> bool:
     return any(call_asks(c) for c in step_calls(st))
 
@@ -378,6 +433,9 @@ class _Checker:
         self.used: list[dict] = []
         self.origin: dict[str, str] = {}          # a file-scope name → the file that declares it
         self.file_scope = _Scope()
+        self.contracts: dict[str, ps.Block] = {}
+        self.local_contracts: dict[str, dict[str, ps.Block]] = {}
+        self.flavours: dict[int, str] = {}        # id(expr) → the flavour of the fabula it gives, where known
 
     # -- refusals ----------------------------------------------------------
 
@@ -417,11 +475,17 @@ class _Checker:
                 self.fail("rebound", f"`{b.name}` already names the {first.kind} at line {first.line}; a name is "
                           "unique among the blocks of its file", b.line)
             blocks_by_name[b.name] = b
+        checks_known = known_checks(self.decls) if m.version >= 1 else set()
         for b in m.blocks:
-            for lm in b.moves:
-                self.name_ok(lm.name, lm.line, "a move")
-                if lm.name in blocks_by_name or any(o is not lm and o.name == lm.name for o in b.moves):
+            locals_ = b.moves + b.contracts
+            for lm in locals_:
+                self.name_ok(lm.name, lm.line, f"a {lm.kind}")
+                if lm.name in blocks_by_name or any(o is not lm and o.name == lm.name for o in locals_):
                     self.fail("rebound", f"`{lm.name}` already names a block of this file", lm.line)
+            for cb in [b] + b.contracts:
+                if cb.kind == "contract" and cb.name in checks_known:
+                    self.fail("type", f"contract {cb.name} has the name of a standard check; name it otherwise",
+                              cb.line)
         for u in m.uses:
             self.use(u, blocks_by_name)
         for b in m.blocks:
@@ -434,16 +498,23 @@ class _Checker:
             elif b.kind == "move":
                 mv = self.user_move(b, None)
                 self.moves[b.name] = mv
+            elif b.kind == "contract":
+                self.contracts[b.name] = b
         for b in m.blocks:
             if b.kind == "program":
                 self.local[b.name] = {lm.name: self.user_move(lm, b.name) for lm in b.moves}
+                self.local_contracts[b.name] = {lc.name: lc for lc in b.contracts}
         for b in m.blocks:
             self.check_block(b)
         self.no_recursion()
         for mv in self.user_moves:
             self.inherit(mv, set())
+        self.cycles_share()
+        for b in m.blocks:
+            for cb in ([b] if b.kind == "contract" else b.contracts):
+                self.contract_never_asks(cb)
         return Checked(m, self.decls, self.names, self.moves, self.local, self.user_moves, self.symbols, self.used,
-                       list(m.warnings))
+                       list(m.warnings), self.contracts, self.local_contracts)
 
     def add_name(self, b: Binding) -> None:
         self.names[b.name] = b
@@ -475,6 +546,8 @@ class _Checker:
             names.append(name)
             if kind == "move":
                 self.moves[name] = value
+            elif kind == "contract":
+                self.contracts[name] = value
             else:
                 self.add_name(value)
         self.used.append({"uri": u.uri, "line": u.line, "names": names})
@@ -585,6 +658,8 @@ class _Checker:
         for b in mod.blocks:
             if b.kind == "move" and b.name in sub.moves:
                 out[b.name] = ("move", sub.moves[b.name], label)
+            elif b.kind == "contract" and b.name in sub.contracts:
+                out[b.name] = ("contract", sub.contracts[b.name], label)
             elif b.kind in ("morph", "context") and b.name in sub.names:
                 out[b.name] = (b.kind, sub.names[b.name], label)
         return out
@@ -621,9 +696,13 @@ class _Checker:
             self.context(b)
         elif b.kind == "move":
             self.body(b, None)
+        elif b.kind == "contract":
+            self.contract(b, None)
         else:
             for lm in b.moves:
                 self.body(lm, b.name)
+            for lc in b.contracts:
+                self.contract(lc, b.name)
             self.body(b, b.name)
 
     def morph(self, b: ps.Block) -> None:
@@ -660,6 +739,105 @@ class _Checker:
             if isinstance(f.value, ps.FieldRead):
                 self.fail("type", "a context field holds a literal or a word", f.line)
 
+    def contract(self, b: ps.Block, program: str | None) -> None:
+        """A contract block (THYM 7.5): its parameters bound, its body of `let`, `assert` and `for each` lines only,
+        typed as any body is. That it asks no model is checked once every move's asks are known
+        (`contract_never_asks`)."""
+        what = {"keep": "a keep", "if": "an if", "emit": "an emit", "give": "a give", "withhold": "a withhold",
+                "effect": "a move run for its effect"}
+        for st in walk(b.stmts):
+            form = "a loop that collects" if isinstance(st, ps.For) and st.collect else what.get(st.form)
+            if form:
+                self.fail("type", f"a contract holds let, assert and for each lines; line {st.line} is {form}",
+                          st.line)
+        sink: dict[str, Binding] = {}
+        self.symbols[b.qualified] = sink
+        scope = _Scope(self.file_scope, sink)
+        for p in b.params:
+            self.name_ok(p.name, p.line, "a parameter")
+            if scope.lookup(p.name) is not None:
+                self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
+            scope.add(Binding(p.name, p.type, "param", p.line, self.file))
+        self.stmts(b.stmts, scope, _Ctx(block=b, program=program))
+
+    def contract_never_asks(self, b: ps.Block) -> None:
+        """A contract checks, and never asks: no call in its body asks a model, directly or through a user move."""
+        for st in walk(b.stmts):
+            for c in step_calls(st):
+                if call_asks(c):
+                    self.fail("type", f"contract {b.name} asks the model at line {st.line} ({move_name(c)}); a "
+                              "contract checks, and never asks", st.line)
+
+    def find_contract(self, name: str, program: str | None) -> ps.Block | None:
+        if program and name in self.local_contracts.get(program, {}):
+            return self.local_contracts[program][name]
+        return self.contracts.get(name)
+
+    def keeps(self, b: ps.Block, program: str | None) -> None:
+        """A block's keeps heads (THYM 7.5): in a block that gives; the output named (`of`) in a program of several;
+        `against` names among the block's parameters or inputs; the name a contract block the file can see, or a
+        named check (else `unknown-check`); for a contract block, the kept value and the `against` names fit its
+        parameters in count and type."""
+        if not b.keeps:
+            return
+        if b.gives is None:
+            self.fail("type", f"{b.kind} {b.name} gives nothing, so it keeps nothing", b.keeps[0].line)
+        outs = b.outputs or [b.gives]
+        own = {p.name: p.type for p in (b.params if b.kind == "move" else b.takes)}
+        checks_known = known_checks(self.decls)
+        for k in b.keeps:
+            if k.of is not None:
+                out = next((o for o in outs if o.name == k.of), None)
+                if out is None:
+                    self.fail("type", f"keeps {k.name} of {k.of}: {b.kind} {b.name} gives no {k.of}; it gives "
+                              f"{_and([o.name for o in outs])}", k.line)
+            elif len(outs) > 1:
+                self.fail("type", f"{b.kind} {b.name} gives {_and([o.name for o in outs])}; keeps says which: keeps "
+                          f"{k.name} of {outs[0].name}", k.line)
+                out = outs[0]
+            else:
+                out = outs[0]
+            said = f"keeps {k.name}" + (f" of {k.of}" if k.of else "") + \
+                (f" against {', '.join(k.against)}" if k.against else "")
+            for a in k.against:
+                if a not in own:
+                    whose = "parameters" if b.kind == "move" else "inputs"
+                    self.fail("unbound", f"{said}: {a} is not one of the {whose} of {b.kind} {b.name}", k.line)
+            target = self.find_contract(k.name, program)
+            if target is None:
+                if k.name in checks_known:
+                    continue
+                seen = sorted(set(self.contracts) | set(self.local_contracts.get(program or "", {})) | checks_known)
+                near = difflib.get_close_matches(k.name, seen, n=1, cutoff=0.6)
+                self.fail("unknown-check", f"{said}: no contract block and no named check is called so"
+                          + (f"; did you mean {near[0]}?" if near else ""), k.line)
+            params = target.params
+            values = [(b.name, out.type, "gives")] + [(a, own[a], "is") for a in k.against]
+            wrong = None
+            if len(params) != len(values):
+                wrong = values[0] if len(params) < len(values) else None
+                takes = ", ".join(f"{p.name}: {p.type}" for p in params)
+                given = f"it is given {len(values)} value{'s' if len(values) != 1 else ''}"
+                self.fail("type", f"{said}: {k.name} takes {takes}, and {given}", k.line)
+            for p, (who, t, verb) in zip(params, values):
+                if not ty.accepts([p.type], t):
+                    wrong = (who, t, verb)
+                    break
+            if wrong is not None:
+                takes = ", ".join(f"{p.name}: {p.type}" for p in params)
+                self.fail("type", f"{said}: {k.name} takes {takes}, and {wrong[0]} {wrong[2]} "
+                          f"{ty.show([wrong[1]])}", k.line)
+
+    def depth(self, b: ps.Block) -> None:
+        """A `depth:` head: a move's, from 1 to 64 (THYM 8.3); whether its move calls itself is `no_recursion`'s."""
+        if b.depth is None:
+            return
+        if b.kind != "move":
+            self.fail("type", f"{b.kind} {b.name} is never called, so it says no depth: a depth: line stands in a "
+                      "move that calls itself", b.depth_line)
+        if b.depth not in DEPTHS:
+            self.fail("type", "depth is a number from 1 to 64", b.depth_line)
+
     def body(self, b: ps.Block, program: str | None) -> None:
         sink: dict[str, Binding] = {}
         self.symbols[b.qualified] = sink
@@ -678,6 +856,8 @@ class _Checker:
                           f"{seen_out[o.name]}", o.line)
             seen_out[o.name] = o.line
         self.stmts(b.stmts, scope, ctx)
+        self.depth(b)
+        self.keeps(b, program)
         if len(outs) > 1:
             names = [o.name for o in outs]
             for o in outs:
@@ -763,6 +943,14 @@ class _Checker:
         if isinstance(s, ps.Let):
             t = self.expr(s.expr, scope, ctx)
             s.binding = self.bind(scope, s.name, t, "let", s.line, ctx)
+            s.binding.flavour = self.flavours.get(id(strip_paren(s.expr)))
+        elif isinstance(s, ps.Keep):
+            t = self.expr(s.expr, scope, ctx)
+            if not ctx.collect:
+                where = (f"; the loop at line {ctx.loops[-1].line} binds nothing" if ctx.loops else
+                         f"; line {s.line} stands in no loop")
+                self.fail("type", f"keep stands inside a loop that collects (let <name> = for each …){where}", s.line)
+            ctx.collect[-1]["kept"].append((t, s.line))
         elif isinstance(s, ps.Assert):
             self.cond(s.cond, scope, ctx, items=False)
         elif isinstance(s, ps.If):
@@ -779,8 +967,19 @@ class _Checker:
                 self.cond(s.where, inner, ctx, items=True)
             was = ctx.in_loop
             ctx.in_loop = True
-            self.stmts(s.body, inner, ctx)
+            frame = {"name": s.collect, "line": s.line, "end": s.end, "kept": []} if s.collect else None
+            if frame is not None:
+                ctx.collect.append(frame)
+            ctx.loops.append(s)
+            try:
+                self.stmts(s.body, inner, ctx)
+            finally:
+                ctx.loops.pop()
+                if frame is not None:
+                    ctx.collect.pop()
             ctx.in_loop = was
+            if frame is not None:
+                self.collected(s, frame, scope, ctx)
         elif isinstance(s, ps.Emit):
             t = self.expr(s.expr, scope, ctx)
             if s.slot is None and not self.emittable(s.expr, t):
@@ -803,6 +1002,23 @@ class _Checker:
             self.expr(s.call, scope, ctx)
         elif isinstance(s, ps.Effect):
             self.expr(s.expr, scope, ctx)
+
+    def collected(self, s: ps.For, frame: dict, scope: _Scope, ctx: _Ctx) -> None:
+        """A loop that collects (THYM 8.1): at least one keep; every keep of one type T; the loop binds `list of T`
+        after its end."""
+        kept = frame["kept"]
+        if not kept:
+            self.fail("type", f"the loop that binds {s.collect} keeps nothing: add a keep line", s.line)
+        first: dict[str, int] = {}
+        for t, line in kept:
+            if t != ty.ANY:
+                first.setdefault(t, line)
+        if len(first) > 1:
+            (a, la), (b2, lb) = list(first.items())[:2]
+            self.fail("type", f"the loop that binds {s.collect} keeps {ty.show([a])} at line {la} and {ty.show([b2])} "
+                      f"at line {lb}; a list holds one type", lb)
+        t = next(iter(first), ty.ANY)
+        s.collect_binding = self.bind(scope, s.collect, ty.list_of(t), "let", s.line, ctx)
 
     def output_of(self, s: ps.Give, b: ps.Block) -> ps.Param:
         """The output a give gives: the one its label names; the block's one output when it has one (THYM 8.2)."""
@@ -864,6 +1080,8 @@ class _Checker:
         if isinstance(e, ps.ListLit):
             types = {self.expr(x, scope, ctx, word_ok=True) for x in e.items}
             types.discard(ty.ANY)
+            if types == {"string", "line"}:               # a line is a string with a place (THYM 5.1)
+                types = {"string"}
             if len(types) > 1:
                 self.fail("type", f"a list holds values of one type; {ps.render(e)} mixes {', '.join(sorted(types))}",
                           e.line)
@@ -911,7 +1129,13 @@ class _Checker:
         b = scope.lookup(e.name)
         if b is not None:
             e.kind, e.binding = "binding", b
+            if b.flavour:
+                self.flavours[id(e)] = b.flavour
             return b.type
+        inside = next((f for f in ctx.collect if f["name"] == e.name), None)
+        if inside is not None:
+            self.fail("type", f"{e.name} is bound by the loop it is read in; read it after the loop's end (line "
+                      f"{inside['end']})", e.line)
         if e.name in ty.LITERAL_WORDS or (word_ok and ps.NAME.match(e.name)):
             e.kind = "word"
             return ty.WORD
@@ -990,6 +1214,7 @@ class _Checker:
         if not takes and "of" in target.modifiers and c.mod("of") is None:
             self.fail("type", f"{c.move} takes its argument through of: {c.move} of …", c.line)
         self.thym1_use(c, target)
+        self.flavour(c)
         chosen = self.chosen(c, target)
         c.contract = tuple(chosen["contract"])
         gives = list(chosen["gives"])
@@ -998,6 +1223,25 @@ class _Checker:
         if c.operands and c.operands[0].type in gives:
             return c.operands[0].type
         return ty.ANY
+
+    def flavour(self, c: ps.Call) -> None:
+        """The flavour of the fabula a call gives, where the call says it (THYM 20.5), noted for what reads it; and a
+        `tell` of a depth only a fabulac has, of a fabula known to be a fabulan or a fabulap, refused (`flavour`)."""
+        as_mod = c.mod("as")
+        word = as_mod.arg.word if as_mod is not None and isinstance(as_mod.arg, ps.Word) else None
+        first = c.operands[0] if c.operands else None
+        if c.move == "derive" and first is not None:
+            made = FLAVOUR_OF_AS.get(word or "") or ("fabulac" if first.type == "folder" else
+                                                     "fabulan" if first.type == "text" and word is None else None)
+        else:
+            made = FLAVOUR_MAKERS.get(c.move)
+        if made:
+            self.flavours[id(c)] = made
+        if word in FABULAC_ONLY.get(c.move, ()) and first is not None:
+            known = self.flavours.get(id(strip_paren(first)))
+            if known in _FLAVOUR_SAID:
+                what = "only a fabulac is told as code" if word == "code" else "a catem is told from a fabulac"
+                self.fail("flavour", f"{ps.render(first)} is {_FLAVOUR_SAID[known]}; {what}", c.line)
 
     @staticmethod
     def chosen(c: ps.Call, target: Any) -> dict:
@@ -1156,15 +1400,82 @@ class _Checker:
         for mv in mine:
             if state.get(id(mv)) is None:
                 visit(mv, [mv])
-        if on_cycle:
+        if on_cycle and self.m.version < 1:
             first, cycle = min(on_cycle, key=lambda x: x[0].line)
             chain = " → ".join(m.name for m in cycle)
             how = "calls itself" if len(cycle) <= 2 and cycle[0] is cycle[-1] else f"calls itself through {chain}"
-            if self.m.version < 1:
-                self.fail("recursion", f"move {first.name} {how}, and thym 0 has no recursion; thym 1 allows it with "
-                          "a depth: line", first.line)
-            # the seam for recursion under depth: (a later part of the compiler): until then thym 1 refuses as 0 did
-            self.fail("recursion", f"move {first.name} {how}, and has no depth: line", first.line)
+            self.fail("recursion", f"move {first.name} {how}, and thym 0 has no recursion; thym 1 allows it with "
+                      "a depth: line", first.line)
+        if self.m.version < 1:
+            return
+        # thym 1 (THYM 8.3): every move on a cycle says depth:, and a move that says it is on one
+        cycles = self.cycles()
+        on = {id(mv): comp for comp in cycles for mv in comp}
+        missing: list[UserMove] = []
+        for mv in sorted(mine, key=lambda x: x.line):
+            if id(mv) in on:
+                self.m.met(mv.line, "recursion", mv.name)
+                if mv.block.depth is None:
+                    missing.append(mv)
+            elif mv.block.depth is not None:
+                self.fail("type", f"move {mv.name} says depth: {mv.block.depth} and never calls itself; drop the line",
+                          mv.block.depth_line)
+        if missing:
+            first = missing[0]
+            comp = on[id(first)]
+            how = "calls itself" if len(comp) == 1 else \
+                f"calls itself through {' → '.join([m.name for m in comp] + [comp[0].name])}"
+            self.fail("recursion", f"move {first.name} {how}; a move that calls itself says how deep it may go: add "
+                      "`depth: 8` under its why", first.line)
+
+    def cycles(self) -> list[list[UserMove]]:
+        """The cycles of calls among this file's user moves: each strongly connected set of moves that call one
+        another (a move that calls itself is one alone), its moves in the order written."""
+        mine = list(self.user_moves)
+        index: dict[int, int] = {}
+        low: dict[int, int] = {}
+        stack: list[UserMove] = []
+        on_stack: set[int] = set()
+        out: list[list[UserMove]] = []
+        counter = [0]
+
+        def visit(mv: UserMove) -> None:
+            index[id(mv)] = low[id(mv)] = counter[0]
+            counter[0] += 1
+            stack.append(mv)
+            on_stack.add(id(mv))
+            for nxt in self.callees(mv):
+                if id(nxt) not in index:
+                    visit(nxt)
+                    low[id(mv)] = min(low[id(mv)], low[id(nxt)])
+                elif id(nxt) in on_stack:
+                    low[id(mv)] = min(low[id(mv)], index[id(nxt)])
+            if low[id(mv)] == index[id(mv)]:
+                comp: list[UserMove] = []
+                while True:
+                    w = stack.pop()
+                    on_stack.discard(id(w))
+                    comp.append(w)
+                    if w is mv:
+                        break
+                if len(comp) > 1 or mv in self.callees(mv):
+                    out.append(sorted(comp, key=lambda x: x.line))
+
+        for mv in mine:
+            if id(mv) not in index:
+                visit(mv)
+        return out
+
+    def cycles_share(self) -> None:
+        """A recursive move's calls, checks and asks are those of every move on its cycle (THYM 8.3)."""
+        if self.m.version < 1:
+            return
+        for comp in self.cycles():
+            calls = _once([c for mv in comp for c in mv.calls])
+            checks = _once([c for mv in comp for c in mv.checks])
+            asks = any(mv.asks for mv in comp)
+            for mv in comp:
+                mv.calls, mv.checks, mv.asks = list(calls), list(checks), asks
 
     def inherit(self, mv: UserMove, busy: set[int]) -> UserMove:
         if mv.inherited or id(mv) in busy:
@@ -1187,6 +1498,7 @@ class _Checker:
                     asks = asks or bool(getattr(t, "asks", False))
             if isinstance(s, ps.Assert):
                 checks.extend(ct.condition_checks(s.cond))
+        checks.extend(mv.keeps)                          # what it keeps, after what it inherits (THYM 10)
         mv.calls = _once(calls)
         mv.checks = _once(checks)
         mv.asks = asks

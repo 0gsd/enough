@@ -20,8 +20,11 @@ first `thym 1` feature it met ("this needs `thym 1`: …"), and otherwise the fi
 `thym 1` productions written so far: a call on either side of a comparison without parentheses (THYM 4.5); the types
 `folder`, `line` and `change` (THYM 5.1); a program that gives several outputs, `gives code: folder, manual: short`, and
 the labelled give, `give code: …` (THYM 8.2); a `where` after a call in a `for each` header, which belongs to the loop
-unless the move declares a `where` modifier (THYM 4.5). The words of `PENDING` are in the `thym 1` tables and their
-productions are not read yet: a `thym 1` file that writes one is refused, saying so.
+unless the move declares a `where` modifier (THYM 4.5); the loop that collects, `let xs = for each x in c … keep <expr>
+… end` (THYM 8.1); the `contract` block, at the top level or inside a program before its statements, and the `keeps
+<name> [of <output>] [against <name>, …]` head of a move or a program (THYM 7.5); the `depth: <N>` head of a move that
+may call itself (THYM 8.3). Every production of the `thym 1` grammar is read: `PENDING` is empty, and stays as the
+place a later grammar's unread words would go.
 
 Calls are read with the names of the moves the file can see: the declared moves (`declarations.names()`), the file's
 own `move` blocks, and the `move` blocks of the `.thym` files it `use`s. A modifier's argument that begins with a
@@ -102,12 +105,9 @@ FEATURES = {
     "use-thym1": "use of a thym 1 file ({})",
 }
 
-#: Words of the `thym 1` tables whose productions are not read yet (a later part of the compiler writes each and
-#: takes it out of here): a `thym 1` file that writes one is refused at parse, naming what it is.
-PENDING = {
-    "contract": "a contract block", "keeps": "a keeps line", "depth": "a depth: line",
-    "keep": "a loop that collects (let … = for each … keep … end)",
-}
+#: Words of a grammar's tables whose productions this compiler does not read yet: a file that writes one is refused at
+#: parse, naming what it is. Every `thym 1` production is read, so it is empty.
+PENDING: dict[str, str] = {}
 
 THYM0 = Grammar(0, KEYWORDS, HEAD_WORDS, STATEMENT_WORDS, MODIFIER_WORDS, BLOCK_WORDS, ty.SIMPLE)
 THYM1 = Grammar(
@@ -119,7 +119,8 @@ THYM1 = Grammar(
     BLOCK_WORDS + ("contract",),
     ty.SIMPLE + ("folder", "line", "change"),
     frozenset(("side-call", "since-move", "thym1-word", "thym1-operand", "type-folder", "type-line", "type-change",
-               "several-gives", "labelled-give", "in-text", "loop-where")),
+               "several-gives", "labelled-give", "in-text", "loop-where", "collecting-loop", "contract-block", "keeps",
+               "depth", "recursion")),
 )
 #: The grammars this compiler reads, by the number on the version line.
 GRAMMARS = {0: THYM0, 1: THYM1}
@@ -335,11 +336,21 @@ class If(Stmt):
 
 @dataclass(eq=False, kw_only=True)
 class For(Stmt):
+    """`for each <var> in <coll> [where <cond>] … end`; in `thym 1` also the loop that collects, `let <collect> = for
+    each …`, whose `keep` lines make the list it binds (THYM 8.1). `text` is its header line(s)."""
     var: str
     coll: Expr
     where: Cond | None
     body: list[Stmt]
     binding: Any = None
+    collect: str | None = None
+    collect_binding: Any = None
+
+
+@dataclass(eq=False, kw_only=True)
+class Keep(Stmt):
+    """`keep <expr>` (`thym 1`): adds a value to the list the nearest enclosing loop that collects is making."""
+    expr: Expr
 
 
 @dataclass(eq=False, kw_only=True)
@@ -367,7 +378,7 @@ class Effect(Stmt):
 
 
 _FORMS = {"Let": "let", "Assert": "assert", "If": "if", "For": "for", "Emit": "emit", "Give": "give",
-          "Withhold": "withhold", "Effect": "effect"}
+          "Withhold": "withhold", "Effect": "effect", "Keep": "keep"}
 
 
 # Blocks.
@@ -392,6 +403,15 @@ class Decided(Node):
 
 
 @dataclass(eq=False, kw_only=True)
+class Keeps(Node):
+    """`keeps <name> [of <output>] [against <name>, …]` (`thym 1`, THYM 7.5): the block's output (or the output `of`
+    names) passes the contract block or the named check `name`; `against` fills its second and later parameters."""
+    name: str
+    of: str | None = None
+    against: list[str] = field(default_factory=list)
+
+
+@dataclass(eq=False, kw_only=True)
 class ScaleLine(Node):
     scale: str
     value: Expr
@@ -406,10 +426,11 @@ class FieldLine(Node):
 
 @dataclass(eq=False, kw_only=True)
 class Block(Node):
-    """One block. `end` is its `end` line. A program's inputs are `takes`, a move's `params`; both may have
-    `gives` (a move's is named after the move); `outputs` is every output a program gives, in the order its gives
-    line names them (`thym 1` may name several; `gives` is the first). `parent` names the program a local move stands
-    in."""
+    """One block. `end` is its `end` line. A program's inputs are `takes`, a move's (and a contract's) `params`; both
+    may have `gives` (a move's is named after the move); `outputs` is every output a program gives, in the order its
+    gives line names them (`thym 1` may name several; `gives` is the first). `parent` names the program a local move
+    or contract stands in. In `thym 1`: `keeps` the block's keeps heads, `depth` its `depth:` (with `depth_line`),
+    `contracts` a program's local contract blocks."""
     kind: str
     name: str
     end: int = 0
@@ -421,6 +442,10 @@ class Block(Node):
     gives: Param | None = None
     outputs: list[Param] = field(default_factory=list)
     moves: list["Block"] = field(default_factory=list)
+    contracts: list["Block"] = field(default_factory=list)
+    keeps: list[Keeps] = field(default_factory=list)
+    depth: int | None = None
+    depth_line: int | None = None
     stmts: list[Stmt] = field(default_factory=list)
     scales: list[ScaleLine] = field(default_factory=list)
     fields: list[FieldLine] = field(default_factory=list)
@@ -770,7 +795,15 @@ class _Parser:
         kind = ts.next().text
         name = ts.name(f"a {kind} block names itself: {kind} <name>").text
         b = Block(line=i + 1, kind=kind, name=name, parent=parent)
-        if kind == "move":
+        if kind == "contract":
+            ts.expect_punct("(", f"a contract declares what it checks: contract {name}(<name>: <type>, …)")
+            b.params.append(self.param(ts))
+            while ts.is_punct(","):
+                ts.next()
+                b.params.append(self.param(ts))
+            ts.expect_punct(")", "a contract's parameters close with )")
+            self.features.append((i + 1, feature("contract-block", name)))
+        elif kind == "move":
             ts.expect_punct("(", f"a move declares its parameters: move {name}(<name>: <type>, …): <type>")
             if not ts.is_punct(")"):
                 b.params.append(self.param(ts))
@@ -788,13 +821,14 @@ class _Parser:
             while True:
                 while i < self.n and self.blank(i):
                     i += 1
-                if i < self.n and self.first_word(i) == "move":
-                    mv, i = self.block(i, parent=name)
-                    b.moves.append(mv)
+                fw = self.first_word(i) if i < self.n else None
+                if fw == "move" or (fw == "contract" and "contract" in self.g.block_words):
+                    local, i = self.block(i, parent=name)
+                    (b.moves if fw == "move" else b.contracts).append(local)
                 else:
                     break
             b.stmts, i = self.stmts(i, ("end",), b)
-        elif kind == "move":
+        elif kind in ("move", "contract"):
             b.stmts, i = self.stmts(i, ("end",), b)
         elif kind == "morph":
             i = self.lines_until_end(b, i, self.scale_line)
@@ -854,10 +888,41 @@ class _Parser:
                     raise _Fail("parse", f"{mt.group(1)} is not a date", i + 1) from None
                 prose, i = self.prose(i, mt.group(2).strip(), b.kind)
                 b.decideds.append(Decided(line=prose.line, date=date, what=prose.text, end=prose.end))
+            elif fw in ("keeps", "depth") and fw in self.g.head_words:
+                if b.kind == "contract":
+                    raise _Fail("parse", f"a contract's heads are why, must and decided; {fw} is not one", i + 1)
+                toks, j = self.logical(i)
+                ts = _Stream(toks, i + 1)
+                ts.next()
+                if fw == "keeps":
+                    name = ts.name("keeps names a contract or a check: keeps <name> [against <name>, …]").text
+                    of = ts.name("keeps … of names an output: keeps <name> of <output>").text \
+                        if ts.take_word("of") else None
+                    against: list[str] = []
+                    if ts.take_word("against"):
+                        against.append(ts.name("keeps … against names a parameter or an input").text)
+                        while ts.is_punct(","):
+                            ts.next()
+                            against.append(ts.name("keeps … against names a parameter or an input").text)
+                    ts.end()
+                    b.keeps.append(Keeps(line=i + 1, name=name, of=of, against=against))
+                    self.features.append((i + 1, feature("keeps")))
+                else:
+                    ts.expect_punct(":", "depth reads depth: <1-64>")
+                    t = ts.peek()
+                    if t is None or t.kind != "int":
+                        raise _Fail("parse", "depth: takes a number from 1 to 64", i + 1)
+                    ts.next()
+                    ts.end()
+                    if b.depth is not None:
+                        raise _Fail("parse", f"{b.kind} {b.name} already says its depth, at line {b.depth_line}", i + 1)
+                    b.depth, b.depth_line = t.value, i + 1
+                    self.features.append((i + 1, feature("depth")))
+                i = j + 1
             elif fw in ("takes", "gives"):
                 if b.kind != "program":
-                    raise _Fail("parse", f"{fw} is a program's head; a move's signature stands on its first line",
-                                i + 1)
+                    where = "a contract's parameters stand" if b.kind == "contract" else "a move's signature stands"
+                    raise _Fail("parse", f"{fw} is a program's head; {where} on its first line", i + 1)
                 toks, j = self.logical(i)
                 ts = _Stream(toks, i + 1)
                 ts.next()
@@ -958,10 +1023,10 @@ class _Parser:
                 return out, i
             if fw in ("else", "end", "then"):
                 raise _Fail("parse", f"`{fw}` without the if or for each it would close", i + 1)
-            if fw == "move":
+            if fw == "move" or (fw == "contract" and "contract" in self.g.block_words):
                 if b.kind == "program":
-                    raise _Fail("parse", "a local move stands before the program's statements", i + 1)
-                raise _Fail("parse", "a move stands at the top of a file or at the start of a program", i + 1)
+                    raise _Fail("parse", f"a local {fw} stands before the program's statements", i + 1)
+                raise _Fail("parse", f"a {fw} stands at the top of a file or at the start of a program", i + 1)
             if fw in self.g.head_words:
                 self.pending(fw, i + 1)
                 raise _Fail("parse", f"`{fw}` is a head: heads stand at the top of a block, before its statements",
@@ -984,8 +1049,13 @@ class _Parser:
             ts.next()
             name = ts.name("let names what it binds: let <name> = <expression>").text
             ts.expect_punct("=", f"let binds with =: let {name} = <expression>")
-            if ts.is_word("for") and "keep" in self.g.keywords:
-                self.pending("keep", line)                      # a loop that collects: its production is pending
+            if ts.is_word("for") and self.g.admits("collecting-loop"):
+                ts.next()                                       # a loop that collects (THYM 8.1)
+                var, coll, where = self.for_header(ts, line)
+                body, k = self.stmts(j + 1, ("end",), b)
+                common["end"] = k + 1
+                self.features.append((line, feature("collecting-loop", name)))
+                return For(var=var, coll=coll, where=where, body=body, collect=name, **common), k + 1
             expr = self.expr(ts)
             ts.end()
             return Let(name=name, expr=expr, **common), j + 1
@@ -1015,23 +1085,15 @@ class _Parser:
             return If(cond=cond, then=then, else_=else_, else_line=else_line, **common), k + 1
         if word == "for":
             ts.next()
-            ts.expect_word("each", "a loop reads for each <name> in <expression>")
-            var = ts.name("a loop names its variable: for each <name> in <expression>").text
-            ts.expect_word("in", f"a loop reads for each {var} in <expression>")
-            was, self.loop_where = self.loop_where, self.g.admits("loop-where")
-            try:
-                coll = self.expr(ts, filter_ok=False)
-            finally:
-                self.loop_where = was
-            if ts.is_word("where") and isinstance(coll, (Call, Marked)):
-                self.features.append((line, feature("loop-where")))
-            where = None
-            if ts.take_word("where"):
-                where = self.cond(ts)
-            ts.end()
+            var, coll, where = self.for_header(ts, line)
             body, k = self.stmts(j + 1, ("end",), b)
             common["end"] = k + 1
             return For(var=var, coll=coll, where=where, body=body, **common), k + 1
+        if word == "keep" and "keep" in self.g.statement_words:
+            ts.next()
+            expr = self.expr(ts)
+            ts.end()
+            return Keep(expr=expr, **common), j + 1
         if word == "emit":
             ts.next()
             slot = None
@@ -1071,6 +1133,24 @@ class _Parser:
         expr = self.expr(ts)
         ts.end()
         return Effect(expr=expr, **common), j + 1
+
+    def for_header(self, ts: _Stream, line: int) -> tuple[str, Expr, Cond | None]:
+        """`each <var> in <coll> [where <cond>]`, after `for`, to the end of the line."""
+        ts.expect_word("each", "a loop reads for each <name> in <expression>")
+        var = ts.name("a loop names its variable: for each <name> in <expression>").text
+        ts.expect_word("in", f"a loop reads for each {var} in <expression>")
+        was, self.loop_where = self.loop_where, self.g.admits("loop-where")
+        try:
+            coll = self.expr(ts, filter_ok=False)
+        finally:
+            self.loop_where = was
+        if ts.is_word("where") and isinstance(coll, (Call, Marked)):
+            self.features.append((line, feature("loop-where")))
+        where = None
+        if ts.take_word("where"):
+            where = self.cond(ts)
+        ts.end()
+        return var, coll, where
 
     # -- expressions -------------------------------------------------------
 

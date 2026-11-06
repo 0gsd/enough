@@ -1,0 +1,12 @@
+-- refused: compile recursion line 8
+thym 1
+
+program recursion-no-depth
+  why: a move that calls itself and says no depth.
+  takes t: text
+  gives s: short
+  move again(f: fabula): short
+    give again f
+  end
+  give again (derive t)
+end

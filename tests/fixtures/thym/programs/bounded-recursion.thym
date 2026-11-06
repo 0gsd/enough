@@ -1,0 +1,19 @@
+thym 1
+
+program bounded-recursion
+  why: a move that calls itself once, under the depth it says, and then gives the words of the text.
+
+  takes t: text
+  gives n: number
+
+  move again(x: text, more: bool): number
+    depth: 2
+    if more then
+      give again x, false
+    else
+      give words x
+    end
+  end
+
+  give again t, true
+end

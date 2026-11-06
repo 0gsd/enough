@@ -1,0 +1,14 @@
+thym 1
+
+program compile-python
+  why: a fabulac told back into Python, file by file, with the manual of everything a person can do
+       with the program.
+  must: nothing told is run, imported or installed.
+  decided 2026-11-05: a cshort is read in enough and never run there; the rebuild test runs outside.
+
+  takes f: fabula
+  gives code: folder, manual: short
+
+  give code: tell f as code                        -- one file at a time; it parses, and every interface is there
+  give manual: tell f as manual                    -- the catem at its deepest
+end

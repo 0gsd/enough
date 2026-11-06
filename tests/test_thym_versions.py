@@ -136,13 +136,18 @@ def test_thym_0_keeps_its_own_words_free():
     assert refused(text.replace("thym 0", "thym 1", 1)).check == "parse"
 
 
-@pytest.mark.parametrize("body, what", [
-    ("  let k = for each x in [t]\n    keep x\n  end\n", "keep"),
-    ("  contract c(x: text)\n  end\n", "contract"),
+@pytest.mark.parametrize("body, phrase", [
+    ("  let k = for each x in [t]\n    keep x\n  end\n", "a loop that collects (let k = for each …)"),
+    ("  move m(x: text): number\n    keeps provenance\n    give words x\n  end\n", "a keeps line"),
 ])
-def test_thym_1_syntax_not_read_yet_is_refused_saying_so(body, what):
-    r = refused(prog(1, body))
-    assert r.check == "parse" and "this compiler does not read yet" in r.message, str(r)
+def test_every_thym_1_production_is_read_and_needs_thym_1(body, phrase):
+    """Part c wrote the last productions (the loop that collects, contract blocks, keeps, depth): `PENDING` is empty,
+    `thym 1` reads them, and the same text under `thym 0` is told it needs `thym 1`."""
+    assert ps.PENDING == {}
+    text = prog(1, body)
+    ok(text)
+    r = refused(text.replace("thym 1", "thym 0", 1))
+    assert r.check == "version" and phrase in r.message, str(r)
 
 
 def test_the_thym_1_types_are_read_and_need_thym_1():

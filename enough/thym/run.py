@@ -48,10 +48,21 @@ a string in a text. A program of several outputs lands them all in one step or n
 directory `outputs/<name>/`, its row in the trace `{name, sha256: <tree digest>, path: outputs/<name>/}`. A move whose
 declaration chooses its `gives`, contract or scaffold by the call (`gives-when`, …) is held to the chosen one.
 
-Two `thym 0` loops still run wrong, and are refused at run with the fix, write `thym 1` (THYM 8.1): an `if` inside a
-loop over a collection known only at run time (its condition is evaluated once, before the loop), and a `let` inside
-such a loop read later in the same loop (it holds every pass's value at once). The `thym 1` loop node, whose body
-runs member by member as a unit, is a later part of the runtime; `_repeat` is its seam.
+Three `thym 0` loops still run wrong, and are refused at run with the fix, write `thym 1` (THYM 8.1): an `if` inside a
+loop over a collection known only at run time (its condition is evaluated once, before the loop), a `let` inside
+such a loop read later in the same loop (it holds every pass's value at once), and a `for each` nested inside such a
+loop (the plan lost the outer loop), check `loop`.
+
+**What `thym 1` adds to a run** (THYM 7.5, 8.1, 8.3, 12.3). A node of move `for` is a whole loop (`_loop_node`): its
+header and body are read from the program by the loop's line, and the body runs member by member as a unit, as a user
+move's body runs (`_body`): a name it binds, an `if` inside it and a nested call take this pass's values; a `keep`
+adds to the list of the nearest loop that collects, bound when the last pass ends; the record says how many `passes`
+it made and holds a row `<name>.<k>` per value kept, and a refusal inside it names the statement of the body and the
+pass. A user move's kept contracts run on the value it gives (a contract block's lines, or a named check); a failed
+one runs the body again when the move asks, within the node's attempts, every model request of the re-run carrying
+the failed verdicts in `repair.failed`, and refuses with the contract's name after the last; a move that does not ask
+is refused at once. A program's kept contracts are checked before anything lands. A move that may call itself is
+counted on the call stack against its `depth`.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
 """
@@ -83,7 +94,7 @@ from enough.thym.trace import Trace, default_root, digest_row, node_number, writ
 from enough.thym.values import (NOTHING, Value, canonical, filter_folder, item_id, item_key, load_input, members,
                                  plain, posix_path, sha256_bytes, stamp, wrap, write_snapshot)
 
-MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked")
+MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked", "before", "after")
 UNITS = ("words", "sentences")
 #: The words a condition's terms are joined and compared with; a call on a side of a comparison ends at one (THYM 4.5)
 _COND_WORDS = ("is", "in", "has", "covers", "and", "or", "not", "then", "else", "where", "marked")
@@ -348,7 +359,12 @@ class _Reader:
             self.take()
             nm = self.name()
             self.expect("=")
+            if self.at("for") and self.at("each", 1):      # a loop that collects (thym 1, THYM 8.1)
+                return Stmt("for", loop=self.for_header(), name=nm)
             return Stmt("let", expr=self.expr(), name=nm)
+        if self.at("keep") and not self.at_move():
+            self.take()
+            return Stmt("keep", expr=self.expr())
         if self.at("assert"):
             self.take()
             cond = self.cond()
@@ -675,14 +691,32 @@ def _has_covers(c: Any) -> bool:
 @dataclass
 class UserMove:
     """A `move` block (THYM.md 8.3): its parameters, the type it gives and its body, a list of statements, each
-    `("stmt", line, text)`, `("if", line, text, then, else)` or `("for", line, text, body)`."""
+    `("stmt", line, text)`, `("if", line, text, then, else)` or `("for", line, text, body)` (a loop that collects is
+    a `for` whose text begins `let <name> =`). In `thym 1`: what it keeps, `(name, against, of)` each, and its
+    `depth`."""
     name: str
     params: list
     gives: str | None
     body: list
+    keeps: list = field(default_factory=list)
+    depth: int | None = None
+
+
+@dataclass
+class ContractBlock:
+    """A `contract` block (`thym 1`, THYM 7.5): its parameters and its body of `let`, `assert` and `for each` lines,
+    in `UserMove`'s shape."""
+    name: str
+    params: list
+    body: list
 
 
 _LET = re.compile(r"^let\s+([a-z][a-z0-9-]*)\s*=\s*(.+)$")
+_COLLECT = re.compile(r"^let\s+[a-z][a-z0-9-]*\s*=\s*for\s+each\b")
+_CONTRACT_HEAD = re.compile(r"^contract\s+([a-z][a-z0-9-]*)\s*\((.*)\)\s*$")
+_KEEPS = re.compile(r"^keeps\s+([a-z][a-z0-9-]*)(?:\s+of\s+([a-z][a-z0-9-]*))?(?:\s+against\s+(.+))?$")
+_DEPTH = re.compile(r"^depth\s*:\s*(\d+)$")
+_WRITTEN = re.compile(r"^(?:let\s+[a-z][a-z0-9-]*\s*=\s*)?for\s+each\s+[a-z][a-z0-9-]*\s+in\s+\[[^\]]*\]$")
 _ELSE_MSG = re.compile(r'\belse\s+"((?:[^"\\]|\\.)*)"\s*$')
 _HEAD = re.compile(r"^(?:(?:why|must)\s*:|decided\b)")
 _MOVE_HEAD = re.compile(r"^move\s+([a-z][a-z0-9-]*)\s*\((.*)\)\s*:\s*(.+)$")
@@ -714,11 +748,20 @@ class ProgramInfo:
     version: int | None = None
     #: every output the program gives, `(name, type)`, in the order its gives line names them (THYM 8.2)
     outputs: list = field(default_factory=list)
+    #: every `for each` of the program's body, by its line, as `UserMove.body` holds one (`thym 1`'s loop node)
+    loops: dict = field(default_factory=dict)
+    #: every `for each` of the program's body: `(line, end, runtime)`, runtime when it walks a collection known only
+    #: at run time (a `thym 0` loop nested in one is refused)
+    spans: list = field(default_factory=list)
+    #: the contract blocks, by name (`thym 1`)
+    contracts: dict = field(default_factory=dict)
+    #: what the program keeps, `(name, against, of)` each (`thym 1`)
+    keeps: list = field(default_factory=list)
 
     @classmethod
-    def from_any(cls, program: Any) -> "ProgramInfo":
+    def from_any(cls, program: Any, name: str | None = None) -> "ProgramInfo":
         """From a program volume mapping (the enumeration, `<name>.thym.cosm`), a `.thym` source text, a path to
-        either, or None."""
+        either, or None. `name` chooses the program of a file of several (the first, when None)."""
         if program is None:
             return cls()
         if isinstance(program, ProgramInfo):
@@ -729,21 +772,23 @@ class ProgramInfo:
             text = p.read_text(encoding="utf-8-sig")
             if p.suffix == ".cosm":
                 data = mc.yaml_load(text)
-                return cls.from_items(data) if isinstance(data, dict) else cls()
-            return cls.from_source(text)
+                return cls.from_items(data, name) if isinstance(data, dict) else cls()
+            return cls.from_source(text, name)
         if isinstance(program, dict):
-            return cls.from_items(program)
+            return cls.from_items(program, name)
         if isinstance(program, str):
-            return cls.from_source(program)
+            return cls.from_source(program, name)
         return cls()
 
     @classmethod
-    def from_items(cls, vol: dict) -> "ProgramInfo":
+    def from_items(cls, vol: dict, name: str | None = None) -> "ProgramInfo":
         info = cls()
         info.version = _version_of(str(vol.get("front") or ""))
         nodes = [n for n in vol.get("nodes") or [] if isinstance(n, dict)]
         by_id = {n.get("id"): n for n in nodes}
-        prog = next((n for n in nodes if n.get("type") == "program"), None)
+        progs = [n for n in nodes if n.get("type") == "program"]
+        prog = next((n for n in progs if n.get("name") == name), None) if name else None
+        prog = prog or (progs[0] if progs else None)
         if prog is not None:
             info.name = prog.get("name")
             info.takes = [(t.get("name"), t.get("type")) for t in prog.get("takes") or [] if isinstance(t, dict)]
@@ -791,15 +836,45 @@ class ProgramInfo:
             gv = [g for g in mv.get("gives") or [] if isinstance(g, dict)]
             info.moves[mv["name"]] = UserMove(mv["name"], params, gv[0].get("type") if gv else None,
                                               tree(mv.get("steps")))
+        if isinstance(vol.get("front"), str):
+            # the program's loops (and, in thym 1, its contracts, keeps and depths) are read from the file the volume
+            # compiles back to
+            tops = sorted((n for n in nodes if isinstance(n.get("order"), int) and isinstance(n.get("body"), str)),
+                          key=lambda n: n["order"])
+            src = cls.from_source(str(vol["front"]) + "".join(n["body"] for n in tops), info.name)
+            info.loops, info.spans, info.contracts, info.keeps = src.loops, src.spans, src.contracts, src.keeps
+            for name, um in info.moves.items():
+                if name in src.moves:
+                    um.keeps, um.depth = src.moves[name].keeps, src.moves[name].depth
         return info
 
     @classmethod
-    def from_source(cls, text: str) -> "ProgramInfo":
-        """Read from the `.thym` text itself, line by line (a statement is one line, THYM.md 4.8)."""
+    def from_source(cls, text: str, name: str | None = None) -> "ProgramInfo":
+        """Read from the `.thym` text itself, line by line (a statement is one line, THYM.md 4.8); `name` chooses the
+        program of a file of several (the first, when None)."""
         info = cls()
         info.version = _version_of(text)
+        thym1 = (info.version or 0) >= 1
         stack: list[dict] = []
         prose = False
+
+        def contract_frame(s: str) -> dict:
+            mt = _CONTRACT_HEAD.match(s)
+            cb = ContractBlock(mt.group(1), _params(mt.group(2)), []) if mt else None
+            return {"kind": "contract", "body": [], "contract": cb}
+
+        def owner() -> dict | None:
+            """The block a head belongs to: the innermost program, move or contract frame."""
+            return next((f for f in reversed(stack) if f["kind"] in ("program", "move", "contract")), None)
+
+        def in_program() -> bool:
+            """Whether the statement being read stands in a program's own body (not a move's or a contract's)."""
+            return bool(stack) and stack[0]["kind"] == "program" and \
+                not any(f["kind"] in ("move", "contract") for f in stack)
+
+        def chosen() -> bool:
+            """Whether it stands in the program this reading is for."""
+            return bool(stack) and stack[0]["kind"] == "program" and stack[0].get("named", True)
 
         def current(frame: dict) -> list:
             if frame["kind"] == "if":
@@ -814,12 +889,16 @@ class ProgramInfo:
             first = s.split()[0]
             if not stack:
                 if first == "program" and len(s.split()) > 1:
-                    info.name = s.split()[1]
-                    stack.append({"kind": "program", "body": []})
+                    mine = info.name is None and (name is None or s.split()[1] == name)
+                    if mine:
+                        info.name = s.split()[1]
+                    stack.append({"kind": "program", "body": [], "named": mine})
                 elif first == "move":
                     mt = _MOVE_HEAD.match(s)
                     um = UserMove(mt.group(1), _params(mt.group(2)), mt.group(3).strip(), []) if mt else None
                     stack.append({"kind": "move", "body": [], "move": um})
+                elif first == "contract" and thym1:
+                    stack.append(contract_frame(s))
                 elif first in ("morph", "context"):
                     stack.append({"kind": "skip"})
                 prose = False
@@ -832,15 +911,32 @@ class ProgramInfo:
             if _HEAD.match(s):
                 prose = True
                 continue
-            if prose and first not in ("takes", "gives", "end"):
+            if prose and first not in ("takes", "gives", "end") and not (thym1 and first in ("keeps", "depth")):
                 continue
             prose = False
+            if thym1 and first == "keeps" and _KEEPS.match(s):
+                mt = _KEEPS.match(s)
+                kept = (mt.group(1), [a.strip() for a in (mt.group(3) or "").split(",") if a.strip()], mt.group(2))
+                f = owner()
+                if f is not None and f["kind"] == "program" and f.get("named", True):
+                    info.keeps.append(kept)
+                elif f is not None and f["kind"] == "move" and f.get("move") is not None:
+                    f["move"].keeps.append(kept)
+                continue
+            if thym1 and _DEPTH.match(s):
+                f = owner()
+                if f is not None and f["kind"] == "move" and f.get("move") is not None:
+                    f["move"].depth = int(_DEPTH.match(s).group(1))
+                continue
+            if thym1 and first == "contract" and _CONTRACT_HEAD.match(s):
+                stack.append(contract_frame(s))
+                continue
             if first == "takes":
-                if top["kind"] == "program":
+                if top["kind"] == "program" and chosen():
                     info.takes = _params(s[len("takes"):])
                 continue
             if first == "gives":
-                if top["kind"] == "program":
+                if top["kind"] == "program" and chosen():
                     g = _params(s[len("gives"):])
                     info.gives = g[0] if g else None
                     info.outputs = list(g)
@@ -855,10 +951,17 @@ class ProgramInfo:
                 if f["kind"] == "move" and f.get("move") is not None:
                     f["move"].body = f["body"]
                     info.moves[f["move"].name] = f["move"]
+                elif f["kind"] == "contract" and f.get("contract") is not None:
+                    f["contract"].body = f["body"]
+                    info.contracts[f["contract"].name] = f["contract"]
                 elif f["kind"] == "if" and stack:
                     current(stack[-1]).append(("if", f["line"], f["text"], f["then"], f["else"]))
                 elif f["kind"] == "for" and stack:
-                    current(stack[-1]).append(("for", f["line"], f["text"], f["body"]))
+                    part = ("for", f["line"], f["text"], f["body"])
+                    current(stack[-1]).append(part)
+                    if f.get("program"):
+                        info.loops[f["line"]] = part
+                        info.spans.append((f["line"], ln, not _WRITTEN.match(f["text"])))
                 continue
             if s == "else" and top["kind"] == "if":
                 top["in_else"] = True
@@ -867,12 +970,12 @@ class ProgramInfo:
             if first == "if":
                 stack.append({"kind": "if", "line": ln, "text": s, "then": [], "else": [], "in_else": False})
                 continue
-            if first == "for":
-                stack.append({"kind": "for", "line": ln, "text": s, "body": []})
+            if first == "for" or (thym1 and _COLLECT.match(s)):
+                stack.append({"kind": "for", "line": ln, "text": s, "body": [], "program": in_program()})
                 continue
             current(top).append(("stmt", ln, s))
             mt = _LET.match(s)
-            if mt and not any(f["kind"] == "move" for f in stack):      # a move's lets are its own (THYM.md 5.4)
+            if mt and in_program() and chosen():      # a move's lets are its own (THYM 5.4), and a program's
                 info.lets.setdefault(mt.group(1), mt.group(2).strip())
             if first == "assert":
                 mm = _ELSE_MSG.search(s)
@@ -965,6 +1068,25 @@ class MoveContext:
     #: the node's call counter (`engines.CallCounter`): the keys of its requests, its engines' model calls and its
     #: engine calls, so that none collide (THYM.md 12.4); `EngineAdapter` takes its keys here
     calls: Any = field(default=None, repr=False)
+    #: a model-backed move that asks more than once (a request per file, `tell f as code`) asks through `ask`; when
+    #: what it gives then fails its contract, the runtime calls it again, within the node's attempts, with the failed
+    #: verdicts in `failed`, what it gave last in `previous` and the attempt's number in `attempt` (1 the first time),
+    #: so that it may ask again for only the parts the failures name
+    ask_fn: Callable[..., dict] | None = field(default=None, repr=False)
+    failed: list = field(default_factory=list)
+    previous: Any = None
+    attempt: int = 1
+
+    def ask(self, contract: dict, inputs: dict, *, budget: dict | None = None) -> dict:
+        """One model request the move makes itself (THYM 12.2, 12.4): `contract` holds `schema` and `repair` (the
+        narrow repairs it allows) as a `Request`'s does, `inputs` the values the model reads, by name. The request is
+        keyed on the node's counter, recorded and replayed as every request is, carries every failed verdict the
+        model should hear of (a kept contract's, and this move's last answer's) in `repair.failed`, and counts
+        toward the run's ceiling of calls. Returns the candidate (`output`, `engine`, `tokens`, …); a refusal (a
+        model the run may not ask, the ceiling reached, a replay that does not match) stops the move."""
+        if self.ask_fn is None:
+            raise _Stop(Refusal("run", "asks", "this move asked a model, and the run has none to ask"))
+        return self.ask_fn(contract, inputs, budget)
 
     def withhold(self, *items: Any) -> None:
         """Mark items withheld from the projection (THYM.md 18): values (items, or a list of them) or ids. An item is
@@ -1027,6 +1149,7 @@ class _NodeState:
     tries: list = field(default_factory=list)      # each attempt that failed: {attempt, failed: [{name, why}]}
     passing: str | None = None                     # the pass a loop is on, in the person's terms: `for o = M:aim/x`
     fault: str | None = None                       # a fault of the runtime: its detail, for the record only
+    passes: int | None = None                      # a loop run as one node: how many passes it made (thym 1)
 
     def __post_init__(self) -> None:
         if self.calls is None:
@@ -1145,6 +1268,13 @@ class _Run:
         #: a replay's snapshots of the folders the recorded run took (its `inputs/`), read in place of the disk
         self.snapshots = Path(kw["snapshots"]) if kw.get("snapshots") else None
         self.folders: dict[str, Value] = {}
+        self._keeping: list[list[Value]] = []          # the lists the loops that collect are making, innermost last
+        self._passes: list[str] = []                   # the passes of a loop node's loops, innermost last
+        self._repairs: list[list[dict]] = []           # failed kept contracts every model request now carries
+        self._emit_k = 0
+        self.ceiling: int | None = kw.get("calls")    # the run's ceiling on its model requests (`--calls`)
+        self.requests = 0
+        self._asking: list[dict] = []                  # the moves asking through `ctx.ask`, innermost last
 
     # -- plan time ------------------------------------------------------------------------------------------------
 
@@ -1161,7 +1291,8 @@ class _Run:
             self.decls = _registry.declarations()
         self.load_problems = _registry.load_all(self.decls)
         try:
-            self.info = ProgramInfo.from_any(self.program)
+            want = (self.plan.get("program") or {}).get("name") if isinstance(self.plan.get("program"), dict) else None
+            self.info = ProgramInfo.from_any(self.program, want)
         except OSError as e:
             return Refusal("plan", "program", f"the program could not be read: {e.strerror or 'the system would not '
                                                                                          'open it'}")
@@ -1179,31 +1310,39 @@ class _Run:
 
     def _body_moves(self, name: str, seen: frozenset[str] = frozenset()) -> set[str]:
         """The declared moves a user move calls, through the user moves it calls (THYM.md 8.3)."""
-        out: set[str] = set()
         um = self.info.moves.get(name)
         if um is None or name in seen:
-            return out
+            return set()
+        return self._part_moves(um.body, seen | {name})
 
-        def walk(body: list) -> None:
-            for part in body:
-                try:
-                    st = read_statement(part[2], self.move_names, self.in_moves, self.where_moves)
-                except ReadError:
-                    continue
-                for m in calls_in(st):
-                    if m in self.info.moves:
-                        out.update(self._body_moves(m, seen | {name}))
-                    else:
-                        out.add(m)
-                for sub in part[3:]:
-                    if isinstance(sub, list):
-                        walk(sub)
-        walk(um.body)
+    def _part_moves(self, body: list, seen: frozenset[str] = frozenset()) -> set[str]:
+        """The declared moves a body's statements call, through the user moves they call."""
+        out: set[str] = set()
+        for part in body:
+            try:
+                st = read_statement(part[2], self.move_names, self.in_moves, self.where_moves)
+            except ReadError:
+                continue
+            for m in calls_in(st):
+                if m in self.info.moves:
+                    out.update(self._body_moves(m, seen))
+                else:
+                    out.add(m)
+            for sub in part[3:]:
+                if isinstance(sub, list):
+                    out.update(self._part_moves(sub, seen))
         return out
 
     def _moves_of(self, node: dict) -> list[str]:
         m = node.get("move")
+        if m == "for":                                 # a loop node: every move its header and its body call
+            part = self.info.loops.get(node.get("line"))
+            return sorted(self._part_moves([part])) if part is not None else []
         return sorted(self._body_moves(m)) if m in self.info.moves else [m]
+
+    def _move_asks(self, name: str) -> bool:
+        """Whether a user move asks: any declared move its body calls, through the user moves it calls, asks."""
+        return any(decl_get(self.decls.get(m), "asks") is True for m in self._body_moves(name))
 
     def _environment(self) -> Refusal | None:
         asks = [n for n in self.nodes if n.get("asks") is True]
@@ -1215,7 +1354,8 @@ class _Run:
 
                 def unscaffolded(n: dict) -> bool:
                     inner = any(decl_get(self.decls.get(m), "asks") is True and bare(m) for m in self._moves_of(n))
-                    return inner or (n.get("move") not in self.info.moves and bare(n.get("move")))
+                    own = n.get("move") not in self.info.moves and n.get("move") != "for"
+                    return inner or (own and bare(n.get("move")))
                 blocked = [n for n in asks if unscaffolded(n)]
             if blocked:
                 k = len(blocked)
@@ -1457,6 +1597,17 @@ class _Run:
             self.cur.engine = "skipped"
             self._record(node)
             return None
+        nested = self._nested_in_runtime(node)
+        if nested is not None:
+            inner, outer = nested
+            r = Refusal("run", "loop", f"{self._at(node)}: this statement stands in the for each at line {inner}, "
+                                       f"inside the for each at line {outer}, and {self._loop_reason()}, so the inner "
+                                       f"loop does not run once for each pass of the outer one; {self._loop_fix()}",
+                        line=node.get("line"))
+            self._record(node, r)
+            return r
+        if node.get("move") == "for":
+            return self._loop_node(node)
         text = str(node.get("name") or "").strip() or " ".join([str(node.get("move"))] + list(node.get("takes") or []))
         try:
             st = read_statement(text, self.move_names, self.in_moves, self.where_moves)
@@ -1492,6 +1643,80 @@ class _Run:
         self._record(node)
         return None
 
+    def _nested_in_runtime(self, node: dict) -> tuple[int, int] | None:
+        """`thym 0`'s third loop that runs wrong (THYM 8.1): a node of a `for each` nested inside a loop over a
+        collection known only at run time, whose plan lost the outer loop. `(inner loop's line, outer loop's line)`."""
+        line = node.get("line")
+        if self._version() >= 1 or not isinstance(line, int):
+            return None
+        around = sorted((sp for sp in self.info.spans if sp[0] < line <= sp[1]), key=lambda sp: sp[0])
+        outer = next((sp for sp in around[:-1] if sp[2]), None)
+        return (around[-1][0], outer[0]) if outer is not None else None
+
+    def _loop_node(self, node: dict) -> Refusal | None:
+        """A whole loop as one node (`thym 1`, THYM 8.1, 11.1): its header and body read from the program by its
+        line, the body run member by member as a unit; a loop that collects binds its list when the last pass ends."""
+        line = node.get("line")
+        part = self.info.loops.get(line) if isinstance(line, int) else None
+        try:
+            if part is None:
+                raise _Stop(Refusal("run", "program", f"{self._at(node)}: this loop's body is read from the program, "
+                                    "and this run has only the plan: run it with the program beside the plan "
+                                    "(--program)"), worded=True)
+            scope = _Scope(self.env, True)
+            st = self._read_stmt(str(node.get("name") or part[2]))
+            if st.member is not None:                     # a loop inside a loop over a written list: one member
+                var, member = st.member
+                self.cur.passing = f"for {var} = {self._member_label(node)}"
+                scope = scope.child({var: self._member(member, scope)})
+            header = self._read_stmt(part[2])
+            self._emit_k = 0
+            kept, passes = self._loop(header, part[3], scope, worded=True)
+            self.cur.passes = passes
+            if header.name:
+                v = Value("list", kept)
+                self.env[header.name] = v
+                self.cur.outputs.append(digest_row(header.name, v, path=""))
+                for k, x in enumerate(kept, 1):
+                    self.cur.outputs.append(digest_row(f"{header.name}.{k}", x, path=""))
+        except _Stop as s:
+            r = s.refusal if s.worded else self._worded(s.refusal, node, self.cur.passing)
+            r = r if r.line else Refusal(r.stage, r.check, r.message, line=line, file=r.file)
+            if s.fault:
+                self.cur.fault = s.fault
+            self._record(node, r)
+            return r
+        self.cur.attempts = max(self.cur.attempts, 1)
+        self._record(node)
+        return None
+
+    def _loop(self, header: Stmt, body: list, scope: _Scope, *, worded: bool) -> tuple[list, int]:
+        """One `for each` (or loop that collects) of a body: its collection walked, the `where` applied, the body run
+        once per member in a scope of its own; `(what its keep lines kept, how many passes)`. With `worded`, the
+        passes are named in the person's terms for a refusal inside them."""
+        loop = header.loop
+        coll = self._eval(loop.coll, scope)
+        rows = members(coll)
+        if rows is None:
+            raise _Stop(Refusal("run", "type", f"a for each goes through a volume, a fabula, a folder, a short or a "
+                                               f"list, and {self._words(_expr_text(loop.coll))} is a {coll.type}"))
+        if loop.cond is not None:
+            rows = [r for r in rows if self._cond(loop.cond, scope.child({loop.var: r}), item=r)]
+        if header.name:
+            self._keeping.append([])
+        try:
+            for k, r in enumerate(rows, 1):
+                if worded:
+                    self._passes.append(self._pass(loop.var, r, k, coll))
+                try:
+                    self._body(body, scope.child({loop.var: r}), worded=worded)
+                finally:
+                    if worded:
+                        self._passes.pop()
+        finally:
+            kept = self._keeping.pop() if header.name else []
+        return kept, len(rows)
+
     def _record(self, node: dict, refusal: Refusal | None = None) -> None:
         cur = self.cur or _NodeState(node)
         ins = []
@@ -1504,7 +1729,7 @@ class _Run:
         rec = _trace.record(node, run_id=self.run_id, move=str(node.get("move") or ""), engine=cur.engine,
                             inputs=ins, outputs=cur.outputs, attempts=cur.attempts if cur.engine != "skipped" else 0,
                             tokens=tokens, seconds=seconds, checks=cur.checks, state=cur.state, refusal=refusal,
-                            tries=cur.tries)
+                            tries=cur.tries, passes=cur.passes)
         if cur.fault:
             rec["fault"] = cur.fault          # a fault of the runtime: the detail, for whoever maintains it (THYM 9)
         self.records = [r for r in self.records if r["id"] != rec["id"]] + [rec]
@@ -1587,9 +1812,7 @@ class _Run:
                 "runs over every member before the next statement starts")
 
     def _loop_fix(self) -> str:
-        if self._version() < 1:
-            return "inside a for each, write thym 1, where a loop's body runs member by member"
-        return "this runtime does not yet run a thym 1 loop's body member by member as a unit"
+        return "inside a for each, write thym 1, where a loop's body runs member by member"
 
     def _same_loop_let(self, node: dict) -> tuple[str, dict] | None:
         """A name this repeating node takes that a `let` of the same loop binds (a node of the same loop gives it):
@@ -1622,6 +1845,8 @@ class _Run:
         member of a list by its place."""
         if isinstance(row, Value) and isinstance((row.origin or {}).get("member"), dict):
             label = str(row.origin["member"].get("path") or _ordinal(k))        # a folder's file, by its path
+        elif isinstance(row, Value) and row.type == "line" and isinstance(row.field("number"), int):
+            label = f"line {row.field('number')}"                              # a line, by its number (THYM 9)
         elif isinstance(row, Value) and row.type == "item":
             label = item_id(row) or _ordinal(k)
         elif coll.type in ("short", "text"):
@@ -1810,7 +2035,44 @@ class _Run:
                            rules=self.rules, now=self.started, emitted=self.emitted, slots=self.slots,
                            withheld=self.withheld, inputs_root=self.inputs_root, root=self.root, stage=self.stage,
                            program=self.info, trace_fn=self._trace_so_far, engines=self.engines,
-                           calls=self.cur.calls if self.cur is not None else None)
+                           calls=self.cur.calls if self.cur is not None else None, ask_fn=self._move_ask)
+
+    def _count_request(self) -> None:
+        """One more model request; past the run's ceiling (`--calls N`), the run is refused (THYM 12.5, 23.4)."""
+        if self.ceiling is not None and self.requests >= self.ceiling:
+            raise _Stop(Refusal("run", "calls", f"this run reached its ceiling of {self.ceiling} model call"
+                                                f"{'s' if self.ceiling != 1 else ''}; nothing landed"))
+        self.requests += 1
+
+    def _move_ask(self, contract: dict, inputs: dict, budget: dict | None) -> dict:
+        """`ctx.ask`: one request a move makes itself, keyed, recorded, replayed and counted like any other."""
+        if not self._asking:
+            raise _Stop(Refusal("run", "asks", "a move asked the model outside a call the runtime made"))
+        frame = self._asking[-1]
+        if self.rules or self.agent_free:
+            raise _Stop(Refusal("run", "rules" if self.rules else "agent-free",
+                                f"{frame['move']} asks a model; " + ("--rules runs no model" if self.rules
+                                                                     else "agent-free is on")))
+        self._count_request()
+        nb = self.cur.node.get("budget") if isinstance(self.cur.node.get("budget"), dict) else {}
+        rb = budget or {}
+        failed = [dict(x) for level in self._repairs for x in level] + [dict(x) for x in frame["failed"]]
+        c = {"move": frame["move"], "schema": plain(contract.get("schema")),
+             "checks": [str(x) for x in decl_get(frame["decl"], "contract") or []],
+             "repair": {"allowed": list(contract.get("repair") or []), "failed": failed}}
+        ins = {}
+        for k, v in (inputs or {}).items():
+            v = v if isinstance(v, Value) else wrap(v)
+            ins[str(k)] = (v, v.sha256)
+        b = {"attempts": 1, "output_words": int(rb.get("output_words") or nb.get("output_words") or 0),
+             "prompt_tokens_max": self.largest_prompt, "seconds": int(rb.get("seconds") or 600)}
+        cand = _ask(self.coproc, c, ins, budget=b, at=(self.cur.calls.request_key(), 1))
+        if isinstance(cand, Refusal):
+            raise _Stop(cand)
+        frame["asked"] += 1
+        frame["engine"] = str(cand.get("engine") or frame["engine"])
+        self.cur.tokens += int(cand.get("tokens") or 0)
+        return cand
 
     def _trace_so_far(self) -> dict:
         self.trace.records = list(self.records)
@@ -1884,11 +2146,20 @@ class _Run:
         fn = self.moves.lookup(move)
         if fn is None:
             raise _Stop(Refusal("run", "move", f"the move {move} has no implementation here"))
-        r = self._invoke(move, fn, ctx, operands, mods)
-        if isinstance(r, Request):
-            if not asks:
-                raise _Stop(Refusal("run", "asks", f"{move} is declared deterministic, and it asked the model"))
-            return self._ask_model(move, decl, r, inputs, check_node)
+        frame = {"move": move, "decl": decl, "failed": [], "asked": 0, "engine": "model:unknown"}
+        self._asking.append(frame)
+        try:
+            r = self._invoke(move, fn, ctx, operands, mods)
+            if isinstance(r, Request):
+                if not asks:
+                    raise _Stop(Refusal("run", "asks", f"{move} is declared deterministic, and it asked the model"))
+                return self._ask_model(move, decl, r, inputs, check_node)
+            if frame["asked"]:
+                if not asks:
+                    raise _Stop(Refusal("run", "asks", f"{move} is declared deterministic, and it asked the model"))
+                return self._asked_itself(move, decl, fn, frame, r, operands, mods, inputs, check_node)
+        finally:
+            self._asking.pop()
         pending = any(isinstance(x, Value) and x.state == "pending" for x in inputs.values())
         # what is made from a scaffold's output is pending too
         v = stamp(self._as_value(r, decl), self._made(move, "code"), pending=pending)
@@ -1896,6 +2167,40 @@ class _Run:
             self.cur.state = "pending"
         self._settle(move, decl, v, inputs, check_node, "code")
         return v
+
+    def _asked_itself(self, move: str, decl: Any, fn: Callable, frame: dict, r: Any, operands: list, mods: dict,
+                      inputs: dict, node: dict) -> Value:
+        """A move that asked through `ctx.ask` gave a value: it is held to its contract, and called again with the
+        failed verdicts (`ctx.failed`, `ctx.previous`, `ctx.attempt`) within the node's attempts (THYM 12.2)."""
+        nb = self.cur.node.get("budget") if isinstance(self.cur.node.get("budget"), dict) else {}
+        attempts = max(1, int(nb.get("attempts") or 3))
+        attempt = 1
+        while True:
+            if isinstance(r, Request):
+                raise _Stop(Refusal("run", "asks", f"{move} asked through ctx.ask and then gave a request; a move "
+                                                   "asks one way"))
+            self._engine(frame["engine"])
+            self.cur.attempts += 1
+            value = stamp(self._as_value(r, decl), self._made(move, frame["engine"]))
+            verdicts = self._verdicts(decl, value, inputs, node)
+            failed = [x for x in verdicts if not x["ok"]]
+            if not failed:
+                self._merge_checks(verdicts)
+                return value
+            self.cur.tries.append({"attempt": attempt, "failed": [{"name": str(x.get("name")),
+                                                                  "why": str(x.get("why") or "")[:400]}
+                                                                 for x in failed]})
+            if attempt >= attempts:
+                self._merge_checks(verdicts)
+                bad = failed[0]
+                why = f": {bad['why']}" if bad.get("why") else ""
+                raise _Stop(Refusal("run", bad["name"], f"{move} still fails {bad['name']} after {attempt} "
+                                                        f"attempt{'s' if attempt != 1 else ''}{why}"))
+            attempt += 1
+            frame["failed"] = [dict(x) for x in failed]
+            ctx = self._ctx()
+            ctx.failed, ctx.previous, ctx.attempt = [dict(x) for x in failed], value, attempt
+            r = self._invoke(move, fn, ctx, operands, mods)
 
     def _invoke(self, move: str, fn: Callable, ctx: MoveContext, operands: list, mods: dict) -> Any:
         try:
@@ -1995,7 +2300,11 @@ class _Run:
         key = self.cur.calls.request_key()
         last: list[dict] = []
         engine = "model:unknown"
+        # a re-run of a move whose kept contract failed: every request carries those verdicts too (THYM 7.5, 12.2)
+        kept_failed = [dict(x) for level in self._repairs for x in level]
+        contract["repair"] = {"allowed": allowed, "failed": [dict(x) for x in kept_failed]}
         for attempt in range(1, attempts + 1):
+            self._count_request()
             cand = _ask(self.coproc, contract, ins, budget=budget, at=(key, attempt))
             self.cur.attempts += 1
             if isinstance(cand, Refusal):
@@ -2029,7 +2338,7 @@ class _Run:
             # the record keeps every attempt's failures, so a refused node explains all its tries, not only the last
             self.cur.tries.append({"attempt": attempt, "failed": [{"name": str(x.get("name") or "schema"),
                                                                   "why": str(x.get("why") or "")[:400]} for x in failed]})
-            contract["repair"] = {"allowed": allowed, "failed": [dict(x) for x in failed]}
+            contract["repair"] = {"allowed": allowed, "failed": [dict(x) for x in kept_failed + failed]}
         self._merge_checks(last)
         bad = next((x for x in last if not x["ok"]), {"name": "schema", "why": "no answer"})
         tries = f"{attempts} attempt{'s' if attempts != 1 else ''}"
@@ -2039,53 +2348,155 @@ class _Run:
     # -- user moves (THYM.md 8.3) ---------------------------------------------------------------------------------
 
     def _user_move(self, name: str, operands: list) -> Value:
+        """A user move's call (THYM 8.3): its body run with its parameters bound; a move that may call itself counted
+        against its depth; what it keeps checked on the value it gives, its body run again within the node's attempts
+        when a kept contract fails and the move asks (THYM 7.5)."""
         um: UserMove = self.info.moves[name]
         if len(operands) != len(um.params):
             raise _Stop(Refusal("run", "type",
                                 f"{name} takes {len(um.params)} operand(s); it was given {len(operands)}"))
-        if name in self._move_stack:
+        deep = self._move_stack.count(name)
+        if deep and um.depth is None:
             raise _Stop(Refusal("run", "recursion", f"{name} calls itself"))
-        scope = _Scope({p[0]: v for p, v in zip(um.params, operands)}, program=False)
-        self._move_stack.append(name)
-        try:
-            out = self._body(um.body, scope)
-        finally:
-            self._move_stack.pop()
-        if out is None:
-            raise _Stop(Refusal("run", "no-give", f"{name} reached its end without a give"))
-        return out
+        if deep and deep >= um.depth:
+            raise _Stop(Refusal("run", "recursion", f"{name} went {deep + 1} deep; its depth is {um.depth}"))
+        args = {p[0]: v for p, v in zip(um.params, operands)}
+        asks = bool(um.keeps) and self._move_asks(name)
+        nb = self.cur.node.get("budget") if isinstance(self.cur.node.get("budget"), dict) else {}
+        budget = max(1, int(nb.get("attempts") or (3 if asks else 1))) if asks else 1
+        repair: list[dict] = []
+        attempt = 0
+        while True:
+            attempt += 1
+            self._move_stack.append(name)
+            self._repairs.append(repair)
+            try:
+                out = self._body(um.body, _Scope(dict(args), program=False))
+            finally:
+                self._repairs.pop()
+                self._move_stack.pop()
+            if out is None:
+                raise _Stop(Refusal("run", "no-give", f"{name} reached its end without a give"))
+            if not um.keeps:
+                return out
+            verdicts = [self._kept(k, out, args) for k in um.keeps]
+            bad = [v for v in verdicts if not v["ok"]]
+            if not bad:
+                self._merge_checks(verdicts)
+                return out
+            self.cur.tries.append({"attempt": attempt, "failed": [{"name": v["name"], "why": str(v["why"])[:400]}
+                                                                  for v in bad]})
+            why = f": {bad[0]['why']}" if bad[0].get("why") else ""
+            if not asks:
+                self._merge_checks(verdicts)
+                raise _Stop(Refusal("run", bad[0]["name"], f"{name} fails {bad[0]['name']}{why}"))
+            if attempt >= budget:
+                self._merge_checks(verdicts)
+                raise _Stop(Refusal("run", bad[0]["name"], f"{name} still fails {bad[0]['name']} after {attempt} "
+                                                          f"attempt{'s' if attempt != 1 else ''}{why}"))
+            repair = [dict(v) for v in bad]
 
-    def _body(self, body: list, scope: _Scope) -> Value | None:
-        for part in body:
-            if part[0] == "if":
+    def _kept(self, kept: tuple, value: Value, given: dict) -> dict:
+        """A kept contract's verdict on a value (THYM 7.5), `{name, ok, why}`: a contract block's lines run with its
+        parameters bound to the value and the `against` values, the first false assert giving the why; a named check
+        asked with the `against` values as its inputs, by name."""
+        cname, against = kept[0], list(kept[1] or [])
+        values = [(a, given[a]) for a in against if a in given]
+        cb = self.info.contracts.get(cname)
+        if cb is not None:
+            why = self._holds(cb, [value] + [v for _, v in values])
+            return {"name": cname, "ok": why is None, "why": why or ""}
+        node = dict(self.cur.node, modifiers={})
+        r = _checks.verdict(cname, value, dict(values), node, None, self._ctx(), registry=self.checks)
+        if isinstance(r, Refusal):
+            raise _Stop(r)
+        return {"name": cname, "ok": r[0], "why": r[1]}
+
+    def _holds(self, cb: ContractBlock, values: list) -> str | None:
+        """A contract block's lines run in order over its parameters (THYM 7.5): None when every assert holds, else
+        the first false assert's message (or its condition, as written, and what it compared). It asks nothing, and
+        leaves the node's record as it found it."""
+        cur = self.cur
+        saved = (cur.attempts, [dict(c) for c in cur.checks], cur.state, cur.engine, list(self._sides))
+
+        def run(body: list, scope: _Scope) -> str | None:
+            for part in body:
                 st = self._read_stmt(part[2])
-                out = self._body(part[3] if self._cond(st.cond, scope) else part[4], scope.child({}))
-                if out is not None:
-                    return out
-            elif part[0] == "for":
-                st = self._read_stmt(part[2])
-                if st.loop is None:
-                    raise _Stop(Refusal("run", "parse", f"the runtime could not read {_cut(part[2])} as a for each; "
-                                                        f"that is {_RUNTIME_FAULT}"))
-                coll = self._eval(st.loop.coll, scope)
-                rows = members(coll) or []
-                if st.loop.cond is not None:
-                    rows = [r for r in rows if self._cond(st.loop.cond, scope.child({st.loop.var: r}), item=r)]
-                for r in rows:
-                    self._body(part[3], scope.child({st.loop.var: r}))
-            else:
-                st = self._read_stmt(part[2])
-                if st.form == "give":
-                    return self._eval(st.expr, scope)
-                if st.form == "let":
+                if part[0] == "for":
+                    coll = self._eval(st.loop.coll, scope)
+                    rows = members(coll) or []
+                    if st.loop.cond is not None:
+                        rows = [r for r in rows if self._cond(st.loop.cond, scope.child({st.loop.var: r}), item=r)]
+                    for r in rows:
+                        why = run(part[3], scope.child({st.loop.var: r}))
+                        if why is not None:
+                            return why
+                elif st.form == "let":
                     scope.vars[st.name] = self._eval(st.expr, scope)
                 elif st.form == "assert":
-                    self._assert(st, scope)
-                elif st.form == "emit":
-                    v = self._eval(st.expr, scope)
-                    (self.slots.__setitem__(st.slot, v) if st.slot else self.emitted.append(v))
-                elif st.expr is not None:
-                    self._eval(st.expr, scope)
+                    self._sides = []
+                    if not self._cond(st.cond, scope):
+                        return st.message or (f"{_cut(self._words(_cond_text(st.cond)))} does not hold" + "".join(
+                            f"; {text} is {describe(v)}" for text, v in self._sides))
+            return None
+
+        try:
+            return run(cb.body, _Scope({p[0]: v for p, v in zip(cb.params, values)}, program=False))
+        finally:
+            cur.attempts, cur.checks, cur.state, cur.engine, self._sides = saved
+
+    def _body(self, body: list, scope: _Scope, *, worded: bool = False) -> Value | None:
+        """A body's statements in order (a user move's, or, `worded`, a loop node's): `if` and `for each` (and a loop
+        that collects) with scopes of their own, `keep` into the nearest loop that collects. With `worded`, a refusal
+        inside names the statement of the body it came from, its line and the pass."""
+        for part in body:
+            try:
+                out = self._part(part, scope, worded)
+            except _Stop as s:
+                if not worded or s.worded:
+                    raise
+                said = self.info.statements.get(part[1]) or strip_comment(part[2]).strip()
+                where = f"line {part[1]}" + (f", {self._passes[-1]}" if self._passes else "")
+                r = s.refusal
+                raise _Stop(Refusal(r.stage, r.check, f"{_cut(said)} ({where}): {r.message}", line=part[1],
+                                    file=r.file), worded=True, fault=s.fault) from None
+            if out is not None:
+                return out
+        return None
+
+    def _part(self, part: tuple, scope: _Scope, worded: bool) -> Value | None:
+        if part[0] == "if":
+            st = self._read_stmt(part[2])
+            return self._body(part[3] if self._cond(st.cond, scope) else part[4], scope.child({}), worded=worded)
+        if part[0] == "for":
+            st = self._read_stmt(part[2])
+            if st.loop is None:
+                raise _Stop(Refusal("run", "parse", f"the runtime could not read {_cut(part[2])} as a for each; "
+                                                    f"that is {_RUNTIME_FAULT}"))
+            kept, _ = self._loop(st, part[3], scope, worded=worded)
+            if st.name:                                   # a loop that collects binds its list after its end
+                scope.vars[st.name] = Value("list", kept)
+            return None
+        st = self._read_stmt(part[2])
+        if st.form == "give":
+            return self._eval(st.expr, scope)
+        if st.form == "let":
+            scope.vars[st.name] = self._eval(st.expr, scope)
+        elif st.form == "keep":
+            if not self._keeping:
+                raise _Stop(Refusal("run", "runtime", f"a keep stands in no loop that collects; that is "
+                                                      f"{_RUNTIME_FAULT}"))
+            self._keeping[-1].append(self._eval(st.expr, scope))
+        elif st.form == "assert":
+            self._assert(st, scope)
+        elif st.form == "emit":
+            v = self._eval(st.expr, scope)
+            (self.slots.__setitem__(st.slot, v) if st.slot else self.emitted.append(v))
+            if worded:                                    # a loop node's record holds a row per emitted value
+                self._emit_k += 1
+                self.cur.outputs.append(digest_row(f"{st.slot or 'emit'}.{self._emit_k}", v, path=""))
+        elif st.expr is not None:
+            self._eval(st.expr, scope)
         return None
 
     def _read_stmt(self, text: str) -> Stmt:
@@ -2102,6 +2513,9 @@ class _Run:
         12.1). A folder lands as a directory holding exactly its files (THYM 20.4)."""
         landed: dict[str, Path] = {}
         prog = self.info.name or (self.plan.get("program") or {}).get("name") or "the program"
+        r = self._program_keeps(prog)
+        if r is not None:
+            return r
         for name in self.output_names:
             v = self.env.get(name)
             if v is None:
@@ -2143,6 +2557,31 @@ class _Run:
                     shutil.copytree(src, dst, dirs_exist_ok=True)
                 else:
                     write_atomic(dst, src.read_bytes())
+        return None
+
+
+    def _program_keeps(self, prog: str) -> Refusal | None:
+        """What a program keeps, checked on its outputs before anything lands (THYM 7.5): a failure refuses the run
+        with the contract's name, and there is no re-ask (a program is not one node)."""
+        for kept in self.info.keeps:
+            out = kept[2] or (self.output_names[0] if self.output_names else None)
+            v = self.env.get(out) if out else None
+            if v is None:
+                continue                                  # no give reached it: _land says so
+            giver = next((n for n in reversed(self.nodes) if n.get("gives") == out), None) or self.nodes[-1]
+            self.cur = _NodeState(giver)
+            try:
+                verdict = self._kept(kept, v, dict(self.inputs))
+            except _Stop as s:
+                return Refusal("run", s.refusal.check, f"program {prog} gives {out}: {s.refusal.message}; nothing "
+                                                       "landed")
+            rec = next((r for r in self.records if r.get("node") == giver.get("id")), None)
+            if rec is not None:
+                rec["checks"] = [c for c in rec.get("checks") or [] if c.get("name") != verdict["name"]] + [verdict]
+            if not verdict["ok"]:
+                why = f": {verdict['why']}" if verdict.get("why") else ""
+                return Refusal("run", verdict["name"], f"program {prog} gives {out}, and it fails "
+                                                       f"{verdict['name']}{why}; nothing landed")
         return None
 
 
@@ -2215,7 +2654,8 @@ def run(plan: dict, *, inputs_root: Path | str, coprocessor: Any = None, root: P
         record: bool = True, run_id: str | None = None, made_run: str | None = None,
         now: _dt.datetime | None = None, replay_of: str | None = None, engines: Any = None,
         progress: Callable[[dict], Any] | None = None,
-        should_stop: Callable[[], bool] | None = None, snapshots: Path | str | None = None) -> Trace | Refusal:
+        should_stop: Callable[[], bool] | None = None, snapshots: Path | str | None = None,
+        calls: int | None = None) -> Trace | Refusal:
     """Run a plan (THYM.md 12.1). `inputs_root` is the folder the plan's input paths are relative to; `program` the
     program's items or `.thym` source (needed for let filters and user moves); `coprocessor` answers model-backed
     nodes (default: refusing); `root` is where runs live (default `ENOUGH_THYM_ROOT`, else `~/enough/thym/`);
@@ -2226,12 +2666,14 @@ def run(plan: dict, *, inputs_root: Path | str, coprocessor: Any = None, root: P
     replay answers them from the record (`engines.py`). `progress({node, of, name, move, state})` hears each node start
     (`running`) and end (`done`, `skipped`, `refused`); `should_stop()`, asked before each node, cancels the run
     (check `cancelled`), and nothing lands. `snapshots` is a recorded run's `inputs/` folder: its folder inputs are
-    read from their snapshots there, never from the disk (a replay's, THYM 20.3)."""
+    read from their snapshots there, never from the disk (a replay's, THYM 20.3). `calls` is a ceiling on the run's
+    model requests (`--calls N`, THYM 12.5, 23.4): every request counts, re-asks included, and the one past it
+    refuses the run, check `calls`."""
     return _Run(plan, inputs_root=inputs_root, coprocessor=coprocessor, root=root, rules=rules, agent_free=agent_free,
                 preflight=preflight, program=program, decls=decls, moves=moves, checks=checks,
                 environment=environment, destination=destination, record=record, run_id=run_id,
                 made_run=made_run, now=now, replay_of=replay_of, engines=engines, progress=progress,
-                should_stop=should_stop, snapshots=snapshots).go()
+                should_stop=should_stop, snapshots=snapshots, calls=calls).go()
 
 
 def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: Path | str | None = None,

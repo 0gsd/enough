@@ -12,6 +12,7 @@ corpus, which holds the public sample Holotype `holotypes/meadow` that `open-hou
 | `expected/<name>/outputs/` | the outputs of deterministic runs, byte for byte (a folder output is a folder here, `outputs/<name>/`, as it lands) (recorded from the first conforming run, then frozen; `conform` runs them with the clock pinned to 2026-11-01T12:00:00Z) |
 | `replay/<name>/<run-id>/` | recorded runs of model-backed programs: plan, trace, candidates; re-run to the recorded outputs. Two of `publish-story` on Qwen3.8-27B, both with their engine calls recorded as `candidates/<node>-e<k>.1.cosm`, so each replays with no dictionary and no engine: `2026-11-01-2148-35b5` (checkpoint A's run, re-recorded on 2026-11-05 under its own id: recorded before engine calls were, it replayed with live engines and stopped matching when the grammar version Canon stamps moved; the id is kept because other fixtures and the UI check copy its package) and `2026-11-02-0843-ff92` (wave 2; its FEED answers re-recorded on 2026-11-05 with the engine's six fields, every other record as it was). Re-record, never hand-edit |
 | `bad/<slug>.thym` | programs that must be refused; the first line says `-- refused: <stage> <check> line <n>` |
+| `draft-0.6/` | not part of the suite run: a copy of the 0.6 draft of the specification text, `thym-0.6-draft.md`, whose `thym 1` blocks `tests/test_thym_shipped.py` compiles, and `programs/`, the six programs the round ships as the draft has them (compiled there against scratch declarations of the moves the move lanes write) |
 
 **Passing.** A compiler conforms when every program in `programs/` compiles, enumerates to its `expected/items.cosm`,
 compiles back byte for byte, plans to its `expected/plan.cosm`, and every `bad/` program is refused at the stage,
@@ -29,6 +30,10 @@ check and line its first line names. A runtime conforms when every deterministic
 | `nested-in-loop` | `h`: `../cosm/holotypes/meadow` |
 | `keep-the-python` | `repo`: `inputs/little-tool/` (a folder; its plan row also records `files` and `bytes`) |
 | `split-a-folder` | `repo`: `inputs/little-tool/` |
+| `collect-the-offers` | `h`: `../cosm/holotypes/meadow` (a loop that collects: one node, `move: for`, `gives`, `members`) |
+| `loop-as-a-unit` | `h`: `../cosm/holotypes/meadow` (a `thym 1` loop of several statements: one node, its body run member by member) |
+| `contract-holds` | `t`: `inputs/notes.md` (a contract block, kept by a move and by the program) |
+| `bounded-recursion` | `t`: `inputs/notes.md` (a move that calls itself under `depth: 2`) |
 
 The orchard text and its twin are copies of `../cosm/emf/notes.md` and `notes.md.cosm`; inside the package the twin's
 `source.path` and its spans say `text.md`, as a package's fabula must.

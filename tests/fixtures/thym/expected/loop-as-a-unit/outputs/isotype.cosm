@@ -1,0 +1,27 @@
+isotype: comprise-isotype/0
+hid: null
+epoch: 2026-Q4
+cadence: quarterly
+sample: true
+identity:
+  name: Meadow Software
+  domains:
+  - meadow.example
+  founded: 2019
+  kind: company
+shape: {}
+offers:
+- name: Bank sync
+  summary: Pulls and normalises bank feeds overnight.
+  kind: service
+- name: Reconcile
+  summary: Categorises, matches and closes each day; writes the morning summary.
+  kind: service
+- name: Tip-out
+  summary: Allocates pooled tips by the house rule.
+  kind: service
+seeks: []
+open_to: []
+program:
+  name: loop-as-a-unit
+  sha256: e4003f87a777e12170eb4bb1fe2f0842f12a9b54b5ea2ce66043ab93cb2a7cfc

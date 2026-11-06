@@ -21,9 +21,30 @@ giving each (THYM 8.2). A folder input's row is `{name, type: folder, path, sha2
 (THYM 20.3). In `thym 1`, a loop whose collection is a call names its nodes with the call's temporary in the trailer
 (`, for each l in t2 where …`), so the runtime walks what that node gave and asks for nothing again.
 
-Both grammar versions plan by these rules. The `thym 1` rule for a loop over a collection known only at run time (one
-node for the loop, its body run member by member as a unit) is a later part of the compiler: `_Planner.loop` is the
-seam where it goes.
+Both grammar versions plan by these rules, and `thym 1` adds three (THYM 11.1, 12.5, 17.3):
+
+- **the loop node**: a `for each` over a collection known only at run time whose body is more than one plain statement
+  (a `let`, `assert`, `emit`, `withhold` or a move run for its effect) is one node, named by the loop's own line, move
+  `for`, `repeats`, taking the names its collection, its `where` and its body read from outside the loop, with
+  `calls` (every move its header and its body call, in written order, once each); its body runs member by member as a
+  unit at run time. A loop of one plain statement gives exactly the `thym 0` node. A `for each` nested inside a loop
+  over a written list (which is still unrolled, one node per statement per member) is a loop node too, named with the
+  outer member's trailer (`, for x = <member>`), so that it sees that member;
+- **the collect node**: a loop that collects (`let xs = for each …`) is one node in every case, move `for`, `gives`
+  the loop's name, `repeats`, `calls`; both loop nodes carry `members: {at_most: n}` when the collection's size is known
+  from the plan itself (a written list; a folder input, or a filter of one, by its row's `files`, counted before any
+  `where`). A volume's or a fabula's count of items is in no input row, and reading it would make a plan depend on
+  where it was made from, so it is left out (the count is then open);
+- **keeps and depth**: a node that calls a user move that keeps contracts carries `keeps` (their names), and one that
+  calls a move that may call itself carries the move's `depth` in its budget; the node that gives a program's output
+  carries what the program keeps of that output.
+
+**The count of model calls** (THYM 23.2). Given `models` (the route the host chose: `route`, `provider`, `model`,
+`window`), a plan whose nodes ask carries the catalog key `models`: those keys with `calls` (the requests the plan
+makes when every check passes the first time: a node's asking call sites, times its members when it repeats),
+`at_most` (each node's calls times its attempts) and `calls_open` (the nodes whose count nobody can know before the
+run: a loop over a collection of unknown size, a move that calls itself, a loop inside a move). `normalise` drops it:
+the route is the run's, not the program's.
 
 A node takes names (inputs, bindings, or a temporary `t<n>` made by the nested call at node n) and gives at most
 one: its binding, the block's `gives` name, or a temporary. It runs after the nodes whose outputs it takes; the node
@@ -91,6 +112,10 @@ class PlanNode:
     summary: str = ""
     inputs: set[str] = field(default_factory=set)
     folded: bool = False           # a statement of a loop's body with its nested calls folded in (THYM 11.1)
+    calls: list[str] | None = None  # a loop node's moves, in written order (`thym 1`)
+    over: Any = None               # a loop node's collection, for `members` (`thym 1`)
+    keeps: list[str] = field(default_factory=list)
+    depth: int | None = None
 
 
 @dataclass
@@ -213,6 +238,15 @@ class _Planner:
             self.checkpoints.append(node.n)
         return node
 
+    def kept(self, node: PlanNode, calls: list[Any]) -> None:
+        """What a node's calls of user moves keep, and the depth of the first that may call itself (`thym 1`)."""
+        for c in calls:
+            t = getattr(c, "target", None)
+            if isinstance(t, ck.UserMove):
+                node.keeps = _once(node.keeps + t.keeps)
+                if node.depth is None and t.depth is not None:
+                    node.depth = t.depth
+
     def expr(self, e: Any, env: _Env, stmt: ps.Stmt, role: str) -> str:
         """Nodes for a call or a `marked` (its nested calls first); returns what the outermost gives."""
         e = ck.strip_paren(e)
@@ -232,6 +266,7 @@ class _Planner:
         takes.extend(n)
         lines |= ls
         node = PlanNode(0, kind, move, stmt, e, 0, takes, subst=sub)
+        self.kept(node, [e])
         node.asks = bool(getattr(target, "asks", False))
         node.own = e is ck.own_call(stmt)
         if isinstance(e, ps.Call):
@@ -299,6 +334,10 @@ class _Planner:
                 self.expr(top, env, s, role=f"out:{out}")
             else:
                 self.simple("give", "give", s, s.expr, env, gives=out, output=True)
+            first = self.b.outputs[0].name if self.b.outputs else out
+            mine = [k.name for k in self.b.keeps if (k.of or first) == out]
+            if mine:                                    # what the program keeps of this output (THYM 7.5)
+                self.nodes[-1].keeps = _once(self.nodes[-1].keeps + mine)
         elif isinstance(s, ps.Withhold):
             self.expr(s.call, env, s, role="withhold")
         elif isinstance(s, ps.Effect):
@@ -307,10 +346,15 @@ class _Planner:
 
     def loop(self, s: ps.For, env: _Env) -> None:
         """A `for each`: its body's statements once per member of a list written in the program, else once, each
-        node marked `repeats` and taking what the collection and the `where` read (THYM 11.1). This is where the
-        `thym 1` rule goes (`self.c.module.version >= 1`: a loop over a collection known only at run time is one node,
-        its body run member by member as a unit, named by the loop's own line, `move: for`, with `calls`); a later
-        part of the compiler writes it. Until then both versions plan a loop by the `thym 0` rule."""
+        node marked `repeats` and taking what the collection and the `where` read (THYM 11.1). In `thym 1`, a loop
+        that collects, a loop over a collection known only at run time whose body is more than one plain statement,
+        and a loop nested in an unrolled one are one node each (`loop_node`)."""
+        coll0 = ck.strip_paren(s.coll)
+        written = isinstance(coll0, ps.ListLit) and s.where is None
+        if self.c.module.version >= 1 and (s.collect is not None or env.member is not None
+                                           or (not written and not _plain_body(s))):
+            self.loop_node(s, env)
+            return
         sub: dict[int, str] = {}
         names, lines = self.names(s.coll, env, sub, s)
         if s.where is not None:
@@ -326,6 +370,36 @@ class _Planner:
                 self.stmts(s.body, env.child(loop=s, loop_names=None, member=member))
         else:
             self.stmts(s.body, env.child(loop=s, loop_names=(_once(names), lines), member=None))
+
+    def loop_node(self, s: ps.For, env: _Env) -> None:
+        """One node for a whole loop (`thym 1`, THYM 11.1): move `for`, named by the loop's own line, taking what its
+        header and its body read from outside it (nested calls fold in: no temporaries), `calls` every move they call
+        in written order, asking when any of them asks; `gives` the loop's name when it collects."""
+        inner = list(ck.walk(s.body))
+        inside = {s.var} | {st.name for st in inner if isinstance(st, ps.Let)} | {
+            n for st in inner if isinstance(st, ps.For) for n in (st.var, st.collect) if n}
+        sub: dict[int, str] = {}
+        takes: list[str] = []
+        lines: set[int] = {s.line, s.end}
+        for st in [s] + inner:
+            for part in ck.parts(st):
+                n, ls = self.names(part, env, sub, st, fold=True)
+                takes.extend(x for x in n if x not in inside)
+                lines |= ls
+        calls = [c for st in [s] + inner for part in ck.parts(st) for c in ck.eval_calls(part)]
+        node = PlanNode(0, "for", "for", s, s.coll, 0, takes, folded=True)
+        node.calls = _once([n for st in [s] + inner for n in ck.step_call_names(st)])
+        node.asks = any(ck.call_asks(c) for c in calls) or any(ck.step_asks(st) for st in [s] + inner)
+        node.own = True
+        node.output_words = max((c.mod("to").arg.count for c in calls if isinstance(c, ps.Call) and c.mod("to")
+                                 and isinstance(c.mod("to").arg, ps.Units) and c.mod("to").arg.unit == "words"),
+                                default=0)
+        node.gives = s.collect
+        node.over = s.coll
+        self.kept(node, calls)
+        self.add(node, env, lines)
+        node.repeats = True
+        self.checkpoints.append(node.n)           # it may emit, assert and refuse: the output waits on it
 
     def fold(self, s: ps.Stmt, env: _Env) -> None:
         """A statement of a loop's body that nests a call inside another (or a call inside an `assert` or an `if`):
@@ -353,6 +427,7 @@ class _Planner:
         else:
             kind, move, expr = "emit", "emit", s.expr
         node = PlanNode(0, kind, move, s, expr, 0, takes, folded=True)
+        self.kept(node, calls)
         node.asks = any(ck.call_asks(c) for c in calls)
         node.own = True
         node.output_words = max((c.mod("to").arg.count for c in calls if isinstance(c, ps.Call) and c.mod("to")
@@ -385,7 +460,9 @@ class _Planner:
     # -- words -------------------------------------------------------------
 
     def node_name(self, nd: PlanNode) -> str:
-        if nd.folded:
+        if nd.kind == "for":
+            text = ps.statement_name(nd.stmt, self.c.module.lines)
+        elif nd.folded:
             text = _statement_text(nd.stmt)
         elif nd.kind in ("assert", "if"):
             text = f"{nd.kind} {ps.render_cond(nd.expr, nd.subst)}"
@@ -417,6 +494,31 @@ class _Planner:
     def node_summary(self, nd: PlanNode) -> str:
         """A node's summary: its line's comment, else its name (THYM.md 10)."""
         return nd.stmt.comment or nd.name
+
+
+def _plain_body(s: ps.For) -> bool:
+    """Whether a loop's body is one plain statement, which `thym 1` plans exactly as `thym 0` does (THYM 11.1)."""
+    return len(s.body) == 1 and isinstance(s.body[0], (ps.Let, ps.Assert, ps.Emit, ps.Withhold, ps.Effect))
+
+
+def _members(over: Any, rows: dict, counts: dict) -> int | None:
+    """How many members a loop node's collection has at most, when the plan knows it (THYM 11.1): a written list's;
+    a folder input's files (its row's `files`); for a filter of an input, the input's (counted before the `where`).
+    `counts` may give a volume's or fabula's count of items; `plan` gives none (see the module's docstring)."""
+    e = ck.strip_paren(over)
+    if isinstance(e, ps.ListLit):
+        return len(e.items)
+    if isinstance(e, ps.Filter):
+        e = ck.strip_paren(e.target)
+    if isinstance(e, ps.Name) and e.kind == "binding" and e.name in rows:
+        b = e.binding
+        if getattr(b, "kind", None) != "takes":
+            return None
+        row = rows[e.name]
+        if row.get("type") == "folder" and isinstance(row.get("files"), int):
+            return row["files"]
+        return counts.get(e.name)
+    return None
 
 
 def _nests(s: ps.Stmt) -> bool:
@@ -481,17 +583,23 @@ def _folder_row(i: dict) -> dict:
     return row
 
 
-def _size(inp: dict) -> int:
+def _here(inp: dict, root: Path | None) -> Path:
+    """Where an input's path points: as given, or under `root` when it is relative and a root was given."""
+    p = Path(str(inp.get("path") or ""))
+    return p if p.is_absolute() or root is None else Path(root) / p
+
+
+def _size(inp: dict, root: Path | None = None) -> int:
     if isinstance(inp.get("size"), int):
         return inp["size"]
     if inp.get("type") == "folder":                # what a prompt could hold of it: its text files
         try:
-            f = fd.read(Path(str(inp.get("path") or "")))
+            f = fd.read(_here(inp, root))
             return sum(e.size for e in f.texts())
         except fd.FolderError:
             return 0
     try:
-        p = Path(str(inp.get("path") or ""))
+        p = _here(inp, root)
         if p.is_file():
             return p.stat().st_size
         if p.is_dir():
@@ -523,10 +631,86 @@ def root_summary(nodes: int, asks: int) -> str:
     return f"{head}, {_count(asks)} of which ask the model."
 
 
+def _sites(stmts: list[ps.Stmt], seen: frozenset[int] = frozenset(), deep: bool = True) -> tuple[int, bool]:
+    """The asking call sites of some statements, through the user moves they call: `(how many, whether the count is
+    open)`. A site inside a `for each` of a written list counts once per member; any other loop, and a move that
+    calls itself, opens the count. Not `deep`: the statements' own expressions only, not their branches or bodies."""
+    n, open_ = 0, False
+    for st in stmts:
+        for c in [c for part in ck.parts(st) for c in ck.eval_calls(part)]:
+            t = getattr(c, "target", None)
+            if isinstance(t, ck.UserMove):
+                if not t.asks:
+                    continue
+                if id(t) in seen or t.depth is not None:
+                    open_ = True
+                    continue
+                k, o = _sites(t.block.stmts, seen | {id(t)})
+                n, open_ = n + k, open_ or o
+            elif ck.call_asks(c):
+                n += 1
+        if not deep:
+            continue
+        if isinstance(st, ps.If):
+            k1, o1 = _sites(st.then, seen)
+            k2, o2 = _sites(st.else_ or [], seen)
+            n, open_ = n + max(k1, k2), open_ or o1 or o2
+        elif isinstance(st, ps.For):
+            k, o = _sites(st.body, seen)
+            coll = ck.strip_paren(st.coll)
+            if k and isinstance(coll, ps.ListLit):
+                k *= len(coll.items)
+            elif k:
+                o = True
+            n, open_ = n + k, open_ or o
+    return n, open_
+
+
+def calls_estimate(nodes: list[PlanNode], rows: dict, counts: dict) -> dict:
+    """`{calls, at_most, calls_open}` for a plan's nodes (THYM 23.2)."""
+    calls = at_most = 0
+    opened: list[str] = []
+    for nd in nodes:
+        if not nd.asks:
+            continue
+        if nd.kind == "for":                       # a loop node: its body's sites, once per member
+            k, o = _sites(nd.stmt.body, frozenset())
+            head = [c for part in ck.parts(nd.stmt) for c in ck.eval_calls(part) if ck.call_asks(c)]
+            m = _members(nd.over, rows, counts)
+            if m is None:
+                o = o or k > 0
+                m = 1
+            k = k * m + len(head)
+        elif nd.folded:
+            k, o = _sites([nd.stmt], frozenset(), deep=False)
+            k = max(k, 1)
+        else:
+            t = getattr(nd.expr, "target", None)
+            k, o = (_sites(t.block.stmts, frozenset({id(t)})) if isinstance(t, ck.UserMove) else (1, False))
+            if isinstance(t, ck.UserMove) and t.depth is not None:
+                o = True
+        if nd.repeats and nd.kind != "for":        # a thym 0 repeating node: once per member
+            m = _members(nd.loop.coll, rows, counts) if nd.loop is not None else None
+            if m is None:
+                o = True
+            else:
+                k *= m
+        calls += k
+        at_most += k * 3
+        if o:
+            opened.append(f"R:node/{nd.n}")
+    return {"calls": calls, "at_most": at_most, "calls_open": opened}
+
+
 def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
-         now: _dt.datetime | None = None) -> dict | Refusal:
+         now: _dt.datetime | None = None, inputs_root: Path | str | None = None,
+         models: dict | None = None) -> dict | Refusal:
     """The plan volume of a checked program over its inputs, `[{name, type, path, sha256}]` in the order the
-    program takes them (a `size` in bytes may come with each, else the file is measured if it is there)."""
+    program takes them (a `size` in bytes may come with each, else the file is measured if it is there).
+    `inputs_root` is the folder a relative input path is read under when it is measured or counted (else the
+    working folder). `models` (`{route, provider, model, window}`, the host's choice of route) adds the catalog key
+    `models` with the count of model calls, when a node asks (THYM 23.2)."""
+    root = Path(inputs_root) if inputs_root is not None else None
     if isinstance(checked, Refusal):
         return checked
     nodes = build(checked, program=program)
@@ -552,7 +736,9 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
             "sha256": str(i.get("sha256"))} for i in inputs]
     program_sha = en.sha256(m.text.encode("utf-8"))
     rid = run_id(program_sha, ins, now)
-    sizes = {str(i.get("name")): _size(i) for i in inputs}
+    sizes = {str(i.get("name")): _size(i, root) for i in inputs}
+    rows = {str(i.get("name")): r for i, r in zip(inputs, ins)}
+    counts: dict[str, int | None] = {}
     largest = max((sum(sizes.get(n, 0) for n in nd.inputs) // 4 for nd in nodes if nd.asks), default=0)
     asks = sum(1 for nd in nodes if nd.asks)
     words = max((nd.output_words for nd in nodes), default=0)
@@ -575,18 +761,33 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
             it["repeats"] = True
         if nd.gives:
             it["gives"] = nd.gives
+        if nd.calls is not None:
+            it["calls"] = list(nd.calls)
+        if nd.over is not None:
+            at_most = _members(nd.over, rows, counts)
+            if at_most is not None:
+                it["members"] = {"at_most": at_most}
+        if nd.keeps:
+            it["keeps"] = list(nd.keeps)
         it["after"] = [f"R:node/{k}" for k in nd.after]
         it["budget"] = {"attempts": 3 if nd.asks else 1, "output_words": nd.output_words}
+        if nd.depth is not None:
+            it["budget"]["depth"] = nd.depth
         it["line"] = nd.stmt.line
         it["provenance"] = en.provenance(fname, nd.lines[0], nd.lines[1])
         items.append(it)
-    return {
+    out = {
         "oes": MINICOSM, "kind": "plan", "id": f"thym/{rid}", "name": title,
         "program": {"name": block.name, "sha256": program_sha},
         "inputs": ins,
         "estimate": {"steps": len(nodes), "asks": asks, "largest_prompt": largest, "output_words": words},
-        "nodes": items,
     }
+    if models is not None and asks:
+        est = calls_estimate(nodes, rows, counts)
+        out["models"] = {**{k: models[k] for k in ("route", "provider", "model") if k in models}, **est,
+                         **({"window": models["window"]} if "window" in models else {})}
+    out["nodes"] = items
+    return out
 
 
 def normalise(mapping: dict) -> dict:
@@ -609,7 +810,7 @@ def normalise(mapping: dict) -> dict:
     prog = (out.get("program") or {}).get("name")
     if prog:
         out["id"] = f"thym/plan.{prog}"
-    for key in ("built", "started", "ended", "at"):
+    for key in ("built", "started", "ended", "at", "models"):
         out.pop(key, None)
     if isinstance(out.get("estimate"), dict):
         out["estimate"]["largest_prompt"] = 0

@@ -1,0 +1,55 @@
+oes: thym/1
+kind: plan
+id: thym/plan.contract-holds
+name: contract-holds on notes.md
+program:
+  name: contract-holds
+  sha256: db291c3fef059cb85d784adf567f9edb0833c11c2ed592844400e14014e42584
+inputs:
+- name: t
+  type: text
+  path: inputs/notes.md
+  sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+estimate:
+  steps: 1
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: contract-holds on notes.md
+  summary: One node, none of which asks the model.
+  nodes:
+  - R:node/1
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: counted t
+  summary: counted t
+  step:
+    program: contract-holds
+    n: 1
+  move: counted
+  asks: false
+  takes:
+  - t
+  gives: n
+  keeps:
+  - counted-some
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 24
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L24
+    confidence: 1

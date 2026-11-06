@@ -1,0 +1,80 @@
+oes: thym/1
+kind: plan
+id: thym/plan.collect-the-offers
+name: collect-the-offers on meadow
+program:
+  name: collect-the-offers
+  sha256: a98ad45431de4f5a21a618c282e197eba948cc8af4d79c7afe29e9c81b03462b
+inputs:
+- name: h
+  type: volume
+  path: ../cosm/holotypes/meadow
+  sha256: b27e86f12b2b2d588cbdaa47c82d160a60cc2056030050088bfc31a9e6f5a5d7
+estimate:
+  steps: 2
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: collect-the-offers on meadow
+  summary: Two nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: let offers = for each o in h where kind in [product, service, platform]
+  summary: let offers = for each o in h where kind in [product, service, platform]
+  step:
+    program: collect-the-offers
+    n: 1
+  move: for
+  asks: false
+  takes:
+  - h
+  repeats: true
+  gives: offers
+  calls:
+  - mark
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 10
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L10-L15
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: count offers
+  summary: count offers
+  step:
+    program: collect-the-offers
+    n: 5
+  move: count
+  asks: false
+  takes:
+  - offers
+  gives: n
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 16
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L16
+    confidence: 1

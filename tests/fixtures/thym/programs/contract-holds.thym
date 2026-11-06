@@ -1,0 +1,25 @@
+thym 1
+
+contract counted-some(n: number, t: text)
+  why: a count of a text's words finds some, and never more than the text holds.
+
+  let all = words t
+  assert n > 0 else "the text has no words"
+  assert not n > all else "more words were counted than the text holds"
+end
+
+program contract-holds
+  why: the words of a text, counted by a move that keeps a contract of the program's own, which the
+       program keeps too.
+
+  takes t: text
+  gives n: number
+  keeps counted-some against t
+
+  move counted(x: text): number
+    keeps counted-some against x
+    give words x
+  end
+
+  give counted t
+end

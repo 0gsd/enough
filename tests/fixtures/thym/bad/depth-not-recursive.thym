@@ -1,0 +1,13 @@
+-- refused: compile type line 9
+thym 1
+
+program depth-not-recursive
+  why: a move that says a depth and never calls itself.
+  takes t: text
+  gives n: number
+  move tidy(x: text): number
+    depth: 4
+    give words x
+  end
+  give tidy t
+end

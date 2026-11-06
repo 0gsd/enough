@@ -1,0 +1,180 @@
+oes: thym/1
+kind: program
+id: thym/collect-the-offers
+name: collect-the-offers
+source:
+  path: collect-the-offers.thym
+  sha256: a98ad45431de4f5a21a618c282e197eba948cc8af4d79c7afe29e9c81b03462b
+  size: 528
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/collect-the-offers
+  type: program
+  name: collect-the-offers
+  summary: Count what the house sells, each offer kept once it is marked as the house says it; a loop that collects,
+    with a binding and a choice of its own on every pass.
+  why: count what the house sells, each offer kept once it is marked as the house says it; a loop that collects,
+    with a binding and a choice of its own on every pass.
+  must: []
+  decided: []
+  takes:
+  - name: h
+    type: volume
+  gives:
+  - name: n
+    type: number
+  lines: 3-17
+  order: 1
+  body: |
+    program collect-the-offers
+      why: count what the house sells, each offer kept once it is marked as the house says it; a loop that
+           collects, with a binding and a choice of its own on every pass.
+
+      takes h: volume                  -- the holotype
+      gives n: number                  -- how many offers
+
+      let offers = for each o in h where kind in [product, service, platform]
+        let m = mark o as stated       -- this pass's offer, marked
+        if m has name then
+          keep m
+        end
+      end
+      give count offers
+    end
+  steps:
+  - P:step/collect-the-offers.1
+  - P:step/collect-the-offers.5
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L3-L17
+    confidence: 1
+- id: P:step/collect-the-offers.1
+  type: step
+  name: let offers = for each o in h where kind in [product, service, platform]
+  summary: let offers = for each o in h where kind in [product, service, platform]
+  of: P:program/collect-the-offers
+  n: 1
+  text: '  let offers = for each o in h where kind in [product, service, platform]'
+  line: 10
+  lines: 10-15
+  form: for
+  calls: []
+  binds: offers
+  uses:
+  - h
+  asks: false
+  steps:
+  - P:step/collect-the-offers.2
+  - P:step/collect-the-offers.3
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L10-L15
+    confidence: 1
+- id: P:step/collect-the-offers.2
+  type: step
+  name: let m = mark o as stated
+  summary: this pass's offer, marked
+  of: P:program/collect-the-offers
+  n: 2
+  text: '    let m = mark o as stated       -- this pass''s offer, marked'
+  line: 11
+  form: let
+  move: mark
+  calls:
+  - mark
+  binds: m
+  uses:
+  - o
+  asks: false
+  contracts:
+  - P:contract/collect-the-offers.2
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L11
+    confidence: 1
+- id: P:step/collect-the-offers.3
+  type: step
+  name: if m has name then
+  summary: if m has name then
+  of: P:program/collect-the-offers
+  n: 3
+  text: '    if m has name then'
+  line: 12
+  lines: 12-14
+  form: if
+  calls: []
+  uses:
+  - m
+  asks: false
+  branches:
+    then:
+    - P:step/collect-the-offers.4
+    else: []
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L12-L14
+    confidence: 1
+- id: P:step/collect-the-offers.4
+  type: step
+  name: keep m
+  summary: keep m
+  of: P:program/collect-the-offers
+  n: 4
+  text: '      keep m'
+  line: 13
+  form: keep
+  calls: []
+  uses:
+  - m
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L13
+    confidence: 1
+- id: P:step/collect-the-offers.5
+  type: step
+  name: give count offers
+  summary: give count offers
+  of: P:program/collect-the-offers
+  n: 5
+  text: '  give count offers'
+  line: 16
+  form: give
+  move: count
+  calls:
+  - count
+  uses:
+  - offers
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L16
+    confidence: 1
+- id: P:contract/collect-the-offers.2
+  type: contract
+  name: mark
+  summary: What mark must leave true of what it gives.
+  of: P:step/collect-the-offers.2
+  move: mark
+  checks:
+  - verified-only-where-derived
+  provenance:
+    mode: derived
+    sources:
+    - collect-the-offers.thym#L11
+    confidence: 1

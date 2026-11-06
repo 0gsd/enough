@@ -16,8 +16,13 @@ block, verbatim) and says when and by what it was built. Its items are:
   call nested inside it, in evaluation order, `marked` included; an `assert` step's contract names the check its
   condition uses, and a call of a user move carries the contracts the move inherits.
 
-What `thym 1` adds here (THYM 10): a program of several outputs lists each in `gives`, and a labelled give holds its
-output's name in `slot`, as a labelled emit does. A `thym 0` file enumerates exactly as before.
+What `thym 1` adds here (THYM 10, 17.3): a program of several outputs lists each in `gives`, and a labelled give holds
+its output's name in `slot`, as a labelled emit does. A contract block gives `P:check/<name>` (or
+`P:check/<program>.<name>` for one local to a program) with `why`, `params`, `lines`, `order` (a top-level one only),
+`body` and `steps`, its lines as steps `P:step/<name>.<n>`. A `keep` is a step of form `keep`; a loop that collects is a
+step of form `for` that binds the loop's name. A move or a program that keeps lists what it keeps in `keeps` (the names,
+in the order written), and a move that may call itself holds its `depth`. A `P:contract` of a call of a keeping move
+lists the kept names after the inherited checks. A `thym 0` file enumerates exactly as before.
 
 `compile_volume` gives `front` and then every top-level item's `body` in `order`: the file, byte for byte (law 4 of
 section 7.2). `dump` writes a volume as canonical `.cosm` text, keys in insertion order, LF, UTF-8, block scalars for
@@ -186,7 +191,7 @@ class _Enumerator:
             if isinstance(st, ps.Let):
                 item["binds"] = st.name
             elif isinstance(st, ps.For):
-                item["binds"] = st.var
+                item["binds"] = st.collect or st.var
             item["uses"] = ck.names_used(st)
             item["asks"] = ck.step_asks(st)
             if isinstance(st, ps.If):
@@ -244,10 +249,14 @@ class _Enumerator:
             return [item]
         if b.kind == "move":
             return self.move_items(b, order=order, body=body)
+        if b.kind == "contract":
+            return self.move_items(b, order=order, body=body)
         item = {"id": f"P:program/{b.name}", "type": "program", "name": b.name, "summary": block_summary(b, self.lines)}
         _heads(b, item, always=True)
         item["takes"] = [{"name": p.name, "type": p.type} for p in b.takes]
         item["gives"] = [{"name": o.name, "type": o.type} for o in (b.outputs or [b.gives])] if b.gives else []
+        if b.keeps:
+            item["keeps"] = _kept(b)
         item.update({"lines": lines, "order": order, "body": body})
         if b.moves:
             item["moves"] = [f"P:move/{b.name}.{lm.name}" for lm in b.moves]
@@ -255,7 +264,7 @@ class _Enumerator:
         item["provenance"] = prov
         out.append(item)
         move_contracts: list[dict] = []
-        for lm in b.moves:
+        for lm in b.moves + b.contracts:
             lbody = "\n".join(self.m.raw_lines[lm.line - 1:lm.end]) + "\n"
             items = self.move_items(lm, order=None, body=lbody, split=True)
             out.extend(items[0])
@@ -267,11 +276,18 @@ class _Enumerator:
         return out
 
     def move_items(self, b: ps.Block, *, order: int | None, body: str, split: bool = False):
-        item: dict[str, Any] = {"id": f"P:move/{b.qualified}", "type": "move", "name": b.name,
+        """A move's items, or a contract block's (`P:check`, THYM 17.3): the block, its steps and their contracts."""
+        kind = "check" if b.kind == "contract" else "move"
+        item: dict[str, Any] = {"id": f"P:{kind}/{b.qualified}", "type": kind, "name": b.name,
                                 "summary": block_summary(b, self.lines)}
         _heads(b, item, always=False)
         item["params"] = [{"name": p.name, "type": p.type} for p in b.params]
-        item["gives"] = [{"name": b.gives.name, "type": b.gives.type}] if b.gives else []
+        if kind == "move":
+            item["gives"] = [{"name": b.gives.name, "type": b.gives.type}] if b.gives else []
+            if b.keeps:
+                item["keeps"] = _kept(b)
+            if b.depth is not None:
+                item["depth"] = b.depth
         item["lines"] = f"{b.line}-{b.end}"
         if order is not None:
             item["order"] = order
@@ -282,6 +298,15 @@ class _Enumerator:
         if split:
             return [item] + steps, contracts
         return [item] + steps + contracts
+
+
+def _kept(b: ps.Block) -> list[str]:
+    """What a block keeps, by name, once each, in the order written (THYM 10)."""
+    out: list[str] = []
+    for k in b.keeps:
+        if k.name not in out:
+            out.append(k.name)
+    return out
 
 
 def enumerate_checked(checked: ck.Checked, *, built_at: _dt.datetime | None = None) -> dict:

@@ -1,0 +1,80 @@
+thym 1
+
+-- The fabulac of a small Python repository, built in five runs. A host runs the programs of this file
+-- in the order they are written, as one job: each lands the fabulac so far beside the folder, and a
+-- job that stops takes up again after the last one that landed.
+
+contract its-own-file(r: fabula, t: text)
+  why: a file's reading speaks of that file and of no other.
+
+  assert count r > 0 else "the reading found nothing in the file"
+  for each i in r where i has span
+    assert i.span.file is t.path else "an item points into another file"
+  end
+end
+
+program survey-the-repo
+  why: a repository's files, parts and interfaces are found from its syntax alone, before any
+       model reads a line.
+  must: nothing in the repository is run, imported or installed.
+  decided 2026-11-05: this build reads pure Python a person could read in an afternoon: sixty
+       files, six thousand lines.
+
+  takes repo: folder
+  gives f: fabula
+
+  let code = repo where suffix is py
+  assert count code > 0 else "there is no Python file here"
+  assert count code < 61 else "more than sixty Python files: past what this build reads"
+  assert code.lines < 6001 else "more than six thousand lines of Python: past what this build reads"
+  give survey repo                                 -- files, parts, interfaces, licence: rules only
+end
+
+program read-the-history
+  why: the clone's log and its tags say how the code came to be.
+  decided 2026-11-05: history is the clone; issues and pull requests are reserved.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  give history repo with f                         -- changes in episodes, releases from tags: rules only
+end
+
+program read-every-file
+  why: each Python file is read once by a model, against the outline, for what it does and how.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  move read-file(t: text, so-far: fabula): fabula
+    keeps its-own-file against t
+    give derive t as code with so-far              -- behaviours, structures, cases, terms, claims, events
+  end
+
+  let readings = for each t in repo where suffix is py
+    keep read-file t, f
+  end
+  give gather readings with f
+end
+
+program fold-the-whole
+  why: read as a whole, the code says what it is for, for whom, and what it will not do.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  give derive repo with f                          -- aims, uses, requirements, decisions, exclusions, the atem
+end
+
+program raise-the-questions
+  why: where the build was unsure it asks the person who knows, and the questions land with the
+       fabulac.
+  decided 2026-11-05: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end

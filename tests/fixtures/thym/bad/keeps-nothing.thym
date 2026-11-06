@@ -1,0 +1,13 @@
+-- refused: compile type line 9
+thym 1
+
+program keeps-nothing
+  why: a loop that collects and never keeps.
+  takes h: volume
+  gives n: number
+
+  let offers = for each o in h where kind is service
+    emit o
+  end
+  give count offers
+end

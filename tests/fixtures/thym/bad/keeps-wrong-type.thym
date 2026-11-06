@@ -1,0 +1,17 @@
+-- refused: compile type line 14
+thym 1
+
+contract shorter(new: short, old: short)
+  why: a short that says less.
+
+  assert words new < words old else "not shorter"
+end
+
+program keeps-wrong-type
+  why: keep a contract of shorts over a number.
+  takes s: short
+  gives n: number
+  keeps shorter against s
+
+  give words s
+end

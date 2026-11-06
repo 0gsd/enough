@@ -376,7 +376,7 @@ def test_manifests_become_reference_items():
                     if it["type"] in ("module", "kind", "list"))
     assert [(count[("module", m)], count[("kind", m)])
             for m in ("comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym")] == \
-        [(9, 73), (2, 11), (2, 5), (11, 42), (5, 14), (12, 15), (6, 14)]      # each with the core's D (0.6)
+        [(9, 73), (2, 11), (2, 5), (11, 42), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check
     assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 4, 24]
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
         ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc",

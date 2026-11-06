@@ -1,0 +1,17 @@
+-- refused: compile type line 7
+thym 1
+
+contract told-briefly(s: short)
+  why: a contract that asks the model, which a contract never does.
+
+  assert (words (atem s)) > 0
+end
+
+program contract-asks
+  why: keep a contract that asks.
+  takes s: short
+  gives t: short
+  keeps told-briefly
+
+  give s
+end

@@ -1,0 +1,177 @@
+oes: thym/1
+kind: program
+id: thym/bounded-recursion
+name: bounded-recursion
+source:
+  path: bounded-recursion.thym
+  sha256: 43fb01d03638d6bc4ac9500fee6a0b9bbfa1f6a2d731f43b8f23d055a890bfa4
+  size: 337
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/bounded-recursion
+  type: program
+  name: bounded-recursion
+  summary: A move that calls itself once, under the depth it says, and then gives the words of the text.
+  why: a move that calls itself once, under the depth it says, and then gives the words of the text.
+  must: []
+  decided: []
+  takes:
+  - name: t
+    type: text
+  gives:
+  - name: n
+    type: number
+  lines: 3-19
+  order: 1
+  body: |
+    program bounded-recursion
+      why: a move that calls itself once, under the depth it says, and then gives the words of the text.
+
+      takes t: text
+      gives n: number
+
+      move again(x: text, more: bool): number
+        depth: 2
+        if more then
+          give again x, false
+        else
+          give words x
+        end
+      end
+
+      give again t, true
+    end
+  moves:
+  - P:move/bounded-recursion.again
+  steps:
+  - P:step/bounded-recursion.1
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L3-L19
+    confidence: 1
+- id: P:move/bounded-recursion.again
+  type: move
+  name: again
+  summary: 'move again(x: text, more: bool): number'
+  params:
+  - name: x
+    type: text
+  - name: more
+    type: bool
+  gives:
+  - name: again
+    type: number
+  depth: 2
+  lines: 9-16
+  body: |2
+      move again(x: text, more: bool): number
+        depth: 2
+        if more then
+          give again x, false
+        else
+          give words x
+        end
+      end
+  steps:
+  - P:step/bounded-recursion.again.1
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L9-L16
+    confidence: 1
+- id: P:step/bounded-recursion.again.1
+  type: step
+  name: if more then
+  summary: if more then
+  of: P:move/bounded-recursion.again
+  n: 1
+  text: '    if more then'
+  line: 11
+  lines: 11-15
+  form: if
+  calls: []
+  uses:
+  - more
+  asks: false
+  branches:
+    then:
+    - P:step/bounded-recursion.again.2
+    else:
+    - P:step/bounded-recursion.again.3
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L11-L15
+    confidence: 1
+- id: P:step/bounded-recursion.again.2
+  type: step
+  name: give again x, false
+  summary: give again x, false
+  of: P:move/bounded-recursion.again
+  n: 2
+  text: '      give again x, false'
+  line: 12
+  form: give
+  move: again
+  calls:
+  - again
+  - words
+  uses:
+  - x
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L12
+    confidence: 1
+- id: P:step/bounded-recursion.again.3
+  type: step
+  name: give words x
+  summary: give words x
+  of: P:move/bounded-recursion.again
+  n: 3
+  text: '      give words x'
+  line: 14
+  form: give
+  move: words
+  calls:
+  - words
+  uses:
+  - x
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L14
+    confidence: 1
+- id: P:step/bounded-recursion.1
+  type: step
+  name: give again t, true
+  summary: give again t, true
+  of: P:program/bounded-recursion
+  n: 1
+  text: '  give again t, true'
+  line: 18
+  form: give
+  move: again
+  calls:
+  - again
+  - words
+  uses:
+  - t
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - bounded-recursion.thym#L18
+    confidence: 1

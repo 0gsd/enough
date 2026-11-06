@@ -1,0 +1,234 @@
+oes: thym/1
+kind: program
+id: thym/contract-holds
+name: contract-holds
+source:
+  path: contract-holds.thym
+  sha256: db291c3fef059cb85d784adf567f9edb0833c11c2ed592844400e14014e42584
+  size: 599
+front: |+
+  thym 1
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:check/counted-some
+  type: check
+  name: counted-some
+  summary: A count of a text's words finds some, and never more than the text holds.
+  why: a count of a text's words finds some, and never more than the text holds.
+  params:
+  - name: n
+    type: number
+  - name: t
+    type: text
+  lines: 3-9
+  order: 1
+  body: |+
+    contract counted-some(n: number, t: text)
+      why: a count of a text's words finds some, and never more than the text holds.
+
+      let all = words t
+      assert n > 0 else "the text has no words"
+      assert not n > all else "more words were counted than the text holds"
+    end
+
+  steps:
+  - P:step/counted-some.1
+  - P:step/counted-some.2
+  - P:step/counted-some.3
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L3-L9
+    confidence: 1
+- id: P:step/counted-some.1
+  type: step
+  name: let all = words t
+  summary: let all = words t
+  of: P:check/counted-some
+  n: 1
+  text: '  let all = words t'
+  line: 6
+  form: let
+  move: words
+  calls:
+  - words
+  binds: all
+  uses:
+  - t
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L6
+    confidence: 1
+- id: P:step/counted-some.2
+  type: step
+  name: assert n > 0 else "the text has no words"
+  summary: assert n > 0 else "the text has no words"
+  of: P:check/counted-some
+  n: 2
+  text: '  assert n > 0 else "the text has no words"'
+  line: 7
+  form: assert
+  move: assert
+  calls: []
+  uses:
+  - n
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L7
+    confidence: 1
+- id: P:step/counted-some.3
+  type: step
+  name: assert not n > all else "more words were counted than the text holds"
+  summary: assert not n > all else "more words were counted than the text holds"
+  of: P:check/counted-some
+  n: 3
+  text: '  assert not n > all else "more words were counted than the text holds"'
+  line: 8
+  form: assert
+  move: assert
+  calls: []
+  uses:
+  - n
+  - all
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L8
+    confidence: 1
+- id: P:program/contract-holds
+  type: program
+  name: contract-holds
+  summary: The words of a text, counted by a move that keeps a contract of the program's own, which the program
+    keeps too.
+  why: the words of a text, counted by a move that keeps a contract of the program's own, which the program keeps
+    too.
+  must: []
+  decided: []
+  takes:
+  - name: t
+    type: text
+  gives:
+  - name: n
+    type: number
+  keeps:
+  - counted-some
+  lines: 11-25
+  order: 2
+  body: |
+    program contract-holds
+      why: the words of a text, counted by a move that keeps a contract of the program's own, which the
+           program keeps too.
+
+      takes t: text
+      gives n: number
+      keeps counted-some against t
+
+      move counted(x: text): number
+        keeps counted-some against x
+        give words x
+      end
+
+      give counted t
+    end
+  moves:
+  - P:move/contract-holds.counted
+  steps:
+  - P:step/contract-holds.1
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L11-L25
+    confidence: 1
+- id: P:move/contract-holds.counted
+  type: move
+  name: counted
+  summary: 'move counted(x: text): number'
+  params:
+  - name: x
+    type: text
+  gives:
+  - name: counted
+    type: number
+  keeps:
+  - counted-some
+  lines: 19-22
+  body: |2
+      move counted(x: text): number
+        keeps counted-some against x
+        give words x
+      end
+  steps:
+  - P:step/contract-holds.counted.1
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L19-L22
+    confidence: 1
+- id: P:step/contract-holds.counted.1
+  type: step
+  name: give words x
+  summary: give words x
+  of: P:move/contract-holds.counted
+  n: 1
+  text: '    give words x'
+  line: 21
+  form: give
+  move: words
+  calls:
+  - words
+  uses:
+  - x
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L21
+    confidence: 1
+- id: P:step/contract-holds.1
+  type: step
+  name: give counted t
+  summary: give counted t
+  of: P:program/contract-holds
+  n: 1
+  text: '  give counted t'
+  line: 24
+  form: give
+  move: counted
+  calls:
+  - counted
+  - words
+  uses:
+  - t
+  asks: false
+  contracts:
+  - P:contract/contract-holds.1
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L24
+    confidence: 1
+- id: P:contract/contract-holds.1
+  type: contract
+  name: counted
+  summary: What counted must leave true of what it gives.
+  of: P:step/contract-holds.1
+  move: counted
+  checks:
+  - counted-some
+  provenance:
+    mode: derived
+    sources:
+    - contract-holds.thym#L24
+    confidence: 1

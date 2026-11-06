@@ -1,0 +1,13 @@
+-- refused: compile version line 9
+thym 0
+
+program collect-in-zero
+  why: a loop that collects, under a thym 0 line.
+  takes h: volume
+  gives n: number
+
+  let offers = for each o in h where kind is service
+    keep o
+  end
+  give count offers
+end

@@ -1,0 +1,13 @@
+-- refused: compile type line 10
+thym 1
+
+program keep-outside
+  why: a keep in a plain for each, which binds nothing.
+  takes h: volume
+  gives n: number
+
+  for each o in h where kind is service
+    keep o
+  end
+  give count h
+end
