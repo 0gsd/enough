@@ -180,17 +180,18 @@ def test_sniff_declaration_reads_only_the_head():
 # ---------------------------------------------------------------------------
 
 def test_registry_loads_the_shipped_manifests_in_order():
-    """The five of 0.0.1 in registry order, then any other by name (spec 13.6): ascribe and thym joined in 0.5.0."""
+    """The five of 0.0.1 in registry order, then any other by name (spec 13.6): ascribe and thym joined in 0.5.0;
+    emf became fabula in 0.6, in the same place."""
     reg = M.default_registry()
-    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc", "ascribe", "thym"]
+    assert list(reg.manifests) == ["comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym"]
     assert reg.problems == []
     assert [(m.name, m.version) for m in reg.manifests.values()] == [("comprise", 1), ("cosm", 0), ("canon", 1),
-                                                                      ("emf", 1), ("doc", 1), ("ascribe", 1),
+                                                                      ("fabula", 1), ("doc", 1), ("ascribe", 1),
                                                                       ("thym", 1)]
     assert M.default_registry() is reg
 
 
-@pytest.mark.parametrize("name", ["cosm", "canon", "emf", "doc"])
+@pytest.mark.parametrize("name", ["cosm", "canon", "fabula", "doc", "thym"])
 def test_our_manifests_carry_the_header_and_the_notice(name):
     text = (MANIFESTS / f"{name}.manifest.cosm").read_text(encoding="utf-8")
     head = text.split("\nmanifest:", 1)[0]
@@ -207,8 +208,8 @@ def test_the_comprise_manifest_is_the_synced_copy():
 
 def test_manifest_helpers():
     reg = M.default_registry()
-    comprise, emf, canon = reg.get("comprise"), reg.get("emf"), reg.get("canon")
-    assert comprise.modules() == list("COMPRISE")
+    comprise, emf, canon = reg.get("comprise"), reg.get("fabula"), reg.get("canon")
+    assert comprise.modules() == list("COMPRISE") + ["D"]           # the core's D, inherited (spec 13.4)
     assert "bond" in comprise.kinds("C") and comprise.refs("C", "bond")[:6] == ["owner", "at", "attributed-to",
                                                                                 "counterparty", "shared-with", "links"]
     assert comprise.refs("I", "mapping")[-1] == "exclusions.sku"
@@ -232,7 +233,7 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     bad = _write(tmp_path, "y.manifest.cosm", "manifest: minicosm/0\nname: Y Z\nversion: 1\n")
     assert isinstance(M.load_manifest(bad), M.Refusal)
     reg = M.Registry([tmp_path, MANIFESTS])
-    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc", "ascribe",
+    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "fabula", "doc", "ascribe",
                                                               "thym"]
 
 
@@ -251,7 +252,8 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     ({"opi": 0.1}, None, ("cosm", 0, "legacy")),
     ({"oes": "cosm/0", "cosm": 0.3}, None, ("cosm", 0, "oes")),
     ({"oes": "canon/1"}, "canon.cosm", ("canon", 1, "oes")),
-    ({"oes": "emf/1"}, "notes.md.cosm", ("emf", 1, "oes")),
+    ({"oes": "emf/1"}, "notes.md.cosm", ("fabula", 1, "old")),          # an old spelling (spec 5.2)
+    ({"oes": "fabula/1"}, "notes.md.fabulan.cosm", ("fabula", 1, "oes")),
 ])
 def test_declarations_that_read(catalog, filename, expect):
     d = M.default_registry().identify(catalog, filename=filename)
@@ -410,7 +412,7 @@ def test_qualified_forms(vols):
     assert isinstance(M.parse_path(moz, "oes:comprise/meadow/meadow/P"), M.Refusal)      # another database
     assert isinstance(M.parse_path(moz, "oes:canon/mozilla/x"), M.Refusal)               # another MiniCOSM
     assert M.qualified_uri(vols["canon:project"]) == "oes:canon/~field-notes"
-    assert M.qualified_uri(vols["emf:notes"]).startswith("oes:emf/notes-md")
+    assert M.qualified_uri(vols["emf:notes"]) == "oes:fabula/notes-md"   # written with the format's own name
 
 
 def test_vendor_paths_parse_as_a_whole(vols):
@@ -525,7 +527,7 @@ BAD = {
     "identity-min": "identity-min.cosm", "provenance": "provenance.cosm", "status": "status.cosm",
     "visibility": "visibility.cosm", "ref-grammar": "ref-grammar.cosm", "ref-unresolved": "ref-unresolved.cosm",
     "closed-list": "closed-list.cosm", "pending-shape": "pending-shape.cosm", "module-none": "module-none",
-    "catalog-key": "catalog-key.cosm",
+    "catalog-key": "catalog-key.cosm", "flavour": "flavour.cosm", "flavour-kind": "flavour-kind.cosm",
 }
 
 
@@ -624,13 +626,14 @@ def test_soft_references_are_ids_or_text(tmp_path):
 def test_unknown_check_ids_are_not_run(tmp_path):
     d = tmp_path / "m"
     d.mkdir()
-    text = (MANIFESTS / "emf.manifest.cosm").read_text(encoding="utf-8")
-    (d / "emf.manifest.cosm").write_text(text.replace("closed-list, pending-shape, catalog-key]",
-                                                      "closed-list, pending-shape, catalog-key, emf-pronouns]"),
-                                         encoding="utf-8")
-    v = M.load_volume(FIX / "emf" / "notes.md.cosm", M.Registry([d]))
+    text = (MANIFESTS / "canon.manifest.cosm").read_text(encoding="utf-8")
+    assert "closed-list, pending-shape, catalog-key]" in text
+    (d / "canon.manifest.cosm").write_text(text.replace("closed-list, pending-shape, catalog-key]",
+                                                        "closed-list, pending-shape, catalog-key, canon-pronouns]"),
+                                           encoding="utf-8")
+    v = M.load_volume(FIX / "canon" / "rust-book" / "canon.cosm", M.Registry([d]))
     rep = M.lint(v)
-    assert rep.ok and rep.not_run == ["emf-pronouns"] and "emf-pronouns" not in rep.checks
+    assert rep.ok and rep.not_run == ["canon-pronouns"] and "canon-pronouns" not in rep.checks
 
 
 # ---------------------------------------------------------------------------
@@ -639,14 +642,23 @@ def test_unknown_check_ids_are_not_run(tmp_path):
 
 @pytest.mark.parametrize("key, oes, n", [
     ("cosm02:meadow", "cosm/0", 17), ("canon:rust-book", "canon/1", 9), ("canon:project", "canon/1", 8),
-    ("emf:notes", "emf/1", 21), ("emf:standalone", "emf/1", 3),
+    ("emf:notes", "fabula/1", 21), ("emf:standalone", "fabula/1", 3),
 ])
 def test_our_examples_lint_clean(vols, key, oes, n):
+    """Ours load and lint clean. The two `oes: emf/1` files are fabulas read by their old spelling (spec 5.2); the
+    reader lists the fabula's own checks as not run, and enough/fabula.py runs them clean."""
+    from enough import fabula
     v = vols[key]
     assert v.oes == oes and len(v.items) == n and v.problems == []
     rep = M.lint(v)
     assert rep.problems() == [], [str(p) for p in rep.problems()]
-    assert rep.not_run == []
+    if oes == "fabula/1":
+        assert v.declaration.how == "old" and v.declaration.said == "emf/1" and v.catalog["oes"] == "emf/1"
+        assert rep.not_run == list(fabula.OWN_CHECKS)
+        full = fabula.lint(v)
+        assert full.ok and full.problems() == [] and full.not_run == []
+    else:
+        assert rep.not_run == []
 
 
 def test_cosm02_reads_the_legacy_tree(vols):
@@ -818,7 +830,7 @@ def test_cli_lint():
     assert r.returncode == 1 and "ref-unresolved K:concept/x" in r.stdout
     r = _cli("lint", FIX / "emf" / "notes.md.cosm", "--json")
     body = json.loads(r.stdout)
-    assert r.returncode == 0 and body["ok"] and body["minicosm"] == "emf/1" and body["pending"]
+    assert r.returncode == 0 and body["ok"] and body["minicosm"] == "fabula/1" and body["pending"]
 
 
 def test_cli_paths_tree_mermaid_identify():
@@ -861,7 +873,7 @@ def test_the_grammar_version_set():
     reg = M.default_registry()
     assert reg.notes == [] and reg.problems == []
     carried = {m.name: str(m.data.get("macrocosm")) for m in reg.manifests.values() if "macrocosm" in m.data}
-    assert carried == {n: "0.5.4" for n in ("cosm", "canon", "emf", "doc", "ascribe", "thym")}   # Comprise's has none
+    assert carried == {n: "0.5.4" for n in ("cosm", "canon", "fabula", "doc", "ascribe", "thym")}  # Comprise's has none
 
 
 @pytest.mark.parametrize("said", ["0.0.1", "0.0.2", "0.5.4"])

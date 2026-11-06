@@ -3090,18 +3090,18 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
             fails.append(f"§18.4.5's card lists examples {ex}, expected S:example/4 and /5")
     # An atem row of the reference opens its card.
     _docs_open(d, "macrocosm-oes", "atem")
-    d.js("document.querySelector('#docs-body .docs-rmini a[data-go=\"R:kind/emf.P.claim\"]').click()")
+    d.js("document.querySelector('#docs-body .docs-rmini a[data-go=\"R:kind/fabula.P.claim\"]').click()")
     if not _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
-                       " && document.activeElement.dataset.key === 'R:kind/emf.P.claim'"):
-        fails.append(f"the atem row of R:kind/emf.P.claim did not open its card (focus on {_active(d)})")
+                       " && document.activeElement.dataset.key === 'R:kind/fabula.P.claim'"):
+        fails.append(f"the atem row of R:kind/fabula.P.claim did not open its card (focus on {_active(d)})")
     else:
         r = d.js("(() => { const c = document.activeElement; return {crumb: Array.from(c.querySelectorAll("
                  "'.docs-crumb a[data-short]')).map((a) => a.dataset.short),"
                  " src: c.querySelector('dd[data-facet=\"identity\"] .docs-src')?.textContent || '',"
                  " schema: Array.from(c.querySelectorAll('dd[data-facet=\"schema\"] dt')).map((x) => x.textContent)}; })()")
         if not r["crumb"] or r["crumb"][-1] != "S:section/18.4":
-            fails.append(f"a kind of EMF's breadcrumb does not lead to §18.4: {r['crumb']}")
-        if "emf.manifest.cosm" not in r["src"]:
+            fails.append(f"a kind of the fabula's breadcrumb does not lead to §18.4: {r['crumb']}")
+        if "fabula.manifest.cosm" not in r["src"]:
             fails.append(f"a generated item does not say which manifest declared it: {r['src']!r}")
         if not {"fields", "required", "lists"} <= set(r["schema"]):
             fails.append(f"a kind's schema facet lacks fields/required/lists: {r['schema']}")

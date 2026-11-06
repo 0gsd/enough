@@ -321,7 +321,7 @@ def test_count_words_digest_lint_and_trace(tmp_path, engines):
     assert edit.words(ctx, Value("atem", {"line": "four words are here"})).payload == 4
     assert edit.digest(ctx, story).payload == hashlib.sha256(NOTES.read_bytes()).hexdigest()
     rep = edit.lint(ctx, twin).payload
-    assert rep["ok"] is True and rep["minicosm"] == "emf/1" and rep["errors"] == []
+    assert rep["ok"] is True and rep["minicosm"] == "fabula/1" and rep["errors"] == []
     bad = edit.lint(ctx, Value("volume", {"oes": "emf/1", "id": "emf/x", "name": "x",
                                           "nodes": [{"id": "P:claim/x", "type": "claim"}]})).payload
     assert bad["ok"] is False and bad["errors"]

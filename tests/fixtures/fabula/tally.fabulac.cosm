@@ -1,0 +1,912 @@
+oes: fabula/1
+macrocosm: 0.5.4
+flavour: fabulac
+id: fabula/tally
+name: tally
+source: {path: tally/, kind: folder, language: python, files: 9, bytes: 11325, skipped: 0, tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea, licence: MIT}
+derived: {at: 2026-11-05T14:02:40Z, by: person, model: anthropic/claude-opus-5.5, route: cloud, provider: openrouter, program: build-fabulac.thym, run: 2026-11-05-1351-e4f2, mode: model, completeness: full, chunks: 9, stages: [survey, history, read, fold, question]}
+atem:
+  line: tally counts named things from the command line in an append-only ledger, so concurrent adds are never lost and any add can be undone.
+  focus: A three-command tool, add, show and undo, over a ledger file that is only ever appended to.
+  push: Count small things without a spreadsheet, and trust the counts, because nothing is ever overwritten.
+  pull: The safety of concurrent adds rests on the operating system appending one short line at a time, which the code assumes and does not check.
+shorts:
+  - {path: tally.cshort-2026-11-05-1412/, at: 2026-11-05T14:12:09Z, by: anthropic/claude-opus-5.5, mode: model, order: code, route: cloud, language: python, files: 6}
+catems:
+  - {path: tally.catem-2026-11-05-1415.md, at: 2026-11-05T14:15:30Z, by: anthropic/claude-opus-5.5, mode: model, route: cloud, depth: overview}
+nodes:
+  # === I: Inspiration =============================================================================================
+  - id: I:occasion/lost-counts
+    type: occasion
+    name: Counts lost by 0.1
+    summary: The change to a log was prompted by 0.1 losing a count when two adds rewrote its totals file at once.
+    stance: observed
+    roles: {event: R:change/append-only-log}
+    when: 2026-10
+    span: {file: CHANGES.md, lines: "5-6"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L5-L6'], confidence: 0.8, state: known}
+  - id: I:occasion/first-need
+    type: occasion
+    name: What set tally going
+    summary: Nothing in the repository says what need first set tally going.
+    stance: assumed
+    roles: {event: {pending: "what problem or moment set tally going?"}}
+    provenance: {mode: derived, sources: ['README.md#L1-L3'], confidence: 0.2, state: pending}
+  # === L E K ======================================================================================================
+  - id: L:term/tally
+    type: term
+    name: tally
+    summary: The program's name and its verb, to keep a running count.
+    feed: {word: tally, pos: verb, origin: feed}
+    sense: To keep a running count of something.
+    span: {file: README.md, lines: "1-3"}
+    provenance: {mode: derived, sources: ['README.md#L1-L3'], confidence: 0.9, state: known}
+  - id: L:term/ledger
+    type: term
+    name: ledger
+    summary: The code's word for the file that holds every count ever added.
+    feed: {word: ledger, pos: noun, origin: feed}
+    sense: The append-only file of entries from which every total is folded.
+    span: {file: tally/ledger.py, lines: "1-5"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L1-L5'], confidence: 0.9, state: known}
+  - id: L:term/total
+    type: term
+    name: total
+    summary: The sum of every entry for one name.
+    feed: {word: total, pos: noun, origin: feed}
+    sense: The sum of the deltas of every entry with that name, undo entries included.
+    span: {file: tally/ledger.py, lines: "87-92"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L87-L92'], confidence: 0.9, state: known}
+  - id: E:org/meadow
+    type: org
+    name: Meadow Software
+    summary: Meadow Software, the holder of tally's copyright.
+    span: {file: LICENSE, lines: "3"}
+    provenance: {mode: derived, sources: ['LICENSE#L3'], confidence: 0.9, state: known}
+  - id: K:concept/append-only-log
+    type: concept
+    name: append-only log
+    summary: A file that is only ever added to at its end, so that every earlier state can be read back from it.
+    defined-by: N:decision/append-only-log
+    span: {file: tally/ledger.py, lines: "1-5"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L1-L5'], confidence: 0.9, state: known}
+  # === N: Intent ==================================================================================================
+  - id: N:aim/count-without-loss
+    type: aim
+    name: Count from a shell, and lose nothing
+    summary: tally sets out to let a person count named things from a shell, with counts that are never lost and adds that can be undone.
+    stance: observed
+    measure: Every add made is reflected in show, two shells adding at once lose nothing, and undo walks back as far as asked.
+    roles: {for: N:audience/shell-users}
+    span: {file: README.md, lines: "1-11"}
+    provenance: {mode: derived, sources: ['README.md#L1-L11'], confidence: 0.9, state: known}
+  - id: N:audience/shell-users
+    type: audience
+    name: People who live in a terminal
+    summary: People who keep a terminal open and want to count small things, cups of tea, walks, pages, without a spreadsheet.
+    stance: deduced
+    who: a person at a terminal, who can type a command and set an environment variable
+    needs: A count that is quick to bump and quick to read, and that survives two shells at once.
+    span: {file: README.md, lines: "3"}
+    provenance: {mode: derived, sources: ['README.md#L3'], confidence: 0.7, state: known}
+  - id: N:use/count-something
+    type: use
+    name: Count something
+    summary: A person adds to a named count and sees its new total at once.
+    stance: observed
+    for: N:audience/shell-users
+    via: [C:interface/command.add]
+    steps: ['tally add tea', 'tally add pages 12', 'tally add pages -2']
+    gets: 'One line, NAME: TOTAL, after each add.'
+    span: {file: README.md, lines: "5-7"}
+    provenance: {mode: derived, sources: ['README.md#L5-L7'], confidence: 0.9, state: known}
+  - id: N:use/see-the-totals
+    type: use
+    name: See every total
+    summary: A person lists every name with its total and a bar, or as JSON for another program.
+    stance: observed
+    for: N:audience/shell-users
+    via: [C:interface/command.show]
+    steps: ['tally show', 'tally show --all', 'tally show --json']
+    gets: One row per name with a bar scaled to the largest total, or one JSON object.
+    span: {file: README.md, lines: "8"}
+    provenance: {mode: derived, sources: ['README.md#L8'], confidence: 0.9, state: known}
+  - id: N:use/take-it-back
+    type: use
+    name: Take an add back
+    summary: A person cancels the latest add, and undoing again walks further back.
+    stance: observed
+    for: N:audience/shell-users
+    via: [C:interface/command.undo]
+    steps: ['tally undo', 'tally undo']
+    gets: 'One line saying what was undone and the new total, or "nothing to undo".'
+    span: {file: README.md, lines: "9"}
+    provenance: {mode: derived, sources: ['README.md#L9'], confidence: 0.9, state: known}
+  - id: N:requirement/never-rewrite
+    type: requirement
+    name: The ledger is never rewritten
+    summary: Every change to the ledger appends a line; no line already written is ever changed or removed.
+    stance: observed
+    force: must
+    met-by: [C:behaviour/add, C:behaviour/undo]
+    checked-by: [P:case/undo-walks-back]
+    span: {file: tally/ledger.py, lines: "1-5"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L1-L5', 'README.md#L11-L12'], confidence: 0.9, state: known}
+  - id: N:requirement/no-lost-counts
+    type: requirement
+    name: Two shells never lose a count
+    summary: Two shells adding at the same moment must both be counted.
+    stance: hearsay
+    force: must
+    met-by: [C:behaviour/add]
+    links: [{rel: depends-on, to: P:claim/one-line-appends-are-whole}]
+    span: {file: README.md, lines: "11-12"}
+    provenance: {mode: derived, sources: ['README.md#L11-L12'], confidence: 0.7, state: known}
+  - id: N:requirement/standard-library
+    type: requirement
+    name: Standard library only
+    summary: tally runs on Python 3.10 or later with the standard library alone.
+    stance: observed
+    force: must
+    met-by: [C:dependency/python-standard-library]
+    span: {file: README.md, lines: "14"}
+    provenance: {mode: derived, sources: ['README.md#L14'], confidence: 0.9, state: known}
+  - id: N:decision/append-only-log
+    type: decision
+    name: An append-only log, not a totals file
+    summary: In 0.2 the ledger became an append-only log of entries instead of one JSON file of totals rewritten on every add.
+    stance: observed
+    chose: one JSON object per line, appended, with totals folded from the whole log when needed
+    over:
+      - {option: 'one JSON file of totals, rewritten on every add (0.1)', because: 'two adds at once could lose one, and nothing could be undone'}
+    because: Appending never loses an earlier count and keeps every step, so undo can walk back.
+    by: R:maker/meadow
+    changed-in: [R:change/append-only-log]
+    span: {file: CHANGES.md, lines: "5-6"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L5-L6'], confidence: 0.9, state: known}
+  - id: N:decision/undo-by-opposite
+    type: decision
+    name: Undo appends the opposite
+    summary: An undo appends the opposite of the entry it cancels and names that entry's line, instead of removing anything.
+    stance: deduced
+    chose: append an entry with the opposite delta and undoes set to the cancelled line's number
+    over:
+      - {option: remove the last line, because: 'it would rewrite the ledger, which the log forbids'}
+    because: It keeps the ledger append-only, and naming the cancelled line lets a second undo skip it and walk further back.
+    changed-in: [R:change/undo-added]
+    span: {file: tally/ledger.py, lines: "73-84"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L73-L84'], confidence: 0.8, state: known}
+  - id: N:exclusion/old-ledger
+    type: exclusion
+    name: 0.1's ledger is not read
+    summary: tally 0.2 does not read 0.1's ~/.tally.json; its totals are carried over by hand, one add each.
+    stance: observed
+    horizon: {pending: "will 0.1's ledger ever be read again, or never?"}
+    because: The two files hold different things, totals and entries.
+    span: {file: CHANGES.md, lines: "9"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L9'], confidence: 0.9, state: known}
+  # === C: Construction ============================================================================================
+  - id: C:file/readme-md
+    type: file
+    name: README.md
+    summary: What tally is for, its three commands with examples, where the ledger lives, and the Python it needs.
+    stance: observed
+    path: README.md
+    language: markdown
+    holds: the user's introduction
+    length: {lines: 14, bytes: 601}
+    sha256: f6f730f06998523a698600e2043427dbcf00179d5d7addb575d5d1a3915bedbf
+    span: {file: README.md, lines: "1-14"}
+    provenance: {mode: derived, sources: ['README.md'], confidence: 1, state: known}
+  - id: C:file/changes-md
+    type: file
+    name: CHANGES.md
+    summary: The changes of 0.1.0 and 0.2.0, newest first.
+    stance: observed
+    path: CHANGES.md
+    language: markdown
+    holds: the change log
+    length: {lines: 13, bytes: 616}
+    sha256: 9e53f22c4627e118bae819dc26614541ea1f375255128de8ed5e41a4eac45aee
+    span: {file: CHANGES.md, lines: "1-13"}
+    provenance: {mode: derived, sources: ['CHANGES.md'], confidence: 1, state: known}
+  - id: C:file/license
+    type: file
+    name: LICENSE
+    summary: The MIT licence, copyright 2026 Meadow Software.
+    stance: observed
+    path: LICENSE
+    language: text
+    holds: the licence
+    length: {lines: 16, bytes: 1072}
+    sha256: 7a4a44c3502c5f7b39d1ef207e36d4096160690e16886d672d5cd16ca6032f41
+    span: {file: LICENSE, lines: "1-16"}
+    provenance: {mode: derived, sources: ['LICENSE'], confidence: 1, state: known}
+  - id: C:file/tally--init-py
+    type: file
+    name: tally/__init__.py
+    summary: The package's docstring and its version string, 0.2.0.
+    stance: observed
+    path: tally/__init__.py
+    language: python
+    holds: '__version__ = "0.2.0"'
+    component: C:component/tally
+    length: {lines: 2, bytes: 97}
+    sha256: 1eb152f3dd16bbc000db3de9f7f127551551242f3e833e17c301217c3b897caf
+    span: {file: tally/__init__.py, lines: "1-2"}
+    provenance: {mode: derived, sources: ['tally/__init__.py'], confidence: 1, state: known}
+  - id: C:file/tally--main-py
+    type: file
+    name: tally/__main__.py
+    summary: Runs the command line when the package is run with python -m tally, exiting with main's return value.
+    stance: observed
+    path: tally/__main__.py
+    language: python
+    holds: sys.exit(main())
+    component: C:component/tally
+    entry: true
+    length: {lines: 5, bytes: 52}
+    sha256: 13a1a5b340cdcfc1902b62be90e508c7c71886000d5bf087e7854aadf09fb35e
+    span: {file: tally/__main__.py, lines: "1-5"}
+    provenance: {mode: derived, sources: ['tally/__main__.py'], confidence: 1, state: known}
+  - id: C:file/tally--cli-py
+    type: file
+    name: tally/cli.py
+    summary: The argument parser and main, which runs one command, prints its result and returns the exit status.
+    stance: observed
+    path: tally/cli.py
+    language: python
+    holds: build_parser, main
+    component: C:component/cli
+    length: {lines: 62, bytes: 2318}
+    sha256: 44d9b21ef02de75f408bbf1720f7bd5e9e53be5fadf788e3462aa8cd5eebf945
+    span: {file: tally/cli.py, lines: "1-62"}
+    provenance: {mode: derived, sources: ['tally/cli.py'], confidence: 1, state: known}
+  - id: C:file/tally--ledger-py
+    type: file
+    name: tally/ledger.py
+    summary: The ledger, its entries and its error, and the functions that read it, append to it and fold its totals.
+    stance: observed
+    path: tally/ledger.py
+    language: python
+    holds: DEFAULT_NAME, LedgerError, Entry, ledger_path, read, add, undo, totals
+    component: C:component/ledger
+    length: {lines: 92, bytes: 3388}
+    sha256: de9dfa75c4de4cbe80dd36e77be0f4efbbd442c5d42e3c528b5f5a60c5a85e7c
+    span: {file: tally/ledger.py, lines: "1-92"}
+    provenance: {mode: derived, sources: ['tally/ledger.py'], confidence: 1, state: known}
+  - id: C:file/tally--render-py
+    type: file
+    name: tally/render.py
+    summary: Draws totals as rows for a terminal, with bars, and gives the message for an empty table.
+    stance: observed
+    path: tally/render.py
+    language: python
+    holds: BAR_WIDTH, BAR, rows, empty_message
+    component: C:component/render
+    length: {lines: 29, bytes: 1208}
+    sha256: 4c8b0e2f9b15fbf0d3f0f95cc4197d60df873028800136cce8a7476bdaba4fc7
+    span: {file: tally/render.py, lines: "1-29"}
+    provenance: {mode: derived, sources: ['tally/render.py'], confidence: 1, state: known}
+  - id: C:file/tests--test-tally-py
+    type: file
+    name: tests/test_tally.py
+    summary: Six pytest tests of the ledger, the rows and the command line.
+    stance: observed
+    path: tests/test_tally.py
+    language: python
+    holds: the tests
+    length: {lines: 55, bytes: 1973}
+    sha256: 58db849a8bb015ed04a8e8bfd3c6849467f553b5a4f77e9c6d2f3b06a68dc836
+    span: {file: tests/test_tally.py, lines: "1-55"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py'], confidence: 1, state: known}
+  - id: C:component/tally
+    type: component
+    name: the tally package
+    summary: The package, run as python -m tally; it holds the version and the three modules.
+    stance: observed
+    files: [C:file/tally--init-py, C:file/tally--main-py]
+    does: Holds the version and starts the command line.
+    uses: [C:component/cli]
+    provenance: {mode: derived, sources: ['tally/__init__.py', 'tally/__main__.py'], confidence: 1, state: known}
+  - id: C:component/cli
+    type: component
+    name: tally.cli
+    summary: Parses the command line, runs one command against the ledger, prints, and turns a ledger error into exit status 1.
+    stance: observed
+    of: C:component/tally
+    files: [C:file/tally--cli-py]
+    does: The command line, and nothing else; it holds no counting logic.
+    exposes: [C:interface/command.tally, C:interface/command.add, C:interface/command.show, C:interface/command.undo, C:interface/tally.cli.main]
+    uses: [C:component/ledger, C:component/render, C:dependency/python-standard-library]
+    provenance: {mode: derived, sources: ['tally/cli.py'], confidence: 1, state: known}
+  - id: C:component/ledger
+    type: component
+    name: tally.ledger
+    summary: Everything about the ledger file, where it is, its entries, reading, appending, undoing and folding totals.
+    stance: observed
+    of: C:component/tally
+    files: [C:file/tally--ledger-py]
+    does: Owns the ledger; the only code that reads or writes it.
+    exposes: [C:interface/tally.ledger.ledger_path, C:interface/tally.ledger.read, C:interface/tally.ledger.add, C:interface/tally.ledger.undo, C:interface/tally.ledger.totals, C:interface/tally.ledger.LedgerError, C:interface/format.ledger-line]
+    uses: [C:dependency/python-standard-library]
+    provenance: {mode: derived, sources: ['tally/ledger.py'], confidence: 1, state: known}
+  - id: C:component/render
+    type: component
+    name: tally.render
+    summary: Turns totals into text rows for a terminal; it never touches the ledger.
+    stance: observed
+    of: C:component/tally
+    files: [C:file/tally--render-py]
+    does: Drawing only.
+    exposes: [C:interface/tally.render.rows, C:interface/tally.render.empty_message]
+    provenance: {mode: derived, sources: ['tally/render.py'], confidence: 1, state: known}
+  # --- the command line ----------------------------------------------------------------------------------------------
+  - id: C:interface/command.tally
+    type: interface
+    name: tally
+    summary: The program, with three subcommands and --version; a subcommand is required.
+    stance: observed
+    surface: command
+    signature: 'tally [-h] [--version] {add,show,undo} ...'
+    defined-in: C:file/tally--cli-py
+    takes:
+      - {name: --version, means: 'print "tally 0.2.0" and exit 0'}
+      - {name: command, required: true, means: 'add, show or undo'}
+    gives: {exit: '0 done; 1 a ledger error (message on standard error); 2 a usage error (argparse''s message)'}
+    exported: true
+    span: {file: tally/cli.py, lines: "18-29"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L18-L29'], confidence: 1, state: known}
+  - id: C:interface/command.add
+    type: interface
+    name: tally add
+    summary: Adds N to the count called NAME and prints the new total.
+    stance: observed
+    surface: command
+    signature: 'tally add [-h] name [n]'
+    defined-in: C:file/tally--cli-py
+    takes:
+      - {name: name, type: str, required: true, means: 'one word, no spaces'}
+      - {name: n, type: int, default: 1, means: 'what to add; may be negative (tally add pages -2); never 0'}
+    gives: {output: 'NAME: TOTAL', exit: 0}
+    raises:
+      - {error: LedgerError, when: the name is empty or holds a space, message: 'tally: a name is one word, with no spaces'}
+      - {error: LedgerError, when: n is 0, message: 'tally: adding 0 changes nothing'}
+    exported: true
+    span: {file: tally/cli.py, lines: "22-24"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L22-L24', 'tally/cli.py#L36-L39'], confidence: 1, state: known}
+  - id: C:interface/command.show
+    type: interface
+    name: tally show
+    summary: Prints every total, as rows with bars or as one JSON object.
+    stance: observed
+    surface: command
+    signature: 'tally show [-h] [--all] [--json]'
+    defined-in: C:file/tally--cli-py
+    takes:
+      - {name: --all, type: flag, means: include totals of 0}
+      - {name: --json, type: flag, means: 'print one JSON object, keys sorted, instead of rows'}
+    gives: {output: 'the rows of tally.render.rows, or its empty message; with --json, one JSON object', exit: 0}
+    exported: true
+    span: {file: tally/cli.py, lines: "25-27"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L25-L27', 'tally/cli.py#L40-L47'], confidence: 1, state: known}
+  - id: C:interface/command.undo
+    type: interface
+    name: tally undo
+    summary: Cancels the latest add that has not been undone, and says what it did.
+    stance: observed
+    surface: command
+    signature: 'tally undo [-h]'
+    defined-in: C:file/tally--cli-py
+    gives: {output: 'undid <the cancelled delta, signed> on NAME; NAME: TOTAL, or nothing to undo', exit: 0}
+    exported: true
+    span: {file: tally/cli.py, lines: "28"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L28', 'tally/cli.py#L48-L54'], confidence: 1, state: known}
+  # --- the Python interfaces --------------------------------------------------------------------------------------------
+  - id: C:interface/tally.cli.main
+    type: interface
+    name: main
+    summary: Runs the command line on argv and returns the exit status; the ledger is the one ledger_path() names.
+    stance: observed
+    surface: function
+    signature: 'def main(argv: list[str] | None = None) -> int'
+    defined-in: C:file/tally--cli-py
+    takes: [{name: argv, type: 'list[str] | None', default: None, means: 'the arguments after the program name; None reads sys.argv'}]
+    gives: {type: int, means: '0, or 1 after a LedgerError; argparse exits with 2 itself on a usage error'}
+    exported: true
+    span: {file: tally/cli.py, lines: "32-58"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L32-L58'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.ledger_path
+    type: interface
+    name: ledger_path
+    summary: The ledger's path, from the environment or the default in the home folder.
+    stance: observed
+    surface: function
+    signature: 'def ledger_path(env: dict | None = None) -> Path'
+    defined-in: C:file/tally--ledger-py
+    takes: [{name: env, type: 'dict | None', default: None, means: 'the environment to read; None reads os.environ'}]
+    gives: {type: Path, means: 'TALLY_FILE stripped and with ~ expanded when it is set and not blank, else Path.home() / ".tally.jsonl"'}
+    exported: true
+    span: {file: tally/ledger.py, lines: "29-33"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L29-L33'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.read
+    type: interface
+    name: read
+    summary: Every entry of a ledger, in the order written.
+    stance: observed
+    surface: function
+    signature: 'def read(path: Path) -> list[Entry]'
+    defined-in: C:file/tally--ledger-py
+    takes: [{name: path, type: Path}]
+    gives: {type: 'list[Entry]', means: 'an empty list when the file does not exist'}
+    raises: [{error: LedgerError, when: 'a non-blank line is not a JSON object with at, name and delta', message: '<path>: line <n> is not a tally entry'}]
+    exported: true
+    span: {file: tally/ledger.py, lines: "36-49"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L36-L49'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.add
+    type: interface
+    name: add
+    summary: Appends one count to the ledger and returns the entry written.
+    stance: observed
+    surface: function
+    signature: 'def add(path: Path, name: str, delta: int = 1, now: float | None = None) -> Entry'
+    defined-in: C:file/tally--ledger-py
+    takes:
+      - {name: path, type: Path}
+      - {name: name, type: str, means: stripped of surrounding space before it is checked}
+      - {name: delta, type: int, default: 1}
+      - {name: now, type: 'float | None', default: None, means: 'the entry''s time; None is time.time()'}
+    gives: {type: Entry}
+    raises:
+      - {error: LedgerError, when: the stripped name is empty or holds any whitespace, message: 'a name is one word, with no spaces'}
+      - {error: LedgerError, when: delta is 0, message: adding 0 changes nothing}
+    exported: true
+    span: {file: tally/ledger.py, lines: "61-70"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L61-L70'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.undo
+    type: interface
+    name: undo
+    summary: Cancels the latest entry that can be cancelled, by appending its opposite; returns that new entry or None.
+    stance: observed
+    surface: function
+    signature: 'def undo(path: Path, now: float | None = None) -> Entry | None'
+    defined-in: C:file/tally--ledger-py
+    takes: [{name: path, type: Path}, {name: now, type: 'float | None', default: None}]
+    gives: {type: 'Entry | None', means: 'the entry appended, or None when nothing is left to undo'}
+    raises: [{error: LedgerError, when: read raises}]
+    exported: true
+    span: {file: tally/ledger.py, lines: "73-84"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L73-L84'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.totals
+    type: interface
+    name: totals
+    summary: Each name's total, names in alphabetical order.
+    stance: observed
+    surface: function
+    signature: 'def totals(entries: list[Entry]) -> dict[str, int]'
+    defined-in: C:file/tally--ledger-py
+    takes: [{name: entries, type: 'list[Entry]'}]
+    gives: {type: 'dict[str, int]', means: 'every name that appears, totals of 0 included, keys sorted'}
+    exported: true
+    span: {file: tally/ledger.py, lines: "87-92"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L87-L92'], confidence: 1, state: known}
+  - id: C:interface/tally.ledger.LedgerError
+    type: interface
+    name: LedgerError
+    summary: The one error tally raises on purpose; its message is shown to the user as it is.
+    stance: observed
+    surface: class
+    signature: 'class LedgerError(Exception)'
+    defined-in: C:file/tally--ledger-py
+    exported: true
+    span: {file: tally/ledger.py, lines: "17-18"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L17-L18'], confidence: 1, state: known}
+  - id: C:interface/tally.render.rows
+    type: interface
+    name: rows
+    summary: The lines that draw a set of totals, one per name.
+    stance: observed
+    surface: function
+    signature: 'def rows(totals: dict[str, int], show_all: bool = False) -> list[str]'
+    defined-in: C:file/tally--render-py
+    takes: [{name: totals, type: 'dict[str, int]', means: in the order to draw them}, {name: show_all, type: bool, default: false, means: include totals of 0}]
+    gives: {type: 'list[str]', means: 'one line per name shown; an empty list when none is shown'}
+    exported: true
+    span: {file: tally/render.py, lines: "8-25"}
+    provenance: {mode: derived, sources: ['tally/render.py#L8-L25'], confidence: 1, state: known}
+  - id: C:interface/tally.render.empty_message
+    type: interface
+    name: empty_message
+    summary: What show prints when it has no rows.
+    stance: observed
+    surface: function
+    signature: 'def empty_message(show_all: bool) -> str'
+    defined-in: C:file/tally--render-py
+    gives: {type: str, means: '"nothing tallied yet" with --all; without it, "nothing tallied yet (or every total is 0; try --all)"'}
+    exported: true
+    span: {file: tally/render.py, lines: "28-29"}
+    provenance: {mode: derived, sources: ['tally/render.py#L28-L29'], confidence: 1, state: known}
+  - id: C:interface/format.ledger-line
+    type: interface
+    name: a ledger line
+    summary: The ledger's format, one JSON object per line, which another program may read or append to.
+    stance: observed
+    surface: format
+    signature: '{"at": <float seconds>, "delta": <int>, "name": <str>, ["undoes": <int, a line number from 1>]} with keys sorted, one per line, UTF-8, LF'
+    defined-in: C:file/tally--ledger-py
+    exported: true
+    span: {file: tally/ledger.py, lines: "52-58"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L52-L58'], confidence: 1, state: known}
+  - id: C:structure/tally.ledger.Entry
+    type: structure
+    name: Entry
+    summary: One line of the ledger, as the code holds it.
+    stance: observed
+    defined-in: C:file/tally--ledger-py
+    shape: a frozen dataclass
+    fields:
+      - {name: at, type: float, means: seconds since the epoch}
+      - {name: name, type: str}
+      - {name: delta, type: int, means: 'what was added; never 0 for an add'}
+      - {name: undoes, type: 'int | None', default: None, means: 'on an undo, the line number (from 1, counting blank lines) of the entry it cancels'}
+    invariants:
+      - an undo entry's delta is the opposite of the delta of the entry it names
+      - no entry is named by two undo entries
+    span: {file: tally/ledger.py, lines: "21-26"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L21-L26'], confidence: 1, state: known}
+  # --- what happens -------------------------------------------------------------------------------------------------
+  - id: C:behaviour/add
+    type: behaviour
+    name: An add appends and reports
+    summary: tally add checks the name and the number, appends one line to the ledger, then reads the whole ledger back and prints the name's new total.
+    stance: observed
+    of: [C:interface/command.add, C:interface/tally.ledger.add]
+    when: tally add NAME [N]
+    does: 'Strips NAME; refuses an empty name, a name with whitespace, or N of 0; creates the ledger''s folder if needed; appends {"at", "delta", "name"}; prints NAME: TOTAL.'
+    edges:
+      - {given: 'tally add pages -2', then: 'a negative N is read as the number, not an option; pages goes down by 2'}
+      - {given: a ledger that does not exist yet, then: 'it is created, with its parent folders'}
+    errors:
+      - {when: 'tally add "two words"', message: 'tally: a name is one word, with no spaces', exit: 1}
+      - {when: tally add tea 0, message: 'tally: adding 0 changes nothing', exit: 1}
+      - {when: tally add with no name, message: argparse's usage and its 'the following arguments are required' line, exit: 2}
+    span: {file: tally/ledger.py, lines: "61-70"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L52-L70', 'tally/cli.py#L36-L39'], confidence: 0.9, state: known}
+  - id: C:behaviour/undo
+    type: behaviour
+    name: Undo walks back
+    summary: tally undo looks back from the newest line for an add that is neither an undo nor already undone, and appends its opposite naming its line.
+    stance: observed
+    of: [C:interface/command.undo, C:interface/tally.ledger.undo]
+    when: tally undo
+    does: 'Reads every entry; collects the line numbers that undo entries name; from the last entry to the first, takes the first that has no undoes and is not named; appends {name, delta: -delta, undoes: its line}; prints "undid D on NAME; NAME: TOTAL", D being the cancelled entry''s delta with its sign (undid +1, undid -2).'
+    edges:
+      - {given: undo after undo, then: the second cancels the add before the first's; an undo is never itself undone}
+      - {given: 'every add already undone, or an empty ledger', then: 'prints "nothing to undo", writes nothing, exit 0'}
+    span: {file: tally/ledger.py, lines: "73-84"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L73-L84', 'tally/cli.py#L48-L54'], confidence: 0.9, state: known}
+  - id: C:behaviour/read
+    type: behaviour
+    name: Reading the ledger
+    summary: A missing ledger is empty; blank lines are skipped; any other line that is not an entry stops the command with its line number.
+    stance: observed
+    of: [C:interface/tally.ledger.read]
+    when: any command
+    does: Reads the file as UTF-8, numbers its lines from 1 (blank lines counted), skips blank ones, and builds one Entry per line.
+    errors:
+      - {when: 'a line is not a JSON object with at, name and delta', message: 'tally: <path>: line <n> is not a tally entry', exit: 1}
+    span: {file: tally/ledger.py, lines: "36-49"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L36-L49'], confidence: 0.9, state: known}
+  - id: C:behaviour/show
+    type: behaviour
+    name: Show draws bars
+    summary: tally show prints one row per name, the name padded, the total right-aligned and a bar of '#' scaled so the largest positive total gets 30.
+    stance: observed
+    of: [C:interface/command.show, C:interface/tally.render.rows]
+    when: tally show [--all] [--json]
+    does: 'Names in alphabetical order; a total of 0 is left out unless --all; each row is NAME padded to the longest name, two spaces, TOTAL right-aligned to the widest total, two spaces, the bar, with trailing space removed; a bar is round(total * 30 / largest positive total) characters, at least one for any positive total; a negative total has no bar. --json prints the same totals (0 left out unless --all) as one JSON object with sorted keys.'
+    edges:
+      - {given: 'totals {a: 10, bb: 1, c: 0}', then: ['a   10  ##############################', 'bb   1  ###']}
+      - {given: 'totals {a: -2}', then: ['a  -2']}
+      - {given: no rows to show, then: 'prints empty_message: "nothing tallied yet (or every total is 0; try --all)", or "nothing tallied yet" with --all'}
+    intended: {pending: "is hiding totals of 0 by default intended, or a choice users would change?"}
+    span: {file: tally/render.py, lines: "8-25"}
+    provenance: {mode: derived, sources: ['tally/render.py#L8-L29', 'tally/cli.py#L40-L47'], confidence: 0.9, state: known}
+  - id: C:behaviour/errors
+    type: behaviour
+    name: Errors and exit status
+    summary: 'A LedgerError is printed as "tally: <message>" on standard error with exit status 1; a usage error is argparse''s, exit status 2.'
+    stance: observed
+    of: [C:interface/tally.cli.main]
+    when: any command
+    does: main catches LedgerError only; any other exception is not caught.
+    span: {file: tally/cli.py, lines: "55-58"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L55-L58'], confidence: 0.9, state: known}
+  - id: C:dependency/python-standard-library
+    type: dependency
+    name: Python 3.10 and its standard library
+    summary: tally needs Python 3.10 or later and uses only argparse, json, os, sys, time, dataclasses and pathlib from its standard library.
+    stance: observed
+    package: python
+    version: '>=3.10'
+    scope: standard
+    needed-for: everything
+    used-by: [C:component/cli, C:component/ledger]
+    span: {file: README.md, lines: "14"}
+    provenance: {mode: derived, sources: ['README.md#L14', 'tally/ledger.py#L7-L12', 'tally/cli.py#L11-L15'], confidence: 0.9, state: known}
+  - id: C:dependency/pytest
+    type: dependency
+    name: pytest
+    summary: The tests are written for pytest; nothing else needs it.
+    stance: deduced
+    package: pytest
+    version: {pending: "which pytest versions are the tests meant to run under?"}
+    scope: test
+    needed-for: running tests/test_tally.py
+    span: {file: tests/test_tally.py, lines: "3"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L3'], confidence: 0.9, state: known}
+  - id: C:setting/tally-file
+    type: setting
+    name: TALLY_FILE
+    summary: The environment variable that names another ledger.
+    stance: observed
+    key: TALLY_FILE
+    set-in: environment
+    default: ~/.tally.jsonl
+    means: The ledger's path; blank or unset means the default; ~ is expanded.
+    read-by: [C:interface/tally.ledger.ledger_path]
+    span: {file: tally/ledger.py, lines: "29-33"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L29-L33'], confidence: 1, state: known}
+  - id: C:setting/bar-width
+    type: setting
+    name: BAR_WIDTH and BAR
+    summary: 'The longest bar''s length, 30, and the character bars are drawn with, #.'
+    stance: observed
+    key: BAR_WIDTH, BAR
+    set-in: constant
+    default: '30 and "#"'
+    read-by: [C:interface/tally.render.rows]
+    span: {file: tally/render.py, lines: "4-5"}
+    provenance: {mode: derived, sources: ['tally/render.py#L4-L5'], confidence: 1, state: known}
+  # === R: Production ==============================================================================================
+  - id: R:maker/meadow
+    type: maker
+    name: Meadow Software
+    summary: Meadow Software holds the copyright and, the history suggests, wrote tally.
+    stance: deduced
+    who: E:org/meadow
+    capacity: author
+    span: {file: LICENSE, lines: "3"}
+    provenance: {mode: derived, sources: ['LICENSE#L3'], confidence: 0.7, state: known}
+  - id: R:change/first-release
+    type: change
+    name: add and show, totals in one file
+    summary: 0.1.0 shipped tally add and tally show, keeping totals in ~/.tally.json.
+    stance: observed
+    at: 2026-09-30
+    nature: feature
+    release: R:release/0-1-0
+    phase: R:phase/totals-to-log
+    span: {file: CHANGES.md, lines: "13"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L13'], confidence: 0.9, state: known}
+  - id: R:change/append-only-log
+    type: change
+    name: The ledger becomes a log
+    summary: 0.2.0 replaced the totals file with the append-only ledger ~/.tally.jsonl.
+    stance: observed
+    at: 2026-10-14
+    nature: refactor
+    because: 0.1 rewrote one totals file on every add, so two adds at the same moment could lose one, and nothing could be undone.
+    touches: [C:component/ledger, C:interface/format.ledger-line, C:structure/tally.ledger.Entry]
+    release: R:release/0-2-0
+    phase: R:phase/totals-to-log
+    span: {file: CHANGES.md, lines: "5-6"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L5-L6'], confidence: 0.9, state: known}
+  - id: R:change/undo-added
+    type: change
+    name: undo
+    summary: 0.2.0 added tally undo, which cancels the latest add by appending its opposite.
+    stance: observed
+    at: 2026-10-14
+    nature: feature
+    touches: [C:interface/command.undo, C:interface/tally.ledger.undo]
+    release: R:release/0-2-0
+    phase: R:phase/totals-to-log
+    span: {file: CHANGES.md, lines: "7"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L7'], confidence: 0.9, state: known}
+  - id: R:change/tally-file
+    type: change
+    name: TALLY_FILE
+    summary: 0.2.0 added the TALLY_FILE environment variable.
+    stance: observed
+    at: 2026-10-14
+    nature: feature
+    touches: [C:setting/tally-file]
+    release: R:release/0-2-0
+    span: {file: CHANGES.md, lines: "8"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L8'], confidence: 0.9, state: known}
+  - id: R:phase/totals-to-log
+    type: phase
+    name: From a totals file to a log
+    summary: In its first two weeks tally went from a file of totals to an append-only log with undo.
+    stance: deduced
+    began: 2026-09-30
+    ended: 2026-10-14
+    changes: [R:change/first-release, R:change/append-only-log, R:change/undo-added]
+    provenance: {mode: derived, sources: ['CHANGES.md#L1-L13'], confidence: 0.7, state: known}
+  - id: R:release/0-1-0
+    type: release
+    name: 0.1.0
+    summary: The first release, 30 September 2026.
+    stance: observed
+    version: 0.1.0
+    at: 2026-09-30
+    changes: [R:change/first-release]
+    span: {file: CHANGES.md, lines: "11"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L11'], confidence: 0.9, state: known}
+  - id: R:release/0-2-0
+    type: release
+    name: 0.2.0
+    summary: The release of 14 October 2026, the version in the tree.
+    stance: observed
+    version: 0.2.0
+    at: 2026-10-14
+    changes: [R:change/append-only-log, R:change/undo-added, R:change/tally-file]
+    span: {file: CHANGES.md, lines: "3"}
+    provenance: {mode: derived, sources: ['CHANGES.md#L3', 'tally/__init__.py#L2'], confidence: 0.9, state: known}
+  - id: R:means/pytest
+    type: means
+    name: Tested with pytest
+    summary: The behaviour is pinned by six pytest tests.
+    stance: observed
+    what: pytest
+    used-for: tests
+    provenance: {mode: derived, sources: ['tests/test_tally.py'], confidence: 0.9, state: known}
+  - id: R:licence/mit
+    type: licence
+    name: MIT
+    summary: tally is under the MIT licence, copyright 2026 Meadow Software.
+    stance: observed
+    identifier: MIT
+    file: LICENSE
+    holder: Meadow Software
+    year: '2026'
+    first-line: MIT License
+    span: {file: LICENSE, lines: "1-3"}
+    provenance: {mode: derived, sources: ['LICENSE#L1-L3'], confidence: 1, state: known}
+  # === P: claims and cases ========================================================================================
+  - id: P:claim/one-line-appends-are-whole
+    type: claim
+    name: A one-line append lands whole
+    summary: tally assumes that the operating system writes each appended ledger line whole, so two shells appending at once interleave whole lines.
+    stance: assumed
+    salience: high
+    roles: {holder: C:component/ledger, subject: C:interface/format.ledger-line}
+    span: {file: tally/ledger.py, lines: "52-58"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L52-L58', 'README.md#L11-L12'], confidence: 0.6, state: known}
+  - id: P:case/add-and-totals
+    type: case
+    name: Adds fold into totals
+    summary: Two adds to tea and one to walks give totals tea 3 and walks 1.
+    stance: observed
+    of: [C:interface/tally.ledger.add, C:interface/tally.ledger.totals]
+    given: {calls: ['add(p, "tea", now=1.0)', 'add(p, "tea", 2, now=2.0)', 'add(p, "walks", now=3.0)']}
+    expect: {value: 'totals(read(p)) == {"tea": 3, "walks": 1}'}
+    span: {file: tests/test_tally.py, lines: "8-13"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L8-L13'], confidence: 1, state: known}
+  - id: P:case/undo-walks-back
+    type: case
+    name: Undo walks back, never undoing an undo
+    summary: After two adds, the first undo names line 2, the second line 1, the third finds nothing, and every total is 0.
+    stance: observed
+    of: [C:behaviour/undo, N:requirement/never-rewrite]
+    given: {calls: ['add(p, "tea", now=1.0)', 'add(p, "walks", 2, now=2.0)', 'undo(p) three times']}
+    expect: {value: 'undoes 2, then 1, then None; totals {"tea": 0, "walks": 0}'}
+    span: {file: tests/test_tally.py, lines: "16-23"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L16-L23'], confidence: 1, state: known}
+  - id: P:case/bad-names-and-zero
+    type: case
+    name: Bad names and zero are refused
+    summary: A name with a space and a delta of 0 both raise LedgerError, and the ledger is not created.
+    stance: observed
+    of: [C:interface/tally.ledger.add]
+    given: {calls: ['add(p, "two words")', 'add(p, "tea", 0)']}
+    expect: {raises: [LedgerError matching "one word", LedgerError matching "changes nothing"], files: the ledger does not exist}
+    span: {file: tests/test_tally.py, lines: "26-32"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L26-L32'], confidence: 1, state: known}
+  - id: P:case/broken-line
+    type: case
+    name: A broken line names its number
+    summary: A ledger whose second line is not JSON makes read raise an error naming line 2.
+    stance: observed
+    of: [C:behaviour/read]
+    given: {file: '{"at": 1, "name": "tea", "delta": 1} then the line not json'}
+    expect: {raises: 'LedgerError matching "line 2 is not a tally entry"'}
+    span: {file: tests/test_tally.py, lines: "35-39"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L35-L39'], confidence: 1, state: known}
+  - id: P:case/rows
+    type: case
+    name: Rows scale bars and hide 0
+    summary: rows draws the largest total with 30 marks, scales the rest, hides 0 unless asked, and gives a negative total no bar.
+    stance: observed
+    of: [C:interface/tally.render.rows]
+    given: {calls: ['rows({"a": 10, "bb": 1, "c": 0})', 'rows({"a": -2})', 'rows({"c": 0})', 'rows({"c": 0}, show_all=True)']}
+    expect: {value: ['["a   10  " + 30 marks, "bb   1  ###"]', '["a  -2"]', '[]', '["c  0"]']}
+    span: {file: tests/test_tally.py, lines: "42-46"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L42-L46'], confidence: 1, state: known}
+  - id: P:case/cli-json-and-error
+    type: case
+    name: The command line's JSON and its error exit
+    summary: 'Through main, add tea 3 then show --json prints {"tea": 3}; adding "two words" exits 1 with the message on standard error.'
+    stance: observed
+    of: [C:interface/tally.cli.main, C:behaviour/errors]
+    given: {env: 'TALLY_FILE=<a fresh file>', arguments: ['add tea 3', 'show --json', 'add "two words"']}
+    expect: {exit: [0, 0, 1], output: '{"tea": 3}', error-output: "tally: a name is one word, with no spaces"}
+    span: {file: tests/test_tally.py, lines: "49-55"}
+    provenance: {mode: derived, sources: ['tests/test_tally.py#L49-L55'], confidence: 1, state: known}
+  # === T: what happens when tally add runs ========================================================================
+  - id: T:event/parse
+    type: event
+    name: The arguments are parsed
+    summary: tally.cli.main parses the command line; a usage error ends the run with exit status 2.
+    agent: C:component/cli
+    links: [{rel: part-of, to: N:use/count-something}]
+    span: {file: tally/cli.py, lines: "33"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L33'], confidence: 0.9, state: known}
+  - id: T:event/locate
+    type: event
+    name: The ledger is found
+    summary: tally.cli.main asks tally.ledger for the ledger's path.
+    agent: C:component/cli
+    after: T:event/parse
+    links: [{rel: part-of, to: N:use/count-something}]
+    span: {file: tally/cli.py, lines: "34"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L34'], confidence: 0.9, state: known}
+  - id: T:event/append
+    type: event
+    name: One line is appended
+    summary: tally.ledger checks the name and the number and appends one line to the ledger.
+    agent: C:component/ledger
+    patient: C:interface/format.ledger-line
+    after: T:event/locate
+    links: [{rel: part-of, to: N:use/count-something}]
+    span: {file: tally/ledger.py, lines: "61-70"}
+    provenance: {mode: derived, sources: ['tally/ledger.py#L61-L70'], confidence: 0.9, state: known}
+  - id: T:event/report
+    type: event
+    name: The new total is printed
+    summary: tally.cli reads the whole ledger back, folds the totals and prints the name's total.
+    agent: C:component/cli
+    after: T:event/append
+    links: [{rel: part-of, to: N:use/count-something}]
+    span: {file: tally/cli.py, lines: "37-39"}
+    provenance: {mode: derived, sources: ['tally/cli.py#L37-L39'], confidence: 0.9, state: known}
+  # === D: where the build was unsure ==============================================================================
+  - id: D:question/hide-zero
+    type: question
+    about: C:behaviour/show#intended
+    asks: Is hiding totals of 0 by default intended, or a choice users would change?
+    why: intent
+    kind: yes-no
+    to: maker
+    raised: {by: bank, from: fabulac/intended, at: 2026-11-05T14:02:40Z, run: 2026-11-05-1351-e4f2}
+    state: open
+  - id: D:question/old-ledger
+    type: question
+    about: N:exclusion/old-ledger#horizon
+    asks: Will 0.1's ledger ever be read again, or never?
+    why: missing
+    kind: choice
+    options: [never, later]
+    to: maker
+    raised: {by: move, from: question, at: 2026-11-05T14:02:40Z, run: 2026-11-05-1351-e4f2}
+    state: open
+  - id: D:question/shared-ledger
+    type: question
+    about: N:requirement/no-lost-counts
+    asks: Must two machines sharing one ledger over a network folder also never lose a count?
+    why: unsure
+    kind: yes-no
+    to: maker
+    raised: {by: model, from: fold, at: 2026-11-05T14:02:40Z, run: 2026-11-05-1351-e4f2}
+    state: open

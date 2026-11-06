@@ -1513,6 +1513,14 @@ def _manifest_rel(m: mc.Manifest, root: Path) -> str:
         return f"{MANIFESTS_DIR}/{m.path.name}" if m.path else f"{MANIFESTS_DIR}/{m.name}.manifest.cosm"
 
 
+def _core_modules_rel(path: Path, root: Path) -> str:
+    """The core's file of modules, relative to the install root, as a manifest's path is."""
+    try:
+        return path.resolve().relative_to(root.resolve()).as_posix()
+    except (ValueError, OSError):
+        return f"{MANIFESTS_DIR}/{path.name}"
+
+
 def _list_source(field_path: str) -> str:
     return {"status": "envelope.status", "visibility": "envelope.visibility",
             "provenance.mode": "envelope.provenance.modes", "provenance.state": "envelope.provenance.states",
@@ -1522,9 +1530,10 @@ def _list_source(field_path: str) -> str:
 @dataclass
 class SpecTables:
     """The hand-written lines the spec gives generated items, joined by id in a table's first cell: the checks
-    (§12.2, §18.5.4: Check | Default severity | Catches), the lenses (§14.5: MiniCOSM | Lens | Draws), the
-    MiniCOSMs (§18: MiniCOSM | … | Enumerates), the kinds (Kind | … | What it is, inside a MiniCOSM's section),
-    and closed lists' values (a table whose first column is the list's field)."""
+    (§12.2, §18.5.4: Check | Default severity | Catches), the lenses (§14.5: Format | Lens | Draws; before 0.6,
+    MiniCOSM | Lens | Draws), the formats (§18.1: Format | … | Enumerates, and §19: MiniCOSM | … | Enumerates), the
+    kinds (Kind | … | What it is, or What it holds, inside a format's section: `### 18.N <name>:` for a built-in,
+    `### 19.N <name>:` for a MiniCOSM), and closed lists' values (a table whose first column is the list's field)."""
     checks: dict = field(default_factory=dict)       # id -> (severity, catches)
     lenses: dict = field(default_factory=dict)       # (minicosm, lens) -> draws
     minicosms: dict = field(default_factory=dict)    # name -> enumerates
@@ -1536,12 +1545,12 @@ def spec_tables(text: str) -> SpecTables:
     """Read the overlay tables out of the spec's markdown."""
     lines, _ = _scan(text)
     out = SpecTables()
-    names_rx = re.compile(r"^#{3,4} (18\.\d+)(?:\.\d+)* ")
+    names_rx = re.compile(r"^#{3,4} (1[89]\.\d+)(?:\.\d+)* ")
     mini_at: dict[str, str] = {}
     blocks = _blocks(lines, 0, len(lines) - 1) if lines else []
     heads = [(i, ln.text) for i, ln in enumerate(lines) if not ln.code and _HEADING.match(ln.text)]
     for i, t in heads:
-        m = re.match(r"^### (18\.\d+) ([a-z][a-z0-9-]*):", t)
+        m = re.match(r"^### (1[89]\.\d+) ([a-z][a-z0-9-]*):", t)
         if m:
             mini_at[m.group(1)] = m.group(2)
 
@@ -1569,24 +1578,26 @@ def spec_tables(text: str) -> SpecTables:
             for r in body:
                 if len(r) >= 3:
                     out.checks[_plain(r[0])] = (_plain(r[1]), _plain(r[2]))
-        elif head[:3] == ["minicosm", "lens", "draws"]:
+        elif head[:3] in (["minicosm", "lens", "draws"], ["format", "lens", "draws"]):
             for r in body:
                 if len(r) >= 3:
                     lens = _plain(r[1]).split(" ")[0]
                     for mini in re.split(r"\s*,\s*", _plain(r[0])):
                         out.lenses.setdefault((mini, lens), _plain(r[2]))
-        elif head and head[0] == "minicosm" and "enumerates" in head:
+        elif head and head[0] in ("minicosm", "format") and "enumerates" in head:
             col = head.index("enumerates")
             for r in body:
                 if len(r) > col:
                     out.minicosms[_plain(r[0])] = _plain(r[col])
-        elif head and head[0] == "kind" and "what it is" in head:
-            col = head.index("what it is")
+        elif head and head[0] == "kind" and ("what it is" in head or "what it holds" in head):
+            col = head.index("what it is" if "what it is" in head else "what it holds")
             mini = mini_for(blk.first)
             if mini:
                 for r in body:
                     if len(r) > col:
-                        out.kinds[(mini, _plain(r[0]))] = _plain(r[col])
+                        # One kind, or several (`E:person` `E:org` …), each with or without its module letter.
+                        for k in re.findall(r"(?:[A-Z]:)?([a-z][a-z0-9-]*)", _plain(r[0])) or [_plain(r[0])]:
+                            out.kinds[(mini, k)] = _plain(r[col])
         elif len(head) >= 2:
             mini = mini_for(blk.first)
             if mini:
@@ -1613,8 +1624,11 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
     check_sel: dict[str, list[str]] = {}
 
     def prov(m: mc.Manifest, fpath: str, value: Any) -> dict:
-        return {"mode": "catalogue", "sources": [f"{_manifest_rel(m, root)}#{fpath}"], "confidence": 1,
-                "state": "known", "hash": _subtree_hash(value)}
+        src = f"{_manifest_rel(m, root)}#{fpath}"
+        letter = fpath.split(".")[1] if fpath.startswith("modules.") and fpath.count(".") >= 1 else None
+        if letter in m.inherited and m.inherited_from is not None:       # the core's module D: its own file
+            src = f"{_core_modules_rel(m.inherited_from, root)}#{fpath}"
+        return {"mode": "catalogue", "sources": [src], "confidence": 1, "state": "known", "hash": _subtree_hash(value)}
 
     for m in reg.manifests.values():
         name, title = m.name, m.title
@@ -1630,14 +1644,29 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
             generic.append("tree")
         lens_ids = list(declared) + generic
         summ = m.data.get("summary") if isinstance(m.data.get("summary"), str) else title
-        atem = tables.minicosms.get(name)
-        atem = _atem_cut(atem) if atem else (_atem_of(summ) or _atem_cut(f"the {title} MiniCOSM"))
-        head = {k: m.data.get(k) for k in ("name", "title", "version", "summary", "declaration", "volume")}
-        items.append({"id": f"R:minicosm/{name}", "type": "minicosm", "name": title, "summary": summ,
-                      "atem": atem, "declaration": mc._decl_value(m), "version": m.version,
-                      "modules": [f"R:module/{name}.{L}" for L in mods],
-                      "lenses": [f"R:lens/{name}.{x}" for x in lens_ids],
-                      "provenance": prov(m, "declaration", head)})
+        names = [name] + m.old_names              # a text written before 0.6 says emf where the reader says fabula
+
+        def overlay(table: dict, key: Any = None) -> Any:
+            for n in names:
+                hit = table.get(n if key is None else (n, key))
+                if hit:
+                    return hit
+            return None
+
+        atem = overlay(tables.minicosms)
+        what = "built-in" if m.core else "MiniCOSM"
+        atem = _atem_cut(atem) if atem else (_atem_of(summ) or _atem_cut(f"the {title} {what}"))
+        head = {k: m.data.get(k) for k in ("name", "title", "version", "summary", "declaration", "volume", "core")}
+        # The kind stays `minicosm` (R:minicosm/<name>), so links into volumes built before 0.6 keep resolving; `core`
+        # says which of the two a format is (a built-in of the core, or a MiniCOSM), and `old` its old spellings.
+        it = {"id": f"R:minicosm/{name}", "type": "minicosm", "name": title, "summary": summ,
+              "atem": atem, "declaration": mc._decl_value(m), "version": m.version, "core": m.core}
+        if m.old:
+            it["old"] = list(m.old)
+        it.update({"modules": [f"R:module/{name}.{L}" for L in mods],
+                   "lenses": [f"R:lens/{name}.{x}" for x in lens_ids],
+                   "provenance": prov(m, "declaration", head)})
+        items.append(it)
         lists = m.closed_lists()
         for L in mods:
             mod = m.module(L)
@@ -1656,7 +1685,7 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                 req = m.required_fields(L, k)
                 fields_seen = set(refs) | set(checked) | set(req) | set(mc._strs(m.envelope.get("fields")))
                 klists = [f"R:list/{name}.{f}" for f in lists if f in fields_seen or f.split(".")[0] in fields_seen]
-                what = tables.kinds.get((name, k))
+                what = overlay(tables.kinds, k)
                 katem = _atem_cut(what) if what and _count(_atem_cut(what), "en") >= 2 else \
                     f"the {k} kind of {title}'s {mname} module"
                 it = {"id": f"R:kind/{name}.{L}.{k}", "type": "kind", "name": k,
@@ -1674,7 +1703,7 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
             meanings = {}
             short = fpath.split(".")[-1]
             for key in (fpath, short, f"`{short}`", f"{short}s"):
-                tbl = tables.lists.get((name, key.strip("`").casefold()))
+                tbl = overlay(tables.lists, key.strip("`").casefold())
                 if tbl and all(str(v) in tbl for v in values if str(v) in tbl) and \
                         any(str(v) in tbl for v in values):
                     meanings = {str(v): tbl[str(v)] for v in values if str(v) in tbl}
@@ -1692,7 +1721,7 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                 i, spec = declared[lens]
                 lspec = spec["lens"]
                 inc = [str(x) for x in mc._list(lspec.get("include"))] or mods
-                draws = tables.lenses.get((name, lens)) or spec.get("makes")
+                draws = overlay(tables.lenses, lens) or spec.get("makes")
                 summary = f"{title}'s lens {lens}: " + (str(spec.get("makes")) if spec.get("makes") else
                                                         f"a {lspec.get('kind', 'mermaid')} {lspec.get('diagram', '')}".strip()) + "."
                 src = prov(m, f"renderers[{i}]", spec)
@@ -1701,7 +1730,7 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
                 if lens == "tree":
                     lspec["edges"] = ["parts", "parent"]
                 inc = mods
-                draws = tables.lenses.get((name, lens))
+                draws = overlay(tables.lenses, lens)
                 summary = f"{title}'s generic lens {lens}, drawn by the reader from the manifest alone."
                 src = {"mode": "catalogue", "sources": ["enough/macrocosm.py#lenses"], "confidence": 1,
                        "state": "known", "hash": _subtree_hash({"lens": lens, "modules": mods})}
@@ -1844,6 +1873,8 @@ def digest(doc: str | Document, lang: str = "en", *, sources: Path | None = None
                 parts.append(f"cites {cited} {document_version(cited, sources=root)}")
     for m in reg.manifests.values():
         parts.append(f"manifest {m.name} {m.version} {_file_sha(m.path) if m.path else 'none'}")
+    if reg.core_modules_path is not None:
+        parts.append(f"core modules {_file_sha(reg.core_modules_path)}")
     return _sha("\n".join(parts).encode("utf-8"))
 
 
@@ -1885,7 +1916,8 @@ def catalog_for(doc: str | Document, lang: str = "en", *, sources: Path | None =
         minis = {it["id"] for it in rs if it["type"] == "minicosm"}
         for it in nodes:
             if it.get("type") == "example" and it.get("declaration"):
-                target = f"R:minicosm/{it['declaration'].split('/', 1)[0]}"
+                fm = reg.by_declaration(it["declaration"])           # an old spelling (emf/1) declares its format
+                target = f"R:minicosm/{fm.name if fm is not None else it['declaration'].split('/', 1)[0]}"
                 if target in minis:
                     it["declares"] = target
                     order_keys = list(it)

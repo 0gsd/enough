@@ -1120,7 +1120,7 @@ def resolve_document(arg: str, *, sources: Path, lang: str | None = None, slug: 
             # (XREF_RULES) by slug, so the spec's own conventions still hold for a text exported from elsewhere.
             lang = lang or "en"
             if version is None:
-                m = D._registry(sources).get(s)
+                m = D._registry(sources).by_name(s)          # a format's name, or an old spelling's (emf)
                 version = str(m.version) if m is not None and m.version is not None else ""
             text = full.read_bytes().decode("utf-8")
             d = D.Document(s, name or _h1(text) or s, {lang: rel}, version=version)

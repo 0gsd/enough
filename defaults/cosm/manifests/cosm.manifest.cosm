@@ -17,6 +17,7 @@ macrocosm: 0.5.4
 name: cosm
 title: COSM product tree
 version: 0
+core: true                            # a built-in of MacroCOSM's core (MacroCOSM OES 13.3, 18.1)
 summary: One firm's product tree as the COSM 0.2 and 0.3 skills write it outside a Holotype, read so it opens in enough.
 spec: https://macro.cosmoes.org/      # MacroCOSM OES, the canonical edition (bundled as docs/MACROCOSM_OES.md)
 reference: [enough/macrocosm.py]

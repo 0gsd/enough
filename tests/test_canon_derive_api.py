@@ -194,10 +194,10 @@ def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
     # the reader's route and the cosm viewer's route both read it
     emf = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
     assert emf["twin_path"] == "notes.md.cosm" and emf["state"] == "fresh"
-    assert emf["cosm"]["minicosm"] == "emf" and emf["cosm"]["report"]["errors"] == []
+    assert emf["cosm"]["minicosm"] == "fabula" and emf["cosm"]["report"]["errors"] == []
     assert client.get("/api/canon/emf", params={"path": "notes.md.cosm"}).json()["twin_path"] == "notes.md.cosm"
     viewer = client.get("/api/cosm", params={"path": "notes.md.cosm"})
-    assert viewer.status_code == 200 and viewer.json()["minicosm"] == "emf"
+    assert viewer.status_code == 200 and viewer.json()["minicosm"] == "fabula"
     # the SSE `canon` event carries the snapshot, ending done
     deadline = time.time() + 5
     while time.time() < deadline and not any(e == "canon" and d["state"] == "done" for e, d in sse_events):

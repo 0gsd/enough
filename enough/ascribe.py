@@ -302,7 +302,10 @@ class _Own:
         self.generic_sev = dict(mc.SEVERITY, **{str(k): str(v) for k, v in override.items()})
         self.selected = set(self.m.checks())
         mods = self.m.modules()
-        self.node_modules = [L for L in mods if L != FORM_MODULE]
+        # The ten containers: not F, and not the core's dialectic module D, which every format inherits (its
+        # questions and sessions anchor to nothing).
+        self.node_modules = [L for L in mods if L != FORM_MODULE and L not in self.m.inherited
+                             and L != mc.DIALECTIC_MODULE]
         links = self.m._block("links")
         self.starter = tuple(mc._strs(links.get("starter"))) or STARTER_RELS
         filt = self.m._block("filter")

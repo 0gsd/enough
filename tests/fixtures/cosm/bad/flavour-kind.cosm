@@ -1,0 +1,13 @@
+oes: fabula/1
+flavour: fabulan
+id: fabula/bad-flavour-kind
+name: bad flavour-kind
+# flavour-kind: a line of verse in a fabulan (C:line belongs to fabulap)
+nodes:
+  - id: C:line/1
+    type: line
+    name: line 1
+    summary: The first line of a poem, in a fabula that says it is prose.
+    stance: observed
+    number: 1
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

@@ -564,7 +564,7 @@ def test_declarations_load_from_the_real_manifests():
     assert decls.problems == []
     assert set(decls) == set(_table_rows("### 6.3 The standard moves", "The accessors are read-only"))
     tell = decls["tell"]
-    assert tell.owner == "emf" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)
+    assert tell.owner == "fabula" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)
     assert list(tell.modifiers) == ["as", "by", "with"] and tell.modifiers["with"] == ("morph",)
     assert decls["band"].modifiers["as"] == ("list of word",) and decls["band"].owner == "comprise"
     assert decls["cut"].modifiers["to"] == ("words", "sentences")
@@ -576,15 +576,15 @@ def test_declarations_load_from_the_real_manifests():
 def test_a_manifest_block_wins_over_a_sidecar_and_a_move_declared_twice_is_reported(tmp_path):
     for p in mc.DEFAULT_MANIFEST_DIR.glob("*.cosm"):
         shutil.copy(p, tmp_path / p.name)
-    (tmp_path / "emf.moves.cosm").write_text("moves-of: emf/1\nmoves:\n  - {name: retell, takes: [fabula], "
+    (tmp_path / "fabula.moves.cosm").write_text("moves-of: fabula/1\nmoves:\n  - {name: retell, takes: [fabula], "
                                              "gives: short, says: again}\n")
     (tmp_path / "zzz.moves.cosm").write_text("moves-of: zzz/1\nmoves:\n  - {name: tell, takes: [text], "
                                              "gives: short, says: twice}\n")
     decls = dc.load(mc.Registry([tmp_path]))
-    assert "retell" not in decls and decls["tell"].owner == "emf"
+    assert "retell" not in decls and decls["tell"].owner == "fabula"
     joined = " | ".join(decls.problems)
-    assert "emf.moves.cosm" in joined and "tell is declared again" in joined
-    assert "emf.moves.cosm: emf's manifest declares its own moves, which win; this sidecar is not read" in joined
+    assert "fabula.moves.cosm" in joined and "tell is declared again" in joined
+    assert "fabula.moves.cosm: fabula's manifest declares its own moves, which win; this sidecar is not read" in joined
 
 
 def test_a_second_sidecar_says_the_first_sidecar_won_not_a_manifest(tmp_path):

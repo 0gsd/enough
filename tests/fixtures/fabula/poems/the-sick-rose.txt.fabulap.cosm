@@ -1,0 +1,449 @@
+oes: fabula/1
+macrocosm: 0.5.4
+flavour: fabulap
+id: fabula/poems--the-sick-rose-txt
+name: The Sick Rose
+source: {path: the-sick-rose.txt, sha256: c35789bdb766ef26a13b65a2c3cb243ac59e9119731f361194ed5023c39fca58, size: 232, mtime_ns: 1793914431114080113}
+derived: {at: 2026-11-05T11:40:00Z, by: person, model: anthropic/claude-opus-5.5, route: cloud, provider: openrouter, mode: model, completeness: full, chunks: 1}
+atem:
+  line: An unseen worm flying through a stormy night finds a rose's bed of crimson joy, and its dark secret love destroys the rose's life.
+  focus: A speaker tells a rose that it is sick, and names the cause, a worm whose hidden love is killing it.
+  push: Something loved in secret, in the dark, destroys what it loves.
+  pull: The poem never says what the rose or the worm stands for, so every reading of them, a canker, a lover, experience itself, is the reader's to argue for.
+nodes:
+  # --- I ----------------------------------------------------------------------------------------------------------
+  - id: I:occasion/songs-of-experience
+    type: occasion
+    name: Songs of Experience, 1794
+    summary: The poem appeared in Blake's Songs of Experience in 1794, the book that answers his Songs of Innocence.
+    stance: observed
+    roles: {event: E:work/songs-of-experience, when: '1794'}
+    span: {lines: "2"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.9, state: known}
+  - id: I:allusion/the-undying-worm
+    type: allusion
+    name: The worm of scripture
+    summary: The worm may echo the scriptural worm that eats the dead and does not die; nothing in the text confirms it.
+    stance: assumed
+    cue: The invisible worm
+    roles: {to: {pending: "which passage of scripture, if any, is echoed?"}, at: C:line/2}
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5'], confidence: 0.3, state: pending}
+  # --- L E K ------------------------------------------------------------------------------------------------------
+  - id: L:term/worm
+    type: term
+    name: worm
+    summary: The poem's word for what destroys the rose, a creature that flies and loves.
+    feed: {word: worm, pos: noun, origin: feed}
+    sense: A grub that eats into a plant, here given wings and a love; the poem keeps both senses open.
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5'], confidence: 0.8, state: known}
+  - id: L:term/bed
+    type: term
+    name: bed
+    summary: The poem's word for the place the worm finds, the rose's bed of crimson joy.
+    feed: {word: bed, pos: noun, origin: feed}
+    sense: {pending: "a flower bed, a bed to sleep or love in, or both?"}
+    span: {lines: "9-10"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L9-L10'], confidence: 0.6, state: pending}
+  - id: L:term/crimson
+    type: term
+    name: crimson
+    summary: The colour of the rose's bed of joy.
+    feed: {word: crimson, pos: adjective, origin: feed}
+    sense: A deep red; FEED's sense.
+    span: {lines: "10"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L10'], confidence: 0.9, state: known}
+  - id: E:person/william-blake
+    type: person
+    name: William Blake
+    summary: William Blake, the poet, painter and printer who wrote, etched and published the poem.
+    span: {lines: "2"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 1, state: known}
+  - id: E:work/songs-of-experience
+    type: work
+    name: Songs of Experience
+    summary: Blake's book of poems of 1794, issued with Songs of Innocence as Songs of Innocence and of Experience.
+    span: {lines: "2"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.9, state: known}
+  - id: E:thing/rose
+    type: thing
+    name: the rose
+    summary: The rose the poem addresses and declares sick.
+    span: {lines: "4"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4'], confidence: 1, state: known}
+  - id: E:thing/worm
+    type: thing
+    name: the invisible worm
+    summary: The unseen worm that flies by night and destroys the rose with its love.
+    span: {lines: "5-11"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5-L11'], confidence: 1, state: known}
+  - id: K:concept/secret-love
+    type: concept
+    name: secret love
+    summary: Love kept dark and hidden, which in the poem destroys what it loves.
+    span: {lines: "11-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L11-L12'], confidence: 0.7, state: known}
+  # --- N ----------------------------------------------------------------------------------------------------------
+  - id: N:aim/feel-the-loss
+    type: aim
+    name: A reader feels the loss
+    summary: The poem seems to aim at making a reader feel that something beautiful is being destroyed from within, unseen.
+    stance: opinion
+    measure: {pending: "what did the poet want a reader to feel by the last line?"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4-L12'], confidence: 0.4, state: pending}
+  # --- C: the construction of the verse ------------------------------------------------------------------------------
+  - id: C:part/stanza-1
+    type: part
+    name: First stanza
+    summary: The speaker tells the rose it is sick and introduces the worm flying in the night storm.
+    stance: observed
+    division: stanza
+    number: 1
+    span: {lines: "4-7"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4-L7'], confidence: 1, state: known}
+  - id: C:part/stanza-2
+    type: part
+    name: Second stanza
+    summary: The worm finds the rose's bed and its dark secret love destroys the rose's life.
+    stance: observed
+    division: stanza
+    number: 2
+    span: {lines: "9-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L9-L12'], confidence: 1, state: known}
+  - id: C:line/1
+    type: line
+    name: O Rose thou art sick
+    summary: The speaker tells the rose, directly, that it is sick.
+    stance: observed
+    number: 1
+    text: O Rose thou art sick.
+    part: C:part/stanza-1
+    metre: C:metre/two-beat
+    stresses: x / | x x /
+    syllables: 5
+    rhyme: a
+    ending: stopped
+    span: {lines: "4"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4'], confidence: 0.9, state: known}
+  - id: C:line/2
+    type: line
+    name: The invisible worm
+    summary: The cause is named, a worm that cannot be seen.
+    stance: observed
+    number: 2
+    text: The invisible worm,
+    part: C:part/stanza-1
+    metre: C:metre/two-beat
+    stresses: x x / | x x /
+    syllables: 6
+    rhyme: b
+    ending: run-on
+    span: {lines: "5"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5'], confidence: 0.9, state: known}
+  - id: C:line/3
+    type: line
+    name: That flies in the night
+    summary: The worm flies by night.
+    stance: observed
+    number: 3
+    text: That flies in the night
+    part: C:part/stanza-1
+    metre: C:metre/two-beat
+    stresses: x / | x x /
+    syllables: 5
+    rhyme: c
+    ending: run-on
+    span: {lines: "6"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L6'], confidence: 0.9, state: known}
+  - id: C:line/4
+    type: line
+    name: In the howling storm
+    summary: It flies through a howling storm.
+    stance: observed
+    number: 4
+    text: 'In the howling storm:'
+    part: C:part/stanza-1
+    metre: C:metre/two-beat
+    stresses: x x / x /
+    syllables: 5
+    rhyme: b
+    ending: run-on
+    span: {lines: "7"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L7'], confidence: 0.8, state: known}
+  - id: C:line/5
+    type: line
+    name: Has found out thy bed
+    summary: The worm has found the rose's bed.
+    stance: observed
+    number: 5
+    text: Has found out thy bed
+    part: C:part/stanza-2
+    metre: C:metre/two-beat
+    stresses: x / | x x /
+    syllables: 5
+    rhyme: d
+    ending: run-on
+    span: {lines: "9"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L9'], confidence: 0.8, state: known}
+  - id: C:line/6
+    type: line
+    name: Of crimson joy
+    summary: The bed is one of crimson joy.
+    stance: observed
+    number: 6
+    text: 'Of crimson joy:'
+    part: C:part/stanza-2
+    metre: C:metre/two-beat
+    stresses: x / | x /
+    syllables: 4
+    rhyme: e
+    ending: stopped
+    span: {lines: "10"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L10'], confidence: 0.9, state: known}
+  - id: C:line/7
+    type: line
+    name: And his dark secret love
+    summary: The worm's love is dark and secret.
+    stance: observed
+    number: 7
+    text: And his dark secret love
+    part: C:part/stanza-2
+    metre: C:metre/two-beat
+    stresses: x x / | / x /
+    syllables: 6
+    rhyme: f
+    ending: run-on
+    span: {lines: "11"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L11'], confidence: 0.6, state: known}
+  - id: C:line/8
+    type: line
+    name: Does thy life destroy
+    summary: That love destroys the rose's life.
+    stance: observed
+    number: 8
+    text: Does thy life destroy.
+    part: C:part/stanza-2
+    metre: C:metre/two-beat
+    stresses: x x / | x /
+    syllables: 5
+    rhyme: e
+    ending: stopped
+    span: {lines: "12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L12'], confidence: 0.9, state: known}
+  - id: C:metre/two-beat
+    type: metre
+    name: Two beats a line
+    summary: Every line carries two strong beats, in feet that mix anapaests and iambs, so the lines run short and quick.
+    stance: deduced
+    foot: mixed
+    feet: 2
+    basis: accentual
+    lines: [C:line/1, C:line/2, C:line/3, C:line/4, C:line/5, C:line/6, C:line/7, C:line/8]
+    departures:
+      - {line: C:line/6, what: 'the shortest line, two iambs, four syllables'}
+      - {line: C:line/7, what: '"dark" may take a third stress, slowing the line before the end'}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4-L12'], confidence: 0.6, state: known}
+  - id: C:rhyme/worm-storm
+    type: rhyme
+    name: worm, storm
+    summary: Lines 2 and 4 rhyme worm with storm, a rhyme of the consonants more than the vowel.
+    stance: deduced
+    scheme: b
+    sound: -orm
+    lines: [C:line/2, C:line/4]
+    quality: slant
+    placement: end
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5-L7'], confidence: 0.7, state: known}
+  - id: C:rhyme/joy-destroy
+    type: rhyme
+    name: joy, destroy
+    summary: Lines 6 and 8 rhyme joy with destroy, so the poem's last word answers its happiest one.
+    stance: observed
+    scheme: e
+    sound: -oy
+    lines: [C:line/6, C:line/8]
+    quality: full
+    placement: end
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L10-L12'], confidence: 0.9, state: known}
+  - id: C:voice/speaker-to-rose
+    type: voice
+    name: An unnamed speaker to the rose
+    summary: An unnamed speaker addresses the rose as thou and tells it what is killing it.
+    stance: observed
+    perspective: second
+    tone: grave, intimate
+    roles: {speaker: {pending: "who speaks: the poet, a witness, a lover?"}, addressee: E:thing/rose}
+    span: {lines: "4-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4-L12'], confidence: 0.8, state: known}
+  - id: C:device/apostrophe
+    type: device
+    name: O Rose
+    summary: The poem opens by speaking to the rose as if it could hear.
+    stance: observed
+    figure: apostrophe
+    where: [C:line/1]
+    effect: The rose becomes a person who is told bad news, so the poem reads as a diagnosis given face to face.
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4'], confidence: 0.9, state: known}
+  - id: C:device/the-worm-as-symbol
+    type: device
+    name: The worm as a symbol
+    summary: The worm is given flight, a love and a secret, more than any worm has, so it stands for something the poem never names.
+    stance: deduced
+    figure: symbol
+    where: [C:line/2, C:line/3, C:line/7]
+    effect: The image stays open, and the poem's readings divide over what the worm stands for.
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5-L11'], confidence: 0.8, state: known}
+  # --- R ----------------------------------------------------------------------------------------------------------
+  - id: R:maker/blake
+    type: maker
+    name: Blake, author and printer
+    summary: William Blake wrote the poem and etched, printed and coloured the plate it first appeared on.
+    stance: observed
+    who: E:person/william-blake
+    capacity: author
+    span: {lines: "2"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.9, state: known}
+  - id: R:release/1794
+    type: release
+    name: Songs of Innocence and of Experience, 1794
+    summary: The poem was first issued in 1794, in the combined Songs of Innocence and of Experience.
+    stance: observed
+    at: '1794'
+    venue: Songs of Innocence and of Experience
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.8, state: known}
+  - id: R:means/relief-etching
+    type: means
+    name: Relief etching
+    summary: Blake printed his songs from copper plates etched in relief, text and design together, and coloured each copy by hand.
+    stance: hearsay
+    what: relief etching on copper, hand coloured
+    used-for: the first and every early printing
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.6, state: known}
+  - id: R:licence/public-domain
+    type: licence
+    name: Public domain
+    summary: The poem is out of copyright everywhere; it was published in 1794 and its author died in 1827.
+    stance: deduced
+    identifier: public domain
+    year: '1794'
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2'], confidence: 0.9, state: known}
+  # --- P: what it claims, and how it can be read --------------------------------------------------------------------
+  - id: P:claim/the-rose-is-sick
+    type: claim
+    name: The rose is sick
+    summary: The speaker declares that the rose is sick, and that the worm's dark secret love is destroying the rose's life.
+    stance: observed
+    salience: critical
+    roles: {holder: C:voice/speaker-to-rose, subject: E:thing/rose, cause: E:thing/worm}
+    span: {lines: "4-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L4-L12'], confidence: 0.9, state: known}
+  - id: P:reading/worm-is-a-canker
+    type: reading
+    name: The worm is a canker
+    summary: Read plainly, the worm is a canker grub that eats into the rose from its bed, and the poem is about blight.
+    stance: opinion
+    of: [E:thing/worm, L:term/worm]
+    whose: {by: model}
+    grounds:
+      - {of: C:line/2, because: '"worm" is the plain word for a grub that eats roses'}
+      - {of: C:line/5, because: 'a bed is where a rose grows'}
+    span: {lines: "5-10"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5-L10'], confidence: 0.5, state: known}
+  - id: P:reading/worm-as-desire
+    type: reading
+    name: The worm is a lover's desire
+    summary: The worm is a lover whose possessive, hidden desire spoils the love it enters, and the bed of crimson joy is a bed of love.
+    stance: hearsay
+    of: [E:thing/worm, L:term/bed]
+    whose: {by: critic, name: {pending: "which critic first argued this reading in print, and where?"}}
+    grounds:
+      - {of: C:line/7, because: 'the worm has a "love" that is dark and secret'}
+      - {of: C:line/6, because: '"crimson joy" reads as passion as easily as colour'}
+    span: {lines: "9-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L9-L12'], confidence: 0.6, state: known}
+  - id: P:reading/worm-as-experience
+    type: reading
+    name: The worm is experience
+    summary: In a book of songs of experience, the worm is what experience does to innocence, entering unseen and destroying it.
+    stance: opinion
+    of: [E:thing/worm]
+    whose: {by: model}
+    grounds:
+      - {of: I:occasion/songs-of-experience, because: the poem belongs to the book that answers Songs of Innocence}
+    links: [{rel: depends-on, to: P:reading/worm-is-a-canker}]
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L2-L12'], confidence: 0.4, state: known}
+  # --- T ----------------------------------------------------------------------------------------------------------
+  - id: T:event/worm-flies
+    type: event
+    name: The worm flies in the night
+    summary: The invisible worm flies through the night in a howling storm.
+    agent: E:thing/worm
+    when: at night, in a storm
+    span: {lines: "5-7"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L5-L7'], confidence: 0.9, state: known}
+  - id: T:event/worm-finds-the-bed
+    type: event
+    name: The worm finds the bed
+    summary: The worm has found the rose's bed of crimson joy.
+    agent: E:thing/worm
+    patient: E:thing/rose
+    after: T:event/worm-flies
+    span: {lines: "9-10"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L9-L10'], confidence: 0.9, state: known}
+  - id: T:event/love-destroys
+    type: event
+    name: The worm's love destroys the rose
+    summary: The worm's dark secret love destroys the rose's life.
+    agent: E:thing/worm
+    patient: E:thing/rose
+    after: T:event/worm-finds-the-bed
+    span: {lines: "11-12"}
+    provenance: {mode: derived, sources: ['the-sick-rose.txt#L11-L12'], confidence: 0.9, state: known}
+  # --- D: five questions for an expert in Blake's work (the author cannot be asked) -------------------------------
+  - id: D:question/speaker
+    type: question
+    about: C:voice/speaker-to-rose#roles.speaker
+    asks: Who speaks the poem, and is the rose addressed as a flower, a woman, or both?
+    why: unsure
+    kind: text
+    to: expert
+    raised: {by: bank, from: fabulap/speaker, at: 2026-11-05T11:40:00Z, run: 2026-11-05-1140-c2d9}
+    state: open
+  - id: D:question/worm-intended
+    type: question
+    about: P:reading/worm-as-desire#intended
+    asks: Did Blake mean the worm to be read as a lover's desire as well as a canker?
+    why: ambiguous
+    kind: yes-no
+    to: expert
+    raised: {by: bank, from: fabulap/both, at: 2026-11-05T11:40:00Z, run: 2026-11-05-1140-c2d9}
+    state: open
+  - id: D:question/bed
+    type: question
+    about: L:term/bed#sense
+    asks: Is the "bed of crimson joy" a flower bed, a bed of love, or meant as both?
+    why: ambiguous
+    kind: choice
+    options: [a flower bed, a bed of love, both]
+    to: expert
+    raised: {by: bank, from: fabulap/word, at: 2026-11-05T11:40:00Z, run: 2026-11-05-1140-c2d9}
+    state: open
+  - id: D:question/the-plate
+    type: question
+    about: P:reading/worm-is-a-canker
+    asks: How does the design Blake etched around the poem bear on what the worm is?
+    why: counter
+    kind: text
+    to: expert
+    raised: {by: model, from: fold, at: 2026-11-05T11:40:00Z, run: 2026-11-05-1140-c2d9}
+    state: open
+  - id: D:question/dark
+    type: question
+    about: C:metre/two-beat#departures[1]
+    asks: Is the third stress on "dark" in line 7 meant to slow the line before the end?
+    why: intent
+    kind: yes-no
+    to: expert
+    raised: {by: bank, from: fabulap/metre-break, at: 2026-11-05T11:40:00Z, run: 2026-11-05-1140-c2d9}
+    state: open

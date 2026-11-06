@@ -95,7 +95,7 @@ def _declared_moves() -> dict[str, tuple[str, dict]]:
 def test_moves_are_declared_by_their_owners():
     moves = _declared_moves()
     owners = {n: o for n, (o, _) in moves.items()}
-    assert {owners[n] for n in ("derive", "tell", "atem", "expand")} == {"emf"}
+    assert {owners[n] for n in ("derive", "tell", "atem", "expand")} == {"fabula"}
     assert {owners[n] for n in ("enumerate", "compile")} == {"doc"}
     assert {owners[n] for n in ("project", "band", "mark", "withhold")} == {"comprise"}
     assert {owners[n] for n in ("cut", "null", "measure", "morph", "read", "package", "unpack", "lint", "trace",

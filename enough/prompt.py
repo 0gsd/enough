@@ -1001,7 +1001,7 @@ def _macrocosm_available() -> bool:
     (owner decision 12). One file check, cheap enough for every turn."""
     try:
         from . import macrocosm
-        return (macrocosm.DEFAULT_MANIFEST_DIR / "emf.manifest.cosm").is_file()
+        return (macrocosm.DEFAULT_MANIFEST_DIR / "fabula.manifest.cosm").is_file()
     except Exception:  # noqa: BLE001 — no reader is not a broken prompt
         return False
 

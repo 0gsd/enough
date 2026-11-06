@@ -53,7 +53,8 @@ def test_cosm_holotype_in_a_volume(client: TestClient):
     assert p["problems"] == [] and p["pending"] == []
     letters = [m["letter"] for m in p["modules"]]
     manifest = macrocosm.default_registry().get("comprise")
-    assert letters[: len(manifest.modules())] == manifest.modules()      # manifest order
+    own = [L for L in manifest.modules() if L not in manifest.inherited]  # the core's D shows only when it holds items
+    assert letters[: len(own)] == own and "D" not in letters             # manifest order
     assert sum(m["count"] for m in p["modules"]) == 36
     assert "map" in p["lenses"]
     item = p["modules"][letters.index("P")]["kinds"][0]["items"][0]
@@ -78,10 +79,12 @@ def test_cosm_volume_folder_loads_its_canon_catalog(client: TestClient):
 
 def test_cosm_emf_twin_and_standalone(client: TestClient):
     p = client.get("/api/cosm", params={"path": "notes.md.cosm"}).json()
-    assert p["minicosm"] == "emf" and p["refused"] is None
-    assert [m["letter"] for m in p["modules"]][:6] == ["L", "E", "K", "P", "T", "X"]
+    assert p["minicosm"] == "fabula" and p["refused"] is None              # emf/1, the fabula's old spelling
+    assert p["declared"] == {"how": "old", "said": "emf/1"} and p["catalog"]["oes"] == "emf/1"
+    assert p["report"]["not_run"] == [] and p["report"]["ok"]           # the fabula's own checks run (enough/fabula.py)
+    assert [m["letter"] for m in p["modules"]] == list("ILEKNCRPTX")      # the fabula's ten; no D items, no D
     assert set(p["lenses"]) >= {"claims", "map"}
-    assert client.get("/api/cosm", params={"path": "rain.cosm"}).json()["minicosm"] == "emf"
+    assert client.get("/api/cosm", params={"path": "rain.cosm"}).json()["minicosm"] == "fabula"
 
 
 def test_cosm_project_catalog_is_reconciled_on_read(client: TestClient):
@@ -143,11 +146,12 @@ def test_macrocosm_manifests(client: TestClient):
     r = client.get("/api/macrocosm/manifests")
     assert r.status_code == 200
     rows = r.json()
-    assert [m["name"] for m in rows][:4] == ["comprise", "cosm", "canon", "emf"]
+    assert [m["name"] for m in rows][:4] == ["comprise", "cosm", "canon", "fabula"]
     by = {m["name"]: m for m in rows}
-    assert by["canon"]["declaration"] == "canon/1" and by["emf"]["declaration"] == "emf/1"
+    assert by["canon"]["declaration"] == "canon/1" and by["fabula"]["declaration"] == "fabula/1"
+    assert by["fabula"]["old"] == ["emf/1"] and by["fabula"]["core"] is True and by["comprise"]["core"] is False
     for m in rows:
-        assert set(m) == {"name", "title", "version", "declaration", "summary"}
+        assert set(m) == {"name", "title", "version", "declaration", "summary", "core", "old"}
         assert m["title"] and m["summary"]
 
 

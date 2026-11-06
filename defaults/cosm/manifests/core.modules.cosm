@@ -1,0 +1,43 @@
+# The core's modules: what MacroCOSM gives every format beside the grammar (MacroCOSM OES 13.4, 18.6).
+#
+# One module today, D, the dialectic: the questions a volume asks a person about what its source means, and the
+# sessions in which they were asked and answered. Every format inherits it: the reader merges this module, with the
+# closed lists of its kinds, into every manifest that does not declare a module D itself, and adds D to a manifest's
+# module segment where paths.segments.module lists the letters. A manifest that declares D keeps its own. Comprise's
+# manifest, a byte copy of Comprise's own, inherits D this way without being edited.
+#
+# Not a manifest and not a moves sidecar: the registry reads it by its name, core.modules.cosm, from the first
+# manifest folder that holds it. The closed lists below apply to the items of D's kinds only, never to a field of the
+# same name in another module. Items of D carry no provenance of their own (the record is the provenance), so each
+# kind's required list replaces the envelope's. The core's own checks on D (question-about, question-shape,
+# session-declared) are run by enough/fabula.py; a reader that does not run them lists them as not run on a volume
+# that holds an item of D. The prose is MacroCOSM OES (https://macro.cosmoes.org/), section 18.6; the reference
+# reader is enough/macrocosm.py.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+modules-of: core
+macrocosm: 0.5.4
+
+modules:
+  D:
+    name: Dialectic
+    subtitle: What was asked about the source, and what was answered
+    kinds:
+      question: {refs: [answers.session],
+                 checked: [about, asks, why, kind, options, options-open, many, range, hint, to, raised, state, answers,
+                           settled, ended],
+                 required: [id, type, about, asks, why, kind, to, raised, state]}
+      session: {refs: [asked, answered, skipped], checked: [at, with, through, model, covers],
+                required: [id, type, at, with, through]}
+
+closed:
+  question:
+    why: [missing, unsure, ambiguous, intent, conflict, counter]
+    kind: [text, choice, yes-no, number, date, ref, span]
+    state: [open, answered, unknown, declined, stale, withdrawn]
+  session:
+    through: [person, agent]

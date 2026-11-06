@@ -396,7 +396,7 @@ def test_a_markdown_path_exports_ad_hoc(mini, tmp_path):
     assert list(docs) == ["emf", "field-notes", "notes", "macrocosm-oes", "thym"]
     emf = docs["emf"]
     assert emf["name"] == "EMF: a language in miniature" and emf["id"] == "doc/emf"
-    assert emf["version"] == str(mc.default_registry().get("emf").version)      # its manifest's version
+    assert emf["version"] == str(mc.default_registry().by_name("emf").version)  # its manifest's (the fabula's) version
     assert emf["chapters"] == [] and emf["counts"]["reference"] == 0
     assert docs["field-notes"]["name"] == "Field notes" and docs["field-notes"]["version"] == ""
     assert docs["notes"]["name"] == "Notes" and docs["notes"]["version"] == "7"

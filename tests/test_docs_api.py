@@ -504,9 +504,10 @@ def test_declared_lenses_carry_the_modules_they_draw(docs_src: Path, project: Pa
                          for doc, lang in (("macrocosm-oes", "en"), ("help-center", "de")))
     for p in (spec, help_de):
         got = {d["id"]: (d["include"], d["generic"]) for d in p["declared_lenses"]}
-        assert got == {"manual": (["S", "T", "R", "B"], False), "map": (["S", "T"], False),
-                       "graph": (["S", "T", "R"], False), "inventory": (["S", "T", "R", "B"], False),
-                       "tree": (["S", "T", "R", "B"], True)}
+        # a lens with no `include` draws every module, the core's D included (0.6)
+        assert got == {"manual": (["S", "T", "R", "B", "D"], False), "map": (["S", "T"], False),
+                       "graph": (["S", "T", "R"], False), "inventory": (["S", "T", "R", "B", "D"], False),
+                       "tree": (["S", "T", "R", "B", "D"], True)}
         assert {d["id"] for d in p["declared_lenses"] if d["kind"] == "mermaid"} == set(p["lenses"])
     # The spec's own R:lens/doc.* items say the same thing.
     items = {i["id"]: i["data"] for m in spec["modules"] for k in m["kinds"] for i in k["items"]}

@@ -1,0 +1,436 @@
+# The fabula 1: a built-in of MacroCOSM's core. What a decompile makes from one input: everything found in it or
+# derived from it, enumerated item by item: its inspiration, meaning, intent, construction, production and
+# assertions, and its atems. One format, three flavours: fabulan (narrative and non-fiction prose), fabulap (poetry,
+# metered verse, song lyrics), fabulac (code: a folder of source). A fabula is compiled into a short (markdown for
+# prose and verse; for code a cshort, a folder of source rebuilt from it, viewed and never run) and said most plainly
+# as an atem (for code also a catem, everything a user can do, at one of three depths).
+#
+# Every emf/1 file is a valid fabulan with no conversion: the declaration reads the old spelling (declaration.old),
+# and the six modules L E K P T X keep emf/1's kinds, fields and closed lists exactly. Four modules are added
+# (I Inspiration, N Intent, C Construction, R Production), and P gains two kinds (reading, case). The core's
+# dialectic module D (question, session) is not declared here: the reader merges it in from core.modules.cosm, as it
+# does for every format (MacroCOSM OES 13.4, 18.6).
+#
+# A kind's flavours: note says which flavours may hold it (check flavour-kind). The dialectic: block holds the opening
+# questions, one bank per flavour. The prose is MacroCOSM OES (https://macro.cosmoes.org/), section 18.4, and the
+# dialectic is its section 18.6. The reference reader is enough/macrocosm.py; the fabula's own checks are
+# enough/fabula.py's (listed under checks.own). Where this file and the reader disagree, the reader wins and this file
+# is corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.5.4
+name: fabula
+title: fabula
+version: 1
+core: true
+summary: "One input decompiled: everything found in it or derived from it, enumerated: its inspiration, meaning, intent, construction, production and assertions, and its atems. Three flavours: prose, verse, code."
+spec: https://macro.cosmoes.org/      # MacroCOSM OES, section 18.4 (bundled as docs/MACROCOSM_OES.md)
+reference: [enough/macrocosm.py]
+
+declaration:
+  key: oes
+  value: fabula/1
+  old: [emf/1]                    # earlier oes: values this manifest reads and never writes; the reader says how: old
+  absent: refuse
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+volume:
+  catalog: ['<text>.fabulan.cosm', '<text>.fabulap.cosm', '<folder>.fabulac.cosm', '<name>.fabulan.cosm',
+            '<name>.fabulap.cosm', '<text>.cosm']      # <text>.cosm is the old twin name, read forever; a fabula is
+  single-file: true                                   # identified by its declaration, never by its file name
+
+catalog:
+  keys: [oes, macrocosm, flavour, id, name, source, derived, atem, shorts, catems, nodes]
+  id: fabula/<slug>
+  id-old: [emf/<slug>]                                 # an emf/1 twin's id, read as it is
+  flavour: [fabulan, fabulap, fabulac]
+  flavour-absent: fabulan                              # every emf/1 file
+  source-fields: [path, sha256, size, mtime_ns]                    # a text; absent for a standalone fabula
+  source-folder-fields: [path, kind, language, files, bytes, skipped, tree, commit, origin, licence]   # a folder (fabulac)
+  source-kind: [text, folder]                                      # absent: text
+  tree: 'sha256 over the read set: for each file read, sorted by the UTF-8 bytes of its relative path, the bytes of
+         <relative path> NUL <lowercase hex sha256 of its bytes> LF (MacroCOSM OES 18.4.1; Thym 20.1 uses the same digest)'
+  derived-fields: [at, by, model, route, provider, program, run, mode, completeness, chunks, dropped, runs]
+  derived-modes: [model, rules]
+  derived-routes: [local, cloud]                                   # absent in rules mode
+  derived-completeness: [full, atem, outline]                      # outline: a fabulac's rules-only skeleton
+  derived-runs-fields: [program, run, at, model, route, provider] # one per run that wrote into the fabula, a settle
+                                                                   # run included; the single keys describe the last
+                                                                   # run that derived the fabula from its source
+  atem-fields: [line, focus, push, pull]
+  shorts-fields: [path, at, by, mode, order, route, language, files]
+  shorts-path: '<text-stem>.short-<YYYY-MM-DD-HHMM>.md; a cshort: <folder>.cshort-<YYYY-MM-DD-HHMM>/'
+  shorts-modes: [model, rules]
+  shorts-orders: [told, weight, code]                              # code: a cshort, told file by file
+  catems-fields: [path, at, by, mode, route, depth]
+  catems-path: '<folder>.catem-<YYYY-MM-DD-HHMM>.md'
+  catems-depths: [line, overview, manual]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  passage-atem: 'X:atem/<n>'
+  code-slug: 'a file: its path respelled by the Canon rule (tally--cli-py); a Python name: its dotted name (tally.cli.main)'
+  inside-own-text: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: '[ILEKNCRPTX]'                # the reader adds the core's D
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<module>', id: none}
+    - {path: '<module>/<kind>', id: none}
+    - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:fabula/<database>/<path>; oes:emf/<database>/<path> names the same thing'
+  qualified-database: the catalog id without fabula/ (or without emf/, for an old twin)
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, status, visibility, provenance, pending, links, span, salience, withheld]
+  references: [links]
+  required: [id, type, name, summary, provenance]
+  required-in-P: [id, type, name, summary, provenance, stance]     # every claim, reading and case says how it is known
+  status: [active, dormant, planned, retired]
+  visibility: [public, internal, restricted]
+  provenance:
+    fields: [mode, sources, confidence, state, answered]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1
+    rules-mode: '{mode: derived, confidence: 0.3, state: pending} with pending: "a model has not read this passage"'
+    answered: '{<field path>: {sources: [D:session/<id>], confidence}}: the fields a dialectic answer wrote into an item
+               that was made some other way'
+  span: '{lines: "12-18"} or {start: "<up to 60 characters>", end: "<up to 60 characters>"}; in a fabulac
+         {file: <path relative to source.path>, lines: "12-40"}'
+  stance: 'on a claim, how the text knows it (emf/1, unchanged); on every other kind that carries one, how the fabula
+           knows the item: observed (read in the input), deduced (reasoned from other items), assumed (taken without
+           support), hearsay (someone said so: an answer, a critic, a document), opinion (a judgement, a model''s own
+           reading), axiom (given)'
+  withheld: 'the field paths a person declined to give (a dialectic answer declined); the item''s provenance.state is
+             then not-disclosed'
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+links:
+  rels: [is-a, part-of, depends-on, supports, contradicts, resolves, exemplifies, defines, mentions]
+
+closed-lists:
+  stance: [axiom, observed, deduced, opinion, assumed, hearsay]
+  salience: [critical, high, normal, low]
+  feed.origin: [feed, user]
+  whose.by: [author, expert, critic, model, reader]                       # P:reading
+  intended: [true, false]                                                 # C:behaviour, P:reading
+  division: [chapter, section, paragraph, scene, list, quotation, stanza, verse, chorus, refrain, bridge, other]
+  foot: [iamb, trochee, anapaest, dactyl, spondee, amphibrach, mixed, none]
+  basis: [accentual-syllabic, accentual, syllabic, quantitative, free]
+  ending: [stopped, run-on]
+  quality: [full, slant, eye, identical]
+  placement: [end, internal]
+  perspective: [first, second, third, mixed]
+  force: [must, should, may]
+  horizon: [never, later]
+  surface: [function, method, class, command, format, stream]
+  scope: [standard, run-time, test, build, optional]
+  set-in: [environment, file, option, constant]
+  capacity: [author, maintainer, contributor, editor, translator, publisher, performer, composer]
+  nature: [feature, fix, refactor, removal, docs, tests, build, revision]
+
+references:
+  forms:
+    - {form: bare, example: 'K:concept/compost', names: an item of the same fabula}
+    - {form: typed-link, example: '{rel: contradicts, to: P:claim/x}', names: its to; rel from links.rels}
+    - {form: role, example: 'roles: {actor: E:person/x, condition: "when it rains"}', names: 'an item where the value is an id; text otherwise'}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+    - {form: address, example: 'N:audience/owners#who', names: 'an item and a field of it, absent or open fields included (the reader resolves the item before #; MacroCOSM OES 9.3)'}
+  unresolved: error
+
+modules:
+  I:
+    name: Inspiration
+    subtitle: What the work came from
+    kinds:
+      influence: {refs: [roles.*], checked: [stance, how], flavours: [fabulan, fabulap, fabulac],
+                  required: [id, type, name, summary, provenance, stance]}
+      allusion: {refs: [roles.*], checked: [stance, cue], flavours: [fabulan, fabulap],
+                 required: [id, type, name, summary, provenance, stance]}
+      occasion: {refs: [roles.*], checked: [stance, when], flavours: [fabulan, fabulap, fabulac],
+                 required: [id, type, name, summary, provenance, stance]}
+  L:
+    name: Lexicon
+    subtitle: The words the text leans on
+    kinds:
+      term: {refs: [], checked: [feed, sense], flavours: [fabulan, fabulap, fabulac]}
+  E:
+    name: Entities
+    subtitle: The particular things and people named
+    kinds:
+      person: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+      org: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+      place: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+      work: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+      thing: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+  K:
+    name: Concepts
+    subtitle: The ideas and universals the text uses
+    kinds:
+      concept: {refs: [defined-by], flavours: [fabulan, fabulap, fabulac]}
+  N:
+    name: Intent
+    subtitle: What the work means to do, for whom, and what it chose
+    kinds:
+      aim: {refs: [roles.*], checked: [stance, measure], flavours: [fabulan, fabulap, fabulac],
+            required: [id, type, name, summary, provenance, stance]}
+      audience: {refs: [], checked: [stance, who, needs], flavours: [fabulan, fabulap, fabulac],
+                 required: [id, type, name, summary, provenance, stance]}
+      use: {refs: [for, via], checked: [stance, steps, gets], flavours: [fabulac],
+            required: [id, type, name, summary, provenance, stance]}
+      requirement: {refs: [met-by, checked-by], checked: [stance, force], flavours: [fabulac],
+                    required: [id, type, name, summary, provenance, stance, force]}
+      decision: {refs: [by, changed-in], checked: [stance, chose, over, because], flavours: [fabulan, fabulap, fabulac],
+                 required: [id, type, name, summary, provenance, stance, chose]}
+      exclusion: {refs: [], checked: [stance, horizon, because], flavours: [fabulan, fabulap, fabulac],
+                  required: [id, type, name, summary, provenance, stance]}
+  C:
+    name: Construction
+    subtitle: How the work is built
+    kinds:
+      part: {refs: [of], checked: [division, number, heading, stance], flavours: [fabulan, fabulap],
+             required: [id, type, name, summary, provenance, stance, division]}
+      device: {refs: [where], checked: [figure, effect, stance], flavours: [fabulan, fabulap],
+               required: [id, type, name, summary, provenance, stance, figure]}
+      voice: {refs: [roles.*], checked: [perspective, tone, stance], flavours: [fabulan, fabulap],
+              required: [id, type, name, summary, provenance, stance]}
+      line: {refs: [part, metre], checked: [number, text, stresses, syllables, rhyme, ending, stance], flavours: [fabulap],
+             required: [id, type, name, summary, provenance, stance, number]}
+      metre: {refs: [lines, departures.line], checked: [foot, feet, basis, stance], flavours: [fabulap],
+              required: [id, type, name, summary, provenance, stance]}
+      rhyme: {refs: [lines], checked: [scheme, sound, quality, placement, stance], flavours: [fabulap],
+              required: [id, type, name, summary, provenance, stance]}
+      file: {refs: [component], checked: [path, language, holds, length, sha256, entry, stance], flavours: [fabulac],
+             required: [id, type, name, summary, provenance, stance, path]}
+      component: {refs: [files, of, exposes, uses], checked: [does, stance], flavours: [fabulac],
+                  required: [id, type, name, summary, provenance, stance]}
+      interface: {refs: [defined-in], checked: [surface, signature, takes, gives, raises, exported, stance], flavours: [fabulac],
+                  required: [id, type, name, summary, provenance, stance, surface]}
+      structure: {refs: [defined-in], checked: [shape, fields, invariants, stance], flavours: [fabulac],
+                  required: [id, type, name, summary, provenance, stance]}
+      behaviour: {refs: [of], checked: [when, does, edges, errors, intended, stance], flavours: [fabulac],
+                  required: [id, type, name, summary, provenance, stance, does]}
+      dependency: {refs: [used-by], checked: [package, version, scope, needed-for, licence, stance], flavours: [fabulac],
+                   required: [id, type, name, summary, provenance, stance, scope]}
+      setting: {refs: [read-by], checked: [key, set-in, default, means, stance], flavours: [fabulac],
+                required: [id, type, name, summary, provenance, stance, set-in]}
+  R:
+    name: Production
+    subtitle: Who made the work, with what, and how it changed
+    kinds:
+      maker: {refs: [who], checked: [capacity, stance], flavours: [fabulan, fabulap, fabulac],
+              required: [id, type, name, summary, provenance, stance]}
+      change: {refs: [by, touches, release, phase], checked: [at, nature, because, commit, stance], flavours: [fabulan, fabulap, fabulac],
+               required: [id, type, name, summary, provenance, stance]}
+      phase: {refs: [changes], checked: [began, ended, stance], flavours: [fabulan, fabulap, fabulac],
+              required: [id, type, name, summary, provenance, stance]}
+      release: {refs: [changes], checked: [version, at, tag, venue, stance], flavours: [fabulan, fabulap, fabulac],
+                required: [id, type, name, summary, provenance, stance]}
+      means: {refs: [], checked: [what, used-for, version, stance], flavours: [fabulan, fabulap, fabulac],
+              required: [id, type, name, summary, provenance, stance]}
+      licence: {refs: [], checked: [identifier, file, holder, year, first-line, stance], flavours: [fabulan, fabulap, fabulac],
+                required: [id, type, name, summary, provenance, stance]}
+  P:
+    name: Propositions
+    subtitle: What the work claims, how it can be read, and what it must do
+    kinds:
+      claim: {refs: [roles.*], checked: [stance, salience, span], flavours: [fabulan, fabulap, fabulac]}
+      reading: {refs: [of, grounds.of], checked: [whose, grounds, intended, stance, span], flavours: [fabulan, fabulap],
+                required: [id, type, name, summary, provenance, stance, of, whose]}
+      case: {refs: [of], checked: [given, expect, stance, span], flavours: [fabulac],
+             required: [id, type, name, summary, provenance, stance, of, given, expect]}
+  T:
+    name: Transitions
+    subtitle: What happens, in order
+    note: in a fabulac an event is one step of what happens when the program is used; a use links its events with part-of
+    kinds:
+      event: {refs: [agent, patient, before, after], checked: [when, span], flavours: [fabulan, fabulap, fabulac]}
+  X:
+    name: Atems
+    subtitle: The tight reductions of passages
+    kinds:
+      atem: {refs: [of], checked: [line, focus, push, pull, span], flavours: [fabulan, fabulap, fabulac]}
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, provenance, status, visibility,
+             ref-grammar, ref-unresolved, closed-list, pending-shape, catalog-key, flavour, flavour-kind]
+  own: [code-span, licence-recorded, question-about, question-shape, session-declared, reading-whose,
+        interface-signature, case-outcome]                # enough/fabula.py (lint_fabula); a generic reader lists them as not run
+  contract: 'fabula-checks: the generic checks above and the own checks, with no error; its old name emf-checks is read
+             wherever a manifest, a program or a trace says it'
+  severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning}
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  long-form: 'a D:question item about the field (the dialectic); the inline form stays valid and is what a question settles'
+  answered-by: 'the dialectic: banks: to (author for prose and verse, maker for code)'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: claims
+    makes: the claims, who and what they are about, and how each is known
+    lens: {kind: mermaid, diagram: flowchart, include: [E, K, P], edges: [roles.*, links], class-by: stance,
+           shape: {claim: '[ ]', concept: '{{ }}', person: '([ ])', org: '([ ])', place: '([ ])', work: '([ ])',
+                   thing: '([ ])'}}
+  - id: map
+    makes: the whole fabula at a glance
+    lens: {kind: mermaid, diagram: mindmap, include: [I, L, E, K, N, C, R, P, T]}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+moves:                                  # Thym (docs/THYM.md, sections 6 and 17.6): the moves this MiniCOSM declares
+  - name: derive
+    takes: [text]
+    gives: fabula
+    asks: true
+    contract: [span-resolves, stance-closed, terms-grounded, coverage, emf-checks, provenance]
+    scaffold: rules-twin
+    code: enough.thym.moves.emf:derive
+    says: a text decompiled into its fabula, the EMF twin
+  - name: tell
+    takes: ['fabula | item | volume']
+    gives: short
+    modifiers: {as: order, by: order, with: morph}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, scales-met, footer, provenance]
+    scaffold: outline
+    code: enough.thym.moves.emf:tell
+    says: a telling of the fabula, in an order, in a morph
+  - name: atem
+    takes: ['text | fabula | short | item']
+    gives: atem
+    asks: true
+    contract: [atem-shape, span-resolves, provenance]
+    scaffold: first-sentence
+    code: enough.thym.moves.emf:atem
+    says: the line, focus, push and pull of a text or a passage
+  - name: expand
+    takes: [atem]
+    gives: short
+    modifiers: {with: fabula, to: words}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, length, span-inside, provenance]
+    code: enough.thym.moves.emf:expand
+    says: an atem opened out into a short of a given length, from its fabula
+
+# The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
+# about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
+# the volume once; about a kind, of each item of it; about a field, of each item where the field is absent or pending,
+# and {name} is filled from the item. The answer is written as the dialectic says (docs/fabula-pins-schema.md part 5).
+dialectic:
+  writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
+  answer-kinds: [text, choice, yes-no, number, date, ref, span]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint]
+  banks:
+    fabulan:
+      for: {flavour: fabulan}
+      to: author
+      questions:
+        - {id: occasion, about: I, asks: "What prompted this text: an event, a request, a need?", kind: text, why: missing}
+        - {id: influence, about: I, asks: "Which writers, works or traditions shaped it?", kind: text, why: missing}
+        - {id: allusion, about: I:allusion, asks: "Did you mean the echo of {name} here?", kind: yes-no, why: intent}
+        - {id: aim, about: N, asks: "What should a reader know, believe or do after reading it?", kind: text, why: intent}
+        - {id: audience, about: N, asks: "Whom did you write it for?", kind: text, why: missing}
+        - {id: exclusion, about: N, asks: "What did you choose to leave out, and why?", kind: text, why: intent}
+        - {id: decision, about: N, asks: "Which choice in it was hardest to make?", kind: text, why: intent}
+        - {id: voice, about: C:voice, asks: "Who is speaking here, and to whom?", kind: text, why: unsure}
+        - {id: parts, about: C, asks: "Why is it divided the way it is?", kind: text, why: intent}
+        - {id: maker, about: R, asks: "Who wrote it, and who else had a hand in it?", kind: text, why: missing}
+        - {id: release, about: R, asks: "Where and when was it first published?", kind: text, why: missing}
+        - {id: drafts, about: R, asks: "What changed between drafts?", kind: text, why: missing}
+        - {id: licence, about: R, asks: "May others copy it, and on what terms?", kind: text, why: missing}
+        - {id: weight, about: P, asks: "Which claim matters most to you?", kind: ref, why: intent}
+        - {id: stand-by, about: P:claim, asks: "Would you still stand behind this: {name}?", kind: yes-no, why: unsure}
+        - {id: refuse, about: P, asks: "Is there a reading of it you would refuse?", kind: text, why: intent}
+        - {id: sense, about: L:term#sense, asks: "Do you use {name} in a sense of your own? Which?", kind: text, why: unsure}
+    fabulap:
+      for: {flavour: fabulap}
+      to: author                  # an expert in the poet's work when the author cannot be asked
+      questions:
+        - {id: spark, about: I, asks: "What set the poem going: something seen, heard, read, or a line that came first?", kind: text, why: missing}
+        - {id: ear, about: I, asks: "Which poets or poems were in your ear while you wrote it?", kind: text, why: missing}
+        - {id: echo, about: I:allusion, asks: "Does {name} echo another text on purpose?", kind: yes-no, why: intent}
+        - {id: for-whom, about: I, asks: "Was it written for a person or an occasion?", kind: text, why: missing}
+        - {id: last-line, about: N, asks: "What did you want a reader to feel by the last line?", kind: text, why: intent}
+        - {id: listener, about: N, asks: "Whom did you imagine reading it, or hearing it?", kind: text, why: missing}
+        - {id: unsaid, about: N, asks: "Is there something the poem is careful not to say?", kind: text, why: intent}
+        - {id: speaker, about: C:voice#roles.speaker, asks: "Who speaks the poem: you, a character, or no one in particular?", kind: text, why: unsure}
+        - {id: addressee, about: C:voice#roles.addressee, asks: "Whom does the poem address, and is that one listening?", kind: text, why: unsure}
+        - {id: shift, about: C:voice, asks: "Does the speaker or the tone change anywhere? Where?", kind: span, why: unsure}
+        - {id: breaks, about: C:line, asks: "Why do the lines break where they do?", kind: text, why: intent}
+        - {id: stanza, about: C:part, asks: "Why this stanza shape, and these lengths?", kind: text, why: intent}
+        - {id: rhyme, about: C:rhyme, asks: "Was the rhyme (or its absence) chosen early or late, and why?", kind: text, why: intent}
+        - {id: metre-break, about: C:metre#departures, asks: "Where the metre breaks, is that on purpose?", kind: yes-no, why: intent}
+        - {id: stresses, about: C:line#stresses, asks: "How should line {number} be read aloud: where do the stresses fall?", kind: text, why: unsure}
+        - {id: image, about: C:device, asks: "Which image carries the most weight for you?", kind: ref, why: intent}
+        - {id: stands-for, about: C:device, asks: "Is {name} meant to stand for something beyond itself? What?", kind: text, why: ambiguous}
+        - {id: both, about: P:reading#intended, asks: "Is this reading one you meant: {name}?", kind: yes-no, why: ambiguous}
+        - {id: refuse, about: P, asks: "Is there a reading of the poem you would refuse?", kind: text, why: intent}
+        - {id: title, about: P, asks: "How does the title change the way the poem reads?", kind: text, why: intent}
+        - {id: cut, about: R, asks: "What did you cut from earlier drafts, and why?", kind: text, why: missing}
+        - {id: drafts, about: R, asks: "How many drafts did it go through, and what changed most?", kind: text, why: missing}
+        - {id: published, about: R, asks: "Where and when was it first published or performed?", kind: text, why: missing}
+        - {id: music, about: R, asks: "Is it set to music, or meant to be?", kind: yes-no, why: missing}
+        - {id: word, about: L:term#sense, asks: "Is {name} used in an old, regional or private sense?", kind: text, why: unsure}
+    fabulac:
+      for: {flavour: fabulac}
+      to: maker
+      questions:
+        - {id: modelled-on, about: I, asks: "What existing tool or program was this modelled on, or made to replace?", kind: text, why: missing}
+        - {id: prompted, about: I, asks: "What problem or moment set it going?", kind: text, why: missing}
+        - {id: for-whom, about: N, asks: "Who is it for, and what do they already know?", kind: text, why: missing}
+        - {id: never, about: N, asks: "What must it never do, whatever a user asks?", kind: text, why: intent}
+        - {id: left-out, about: N, asks: "What is deliberately left out, for now or for good?", kind: text, why: intent}
+        - {id: why-this, about: N:decision#because, asks: "Why was {name} chosen over the alternatives?", kind: text, why: intent}
+        - {id: tried, about: N:decision#over, asks: "What else was tried for {name} and dropped?", kind: text, why: missing}
+        - {id: intended, about: C:behaviour#intended, asks: "Is this behaviour intended, or an accident users now rely on: {name}?", kind: yes-no, why: intent}
+        - {id: public, about: C:interface#exported, asks: "Is {name} meant for others to call, or internal?", kind: yes-no, why: unsure}
+        - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing}
+        - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure}
+        - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
+        - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing}
+        - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing}
+        - {id: licence, about: R:licence, asks: "Under which licence may it be used?", kind: text, why: missing}
+        - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent}
+        - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most?", kind: ref, why: intent}
+
+extension:
+  status: not built

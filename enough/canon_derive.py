@@ -384,9 +384,9 @@ def _lines(text: str) -> list[str]:
 
 @lru_cache(maxsize=1)
 def _manifest() -> macrocosm.Manifest:
-    m = macrocosm.default_registry().get("emf")
+    m = macrocosm.default_registry().get("fabula")        # emf/1, the twin's spelling, is the fabula's old one
     if m is None:
-        raise DeriveError("the emf manifest is missing from defaults/cosm/manifests")
+        raise DeriveError("the fabula manifest is missing from defaults/cosm/manifests")
     return m
 
 

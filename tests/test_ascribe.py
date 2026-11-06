@@ -44,7 +44,8 @@ def _ascribe() -> mc.Manifest:
 
 def test_the_manifest_joins_the_registry_seventh():
     reg = mc.default_registry()
-    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc", "ascribe", "thym"]
+    assert list(reg.manifests) == ["comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym"]
+    assert reg.get("ascribe") in reg.minicosms() and not reg.get("ascribe").core      # a MiniCOSM, never built in
     assert reg.problems == []
     m = reg.get("ascribe")
     assert (m.name, m.title, m.version, mc._decl_value(m)) == ("ascribe", "Ascribe", 1, "ascribe/1")
@@ -66,9 +67,10 @@ def test_the_manifest_carries_the_header_and_the_notice():
 
 def test_ten_modules_of_one_kind_each_and_the_forms():
     m = _ascribe()
-    assert m.modules() == list("ABCEIOQSUYF")
-    assert {L: m.module(L)["name"] for L in m.modules()} == MODULE_NAMES
+    assert m.modules() == list("ABCEIOQSUYF") + ["D"]                  # the core's dialectic, inherited
+    assert {L: m.module(L)["name"] for L in m.modules() if L != "D"} == MODULE_NAMES
     assert len({name[0] for name in MODULE_NAMES.values()}) == 11            # every initial distinct
+    assert list(m.kinds("D")) == ["question", "session"] and "D" not in m.data["modules"]
     for letter, kind in NODE_KINDS.items():
         assert list(m.kinds(letter)) == [kind]
         assert {"form", "of", "parts", "links"} <= set(m.refs(letter, kind))
@@ -76,7 +78,8 @@ def test_ten_modules_of_one_kind_each_and_the_forms():
         assert isinstance(sub, str) and len(sub.split()) >= 3 and not sub.endswith(".")
     assert list(m.kinds("F")) == ["form", "polyform", "relation"]
     assert set(m.refs("F", "polyform")) == {"links", "forms", "links.from"}
-    assert m.grammar.seg["module"].pattern == "[ABCEIOQSUYF]"
+    assert m.data["paths"]["segments"]["module"] == "[ABCEIOQSUYF]"      # the file, untouched
+    assert m.grammar.seg["module"].pattern == "[ABCEIOQSUYFD]"            # the reader adds the core's D
 
 
 def test_links_closed_lists_checks_and_renderers():
@@ -114,7 +117,7 @@ def test_the_schema_has_no_place_for_personal_data():
 def test_the_dialectic_asks_three_to_five_plain_questions_per_module():
     m = _ascribe()
     qs = m.data["dialectic"]["questions"]
-    assert list(qs) == m.modules()
+    assert list(qs) == [L for L in m.modules() if L != "D"]
     for letter, questions in qs.items():
         assert 3 <= len(questions) <= 5, letter
         assert len(set(questions)) == len(questions)

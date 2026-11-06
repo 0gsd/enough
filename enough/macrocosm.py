@@ -1,16 +1,19 @@
 """MacroCOSM OES: the reference reader for `.cosm` volumes (grammar version 0.5.4; 0.0.2 and 0.0.1 read unchanged).
 
-MacroCOSM is the shared grammar every MiniCOSM is written in: a domain
-enumerated as a file system that is also a relational database, made to
-be rendered. A MiniCOSM (Comprise OES for companies, Canon for enough's
-library, EMF for one text) is declared by a manifest (`manifest:
-minicosm/0`). A volume is one database of a MiniCOSM: a folder, or a
-single catalog file, whose catalog's first key says which MiniCOSM it is
-written in (`oes: <minicosm>/<major>`). This module reads any volume of
-any MiniCOSM it holds a manifest for: it loads it, runs the generic
-checks, resolves paths and references, and draws it. The prose is
-docs/MACROCOSM_OES.md; the cosm viewer, Canon and the readvisor tools
-all call through here.
+MacroCOSM is an OES: the shared grammar, and the core built into it. A
+domain is enumerated as a file system that is also a relational
+database, made to be rendered. A format is declared by a manifest
+(`manifest: minicosm/0`): one of the core's five built-ins (`core:
+true`: cosm, canon, fabula, doc, thym) or one of the two MiniCOSMs
+(comprise, ascribe). A volume is one database of a format: a folder, or
+a single catalog file, whose catalog's first key says which format it is
+written in (`oes: <format>/<major>`, or an old spelling the manifest
+lists: `oes: emf/1` is a fabula). Every format inherits the core's module
+D, the dialectic, from `core.modules.cosm`. This module reads any volume
+of any format it holds a manifest for: it loads it, runs the generic
+checks, resolves paths and references, and draws it; `tree_digest`
+gives a fabulac's folder digest. The prose is docs/MACROCOSM_OES.md;
+the cosm viewer, Canon and the readvisor tools all call through here.
 
 Charter:
 
@@ -57,6 +60,7 @@ import fnmatch
 import functools
 import hashlib
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -74,8 +78,17 @@ MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4")
 MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"
-# When two manifests could claim one catalog, the first in this order wins; any other MiniCOSM follows by name.
-REGISTRY_ORDER = ("comprise", "cosm", "canon", "emf", "doc")
+# When two manifests could claim one catalog, the first in this order wins; any other format follows by name. The
+# order is independent of whether a format is built in (`core: true`) or a MiniCOSM (spec 13.6).
+REGISTRY_ORDER = ("comprise", "cosm", "canon", "fabula", "doc")
+# The core's file of modules (spec 13.4): `{modules-of: core, modules: {D: ...}, closed: {<kind>: {<field>: [...]}}}`,
+# beside the manifests. Not a manifest and not a moves sidecar: the registry merges its modules into every manifest
+# that does not declare them (module D, the dialectic, which every format inherits).
+CORE_MODULES_FILE = "core.modules.cosm"
+# The core's own checks (spec 12.3, 18.6.8): run on every volume that holds an item of module D, by the code that
+# runs them (enough/fabula.py); this reader lists them as not run on such a volume.
+CORE_CHECKS = ("question-about", "question-shape", "session-declared")
+DIALECTIC_MODULE = "D"
 # The lens kinds `to_mermaid` draws. A manifest may declare others (DocOES's `short` and `table`): `Manifest.lenses`
 # keeps them for the code that renders them; `lenses(volume)` lists only the ones drawn here.
 DRAWN_LENS_KINDS = ("mermaid",)
@@ -88,7 +101,7 @@ RESERVED_CATALOG_KEYS = ("macrocosm",)
 # the ids it lists that are not here are reported as not run, never as failures.
 CHECKS = ("load", "duplicate-id", "id-grammar", "id-module", "type", "type-prefix", "identity-min", "provenance",
           "status", "visibility", "ref-grammar", "ref-unresolved", "closed-list", "pending-shape", "module-none",
-          "catalog-key")
+          "catalog-key", "flavour", "flavour-kind")
 SEVERITY = {**{c: "error" for c in CHECKS}, "module-none": "warning", "pending-shape": "warning"}
 
 WHOLE_ITEM = "node"            # the field path of an open question on a whole item (Comprise's word)
@@ -273,8 +286,10 @@ class Problem:
 
 @dataclass(frozen=True)
 class Declaration:
-    """Which MiniCOSM a catalog is written in, and how the reader knows: `oes` (the key said so), `legacy` (an
-    older key the manifest still reads) or `absent` (no key, and the manifest reads that as itself)."""
+    """Which format a catalog is written in, and how the reader knows: `oes` (the key said so), `old` (the key gave an
+    old spelling the manifest lists in `declaration.old`: `oes: emf/1` is the fabula's), `legacy` (an older key the
+    manifest still reads) or `absent` (no key, and the manifest reads that as itself). `minicosm` is the format's
+    name as its manifest gives it (`fabula` for an `emf/1` twin); `said` what the file wrote."""
     minicosm: str
     major: int
     manifest: "Manifest"
@@ -315,10 +330,104 @@ class Manifest:
     version: int
     path: Path | None
     data: dict = field(repr=False)
+    # Modules the core gives this manifest (spec 13.4): {letter: module spec}, merged in by the registry from
+    # `core.modules.cosm` where the manifest does not declare the letter itself. `data` is never touched.
+    inherited: dict = field(default_factory=dict, repr=False)
+    inherited_from: Path | None = None
 
     def _block(self, key: str) -> dict:
         v = self.data.get(key)
         return v if isinstance(v, dict) else {}
+
+    @property
+    def core(self) -> bool:
+        """A built-in of the core (`core: true`); absent or false: a MiniCOSM (spec 13.3)."""
+        return self.data.get("core") is True
+
+    @property
+    def old(self) -> list[str]:
+        """The old spellings this manifest reads and never writes (`declaration.old`: the fabula's `emf/1`)."""
+        return [v for v in _strs(self.declaration.get("old")) if _DECL_RE.match(v)]
+
+    @property
+    def old_names(self) -> list[str]:
+        """The format names of the old spellings (`emf`), for URIs written under an old name (spec 11.3)."""
+        out = []
+        for v in self.old:
+            n = v.split("/", 1)[0]
+            if n not in out and n != self.name:
+                out.append(n)
+        return out
+
+    def _modules_block(self) -> dict:
+        own = self._block("modules")
+        if not self.inherited:
+            return own
+        return {**own, **{k: v for k, v in self.inherited.items() if k not in own}}
+
+    @property
+    def flavours(self) -> list[str]:
+        """The closed list of flavours a catalog may name (`catalog.flavour`); empty for a format without flavours."""
+        v = self._block("catalog").get("flavour")
+        return _strs(v) if isinstance(v, list) else []
+
+    @property
+    def flavour_absent(self) -> str | None:
+        """What an absent `flavour` reads as (`catalog.flavour-absent`: the fabula's `fabulan`)."""
+        v = self._block("catalog").get("flavour-absent")
+        return v if isinstance(v, str) else None
+
+    def flavour_of(self, catalog: dict) -> Any:
+        """A catalog's flavour as this manifest reads it: its `flavour`, else `catalog.flavour-absent`."""
+        return catalog.get("flavour") if "flavour" in catalog else self.flavour_absent
+
+    def catalog_id_forms(self) -> list[str]:
+        """The catalog id's templates: `catalog.id`, then the earlier forms of `catalog.id-old` (read, never
+        written: the fabula's `emf/<slug>`)."""
+        cat = self._block("catalog")
+        out = [cat["id"]] if isinstance(cat.get("id"), str) else []
+        return out + [t for t in _strs(cat.get("id-old")) if t not in out]
+
+    def own_checks(self) -> list[str]:
+        """The format's own check ids (`checks.own` given as a list). Given as a string, `own` is prose: no ids."""
+        own = self._block("checks").get("own")
+        return _strs(own) if isinstance(own, list) else []
+
+    def banks(self) -> list[dict]:
+        """The dialectic's banks of opening questions (spec 18.6.6), in manifest order: [{name, for, to, intro,
+        counters, questions: [{id, about, asks, kind, why, to, ...}]}]. Both shapes are read: `dialectic.banks`
+        (a mapping of named banks), and the older `dialectic.questions` (`{<letter>: [<question>, ...]}`, Ascribe's),
+        read as one bank named after the manifest whose entries are `{id: <letter><n>, about: <letter>, asks, kind:
+        text, why: missing}` with the bank's default answerer (`dialectic.to`, else `holder`: the older shape is
+        Ascribe's, whose subject answers)."""
+        dia = self._block("dialectic")
+        out: list[dict] = []
+        banks = dia.get("banks")
+        if isinstance(banks, dict):
+            for bname, b in banks.items():
+                if not isinstance(b, dict):
+                    continue
+                entries = []
+                for e in _list(b.get("questions")):
+                    if isinstance(e, dict):
+                        entries.append({**e, "to": e.get("to", b.get("to"))})
+                out.append({"name": str(bname), "for": b.get("for") if isinstance(b.get("for"), dict) else {},
+                            "to": b.get("to"), "intro": b.get("intro"),
+                            "counters": b.get("counters") if isinstance(b.get("counters"), dict) else {},
+                            "questions": entries})
+        qs = dia.get("questions")
+        if isinstance(qs, dict):
+            to = dia.get("to") if isinstance(dia.get("to"), str) else "holder"
+            entries = []
+            for letter, lst in qs.items():
+                for n, q in enumerate(_list(lst), 1):
+                    if isinstance(q, str):
+                        entries.append({"id": f"{letter}{n}", "about": str(letter), "asks": q, "kind": "text",
+                                        "why": "missing", "to": to})
+            if not any(b["name"] == self.name for b in out):
+                out.append({"name": self.name, "for": {}, "to": to, "intro": None, "counters": {},
+                            "questions": entries})
+        return out
 
     @property
     def declaration(self) -> dict:
@@ -357,11 +466,17 @@ class Manifest:
         return _strs(rels) if isinstance(rels, list) else None
 
     def modules(self) -> list[str]:
-        return [str(k) for k in self._block("modules")]
+        """The module letters: the manifest's own, in its order, then any the core gives it (module D)."""
+        return [str(k) for k in self._modules_block()]
 
     def module(self, letter: str | None) -> dict:
-        v = self._block("modules").get(letter)
+        v = self._modules_block().get(letter)
         return v if isinstance(v, dict) else {}
+
+    def kind_closed(self, module: str | None, kind: str | None) -> dict[str, list]:
+        """A kind's own closed lists (`closed: {<field>: [values]}`), applied to its items over `closed-lists`."""
+        c = (self.kind(module, kind) or {}).get("closed")
+        return {str(k): list(v) for k, v in c.items() if isinstance(v, list)} if isinstance(c, dict) else {}
 
     def kinds(self, module: str | None) -> dict[str, dict]:
         """The module's kinds, in manifest order: {kind: its spec mapping}."""
@@ -562,12 +677,53 @@ class Registry:
                                           f"({', '.join(MACROCOSM_VERSIONS)}); read as {MACROCOSM_VERSION}")
         order = [n for n in REGISTRY_ORDER if n in found] + sorted(n for n in found if n not in REGISTRY_ORDER)
         self.manifests: dict[str, Manifest] = {n: found[n] for n in order}
+        # The core's modules (spec 13.4): read from the first folder that holds the file, merged into every manifest
+        # that does not declare the letter itself.
+        self.core_modules: dict = {}
+        self.core_modules_path: Path | None = None
+        for d in self.dirs:
+            p = d / CORE_MODULES_FILE
+            try:
+                if not p.is_file():
+                    continue
+            except OSError:
+                continue
+            got = _load_core_modules(p, self.problems)
+            if got is not None:
+                self.core_modules, self.core_modules_path = got, p
+            break
+        for m in self.manifests.values():
+            own = m._block("modules")
+            m.inherited = {k: v for k, v in self.core_modules.items() if k not in own}
+            m.inherited_from = self.core_modules_path if m.inherited else None
 
     def get(self, name: str) -> Manifest | None:
         return self.manifests.get(name)
 
+    def built_ins(self) -> list[Manifest]:
+        """The core's built-ins: the manifests that say `core: true`, in registry order (spec 13.6)."""
+        return [m for m in self.manifests.values() if m.core]
+
+    def minicosms(self) -> list[Manifest]:
+        """The MiniCOSMs: every other manifest, in registry order."""
+        return [m for m in self.manifests.values() if not m.core]
+
+    def by_name(self, name: str) -> Manifest | None:
+        """A manifest by its format's name or by the name of one of its old spellings (`emf` -> the fabula's)."""
+        if name in self.manifests:
+            return self.manifests[name]
+        return next((m for m in self.manifests.values() if name in m.old_names), None)
+
+    def by_declaration(self, value: Any) -> Manifest | None:
+        """The manifest a declaration value names exactly: its own value or one of its old spellings."""
+        if not isinstance(value, str):
+            return None
+        return next((m for m in self.manifests.values() if value == _decl_value(m) or value in m.old), None)
+
     def known(self) -> str:
-        return ", ".join(_decl_value(m) for m in self.manifests.values()) or "none (no manifests)"
+        """What a refusal lists: each format's declaration, its old spellings after it (`fabula/1 (also emf/1)`)."""
+        return ", ".join(_decl_value(m) + (f" (also {', '.join(m.old)})" if m.old else "")
+                         for m in self.manifests.values()) or "none (no manifests)"
 
     def find_catalog(self, folder: Path) -> Path | None:
         """The catalog file at a folder's root, by the names the manifests give, in registry order."""
@@ -581,10 +737,11 @@ class Registry:
         return None
 
     def identify(self, catalog: dict, *, filename: str | None = None) -> Declaration | Refusal:
-        """Which MiniCOSM a catalog mapping is written in. An explicit `oes:` always decides, and an unknown
-        MiniCOSM, an unknown major or an empty value is refused; otherwise the first manifest whose legacy key
-        matches (registry order); otherwise the first whose `absent` rule claims a catalog with no key, among
-        the manifests whose catalog name fits `filename` (all of them when no filename is given)."""
+        """Which format a catalog mapping is written in (spec 5.2). An explicit `oes:` always decides: the
+        manifest's own value (`how: oes`) or an old spelling it lists in `declaration.old` (`how: old`), each spelled
+        exactly; an unknown format, an unknown major or an empty value is refused. Otherwise the first manifest whose
+        legacy key matches (registry order); otherwise the first whose `absent` rule claims a catalog with no key,
+        among the manifests whose catalog name fits `filename` (all of them when no filename is given)."""
         what = filename or "the catalog"
         if not isinstance(catalog, dict):
             return Refusal(f"{what}: a catalog's top level is a mapping", file=filename)
@@ -602,8 +759,14 @@ class Registry:
             m = self.manifests.get(mt.group(1)) if mt else None
             if m is not None and str(m.declaration.get("key") or "oes") == key and v == _decl_value(m):
                 return Declaration(m.name, int(mt.group(2)), m, "oes", key, v)      # one spelling, as Comprise reads it
+            for om in self.manifests.values():                  # an old spelling, exactly as the manifest lists it
+                if isinstance(v, str) and v in om.old and str(om.declaration.get("key") or "oes") == key:
+                    own = _DECL_RE.match(_decl_value(om))
+                    return Declaration(om.name, int(own.group(2)) if own else om.version, om, "old", key, v)
+            m = m or (self.by_name(mt.group(1)) if mt else None)
             if m is not None:
-                why = f"this reader reads {m.title} as {_decl_value(m)} only"
+                why = f"this reader reads {m.title} as {_decl_value(m)}" + \
+                      (f" (or its old spelling {', '.join(m.old)})" if m.old else "") + " only"
             elif mt:
                 why = f"it does not know the MiniCOSM {mt.group(1)!r}; it knows {self.known()}"
             else:
@@ -636,6 +799,40 @@ class Registry:
 def _decl_value(m: Manifest) -> str:
     v = m.declaration.get("value")
     return v if isinstance(v, str) and _DECL_RE.match(v) else f"{m.name}/{m.version}"
+
+
+def _load_core_modules(p: Path, problems: list[str]) -> dict | None:
+    """The modules of the core's file (`core.modules.cosm`), each kind given its closed lists from the file's
+    `closed:` block (merged over any `closed` the kind declares itself). None, with a problem, when it cannot be read
+    or is not the file it should be."""
+    try:
+        data, forbidden, error = _parse(read_text(p))
+    except (OSError, UnicodeDecodeError) as e:
+        problems.append(f"{p.name}: cannot read: {e}")
+        return None
+    if error or forbidden or not isinstance(data, dict):
+        problems.append(f"{p.name}: {error or (forbidden[0] if forbidden else 'its top level is a mapping')}")
+        return None
+    if data.get("modules-of") != "core" or not isinstance(data.get("modules"), dict):
+        problems.append(f"{p.name}: the core's modules are {{modules-of: core, modules: {{...}}}}")
+        return None
+    closed = data.get("closed") if isinstance(data.get("closed"), dict) else {}
+    out: dict = {}
+    for letter, mod in data["modules"].items():
+        if not isinstance(mod, dict):
+            continue
+        mod = dict(mod)
+        kinds = mod.get("kinds") if isinstance(mod.get("kinds"), dict) else {}
+        merged = {}
+        for k, spec in kinds.items():
+            spec = dict(spec) if isinstance(spec, dict) else {}
+            extra = closed.get(k)
+            if isinstance(extra, dict):
+                spec["closed"] = {**(spec.get("closed") if isinstance(spec.get("closed"), dict) else {}), **extra}
+            merged[str(k)] = spec
+        mod["kinds"] = merged
+        out[str(letter)] = mod
+    return out
 
 
 def _scalar_text(v: Any) -> str:
@@ -700,7 +897,19 @@ class _Grammar:
         self.part_level = first if first not in _NON_ITEM_LEVELS else None
         seg = paths.get("segments") if isinstance(paths.get("segments"), dict) else {}
         mod_default = "(?:" + "|".join(map(re.escape, self.modules)) + ")" if self.modules else "[A-Z]"
-        self.seg = {"module": _compile(seg.get("module"), mod_default),
+        mod_seg = seg.get("module")
+        self.inherited = tuple(L for L in m.inherited if L in self.modules)
+        if isinstance(mod_seg, str):                    # the core's letters join a module segment that lists letters
+            for L in self.inherited:
+                try:
+                    if re.fullmatch(mod_seg, L):
+                        continue
+                except re.error:
+                    break
+                cls = re.fullmatch(r"\[([A-Za-z]+)\]", mod_seg)
+                mod_seg = f"[{cls.group(1)}{L}]" if cls else (f"[{mod_seg}{L}]" if re.fullmatch(r"[A-Za-z]", mod_seg)
+                                                             else f"(?:{mod_seg}|{re.escape(L)})")
+        self.seg = {"module": _compile(mod_seg, mod_default),
                     "kind": _compile(seg.get("kind"), _SEGMENT_DEFAULTS["kind"]),
                     "slug": _compile(seg.get("slug"), _SEGMENT_DEFAULTS["slug"]),
                     "field": _compile(seg.get("field"), _SEGMENT_DEFAULTS["field"])}
@@ -728,7 +937,13 @@ class _Grammar:
 
         # The item form.
         self.item_form = str(ids.get("item-form") or "<module>:<kind>/<slug>")
-        self.default_module = self.modules[0] if "<module>" not in self.item_form and len(self.modules) == 1 else None
+        own_modules = [L for L in self.modules if L not in self.inherited]
+        self.default_module = own_modules[0] if "<module>" not in self.item_form and len(own_modules) == 1 else None
+        # The core's modules always take the full form `<module>:<kind>/<slug>` (with a part's qualifier where the
+        # volume has parts), whatever form the manifest gives its own items (a COSM tree's `<kind>/<slug>`,
+        # Comprise's regex of its eight letters).
+        self.inherited_rx = (re.compile("^" + qual + "(?P<module>" + "|".join(map(re.escape, self.inherited))
+                                        + r"):(?P<kind>[a-z][a-z0-9-]*)/(?P<slug>\S+)$") if self.inherited else None)
         self.item_part_group: str | None = None
         given = ids.get("item")
         if isinstance(given, str) and given.startswith("^"):
@@ -775,6 +990,12 @@ class _Grammar:
         """An id -> its parts, by spelling alone; None when it is not an id in this MiniCOSM."""
         if not isinstance(s, str) or not s:
             return None
+        if self.inherited_rx is not None:
+            mt = self.inherited_rx.match(s)
+            if mt:
+                part = mt.groupdict().get("part")
+                return _IdParts(mt.group("module"), mt.group("kind"), mt.group("slug"),
+                                s.split("//", 1)[1] if part else s, part)
         for rx, mod, kind, loose in self.custom:
             mt = rx.match(s)
             if mt:
@@ -811,6 +1032,8 @@ class _Grammar:
     def item_id(self, module: str, kind: str, slug: str) -> str:
         """The id a (module, kind, slug) respells: the kind's own form when it has one, else the item form."""
         spec = self.manifest.kind(module, kind) or {}
+        if module in self.inherited:
+            return f"{module}:{kind}/{slug}"
         t = spec.get("id") if isinstance(spec.get("id"), str) and "<slug>" in spec["id"] else self.item_form
         return t.replace("<module>", module).replace("<kind>", kind).replace("<slug>", slug)
 
@@ -899,11 +1122,14 @@ class Volume:
     @property
     def database(self) -> str:
         """The volume's name in a qualified URI: the catalog id without the literal prefix of the manifest's
-        `catalog.id` (holotype/, canon/, emf/), so a project catalog's is `~<slug>`."""
+        `catalog.id` (holotype/, canon/, fabula/), or of an earlier form `catalog.id-old` lists (an old twin's emf/),
+        so a project catalog's is `~<slug>` and `emf/guides--close-md` gives `guides--close-md` (spec 6.2)."""
         cid = self.id
-        tmpl = self.manifest._block("catalog").get("id") if self.manifest else None
-        prefix = tmpl.split("<", 1)[0] if isinstance(tmpl, str) and "<" in tmpl else ""
-        return cid[len(prefix):] if prefix and cid.startswith(prefix) and len(cid) > len(prefix) else cid
+        for tmpl in (self.manifest.catalog_id_forms() if self.manifest else []):
+            prefix = tmpl.split("<", 1)[0] if "<" in tmpl else ""
+            if prefix and cid.startswith(prefix) and len(cid) > len(prefix):
+                return cid[len(prefix):]
+        return cid
 
     @property
     def name(self) -> str:
@@ -1339,6 +1565,10 @@ def parse_path(volume: Volume, path: Any) -> Address | Refusal:
     s = path
     if s.startswith("oes:"):
         head = f"oes:{volume.minicosm}/"
+        for old in m.old_names:                    # an old spelling's name names the same thing (spec 11.3)
+            if s.startswith(f"oes:{old}/") or s == f"oes:{old}":
+                s = f"oes:{volume.minicosm}" + s[len(f"oes:{old}"):]
+                break
         if not s.startswith(head):
             other = s[4:].split("/", 1)[0]
             return Refusal(f"refused {path!r}: it names the MiniCOSM {other!r}; this volume is {volume.oes}")
@@ -1446,9 +1676,10 @@ def items_under(volume: Volume, path: Any) -> list[Item]:
 
 
 def qualified_uri(volume: Volume, item: Item | None = None) -> str:
-    """`oes:<minicosm>/<database>/<path>` for an item, `oes:<minicosm>/<database>` for the volume; '' when the
+    """`oes:<format>/<database>/<path>` for an item, `oes:<format>/<database>` for the volume; '' when the
     item has no path. The database is the catalog id without its prefix (Comprise: holotype/<x> -> x; Canon:
-    canon/<volume> -> <volume>, a project's ~<slug>; EMF: emf/<x> -> x)."""
+    canon/<volume> -> <volume>, a project's ~<slug>; the fabula: fabula/<x> -> x, and an old twin's emf/<x> -> x).
+    Always written with the format's own name (`oes:fabula/…`, never an old spelling's `oes:emf/…`)."""
     if volume.manifest is None:
         return ""
     base = f"oes:{volume.minicosm}/{volume.database}"
@@ -1520,6 +1751,10 @@ def _resolve(volume: Volume, from_item: Item | None, ref: Any) -> Item | Part | 
     if m is None or not isinstance(ref, str) or ref in m.sentinels:
         return None
     g = m.grammar
+    if "#" in ref:                                  # an address: the item before `#`, and a field path that parses
+        ref, _, fpath = ref.partition("#")          # (the field need not be present: spec 9.3)
+        if not g.seg["field"].fullmatch(fpath):
+            return None
     if g.is_part_id(ref):
         return volume.parts.get(ref)
     p = g.parse(ref)
@@ -1532,8 +1767,9 @@ def _resolve(volume: Volume, from_item: Item | None, ref: Any) -> Item | Part | 
 
 
 def resolve_ref(volume: Volume, from_item: Item | None, ref: Any) -> Item | None:
-    """The item a reference names, read from `from_item` (a bare id resolves in its part): an id string or a
-    typed link `{rel, to}`. None for a sentinel, an open question, a part, or nothing there."""
+    """The item a reference names, read from `from_item` (a bare id resolves in its part): an id string, an
+    address `<id>#<field path>` (the item; the path must parse) or a typed link `{rel, to}`. None for a sentinel, an
+    open question, a part, or nothing there."""
     hit = _resolve(volume, from_item, ref)
     return hit if isinstance(hit, Item) else None
 
@@ -1602,6 +1838,9 @@ def _not_run(m: Manifest) -> list[str]:
     for r in _list(c.get("rules")):
         if isinstance(r, dict) and "id" in r:
             out.append(f"rule {r['id']}")
+    for x in m.own_checks():                        # the format's own checks, given as ids (spec 12.3)
+        if x not in out and x not in m.checks():
+            out.append(x)
     return out
 
 
@@ -1616,6 +1855,10 @@ class _Lint:
         self.closed = self.m.closed_lists()
         prov = self.m.envelope.get("provenance")
         self.state_default = str(prov.get("state-default") or "known") if isinstance(prov, dict) else "known"
+        # The catalog's flavour, when the format has flavours and the value is one of them (else flavour-kind waits
+        # for the flavour check's finding to be fixed).
+        fl = self.m.flavour_of(volume.catalog) if self.m.flavours else None
+        self.flavour = fl if isinstance(fl, str) and fl in self.m.flavours else None
 
     def add(self, check: str, item: Item | None, msg: str, fld: str | None = None, severity: str | None = None,
             file: str | None = None) -> None:
@@ -1652,6 +1895,9 @@ class _Lint:
             else:
                 self.add("type", it, f"{kind!r} is not a {it.module} kind ({', '.join(kinds)})", "type")
                 return
+        fls = _strs(kinds[kind].get("flavours"))
+        if self.flavour is not None and fls and self.flavour not in fls:
+            self.add("flavour-kind", it, f"{_a(kind)} belongs to {_or(fls)}, not to {_a(self.flavour)}", "type")
         own = kinds[kind].get("id")
         if isinstance(own, str) and "<slug>" in own:
             if p.form != kind:
@@ -1672,7 +1918,9 @@ class _Lint:
         for fpath in m.refs(it.module, kind):
             for v in walk_path(d, fpath):
                 self.ref(it, fpath, v, soft="*" in fpath)
-        for fpath, allowed in self.closed.items():
+        own_lists = m.kind_closed(it.module, kind)
+        closed = {**self.closed, **own_lists} if own_lists else self.closed
+        for fpath, allowed in closed.items():
             if fpath in ("status", "visibility") and fpath in self.sel:
                 continue
             if fpath.startswith("provenance.") and "provenance" in self.sel and "provenance" in req:
@@ -1746,19 +1994,38 @@ class _Lint:
             tmpl = cat.get("id")
             cid = v.catalog.get("id")
             if isinstance(tmpl, str) and "<" in tmpl:
-                rx = re.compile("^" + _Grammar._template(tmpl, {}) + "$")
+                forms = [t for t in m.catalog_id_forms() if "<" in t]
                 if cid is None:
                     self.add("catalog-key", None, f"no id: a catalog's id is {tmpl}", "id", file=v.catalog_file)
-                elif not isinstance(cid, str) or not rx.match(cid):
+                elif not isinstance(cid, str) or not any(re.match("^" + _Grammar._template(t, {}) + "$", cid)
+                                                         for t in forms):
                     self.add("catalog-key", None, f"id {cid!r} is not {tmpl}", "id", file=v.catalog_file)
             for k in _strs(cat.get("keys")):
                 allowed = cat.get(k)
                 if k == "keys" or not isinstance(allowed, list) or k not in v.catalog:
                     continue
+                if k == "flavour" and "flavour" in self.sel:
+                    continue                        # the flavour check says it, once
                 val = v.catalog[k]
                 if not is_pending(val) and (isinstance(val, (dict, list)) or val not in allowed):
                     self.add("catalog-key", None, f"{k}: {val!r} must be one of {', '.join(map(str, allowed))}", k,
                              file=v.catalog_file)
+        if "flavour" in self.sel and m.flavours:
+            val = m.flavour_of(v.catalog)
+            if val not in m.flavours:
+                said = "absent" if "flavour" not in v.catalog else repr(val)
+                self.add("flavour", None, f"flavour {said} is not {_or(m.flavours)}", "flavour", file=v.catalog_file)
+
+
+def _a(word: str) -> str:
+    """A word with its indefinite article: `a line`, `an interface`."""
+    return ("an " if word[:1].lower() in "aeiou" else "a ") + word
+
+
+def _or(words: list[str]) -> str:
+    """`fabulan`, `fabulan or fabulap`, `fabulan, fabulap or fabulac`."""
+    words = [str(w) for w in words]
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " or " + words[-1]
 
 
 def lint(volume: Volume) -> Report:
@@ -1777,6 +2044,8 @@ def lint(volume: Volume) -> Report:
         return rep
     rep.checks = ["load"] + [c for c in selected if c in CHECKS and c != "load"]
     rep.not_run = _not_run(m)
+    if any(it.module == DIALECTIC_MODULE for it in volume.items.values()):
+        rep.not_run += [c for c in CORE_CHECKS if c not in rep.not_run]     # the dialectic's own (spec 12.3)
     ctx = _Lint(volume, rep)
     for it in volume.items.values():
         ctx.item(it)
@@ -1795,6 +2064,66 @@ def jsonable(value: Any) -> Any:
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
     return str(value)
+
+
+# ---------------------------------------------------------------------------
+# The tree digest: a fabulac's folder, fresh or stale (spec 18.4.1)
+# ---------------------------------------------------------------------------
+
+# Folders skipped whole, by name at any depth (and any folder holding a pyvenv.cfg, any name ending .egg-info, any
+# name containing .cshort-); files skipped by name or ending; the size cap; the NUL sniff. Exactly the spec's table,
+# so that enough, Thym's vendored copy and Comprise's agree to the byte.
+TREE_SKIP_DIRS = frozenset({".git", ".hg", ".svn", ".bzr", "_darcs", "CVS",
+                            ".venv", "venv", "__pypackages__", ".tox", ".nox", "node_modules",
+                            "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".hypothesis",
+                            ".ipynb_checkpoints", ".cache", "htmlcov", "build", "dist", ".eggs"})
+TREE_SKIP_DIR_SUFFIXES = (".egg-info",)
+TREE_SKIP_FILES = frozenset({".DS_Store", "Thumbs.db", "desktop.ini", ".coverage"})
+TREE_SKIP_FILE_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll", ".o", ".a", ".class")
+TREE_MAX_BYTES = 1_000_000
+TREE_SNIFF = 8192
+
+
+def _tree_skip_dir(d: Path) -> bool:
+    n = d.name
+    return n in TREE_SKIP_DIRS or n.endswith(TREE_SKIP_DIR_SUFFIXES) or ".cshort-" in n or (d / "pyvenv.cfg").is_file()
+
+
+def tree_digest(folder) -> dict:
+    """The tree digest of a folder of source (spec 18.4.1): `{files, bytes, skipped, tree, read}`, where `tree` is
+    the sha256 (64 lowercase hex digits) over, for each file read in ascending order of its relative path's UTF-8
+    bytes, `<relative path> NUL <the file's sha256 in hex> LF`; `read` is [(relative path, sha256, size)] in that
+    order. Symbolic links are never followed or read; ignore files, the git index and modification times are not
+    used. Byte for byte the reference code of docs/fabula-pins-schema.md, appendix G. Raises OSError when the folder
+    cannot be walked (a caller that must not raise catches it)."""
+    root = Path(folder)
+    read, skipped = [], 0
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        here = Path(dirpath)
+        dirnames[:] = [d for d in dirnames if not ((here / d).is_symlink() or _tree_skip_dir(here / d))]
+        for f in filenames:
+            p = here / f
+            rel = p.relative_to(root).as_posix()
+            if (p.is_symlink() or f in TREE_SKIP_FILES or f.endswith(TREE_SKIP_FILE_SUFFIXES)
+                    or f.endswith(".fabulac.cosm") or ".catem-" in f):
+                skipped += 1
+                continue
+            data = p.read_bytes()
+            if len(data) > TREE_MAX_BYTES or b"\0" in data[:TREE_SNIFF]:
+                skipped += 1
+                continue
+            try:
+                data.decode("utf-8")
+            except UnicodeDecodeError:
+                skipped += 1
+                continue
+            read.append((rel, hashlib.sha256(data).hexdigest(), len(data)))
+    read.sort(key=lambda r: r[0].encode("utf-8"))
+    h = hashlib.sha256()
+    for rel, digest, _ in read:
+        h.update(rel.encode("utf-8") + b"\0" + digest.encode("ascii") + b"\n")
+    return {"files": len(read), "bytes": sum(s for _, _, s in read), "skipped": skipped, "tree": h.hexdigest(),
+            "read": read}
 
 
 # ---------------------------------------------------------------------------

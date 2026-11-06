@@ -480,6 +480,8 @@ def declaration_text(vol: Any) -> str:
         return f"{d.value} (`oes: {d.said or d.value}`)"
     if d.how == "legacy":
         return f"{d.value} (legacy `{d.key}: {d.said}`, read as {d.value})"
+    if d.how == "old":
+        return f"{d.value} (`{d.key}: {d.said}`, an old spelling, read as {d.value})"
     return f"{d.value} (no declaration key: {vol.catalog_file or 'its catalog'} reads as {d.minicosm})"
 
 
@@ -711,7 +713,8 @@ def report_lines(vol: Any, report: Any, path: str) -> list[str]:
     if report.not_run:
         shown = ", ".join(report.not_run[:NOT_RUN_SHOWN])
         more = f", … ({len(report.not_run) - NOT_RUN_SHOWN} more)" if len(report.not_run) > NOT_RUN_SHOWN else ""
-        lines.append(f"not run: {len(report.not_run)} checks the {vol.minicosm} MiniCOSM keeps to its own tools "
+        lines.append(f"not run: {len(report.not_run)} checks the {vol.minicosm} "
+                     f"{'format' if vol.manifest is not None and vol.manifest.core else 'MiniCOSM'} keeps to its own tools "
                      f"({shown}{more})")
     return lines
 
@@ -774,7 +777,7 @@ def _module_counts(counts: dict) -> str:
     from . import macrocosm as _macrocosm
     names: dict[str, str] = {}
     try:
-        man = _macrocosm.default_registry().get("emf")
+        man = _macrocosm.default_registry().get("fabula")
         if man is not None:
             names = {m: str(man.module(m).get("name") or m) for m in man.modules()}
     except Exception:  # noqa: BLE001 — names are a nicety

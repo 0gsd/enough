@@ -31321,7 +31321,7 @@
     const COSM_SKIP = new Set(['id', 'type', 'name', 'summary', 'status', 'visibility', 'body']);
     const COSM_STANCES = ['axiom', 'observed', 'deduced', 'opinion', 'assumed', 'hearsay'];
     // "about this format": each MiniCOSM's section of the spec.
-    const COSM_SPEC_SECTION = { comprise: '18.1', cosm: '18.2', canon: '18.3', emf: '18.4', doc: '18.5' };
+    const COSM_SPEC_SECTION = { comprise: '19.1', cosm: '18.2', canon: '18.3', fabula: '18.4', doc: '18.5', ascribe: '19.2' };
     const COSM = {
       path: null,          // what was asked for
       data: null,          // the /api/cosm payload
@@ -31816,7 +31816,7 @@
           + '"><span class="cosm-sh" aria-hidden="true"></span>' + d.stance + '</span>';
         skip.add('stance');
       }
-      if (host.data.minicosm === 'emf' && typeof d.salience === 'string') {
+      if (host.data.minicosm === 'fabula' && typeof d.salience === 'string') {
         badges += '<span class="cosm-sal sal-' + cosmEsc(d.salience) + '" title="'
           + cosmEsc(t('cosm.salience.title', 'salience: how much this matters to the text')) + '">'
           + cosmEsc(d.salience) + '</span>';
@@ -33103,7 +33103,7 @@
     const ATEM = { open: false, token: 0, job: null, kind: null, source: '', path: null, snap: null,
       result: null, error: null, pinned: null };
     // A host for cosmAtemHTML that resolves nothing (the card has no volume).
-    const ATEM_HOST = { path: null, data: { minicosm: 'emf' }, shown: new Map(), railWant: null, viewer: false,
+    const ATEM_HOST = { path: null, data: { minicosm: 'fabula' }, shown: new Map(), railWant: null, viewer: false,
       ix: { byKey: new Map(), byId: new Map(), byPart: new Map(), where: new Map() },
       body: () => null, rail: () => null, railBtn: () => null };
     const atemEl = (id) => document.getElementById(id);

@@ -21,6 +21,7 @@ macrocosm: 0.5.4
 name: thym
 title: Thym
 version: 1
+core: true                            # a built-in of MacroCOSM's core (MacroCOSM OES 13.3, 18.1)
 summary: "Programs that move meaning between densities, the morphs and contexts they use, the plans they make, the traces they leave, and the packages a text travels in."
 spec: https://thym.cosmoes.org/       # Thym, the canonical edition (bundled as docs/THYM.md)
 reference: [enough/macrocosm.py, enough/thym/]

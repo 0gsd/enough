@@ -4163,11 +4163,17 @@ def create_app(
         questions, and the lenses it can be drawn in. `report` replaces the
         generic lint (a doc volume passes `docoes.lint_doc`'s)."""
         m = vol.manifest
-        report = report if report is not None else _macrocosm.lint(vol)
+        if report is None:
+            # A fabula's own checks are enough's (enough/fabula.py): run them, so the viewer shows them as run
+            # rather than as checks left to another tool. Any other format: the generic checks.
+            from . import fabula as _fabula
+            report = _fabula.lint(vol) if _fabula.is_fabula(vol) else _macrocosm.lint(vol)
         modules: list[dict[str, Any]] = []
         if m is not None:
             found = vol.by_module()
-            letters = list(m.modules()) + [x for x in found if x not in m.modules()]
+            # The core's module D, which every format inherits, shows only where the volume holds items of it.
+            letters = [x for x in m.modules() if x not in m.inherited or x in found] \
+                + [x for x in found if x not in m.modules()]
             for letter in letters:
                 kinds_found = found.get(letter, {})
                 declared = list(m.kinds(letter)) if letter in m.modules() else []
@@ -4186,6 +4192,10 @@ def create_app(
             "path": path,
             "minicosm": vol.minicosm,
             "major": vol.major,
+            # How the catalog named its format: `oes`, `old` (an old spelling such as `emf/1`, which `said` keeps),
+            # `legacy` or `absent`.
+            "declared": ({"how": vol.declaration.how, "said": vol.declaration.said}
+                         if vol.declaration is not None else None),
             "title": vol.name,
             "manifest_title": m.title if m is not None else None,
             "uri": _macrocosm.qualified_uri(vol) if not refused else None,
@@ -4286,8 +4296,10 @@ def create_app(
 
     @app.get("/api/macrocosm/manifests")
     async def api_macrocosm_manifests() -> list[dict[str, Any]]:
-        """The MiniCOSMs this install reads (the bundled registry), in
-        registry order: `[{name, title, version, declaration, summary}]`."""
+        """The formats this install reads (the bundled registry), in
+        registry order: `[{name, title, version, declaration, summary, core,
+        old}]`: `core` true for a built-in of the core, false for a MiniCOSM;
+        `old` the old spellings it also reads (the fabula's `emf/1`)."""
 
         def _build() -> list[dict[str, Any]]:
             out = []
@@ -4297,6 +4309,7 @@ def create_app(
                     "name": m.name, "title": m.title, "version": m.version,
                     "declaration": decl if isinstance(decl, str) else f"{m.name}/{m.version}",
                     "summary": _macrocosm.jsonable(m.data.get("summary")) or "",
+                    "core": m.core, "old": list(m.old),
                 })
             return out
 

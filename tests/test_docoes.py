@@ -293,8 +293,9 @@ def test_the_spec_examples_are_items_that_load(built, tmp_path):
     examples = [it for it in vol.items.values() if it.data.get("type") == "example"]
     assert len(examples) == len(blocks) == 8                    # §18.6 ascribe and §18.7 thym added theirs (0.5.0)
     assert [it.data["body"] for it in examples] == blocks
+    # an `emf/1` example declares the fabula, the format its old spelling names (0.6)
     assert [it.data["declares"] for it in examples] == ["R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/canon",
-                                                        "R:minicosm/emf", "R:minicosm/emf", "R:minicosm/doc",
+                                                        "R:minicosm/fabula", "R:minicosm/fabula", "R:minicosm/doc",
                                                         "R:minicosm/ascribe", "R:minicosm/thym"]
     assert vol.item("S:example/6").data["in"] == "S:section/18.5.5"
     for it in examples:
@@ -374,29 +375,34 @@ def test_manifests_become_reference_items():
     count = Counter((it["type"], it["id"].split("/", 1)[1].split(".", 1)[0]) for it in items
                     if it["type"] in ("module", "kind", "list"))
     assert [(count[("module", m)], count[("kind", m)])
-            for m in ("comprise", "cosm", "canon", "emf", "doc", "ascribe", "thym")] == \
-        [(8, 71), (1, 9), (1, 3), (6, 10), (4, 12), (11, 13), (5, 12)]
-    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "emf")] == [4, 1, 4, 8]
+            for m in ("comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym")] == \
+        [(9, 73), (2, 11), (2, 5), (11, 42), (5, 14), (12, 15), (6, 14)]      # each with the core's D (0.6)
+    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 4, 24]
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
-        ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/emf", "R:minicosm/doc",
+        ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc",
          "R:minicosm/ascribe", "R:minicosm/thym"]
+    assert [it["id"] for it in items if it["type"] == "minicosm" and it["core"]] == \
+        ["R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc", "R:minicosm/thym"]
+    assert by["R:minicosm/fabula"]["old"] == ["emf/1"] and "old" not in by["R:minicosm/canon"]
+    assert by["R:module/cosm.D"]["provenance"]["sources"] == ["defaults/cosm/manifests/core.modules.cosm#modules.D"]
     checks = [it["id"].split("/", 1)[1] for it in items if it["type"] == "check"]
     assert checks == list(mc.CHECKS) + list(D.DOC_CHECKS)
-    claim = by["R:kind/emf.P.claim"]
+    claim = by["R:kind/fabula.P.claim"]
     assert claim["refs"] == ["links", "roles.*"] and claim["required"][-1] == "stance"
-    assert "R:list/emf.stance" in claim["lists"] and claim["of"] == "R:module/emf.P"
+    assert "R:list/fabula.stance" in claim["lists"] and claim["of"] == "R:module/fabula.P"
     assert claim["provenance"]["mode"] == "catalogue"
-    assert claim["provenance"]["sources"] == ["defaults/cosm/manifests/emf.manifest.cosm#modules.P.kinds.claim"]
+    assert claim["provenance"]["sources"] == ["defaults/cosm/manifests/fabula.manifest.cosm#modules.P.kinds.claim"]
     assert re.fullmatch(r"[0-9a-f]{16}", claim["provenance"]["hash"])
-    assert by["R:module/emf.P"]["atem"] == "What the text claims, and how it knows"
+    assert by["R:module/fabula.P"]["atem"] == "What the work claims, how it can be read, and what it must do"
     assert by["R:check/ref-unresolved"]["atem"] == "a reference that names nothing in the volume"
     assert by["R:check/ref-unresolved"]["selected_by"] == [f"R:minicosm/{m}" for m in ("comprise", "cosm", "canon",
-                                                                                         "emf", "doc", "ascribe",
+                                                                                         "fabula", "doc", "ascribe",
                                                                                          "thym")]
     assert by["R:check/module-none"]["selected_by"] == ["R:minicosm/comprise"]
     assert by["R:check/atem-shape"]["severity"] == "error" and by["R:check/atem-shape"]["atem"] == "an item with no atem"
-    assert by["R:list/emf.stance"]["meanings"]["assumed"].startswith("taken for granted")
-    assert by["R:lens/emf.claims"]["atem"].startswith("entities, concepts and claims")
+    # the bundled text still says emf where the reader says fabula: its overlay still reaches the fabula's items
+    assert by["R:list/fabula.stance"]["meanings"]["assumed"].startswith("taken for granted")
+    assert by["R:lens/fabula.claims"]["atem"].startswith("entities, concepts and claims")
     assert by["R:lens/comprise.map"]["lens"]["generic"] is True
     assert by["R:kind/canon.V.folder"]["atem"] == "a folder of the volume"
     assert by["R:kind/comprise.E.broadcast"]["declared"]["status"] == "not built"
@@ -609,7 +615,7 @@ def test_build_on_digest(tmp_path, monkeypatch):
     assert D.ensure_built("help-center", "en", docs_root=out, sources=src)["built"] == ["help-center.en"]
     assert D.compile_doc(mc.load_volume(path, mc.Registry([src / "defaults/cosm/manifests"]))) == \
         (src / "docs/HELP_CENTER.md").read_text(encoding="utf-8")
-    with open(src / "defaults/cosm/manifests/emf.manifest.cosm", "a", encoding="utf-8") as fh:   # a manifest does
+    with open(src / "defaults/cosm/manifests/fabula.manifest.cosm", "a", encoding="utf-8") as fh:   # a manifest does
         fh.write("# a comment\n")
     assert D.ensure_built("help-center", "en", docs_root=out, sources=src)["built"] == ["help-center.en"]
     monkeypatch.setattr(D, "ENOUGH_VERSION", "9.9.9")                                    # enough's version does
@@ -653,13 +659,14 @@ def test_stale_provenance_hash(built, tmp_path):
     (root / "docs").mkdir()
     shutil.copyfile(SPEC, root / "docs" / "MACROCOSM_OES.md")
     assert not [p for p in D.lint_doc(vol, sources=root).problems() if p.check == "stale-provenance-hash"]
-    m = root / "defaults/cosm/manifests/emf.manifest.cosm"
-    m.write_text(m.read_text(encoding="utf-8").replace("subtitle: What the text claims, and how it knows",
-                                                       "subtitle: What the text claims"), encoding="utf-8")
+    m = root / "defaults/cosm/manifests/fabula.manifest.cosm"
+    m.write_text(m.read_text(encoding="utf-8").replace("subtitle: What the work claims, how it can be read, and what "
+                                                       "it must do", "subtitle: What the work claims"),
+                 encoding="utf-8")
     rep = D.lint_doc(vol, sources=root, registry=mc.Registry([root / "defaults/cosm/manifests"]))
     stale = {p.item for p in rep.warnings if p.check == "stale-provenance-hash"}
-    assert "R:module/emf.P" in stale
-    assert "R:module/emf.L" not in stale
+    assert "R:module/fabula.P" in stale
+    assert "R:module/fabula.L" not in stale
 
 
 # ---------------------------------------------------------------------------

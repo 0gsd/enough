@@ -150,7 +150,7 @@ def test_every_documented_example_runs(project: Path):
     read, lint, derive, atem, guide, lookup, _check, _run = examples
     r = run(project, lookup)
     # 0.4.4 (D3's spec pass): the spec defines `stance` as a term; its answer still carries the closed list's words.
-    assert r.ok and r.body.startswith("stance  [T:term/stance") and "R:list/emf.stance" in r.body, r.body
+    assert r.ok and r.body.startswith("stance  [T:term/stance") and "R:list/fabula.stance" in r.body, r.body
     assert all(f"- {w} — " in r.body for w in ("axiom", "observed", "deduced", "opinion", "assumed", "hearsay"))
     r = run(project, guide)
     assert r.ok and r.body.startswith("# macrocosm-oes"), r.body[:80]
@@ -256,7 +256,8 @@ def test_read_an_item_a_field_and_a_module(project: Path):
 def test_read_an_emf_twin_a_legacy_tree_and_a_text_through_its_twin(project: Path):
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
     r = run(project, tool("cosm_read", path="notes.md.cosm"))
-    assert r.ok and "a emf/1 volume" in r.body and "declared: emf/1 (`oes: emf/1`)" in r.body, r.body
+    assert r.ok and "a fabula/1 volume" in r.body, r.body
+    assert "declared: fabula/1 (`oes: emf/1`, an old spelling, read as fabula/1)" in r.body, r.body
     assert "P:claim/" in r.body
     r = run(project, tool("cosm_read", path="notes.md"))
     assert r.ok and "(reading notes.md.cosm, the EMF twin of notes.md)" in r.body, r.body
@@ -296,9 +297,9 @@ def test_read_refusals(project: Path, tags: dict, words: str):
 def test_lint_a_bad_volume(project: Path):
     r = run(project, tool("cosm_lint", path="bad.cosm"))
     assert r.ok, r.body
-    assert "bad.cosm — emf/1, 1 items: 1 errors · 0 warnings · 0 notes · 0 open questions" in r.body
+    assert "bad.cosm — fabula/1, 1 items: 1 errors · 0 warnings · 0 notes · 0 open questions" in r.body
     assert "errors:\n- ref-unresolved K:concept/x (bad.cosm): defined-by -> L:term/missing does not exist" in r.body
-    assert "not run" not in r.body                     # emf lists nothing the reader lacks
+    assert "not run: 8 checks the fabula format keeps to its own tools" in r.body    # enough/fabula.py's (0.6)
 
 
 def test_lint_a_holotype_names_what_comprise_keeps_in_one_line(project: Path):

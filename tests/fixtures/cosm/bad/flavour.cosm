@@ -1,0 +1,11 @@
+oes: fabula/1
+flavour: fabulax
+id: fabula/bad-flavour
+name: bad flavour
+# flavour: a catalog flavour outside the manifest's catalog.flavour list
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept in a fabula whose flavour is not one of the three.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}
