@@ -5321,10 +5321,10 @@ pack 042 added the MacroCOSM/Comprise terms of art (atem, cosm, minicosm,
 syuzhet …) and 19 OES senses of existing words, pack 044 the fabula
 round's terms (fabulac, fabulan, fabulap, cshort, catem …), and pack 045
 the five file-name words the 0.6.0 texts use (pyi, pyproject, toml, readme,
-utf) with five inflections demoted to the forms they already were. The count is
-**held there** by a rule called one in, one out: no growth packs for their
-own sake, and an addition a specification needs names an equal number of
-removals. `reflib/dict/manifest.json`'s `headwords` / `words` are the live
+utf) with five inflections demoted to the forms they already were. The count
+moves as the specifications' work needs words: the one in, one out rule of
+2026-11-05 ran once, in pack 045, and was retired on 2026-11-06; there is no
+cap and no growth pack on a schedule. `reflib/dict/manifest.json`'s `headwords` / `words` are the live
 numbers, and a re-sync moves them — an original work, read-only to
 the user and to the readvisors, with a second **user dictionary** beside it
 that only the user's own words go into. Names are fixed: product name
