@@ -178,6 +178,54 @@ def test_plan_takes_the_shorthand_and_says_its_cost(client: TestClient):
                                                "inputs": {"nope": "notes.md"}}).status_code == 400
 
 
+def test_bundle_gives_the_page_what_its_runtime_reads_and_writes_nothing(client: TestClient, project: Path):
+    before = sorted(p.name for p in project.iterdir())
+    b = client.post("/api/thym/bundle", json={"program": "count-words", "path": "notes.md"})
+    assert b.status_code == 200, b.text
+    b = b.json()
+    assert set(b) >= {"plan", "program", "version", "decls", "inputs", "manifests", "route", "environment"}
+    assert b["plan"]["kind"] == "plan" and b["program"] == COUNT and b["version"] == 0
+    story = b["inputs"]["story"]
+    assert story["type"] == "text" and story["path"].endswith("notes.md")
+    assert story["text"] == (INPUTS / "notes.md").read_text(encoding="utf-8")
+    assert "words" in b["decls"] and b["route"] == "local"
+    assert b["environment"]["agent_free"] is True and b["environment"]["model"] == "none"
+    # a plan that asks is bundled all the same: the page's runtime refuses it in the server's words
+    asks = client.post("/api/thym/bundle", json={"program": "publish-story", "path": "notes.md"}).json()
+    assert any(n.get("asks") is True for n in asks["plan"]["nodes"] if isinstance(n, dict))
+    assert client.post("/api/thym/bundle", json={"program": "count-words", "path": "missing.md"}).status_code == 404
+    assert client.post("/api/thym/bundle", json={"program": "count-words",
+                                                 "inputs": {"nope": "notes.md"}}).status_code == 400
+    assert client.post("/api/thym/bundle", json={"program": "count-words", "path": "notes.md",
+                                                 "route": "elsewhere"}).status_code == 400
+    assert sorted(p.name for p in project.iterdir()) == before
+    assert not H.host_root().exists(), "a bundle runs nothing, so it makes no runs folder"
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not on PATH")
+def test_the_page_runs_a_bundle_to_the_same_bytes_as_the_server(client: TestClient, project: Path):
+    import subprocess
+    b = client.post("/api/thym/bundle", json={"program": "count-words", "path": "notes.md"}).json()
+    req = {"bundle": b, "runId": "2026-11-12-0000-abcd", "now": "2026-11-12T00:00:00Z"}
+    p = subprocess.run([shutil.which("node"), str(REPO / "tests" / "thym_js_harness.js")], input=json.dumps(req),
+                       capture_output=True, text=True, timeout=120)
+    assert p.returncode == 0, p.stderr
+    page = json.loads(p.stdout)
+    assert page["outcome"] == "landed" and page["refusal"] is None
+    job = start(client, "/api/thym/run", {"program": "count-words", "path": "notes.md"})
+    done = wait_job(client, job["id"])
+    landed = Path(done["result"]["outputs"][0]["path"]).read_bytes()
+    import base64
+    (name, raw), = page["files"].items()
+    assert name == "outputs/n.txt" and base64.b64decode(raw) == landed
+    asks = client.post("/api/thym/bundle", json={"program": "publish-story", "path": "notes.md"}).json()
+    p = subprocess.run([shutil.which("node"), str(REPO / "tests" / "thym_js_harness.js")],
+                       input=json.dumps({"bundle": asks}), capture_output=True, text=True, timeout=120)
+    refused = json.loads(p.stdout)
+    assert refused["outcome"] == "refused" and refused["refusal"]["check"] == "agent-free"
+    assert refused["refusal"]["message"] == STORY_ASKS + "; agent-free is on"
+
+
 # ---------------------------------------------------------------------------
 # Runs, the runs list, traces
 # ---------------------------------------------------------------------------

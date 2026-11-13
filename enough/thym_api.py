@@ -1109,6 +1109,25 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             out.update(fits=False, why=r.message)
         return out
 
+    @router.post("/api/thym/bundle")
+    async def thym_bundle(request: Request) -> dict:
+        """What the page's own runtime runs (0.7, `enough/static/thym/`): the same body as `/api/thym/plan`, planned here
+        by rules, answered as `bundle.page_bundle`: `{plan, program, version, decls, inputs, manifests}` (an input
+        missing or changed since the plan carries its refusal in place of its value), with the `route` the request
+        named and the `environment` a server run's trace would name, agent-free. Reads the inputs and writes nothing;
+        a plan that asks a model is bundled all the same, and the page's runtime refuses it in the server's words. A
+        plan refused before it is made is 400, as for a run."""
+        from .thym import bundle as _bundle
+        body = await body_of(request)
+        route, _model, _calls = route_of(body)
+        prog, _checked, plan, _rows, _info = await asyncio.to_thread(prepared, body, route=route)
+        if isinstance(plan, Refusal):
+            where = f" (line {plan.line})" if plan.line else ""
+            raise HTTPException(400, f"{plan.message}{where}")
+        out = await asyncio.to_thread(_bundle.page_bundle, plan, inputs_root=project_dir, program=prog)
+        out.update(route=route, environment=_host.environment(agent_free=True))
+        return out
+
     @router.post("/api/thym/run")
     async def thym_run(request: Request) -> dict:
         body = await body_of(request)
