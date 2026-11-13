@@ -147,13 +147,15 @@ def test_the_vendored_client_is_cosmoes_site_s_unchanged():
 
 def test_one_sync_fills_the_root_and_the_viewer_reads_the_synced_copy(fake, tmp_path, monkeypatch):
     """The launch check against the stand-in: one manifest request and one per source, every text validated by the
-    real DocOES build; thym changed (edition 0.5.5) and ascribe made invalid. Afterwards `spec_source` reads the
+    real DocOES build; thym changed (edition 99.0.0, newer than any bundled one: since 0.7 an older synced copy is
+    set aside) and ascribe made invalid. Afterwards `spec_source` reads the
     synced copies, the volume rebuilds from thym's new text under the new edition, ascribe stays bundled (the
     previous copy is kept on a failed validation), and a second launch costs one conditional request (304)."""
-    changed = bundled("thym").replace(b"*Edition 0.5.4 ", b"*Edition 0.5.5 ", 1) + b"\n## 23. Added by the test\n\nA new section.\n"
+    shipped = D.bundled_editions()["thym"]["edition"]
+    changed = bundled("thym").replace(f"*Edition {shipped} ".encode(), b"*Edition 99.0.0 ", 1) + b"\n## 23. Added by the test\n\nA new section.\n"
     assert changed != bundled("thym")
-    fake.docs["thym"] = (changed, "0.5.5", "2026-11-04")
-    fake.docs["ascribe"] = (b"\xff\xfe not utf-8", "0.5.5", "2026-11-04")
+    fake.docs["thym"] = (changed, "99.0.0", "2026-11-04")
+    fake.docs["ascribe"] = (b"\xff\xfe not utf-8", "99.0.0", "2026-11-04")
     root = tmp_path / "specs"
     monkeypatch.setenv("ENOUGH_SPECS_ROOT", str(root))
     monkeypatch.setenv("ENOUGH_SPECS_SYNC", "1")
@@ -177,20 +179,20 @@ def test_one_sync_fills_the_root_and_the_viewer_reads_the_synced_copy(fake, tmp_
     # The folder, as the client leaves it; the resolution follows.
     assert (root / "thym" / "source.md").read_bytes() == changed and not (root / "ascribe").exists()
     state = cc.load_state(root)
-    assert state["documents"]["thym"]["version"] == "0.5.5" and "ascribe" not in state["documents"]
+    assert state["documents"]["thym"]["version"] == "99.0.0" and "ascribe" not in state["documents"]
     info = D.spec_info("thym")
     assert (info["source"], info["version"], info["revised"], info["path"]) == \
-        ("cosmoes", "0.5.5", "2026-11-04", root / "thym" / "source.md")
-    assert D.spec_source("thym") == root / "thym" / "source.md" and D.document_version("thym") == "0.5.5"
+        ("cosmoes", "99.0.0", "2026-11-04", root / "thym" / "source.md")
+    assert D.spec_source("thym") == root / "thym" / "source.md" and D.document_version("thym") == "99.0.0"
     assert D.spec_info("ascribe")["source"] == "bundled" and D.spec_source("ascribe") == REPO / "docs" / "ASCRIBE.md"
     assert D.spec_info("macrocosm-oes")["source"] == "cosmoes"            # fetched on the first fill, same bytes
     assert D.digest("thym") != before                                      # the digest moved: a rebuild on next open
     vol = mc.load_volume(D.build("thym", "en"))
-    assert vol.name == "Thym" and vol.catalog["document"]["version"] == "0.5.5"
+    assert vol.name == "Thym" and vol.catalog["document"]["version"] == "99.0.0"
     assert vol.catalog["document"]["source"] == "cosmoes" and vol.catalog["document"]["revised"] == "2026-11-04"
     assert vol.catalog["document"]["path"] == str(root / "thym" / "source.md")
     assert D.compile_doc(vol) == changed.decode("utf-8") and vol.item("S:section/23") is not None
-    assert st["documents"]["thym"]["edition"] == "0.5.5" and st["documents"]["ascribe"]["source"] == "bundled"
+    assert st["documents"]["thym"]["edition"] == "99.0.0" and st["documents"]["ascribe"]["source"] == "bundled"
     # One check per launch: a second call in this process is a no-op.
     n = len(fake.requests)
     assert S.launch_check({"specs_sync": True}) is not None and len(fake.requests) == n
@@ -229,6 +231,109 @@ def test_the_launch_check_is_off_by_the_seam_and_by_the_preference(fake, tmp_pat
     _wait(S.launch_check({}))
     st = S.status({})
     assert st["ran"] and not st["checked"] and st["errors"][0][:2] == ["*", "client"] and "ValueError" in st["errors"][0][2]
+
+
+# ------------------------------------------------------------------------------------------------ the newer copy wins
+
+def _lay(root: Path, slug: str, version, data: bytes | None = None) -> Path:
+    """A synced copy as the client leaves one: `<root>/<slug>/source.md` and its line in state.json (sha256 of the
+    file, the edition as `version`; `version=None` leaves the edition out)."""
+    data = data if data is not None else bundled(slug) + b"\n## 99. Synced only\n\nA section the bundled text lacks.\n"
+    (root / slug).mkdir(parents=True, exist_ok=True)
+    (root / slug / "source.md").write_bytes(data)
+    try:
+        state = json.loads((root / "state.json").read_text(encoding="utf-8"))
+    except OSError:
+        state = {"checked": "2026-11-12T00:00:00Z", "updated": "2026-11-12T00:00:00Z", "etag": None, "documents": {}}
+    doc = {"name": D.DOCUMENTS[slug].name, "revised": "2026-11-12", "host": f"{slug}.cosmoes.org",
+           "kinds": {"source": {"sha256": sha(data), "fetched": "2026-11-12T00:00:00Z"}}}
+    if version is not None:
+        doc["version"] = version
+    state["documents"][slug] = doc
+    (root / "state.json").write_text(json.dumps(state), encoding="utf-8")
+    return root / slug / "source.md"
+
+
+def test_the_newer_of_the_bundled_and_the_synced_copy_wins(tmp_path, monkeypatch):
+    """Tracker specs-newer-copy-wins (0.7, the same rule as Comprise's): the editions compare as tuples of integers
+    and the newer is shown; equal editions keep the synced copy (it may carry a later revision); a synced copy whose
+    edition does not read falls back to the bundled text. The signed 0.6.0 build showed MacroCOSM OES at 0.5.4 —
+    the last major's synced copy — until its next sync got through; that is the first case here."""
+    root = tmp_path / "specs"
+    monkeypatch.setenv("ENOUGH_SPECS_ROOT", str(root))
+    shipped = D.bundled_editions()
+    # A miniature install whose docs/specs.json bundles thym at 0.6.0 exactly, whatever this checkout carries.
+    mini = tmp_path / "mini"
+    (mini / "docs").mkdir(parents=True)
+    body = json.loads((REPO / D.SPECS_JSON).read_text(encoding="utf-8"))
+    for d in body["documents"]:
+        d["edition"] = "0.6.0"
+        (mini / d["path"]).write_bytes((REPO / d["path"]).read_bytes())
+    (mini / D.SPECS_JSON).write_text(json.dumps(body), encoding="utf-8")
+    bundled_thym = mini / "docs" / "THYM.md"
+
+    # Bundled 0.6.0 beside a synced 0.5.4: the bundled text, its provenance saying so, the older copy named.
+    _lay(root, "thym", "0.5.4")
+    info = D.spec_info("thym", sources=mini)
+    assert (info["source"], info["version"], info["path"], info["set_aside"]) == ("bundled", "0.6.0", bundled_thym,
+                                                                                  "0.5.4")
+    assert info["revised"] == shipped["thym"]["revised"] and info["home"] == "https://thym.cosmoes.org/"
+    assert D.spec_source("thym", sources=mini) == bundled_thym and D.document_version("thym", sources=mini) == "0.6.0"
+    # Synced 0.6.1 beside bundled 0.6.0: the synced copy.
+    synced = _lay(root, "thym", "0.6.1")
+    info = D.spec_info("thym", sources=mini)
+    assert (info["source"], info["version"], info["path"], info["set_aside"]) == ("cosmoes", "0.6.1", synced, None)
+    assert info["revised"] == "2026-11-12" and info["home"] == "https://thym.cosmoes.org/"
+    # Equal editions: the synced copy (a later revision of the same edition); "0.6" is the edition "0.6.0".
+    for v in ("0.6.0", "0.6"):
+        _lay(root, "thym", v)
+        info = D.spec_info("thym", sources=mini)
+        assert (info["source"], info["version"], info["path"]) == ("cosmoes", v, synced), v
+    # Integers, not strings: 0.10.0 is newer than 0.6.0 (a string compare says older); 0.5.10 is older.
+    _lay(root, "thym", "0.10.0")
+    assert D.spec_info("thym", sources=mini)["source"] == "cosmoes"
+    _lay(root, "thym", "0.5.10")
+    assert D.spec_info("thym", sources=mini)["source"] == "bundled"
+    # A synced copy with no readable edition falls back to the bundled text.
+    for v in (None, "", "draft", "v0.7.0", 7):
+        _lay(root, "thym", v)
+        info = D.spec_info("thym", sources=mini)
+        assert (info["source"], info["version"], info["path"]) == ("bundled", "0.6.0", bundled_thym), v
+    # The digest follows the copy shown: setting a stale copy aside rebuilds from the bundled text.
+    _lay(root, "thym", "0.5.4")
+    aside = D.digest("thym", sources=mini)
+    _lay(root, "thym", "0.6.1")
+    assert D.digest("thym", sources=mini) != aside
+    # An install whose docs/specs.json is missing has no bundled edition: a readable synced copy is shown.
+    bare = tmp_path / "bare"
+    (bare / "docs").mkdir(parents=True)
+    (bare / "docs" / "THYM.md").write_bytes(bundled("thym"))
+    assert D.spec_info("thym", sources=bare)["source"] == "cosmoes"
+    # The edition key itself.
+    assert D.edition_key("0.6.0") == D.edition_key("0.6") == (0, 6) and D.edition_key(" 1.2.3 ") == (1, 2, 3)
+    assert D.edition_key("0.10.0") > D.edition_key("0.6.1") > D.edition_key("0.6.0") > D.edition_key("0.5.4")
+    assert [D.edition_key(x) for x in (None, "", "x", "1..2", "1.2.", 3, "v1")] == [None] * 7
+
+
+def test_the_status_says_which_copy_is_shown(tmp_path, monkeypatch):
+    """`GET /api/specs-status`'s documents (what QA and the viewer read): `source` is the copy shown, `set_aside`
+    the edition of an older synced copy the bundled text was preferred to; the doc volume's catalog follows."""
+    root = tmp_path / "specs"
+    monkeypatch.setenv("ENOUGH_SPECS_ROOT", str(root))
+    monkeypatch.setenv("ENOUGH_DOCS_ROOT", str(tmp_path / "docoes"))
+    shipped = D.bundled_editions()
+    _lay(root, "macrocosm-oes", "0.5.4")
+    _lay(root, "ascribe", shipped["ascribe"]["edition"])
+    docs = S.documents()
+    m = docs["macrocosm-oes"]
+    assert (m["source"], m["edition"], m["set_aside"]) == ("bundled", shipped["macrocosm-oes"]["edition"], "0.5.4")
+    assert m["path"] == str(REPO / "docs" / "MACROCOSM_OES.md")
+    a = docs["ascribe"]
+    assert (a["source"], a["edition"], a["set_aside"]) == ("cosmoes", shipped["ascribe"]["edition"], None)
+    assert docs["thym"]["source"] == "bundled" and docs["thym"]["set_aside"] is None
+    vol = mc.load_volume(D.build("macrocosm-oes", "en"))
+    assert vol.catalog["document"]["source"] == "bundled"
+    assert vol.catalog["document"]["version"] == shipped["macrocosm-oes"]["edition"]
 
 
 # ------------------------------------------------------------------------------------------------ the validator

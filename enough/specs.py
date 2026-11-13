@@ -140,13 +140,14 @@ def reset_for_tests() -> None:
 
 def documents(root: Path | None = None) -> dict[str, dict[str, Any]]:
     """Each specification's edition and where enough reads it from: `{slug: {name, edition, revised, source, path,
-    home}}` with `source` "cosmoes" (a synced copy is in use) or "bundled"."""
+    home, set_aside}}` with `source` "cosmoes" (the synced copy is shown) or "bundled", and `set_aside` the edition
+    of an older synced copy the bundled text was preferred to (0.7: the newer copy wins), else None."""
     out: dict[str, dict[str, Any]] = {}
     for slug in SLUGS:
         info = _docoes.spec_info(slug)
         d = _docoes.DOCUMENTS[slug]
         out[slug] = {"name": d.name, "edition": info["version"], "revised": info["revised"], "source": info["source"],
-                     "path": str(info["path"]), "home": info["home"]}
+                     "path": str(info["path"]), "home": info["home"], "set_aside": info["set_aside"]}
     return out
 
 

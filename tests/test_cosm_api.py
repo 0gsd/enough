@@ -195,15 +195,17 @@ def test_ascribe_and_comprise_specs(client: TestClient):
 def test_a_spec_route_serves_the_synced_copy_once_one_exists(client: TestClient, tmp_path: Path,
                                                              monkeypatch: pytest.MonkeyPatch):
     """0.5.4: `docoes.spec_source` — the copy under the specs root when state.json lists the slug with a sha256 that
-    matches the file; else the bundled text. The routes read what DocOES builds from."""
+    matches the file and (0.7) an edition not older than the bundled one; else the bundled text. The routes read
+    what DocOES builds from."""
     import hashlib
     import json
     root = tmp_path / "specs"
     (root / "thym").mkdir(parents=True)
-    text = b"# Thym\n\n*Edition 0.5.5 \u00b7 revised 2026-11-04 \u00b7 cosmoes.org home: https://thym.cosmoes.org/*\n\n## 1. A\n\nchanged\n"
+    # An edition newer than any this checkout bundles, so the synced copy wins whatever docs/specs.json says.
+    text = b"# Thym\n\n*Edition 99.0.0 \u00b7 revised 2026-11-04 \u00b7 cosmoes.org home: https://thym.cosmoes.org/*\n\n## 1. A\n\nchanged\n"
     (root / "thym" / "source.md").write_bytes(text)
     state = {"checked": "2026-11-04T00:00:00Z", "updated": "2026-11-04T00:00:00Z", "etag": None, "documents": {
-        "thym": {"name": "Thym", "version": "0.5.5", "revised": "2026-11-04", "host": "thym.cosmoes.org",
+        "thym": {"name": "Thym", "version": "99.0.0", "revised": "2026-11-04", "host": "thym.cosmoes.org",
                  "kinds": {"source": {"sha256": hashlib.sha256(text).hexdigest(), "fetched": "2026-11-04T00:00:00Z"}}}}}
     (root / "state.json").write_text(json.dumps(state), encoding="utf-8")
     monkeypatch.setenv("ENOUGH_SPECS_ROOT", str(root))
@@ -211,14 +213,25 @@ def test_a_spec_route_serves_the_synced_copy_once_one_exists(client: TestClient,
     bundled = (REPO / "docs" / "MACROCOSM_OES.md").read_text(encoding="utf-8")
     assert client.get("/api/macrocosm-spec").text == bundled                   # not synced: the bundled text stands
     status = client.get("/api/specs-status").json()
-    assert status["documents"]["thym"] == {"name": "Thym", "edition": "0.5.5", "revised": "2026-11-04",
+    assert status["documents"]["thym"] == {"name": "Thym", "edition": "99.0.0", "revised": "2026-11-04",
                                            "source": "cosmoes", "path": str(root / "thym" / "source.md"),
-                                           "home": "https://thym.cosmoes.org/"}
+                                           "home": "https://thym.cosmoes.org/", "set_aside": None}
     assert status["documents"]["macrocosm-oes"]["source"] == "bundled"
     assert status["ran"] is False and status["reason"] == "ENOUGH_SPECS_SYNC=0" and status["allowed"] is False
     # A copy whose bytes no longer match what state.json recorded is not in use: the bundled text again.
     (root / "thym" / "source.md").write_bytes(text + b"tampered\n")
     assert client.get("/api/thym-spec").text == (REPO / "docs" / "THYM.md").read_text(encoding="utf-8")
+    # 0.7: a synced copy older than the bundled edition (the last major's, left by an install before the upgrade)
+    # is set aside: the bundled text is served and the status says which edition it was preferred to.
+    old = text.replace(b"99.0.0", b"0.5.4")
+    (root / "thym" / "source.md").write_bytes(old)
+    state["documents"]["thym"].update(version="0.5.4")
+    state["documents"]["thym"]["kinds"]["source"]["sha256"] = hashlib.sha256(old).hexdigest()
+    (root / "state.json").write_text(json.dumps(state), encoding="utf-8")
+    assert client.get("/api/thym-spec").text == (REPO / "docs" / "THYM.md").read_text(encoding="utf-8")
+    got = client.get("/api/specs-status").json()["documents"]["thym"]
+    shipped = {d["slug"]: d["edition"] for d in json.loads((REPO / "docs" / "specs.json").read_text())["documents"]}
+    assert (got["source"], got["edition"], got["set_aside"]) == ("bundled", shipped["thym"], "0.5.4")
 
 
 def test_the_specs_preference_round_trips(client: TestClient):

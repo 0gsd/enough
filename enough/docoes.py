@@ -29,7 +29,7 @@ Standalone like the reader: the standard library, PyYAML and `enough.macrocosm`,
 Documents: the four OES specifications — `macrocosm-oes`, `thym`, `ascribe` and `comprise-oes` (0.5.4) — English,
 the canonical editions published at cosmoes.org, bundled as `docs/*.md` by `scripts/sync_specs.py` (their editions
 in `docs/specs.json`) and read from a synced copy under `ENOUGH_SPECS_ROOT` (`~/enough/specs/`) once `enough/specs.py`
-has fetched one; and `help-center` (six tellings: en de es fr ja zh, written by Rosa).
+has fetched one whose edition is not older than the bundled one (0.7: the newer copy wins); and `help-center` (six tellings: en de es fr ja zh, written by Rosa).
 """
 
 from __future__ import annotations
@@ -74,7 +74,8 @@ MANIFESTS_DIR = "defaults/cosm/manifests"
 # The specifications' bundled editions (0.5.4): written by `scripts/sync_specs.py` from a cosmoes-site checkout —
 # each document's registry entry (name, edition, revised, host) with the bundled path and sha256. A synced copy
 # under `specs_root()` (the client's folder: `<slug>/source.md` + `state.json`) is read in its place when its
-# state.json lists the slug with a sha256 that matches the file; see `spec_source`.
+# state.json lists the slug with a sha256 that matches the file and an edition not older than the bundled one;
+# see `spec_info`.
 SPECS_JSON = "docs/specs.json"
 
 # DocOES's own checks, run by `lint_doc` after the generic ones (a generic reader lists them as not run).
@@ -200,27 +201,53 @@ def synced_spec(slug: str, root: Path | None = None) -> dict | None:
             "host": doc.get("host"), "sha256": sha}
 
 
+def edition_key(text: Any) -> tuple[int, ...] | None:
+    """An edition as a tuple of integers for comparing ("0.6.0" -> (0, 6, 0)), trailing zeros dropped so "0.6" and
+    "0.6.0" are one edition; None when it is not dotted integers (missing, empty, "draft")."""
+    if not isinstance(text, str) or not re.fullmatch(r"\d+(?:\.\d+)*", text.strip()):
+        return None
+    parts = [int(p) for p in text.strip().split(".")]
+    while len(parts) > 1 and parts[-1] == 0:
+        parts.pop()
+    return tuple(parts)
+
+
 def spec_info(doc: str | Document, *, sources: Path | None = None, synced: bool = True) -> dict:
-    """Where a specification is read from and which edition it is: `{path, version, revised, host, home, source}`
-    with `source` "cosmoes" (a synced copy is in use) or "bundled" (the text shipped with enough, its edition from
-    docs/specs.json). `synced=False` ignores the specs root (the validator builds a candidate text on its own)."""
+    """Where a specification is read from and which edition it is: `{path, version, revised, host, home, source,
+    set_aside}` with `source` "cosmoes" (the synced copy is shown) or "bundled" (the text shipped with enough, its
+    edition from docs/specs.json). `synced=False` ignores the specs root (the validator builds a candidate text on
+    its own).
+
+    The newer of the two copies wins (0.7, the same rule as Comprise's): the editions compare as tuples of integers;
+    on equal editions the synced copy stands (it may carry a later revision of the same edition); a synced copy whose
+    edition does not read as one never wins, and a bundled edition that does not read (a miniature without
+    docs/specs.json) never holds a readable synced one back. So an app upgraded to a new major shows its own texts
+    until a sync brings something newer, never the last major's. `set_aside` is the edition of the synced copy the
+    bundled text was preferred to, else None."""
     d = _document(doc)
     root = Path(sources or sources_root())
     rel = d.sources["en"]
-    s = synced_spec(d.slug) if (d.spec and synced) else None
-    if s:
-        host = s.get("host")
-        return {"path": s["path"], "version": str(s.get("version") or ""), "revised": s.get("revised"),
-                "host": host, "home": f"https://{host}/" if host else None, "source": "cosmoes"}
     b = bundled_editions(root).get(d.slug, {}) if d.spec else {}
+    b_version = str(b.get("edition") or d.version or "")
+    s = synced_spec(d.slug) if (d.spec and synced) else None
+    set_aside = None
+    if s:
+        s_version = str(s.get("version") or "")
+        sk, bk = edition_key(s.get("version")), edition_key(b_version)      # a non-string edition does not read
+        if sk is not None and (bk is None or sk >= bk):
+            host = s.get("host")
+            return {"path": s["path"], "version": s_version, "revised": s.get("revised"),
+                    "host": host, "home": f"https://{host}/" if host else None, "source": "cosmoes",
+                    "set_aside": None}
+        set_aside = s_version or None
     host = b.get("host")
-    return {"path": root / rel, "version": str(b.get("edition") or d.version or ""), "revised": b.get("revised"),
-            "host": host, "home": f"https://{host}/" if host else None, "source": "bundled"}
+    return {"path": root / rel, "version": b_version, "revised": b.get("revised"),
+            "host": host, "home": f"https://{host}/" if host else None, "source": "bundled", "set_aside": set_aside}
 
 
 def spec_source(slug: str, *, sources: Path | None = None) -> Path:
     """The file a specification is read from: `<specs root>/<slug>/source.md` when state.json lists the slug with a
-    sha256 that matches the file, else the bundled path. What `/api/*-spec` serves and the viewer's volume is built
+    sha256 that matches the file and an edition not older than the bundled one (`spec_info`), else the bundled path. What `/api/*-spec` serves and the viewer's volume is built
     from; DocOES's digest follows it, so a synced change rebuilds the volume on the next open."""
     return spec_info(slug, sources=sources)["path"]
 
