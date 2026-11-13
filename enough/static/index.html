@@ -19632,9 +19632,9 @@
              and Ascribe — instead of two more buttons in this row, which
              wrapped the title and "close project" in de, fr, es and ja.
              Both modes, like help: /api/docs is home-accessible. Icons in
-             the menu: the closest existing glyphs (cosm, which the Thym
-             surfaces already wear; readvisor-rename, a person saying who
-             they are) until thym and ascribe have their own. -->
+             the menu: MacroCOSM's and Thym's own (0.7), and for the others
+             the closest existing glyphs (readvisor-rename, a person saying
+             who they are, for Ascribe; cosm for Comprise OES). -->
         <div class="ui-specs-wrap" id="ui-specs-wrap">
           <button type="button" class="help-center-launch" id="ui-specs-btn"
             aria-haspopup="menu" aria-expanded="false" aria-controls="ui-specs-menu"
@@ -19657,7 +19657,7 @@
               data-i18n-title="docs.launch.thym.title"
               title="open the Thym specification — the language enough's programs are written in, with its compiler and runtime"
               onclick="closeUIModal(); enterDocsMode({doc: 'thym'});">
-              <img class="svg-icon" data-icon="cosm" alt="" draggable="false">
+              <img class="svg-icon" data-icon="thym" alt="" draggable="false">
               <span data-i18n="docs.launch.thym.label">Thym</span>
             </button>
             <button type="button" class="ui-specs-item" role="menuitem" id="ui-ascribe-btn"
@@ -23064,7 +23064,7 @@
       'macrocosm-oes': { icon: 'macrocosm', unwrap: true, plain: 'all', kind: 'spec',
         stack: () => t('modes.docs.spec.icon', 'MacroCOSM specification') },
       // 0.5.0 (lane X2): the two specifications written in MacroCOSM OES.
-      thym: { icon: 'cosm', unwrap: true, plain: 'all', kind: 'spec',
+      thym: { icon: 'thym', unwrap: true, plain: 'all', kind: 'spec',
         stack: () => t('modes.docs.thym.icon', 'Thym specification') },
       ascribe: { icon: 'readvisor-rename', unwrap: true, plain: 'all', kind: 'spec',
         stack: () => t('modes.docs.ascribe.icon', 'Ascribe specification') },
