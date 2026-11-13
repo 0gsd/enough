@@ -381,13 +381,58 @@ def test_a_recorded_run_replays_to_byte_identical_outputs(root):
     cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert t.landed
-    again = RUN.replay(t.dir, root=root, moves=fake_moves(), checks=fake_checks())
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=fake_moves(), checks=fake_checks())
     assert isinstance(again, T.Trace) and again.landed, getattr(again, "refusal", again)
     assert again.replay == {"of": t.run_id, "identical": True, "differences": []}
     assert again.run_id != t.run_id
     assert again.outputs["s"].read_bytes() == t.outputs["s"].read_bytes()
     assert again.values["s"].made["run"] == t.run_id                       # made names the recorded run
     assert T.root_item(again.to_volume())["replay_of"] == t.run_id
+
+
+def test_a_replay_says_its_own_time_and_its_moves_the_recorded_clock(root):
+    """0.7: a replay's trace reported the seconds since the recorded run started, its moves' clock; it says its own."""
+    import datetime as dt
+    long_ago = dt.datetime(2026, 1, 2, 3, 4, 5, tzinfo=dt.timezone.utc)
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks(),
+                now=long_ago)
+    assert t.landed and t.started == long_ago
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=fake_moves(), checks=fake_checks())
+    assert isinstance(again, T.Trace) and again.replay["identical"], getattr(again, "refusal", again)
+    assert again.started > long_ago + dt.timedelta(days=1)                 # the replay's own start
+    assert again.seconds() < 60 and f" in {again.seconds()} s " in again.atem()
+    assert again.values["s"].made["run"] == t.run_id                       # its moves still ran on the recorded clock
+
+
+def test_a_trace_names_its_inputs_root_relative_to_the_runs_root_never_the_machines_folder(root, tmp_path):
+    """0.7: `inputs_root` was the absolute folder on the recording machine. It is written relative to the run's root
+    when the inputs lie under it, else `.` (the replayer names the folder); a trace written before still replays."""
+    import shutil
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    # inputs elsewhere: `.`, and the replay is given its inputs root
+    t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
+    assert t.landed
+    head = T.root_item(T.load(t.path))
+    assert head["inputs_root"] == "." and str(SUITE) not in t.path.read_text(encoding="utf-8")
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=fake_moves(), checks=fake_checks())
+    assert again.replay["identical"], again.replay
+    # inputs under the run's root: the folder relative to it, and the replay finds them with no help
+    shutil.copytree(SUITE / "inputs", root / "work" / "inputs")
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    t2 = RUN.run(brief_plan(), inputs_root=root / "work", root=root, coprocessor=cp, moves=fake_moves(),
+                 checks=fake_checks())
+    assert t2.landed and T.root_item(T.load(t2.path))["inputs_root"] == "work"
+    again = RUN.replay(t2.dir, root=root, moves=fake_moves(), checks=fake_checks())
+    assert again.replay["identical"], again.replay
+    # a trace written before 0.7, naming the absolute folder: read as written
+    text = t.path.read_text(encoding="utf-8")
+    assert "inputs_root: ." in text
+    t.path.write_text(text.replace("inputs_root: .", f"inputs_root: {SUITE.as_posix()}", 1), encoding="utf-8")
+    again = RUN.replay(t.dir, root=root, moves=fake_moves(), checks=fake_checks())
+    assert again.replay["identical"], again.replay
+    assert T.portable_inputs_root(root, root) == "." and T.recorded_inputs_root(".", t.dir) is None
+    assert T.recorded_inputs_root("work", t.dir) == (root / "work").absolute()
 
 
 def test_the_replay_coprocessor_refuses_a_changed_input_or_contract(root):
@@ -500,7 +545,7 @@ def test_a_user_move_runs_its_body_with_its_asks_and_asserts(root):
     rec = next(r for r in t.records if r["id"] == "R:record/2")
     assert rec["engine"] == "model:fake-1" and {c["name"] for c in rec["checks"]} >= {"coverage", "whole-sentences"}
     assert (t.dir / "story-in-brief.thym").read_text(encoding="utf-8") == STORY_IN_BRIEF
-    again = RUN.replay(t.dir, root=root, moves=fake_moves(), checks=fake_checks())
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=fake_moves(), checks=fake_checks())
     assert again.replay["identical"], again.replay
 
 

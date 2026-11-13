@@ -4395,7 +4395,14 @@ into a temp root and reads only, the others write runs under the root.
 `plan` prints one line, `cli.plan_atem`'s: "publish-story: 7 nodes, 3 ask a
 model; largest prompt 307 tokens, output budget 0 words" — and, for a plan
 that asks, the models line under it (see "Models" → "A model route per
-job"); the routes and `thym_check` show the same lines. `cli.py` is copied
+job"); the routes and `thym_check` show the same lines. Since 0.7 `check`
+prints every independent fault, one line each, and a trace names its
+`inputs_root` relative to the run's root (`.` when the inputs lay elsewhere,
+never the recording machine's folder; `trace.portable_inputs_root`): a replay
+reads them against `--inputs-root`, else the folder the trace names under the
+root, else the current folder (`run.replay(..., elsewhere=)`); a trace written
+before names the absolute folder and is read as written. A replay's trace says
+its own start (its moves still see the recorded run's clock). `cli.py` is copied
 text-exactly into Comprise: `tests/test_thym_cli.py` refuses an added line
 that names an app seam or an install path.
 

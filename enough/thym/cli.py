@@ -398,7 +398,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         if not run_dir.is_dir():
             _say(str(Refusal("run", "replay", f"no run {args.replay} under {root / 'runs'}")))
             return 2
-        t = R.replay(run_dir, root=root, inputs_root=args.inputs_root, environment=kw.get("environment"),
+        t = R.replay(run_dir, root=root, inputs_root=args.inputs_root, elsewhere=Path.cwd(),
+                     environment=kw.get("environment"),
                      engines=kw.get("engines"))
         if isinstance(t, Refusal):
             _say(str(t))

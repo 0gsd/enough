@@ -1606,10 +1606,14 @@ class _Run:
         prog = self.plan.get("program") if isinstance(self.plan.get("program"), dict) else {}
         self.trace = Trace(run_id=rid, dir=self.dir, program={"name": prog.get("name") or self.info.name,
                                                                "sha256": prog.get("sha256")},
-                           plan_sha256=sha256_bytes(plan_bytes), environment=env, started=self.started,
+                           plan_sha256=sha256_bytes(plan_bytes), environment=env,
+                           # a replay's moves see the recorded run's clock; its trace says when the replay itself
+                           # started, so its seconds are its own and not the time since the recorded run
+                           started=start if self.replay_of else self.started,
                            nodes=[n for n in self.nodes],
                            inputs=self._trace_inputs(),
-                           extra={"inputs_root": str(self.inputs_root), "rules": self.rules,
+                           extra={"inputs_root": _trace.portable_inputs_root(self.inputs_root, self.root),
+                                  "rules": self.rules,
                                   "replay_of": self.replay_of,
                                   "made_run": self.made_run if self.made_run != rid else None,
                                   "engines": recorded_engines})
@@ -2872,12 +2876,17 @@ def run(plan: dict, *, inputs_root: Path | str, coprocessor: Any = None, root: P
 
 
 def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: Path | str | None = None,
+           elsewhere: Path | str | None = None,
            program: Any = None, decls: dict | None = None, moves: _registry.Moves | None = None,
            checks: _checks.Checks | None = None, environment: dict | None = None,
            engines: dict | None = None) -> Trace | Refusal:
     """Re-run a recorded run with the replay coprocessor (THYM.md 12.4) and compare its outputs with the recorded
     ones, byte for byte. The new run lands under `root` like any other; its values' `made` names the recorded run,
     and `trace.replay` says `{of, identical, differences}`. A difference is a conformance failure of the runtime.
+
+    The inputs are read against `inputs_root` when given; else the folder the trace names under the run's root;
+    else, for a run whose inputs lay outside its root (the trace says `.`, 0.7), `elsewhere` (the CLI's current
+    folder), else the run's root. A trace written before 0.7 names the absolute folder it was read in.
 
     A run that recorded its engine calls (its trace's root item names `engines`) replays without any engine: every
     engine call is answered from its record (`engines.py`), and `engines` is not used. A run recorded before that
@@ -2906,7 +2915,8 @@ def replay(run_dir: Path | str, *, root: Path | str | None = None, inputs_root: 
         program = kept[0] if kept else None
     names = recorded_names(head)
     eng: Any = Replaying(run_dir, names) if names is not None else engines
-    t = run(plan, inputs_root=inputs_root or head.get("inputs_root") or run_dir,
+    recorded = _trace.recorded_inputs_root(head.get("inputs_root"), run_dir)
+    t = run(plan, inputs_root=inputs_root or recorded or elsewhere or run_dir.absolute().parents[1],
             coprocessor=ReplayCoprocessor(run_dir), root=root, rules=bool(head.get("rules")), program=program,
             decls=decls, moves=moves, checks=checks, environment=environment, record=False,
             made_run=str(head.get("made_run") or rid), now=_trace.parse_utc(tv.get("started")), replay_of=rid,

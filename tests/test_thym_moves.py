@@ -558,7 +558,7 @@ def test_publish_story_replays_byte_identical(root, engines):
     t, _cp = run_publish(root, engines, {"derive": [PASSAGE, WHOLE_ATEM], "null": null_answer(), "measure": JUDGED},
                          now=None)
     assert t.landed, t.refusal
-    again = RUN.replay(t.dir, root=root, engines=engines)
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, engines=engines)
     assert isinstance(again, T.Trace) and again.landed, getattr(again, "refusal", again)
     assert again.replay == {"of": t.run_id, "identical": True, "differences": []}
     assert again.outputs["out"].read_bytes() == t.outputs["out"].read_bytes()
@@ -806,7 +806,7 @@ def test_read_my_way_runs_end_to_end_the_short_way_in(root, engines):
     assert 240 <= C.words(C.body(text)) <= 300
     assert "expanded from its atem to about 300 words" in text.splitlines()[-1]
     assert {r["id"]: r["engine"] for r in t.records}["R:record/5"] == "skipped"
-    again = RUN.replay(t.dir, root=root, engines=engines, program=SUITE / "programs" / "read-my-way.thym")
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, engines=engines, program=SUITE / "programs" / "read-my-way.thym")
     assert again.replay["identical"], again.replay
 
 
@@ -1060,7 +1060,7 @@ def test_a_run_records_its_engine_calls_and_replays_with_no_engine(root):
             raise AssertionError(f"a replay that recorded its engine calls reaches no engine ({name})")
 
     # the host of a replay has no FEED and no engine at all: the record is the whole of what they said
-    again = RUN.replay(t.dir, root=root, engines=Refuses())
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, engines=Refuses())
     assert isinstance(again, T.Trace) and again.landed, getattr(again, "refusal", again)
     assert again.replay == {"of": t.run_id, "identical": True, "differences": []}
     assert conform._records_engines(t.dir) is True
@@ -1149,7 +1149,7 @@ def test_engine_calls_and_two_requests_in_one_node_never_collide(root):
     assert moves == ["derive", "derive", "tell", "tell", "derive"]
     rec = next(r for r in t.records if r["id"] == "R:record/1")
     assert rec["tokens"] == 50, "two passages and three requests at 10 tokens each: the engine's calls count too"
-    again = RUN.replay(t.dir, root=root, moves=mv, checks=fake_checks())
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=mv, checks=fake_checks())
     assert again.replay["identical"], again.replay
 
 
@@ -1210,7 +1210,7 @@ def test_prose_around_the_yaml_fails_schema_at_once_and_is_asked_again(root, eng
     assert rec["attempts"] == 2
     first = mc.yaml_load((t.dir / "candidates" / "1.1.cosm").read_text(encoding="utf-8"))
     assert first["output"].startswith("Thinking Process:"), "the narration is recorded as the model wrote it"
-    again = RUN.replay(t.dir, root=root)
+    again = RUN.replay(t.dir, inputs_root=SUITE, root=root)
     assert again.replay["identical"], again.replay
 
 
@@ -1256,7 +1256,7 @@ def test_a_replay_that_cannot_match_refuses_at_once(root, tmp_path):
 
     for name in ("1-e1.1.cosm", "1.1.cosm", "4.1.cosm"):
         t0 = _time.monotonic()
-        r = RUN.replay(tampered(name, "inputs"), root=root)
+        r = RUN.replay(tampered(name, "inputs"), inputs_root=SUITE, root=root)
         took = _time.monotonic() - t0
         assert isinstance(r, T.Trace) and r.outcome == "refused", r
         assert r.refusal.check in ("replay", "move") and "replay" in str(r.refusal), r.refusal
@@ -1270,7 +1270,7 @@ def test_a_replay_that_cannot_match_refuses_at_once(root, tmp_path):
     assert t3.landed, t3.refusal
     (moved / "inputs" / "notes.md").write_text("A changed text.\n", encoding="utf-8")
     t0 = _time.monotonic()
-    r = RUN.replay(t3.dir, root=root)
+    r = RUN.replay(t3.dir, inputs_root=moved, root=root)
     assert isinstance(r, Refusal) and (r.stage, r.check) == ("plan", "input") and _time.monotonic() - t0 < 2
 
 

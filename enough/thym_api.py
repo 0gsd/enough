@@ -544,12 +544,15 @@ def _input_rows(project_dir: Path, run_dir: Path, rid: str, inputs_root: Any) ->
     except Exception:  # noqa: BLE001 - a plan that cannot be read lists no inputs
         plan = {}
     rows = []
+    # the trace's inputs root: absolute in a trace before 0.7, relative to the run's root since, `.` when the inputs
+    # lay elsewhere (an app run's are read against the project, as here)
+    base = _trace.recorded_inputs_root(inputs_root, run_dir) or Path(project_dir)
     for row in (plan or {}).get("inputs") or []:
         if not isinstance(row, dict):
             continue
         p = Path(str(row.get("path") or ""))
-        if not p.is_absolute() and inputs_root:
-            p = Path(str(inputs_root)) / p
+        if not p.is_absolute():
+            p = base / p
         rows.append({"name": row.get("name"), "rel": rel_of(project_dir, p), "path": str(p)})
     return rows
 

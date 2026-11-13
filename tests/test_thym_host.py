@@ -353,7 +353,7 @@ def test_made_and_the_recorded_candidate_carry_the_route(live, tmp_path, monkeyp
     assert t.landed, t.refusal
     made = t.values["s"].made
     rec = (t.dir / "candidates" / "2.1.cosm").read_text(encoding="utf-8")
-    again = RUN.replay(t.dir, root=tmp_path / "thym", moves=TR.fake_moves(), checks=TR.fake_checks())
+    again = RUN.replay(t.dir, inputs_root=TR.SUITE, root=tmp_path / "thym", moves=TR.fake_moves(), checks=TR.fake_checks())
     assert (made["route"], made["provider"]) == ("cloud", "openrouter") and "route: cloud" in rec
     assert again.values["s"].made.get("route") == "cloud"
 
@@ -364,7 +364,7 @@ def test_a_run_recorded_before_routes_replays_without_one(tmp_path):
     t = RUN.run(TR.brief_plan(), inputs_root=TR.SUITE, root=tmp_path / "thym", coprocessor=cp,
                 moves=TR.fake_moves(), checks=TR.fake_checks())
     assert "route" not in (t.dir / "candidates" / "2.1.cosm").read_text(encoding="utf-8")
-    again = RUN.replay(t.dir, root=tmp_path / "thym", moves=TR.fake_moves(), checks=TR.fake_checks(),
+    again = RUN.replay(t.dir, inputs_root=TR.SUITE, root=tmp_path / "thym", moves=TR.fake_moves(), checks=TR.fake_checks(),
                        environment=H.environment(agent_free=False, route="local"))
     assert again.landed and again.replay["identical"] is True
     assert "route" not in again.values["s"].made and again.outputs["s"].read_bytes() == t.outputs["s"].read_bytes()

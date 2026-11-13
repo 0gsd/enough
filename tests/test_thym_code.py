@@ -491,7 +491,7 @@ def test_history_reads_a_real_clone_through_the_engine_and_replays_without_it(tm
     assert FAB.lint(g).ok
     # the replay needs no clone and no git
     shutil.rmtree(repo)
-    again = RUN.replay(h.dir, root=tmp_path / "root", engines=engines())
+    again = RUN.replay(h.dir, inputs_root=tmp_path, root=tmp_path / "root", engines=engines())
     assert again.replay["identical"], again.replay
 
 
@@ -834,7 +834,7 @@ def test_decompile_then_compile_end_to_end_and_every_run_replays_without_the_fol
     runs.append(c)
     shutil.rmtree(repo)
     for t in runs:
-        again = RUN.replay(t.dir, root=tmp_path / "root", engines=engines())
+        again = RUN.replay(t.dir, inputs_root=tmp_path, root=tmp_path / "root", engines=engines())
         assert isinstance(again, T.Trace) and again.replay["identical"], (t.dir.name, getattr(again, "replay", again))
 
 

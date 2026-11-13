@@ -204,6 +204,27 @@ class Trace:
         }
 
 
+def portable_inputs_root(inputs_root: Path | str, root: Path | str) -> str:
+    """How a trace writes the folder a run's relative input paths were read against (0.7): relative to the run's
+    root when it is under it (`.` for the root itself), else `.`. Never the absolute folder on the recording machine:
+    a trace travels (a recorded fixture, a package), and a replay elsewhere is given its own inputs root."""
+    try:
+        rel = Path(inputs_root).absolute().relative_to(Path(root).absolute())
+    except ValueError:
+        return "."
+    return rel.as_posix() or "."
+
+
+def recorded_inputs_root(value: Any, run_dir: Path | str) -> Path | None:
+    """The folder a recorded trace's `inputs_root` names: an absolute one as written (traces before 0.7 wrote the
+    recording machine's folder), a relative one under the run's root (`<root>/runs/<run-id>/` is the run's folder);
+    None for `.` or nothing, which say the inputs lay outside the run's root and the replayer names them."""
+    if not isinstance(value, str) or not value.strip() or value.strip() == ".":
+        return None
+    p = Path(value)
+    return p if p.is_absolute() else Path(run_dir).absolute().parents[1] / p
+
+
 def write(trace: Trace) -> Path:
     """Write the trace volume beside the run's plan, atomically."""
     path = trace.path
