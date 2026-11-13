@@ -1,6 +1,6 @@
 # Thym
 
-*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://thym.cosmoes.org/*
+*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://thym.cosmoes.org/*
 
 *This edition describes the `thym/1` built-in and defines the language in two grammars; a program's version line, `thym 0` or `thym 1`, names the grammar it is written in.*
 
@@ -2737,6 +2737,32 @@ section it touched.
 ## 25. Changes
 
 <!-- atem: what each edition changed, newest first -->
+
+**Edition 0.7.0 · 2026-11-13.** `tell` is `entail`, and a poem is decompiled in steps.
+
+1. **`entail`, once `tell`** (section 6.3). The move that makes a short of a fabula is spelled `entail`. `tell` names
+   the same move under `thym 0` and `thym 1` alike and for good, and compiles to the same items, plan and contract; the
+   compiler reads it and never writes it, so a step, a plan, a record and a value's `made` say `entail`, and a trace
+   recorded with `move: tell` reads as `entail`. No version line marks the change. `entail` is reserved from 0.7 and
+   `tell` stays reserved, so a program that used `entail` as a name must rename it (section 4.7); none is known.
+2. **Entailment.** Each step from a text to its fabula, a short and an atem is an entailment, the step that expands
+   meaning by reducing data (How to read this). A projection is an entailment made by rule and holds by construction;
+   what `entail` makes holds only because `coverage`, `no-invention` and `stance-kept` hold it: `project` transcodes,
+   and `entail` transcognizes (section 18). The null morph is Thym's reference entailment of a fabula (section 13).
+3. **The fabulap's helper moves** (section 20.9, new; section 20 is "Folders, code and verse"). `scan` reads a poem by
+   rule and asks no model, `as` rhyme, sound, recurrence or form; `construe` asks a model under contract, `as` figure,
+   image, allusion, voice, turn, meaning or ambiguity. Both carry `since: 1` and are reserved in a `thym 1` program
+   (sections 4.7 and 6.3). The full fabulap is one file of five programs, run by a host as one job that takes up again
+   after the last that landed; under `--rules` a host runs the first two, and `construe` refuses at plan time (section
+   19). A manifest may add an `as` word to either move by declaration.
+4. **Four checks for verse** (section 7.3): `lines-found`, `scansion-grounded`, `sound-grounded` and `form-grounded`.
+   `coverage`, `no-invention` and `stance-kept` have a reading for verse, which `construe` keeps. `flavour` takes only a
+   fabulap for `scan … with`, `construe … with` and `derive … as verse with`, and the last also keeps `nothing-lost`.
+5. **`project h as allograph`** (section 18): Ascribe's second projection, the one thing of a holograph a registry
+   lists. Listing it is the implementation's act after the run, and no move sends anything to a registry. Ascribe
+   makes match tokens no more, so no move is reserved for them.
+6. **Stewardship.** The text is licensed under CC BY 4.0, the author makes the OWFa 1.0 promise, and the names are not
+   licensed (section 1.3 and the colophon).
 
 **Edition 0.6.0 · 2026-11-06.** The language gains a second grammar, and the text follows MacroCOSM's new taxonomy.
 

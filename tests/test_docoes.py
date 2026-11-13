@@ -365,16 +365,16 @@ def test_the_spec_terms_and_decisions(built):
     assert vol.item("T:term/stance") is None or vol.item("T:term/stance").data["defined_in"].startswith("S:section/")
     assert "T:term/kind" in vol.item("S:section/7.4").data["mentions"]
     # The decisions come from the "Changes" section — every item of every edition's list, numbered through the
-    # section, each carrying its edition and date: 15 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
+    # section, each carrying its edition and date: 8 for 0.7.0, 15 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
     decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
-    assert len(decisions) == 53
+    assert len(decisions) == 61
     assert decisions[-1].data["name"] == "All rights reserved for the specification and the manifests;"
-    assert decisions[27].data["name"] == "A document is enumerated in its own grammar"
-    assert Counter(d.data.get("edition") for d in decisions) == {"0.6.0": 15, "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
+    assert decisions[35].data["name"] == "A document is enumerated in its own grammar"
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.7.0": 8, "0.6.0": 15, "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first["edition"], first["dated"]) == \
-        ("S:decision/1", "The taxonomy", "0.6.0", "2026-11-06")
-    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 54)]
+        ("S:decision/1", "Entailment", "0.7.0", "2026-11-13")
+    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 62)]
     assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/21"           # 0.6: Changes is 21
 
 
@@ -581,7 +581,7 @@ def test_the_five_documents():
     assert D.DOCUMENTS["macrocosm-oes"].xref == {"§": "", "README §": "", "P.": ""}
     assert D.DOCUMENTS["comprise-oes"].own_p and D.DOCUMENTS["comprise-oes"].xref == {"§": ""}
     # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
-    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.6.0"
+    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.7.0"
     assert str(mc.default_registry().get("thym").version) == "1"
 
 
@@ -590,9 +590,9 @@ def test_the_three_minicosm_specifications_enumerate(built):
     7 + 2 + 20),
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
-    for slug, counts in (("thym", {"section": 112, "term": 20, "example": 1, "decision": 47}),   # 0.7: the fabulap's helper moves (20.9)
-                         ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 22}),   # 0.7: the Allograph Registry (14.6-14.14, 16.3)
-                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 29})):
+    for slug, counts in (("thym", {"section": 112, "term": 20, "example": 1, "decision": 53}),   # 0.7: the fabulap's helper moves (20.9)
+                         ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 31}),   # 0.7: the Allograph Registry (14.6-14.14, 16.3)
+                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 32})):
         vol = built["vols"][(slug, "en")]
         assert vol.refused is None and vol.id == f"doc/{slug}"
         got = Counter(it.data.get("type") for it in vol.items.values())
@@ -611,7 +611,7 @@ def test_the_three_minicosm_specifications_enumerate(built):
         assert rows and all(r["inventory"] == slug and r["version"] == edition for r in rows)
         decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
         assert decisions and all(d.data.get("edition") for d in decisions), slug
-        assert decisions[0].data["edition"] == "0.6.0" and decisions[0].data["dated"] == "2026-11-06", slug
+        assert decisions[0].data["edition"] == edition and re.fullmatch(r"\d{4}-\d{2}-\d{2}", decisions[0].data["dated"]), slug   # the newest Changes entry is this edition's
 
 
 # ---------------------------------------------------------------------------

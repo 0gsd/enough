@@ -3,7 +3,7 @@
     "language": "zh",
     "label": "中文",
     "role": "translated chrome strings",
-    "source": "en @ 0.6.0"
+    "source": "en @ 0.7.0"
   },
   "strings": {
     "agentmode.agent": "智能体",

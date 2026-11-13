@@ -868,12 +868,12 @@ def test_the_grammar_version_set():
     """enough writes MACROCOSM_VERSION into every catalog it makes; the reader reads every version in
     MACROCOSM_VERSIONS unchanged (the grammar has not changed since 0.0.1). Every shipped manifest that carries the
     key carries the current one, and the registry notes nothing."""
-    assert M.MACROCOSM_VERSION == "0.6.0" and M.MACROCOSM_VERSIONS == ("0.0.1", "0.0.2", "0.5.4", "0.6.0")
+    assert M.MACROCOSM_VERSION == "0.7.0" and M.MACROCOSM_VERSIONS == ("0.0.1", "0.0.2", "0.5.4", "0.6.0", "0.7.0")
     assert M.MACROCOSM_VERSION in M.MACROCOSM_VERSIONS
     reg = M.default_registry()
     assert reg.notes == [] and reg.problems == []
     carried = {m.name: str(m.data.get("macrocosm")) for m in reg.manifests.values() if "macrocosm" in m.data}
-    assert carried == {n: "0.6.0" for n in ("cosm", "canon", "fabula", "doc", "ascribe", "thym")}  # Comprise's has none
+    assert carried == {n: "0.7.0" for n in ("cosm", "canon", "fabula", "doc", "ascribe", "thym")}  # Comprise's has none
 
 
 @pytest.mark.parametrize("said", ["0.0.1", "0.0.2", "0.5.4"])
@@ -901,10 +901,10 @@ def test_an_unknown_grammar_version_is_a_note_never_a_refusal(tmp_path):
     d = tmp_path / "manifests"
     d.mkdir()
     text = (REPO / "defaults" / "cosm" / "manifests" / "canon.manifest.cosm").read_text(encoding="utf-8")
-    (d / "canon.manifest.cosm").write_text(text.replace("macrocosm: 0.6.0", "macrocosm: 7.7.7", 1), encoding="utf-8")
+    (d / "canon.manifest.cosm").write_text(text.replace("macrocosm: 0.7.0", "macrocosm: 7.7.7", 1), encoding="utf-8")
     reg = M.Registry([d])
     assert list(reg.manifests) == ["canon"] and reg.problems == []
-    assert len(reg.notes) == 1 and "7.7.7" in reg.notes[0] and "read as 0.6.0" in reg.notes[0]
+    assert len(reg.notes) == 1 and "7.7.7" in reg.notes[0] and "read as 0.7.0" in reg.notes[0]
 
 
 # ---------------------------------------------------------------------------

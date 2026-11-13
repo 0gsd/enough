@@ -3,7 +3,7 @@
     "language": "en",
     "label": "English",
     "role": "canonical string catalog",
-    "source": "index.html @ 0.6.0"
+    "source": "index.html @ 0.7.0"
   },
   "strings": {
     "agentmode.agent": "agent",

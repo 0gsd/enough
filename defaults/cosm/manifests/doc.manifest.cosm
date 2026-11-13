@@ -15,7 +15,7 @@
 # Copyright © 2026 Graham Smith. CC BY 4.0, with a patent promise under OWFa 1.0. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.6.0
+macrocosm: 0.7.0
 name: doc
 title: DocOES
 version: 1

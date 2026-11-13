@@ -1,6 +1,6 @@
 # Ascribe
 
-*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://ascribe.cosmoes.org/*
+*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://ascribe.cosmoes.org/*
 
 *This edition describes the `ascribe/1` MiniCOSM: the declaration every holograph carries.*
 
@@ -1441,6 +1441,41 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 ## 17. Changes
 
 <!-- atem: what each edition changed, newest first, one line each -->
+**Edition 0.7.0 · 2026-11-13.** The allograph and the Allograph Registry, which replaces Ascribe-Connect.
+
+1. **The allograph** (section 14.6, new): `ascribe-allograph/0`, the holder's public account of what they can do for
+   others, made by `project h as allograph` from the nodes of experience, skill and understanding alone, made again and
+   never edited. The lead, How to read this and section 2 name it, and a release may be `as: allograph` (section 13).
+2. **The Allograph Registry** (sections 14.7 to 14.13, new), the one public place of Ascribe: served by Comprise
+   Connect beside the Comprise Index, its listings at https://allograph.net, its accounts signing in at Comprise
+   Connect; every act a signed statement (`ascribe-statement/0`); a key for each listing, its tag, a user name and
+   a dangler (14.8); the levels `stated`, `attested` and Allograph+, with attestations and proofs posted on faceplaces
+   (14.9); agents, and the bond to the one owner who answers for each (14.10); look-ups by tag, by name and by need,
+   with no browsing (14.11); its operations (14.12); and withdrawal, which keeps nothing (14.13). What a registry must
+   do is section 16.3, new, and where an implementation and this text disagree moves to 16.4.
+3. **What became of Ascribe-Connect** (section 14.14, new, and section 18). Of what edition 0.6.0 reserved, the
+   registry is kept; the signing key, the shape of a match token and the bridge to Comprise are folded in; an index of
+   isographs, `verified` in an isograph, hosting a cryptograph, the salted list `ascribe-tokens/0` and a seek answered
+   by an isograph are withdrawn.
+4. **The isograph is for private sharing** (section 14.1): every entry `stated`, always, and nothing lists, hosts or
+   signs one. A cryptograph is handed with its key to one party (14.2); a match token is `{about, value}`, what a
+   search asks for (14.3); the bridge to Comprise is the registry (14.4).
+5. **A character's holograph** (section 4.2): the catalog key `subject`, `person` when absent, or `character`, the self
+   of a subject that is not a person, held by the person who keeps it. An agent lists from a character's holograph,
+   never from a person's.
+6. **People by what they are to the holder,** or by a pseudonym the catalog declares, no longer by role (sections 4.2,
+   8.3, 9, 10.3 and 16.2).
+7. **Entailment.** A projection is an entailment made by rule: the holograph entails its isograph and its allograph
+   (sections 14.1 and 14.6).
+8. **Stewardship.** The text is licensed under CC BY 4.0, the author makes the OWFa 1.0 promise, and the names are not
+   licensed (section 1 and the colophon).
+9. **Conformance** (section 16): a reader refuses an allograph with a field section 14.6 does not name and reads a
+   catalog with no `subject` as a person's; a writer makes an allograph only by the program, keeps one key for each
+   listing, and makes no match-token list.
+
+No `ascribe/1` holograph changes meaning, and every one that was valid stays valid; a release recorded `as: tokens`
+still reads.
+
 **Edition 0.6.0 · 2026-11-06.** Ascribe built out: what happens to a holograph after it is written is specified.
 
 1. **The taxonomy.** Ascribe is one of the two MiniCOSMs; MacroCOSM OES is the OES with a core; Thym is the

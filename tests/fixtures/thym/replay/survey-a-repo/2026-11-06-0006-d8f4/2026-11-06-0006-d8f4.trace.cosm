@@ -49,7 +49,7 @@ nodes:
     path: inputs/tiny-tool
   outputs:
   - name: f
-    sha256: 0b76884fd7692701ca4f368f6c35237d3401642b903b934d4cd876c7dec63008
+    sha256: 09f44f6807855840aad8bccc48a4ae52278a5c8b5e1537d8ff78a820f51847d0
     path: outputs/f.cosm
   engine: code
   attempts: 1

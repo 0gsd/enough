@@ -1,8 +1,8 @@
 # MacroCOSM OES
 
-*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://macro.cosmoes.org/*
+*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://macro.cosmoes.org/*
 
-*This edition describes grammar version 0.6.0; files written under 0.5.4, 0.0.2 and 0.0.1 are read unchanged.*
+*This edition describes grammar version 0.7.0; files written under 0.6.0, 0.5.4, 0.0.2 and 0.0.1 are read unchanged.*
 
 MacroCOSM OES is an OES: a shared grammar and the core built into it. The grammar says how a domain is enumerated as
 plain-text `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is
@@ -96,6 +96,7 @@ one learned.
 | MacroCOSM OES 0.0.2 | 2026-11-02 | two MiniCOSMs more, `ascribe/1` (a self with no name, section 19.2) and `thym/1` (programs, morphs, contexts, plans, traces and packages, section 18.7); the `moves:` block of a manifest and the `<name>.moves.cosm` sidecar (section 13.4); the grammar unchanged | `macrocosm: 0.0.2` (reserved) |
 | MacroCOSM OES 0.5.4 | 2026-11-03 | the canonical edition, published at https://macro.cosmoes.org/ with the MiniCOSM specifications at their own homes; the grammar unchanged, and files written under 0.0.2 read unchanged | `macrocosm: 0.5.4` (reserved) |
 | MacroCOSM OES 0.6.0 | 2026-11-06 | an OES with a core: five built-ins (`cosm`, `canon`, `fabula`, `doc`, `thym`) and two MiniCOSMs, `comprise/1` and `ascribe/1` (sections 18 and 19); the fabula, in three flavours, in place of EMF, whose `emf/1` is read as an old spelling; the dialectic, module D, which every format inherits (section 18.6); in the grammar, `minicosm` is `format`, a declaration may have old spellings, and a reference may be an address; files written under 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.6.0` (reserved), `oes: fabula/1`, `core: true` |
+| MacroCOSM OES 0.7.0 | 2026-11-13 | entailment, the step every density is made by and what it makes, named in the core (section 18.1); the fabulap built in full along eight axes, by Thym's helper moves `scan` and `construe` (section 18.4.6); Ascribe's second projection, the allograph, listed in the Allograph Registry (sections 16 and 19.2); in the grammar, the fabula's kind `C:form`, the fields `cue`, `senses` and `intended` of `C:device`, and `completeness: outline` for a fabulap; files written under 0.6.0, 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.7.0` (reserved), `C:form` |
 
 The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES is
 published at https://comprise.cosmoes.org/, and the map of the family, which named the three scales, is the front page
@@ -411,9 +412,9 @@ A legacy key and an old spelling are never errors. A reader keeps them.
 
 ### 5.6 The reserved key `macrocosm:`
 
-A catalog or a manifest may carry `macrocosm: 0.6.0` (or an earlier `0.5.4`, `0.0.2` or `0.0.1`), after its declaration.
-Readers keep the key and ignore it. It is reserved for the day the grammar itself needs a version test; until then no
-reader refuses a file for what it says, and no writer is required to write it.
+A catalog or a manifest may carry `macrocosm: 0.7.0` (or an earlier `0.6.0`, `0.5.4`, `0.0.2` or `0.0.1`), after its
+declaration. Readers keep the key and ignore it. It is reserved for the day the grammar itself needs a version test;
+until then no reader refuses a file for what it says, and no writer is required to write it.
 
 ---
 
@@ -1263,7 +1264,7 @@ Saving and signing are Comprise's; the generic reader does neither, and treats a
 outside the model.
 
 Three other things carry versions, and none of them is a saved version: a format carries its major in the
-declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.6.0, in the
+declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.7.0, in the
 reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (section 11.3).
 
 ---
@@ -4344,6 +4345,38 @@ disagreement stands as a rule of its own.
 <!-- atem: what changed in each edition and version, newest first -->
 Each entry records what changed in the text or the grammar, newest first. Where an implementation and this text
 disagreed and one was corrected, the entry says which.
+
+**Edition 0.7.0 · 2026-11-13.** Each density is an entailment of the one before, and a poem's fabula is built in full.
+
+1. **Entailment** (section 18.1, a new term). An entailment is the step that expands meaning by reducing data, and what
+   that step makes: an input entails its fabula, a fabula a short, and a short an atem; a codebase or an application
+   entails its fabulac; a Holotype entails its isotype and its paratype, and a holograph its isograph and its
+   allograph. One made by rule, a projection, holds by construction; one made by a model holds only because
+   `no-invention`, `stance-kept` and `coverage` hold it. Thym's move `tell` is `entail`, and a program or a trace that
+   names `tell` names `entail` by its earlier spelling (section 18.1). A short is an entailment of its fabula, and the
+   text's words for compiling say so (sections 18.3.5, 18.4 and 18.4.4); a morph measures a text's or a short's
+   departure (section 18.7).
+2. **A telling is one language a document is written in,** and names nothing else (section 18.5.3); what a fabula is
+   compiled into is an entailment.
+3. **The fabulap built in full** (section 18.4.6): what a full fabulap holds along eight axes, sound, form, structure,
+   sense, figure, voice, reference and what is left open, built by Thym's helper moves `scan` by rule and `construe` by
+   a model; the stance each kind of reading keeps; a table of twenty-one forms, each named by rule when the poem keeps
+   its defining rules; the bank's questions, axis by axis; a lyric, and what a fabulap cannot know of a song without
+   its music; and what this edition's fabulap leaves out.
+4. **The fabula's kinds** (sections 18.4.1 and 18.4.2). A fabulap gains the kind `C:form`, the form a poem keeps, with
+   its rules held or broken, its departures and whether the author meant it. `C:device` gains `cue`, `senses` and
+   `intended`, and its open `figure` names `image`, `refrain`, `caesura`, `turn` and `hook` among its examples.
+   `completeness: outline` is a fabulap's rules-only skeleton as well as a fabulac's. A short of a fabulap says its
+   form and its metre before its stanzas (section 18.4.4).
+5. **The allograph.** Ascribe's second projection, which the holder lists in the Allograph Registry, stands beside the
+   isograph in the table of section 16; section 19.2 says the projections and the registry belong to Ascribe's text.
+6. **People by what they are to the holder.** A holograph names the people in a person's life by what they are to the
+   holder or by a pseudonym the catalog declares, no longer by role (section 19.2).
+7. **Stewardship.** The text and its manifests are licensed under CC BY 4.0, the author makes the OWFa 1.0 promise for
+   it, and the names of the family are not licensed and are held by the author for now (section 1.3 and the colophon).
+8. **The grammar version is 0.7.0,** in the reserved `macrocosm:` key (sections 1.1, 5.6 and 15): the kind `C:form`,
+   the fields of `C:device` and a fabulap's `outline` are new. Files written under 0.6.0, 0.5.4, 0.0.2 and 0.0.1 read
+   unchanged.
 
 **Edition 0.6.0 · 2026-11-06.** MacroCOSM is an OES with a core.
 

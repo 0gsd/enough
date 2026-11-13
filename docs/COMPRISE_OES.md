@@ -1,6 +1,6 @@
 # Comprise OES
 
-*Edition 0.6.0 · revised 2026-11-06 · cosmoes.org home: https://comprise.cosmoes.org/*
+*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://comprise.cosmoes.org/*
 
 *This edition describes the `comprise/1` MiniCOSM: a catalog declaring `oes: comprise/1`, with P files headed
 `cosm: 0.3`, the isotype `comprise-isotype/0`, the outside chart `comprise-paratype/0`, the backup `comprise-bundle/0`,
@@ -1641,6 +1641,19 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
+
+**Edition 0.7.0 · 2026-11-13.**
+
+1. **Entailment** (11.3). A release is an entailment made by rule: the Holotype entails its isotype, and what is
+   projected holds by construction. The line built by rule from an item's summary and its public children is
+   `offers[].entailed`, `seeks[].entailed` and `open_to[].entailed`, and the move that writes it is `entailment`; `told`
+   and `telling`, their earlier spellings, are read for good and never written (11.3, 13.1).
+2. **Beside the Index, the Allograph Registry** (11.3). Comprise Connect also serves Ascribe's registry, with the
+   Index's accounts, passkeys and rate limits. A company listed on the Index may own an agent listed there and may
+   attest work a person or an agent did for it, by a statement signed with the key that signs its current isotype; the
+   registry names the company by its Index handle and holds nothing of its Holotype.
+3. **Stewardship.** The colophon licenses the text under CC BY 4.0 and makes the OWFa 1.0 promise for it; the names of
+   the family are not licensed, and the author holds them for now.
 
 **Edition 0.6.0 · 2026-11-06.**
 

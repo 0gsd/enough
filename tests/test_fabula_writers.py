@@ -101,7 +101,7 @@ def test_a_fresh_decompile_writes_the_new_name_and_declaration(client: TestClien
     assert res["twin_path"] == "notes.md.fabulan.cosm" and res["flavour"] == "fabulan" and res["replaced"] is None
     twin = project / "notes.md.fabulan.cosm"
     assert not (project / "notes.md.cosm").exists()
-    assert twin.read_text(encoding="utf-8").splitlines()[:3] == ["oes: fabula/1", "macrocosm: 0.6.0",
+    assert twin.read_text(encoding="utf-8").splitlines()[:3] == ["oes: fabula/1", "macrocosm: 0.7.0",
                                                                  "flavour: fabulan"]
     doc = head(twin)
     assert list(doc)[:5] == ["oes", "macrocosm", "flavour", "id", "name"] and doc["id"] == "fabula/notes-md"
