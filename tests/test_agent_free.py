@@ -290,7 +290,7 @@ def test_the_refusal_table_is_post_only():
     assert _server.agent_free_refusal("GET", "/api/council/state") is None
     assert _server.agent_free_refusal("POST", "/api/council/pause") is None
     assert _server.agent_free_refusal("POST", "/api/models/download/x") is None
-    assert _server.agent_free_refusal("POST", "/api/canon/derive") is None
+    assert _server.agent_free_refusal("POST", "/api/fabula/derive") is None
     assert _server.agent_free_refusal("POST", "/api/council/run").startswith("agent-free mode:")
     assert _server.agent_free_refusal("POST", "/api/chat").startswith("agent-free mode:")
     assert _server.agent_free_refusal("POST", "/api/transcribe").startswith("agent-free mode:")
@@ -340,7 +340,7 @@ def test_derive_atem_and_compile_run_by_rules(client: TestClient, free: Path, mo
 
     monkeypatch.setattr(llm, "complete", no_complete)
 
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "emf"})
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "what": "fabula"})
     assert r.status_code == 200, r.text
     job = r.json()["job"]
     assert job["mode"] == "rules" and job["reason"] == "agent-free"
@@ -362,7 +362,7 @@ def test_derive_atem_and_compile_run_by_rules(client: TestClient, free: Path, mo
     assert done["state"] == "done" and (done["result"]["mode"], done["result"]["reason"]) == \
         ("rules", "agent-free")
 
-    r = client.post("/api/canon/compile", json={"path": "notes.md.fabulan.cosm"})
+    r = client.post("/api/fabula/compile", json={"path": "notes.md.fabulan.cosm"})
     assert r.status_code == 200, r.text
     job = r.json()["job"]
     assert (job["mode"], job["reason"]) == ("rules", "agent-free")

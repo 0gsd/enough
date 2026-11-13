@@ -1,5 +1,5 @@
-"""The derivation routes (0.4.3, P3): `/api/canon/derive`, `/api/canon/atem`, `/api/canon/atem/pin`,
-`/api/canon/emf`, `/api/canon/compile`, `/api/canon/job/{id}` (+ cancel) — refusals, jobs to completion, the
+"""The derivation routes (0.4.3, P3): `/api/fabula/derive`, `/api/canon/atem`, `/api/canon/atem/pin`,
+`/api/fabula/twin`, `/api/fabula/compile`, `/api/canon/job/{id}` (+ cancel) — refusals, jobs to completion, the
 `canon` SSE event, catalogs regenerated after writes, and the generation-lock rule.
 
 TestClient over `create_app(..., supervise=False)` with a dead llm_url (port 9), so `llm.reachable` reports no
@@ -173,7 +173,7 @@ SNAPSHOT_KEYS = {"id", "kind", "path", "state", "phase", "chunk", "chunks", "mes
 def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, project: Path, sse_events):
     before = (project / canon.PROJECT_CATALOG).read_text(encoding="utf-8")
     assert "notes.md.fabulan.cosm" not in before
-    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "emf"})
+    job = start(client, "/api/fabula/derive", {"path": "notes.md", "what": "fabula"})
     assert set(job) == SNAPSHOT_KEYS | {"flavour"}          # 0.6: a decompile's record says its flavour
     assert job["kind"] == "emf" and job["mode"] == "rules" and job["path"] == "notes.md"
     assert job["state"] in ("queued", "running") and "no model is answering" in job["message"]
@@ -192,10 +192,10 @@ def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
     item = next(n for n in cat["nodes"] if n.get("path") == "notes.md")
     assert item["fabula"] == {"path": "notes.md.fabulan.cosm"} and item["atem"]["line"].startswith("Mara Okafor")
     # the reader's route and the cosm viewer's route both read it
-    emf = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    emf = client.get("/api/fabula/twin", params={"path": "notes.md"}).json()
     assert emf["twin_path"] == "notes.md.fabulan.cosm" and emf["state"] == "fresh"
     assert emf["cosm"]["minicosm"] == "fabula" and emf["cosm"]["report"]["errors"] == []
-    assert client.get("/api/canon/emf", params={"path": "notes.md.fabulan.cosm"}).json()["twin_path"] == "notes.md.fabulan.cosm"
+    assert client.get("/api/fabula/twin", params={"path": "notes.md.fabulan.cosm"}).json()["twin_path"] == "notes.md.fabulan.cosm"
     viewer = client.get("/api/cosm", params={"path": "notes.md.fabulan.cosm"})
     assert viewer.status_code == 200 and viewer.json()["minicosm"] == "fabula"
     # the SSE `canon` event carries the snapshot, ending done
@@ -210,16 +210,16 @@ def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
 
 
 def test_fresh_twin_refuses_without_force(client: TestClient):
-    wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "emf"})
+    wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md"})["id"])
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "what": "fabula"})
     assert r.status_code == 409 and "already fresh" in r.json()["detail"]
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md", "force": True})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md", "force": True})["id"])
     assert snap["state"] == "done"
 
 
 def test_twin_state_agrees_with_the_listing(client: TestClient, project: Path):
-    wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
-    wait_job(client, start(client, "/api/canon/derive", {"path": "canon:lib/guide.md"})["id"])
+    wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md"})["id"])
+    wait_job(client, start(client, "/api/fabula/derive", {"path": "canon:lib/guide.md"})["id"])
 
     def listed() -> tuple[str, str]:
         tree = client.get("/api/canon/tree").json()
@@ -233,16 +233,16 @@ def test_twin_state_agrees_with_the_listing(client: TestClient, project: Path):
     with (project / "notes.md").open("a", encoding="utf-8") as fh:
         fh.write("\nAn afterthought.\n")
     assert listed()[0] == "stale" == CD.twin_state(project / "notes.md")
-    assert client.get("/api/canon/emf", params={"path": "notes.md"}).json()["state"] == "stale"
+    assert client.get("/api/fabula/twin", params={"path": "notes.md"}).json()["state"] == "stale"
     # a stale twin is no longer "already fresh"
-    assert client.post("/api/canon/derive", json={"path": "notes.md"}).status_code == 200
+    assert client.post("/api/fabula/derive", json={"path": "notes.md"}).status_code == 200
 
 
 def test_derive_in_a_canon_volume_regenerates_its_catalog(client: TestClient):
     vol = canon.volume_dir("lib")
     canon.regenerate_catalog("lib")
     assert "guide.md.fabulan.cosm" not in (vol / "canon.cosm").read_text(encoding="utf-8")
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "canon:lib/guide.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "canon:lib/guide.md"})["id"])
     assert snap["state"] == "done", snap
     assert snap["result"]["twin_path"] == "canon:lib/guide.md.fabulan.cosm"
     twin = vol / "guide.md.fabulan.cosm"
@@ -251,16 +251,16 @@ def test_derive_in_a_canon_volume_regenerates_its_catalog(client: TestClient):
     cat = macrocosm.yaml_load((vol / "canon.cosm").read_text(encoding="utf-8"))
     item = next(n for n in cat["nodes"] if n.get("path") == "guide.md")
     assert item["fabula"]["path"] == "guide.md.fabulan.cosm" and item["fabula"]["state"] == "fresh"
-    emf = client.get("/api/canon/emf", params={"path": "canon:lib/guide.md"}).json()
+    emf = client.get("/api/fabula/twin", params={"path": "canon:lib/guide.md"}).json()
     assert emf["twin_path"] == "canon:lib/guide.md.fabulan.cosm"
 
 
 def test_derive_reads_a_converted_original_through_its_markdown(client: TestClient, project: Path):
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "memo.pdf"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "memo.pdf"})["id"])
     assert snap["state"] == "done", snap
     assert snap["result"]["text_path"] == "memo.pdf.md" and snap["result"]["twin_path"] == "memo.pdf.md.fabulan.cosm"
     assert (project / "memo.pdf.md.fabulan.cosm").is_file() and not (project / "memo.pdf.cosm").exists()
-    assert client.get("/api/canon/emf", params={"path": "memo.pdf"}).json()["twin_path"] == "memo.pdf.md.fabulan.cosm"
+    assert client.get("/api/fabula/twin", params={"path": "memo.pdf"}).json()["twin_path"] == "memo.pdf.md.fabulan.cosm"
 
 
 @pytest.mark.parametrize("path,status,words", [
@@ -282,14 +282,14 @@ def test_derive_reads_a_converted_original_through_its_markdown(client: TestClie
     ("", 400, "missing path"),
 ])
 def test_derive_refusals(client: TestClient, project: Path, path: str, status: int, words: str):
-    r = client.post("/api/canon/derive", json={"path": path, "what": "emf"})
+    r = client.post("/api/fabula/derive", json={"path": path, "what": "fabula"})
     assert r.status_code == status, (path, r.text)
     assert words in r.json()["detail"], (path, r.json())
     assert not (project / "other.md.fabulan.cosm").read_text(encoding="utf-8").startswith("oes: fabula/1")
 
 
 def test_derive_refuses_an_unknown_what(client: TestClient):
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "summary"})
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "what": "summary"})
     assert r.status_code == 400 and "fabula or atem" in r.json()["detail"]
 
 
@@ -311,10 +311,10 @@ def test_file_atem_makes_a_minimal_twin(client: TestClient, project: Path):
     item = next(n for n in cat["nodes"] if n.get("path") == "hello.md")
     assert item["atem"]["line"] == "A short note about the lane by the orchard."
     # derive what=atem on a fresh atem is "already fresh"; the atem route itself always remakes it
-    assert client.post("/api/canon/derive", json={"path": "hello.md", "what": "atem"}).status_code == 409
+    assert client.post("/api/fabula/derive", json={"path": "hello.md", "what": "atem"}).status_code == 409
     assert wait_job(client, start(client, "/api/canon/atem", {"path": "hello.md"})["id"])["state"] == "done"
     # a full derive upgrades the minimal twin even though it is fresh
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "hello.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "hello.md"})["id"])
     assert snap["state"] == "done"
     full = macrocosm.yaml_load((project / "hello.md.fabulan.cosm").read_text(encoding="utf-8"))
     assert full["derived"]["completeness"] == "full" and full["nodes"]
@@ -390,7 +390,7 @@ def test_compile_writes_a_short_and_records_it_in_the_twin(client: TestClient, p
     src, emf = project / "notes.md", project / "notes.md.cosm"
     text_before = (src.read_bytes(), src.stat().st_mtime_ns)
     twin_before = emf.read_text(encoding="utf-8")
-    job = start(client, "/api/canon/compile", {"path": "notes.md.cosm"})
+    job = start(client, "/api/fabula/compile", {"path": "notes.md.cosm"})
     snap = wait_job(client, job["id"])
     assert snap["state"] == "done" and snap["kind"] == "compile", snap
     res = snap["result"]
@@ -413,14 +413,14 @@ def test_compile_writes_a_short_and_records_it_in_the_twin(client: TestClient, p
     assert block.count("\n") == 2 and twin_after.replace(block, "", 1) == twin_before, "byte-stable but for the list"
     assert CD.twin_state(src) == "fresh" and lint_errors(emf) == []
     # twice in the same minute, by weight: a second file, never an overwrite, and a second record
-    again = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm", "order": "weight"})["id"])
+    again = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.cosm", "order": "weight"})["id"])
     assert again["result"]["written"] != written and out.read_text(encoding="utf-8") == md
     assert again["result"]["order"] == "weight"
     md2 = (project / again["result"]["written"]).read_text(encoding="utf-8")
     assert "## What it claims" in md2 and md2.splitlines()[-1].startswith("*a short of notes.md, told by weight,")
     assert [x["order"] for x in macrocosm.yaml_load(emf.read_text(encoding="utf-8"))["shorts"]] == ["told", "weight"]
     # a standalone EMF compiles beside itself, by weight, and records its short too
-    rain = wait_job(client, start(client, "/api/canon/compile", {"path": "rain.cosm"})["id"])
+    rain = wait_job(client, start(client, "/api/fabula/compile", {"path": "rain.cosm"})["id"])
     assert re.fullmatch(r"rain\.short-\d{4}-\d{2}-\d{2}-\d{4}\.md", rain["result"]["written"])
     assert rain["result"]["order"] == "weight"
     assert macrocosm.yaml_load((project / "rain.cosm").read_text(encoding="utf-8"))["shorts"][0]["order"] == "weight"
@@ -440,10 +440,10 @@ def test_compile_with_the_text_gone_defaults_to_weight(client: TestClient, proje
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "orphan.cosm")     # names notes.md… beside it
     (project / "elsewhere").mkdir()
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "elsewhere" / "notes.md.cosm")
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "elsewhere/notes.md.cosm"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "elsewhere/notes.md.cosm"})["id"])
     assert snap["state"] == "done" and snap["result"]["order"] == "weight", snap
     assert snap["result"]["written"].startswith("elsewhere/notes.short-")
-    told = wait_job(client, start(client, "/api/canon/compile",
+    told = wait_job(client, start(client, "/api/fabula/compile",
                                   {"path": "elsewhere/notes.md.cosm", "order": "told"})["id"])
     assert told["result"]["order"] == "told", "told can still be asked for: the spans place the items"
 
@@ -451,10 +451,10 @@ def test_compile_with_the_text_gone_defaults_to_weight(client: TestClient, proje
 def test_compile_order_validation(client: TestClient, project: Path):
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
     for bad in ("as it happened", "TOLDX", 3, ["told"]):
-        r = client.post("/api/canon/compile", json={"path": "notes.md.cosm", "order": bad})
+        r = client.post("/api/fabula/compile", json={"path": "notes.md.cosm", "order": bad})
         assert r.status_code == 400 and "told or weight" in r.json()["detail"], (bad, r.text)
     assert not list(project.glob("notes.short-*.md")), "a refused compile writes nothing"
-    ok = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm", "order": " Weight "})["id"])
+    ok = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.cosm", "order": " Weight "})["id"])
     assert ok["result"]["order"] == "weight"
 
 
@@ -463,9 +463,9 @@ def test_compile_shares_the_texts_claim(client: TestClient, project: Path):
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
     jobs = client.app.state.canon_jobs
     with jobs.holding(str(project.resolve() / "notes.md"), "notes.md"):
-        r = client.post("/api/canon/compile", json={"path": "notes.md.cosm"})
+        r = client.post("/api/fabula/compile", json={"path": "notes.md.cosm"})
         assert r.status_code == 409, r.text
-    assert wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])["state"] == "done"
+    assert wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.cosm"})["id"])["state"] == "done"
 
 
 @pytest.mark.parametrize("path,status,words", [
@@ -476,7 +476,7 @@ def test_compile_shares_the_texts_claim(client: TestClient, project: Path):
     ("", 400, "missing path"),
 ])
 def test_compile_refusals(client: TestClient, path: str, status: int, words: str):
-    r = client.post("/api/canon/compile", json={"path": path})
+    r = client.post("/api/fabula/compile", json={"path": path})
     assert r.status_code == status and words in r.json()["detail"], (path, r.text)
 
 
@@ -487,13 +487,13 @@ def test_compile_refusals(client: TestClient, path: str, status: int, words: str
 def test_job_routes_404_and_409(client: TestClient):
     assert client.get("/api/canon/job/cn999").status_code == 404
     assert client.post("/api/canon/job/cn999/cancel").status_code == 404
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "hello.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "hello.md"})["id"])
     r = client.post(f"/api/canon/job/{snap['id']}/cancel")
     assert r.status_code == 409 and "not running" in r.json()["detail"]
 
 
 def test_model_mode_job(client: TestClient, project: Path, model: list):
-    job = start(client, "/api/canon/derive", {"path": "notes.md"})
+    job = start(client, "/api/fabula/derive", {"path": "notes.md"})
     assert job["mode"] == "model"
     snap = wait_job(client, job["id"])
     assert snap["state"] == "done", snap
@@ -508,7 +508,7 @@ def test_model_mode_job(client: TestClient, project: Path, model: list):
     assert doc["derived"]["model"] == "fake-model" and doc["derived"]["mode"] == "model"
     assert doc["atem"]["push"] == "Ask the parish council to wait until September before mowing."
     # compile, model mode: one completion, its prose written, the footer naming the model and the order
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.fabulan.cosm"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.fabulan.cosm"})["id"])
     written = (project / snap["result"]["written"]).read_text(encoding="utf-8")
     assert written.startswith("# The orchard\n\nProse from the model.\n\n---\n\n*a short of notes.md, told as the "
                               "author told it, compiled from its fabula on ")
@@ -527,7 +527,7 @@ def test_a_model_that_dies_mid_job_fails_it_in_words(client: TestClient, project
         raise ConnectionError("connection refused")
 
     monkeypatch.setattr(llm, "complete", dead)
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md"})["id"])
     assert snap["state"] == "failed" and "the model stopped answering" in snap["error"]
     assert not (project / "notes.md.fabulan.cosm").exists(), "no silent fallback to rules"
 
@@ -549,7 +549,7 @@ def test_a_model_job_waits_for_the_generation_lock(client: TestClient, project: 
     session = client.app.state.session
     client.portal.call(session.generation_lock.acquire)
     try:
-        job = start(client, "/api/canon/derive", {"path": "notes.md"})
+        job = start(client, "/api/fabula/derive", {"path": "notes.md"})
         assert job["state"] == "queued" and job["message"] == "waiting for the model"
         time.sleep(0.3)
         snap = client.get(f"/api/canon/job/{job['id']}").json()
@@ -557,7 +557,7 @@ def test_a_model_job_waits_for_the_generation_lock(client: TestClient, project: 
         # A rules-mode job does not take the lock: with no model answering it runs to the end while chat still
         # holds the lock (the mode is decided at the route, so the model can be "down" for this one request).
         monkeypatch.setattr(llm, "reachable", lambda url: (False, "connection refused"))
-        rules = start(client, "/api/canon/compile", {"path": "rain.cosm"})
+        rules = start(client, "/api/fabula/compile", {"path": "rain.cosm"})
         monkeypatch.setattr(llm, "reachable", lambda url: (True, "ok"))
         assert rules["mode"] == "rules"
         done = wait_job(client, rules["id"])
@@ -575,7 +575,7 @@ def test_cancel_a_queued_job(client: TestClient, project: Path, model: list):
     session = client.app.state.session
     client.portal.call(session.generation_lock.acquire)
     try:
-        job = start(client, "/api/canon/derive", {"path": "notes.md"})
+        job = start(client, "/api/fabula/derive", {"path": "notes.md"})
         r = client.post(f"/api/canon/job/{job['id']}/cancel")
         assert r.status_code == 200 and r.json()["state"] == "cancelled"
         assert r.json()["message"] == "cancelled before it started"
@@ -602,10 +602,10 @@ def test_cancel_between_passages(client: TestClient, project: Path, monkeypatch,
     n_chunks = len(CD.chunk(LONG))
     assert n_chunks >= 2
     try:
-        job = start(client, "/api/canon/derive", {"path": "long.md"})
+        job = start(client, "/api/fabula/derive", {"path": "long.md"})
         assert started.wait(10)
         # the same file is claimed while the job runs: no second derive, no pin
-        assert client.post("/api/canon/derive", json={"path": "long.md", "force": True}).status_code == 409
+        assert client.post("/api/fabula/derive", json={"path": "long.md", "force": True}).status_code == 409
         pin = client.post("/api/canon/atem/pin", json={"path": "long.md", "span": {"lines": "3"},
                                                        "atem": {"line": "A line."}})
         assert pin.status_code == 409
@@ -626,32 +626,32 @@ def test_cancel_between_passages(client: TestClient, project: Path, monkeypatch,
         time.sleep(0.02)
     assert any(e == "canon" and d["id"] == job["id"] and d["state"] == "cancelled" for e, d in sse_events)
     # released: the file can be derived again
-    assert client.post("/api/canon/derive", json={"path": "long.md"}).status_code == 200
+    assert client.post("/api/fabula/derive", json={"path": "long.md"}).status_code == 200
 
 
 def test_home_mode_has_no_derivation_routes(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False, home=True)
     with TestClient(app) as c:
-        for method, path in (("post", "/api/canon/derive"), ("post", "/api/canon/atem"),
-                             ("post", "/api/canon/atem/pin"), ("get", "/api/canon/emf?path=notes.md"),
-                             ("post", "/api/canon/compile"), ("get", "/api/canon/job/cn1")):
+        for method, path in (("post", "/api/fabula/derive"), ("post", "/api/canon/atem"),
+                             ("post", "/api/canon/atem/pin"), ("get", "/api/fabula/twin?path=notes.md"),
+                             ("post", "/api/fabula/compile"), ("get", "/api/canon/job/cn1")):
             r = getattr(c, method)(path, **({"json": {"path": "notes.md"}} if method == "post" else {}))
             assert r.status_code == 404, path
 
 
 def test_emf_route_404s_without_a_twin(client: TestClient):
-    r = client.get("/api/canon/emf", params={"path": "hello.md"})
+    r = client.get("/api/fabula/twin", params={"path": "hello.md"})
     assert r.status_code == 404 and "has no fabula yet" in r.json()["detail"]
-    assert client.get("/api/canon/emf", params={"path": "nope.md"}).status_code == 404
-    assert client.get("/api/canon/emf", params={"path": "other.md"}).status_code == 404
+    assert client.get("/api/fabula/twin", params={"path": "nope.md"}).status_code == 404
+    assert client.get("/api/fabula/twin", params={"path": "other.md"}).status_code == 404
 
 
 def test_the_names_before_emf_are_gone(client: TestClient, project: Path):
     """Plan §16 kept `what: "eml"` and `GET /api/canon/eml` one release; 0.6 removed them."""
-    assert client.post("/api/canon/derive", json={"path": "notes.md", "what": "eml"}).status_code == 400
-    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "emf"})
+    assert client.post("/api/fabula/derive", json={"path": "notes.md", "what": "eml"}).status_code == 400
+    job = start(client, "/api/fabula/derive", {"path": "notes.md", "what": "fabula"})
     assert wait_job(client, job["id"])["state"] == "done"
-    assert client.get("/api/canon/emf", params={"path": "notes.md"}).status_code == 200
+    assert client.get("/api/fabula/twin", params={"path": "notes.md"}).status_code == 200
     assert client.get("/api/canon/eml", params={"path": "notes.md"}).status_code in (404, 405)
     assert macrocosm.sniff_declaration(project / "notes.md.fabulan.cosm") == "fabula/1"
 
@@ -661,7 +661,7 @@ def test_pins_survive_a_full_derive(client: TestClient, project: Path):
             "focus": "The mowing date.", "push": "Wait until September.", "pull": "The orchard needs the strip."}
     r = client.post("/api/canon/atem/pin", json={"path": "notes.md", "atem": atem, "span": {"lines": "17-20"}})
     assert r.status_code == 200 and r.json()["item_id"] == "X:atem/1"
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md"})["id"])
     assert snap["state"] == "done" and snap["result"]["counts"]["X"] == 1
     doc = macrocosm.yaml_load((project / "notes.md.fabulan.cosm").read_text(encoding="utf-8"))
     assert doc["derived"]["completeness"] == "full"
@@ -681,7 +681,7 @@ def test_derive_route_threads_copyable_to_a_fabulaps_lines(client: TestClient, p
     body = {"path": "rose.txt", "flavour": "fabulap"}
     if copyable is not None:
         body["copyable"] = copyable
-    snap = wait_job(client, start(client, "/api/canon/derive", body)["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", body)["id"])
     assert snap["state"] == "done", snap
     twin = project / "rose.txt.fabulap.cosm"
     assert lint_errors(twin) == []

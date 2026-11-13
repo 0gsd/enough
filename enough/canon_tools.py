@@ -895,13 +895,12 @@ def _module_counts(counts: dict) -> str:
 
 
 def run_fabula_derive(project_dir: Path, call: Any) -> Any:
-    """`fabula_derive <path> [<force>yes</force>]` (`emf_derive`, its name before 0.6, still answers: the result says
-    the name it was called by) — decompile a text into its
+    """`fabula_derive <path> [<force>yes</force>]` — decompile a text into its
     twin (`notes.md` → `notes.md.cosm`), by this session's model when it
     answers and the text is at most EMF_MODEL_MAX characters, by rules
     otherwise. Refuses what the reader's decompile refuses, and texts over
     TEXT_MAX."""
-    name = "emf_derive" if getattr(call, "name", None) == "emf_derive" else "fabula_derive"
+    name = "fabula_derive"
     from . import canon as _canon
     from . import canon_derive as _canon_derive
     from . import canon_jobs as _canon_jobs
@@ -989,8 +988,6 @@ def run_fabula_derive(project_dir: Path, call: Any) -> Any:
                     started=started, chunks=info["chunks"], by=by)
     return _result(name, raw, True, "\n".join(lines), {SIDE_EFFECT: snap})
 
-
-run_emf_derive = run_fabula_derive          # the 0.5 name of the runner (enough/retired_names.py)
 
 
 def run_atem(project_dir: Path, call: Any) -> Any:
@@ -1455,5 +1452,5 @@ __all__ = ["DOC_LOOKUP_DOCS", "EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT",
            "TOOL_NAMES", "RouteError", "TextTargetError", "atem_lines", "check_route", "capped_tree", "catalog_after", "configure",
            "declaration_text", "guide_text", "inside_holotype", "inside_package", "load", "model", "readvisor_name", "register",
            "report_lines", "resolve", "run_atem", "run_cosm_guide", "run_cosm_lint", "run_cosm_read",
-           "run_doc_lookup", "run_emf_derive", "run_fabula_derive", "snapshot", "store_prefix", "text_target", "tidy_rel",
+           "run_doc_lookup", "run_fabula_derive", "snapshot", "store_prefix", "text_target", "tidy_rel",
            "ui_language", "find_doc_entry", "where"]

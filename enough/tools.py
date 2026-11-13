@@ -1788,7 +1788,7 @@ from . import dictionary_tools as _dictionary_tools  # noqa: E402
 _dictionary_tools.register()
 
 # MacroCOSM's six (0.4.3, `doc_lookup` in 0.4.4): `cosm_read`, `cosm_lint`,
-# `fabula_derive` (`emf_derive` before 0.6), `atem`, `cosm_guide`, `doc_lookup`. Reads and project writes are ungated; a write into the Canon
+# `fabula_derive` `atem`, `cosm_guide`, `doc_lookup`. Reads and project writes are ungated; a write into the Canon
 # store answers to `canon_enabled` inside the runners. Documented in every
 # project (like FEED's); the guide is the `macrocosm-oes` skill, off by
 # default and one `cosm_guide` away. The module imports the engine lazily.
@@ -1841,7 +1841,7 @@ def execute(project_dir: Path, call: ToolCall) -> ToolResult:
             "tools run only for a readvisor, and none runs while agent-free is on"))
     fn = _DISPATCH.get(call.name)
     if fn is None:
-        # a name retired in 0.6 still runs its new name's runner, through 0.6 (enough/retired_names.py)
+        # a name retired last release still runs its new name's runner for one release (enough/retired_names.py)
         from . import retired_names as _retired
         fn = _DISPATCH.get(_retired.tool(call.name))
     if fn is None:

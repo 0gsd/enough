@@ -5214,9 +5214,8 @@ def create_app(
 
     @app.post("/api/fabula/derive")
     async def api_canon_derive(request: Request) -> dict[str, Any]:
-        """Derive a text's twin, its fabula (`what: fabula`; `emf`, the old
-        word, still reads), or its file atem (`what: atem`) as a background
-        job (the old path `/api/canon/derive` answers too, through 0.6): `{path, what,
+        """Derive a text's twin, its fabula (`what: fabula`), or its file atem (`what: atem`) as a background
+        job: `{path, what,
         force?, flavour?, route?}` → `{job, flavour, suggested}`. `flavour` is
         `fabulan` or `fabulap` (absent: the twin's own, else the suggestion;
         `fabulac` is refused for a text); `route` is `local` or `cloud`
@@ -5227,7 +5226,7 @@ def create_app(
         decided here, once."""
         body = await _json_body(request)
         what = str(body.get("what") or "fabula").strip().lower()
-        what = _retired_names.WORDS["what"].get(what, what)
+        what = _retired_names.word("what", what)
         if what not in ("fabula", "atem"):
             raise HTTPException(400, "what must be fabula or atem")
         what = "emf" if what == "fabula" else what            # the job's kind keeps its 0.4 name for the page
@@ -5332,8 +5331,7 @@ def create_app(
 
     @app.get("/api/fabula/twin")
     async def api_canon_emf(path: str = Query(...), flavour: str | None = Query(None)) -> dict[str, Any]:
-        """A text's twin for the reader and the viewer (the old path
-        `/api/canon/emf` answers too, through 0.6): `{twin_path, state:
+        """A text's twin for the reader and the viewer : `{twin_path, state:
         fresh|stale, flavour, twins: {flavour: {path, state}}, suggested, cosm:
         <the /api/cosm payload>}`; 404 when the text has none. Takes the text
         (or a twin itself, `.fabulan.cosm`, `.fabulap.cosm` or the old `.cosm`;
@@ -5568,8 +5566,8 @@ def create_app(
     )
     app.include_router(_dialectic_router)
 
-    # The names retired in 0.6 (`enough/retired_names.py`): each old path is served by its new path's handler,
-    # through 0.6 only; nothing documents them. The table and this loop go a release later.
+    # The names a release has retired (`enough/retired_names.py`): each old path is served by its new path's handler
+    # for one release; nothing documents them. The table is empty in 0.7.
     for _method, _old, _new in _retired_names.ROUTES:
         _hit = next((r for r in app.router.routes
                      if getattr(r, "path", None) == _new and _method in (getattr(r, "methods", None) or ())), None)

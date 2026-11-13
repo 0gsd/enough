@@ -241,7 +241,7 @@ def test_the_engine_names_before_emf_are_gone():
     assert not hasattr(CT, "EML_MODEL_MAX")
     for name in ("SYSTEM", "USER", "CONTINUE", "RESTART", "RETRY", "REPAIR"):
         assert not hasattr(P, f"EML_{name}"), name
-    # 0.6: the tool is fabula_derive; emf_derive still answers through 0.6 (enough/retired_names.py), undocumented
+    # 0.6: the tool is fabula_derive; emf_derive, its name before 0.6, is gone
     assert "fabula_derive" in CT.TOOL_NAMES and "eml_derive" not in CT.TOOL_NAMES
     assert "fabula_derive" in T._DISPATCH and "eml_derive" not in T._DISPATCH and "emf_derive" not in T._DISPATCH
 

@@ -479,7 +479,7 @@ status `ingesting` and marked `complete` (or `failed`) at the end.
 #   install (0.4.1). Short, because then every project pays for it: the
 #   column guide is the `lexicographer` skill, in the Skills section when it
 #   is on and one `dict_guide` call away when it is off.
-# - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
+# - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `fabula_derive`, `atem`,
 #   `cosm_guide`, 0.4.3; `doc_lookup`, 0.4.4; `thym_check` and `thym_run`, 0.5.0, which answer only
 #   with the `macrocosm-oes` skill on), behind the MacroCOSM manifests shipping with this
 #   install — so in every project, as the owner decided (docs/canon-043-plan.md

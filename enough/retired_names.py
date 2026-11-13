@@ -1,30 +1,26 @@
-"""The names retired in 0.6 that still answer, in one table (the conductor's ruling: EMF's name is retired).
+"""The one table of names a release retired, kept for a release so that what learnt an old name is still understood.
 
-The routes and the tools the app documents, and the page will call, are named for the fabula. Each old route path and
-each old tool name below still dispatches to exactly the same code through 0.6, so the page keeps working until its
-own lane moves it, and an agent that learnt an old name is still understood. Nothing documents an old name.
+When a route, a tool or a word in a request body is renamed, the old name goes into the table below and is served
+by the new name's code for ONE release; nothing documents an old name, and the page calls none. Each entry is removed
+one release after it is added (an entry added in 0.7 goes in 0.8). The mechanism stays, emptied, so the next rename
+needs only a line:
 
-THIS TABLE GOES A RELEASE LATER (0.7): delete it, the loop in `server.create_app` that reads `ROUTES`, and the
-lookup in `tools.execute` that reads `TOOLS`.
+- `ROUTES`: `(method, old path, new path)`; `server.create_app` serves the old path with the new path's handler.
+- `TOOLS`: `{old tool name: new tool name}`; `tools.execute` runs the new name's runner for a call by the old name.
+- `WORDS`: `{field: {old word: new word}}`; a handler that reads the field maps the old word to the new one.
+
+Removed in 0.7: the 0.6 fabula renames (`/api/canon/emf`, `/derive`, `/compile`; the tool `emf_derive`; `what: emf`).
 """
 from __future__ import annotations
 
 #: `(method, old path, new path)`: the old path is served by the new path's handler.
-ROUTES: tuple[tuple[str, str, str], ...] = (
-    ("GET", "/api/canon/emf", "/api/fabula/twin"),
-    ("POST", "/api/canon/derive", "/api/fabula/derive"),
-    ("POST", "/api/canon/compile", "/api/fabula/compile"),
-)
+ROUTES: tuple[tuple[str, str, str], ...] = ()
 
 #: `{old tool name: new tool name}`: a call by the old name runs the new name's runner.
-TOOLS: dict[str, str] = {
-    "emf_derive": "fabula_derive",
-}
+TOOLS: dict[str, str] = {}
 
-#: Old words a request's fields may still say: `what: emf` on the derive route means `what: fabula`.
-WORDS: dict[str, dict[str, str]] = {
-    "what": {"emf": "fabula"},
-}
+#: `{field: {old word: new word}}`: old words a request's fields may still say.
+WORDS: dict[str, dict[str, str]] = {}
 
 
 def tool(name: str) -> str:
@@ -32,4 +28,9 @@ def tool(name: str) -> str:
     return TOOLS.get(name, name)
 
 
-__all__ = ["ROUTES", "TOOLS", "WORDS", "tool"]
+def word(field: str, value: str) -> str:
+    """A request field's value, with a retired word read as its new word."""
+    return WORDS.get(field, {}).get(value, value)
+
+
+__all__ = ["ROUTES", "TOOLS", "WORDS", "tool", "word"]

@@ -1,4 +1,4 @@
-"""The readvisor's MacroCOSM tools (0.4.3, P6): `cosm_read`, `cosm_lint`, `emf_derive`, `atem`.
+"""The readvisor's MacroCOSM tools (0.4.3, P6): `cosm_read`, `cosm_lint`, `fabula_derive`, `atem`.
 
 Every tool runs through `tools.execute` with a real `ToolCall` parsed from tool-call text, the documented
 examples in `prompt.CANON_TOOL_INSTRUCTIONS` included. Rules mode is the default (the tools' model seam is
@@ -176,12 +176,12 @@ def test_a_tool_turn_announces_the_write_as_a_canon_event(project: Path, monkeyp
 
     monkeypatch.setattr(server.Session, "emit", spy)
     session = server.Session(project_dir=project, llm_url="http://127.0.0.1:9")
-    call = T.parse_tool_calls(tool("emf_derive", path="hello.md"))[0]
+    call = T.parse_tool_calls(tool("fabula_derive", path="hello.md"))[0]
     asyncio.run(server._handle_tool(session, call, []))
     assert [e for e, _d in seen] == ["tool", "tool", "canon"]
     assert seen[1][1]["status"] == "ok"
     assert seen[2][1]["state"] == "done" and seen[2][1]["result"]["twin_path"] == "hello.md.fabulan.cosm"
-    assert session.history[-1]["content"].startswith('<tool_result name="emf_derive"')
+    assert session.history[-1]["content"].startswith('<tool_result name="fabula_derive"')
 
 
 def test_the_server_configures_the_seam_in_project_mode_only(project: Path):
@@ -322,14 +322,14 @@ def test_lint_a_clean_twin_and_a_refused_file(project: Path):
 
 
 # ---------------------------------------------------------------------------
-# emf_derive
+# fabula_derive
 # ---------------------------------------------------------------------------
 
 def test_derive_in_rules_mode(project: Path):
     ui = Path(os.environ["ENOUGH_UI_CONFIG"])
     ui.parent.mkdir(parents=True, exist_ok=True)
     ui.write_text(json.dumps({"chief_readvisor_name": "Mo"}), encoding="utf-8")
-    r = run(project, tool("emf_derive", path="notes.md"))
+    r = run(project, tool("fabula_derive", path="notes.md"))
     assert r.ok, r.body
     twin = project / "notes.md.fabulan.cosm"
     data = twin_data(twin)
@@ -348,7 +348,7 @@ def test_derive_in_rules_mode(project: Path):
 
 
 def test_derive_in_model_mode(project: Path, model: list):
-    r = run(project, tool("emf_derive", path="notes.md"))
+    r = run(project, tool("fabula_derive", path="notes.md"))
     assert r.ok, r.body
     data = twin_data(project / "notes.md.fabulan.cosm")
     assert data["derived"]["mode"] == "model" and data["derived"]["model"] == "fake-model"
@@ -361,17 +361,17 @@ def test_derive_in_model_mode(project: Path, model: list):
 
 
 def test_already_fresh_force_and_the_upgrade_to_a_model(project: Path, monkeypatch: pytest.MonkeyPatch):
-    assert run(project, tool("emf_derive", path="hello.md")).ok
-    r = run(project, tool("emf_derive", path="hello.md"))
+    assert run(project, tool("fabula_derive", path="hello.md")).ok
+    r = run(project, tool("fabula_derive", path="hello.md"))
     assert r.ok and r.body.startswith("already fresh") and not r.side_effects, r.body
-    r = run(project, tool("emf_derive", path="hello.md", force="yes"))
+    r = run(project, tool("fabula_derive", path="hello.md", force="yes"))
     assert r.ok and r.body.startswith("ok — wrote"), r.body
     # A scaffold is not fresh enough once a model answers: the tool reads it properly.
     monkeypatch.setattr(llm, "reachable", lambda url: (True, "ok"))
     monkeypatch.setattr(llm, "complete", lambda m, **kw: (ATEM_YAML if m[0]["content"].startswith(
         "You write the atem") else good(), {"model": "fake-model"}))
     CT.configure(llm_url="http://127.0.0.1:9")
-    r = run(project, tool("emf_derive", path="hello.md"))
+    r = run(project, tool("fabula_derive", path="hello.md"))
     assert r.ok and "mode: model" in r.body, r.body
 
 
@@ -382,7 +382,7 @@ def test_a_model_that_dies_writes_nothing(project: Path, monkeypatch: pytest.Mon
     monkeypatch.setattr(llm, "reachable", lambda url: (True, "ok"))
     monkeypatch.setattr(llm, "complete", boom)
     CT.configure(llm_url="http://127.0.0.1:9")
-    r = run(project, tool("emf_derive", path="notes.md"))
+    r = run(project, tool("fabula_derive", path="notes.md"))
     assert not r.ok and "the model became unavailable (the gate closed); nothing was written" in r.body, r.body
     assert not (project / "notes.md.fabulan.cosm").exists()
     r = run(project, tool("atem", path="notes.md"))
@@ -394,7 +394,7 @@ def test_a_model_reads_only_short_texts_in_a_chat_turn(project: Path, model: lis
     """Over EMF_MODEL_MAX the twin is the rules scaffold even with a model answering, and the result says the full
     pass belongs in the reader; at or under it the model reads. `atem` keeps the model up to TEXT_MAX."""
     assert CT.EMF_MODEL_MAX < len(MID) <= CT.TEXT_MAX
-    r = run(project, tool("emf_derive", path="mid.md"))
+    r = run(project, tool("fabula_derive", path="mid.md"))
     assert r.ok, r.body
     assert model == [], "no model call for a long text inside a chat turn"
     data = twin_data(project / "mid.md.fabulan.cosm")
@@ -404,20 +404,20 @@ def test_a_model_reads_only_short_texts_in_a_chat_turn(project: Path, model: lis
            "background" in r.body
     assert r.side_effects[CT.SIDE_EFFECT]["mode"] == "rules"
     # A rules twin of a long text is as fresh as it can get here.
-    r = run(project, tool("emf_derive", path="mid.md"))
+    r = run(project, tool("fabula_derive", path="mid.md"))
     assert r.ok and r.body.startswith("already fresh") and model == []
     # The atem of the same text is the model's.
     r = run(project, tool("atem", path="mid.md"))
     assert r.ok and "mode: model (fake-model)" in r.body and len(model) == 1, r.body
     # ...and a short text is the model's for both.
     assert len((project / "notes.md").read_text(encoding="utf-8")) <= CT.EMF_MODEL_MAX
-    r = run(project, tool("emf_derive", path="notes.md"))
+    r = run(project, tool("fabula_derive", path="notes.md"))
     assert r.ok and "mode: model (fake-model)" in r.body
 
 
 def test_the_length_refusal(project: Path):
     assert len(LONG) > CT.TEXT_MAX
-    r = run(project, tool("emf_derive", path="long.md"))
+    r = run(project, tool("fabula_derive", path="long.md"))
     assert not r.ok and "that's long for a chat turn — use decompile in the reader instead" in r.body
     r = run(project, tool("atem", path="long.md"))
     assert not r.ok and "that's long for a chat turn — use atem in the reader instead" in r.body
@@ -427,10 +427,10 @@ def test_the_length_refusal(project: Path):
 
 
 def test_an_absolute_path_inside_the_project_is_taken(project: Path):
-    r = run(project, tool("emf_derive", path=str(project / "hello.md")))
+    r = run(project, tool("fabula_derive", path=str(project / "hello.md")))
     assert r.ok and (project / "hello.md.fabulan.cosm").is_file(), r.body
     # Anything else stays inside the project, as the routes read it: the leading slash is dropped.
-    r = run(project, tool("emf_derive", path="/etc/hosts"))
+    r = run(project, tool("fabula_derive", path="/etc/hosts"))
     assert not r.ok and "no such file: etc/hosts" in r.body
 
 
@@ -439,12 +439,12 @@ def test_a_job_holding_the_file_wins(project: Path):
     CT.configure(jobs=jobs)
     key = str(CT.text_target(project, "notes.md")["key"])
     with jobs.holding(key, "notes.md"):
-        r = run(project, tool("emf_derive", path="notes.md"))
+        r = run(project, tool("fabula_derive", path="notes.md"))
         assert not r.ok and "is being derived right now" in r.body, r.body
         r = run(project, tool("atem", path="notes.md"))
         assert not r.ok and "is being derived right now" in r.body
     assert not (project / "notes.md.fabulan.cosm").exists()
-    assert run(project, tool("emf_derive", path="notes.md")).ok
+    assert run(project, tool("fabula_derive", path="notes.md")).ok
 
 
 # ---------------------------------------------------------------------------
@@ -463,7 +463,7 @@ def test_a_file_atem_makes_a_minimal_twin(project: Path):
     snap = r.side_effects[CT.SIDE_EFFECT]
     assert snap["kind"] == "atem" and snap["result"]["written"] is True
     # A second atem keeps a full twin's items and changes only its atem: block.
-    assert run(project, tool("emf_derive", path="notes.md")).ok
+    assert run(project, tool("fabula_derive", path="notes.md")).ok
     before = twin_data(project / "notes.md.fabulan.cosm")
     r = run(project, tool("atem", path="notes.md"))
     assert r.ok and "the twin's items are kept" in r.body
@@ -497,7 +497,7 @@ def test_a_model_atem(project: Path, model: list):
 def test_no_text_no_path(project: Path):
     r = run(project, tool("atem"))
     assert not r.ok and "<path>" in r.body and "<text>" in r.body
-    r = run(project, tool("emf_derive"))
+    r = run(project, tool("fabula_derive"))
     assert not r.ok and "needs the text in a <path>" in r.body
 
 
@@ -507,19 +507,19 @@ def test_no_text_no_path(project: Path):
 
 def test_store_writes_answer_to_canon_enabled(project: Path):
     set_toggle("canon_enabled", False)
-    for text in (tool("emf_derive", path="canon:lib/guide.md"), tool("atem", path="canon:lib/guide.md")):
+    for text in (tool("fabula_derive", path="canon:lib/guide.md"), tool("atem", path="canon:lib/guide.md")):
         r = run(project, text)
         assert not r.ok and r.body == broker.denial_canon_disabled(), r.body
     assert not (canon.volume_dir("lib") / "guide.md.fabulan.cosm").exists()
     # Reads, project writes and inline atems never ask.
     assert run(project, tool("cosm_read", path="canon:lib")).ok
     assert run(project, tool("atem", text="A passage.")).ok
-    assert run(project, tool("emf_derive", path="hello.md")).ok
+    assert run(project, tool("fabula_derive", path="hello.md")).ok
 
 
 def test_a_store_write_regenerates_the_volume_catalog(project: Path):
     set_toggle("canon_enabled", True)
-    r = run(project, tool("emf_derive", path="canon:lib/guide.md"))
+    r = run(project, tool("fabula_derive", path="canon:lib/guide.md"))
     assert r.ok, r.body
     assert "wrote canon:lib/guide.md.fabulan.cosm" in r.body
     twin = canon.volume_dir("lib") / "guide.md.fabulan.cosm"
@@ -563,7 +563,7 @@ def test_tools_refuse_what_the_routes_refuse(project: Path, path: str, status: i
     with pytest.raises(CT.TextTargetError) as e:
         CT.text_target(project, path)
     assert e.value.status == status and words in str(e.value)
-    for name in ("emf_derive", "atem"):
+    for name in ("fabula_derive", "atem"):
         r = run(project, tool(name, path=path))
         assert not r.ok and words in r.body, (name, r.body)
     assert (project / "other.md.fabulan.cosm").read_text(encoding="utf-8").startswith("oes: canon/1")
@@ -579,27 +579,27 @@ def test_the_routes_still_refuse_identically(project: Path):
                 expected = None
             except CT.TextTargetError as e:
                 expected = (e.status, str(e))
-            r = c.post("/api/canon/derive", json={"path": path, "what": "emf"})
+            r = c.post("/api/fabula/derive", json={"path": path, "what": "fabula"})
             assert (r.status_code, r.json()["detail"]) == expected, (path, r.text)
             assert r.status_code == status and words in r.json()["detail"]
             if path:                                   # the atem route says "nothing to make an atem of"
                 r = c.post("/api/canon/atem", json={"path": path})
                 assert (r.status_code, r.json()["detail"]) == expected, (path, r.text)
         # ...and a text it accepts still derives.
-        r = c.post("/api/canon/derive", json={"path": "hello.md", "what": "emf"})
+        r = c.post("/api/fabula/derive", json={"path": "hello.md", "what": "fabula"})
         assert r.status_code == 200, r.text
 
 
-def test_emf_derive_tool_takes_copyable_for_a_fabulap(project: Path):
+def test_fabula_derive_tool_takes_copyable_for_a_fabulap(project: Path):
     """0.6 (lane C2b): `<copyable>yes</copyable>` keeps a fabulap's lines' words; without it, a line is its place."""
     poem = (REPO / "tests" / "fixtures" / "fabula" / "verse" / "hope.txt").read_text(encoding="utf-8")
     (project / "hope.txt").write_text(poem, encoding="utf-8")
-    r = run(project, tool("emf_derive", path="hope.txt", flavour="fabulap"))
+    r = run(project, tool("fabula_derive", path="hope.txt", flavour="fabulap"))
     assert r.ok, r.body
     twin = project / "hope.txt.fabulap.cosm"
     nodes = {n["id"]: n for n in twin_data(twin)["nodes"]}
     assert "text" not in nodes["C:line/2"] and lint_errors(twin) == []
-    r = run(project, tool("emf_derive", path="hope.txt", flavour="fabulap", copyable="yes", force="yes"))
+    r = run(project, tool("fabula_derive", path="hope.txt", flavour="fabulap", copyable="yes", force="yes"))
     assert r.ok, r.body
     nodes = {n["id"]: n for n in twin_data(twin)["nodes"]}
     assert nodes["C:line/2"]["text"] == "That perches in the soul -"

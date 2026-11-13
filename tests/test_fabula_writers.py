@@ -91,7 +91,7 @@ def cloud_shut(monkeypatch: pytest.MonkeyPatch, denial: str = "error: the gate's
 # ---------------------------------------------------------------------------
 
 def test_a_fresh_decompile_writes_the_new_name_and_declaration(client: TestClient, project: Path):
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "emf"})
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "what": "fabula"})
     assert r.status_code == 200 and r.json()["flavour"] == "fabulan" and r.json()["suggested"] == "fabulan"
     job = r.json()["job"]
     assert job["flavour"] == "fabulan" and "route" not in job, "a rules job has no route"
@@ -111,7 +111,7 @@ def test_a_fresh_decompile_writes_the_new_name_and_declaration(client: TestClien
     item = next(n for n in cat["nodes"] if n["path"] == "notes.md")
     assert item["fabula"] == {"path": "notes.md.fabulan.cosm"} and "emf" not in item
     assert not any(n["path"].startswith("notes.md.") for n in cat["nodes"])
-    got = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    got = client.get("/api/fabula/twin", params={"path": "notes.md"}).json()
     assert got["twin_path"] == "notes.md.fabulan.cosm" and got["flavour"] == "fabulan"
     assert got["twins"] == {"fabulan": {"path": "notes.md.fabulan.cosm", "state": "fresh"}}
     assert got["suggested"] == "fabulan" and got["cosm"]["minicosm"] == "fabula"
@@ -120,7 +120,7 @@ def test_a_fresh_decompile_writes_the_new_name_and_declaration(client: TestClien
 def test_a_poem_is_a_fabulap_by_the_suggestion_and_the_engine_derives_it_as_today(client: TestClient,
                                                                                project: Path):
     (project / "rose.txt").write_text(SICK_ROSE, encoding="utf-8")
-    r = client.post("/api/canon/derive", json={"path": "rose.txt"})
+    r = client.post("/api/fabula/derive", json={"path": "rose.txt"})
     assert r.json()["flavour"] == r.json()["suggested"] == "fabulap"
     snap = wait_job(client, r.json()["job"]["id"])
     assert snap["result"]["twin_path"] == "rose.txt.fabulap.cosm"
@@ -128,7 +128,7 @@ def test_a_poem_is_a_fabulap_by_the_suggestion_and_the_engine_derives_it_as_toda
     assert doc["oes"] == "fabula/1" and doc["flavour"] == "fabulap" and doc["id"] == "fabula/rose-txt"
     assert lint_errors(project / "rose.txt.fabulap.cosm") == []
     # asked for, prose it is
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "rose.txt", "flavour": "fabulan"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "rose.txt", "flavour": "fabulan"})["id"])
     assert snap["result"]["twin_path"] == "rose.txt.fabulan.cosm" and head(project / "rose.txt.fabulan.cosm")[
         "flavour"] == "fabulan"
 
@@ -136,26 +136,26 @@ def test_a_poem_is_a_fabulap_by_the_suggestion_and_the_engine_derives_it_as_toda
 @pytest.mark.parametrize("flavour,words", [("fabulac", "folder of code"), ("emf", "fabulan (prose) or fabulap"),
                                            ("FABULAX", "fabulan (prose) or fabulap")])
 def test_a_flavour_a_text_cannot_take_is_refused(client: TestClient, project: Path, flavour: str, words: str):
-    for url, body in (("/api/canon/derive", {"path": "notes.md", "flavour": flavour}),
+    for url, body in (("/api/fabula/derive", {"path": "notes.md", "flavour": flavour}),
                       ("/api/canon/atem", {"path": "notes.md", "flavour": flavour}),
                       ("/api/canon/atem/pin", {"path": "notes.md", "flavour": flavour, "span": {"lines": "1"},
                                                "atem": {"line": "x"}})):
         r = client.post(url, json=body)
         assert r.status_code == 400 and words in r.json()["detail"], (url, r.text)
-    r = run(project, tool("emf_derive", path="notes.md", flavour=flavour))
+    r = run(project, tool("fabula_derive", path="notes.md", flavour=flavour))
     assert not r.ok and words in r.body
     assert not any(p.name.startswith("notes.md.") for p in project.iterdir())
 
 
 def test_one_twin_per_flavour_and_the_payload_names_both(client: TestClient, project: Path):
-    wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md", "flavour": "fabulap"})["id"])
+    wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md", "flavour": "fabulap"})["id"])
     assert snap["result"]["twin_path"] == "notes.md.fabulap.cosm"
     assert (project / "notes.md.fabulan.cosm").is_file() and (project / "notes.md.fabulap.cosm").is_file()
-    got = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    got = client.get("/api/fabula/twin", params={"path": "notes.md"}).json()
     assert got["flavour"] == "fabulap" and got["twin_path"] == "notes.md.fabulap.cosm", "the one derived last"
     assert set(got["twins"]) == {"fabulan", "fabulap"}
-    assert client.get("/api/canon/emf", params={"path": "notes.md", "flavour": "fabulan"}).json()[
+    assert client.get("/api/fabula/twin", params={"path": "notes.md", "flavour": "fabulan"}).json()[
         "twin_path"] == "notes.md.fabulan.cosm"
     tree = {n["path"]: n for n in server.build_file_tree(project)}
     assert "notes.md.fabulan.cosm" not in tree and "notes.md.fabulap.cosm" not in tree
@@ -163,7 +163,7 @@ def test_one_twin_per_flavour_and_the_payload_names_both(client: TestClient, pro
     assert entry["path"] == "notes.md.fabulap.cosm" and entry["flavour"] == "fabulap"
     assert [o["path"] for o in entry["others"]] == ["notes.md.fabulan.cosm"]
     # a refresh with no flavour refreshes the twin the slot shows
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "force": True})
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "force": True})
     assert r.json()["flavour"] == "fabulap"
     wait_job(client, r.json()["job"]["id"])
 
@@ -174,11 +174,11 @@ def test_one_twin_per_flavour_and_the_payload_names_both(client: TestClient, pro
 
 def test_an_old_twin_is_read_and_updated_in_place(client: TestClient, project: Path):
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
-    got = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    got = client.get("/api/fabula/twin", params={"path": "notes.md"}).json()
     assert got["twin_path"] == "notes.md.cosm" and got["flavour"] == "fabulan"
     assert got["cosm"]["declared"]["how"] == "old"
     # a short is recorded in it, an atem written into it, a passage atem pinned to it: in place, still emf/1
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.cosm"})["id"])
     assert snap["state"] == "done" and snap["result"]["recorded"] is True
     assert snap["result"]["written"].startswith("notes.short-")
     snap = wait_job(client, start(client, "/api/canon/atem", {"path": "notes.md"})["id"])
@@ -200,14 +200,14 @@ def test_an_old_twin_is_read_and_updated_in_place(client: TestClient, project: P
 def test_decompiling_an_old_twin_again_writes_the_new_one_carries_its_shorts_and_removes_it(
         client: TestClient, project: Path):
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
-    wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])
+    wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.cosm"})["id"])
     r = client.post("/api/canon/atem/pin", json={"path": "notes.md", "atem": {"line": "A pinned line."},
                                                  "span": {"lines": "5"}})
     assert r.status_code == 200
     pinned = r.json()["item_id"]
     old = head(project / "notes.md.cosm")
     assert len(old["shorts"]) == 1
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md", "force": True})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "notes.md", "force": True})["id"])
     assert snap["state"] == "done", snap
     res = snap["result"]
     assert res["twin_path"] == "notes.md.fabulan.cosm" and res["replaced"] == "notes.md.cosm"
@@ -221,7 +221,7 @@ def test_decompiling_an_old_twin_again_writes_the_new_one_carries_its_shorts_and
     # a fabulap decompile of a text whose fabulan is old-named leaves the old fabulan alone
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "other-notes.md.cosm")
     shutil.copyfile(project / "notes.md", project / "other-notes.md")
-    snap = wait_job(client, start(client, "/api/canon/derive", {"path": "other-notes.md", "flavour": "fabulap"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/derive", {"path": "other-notes.md", "flavour": "fabulap"})["id"])
     assert snap["result"]["replaced"] is None and (project / "other-notes.md.cosm").is_file()
 
 
@@ -253,8 +253,8 @@ def test_both_names_at_once(client: TestClient, project: Path):
     items = {n["path"]: n for n in head(project / canon.PROJECT_CATALOG)["nodes"]}
     assert items["notes.md"]["fabula"] == {"path": "notes.md.fabulan.cosm"}
     assert items["notes.md.cosm"]["kind"] == "cosm" and "old-named twin" in items["notes.md.cosm"]["note"]
-    assert client.get("/api/canon/emf", params={"path": "notes.md"}).json()["twin_path"] == "notes.md.fabulan.cosm"
-    assert client.get("/api/canon/emf", params={"path": "notes.md.cosm"}).status_code == 404
+    assert client.get("/api/fabula/twin", params={"path": "notes.md"}).json()["twin_path"] == "notes.md.fabulan.cosm"
+    assert client.get("/api/fabula/twin", params={"path": "notes.md.cosm"}).status_code == 404
     skip = home._mirror_skip(project)
     assert skip(project / "notes.md.fabulan.cosm") and not skip(project / "notes.md.cosm")
 
@@ -293,15 +293,15 @@ def test_every_discovery_site_finds_the_twin_under_each_name(client: TestClient,
     vitems = {n["path"]: n for n in cat["nodes"]}
     assert name not in vitems and vitems["notes.md"]["fabula"]["path"] == name
     # the reader's route, the tools' read, Thym's twin check
-    got = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    got = client.get("/api/fabula/twin", params={"path": "notes.md"}).json()
     assert got["twin_path"] == name and got["flavour"] == flavour
-    assert client.get("/api/canon/emf", params={"path": name}).json()["twin_path"] == name
+    assert client.get("/api/fabula/twin", params={"path": name}).json()["twin_path"] == name
     vol_, note = CT.load(project, "notes.md")
     assert Path(vol_.path).name == name and name in note
     t = CT.text_target(project, "notes.md")
     assert t["twin"] == project / name and t["twin_rel"] == name and t["flavour"] == flavour
     # a compile of it is claimed by its text, and its short takes the text's stem
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": name})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": name})["id"])
     assert snap["state"] == "done" and snap["result"]["written"].startswith("notes.short-")
     assert snap["result"]["recorded"] is True and len(head(project / name)["shorts"]) == 1
 
@@ -313,7 +313,7 @@ def test_a_standalone_fabula_under_a_new_name_is_an_ordinary_cosm_file_and_compi
         encoding="utf-8")
     tree = {n["path"]: n for n in server.build_file_tree(project)}
     assert tree["rain.fabulan.cosm"]["cosm"] is True and "emf" not in tree["rain.fabulan.cosm"]
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "rain.fabulan.cosm"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "rain.fabulan.cosm"})["id"])
     assert snap["state"] == "done" and snap["result"]["order"] == "weight"
     assert snap["result"]["written"].startswith("rain.short-")
     canon.project_catalog(project)
@@ -340,7 +340,7 @@ def test_a_catalog_written_before_reads_its_emf_field_as_fabula():
 
 def test_a_job_with_no_route_runs_local_holds_the_lock_and_records_it(client: TestClient, project: Path, model: list,
                                                                      lock_seen: list):
-    job = start(client, "/api/canon/derive", {"path": "notes.md"})
+    job = start(client, "/api/fabula/derive", {"path": "notes.md"})
     assert job["mode"] == "model" and job["route"] == "local" and lock_seen[-1] is not None
     snap = wait_job(client, job["id"])
     assert snap["result"]["route"] == "local"
@@ -348,11 +348,11 @@ def test_a_job_with_no_route_runs_local_holds_the_lock_and_records_it(client: Te
     assert (d["model"], d["route"], "provider" in d) == ("fake-model", "local", False)
     assert list(d)[:4] == ["at", "by", "model", "route"]
     # a short told by a model records its route
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.fabulan.cosm"})["id"])
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.fabulan.cosm"})["id"])
     entry = head(project / "notes.md.fabulan.cosm")["shorts"][0]
     assert entry["route"] == "local" and entry["mode"] == "model" and snap["result"]["route"] == "local"
     # route: local, said, is the same
-    job = start(client, "/api/canon/derive", {"path": "hello.md", "route": "local"})
+    job = start(client, "/api/fabula/derive", {"path": "hello.md", "route": "local"})
     assert job["route"] == "local" and lock_seen[-1] is not None
     wait_job(client, job["id"])
 
@@ -361,7 +361,7 @@ def test_a_cloud_job_with_the_gate_open_holds_no_lock_and_records_the_provider(c
                                                                               lock_seen: list,
                                                                               monkeypatch: pytest.MonkeyPatch):
     calls = cloud_open(monkeypatch)
-    job = start(client, "/api/canon/derive", {"path": "notes.md", "route": "cloud"})
+    job = start(client, "/api/fabula/derive", {"path": "notes.md", "route": "cloud"})
     assert job["mode"] == "model" and job["route"] == "cloud" and lock_seen[-1] is None
     snap = wait_job(client, job["id"])
     assert snap["state"] == "done", snap
@@ -372,7 +372,7 @@ def test_a_cloud_job_with_the_gate_open_holds_no_lock_and_records_the_provider(c
     # the atem and the compile on the cloud too
     snap = wait_job(client, start(client, "/api/canon/atem", {"text": "A passage.", "route": "cloud"})["id"])
     assert snap["result"]["route"] == "cloud" and lock_seen[-1] is None
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.fabulan.cosm",
+    snap = wait_job(client, start(client, "/api/fabula/compile", {"path": "notes.md.fabulan.cosm",
                                                                  "route": "cloud"})["id"])
     assert head(project / "notes.md.fabulan.cosm")["shorts"][0]["route"] == "cloud"
 
@@ -380,20 +380,20 @@ def test_a_cloud_job_with_the_gate_open_holds_no_lock_and_records_the_provider(c
 def test_a_cloud_job_with_the_gate_shut_is_refused_in_the_gates_words(client: TestClient, project: Path,
                                                                      monkeypatch: pytest.MonkeyPatch):
     denial = cloud_shut(monkeypatch)
-    for url, body in (("/api/canon/derive", {"path": "notes.md", "route": "cloud"}),
+    for url, body in (("/api/fabula/derive", {"path": "notes.md", "route": "cloud"}),
                       ("/api/canon/atem", {"text": "A passage.", "route": "cloud"}),
-                      ("/api/canon/compile", {"path": "rain.cosm", "route": "cloud"})):
+                      ("/api/fabula/compile", {"path": "rain.cosm", "route": "cloud"})):
         r = client.post(url, json=body)
         assert r.status_code == 403 and r.json()["detail"] == denial, (url, r.text)
     assert not (project / "notes.md.fabulan.cosm").exists()
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "route": "moon"})
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "route": "moon"})
     assert r.status_code == 400 and "local or cloud" in r.json()["detail"]
-    r = run(project, tool("emf_derive", path="notes.md", route="cloud"))
+    r = run(project, tool("fabula_derive", path="notes.md", route="cloud"))
     assert not r.ok and denial in r.body
 
 
 def test_the_tools_take_flavour_and_route(project: Path, monkeypatch: pytest.MonkeyPatch):
-    r = run(project, tool("emf_derive", path="notes.md", flavour="fabulap"))
+    r = run(project, tool("fabula_derive", path="notes.md", flavour="fabulap"))
     assert r.ok and "notes.md.fabulap.cosm" in r.body, r.body
     assert head(project / "notes.md.fabulap.cosm")["flavour"] == "fabulap"
     r = run(project, tool("atem", path="notes.md"))

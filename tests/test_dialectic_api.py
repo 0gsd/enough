@@ -242,17 +242,17 @@ def test_the_fabulac_tool_starts_and_follows_a_build_through_the_app(client: Tes
     assert not r.ok and "<do>" in r.body
 
 
-def test_an_old_tool_name_runs_the_new_ones_runner_and_is_documented_nowhere(project: Path):
-    from enough import prompt, retired_names
-    for old, new in retired_names.TOOLS.items():
-        assert old not in T._DISPATCH and new in T._DISPATCH
-        enable_skill(project, "macrocosm-oes")
-        text = prompt.tool_instructions(project, pal=True)
-        assert f'<tool name="{old}">' not in text and f"`{old}`" not in text
+def test_the_retired_tool_name_and_routes_are_gone(client: TestClient, project: Path):
+    from enough import retired_names
+    assert not retired_names.TOOLS and not retired_names.ROUTES and not retired_names.WORDS
+    assert "emf_derive" not in T._DISPATCH and "fabula_derive" in T._DISPATCH
     r = run(project, tool("emf_derive", path="notes.md"))
-    assert r.name == "emf_derive"                     # said back under the name it was called by
-    assert "unknown tool" not in r.body
-
+    assert not r.ok and "unknown tool" in r.body
+    for method, path in (("get", "/api/canon/emf"), ("post", "/api/canon/derive"), ("post", "/api/canon/compile")):
+        kw = {"params": {"path": "notes.md"}} if method == "get" else {"json": {"path": "notes.md"}}
+        assert getattr(client, method)(path, **kw).status_code == 404, path
+    r = client.post("/api/fabula/derive", json={"path": "notes.md", "what": "emf"})
+    assert r.status_code == 400                       # `what: emf` is no longer read as `what: fabula`
 
 def test_an_isograph_is_made_by_the_holders_program_and_its_release_recorded_first(client: TestClient,
                                                                                    project: Path):

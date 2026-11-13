@@ -379,12 +379,11 @@ def test_the_compile_route_and_the_read_only_views(client: TestClient):
     assert client.get("/api/fabula/cshort", params={"path": "tiny-tool"}).status_code == 400
     r = client.post("/api/fabula/compile", json={"path": "tiny-tool", "what": "poem"})
     assert r.status_code == 400
-    # the retired path still compiles, through the same code
-    r = client.post("/api/canon/compile", json={"path": "tiny-tool.fabulac.cosm", "what": "line"})
+    r = client.post("/api/fabula/compile", json={"path": "tiny-tool.fabulac.cosm", "what": "line"})
     assert r.status_code == 200, r.text
 
 
-def test_every_retired_route_answers_with_its_new_routes_handler(client: TestClient):
+def test_every_retired_route_in_the_table_answers_with_its_new_routes_handler(client: TestClient):
     from enough import retired_names
     paths = {(m, getattr(r, "path", None)): r.endpoint for r in client.app.router.routes
              for m in (getattr(r, "methods", None) or ())}
