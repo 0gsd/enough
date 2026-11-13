@@ -248,12 +248,9 @@ def test_the_words_are_one_list():
 
 
 def test_the_page_skips_the_same_words():
-    """The docs viewer's `DOCS_XREF_RE` (index.html) carries the same words. The page is another lane's in the 0.7
-    build, so until it takes the list this says so instead of failing; once it has, one word of each language is
-    looked for (the page may spell the list as one alternation: "ihr(?:e|em|en|er|es)?", "仕様書?の")."""
+    """The docs viewer's `DOCS_XREF_RE` (index.html) carries the same words: one word of each language is looked for
+    (the page spells the list as one alternation: "ihr(?:e|em|en|er|es)?", "仕様書?の")."""
     html = (REPO / "enough" / "static" / "index.html").read_text(encoding="utf-8")
     block = html[html.index("const DOCS_XREF_RE"):html.index("const DOCS =", html.index("const DOCS_XREF_RE"))]
-    if "dessen" not in block:
-        pytest.xfail("the page's DOCS_XREF_RE still skips only the English 'its section N'")
     for lang, word in {"en": "its", "de": "dessen", "fr": "ses", "es": "sus", "ja": "その", "zh": "它的"}.items():
         assert word in block, (lang, word)

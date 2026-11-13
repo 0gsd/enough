@@ -1202,7 +1202,7 @@ end
 
 El `contract` de arriba es una comprobación con nombre, `shorter`, y su `assert` dice lo que tiene que cumplirse y, después de `else`, qué decir cuando no se cumple. Dentro del programa, `move tightened` es un movimiento propio del programa: le pide al modelo que haga `reword` de una línea a treinta palabras, y `keeps shorter against l` somete cada respuesta al contrato, de modo que una reformulación que vuelve sin ser más corta se rechaza, y al modelo se le vuelve a preguntar diciéndole por qué. El bucle recorre las líneas del short, toma solo las largas, y guarda un reemplazo para cada una. Luego `edit` hace los cambios todos a la vez, y cada línea que no se le pidió cambiar se queda exactamente como estaba.
 
-Un programa en `thym 0` que usa una de estas palabras se rechaza con una línea que dice que necesita `thym 1`: cambia su primera línea y compila. Las dos gramáticas, enteras, están en el apartado 4 de la especificación de Thym; la sección 13.4 dice dónde leerla.
+Un programa en `thym 0` que usa una de estas palabras se rechaza con una línea que dice que necesita `thym 1`: cambia su primera línea y compila. Las dos gramáticas, enteras, están en la especificación de Thym, en su sección 4; la sección 13.4 dice dónde leerla.
 
 ### 13.6 Escribir un programa
 

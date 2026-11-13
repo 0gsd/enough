@@ -23106,9 +23106,12 @@
       const join = '\\s*(?:,|–|—|-|~|～|〜|、|and|or|to|through|bis|und|oder|à|et|ou|a|y|o|al|hasta'
         + '|から|と|至|到|和|及|与)\\s*';
       const list = num + '(?:' + join + num + ')*';
+      const its = '(?<!\\b(?:its|ihr(?:e|em|en|er|es)?|sein(?:e|em|en|er|es)?|dessen|deren|sa|ses|leurs?|sus?)\\s)';
+      const itsJa = '(?<!(?:その|仕様書?の)\\s?)';
+      const itsZh = '(?<!(?:它的|其|规范的?)\\s?)';
       return new RegExp(
-        '(?:(?<![Ii]ts\\s)\\b(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\\s+|セクション\\s*)(' + list + ')'
-        + '|第\\s*(' + num + ')\\s*节'
+        '(?:' + its + '\\b(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\\s+|' + itsJa + 'セクション\\s*)(' + list + ')'
+        + '|' + itsZh + '第\\s*(' + num + ')\\s*节'
         + '|(README\\s+)?§§?\\s*(' + list + ')'
         + '|\\b([A-Z])\\.(\\d+(?:\\.\\d+)*)\\b', 'giu');
     })();

@@ -1202,7 +1202,7 @@ end
 
 Der `contract` ganz oben ist eine Prüfung mit einem Namen, `shorter`, und sein `assert` sagt, was gelten muss, und nach `else`, was zu sagen ist, wenn es nicht gilt. Im Programm ist `move tightened` ein eigener Handgriff des Programms: Er bittet das Modell, eine Zeile mit `reword` auf dreißig Wörter zu bringen, und `keeps shorter against l` misst jede Antwort an dem Vertrag, sodass eine Umformulierung, die nicht kürzer zurückkommt, abgelehnt wird, und das Modell wird erneut gefragt und erfährt, warum. Die Schleife geht die Zeilen des Shorts durch, nimmt nur die langen und behält für jede einen Ersatz. Dann nimmt `edit` die Änderungen alle auf einmal vor, und jede Zeile, die es nicht ändern sollte, bleibt genau, wie sie war.
 
-Ein Programm in `thym 0`, das eines dieser Wörter benutzt, wird mit einer Zeile abgelehnt, die sagt, dass es `thym 1` braucht: Ändere seine erste Zeile, und es kompiliert. Beide Grammatiken stehen vollständig in der Spezifikation von Thym, in ihrem vierten Abschnitt; Abschnitt 13.4 sagt, wo du sie liest.
+Ein Programm in `thym 0`, das eines dieser Wörter benutzt, wird mit einer Zeile abgelehnt, die sagt, dass es `thym 1` braucht: Ändere seine erste Zeile, und es kompiliert. Beide Grammatiken stehen vollständig in der Spezifikation von Thym, in ihrem Abschnitt 4; Abschnitt 13.4 sagt, wo du sie liest.
 
 ### 13.6 Ein Programm schreiben
 
