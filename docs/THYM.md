@@ -37,7 +37,7 @@ was corrected.
 17. The `thym/1` volumes and the `moves:` block
 18. Projections: the dial as a program
 19. Agent-free
-20. Folders and code
+20. Folders, code and verse
 21. Editing
 22. The dialectic in a program
 23. Models in a run
@@ -73,7 +73,8 @@ their names). Each of these steps is an entailment, the step that expands meanin
 what is made from it (MacroCOSM OES, its section 18.1). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for prose,
 `fabulap` for verse, `fabulac` for code (MacroCOSM OES, its section 18.4). A fabulac's short is a `cshort`, source code
 rebuilt from it and never run, and its atem at depth is a `catem`, a text saying what a person can do with the program
-(section 20). Thym adds three nouns and three verbs:
+(section 20). A fabulap is built by its own helper moves, `scan` by rule and `construe` by a model (section 20.9).
+Thym adds three nouns and three verbs:
 
 - a **reading** is an entailment of someone else's fabula in your morph, local and labelled (section 14);
 - the **null morph** is the plainest entailment that conforms, Thym's reference (section 13);
@@ -407,7 +408,8 @@ modifiers. `depth` is the head only where a `:` follows it; anywhere else it is 
 are reserved too: no block, binding or user move may take one of these names. `entail` is a standard move from 0.7,
 and so reserved: a program that used `entail` as a name before 0.7 must rename it. That is the only
 incompatibility the move's new spelling brings, and none is known. `tell`, its earlier spelling (section 6.3), stays
-reserved. A few words are both a keyword or a type and a move (`morph`,
+reserved. `scan` and `construe`, the fabulap's helper moves from 0.7, are reserved in the same way in a `thym 1` program,
+which sees them (section 20.9). A few words are both a keyword or a type and a move (`morph`,
 `context`, `package`, `graph`, `fabula`, `trace`); where the word stands decides which it is.
 
 ### 4.8 The grammar in full
@@ -628,7 +630,7 @@ stand-in with a weaker output, which a run with `--rules` uses instead (section 
 | owner | what it is | moves |
 |---|---|---|
 | `thym/1` | a built-in of the core | `cut`, `count`, `words`, `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace`, and the accessors `fabula`, `context`, `graph`, `isomorph`; for `thym 1`, the dialectic's `question`, `record` and `settle`, the editing moves `lines`, `replace`, `drop`, `insert`, `edit`, `reword`, and `gather`, `join`, `say`, `folders` |
-| `fabula/1` | a built-in of the core | `derive`, `entail`, `atem`, `expand`; for `thym 1`, `survey` and `history` |
+| `fabula/1` | a built-in of the core | `derive`, `entail`, `atem`, `expand`; for `thym 1`, `survey` and `history`, the fabulac's, and `scan` and `construe`, the fabulap's (section 20.9) |
 | `doc/1` | a built-in of the core | `enumerate`, `compile` |
 | `comprise/1` | a MiniCOSM | `project`, `band`, `mark`, `withhold`, in a sidecar (section 17.6), since `comprise/1`'s manifest belongs to Comprise OES |
 | `ascribe/1` | a MiniCOSM | for `thym 1`, `propose`, and the kinds `isograph` and `allograph` of `project`, by an entry that `extends` it, in its own manifest (Ascribe, https://ascribe.cosmoes.org/) |
@@ -695,10 +697,12 @@ The moves `thym 1` adds or extends. Every move in this table carries `since: 1` 
 
 | move | signature | asks | contract | scaffold |
 |---|---|---|---|---|
-| `derive` | text \| folder → fabula; `as` prose \| verse \| code; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · a folder: none |
+| `derive` | text \| folder → fabula; `as` prose \| verse \| code; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as verse with a fabulap: the same, with `nothing-lost` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · a folder: none |
 | `entail` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview` or `manual`; `by` order; `with` morph; `as code` gives a folder | yes | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `provenance` · as line, overview or manual: `coverage` `no-invention` `uses-told` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` |
 | `survey` | folder → fabula (a fabulac outline) | no | `files-found` `code-span` `licence-recorded` `fabula-checks` `provenance` | — |
 | `history` | folder → fabula; `with` fabula | no | `history-grounded` `fabula-checks` `provenance` | — |
+| `scan` | text → fabula (a fabulap); `as` rhyme \| sound \| recurrence \| form; `with` fabula | no | with no `as`: `lines-found` `scansion-grounded` `span-resolves` `fabula-checks` `provenance` · as rhyme, sound or recurrence: `sound-grounded` `nothing-lost` `fabula-checks` `provenance` · as form: `form-grounded` `nothing-lost` `fabula-checks` `provenance` | — |
+| `construe` | text → fabula (a fabulap); `as` figure \| image \| allusion \| voice \| turn \| meaning \| ambiguity; `with` fabula | yes | `span-resolves` `no-invention` `stance-kept` `coverage` `terms-grounded` `nothing-lost` `fabula-checks` `provenance`, with `coverage`, `no-invention` and `stance-kept` read for verse (section 20.9) | none |
 | `gather` | list of fabula \| list of item → the type of `with`; `with` fabula \| volume | no | `nothing-lost` `ids-unique` `fabula-checks` `provenance` | — |
 | `question` | fabula \| volume → list of item (questions) | yes | `addressed` `no-duplicate` `provenance` | `bank` |
 | `record` | volume → the type of `in`; `in` fabula \| volume | no | `addressed` `only-the-asked` `provenance` | — |
@@ -716,13 +720,15 @@ The moves `thym 1` adds or extends. Every move in this table carries `since: 1` 
 | `count` | adds folder (its text files) | no | none | — |
 | `words` | adds line \| string | no | none | — |
 
-`propose` is Ascribe's: it reads the holder's own text, decompiled to a fabulan, and gives candidate nodes of the
-holograph, each with the question that asks the holder whether it is so; a program lands them with `gather`. `atem`,
-`expand`, `null`, `measure`, `morph`, `read`, `cut`, `package` and the rest are the same in both versions. `atem f` of a
-fabulac is the catem at depth `line`, under the same contract. The compiler picks the `gives`, the contract and the
-scaffold of a call from the call as written (its `as` word, or its first operand's type), and the plan's `P:contract`
-item lists the chosen contract, so a plan says exactly which checks a node keeps. A call whose scaffold is `none` has no
-scaffold, and `--rules` refuses it at plan time (section 19). Sections 20, 21 and 22 say what these moves do.
+`scan` and `construe` are the fabulap's helper moves, the first by rule and the second by a model, each `as` word one
+axis of a poem; section 20.9 says what each finds. `propose` is Ascribe's: it reads the holder's own text, decompiled to
+a fabulan, and gives candidate nodes of the holograph, each with the question that asks the holder whether it is so; a
+program lands them with `gather`. `atem`, `expand`, `null`, `measure`, `morph`, `read`, `cut`, `package` and the rest
+are the same in both versions. `atem f` of a fabulac is the catem at depth `line`, under the same contract. The compiler
+picks the `gives`, the contract and the scaffold of a call from the call as written (its `as` word, or its first
+operand's type), and the plan's `P:contract` item lists the chosen contract, so a plan says exactly which checks a node
+keeps. A call whose scaffold is `none` has no scaffold, and `--rules` refuses it at plan time (section 19). Sections 20,
+21 and 22 say what these moves do.
 
 ### 6.4 Signatures in the manifest
 
@@ -820,7 +826,7 @@ The checks the moves of `thym 1` add:
 
 | check | holds when | where it comes from |
 |---|---|---|
-| `flavour` | the fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth | MacroCOSM OES, its section 18.4.8 |
+| `flavour` | the fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth, and only a fabulap is taken by `scan … with`, `construe … with` or `derive … as verse with` | MacroCOSM OES, its section 18.4.8 |
 | `files-found` | every file the folder rule keeps (section 20.1) has a `C:file` item whose sha256 is the file's, and no `C:file` names a file the tree lacks | Thym's own |
 | `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it | MacroCOSM OES, its section 18.4.8 |
 | `licence-recorded` | the fabulac's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
@@ -839,6 +845,12 @@ The checks the moves of `thym 1` add:
 | `only-the-changed` | every change names the value being edited and a line it holds with that digest; no line is replaced or dropped twice; and the output is the input with exactly those changes (section 21.3) | Thym's own |
 | `one-line` | a reworded `line` is one line; an answer of several lines is repaired by joining them with a space, then checked again | Thym's own |
 | `nothing-added` | every name, number and word outside FEED in the output is in the input | Thym's own |
+| `lines-found` | every line of the poem that is not blank, after its header and less a lyric's labels, is one `C:line`, numbered from 1 in the poem's order, with a span on its own line and its `part`; every stanza and every labelled section is a `C:part`; no `C:line` names a line the poem lacks | Thym's own; the fabulap is MacroCOSM OES's, its section 18.4.6 |
+| `scansion-grounded` | every line's `stresses` and `syllables` are read from FEED's pronunciations of all its words, a contraction as the words it joins (a syllable is stressed where FEED marks a primary or secondary stress; a word of one syllable is stressed unless it is a function word of the edition's list), or are `{pending: …}` naming the words FEED does not hold; the `C:metre` and its departures are those the rule of section 20.9 gives from them | Thym's own |
+| `sound-grounded` | every rhyme, sound pattern and recurrence a call writes names lines of the poem, and their words share what it says they share: a rhyme's words the sound its `quality` names, by FEED; an alliteration's, an assonance's or a consonance's `cue` the sound, by FEED, at the edition's thresholds; a refrain's, an anaphora's or an epistrophe's lines the same words, folded to lowercase; each line's `rhyme` letter is its rhyme's `scheme` | Thym's own |
+| `form-grounded` | a `C:form` names a form of MacroCOSM OES's table (its section 18.4.6) only when the poem keeps that form's defining rules, read from the fabula's own lines, parts, metre, rhymes and recurrences; every other rule of the form is in its `rules`, `held` as the fabula shows it; every departure names a line or a part | Thym's own |
+
+`coverage`, `no-invention` and `stance-kept` have a reading for verse, which `construe` keeps (section 20.9).
 
 ### 7.4 `assert`
 
@@ -1835,6 +1847,8 @@ gives the rules twin, `atem` the labelled scaffold, `entail` and `null` the orde
 statistics scales with the three judgement scales pending; in `thym 1`, `derive … as code` gives its file's outline
 marked pending, `entail` at a catem's depth the uses and interfaces in told order, `question` the bank's questions only,
 and `settle` its rules part, leaving the answers that must be read again answered and unsettled, for a run with a model.
+`scan` asks nothing, and runs, whatever its `as`; `construe` has no scaffold, since only a model reads what a poem may
+mean, and refuses at plan time.
 A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `entail … as code`) still refuses,
 at plan time: "1 step asks a model and has no scaffold: give code: entail f as code (line 12); --rules runs no model"
 (with agent-free on, in the words above, which then add that the steps have no scaffold).
@@ -1844,9 +1858,9 @@ offers only plans that can run.
 
 ---
 
-## 20. Folders and code
+## 20. Folders, code and verse
 
-<!-- atem: a folder of code decompiled to a fabulac, and the cshort and catems it entails -->
+<!-- atem: a folder of code decompiled to a fabulac, the cshort and catems it entails, and a poem decompiled by its helper moves -->
 
 `thym 1` reads a folder of code as a value, decompiles it into a fabulac, and compiles a fabulac back into a cshort and
 its catems. The fabulac, the cshort and the catem are MacroCOSM OES's (its section 18.4.7); this section says how a
@@ -1996,7 +2010,8 @@ end
 
 `covers` of a fabulap reads the poem's lines rather than its sentences: every line that is not blank is in the span of
 at least one item. That is `coverage` read for verse, defined with the fabulap's kinds (MacroCOSM OES, its section
-18.4.6).
+18.4.6). This program makes a fabulap in one call, at its best guess; section 20.9 builds the full fabulap in stages, by
+its helper moves.
 
 ### 20.6 Decompiling a folder of code
 
@@ -2164,6 +2179,197 @@ paths, and each tag's name, commit and date; `parses` and `interfaces-present` a
 answer per file is recorded as an engine call (section 12.4), so a replay, and a runtime in another language, needs no
 parser. Parsing is not running: nothing is imported, compiled into files on disk, or run. A cshort is viewed, never
 run; whether it behaves as its source did is a test that runs outside Thym, in a sandbox of its own.
+
+### 20.9 Decompiling a poem: the fabulap's helper moves
+
+A fabulap (MacroCOSM OES, its section 18.4.6) is built as a fabulac is: in stages, each one atomic run, by moves that do
+one thing each. Two moves stand beside `derive`. **`scan`** reads by rule, from the poem's words and FEED's
+pronunciations, and asks no model: a line's stresses, a rhyme, a refrain or a sonnet's fourteen lines are there or they
+are not, and every run finds the same. **`construe`** asks a model, under contract, for what only a reader finds: a
+figure, an image, an echo, who speaks, where the poem turns, what it may mean and what it leaves open. Each `as` word
+names one axis of a poem and makes one call with its own contract, as `as code` names a file's reading. What only the
+author knows is not found by either: it is asked (section 22).
+
+| call | asks | what it finds, and where it writes it |
+|---|---|---|
+| `scan poem` | no | the fabulap's outline: the header set apart; each stanza, and each labelled section of a lyric, a `C:part`, a stanza that comes back whole of division `refrain` (`chorus` where a lyric labels it so); each line a `C:line`, with its number, its part, its span and its `ending`, its `text` only when the poem may be copied, and its `stresses` and `syllables`; the `C:metre`, with its departures; the lines that pause inside, one `C:device` of figure `caesura`. `derived.completeness: outline` |
+| `scan poem as rhyme with f` | no | the end rhymes, stanza by stanza, and the inner rhymes (`placement: internal`): a `C:rhyme` per sound, and each line's `rhyme` letter |
+| `scan poem as sound with f` | no | alliteration, assonance and consonance: a `C:device` each, its words in `cue` |
+| `scan poem as recurrence with f` | no | a line that comes back in another stanza (`refrain`); lines that open or close on the same words (`anaphora`, `epistrophe`); a word or a phrase said three times or more (`repetition`); and, in a poem with a refrain, a chorus or a line said three times, its `hook`: a `C:device` each |
+| `scan poem as form with f` | no | the form the poem keeps, one of MacroCOSM OES's table (its section 18.4.6), with each of its rules held or not and where the poem departs: a `C:form`; else its shape in plain words, or `free verse` |
+| `derive poem as verse with f` | yes | what the poem says, stanza by stanza and as a whole: its terms, names, ideas, claims and events, each stanza's atem and the poem's, and what its header states of its maker, its occasion and where it appeared |
+| `construe poem as figure with f` | yes | the figures (metaphor, simile, personification, apostrophe, metonymy, synecdoche, symbol, irony, paradox, oxymoron, hyperbole, understatement, pun, chiasmus …): a `C:device` each, with its `cue`, its lines and its `effect`; for a figure that stands for something, the readings of what it stands for, side by side (`P:reading`) |
+| `construe poem as image with f` | yes | the images, and the senses each reaches: a `C:device` of figure `image` with its `senses`, one item for an image that comes back across stanzas; the particular things they show (E) |
+| `construe poem as allusion with f` | yes | what the poem echoes without saying so (`I:allusion`, its `cue` the poem's words); the traditions and genres it may answer to, an elegy, an aubade, a hymn, a ballad (`I:influence`); the occasion its header or its words state (`I:occasion`) |
+| `construe poem as voice with f` | yes | who speaks, to whom, before whom, in which person, tone and register: a `C:voice` for each voice, a second one where the voice shifts, its span where it holds |
+| `construe poem as turn with f` | yes | where the poem changes direction, in argument, feeling, time or address: a `C:device` of figure `turn` at its line, its `effect` saying from what to what; a form that expects a turn (a sonnet's) is read against it |
+| `construe poem as meaning with f` | yes | what the poem may mean and does not say: readings of its lines, its images, each stanza and the whole poem, side by side (`P:reading`); the ideas it turns on (`K:concept`); and, as guesses held open, its aim (`N:aim`) |
+| `construe poem as ambiguity with f` | yes | what the poem leaves open: a word with two senses at once (an `L:term` whose `sense` is a choice), a line that reads two ways, a break that makes a second sense (`C:device` of figure `enjambment`), a person or a thing it never names; each as two readings or more of one `of`, linked `contradicts` when both cannot hold and unlinked when both may be meant |
+| `question f` | yes | the questions, landed with the fabulap: the fabulap's bank, a question for each pending value the moves left, and the model's own where readings stand side by side, conflict or are silent on intent (section 22.1) |
+
+A `scan` with an `as` adds to the fabulap it is given and needs one: "scan … as rhyme adds to what scan found: scan poem
+as rhyme with f". `scan poem` with no `as` reads the poem from the start and takes no `with`. A `construe` names its axis
+and takes the fabulap so far. A `derive … as verse` with no `with` is the one-call fabulap of section 20.5, at its best
+guess: its rules part is `scan` with every `as` word, run inside it, and its model reads the rest in one pass. With
+`with f`, it reads only what the poem says, and leaves figure, image, allusion, voice, turn and meaning to `construe`.
+
+**What `scan` reads, and how.**
+
+- **Lines and stanzas.** The header (a first block of at most three lines that holds a heading, a byline or a year, or
+  one shorter than every block after it) is set apart. Every line after it that is not blank is a line of the poem,
+  numbered from 1 over the whole poem, and a blank line ends a stanza. A line's `ending` is `stopped` when it ends on a
+  mark of punctuation or is the poem's last, and `run-on` otherwise. A stanza whose words, folded to lowercase, are
+  another stanza's is of division `refrain`.
+- **A lyric's labels.** A line that is only the name of a section, `verse`, `chorus`, `refrain`, `bridge`,
+  `prechorus`, `intro`, `outro`, `hook` or `coda`, with or without a number, in brackets or before a colon, is a label,
+  not a line: it opens a `C:part` of that division (`other` for the last five), the label its `heading`. A label with no
+  lines under it repeats the part of its name, and its part is linked `{rel: is-a, to: <that part>}`. A repeat mark
+  after a line or a label (`(x2)`, `×3`) says it is sung that many times; `as recurrence` counts it.
+- **Stresses.** Each word's syllables and stresses are FEED's: a syllable FEED marks with a primary or secondary stress
+  is stressed (`/`), any other is not (`x`), and a word of one syllable that FEED does not mark is stressed unless it is
+  a function word of the edition's list. A contraction (`don't`, `I'm`, `they'd`) is read as the words it joins, said as
+  one syllable where it is spelled as one. A line with a word FEED does not hold is not scanned: its `stresses` and
+  `syllables` are `{pending: …}` naming the word, never a guess.
+- **The metre.** Read from the lines' stresses alone. The foot whose pattern the scanned lines fit best, by the share of
+  their syllables that fall where the foot puts them: at 0.8 or more on average, the metre is accentual-syllabic and
+  named by its foot and its length (`Iambic tetrameter`; lines that alternate four feet and three, stanza by stanza,
+  `Iambic tetrameter and trimeter, alternating`); else lines with the same number of beats, one off in a quarter of them
+  at most, are accentual (`Two beats a line`); else the same number of syllables is syllabic; else a rhymed poem is of
+  mixed metre, and an unrhymed one free verse. A line below 0.75, or of another length than the pattern's, departs from
+  it. The metre's confidence is at most 0.8, and falls with the share of lines FEED could scan.
+- **Pauses.** A line with a mark of punctuation (a comma, a semicolon, a colon, a full stop, a question or exclamation
+  mark, a dash) after its first word and before its last pauses inside: the lines that do are one `C:device` of figure
+  `caesura`, its summary saying after which word each pauses.
+- **Rhyme.** A line's last word is compared with the last words of the earlier lines of its stanza. Two words are an
+  `identical` rhyme when they are the same word; a `full` one when they sound the same from the last stressed vowel to
+  the end, or FEED lists them as perfect rhymes; a `slant` one when FEED lists them as slant rhymes, or their closing
+  consonants agree, or their vowel does and their closings are near; and an `eye` rhyme when they are spelled alike at
+  the end and sounded apart. A stressed word inside a line that rhymes fully with the line's last word, or with another
+  stressed word of the line, is an inner rhyme. The scheme's letters run on from stanza to stanza (MacroCOSM OES, its
+  section 18.4.6).
+- **Sound.** Three stressed syllables or more that open on the same consonant sound, in one line or across two lines
+  that follow one another, are `alliteration`; three or more in one line that share their vowel, the line's rhyme
+  apart, are `assonance`; three or more in one line that close on the same consonants, rhymes apart, are `consonance`.
+  These thresholds are this edition's, and the conformance suite pins them.
+- **Recurrence.** Words are compared folded to lowercase, their marks of punctuation dropped. Lines open on the same
+  words when two or more that follow one another share their first one to three words, not all of them function words.
+  The hook is the line, or the phrase of two words or more, said most often, a chorus's first, then the title's words,
+  then the earliest; it is `deduced`, at a confidence of at most 0.5, since a hook is what a listener keeps, and whether
+  it is one is asked.
+- **Form.** A form of MacroCOSM OES's table is named only when the poem keeps its defining rules (its number of lines
+  and its stanzas' shape); every other rule of the form is listed in `rules`, `held` or not, and each line or part that
+  breaks one is a departure. The form's confidence is the share of its rules held, at most 0.8. A poem that keeps no
+  form of the table is named by its shape, `four quatrains, rhymed abcb`, or is `free verse` when it has neither a
+  metre nor a rhyme scheme.
+
+What `scan` reads exactly (a line, a stanza, a label, a pause, words that come back) is `observed`. What it reads
+through FEED's pronunciations (a metre, a rhyme, a sound pattern) and what it reasons from them (a hook, a form) is
+`deduced`. A line's confidence is 0.7 when FEED scanned it and 1 when only its place is written.
+
+**What `construe` does.** Each call is one request: the poem whole, its lines numbered, with the fabulap so far in brief,
+as a file's reading carries its outline (section 20.6). A poem longer than one request is read by stanzas, as `derive
+… as verse` reads it, and a stanza a check's verdict is about is the only one asked again. A call adds items and adds
+inside the items `derive` and `construe` wrote; it never changes what `scan` wrote, nor a field an answer wrote
+(`nothing-lost`, against the fabulap it was given). Its contract reads three of the laws for verse:
+
+| check | read for verse |
+|---|---|
+| `coverage` | every item a call adds has a span inside the poem, its lines or its header, and every reading's `grounds` name items of the fabulap. `as voice` gives every line of the poem to a `C:voice`; `as meaning` reads every stanza (each `C:part` is in the `of` of a reading, itself or through its lines) and the whole poem (one reading's `of` names every part). The other calls may find nothing: a poem need hold no allusion and no turn |
+| `no-invention` | every name, `cue` and quoted word an added item carries is in the poem or its header. A work, a person or a tradition outside the poem enters only as an allusion's `to` or an influence's `source`, a literal or a question, never as an E item the poem names. A fact about the poem from outside it, a draft, a variant, a date, a life, is never written: it is a question |
+| `stance-kept` | a figure, an image, a voice or a turn is `observed` only where its `cue` or its span shows it in the words (`like` marks a simile, `O` an apostrophe), and `deduced` otherwise, at a confidence of at most 0.7. Every `P:reading` a model writes is `opinion`, `whose: {by: model}`, at a confidence of at most 0.5, with no `intended`. Every item of intent or inspiration the poem does not state, an aim, an audience, an exclusion, a decision, an occasion, an influence, an allusion's `to`, is `assumed`, at most 0.5, with `state: pending`. A speaker or an addressee the poem does not name is `{pending: …}`, and the speaker is never the poet on a model's word. Only the dialectic makes any of them stronger (MacroCOSM OES, its section 18.6.4) |
+
+**The questions.** The moves raise their questions by what they leave open, and `question` lands them (section 22.1):
+the fabulap's bank asks the author, or an expert in the author's work, about each axis (MacroCOSM OES, its section
+18.4.6); a pending value a move wrote, a speaker, a word's sense, a line FEED could not scan, an allusion's source, is
+asked in its own words; an item a model guessed at is asked as unsure; and the model adds a question where readings
+stand side by side, conflict or are silent on intent. `settle` writes the answers by rules where they fill a field
+(`intended` on a reading, a device or a form; a speaker; a word's sense), and asks a model only to read an item again in
+the light of an answer about the whole of it (MacroCOSM OES, its section 18.6.4).
+
+**The program.** The full fabulap is one file of five programs, run by a host as one job, as a fabulac's is (section
+20.6): each lands the fabulap so far beside the poem, and a job that stops takes up again after the last that landed.
+Under `--rules` a host runs the first two and stops: the outline, with its rhymes, sounds, recurrences and form, and no
+model's reading.
+
+```thym
+thym 1
+
+-- The fabulap of a poem or a lyric, built in five runs. A host runs the programs of this file in the
+-- order they are written, as one job: each lands the fabulap so far beside the poem, and a job that
+-- stops takes up again after the last one that landed.
+
+program scan-the-poem
+  why: a poem's stanzas, lines, stresses and metre are read by rule from its words and FEED's
+       pronunciations, before any model reads a line.
+  must: nothing is fetched; the poem is the person's own copy.
+
+  takes poem: text
+  gives f: fabula
+
+  give scan poem                                   -- stanzas, lines, stresses, metre, pauses
+end
+
+program hear-the-poem
+  why: what the poem does with rhyme, sound and repetition, and the form they make, is heard by rule.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let rhymed = scan poem as rhyme with f           -- end and inner rhymes, the scheme
+  let sounded = scan poem as sound with rhymed     -- alliteration, assonance, consonance
+  let heard = scan poem as recurrence with sounded -- refrains, openings, repetitions, the hook
+  give scan poem as form with heard                -- the form it keeps, and where it departs
+end
+
+program read-the-poem
+  why: a model reads what the poem says, stanza by stanza, against what the rules found.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let found = derive poem as verse with f          -- terms, names, ideas, claims, events, atems
+  assert found covers poem else "a line of the poem is in no item"
+  give found
+end
+
+program read-closely
+  why: figure, image, allusion, voice, turn, meaning and what is left open, each read by a model
+       under contract; every reading stays the model's own until the author says otherwise.
+  decided 2026-11-12: what only the author knows is asked, never guessed; a reading is an opinion
+       until the dialectic settles it.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let a = construe poem as figure with f           -- metaphor, simile, symbol, irony …
+  let b = construe poem as image with a            -- the images, and the senses they reach
+  let c = construe poem as allusion with b         -- echoes, traditions, occasions
+  let d = construe poem as voice with c            -- who speaks, to whom, in what tone
+  let e = construe poem as turn with d             -- where the poem changes direction
+  let m = construe poem as meaning with e          -- readings, side by side
+  give construe poem as ambiguity with m           -- what the poem leaves open
+end
+
+program raise-the-questions
+  why: what only the poet knows is asked of the poet, or of an expert in the poet's work, and the
+       questions land with the fabulap.
+  decided 2026-11-12: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end
+```
+
+The answers are settled by `settle-the-answers` (section 22.4), unchanged.
+
+**More by declaration.** The set covers a poem's main axes, and is not a list to finish. A manifest may add an `as`
+word to `scan` or to `construe` by an entry that `extends` it (section 17.6), with its own contract and its own code,
+as Ascribe adds its kinds to `project`; an axis this edition leaves out (MacroCOSM OES, its section 18.4.6) enters that
+way, never as new syntax.
 
 ---
 

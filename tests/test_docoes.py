@@ -404,8 +404,8 @@ def test_manifests_become_reference_items():
                     if it["type"] in ("module", "kind", "list"))
     assert [(count[("module", m)], count[("kind", m)])
             for m in ("comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym")] == \
-        [(9, 73), (2, 11), (2, 5), (11, 42), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check
-    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 5, 24]   # canon: fabula.state
+        [(9, 73), (2, 11), (2, 5), (11, 43), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check; fabula gained C:form (0.7)
+    assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 5, 26]   # canon: fabula.state; fabula: the fabulap's two lists (0.7)
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
         ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc",
          "R:minicosm/ascribe", "R:minicosm/thym"]
@@ -590,7 +590,7 @@ def test_the_three_minicosm_specifications_enumerate(built):
     7 + 2 + 20),
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
-    for slug, counts in (("thym", {"section": 111, "term": 20, "example": 1, "decision": 47}),
+    for slug, counts in (("thym", {"section": 112, "term": 20, "example": 1, "decision": 47}),   # 0.7: the fabulap's helper moves (20.9)
                          ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 22}),   # 0.7: the Allograph Registry (14.6-14.14, 16.3)
                          ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 29})):
         vol = built["vols"][(slug, "en")]

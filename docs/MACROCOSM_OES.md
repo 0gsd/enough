@@ -1758,8 +1758,8 @@ A fabula's **flavour** is the kind of input it is the fabula of, from a closed l
 A **fabulan** is the fabula of narrative or non-fiction prose: an essay, a guide, a story, a report, a page of notes.
 
 <!-- term: fabulap -->
-A **fabulap** is the fabula of poetry, metered verse or song lyrics. It adds the lines, the metre and the rhymes, and
-lets several readings of one line stand side by side (section 18.4.6).
+A **fabulap** is the fabula of poetry, metered verse or song lyrics. It adds the lines, the metre, the rhymes and the
+form, and lets several readings of one line stand side by side (section 18.4.6).
 
 <!-- term: fabulac -->
 A **fabulac** is the fabula of code: a folder of source, enumerated as the specification of the program it holds
@@ -1831,7 +1831,7 @@ source; a run that only settles the dialectic's answers (section 18.6.4) changes
 | `program` | the name of the Thym program that built the fabula, as its `program` line gives it (`raise-the-questions`); one file may hold several programs | when a Thym program did |
 | `run` | the trace id of that program's run | with `program` |
 | `mode` | `model` or `rules` | always |
-| `completeness` | `full`; `atem`, a fabula that holds the atem and nothing else; or `outline`, a fabulac's rules-only skeleton (section 18.4.7) | always |
+| `completeness` | `full`; `atem`, a fabula that holds the atem and nothing else; or `outline`, a rules-only skeleton: a fabulac's (section 18.4.7), or a fabulap's, its lines, sounds and form with nothing read for meaning (section 18.4.6) | always |
 | `chunks` | how many chunks the text was read in; for a fabulac, how many files a model read | always |
 | `dropped` | how many items a derivation dropped because it could not repair them | when any were |
 | `runs` | one entry per run that wrote into the fabula, in order, a settle run included: `{program, run, at, model, route, provider}`, `program` naming the program as above, the last three absent for a run made by rules alone | when a Thym program wrote into the fabula |
@@ -1880,7 +1880,7 @@ core's dialectic module D (section 18.6).
 | E | Entities | meaning | the particular things and people named | `person`, `org`, `place`, `work`, `thing` |
 | K | Concepts | meaning | the ideas and universals the work uses | `concept` |
 | N | Intent | intent | what the work sets out to do, for whom, and what it chose | `aim`, `audience`, `use`, `requirement`, `decision`, `exclusion` |
-| C | Construction | construction | how the work is built | prose and verse: `part`, `device`, `voice`; verse only: `line`, `metre`, `rhyme`; code: `file`, `component`, `interface`, `structure`, `behaviour`, `dependency`, `setting` |
+| C | Construction | construction | how the work is built | prose and verse: `part`, `device`, `voice`; verse only: `line`, `metre`, `rhyme`, `form`; code: `file`, `component`, `interface`, `structure`, `behaviour`, `dependency`, `setting` |
 | R | Production | production | who made the work, with what, and how it changed | `maker`, `change`, `phase`, `release`, `means`, `licence` |
 | P | Propositions | assertions | what the work claims, how it can be read, and what it must do | `claim`, `reading`, `case` |
 | T | Transitions | assertions | what happens, in order | `event` |
@@ -1909,11 +1909,12 @@ fabula, and a literal otherwise.
 | `N:decision` | a choice made between options | n p c | `by`, `changed-in` | `stance`, `chose`, `over`, `because` |
 | `N:exclusion` | what the work deliberately does not do or cover | n p c | | `stance`, `horizon`, `because` |
 | `C:part` | a division of the text | n p | `of` | `stance`, `division`, `number`, `heading` |
-| `C:device` | a figure or technique at a place | n p | `where` | `stance`, `figure`, `effect` |
+| `C:device` | a figure or technique at a place | n p | `where` | `stance`, `figure`, `effect`, `cue`, `senses`, `intended` |
 | `C:voice` | who speaks, to whom, how | n p | `roles.*` | `stance`, `perspective`, `tone` |
 | `C:line` | one line of verse | p | `part`, `metre` | `stance`, `number`, `text`, `stresses`, `syllables`, `rhyme`, `ending` |
 | `C:metre` | a metre that governs lines | p | `lines`, `departures.line` | `stance`, `foot`, `feet`, `basis` |
 | `C:rhyme` | one rhyme sound shared by lines | p | `lines` | `stance`, `scheme`, `sound`, `quality`, `placement` |
+| `C:form` | the form a poem keeps: a sonnet, a villanelle, a ballad stanza, free verse | p | `parts`, `metre`, `departures.at` | `stance`, `form`, `scheme`, `rules`, `intended` |
 | `C:file` | one file of the tree | c | `component` | `stance`, `path`, `language`, `holds`, `length`, `sha256`, `entry` |
 | `C:component` | a package, module or group of files with one responsibility | c | `files`, `of`, `exposes`, `uses` | `stance`, `does` |
 | `C:interface` | something another program or a person calls, types, reads or writes | c | `defined-in` | `stance`, `surface`, `signature`, `takes`, `gives`, `raises`, `exported` |
@@ -1964,11 +1965,12 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `N:decision` | **`chose`** *text*; `over`, a list of `{option, because}`, what was not chosen and why; `because` *text*; `by` *ref* (an `R:maker` or the maker's E item); `changed-in` *refs* `R:change` |
 | `N:exclusion` | `horizon` [`never` `later`]; `because` *text* |
 | `C:part` | **`division`** [`chapter` `section` `paragraph` `scene` `list` `quotation` `stanza` `verse` `chorus` `refrain` `bridge` `other`]; `number` *integer*, its place among its siblings, from 1; `of` *ref* `C:part`, the part it sits in; `heading` *text* |
-| `C:device` | **`figure`** *text*, an open word (`apostrophe`, `metaphor`, `symbol`, `alliteration`, `anaphora`, `irony`, `personification`, `appeal to authority` …); `where` *refs* (`C:line`, `C:part`, `L:term`, `P:claim`); `effect` *text* |
+| `C:device` | **`figure`** *text*, an open word (`apostrophe`, `metaphor`, `symbol`, `image`, `alliteration`, `anaphora`, `refrain`, `caesura`, `turn`, `hook`, `irony`, `personification`, `appeal to authority` …); `where` *refs* (`C:line`, `C:part`, `L:term`, `P:claim`); `effect` *text*; `cue` *text*, the words that carry it, at most 60 characters; `senses`, for an image, a list from [`sight` `hearing` `touch` `taste` `smell` `movement`]; `intended` *bool*, whether the author meant it, absent until asked |
 | `C:voice` | `roles.*`: `speaker`, `addressee`, `listener`; `perspective` [`first` `second` `third` `mixed`]; `tone` *text* |
 | `C:line` | **`number`** *integer*, counted from 1 over the whole poem; `text`, the line as written (section 18.4.6 says when it is written); `part` *ref* `C:part`; `metre` *ref* `C:metre`; `stresses` *text* (`x` unstressed, `/` stressed, `\|` between feet); `syllables` *integer*; `rhyme` *text*, the line's letter in the scheme; `ending` [`stopped` `run-on`] |
 | `C:metre` | `foot` [`iamb` `trochee` `anapaest` `dactyl` `spondee` `amphibrach` `mixed` `none`]; `feet` *integer* or *text* (`"2-3"`); `basis` [`accentual-syllabic` `accentual` `syllabic` `quantitative` `free`]; `lines` *refs* `C:line`; `departures`, a list of `{line, what}` |
 | `C:rhyme` | `scheme` *text*, the letter; `sound` *text*; `lines` *refs* `C:line`; `quality` [`full` `slant` `eye` `identical`]; `placement` [`end` `internal`] |
+| `C:form` | **`form`** *text*: a form's name from the table of section 18.4.6 (`Shakespearean sonnet`, `villanelle`, `ballad stanza`, `free verse`), else the poem's shape in plain words (`four quatrains, rhymed abcb`); `parts` *refs* `C:part`; `metre` *ref* `C:metre`; `scheme` *text*, the rhyme scheme, a space between stanzas (`abab cdcd efef gg`); `rules`, a list of `{rule, held}`, what the form asks (`fourteen lines`, `a turn at line 9`) and whether the poem keeps it, `held` a *bool*; `departures`, a list of `{at, what}`, `at` a `C:line` or a `C:part`; `intended` *bool*, whether the author meant the form, absent until asked |
 | `C:file` | **`path`**, relative to `source.path`; `language`; `holds` *text*, the names it defines or one line on its content; `component` *ref*; `length` `{lines, bytes}`; `sha256`; `entry` *bool*, run directly |
 | `C:component` | `files` *refs* `C:file`; `of` *ref* `C:component`; `does` *text*, its responsibility in one sentence; `exposes` *refs* `C:interface`; `uses` *refs* (`C:component`, `C:dependency`) |
 | `C:interface` | **`surface`** [`function` `method` `class` `command` `format` `stream`]; `signature` *text*, exact: a Python `def` or `class` line with its annotations and defaults, and with its decorators before it on the same line (`@property def size(self)`), a command's usage line, a format's one-line grammar; `defined-in` *ref* `C:file`; `takes`, a list of `{name, type, default, required, means}`; `gives`, `{type, means}` for a function or `{output, exit}` for a command; `raises`, a list of `{error, when, message}`; `exported` *bool* |
@@ -2138,9 +2140,9 @@ fabula. Without a model a short is the ordered outline itself, said in the items
 writes the outline as prose and is told which order it is in. A third order, the events first in the order they
 happened, is reserved for a later edition.
 
-A short of a fabulap (section 18.4.6) goes stanza by stanza: how the poem is built, then each stanza's lines with
-their stresses and rhymes (their words only where the fabulap holds them), its devices and its readings, each reading
-said as whose it is. Told by weight, it ends with how the poem can be read.
+A short of a fabulap (section 18.4.6) goes stanza by stanza: how the poem is built, its form and its metre, then each
+stanza's lines with their stresses and rhymes (their words only where the fabulap holds them), its devices and its
+readings, each reading said as whose it is. Told by weight, it ends with how the poem can be read.
 
 **The file.** A short is written beside its text as `<text-stem>.short-<YYYY-MM-DD-HHMM>.md`, in local time:
 `notes.md` gives `notes.short-2026-10-23-1042.md`. The stem is the text's, whatever the twin is called: the twins
@@ -2494,6 +2496,84 @@ speaks, what an image stands for, whether an ambiguity is meant, what was cut fr
 after the poet an expert in the poet's work. The fabulap's bank of opening questions asks the author these things, and
 when the author cannot be asked the questions go `to: expert`. This is what the dialectic is for (section 18.6). Until
 a question is answered, its field stays pending and the readings stay side by side.
+
+**What a full fabulap holds.** A fabulap made at its best guess holds what one reading finds. A full one is built by
+Thym's helper moves for verse, `scan` by rule and `construe` by a model (Thym (https://thym.cosmoes.org/), its section
+20.9), and holds the poem along eight axes:
+
+| Axis | What the fabulap holds | Kinds | Made by |
+|---|---|---|---|
+| sound | each line's stresses and syllables; the end and inner rhymes, and the scheme; alliteration, assonance, consonance | `C:line`, `C:rhyme`, `C:device` | rule, from FEED's pronunciations |
+| form | the metre and its departures; the form the poem keeps, with each of its rules held or broken; where lines run on, and where they pause | `C:metre`, `C:form`, `C:line`, `C:device` | rule |
+| structure | the stanzas and a lyric's sections; refrains, repeated lines and openings, the hook; where the poem turns; what happens in it, in order | `C:part`, `C:device`, `T:event` | rule; the turn and the events by a model |
+| sense | the words it leans on and their senses, the things and people it names, the ideas it uses, what it states outright, each stanza's atem | L, E, K, `P:claim`, X | a model, grounded in FEED |
+| figure | its figures, and its images with the senses they reach | `C:device` | a model |
+| voice | who speaks, to whom, before whom, in which person, in what tone and register, and where the voice shifts | `C:voice` | a model; the speaker is asked |
+| reference | what it echoes, the traditions and genres it answers to, its occasion, its maker and where it appeared | I, `R:maker`, `R:release`, `R:licence` | a model, from the poem and its header only |
+| what is left open | its readings, side by side; the words and lines that hold two senses; what it never names; and what the author meant, which only the author says | `P:reading`, `L:term`, `D:question` | a model, then the dialectic |
+
+What a rule reads exactly is `observed`, and what it reads through FEED's pronunciations is `deduced`. What a model
+writes keeps the stance the poem gives it: a reading is the model's `opinion`, at a confidence of at most 0.5, and an
+aim, an occasion or an influence the poem does not state is `assumed`, pending, and asked (Thym, its section 20.9).
+
+**Its forms.** A rule names a form when the poem keeps the form's defining rules, the first in this table that it
+keeps, and lists the form's other rules as held or not, with the lines or parts that depart from them:
+
+| Form | Defining rules | Other rules |
+|---|---|---|
+| Shakespearean sonnet | 14 lines; three quatrains and a couplet, as the rhymes run (`abab cdcd efef gg`) | iambic pentameter; a turn at line 13 |
+| Petrarchan sonnet | 14 lines; an octave rhymed `abbaabba` | a sestet on two or three sounds (`cdecde`, `cdcdcd`); iambic pentameter; a turn at line 9 |
+| sonnet | 14 lines of pentameter, rhymed otherwise | a turn |
+| villanelle | 19 lines: five tercets and a quatrain | `aba` throughout and `abaa` last; line 1 again at lines 6, 12 and 18, and line 3 at 9, 15 and 19 |
+| sestina | 39 lines: six sestets and a tercet | the first stanza's six end words end every stanza's lines, each stanza taking them in the order 6 1 5 2 4 3 of the one before; all six in the tercet |
+| terza rima | tercets, each one's middle line rhyming with the outer lines of the next (`aba bcb cdc`) | iambic pentameter; a closing line or couplet |
+| rhyme royal | stanzas of 7 lines rhymed `ababbcc` | iambic pentameter |
+| ottava rima | stanzas of 8 lines rhymed `abababcc` | iambic pentameter |
+| Spenserian stanza | stanzas of 9 lines rhymed `ababbcbcc` | eight lines of iambic pentameter, then one of six feet |
+| common metre | quatrains of 8, 6, 8 and 6 syllables | iambic; the second and fourth lines rhyme |
+| long metre | quatrains of 8 syllables a line | iambic tetrameter; `abab` or `aabb` |
+| short metre | quatrains of 6, 6, 8 and 6 syllables | iambic; the second and fourth lines rhyme |
+| ballad stanza | quatrains of four beats and three, alternating | the second and fourth lines rhyme |
+| limerick | 5 lines rhymed `aabba` | three beats in lines 1, 2 and 5, two in lines 3 and 4; feet of anapaests |
+| triolet | 8 lines on two rhymes | line 1 again at lines 4 and 7, and line 2 at 8 |
+| pantoum | quatrains, lines 2 and 4 of each coming back as lines 1 and 3 of the next | the last stanza ends on the poem's first line |
+| ghazal | five couplets or more | every couplet's second line ends on the same word or words, as both lines of the first do |
+| heroic couplets | rhymed couplets of pentameter (`aabbcc …`) | iambic |
+| haiku | 3 lines | 5, 7 and 5 syllables; no rhyme |
+| blank verse | 10 lines or more of iambic pentameter | no rhyme scheme |
+| free verse | no metre (`basis: free`) and no rhyme scheme | |
+
+The thresholds behind each rule are the conformance suite's. Syllables and beats are counted in English, through FEED,
+so a haiku is counted by English syllables. A poem that keeps no form of the table is named by its shape (`four
+quatrains, rhymed abcb`). The table is this edition's, and a later one may add to it.
+
+**The questions.** The fabulap's bank asks the author, or an expert in the author's work when the author cannot be
+asked, along the same axes: what set the poem going and what was in the author's ear (inspiration); what a reader
+should feel by the last line, and what the poem is careful not to say (intent); who speaks, to whom, and whether the
+voice shifts (voice); how a line is read aloud, and whether a break, a sound, a departure from the metre or the form
+itself was meant (sound and form); which image weighs most and what a figure stands for (figure); whether an echo was
+meant and, when the author cannot be asked, whether every word is as the author left it (reference); whether a reading
+was meant, and which the author would refuse (what is left open); and, for a song, what it is sung to and where the
+tune moves a word (a lyric). Each question names the item it is about, and its answer is written as section 18.6.4
+says: an answer that the author meant a reading, a device or a form sets its `intended`.
+
+**A lyric.** A song's words are verse, and a fabulap holds them as it holds a poem's, with three things more. Its
+sections are the parts a lyric sheet labels, verse, chorus, bridge and the rest, and a chorus that comes back is one part
+sung again. Its hook, the line a listener keeps, is found by rule as the line said most often, held as a guess, and
+asked. Its sung line is not its spoken line: the fabulap scans the words as they are spoken, and says so. Without the
+music a fabulap cannot know the melody, where the tune puts a word's stress or holds one syllable over several notes,
+the rhythm and the pace of the setting, its harmony, which lines are sung and which spoken, or what a singer adds or
+repeats. It holds what the author or an expert says of them: the tune as an `R:means` and its maker as an `R:maker` of
+capacity `composer`, a recording or a performance as an `R:release`, and a stress the tune moves as a `C:device` at its
+line; never the notes.
+
+**What it leaves out.** This edition's fabulap does not hold the music of a song (above); the poem on the page beyond
+its lines and stanzas (indentation, spacing, the shape the lines make, type, and the marks a line's text keeps when it is
+written); prosody beyond stress (the length of syllables, pitch and pace) and every prosody but English's, which FEED
+reads; the poem's life outside its text (drafts, variants, editions, translations, letters, the poet's life), which
+reaches a fabulap only as an answer; readings in a school's name, which reach it only as a named critic's or a reader's
+own; and a measure of the poem's style against the null morph, whose scales read prose (Thym, its section 13). Each is a
+place a later edition can add to, by declaration (Thym, its section 20.9).
 
 **A line's text is stored only when the source may be copied.** `C:line.text` is written only when the person says the
 poem may be copied: it is their own work, or it is out of copyright. Otherwise the line's `span` is the pointer, and

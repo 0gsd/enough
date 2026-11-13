@@ -1,6 +1,6 @@
 {
   "source": "cosmoes-site",
-  "commit": "cd8e5ab",
+  "commit": "da7b531",
   "dirty": false,
   "synced": "2026-11-12",
   "client": {
@@ -23,7 +23,7 @@
       "reference": true,
       "path": "docs/MACROCOSM_OES.md",
       "source": "specs/macrocosm-oes.md",
-      "sha256": "124f886e07eb83dff2d8963661e533a8cf4c02f6d02cfc5aa19aaee571f0b331"
+      "sha256": "3cb303f307c6452e0e76377d23ef5846a408bb6b3769ceb37b9d20f50577ef9b"
     },
     {
       "slug": "thym",
@@ -37,7 +37,7 @@
       "revised": "2026-11-06",
       "path": "docs/THYM.md",
       "source": "specs/thym.md",
-      "sha256": "d596e66ea5127f0eb35857835fb48be37c385f4788d492f1c77e25174787d212"
+      "sha256": "524d17d3e2ed64bd14ffc19b26784869d0f36d5866903c795ac2c918d59ab285"
     },
     {
       "slug": "ascribe",
