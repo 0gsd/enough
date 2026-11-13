@@ -18894,7 +18894,7 @@
                 title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">
                 <img class="svg-icon" data-icon="savewiki-project" alt="save to project" draggable="false">
               </button>
-              <button type="button" class="save-choice" id="wiki-save-infoworld" role="menuitem"
+              <button type="button" class="save-choice" id="wiki-save-canon" role="menuitem"
                 aria-label="save to canon (shared across projects)"
                 data-i18n-title="wiki.saveCanon.title" data-i18n-aria="wiki.saveCanon.aria"
                 title="save this article to ~/enough/canon/wiki (shared across all projects)">
@@ -28713,7 +28713,7 @@
     });
     document.getElementById('wiki-save-project')
       .addEventListener('click', () => { openWikiSaveFlyout(false); wikiSaveArticle('project'); });
-    document.getElementById('wiki-save-infoworld')
+    document.getElementById('wiki-save-canon')
       .addEventListener('click', () => { openWikiSaveFlyout(false); wikiSaveArticle('canon'); });
     document.addEventListener('click', (e) => {
       const fly = document.getElementById('wiki-save-flyout');
