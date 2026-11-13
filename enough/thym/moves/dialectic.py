@@ -75,6 +75,11 @@ PERSON_KINDS = {"fabulac": frozenset({"aim", "use", "requirement", "decision", "
 #: what no flavour's model is asked about as such: a file, a change, a release, a test case or a dependency (asked of
 #: only when it is marked unsure or pending)
 NOT_ASKED = frozenset({"file", "change", "release", "case", "dependency"})
+#: the bank entries a model's own questions stand in for, by flavour (the owner's ruling, 0.7): where `question` asks a
+#: model of a fabulac, the bank's two generic questions ("is this behaviour intended", "is this setting the user's to
+#: change", asked of up to five items each) are not raised, and the model's questions, which name the edge and the
+#: result instead, stand alone. The scaffold `bank` (`--rules`, an agent-free build) keeps them.
+MODEL_STANDS_IN = {"fabulac": frozenset({"fabulac/intended", "fabulac/settings"})}
 ASKS_PER_REQUEST = 2                 # a request is asked again once when nothing could be kept
 MODEL_WHYS = ("unsure", "ambiguous", "conflict", "intent")
 ANSWER_KINDS = ("text", "choice", "yes-no", "number", "date", "ref", "span")
@@ -509,11 +514,22 @@ def _questions_value(res: dict, *, rules: int | None = None, dropped: list | Non
         "dropped": list(dropped or []), "skipped": len(res.get("skipped") or [])}})
 
 
+def _without(res: dict, entries: frozenset) -> dict:
+    """The engine's answer without the questions raised from these bank entries (`raised.from`)."""
+    if not entries:
+        return res
+    keep = [q for q in res.get("questions") or []
+            if not (isinstance(q, dict) and (q.get("raised") or {}).get("by") == "bank"
+                    and (q.get("raised") or {}).get("from") in entries)]
+    return {**res, "questions": keep}
+
+
 @implements("question")
 def question(ctx: Any, v: Value, **_: Any) -> Value:
     """`question v`: the questions to put to a person about v (THYM 22.1): the rules' (its banks, every pending value,
     every unsure item), and those a model raises where v is unsure, ambiguous, in conflict or silent on intent. A
-    list of D:question items, each `open`, landed with `gather asked with v`."""
+    list of D:question items, each `open`, landed with `gather asked with v`. Where the model is asked, the bank
+    entries its questions stand in for (`MODEL_STANDS_IN`) are not raised."""
     vol = _volume_arg(v, "question", single=False)
     qfn = _engine(ctx, "question", "thym_question")
     run, at = getattr(ctx, "run", None), getattr(ctx, "now", None)
@@ -523,6 +539,8 @@ def question(ctx: Any, v: Value, **_: Any) -> Value:
     chunks = _chunks(items, flavour)
     if not chunks:
         return _questions_value(rules)
+    stands_in = MODEL_STANDS_IN.get(flavour, frozenset())
+    rules = _without(rules, stands_in)
     standing = [q for q in items if _is_question(q) and q.get("state") not in ENDED]
     asked = standing + [q for q in rules.get("questions") or [] if isinstance(q, dict)]
     name = str(cat.get("name") or cat.get("id") or "the volume")
@@ -534,7 +552,7 @@ def question(ctx: Any, v: Value, **_: Any) -> Value:
         dropped += lost
     if not proposals:
         return _questions_value(rules, dropped=dropped, asked_model=True)
-    final = qfn(vol, proposed=proposals, run=run, at=at)
+    final = _without(qfn(vol, proposed=proposals, run=run, at=at), stands_in)
     for r in final.get("refused") or []:                # across chunks: one asks what another already asked
         if isinstance(r, dict):
             dropped.append({"about": r.get("about"), "asks": r.get("asks"), "why": r.get("why")})

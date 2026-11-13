@@ -236,6 +236,29 @@ def test_the_request_is_asked_again_when_nothing_valid_comes_back(tmp_path, monk
     assert [m.payload["asks"] for m in got.payload if m.payload["raised"]["by"] == "model"] == [GOOD["asks"]]
 
 
+def test_where_a_model_is_asked_the_fabulac_banks_two_generic_questions_give_way_to_its_own(tmp_path):
+    """The owner's ruling (0.7): of a fabulac, the bank's "is this behaviour intended" and "is this setting meant to
+    be changed by users" (at most five items each) are not raised where the model is asked, so the model's questions
+    about the precise edge stand alone, and are not told the bank asked them; the scaffold `bank` keeps both."""
+    v = fabula(TALLY)
+    two = D.MODEL_STANDS_IN["fabulac"]
+    assert two == {"fabulac/intended", "fabulac/settings"}
+    by_rules = [m.payload["raised"].get("from") for m in D.bank(ctx_for(tmp_path, rules=True), v).payload]
+    assert set(by_rules) >= two                                       # agent free: the bank's, as before
+    edge = {"about": "C:behaviour/" + next(i["id"].split("/", 1)[1] for i in doc(v)["nodes"]
+                                           if i.get("type") == "behaviour"),
+            "asks": "Should an empty input give an empty tally, as it does now, or raise?", "why": "intent",
+            "kind": "choice", "options": ["an empty tally", "raise"]}
+    asker = Asker([ask_yaml(edge)])
+    got = D.question(ctx_for(tmp_path, ask=asker), v)
+    froms = [m.payload["raised"].get("from") for m in got.payload]
+    assert not two & set(froms)
+    assert [m.payload["asks"] for m in got.payload if m.payload["raised"]["by"] == "model"] == [edge["asks"]]
+    told = asker.sent[0]["inputs"]["asked"].payload
+    assert "intended, or an accident" not in told and "meant to be changed by users" not in told
+    assert len(got.payload) == len(by_rules) - sum(f in two for f in by_rules) + 1
+
+
 def test_question_asks_one_request_per_chunk_of_items(tmp_path, monkeypatch):
     v = fabula(TALLY)
     read = D.asked_of(doc(v)["nodes"], "fabulac")

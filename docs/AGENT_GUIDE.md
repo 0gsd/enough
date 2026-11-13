@@ -4938,7 +4938,7 @@ that name), each **one atomic Thym run**, the job resumable between them:
 | history | `read-the-history` | no (rules) | changes from the clone's log, grouped into episodes; releases from tags; makers as roles and counts (a name only where the repository states it) |
 | read | `read-every-file` | yes | per file: behaviours, structures, cases from the tests, terms, concepts, claims, events (`derive t as code with f`, `gather`ed) |
 | fold | `fold-the-whole` | yes | over the whole: aims, audiences, uses, requirements, decisions, exclusions, inspiration, the atem |
-| question | `raise-the-questions` | yes | the dialectic's questions where the build was unsure (to `maker`) |
+| question | `raise-the-questions` | yes | the dialectic's questions where the build was unsure (to `maker`); with a model, the bank's generic `intended` and `settings` entries are not raised and the model's edge questions stand alone (`dialectic.MODEL_STANDS_IN`, 0.7); agent free, the bank's are kept |
 
 After each stage the fabulac so far is written over `<folder>.fabulac.cosm`
 all at once, with the run in `derived.runs` (the host writes the entry for
