@@ -58,7 +58,7 @@ MODULES_ALL = ("I", "L", "E", "K", "N", "C", "R", "P", "T", "X", "D")
 # The kinds every item of which carries a `stance` that is the fabula's own (how the fabula knows the item), not the
 # text's: every kind of I, N, C and R, and the readings and cases of P (MacroCOSM OES 18.4.2, 18.4.3).
 FABULA_STANCE_KINDS = frozenset(
-    "influence allusion occasion aim audience use requirement decision exclusion part device voice line metre rhyme "
+    "influence allusion occasion aim audience use requirement decision exclusion part device voice line metre rhyme form "
     "file component interface structure behaviour dependency setting maker change phase release means licence "
     "reading case".split())
 # The highest confidence a stance allows on those kinds: a model's own judgement is at most 0.5 (18.4.3).
@@ -70,7 +70,7 @@ WHOLE_KINDS = {
     "fabulap": frozenset("influence allusion occasion aim audience maker release".split()),
 }
 # The kinds the rules own in a fabulap (enough/verse.py): a model's items of these kinds are not written.
-VERSE_RULES_KINDS = frozenset(("part", "line", "metre", "rhyme"))
+VERSE_RULES_KINDS = frozenset(("part", "line", "metre", "rhyme", "form"))
 # The whole-text request's system prompt is held under this many characters (it is read once per text).
 WHOLE_SYSTEM_MAX = 3_000
 
@@ -1746,7 +1746,7 @@ def _salvage(text: str, finish: str | None) -> tuple[list[dict], list[str], bool
 
 def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[dict], workdir: Path,
                   stats: dict, on_progress: ProgressFn | None, chunks: int, flavour: str | None = None,
-                  ) -> tuple[list[dict], dict, int]:
+                  verse_system: str | None = None) -> tuple[list[dict], dict, int]:
     """One passage, in at most three completions, each with an output budget (`EMF_MAX_TOKENS`, bounded by the
     model's window): the reading; ONE continuation when the reading was cut off (after the last complete item);
     ONE repair of only the items that still fail after normalization (or, when the reading held no list at all,
@@ -1755,10 +1755,12 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
 
     `flavour` `fabulap` reads a passage of a poem with VERSE_SYSTEM and VERSE_USER (the chunk's lines annotated
     with the poem's line numbers, `verse_chunks`), checks the items as a fabulap, and leaves out the kinds the rules
-    own (`VERSE_RULES_KINDS`); a fabulan's passage is read exactly as before."""
+    own (`VERSE_RULES_KINDS`); a fabulan's passage is read exactly as before. `verse_system` reads a poem's passage
+    with another system prompt (`VERSE_SENSE_SYSTEM`, `derive poem as verse with f`)."""
     prefix = f"c{c.id}"
     verse = flavour == "fabulap"
-    system = {"role": "system", "content": (P.VERSE_SYSTEM if verse else P.EMF_SYSTEM).format(source=source)}
+    system = {"role": "system", "content": ((verse_system or P.VERSE_SYSTEM) if verse else P.EMF_SYSTEM)
+              .format(source=source)}
     user = (P.VERSE_USER if verse else P.EMF_USER).format(
         terms=_passage_terms(table, c), source=source, start=c.start_line, end=c.end_line, passage=c.text_numbered)
 
@@ -3067,7 +3069,13 @@ def _verse_said(it: dict, by_id: dict, names: set[str]) -> str | None:
         return _reading_said(it)
     if kind == "device" and summary:
         fig = it.get("figure") if isinstance(it.get("figure"), str) else "a figure"
-        return f"*{fig}*: {_sentence(summary)}"
+        said = _sentence(summary)
+        if isinstance(it.get("senses"), list) and it["senses"]:
+            said += f" It reaches {', '.join(map(str, it['senses']))}."
+        return f"*{fig}*: {said}"
+    if kind == "form" and summary:
+        scheme = f" Its scheme: {it['scheme']}." if isinstance(it.get("scheme"), str) else ""
+        return _sentence(summary) + scheme
     if kind in ("voice", "metre", "rhyme", "part") and summary:
         return _sentence(summary)
     if summary and kind in FABULA_STANCE_KINDS:
@@ -3077,13 +3085,14 @@ def _verse_said(it: dict, by_id: dict, names: set[str]) -> str | None:
 
 def _verse_told_lines(items: list[dict], by_id: dict, names: set[str]) -> list[str]:
     """A fabulap told as the author told it, stanza by stanza (MacroCOSM OES 18.4.4, 18.4.6): first how the poem is
-    built (its metre, its rhymes, its voice), then under each stanza's heading its lines in order (each with its
+    built (its form, its metre, its rhymes, its voice), then under each stanza's heading its lines in order (each with its
     stresses and rhyme letter, and its words only when the fabulap holds them), then what the fabula says of that
     stanza (devices, readings side by side, words, names, claims, events) in the order of their spans; what no
     stanza places (allusions, aims, a maker) comes last, under "Also in the fabula"."""
     parts = sorted((it for it in items if it.get("type") == "part" and _span_place(it.get("span"), None)),
                    key=lambda p: _span_place(p.get("span"), None))
-    built = [it for it in items if it.get("type") in ("metre", "rhyme", "voice")]
+    built = [it for it in items if it.get("type") in ("form", "metre", "rhyme", "voice")]
+    built.sort(key=lambda it: 0 if it.get("type") == "form" else 1)
     out: list[str] = []
     if built:
         out += ["## How it is built", ""]
@@ -3094,7 +3103,8 @@ def _verse_told_lines(items: list[dict], by_id: dict, names: set[str]) -> list[s
     also: list[dict] = []
     for pos, it in enumerate(items):
         kind = it.get("type")
-        if kind in ("part", "metre", "rhyme", "voice", "atem") or kind not in rank and kind not in FABULA_STANCE_KINDS:
+        if kind in ("part", "metre", "rhyme", "voice", "form", "atem") or kind not in rank \
+                and kind not in FABULA_STANCE_KINDS:
             continue
         where = _span_place(it.get("span"), None)
         home = None

@@ -116,8 +116,9 @@ def test_every_rules_fabulap_passes_the_reader_and_the_fabula_lint(name, tmp_pat
 def test_the_sick_rose_scheme_metre_and_a_question_for_the_word_feed_lacks():
     cosm, _ = rules_twin("the-sick-rose.txt")
     items = items_of(cosm)
-    assert items["C:part/stanza-1"]["summary"].endswith("rhymed abcb.")
-    assert items["C:part/stanza-2"]["summary"].endswith("rhymed defe.")
+    # the scheme is the rhymes' and the form's, never a part's summary (scan … as rhyme adds it; Thym 20.9)
+    assert items["C:part/stanza-1"]["summary"] == "Stanza 1; lines 1-4 of the poem, 4 lines."
+    assert items["C:form/shape"]["form"] == "two quatrains, rhymed abcb"
     joy = items["C:rhyme/joy-destroy"]
     assert (joy["scheme"], joy["quality"], joy["lines"], joy["stance"]) == ("e", "full", ["C:line/6", "C:line/8"],
                                                                             "deduced")
