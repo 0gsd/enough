@@ -105,6 +105,9 @@ _BEHAVIOUR_SEAMS = (
 # before any fixture has run. `_still_pristine()` below is the difference
 # between "the developer exported this" (isolate it) and "another fixture
 # moved it on purpose" (leave it alone); see the docstring.
+_GIT_LOCATION = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
+                 "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX")
+
 _ENV_AT_START = dict(os.environ)
 
 
@@ -182,6 +185,12 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     for var in _BEHAVIOUR_SEAMS:
         if _still_pristine(var):
             monkeypatch.delenv(var, raising=False)
+
+    # Git's own location seams. Git sets them for a hook it runs (GIT_INDEX_FILE always, GIT_DIR in a linked
+    # worktree), and the commit hook runs this suite: inherited, they point every `git` a test runs in a scratch
+    # folder at the checkout being committed, so "the miniature is not a checkout" read the checkout's commit.
+    for var in _GIT_LOCATION:
+        monkeypatch.delenv(var, raising=False)
 
 
 @pytest.fixture(autouse=True)
