@@ -60,6 +60,8 @@ STAGE_WORDS = {"survey-the-repo": "survey", "read-the-history": "history", "read
                "fold-the-whole": "fold", "raise-the-questions": "question"}
 #: The stages that ask no model (the outline): a build with no model runs these and stops (MacroCOSM OES 18.4.7).
 RULES_STAGES = 2
+#: The stages that ask a model: read, fold and question.
+ASKING_STAGES = len(STAGES) - RULES_STAGES
 #: The output each program gives (survey gives `f`, the others `g`).
 OUTPUT = {"survey-the-repo": "f"}
 DEPTHS = ("line", "overview", "manual")
@@ -70,6 +72,21 @@ CATEM_MARK = ".catem-"
 #: The largest file of a cshort read back as text.
 CSHORT_FILE_MAX = 1_000_000
 _STAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?$")
+
+
+def job_ceiling(calls: int | None, job_calls: int | None) -> int | None:
+    """The ceiling on a build's model calls across the whole job (0.7; each stage's run had one, `calls`, and the
+    job none). `job_calls` when the person gives it; else, when they gave a stage ceiling, that ceiling times the
+    stages that ask (`ASKING_STAGES`), so the job never makes more than its stages could each have made; else none,
+    as before (a local build with no ceiling at all; its status still counts the calls made)."""
+    if job_calls is not None:
+        return job_calls
+    return calls * ASKING_STAGES if calls is not None else None
+
+
+def _job_ceiling_words(ceiling: int, made: int) -> str:
+    return (f"the build reached its ceiling of {ceiling} model call{'s' if ceiling != 1 else ''} across the whole "
+            f"job ({made} made)")
 
 
 class BuildError(Exception):
@@ -470,11 +487,16 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
               scaffolds: bool = False, restart: bool = False, resume_only: bool = False,
               runtime: Runtime | None = None, complete: Callable | None = None,
               progress: Callable[[dict], Any] | None = None, should_stop: Callable[[], bool] | None = None,
-              now: dt.datetime | None = None) -> dict:
+              now: dt.datetime | None = None, job_calls: int | None = None) -> dict:
     """The job's work (blocking): the stages from where the build stands (`start_index`), each planned, run and
     landed in turn. Returns the result `{folder, fabulac, ran: [{stage, run, trace}], state, complete, refusal?,
     calls, message}`; raises DeriveCancelled on a cancel (the stages that landed stay) and RuntimeError when a stage
-    is refused while it runs (in the refusal's words, naming the stage the build takes up again from)."""
+    is refused while it runs (in the refusal's words, naming the stage the build takes up again from).
+
+    `calls` is each stage's ceiling on its model calls; `job_calls` the job's, across every stage (`job_ceiling`
+    gives its default). Each stage that asks runs under what is left of the job's; one that would start with none
+    left does not start (the result's refusal says so, and the build takes up again from it), and one that reaches
+    it while it runs is refused in the job's words."""
     from .thym import run as _run
     project_dir = Path(project_dir)
     fab = fabulac_path(folder)
@@ -484,6 +506,7 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
     checked = _checked(prog)
     make = runtime or app_runtime(project_dir, why=why, route=route, model=model, calls=calls, complete=complete)
     tally: dict = {"calls": 0}
+    ceiling = job_ceiling(calls, job_calls)
     ran: list[dict] = []
     refusal: dict | None = None
     stop_note = ""
@@ -519,6 +542,13 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
             refusal["program"] = stage
             stop_note = f"; {stage} waits: {refusal['message']}"
             break
+        left = None if ceiling is None or not asks else ceiling - tally.get("calls", 0)
+        if left is not None and left <= 0:
+            refusal = {"stage": "run", "check": "calls", "line": None, "program": stage,
+                       "message": f"{_job_ceiling_words(ceiling, tally.get('calls', 0))}; {stage} did not start"}
+            stop_note = f"; {stage} waits: {refusal['message']}"
+            break
+        stage_calls = calls if left is None else (left if calls is None else min(calls, left))
         rows = stage_rows(folder, fab, stage)
         info = None
         if asks:
@@ -530,23 +560,26 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
         if isinstance(plan, Refusal):
             raise RuntimeError(_stopped(stage, plan, i))
         if asks:
-            r = _host.route_refusal(plan, info, calls=calls, ceiling="calls", program=prog)
+            r = _host.route_refusal(plan, info, calls=stage_calls, ceiling="calls", program=prog)
             if r is not None:
                 raise RuntimeError(_stopped(stage, r, i))
         models = plan.get("models") if isinstance(plan.get("models"), dict) else {}
         at_most = models.get("at_most")
         say(phase=word, chunk=i + 1, chunks=total, message=f"stage {i + 1} of {total}: {word}",
-            progress=_progress(stage, i, tally, at_most, route if asks else None, state))
+            progress=_progress(stage, i, tally, at_most, route if asks else None, state, ceiling))
         kw = make(stage, plan, info, mode if asks else "rules", False, prog)
         if asks and kw.get("coprocessor") is not None:
             kw["coprocessor"] = Counting(kw["coprocessor"], tally)
+        if left is not None:                     # the stage runs under what is left of the job's ceiling
+            kw["calls"] = left if kw.get("calls") is None else min(kw["calls"], left)
 
         def step(s: dict, _stage: str = stage, _i: int = i, _at: Any = at_most) -> None:
             say(phase=STAGE_WORDS[_stage], chunk=_i + 1, chunks=total,
                 message=f"stage {_i + 1} of {total}: {STAGE_WORDS[_stage]}"
                         + (f", {len(tally.get('read', ()))} of {state.get('python_files') or '?'} files read"
                            if _stage == "read-every-file" else ""),
-                progress={**_progress(_stage, _i, tally, _at, route if asks else None, state), "step": s})
+                progress={**_progress(_stage, _i, tally, _at, route if asks else None, state, ceiling),
+                          "step": s})
         t = _run.run(plan, inputs_root=project_dir, program=prog, progress=step, should_stop=should_stop,
                      **({"now": now} if now is not None else {}), **kw)
         if isinstance(t, Refusal):
@@ -554,6 +587,11 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
         if not t.landed:
             if t.refusal is not None and t.refusal.check == "cancelled":
                 raise DeriveCancelled(_cancelled_words(stage, i))
+            if (t.refusal is not None and t.refusal.check == "calls" and left is not None
+                    and kw.get("calls") == left and (calls is None or left < calls)):
+                # the run stopped at what was left of the job's ceiling, not at its own: said in the job's words
+                raise RuntimeError(_stopped(stage, Refusal("run", "calls", _job_ceiling_words(
+                    ceiling, tally.get("calls", 0)) + "; nothing of this stage landed"), i))
             raise RuntimeError(_stopped(stage, t.refusal, i))
         out = Path(t.outputs[OUTPUT.get(stage, "g")])
         text = out.read_text(encoding="utf-8")
@@ -566,19 +604,20 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
     done = final["complete"]
     msg = (f"{fab.name}: every stage landed" if done else f"{fab.name}: {landed_words} landed{stop_note}")
     out = {"folder": final["folder"], "fabulac": final["fabulac"], "ran": ran, "state": final, "complete": done,
-           "calls": {"made": tally.get("calls", 0), "files_read": len(tally.get("read", ()))},
+           "calls": {"made": tally.get("calls", 0), "files_read": len(tally.get("read", ())), "at_most": ceiling},
            "message": msg}
     if refusal is not None:
         out["refusal"] = refusal
     return out
 
 
-def _progress(stage: str, i: int, tally: dict, at_most: Any, route: str | None, state: dict) -> dict:
-    """A running build's status (the job's `progress`): the stage, files read n of m, model calls made and at most,
-    the route."""
+def _progress(stage: str, i: int, tally: dict, at_most: Any, route: str | None, state: dict,
+              job_at_most: int | None = None) -> dict:
+    """A running build's status (the job's `progress`): the stage, files read n of m, model calls made (across the
+    job) and at most (the stage's plan), the job's ceiling (`job_at_most`, 0.7), the route."""
     return {"stage": STAGE_WORDS[stage], "program": stage, "n": i + 1, "of": len(STAGES),
             "files_read": len(tally.get("read", ())), "files": state.get("python_files"),
-            "calls": tally.get("calls", 0), "at_most": at_most, "route": route}
+            "calls": tally.get("calls", 0), "at_most": at_most, "job_at_most": job_at_most, "route": route}
 
 
 def _cancelled_words(stage: str, i: int) -> str:
@@ -946,6 +985,9 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
 
     async def start_build(body: dict, *, resume_only: bool = False) -> dict:
         route, model, calls = route_of(body)
+        job_calls = body.get("job_calls")             # 0.7: the ceiling across the whole build (`job_ceiling`)
+        if job_calls is not None and (isinstance(job_calls, bool) or not isinstance(job_calls, int) or job_calls < 1):
+            raise HTTPException(400, f"job_calls is a ceiling of at least 1 model call, not {job_calls!r}")
         try:
             folder, fab = await asyncio.to_thread(target_of, project_dir, str(body.get("path") or ""))
             state = await asyncio.to_thread(build_state, project_dir, folder)
@@ -960,7 +1002,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             out = run_build(project_dir, folder, mode=mode, why=why, route=route, model=model, calls=calls,
                             llm_url=llm_url, scaffolds=scaffolds, restart=bool(body.get("restart")),
                             resume_only=resume_only, complete=complete, progress=lambda f: ctx.progress(f),
-                            should_stop=ctx.should_stop)
+                            should_stop=ctx.should_stop, job_calls=job_calls)
             catalog_after(rel)
             return out
 
@@ -972,7 +1014,8 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                          **job_kw(route if mode == "model" else None, mode,
                                   extra={"progress": _progress(STAGES[first], first, {}, None,
                                                                route if mode == "model" and first >= RULES_STAGES
-                                                               else None, state)}))
+                                                               else None, state,
+                                                               job_ceiling(calls, job_calls))}))
         return {**snap, "state": state, "from": STAGES[first]}
 
     @router.post("/api/fabula/build")

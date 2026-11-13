@@ -104,6 +104,42 @@ def test_a_build_with_a_model_lands_every_stage_and_records_every_run(project: P
     assert out["calls"]["made"] >= 6 and out["calls"]["files_read"] == 5
 
 
+def test_the_job_ceiling_defaults_to_the_stage_ceiling_times_the_stages_that_ask():
+    assert F.ASKING_STAGES == 3
+    assert F.job_ceiling(None, None) is None                     # no ceiling given: none, as before
+    assert F.job_ceiling(4, None) == 12
+    assert F.job_ceiling(4, 5) == 5 and F.job_ceiling(None, 7) == 7
+
+
+def test_a_build_stops_at_its_ceiling_across_the_whole_job(project: Path, tmp_path: Path):
+    """0.7: each stage's run had a ceiling on its model calls and the job none; the job has one now."""
+    whole = build(project)
+    n = whole["calls"]["made"]
+    assert whole["complete"] and whole["calls"]["at_most"] is None
+    # reached while a stage runs: refused in the job's words, nothing of that stage written
+    other = tmp_path / "other"
+    other.mkdir()
+    shutil.copytree(TINY, other / "tiny-tool")
+    seen: list[dict] = []
+    with pytest.raises(RuntimeError) as e:
+        F.run_build(other, other / "tiny-tool", mode="model", runtime=runtime(Model(answers())), now=NOW,
+                    job_calls=2, progress=seen.append)
+    said = str(e.value)
+    assert "the build reached its ceiling of 2 model calls across the whole job" in said
+    assert "read was refused" in said and "the build takes up again from read" in said
+    assert {p["progress"].get("job_at_most") for p in seen if "progress" in p} == {2}
+    # reached between stages: the next stage does not start, and the result says why
+    third = tmp_path / "third"
+    third.mkdir()
+    shutil.copytree(TINY, third / "tiny-tool")
+    out = F.run_build(third, third / "tiny-tool", mode="model", runtime=runtime(Model(answers())), now=NOW,
+                      job_calls=n - 1)
+    assert not out["complete"] and out["calls"]["made"] == n - 1 and out["calls"]["at_most"] == n - 1
+    assert out["refusal"]["check"] == "calls" and out["refusal"]["program"] == "raise-the-questions"
+    assert f"the build reached its ceiling of {n - 1} model calls across the whole job" in out["message"]
+    assert [r["program"] for r in out["ran"]] == list(F.STAGES[:-1])
+
+
 def test_rules_writes_the_outline_and_the_read_waits_in_the_hosts_words(project: Path):
     out = build(project, mode="rules", why="the model is not running")
     assert not out["complete"]
@@ -341,6 +377,9 @@ def test_the_build_routes_refusals(client: TestClient):
     assert r.status_code == 404
     r = client.post("/api/fabula/build", json={"path": "tiny-tool", "route": "moon"})
     assert r.status_code == 400 and "route is local or cloud" in r.json()["detail"]
+    for bad in (0, "3", True):
+        r = client.post("/api/fabula/build", json={"path": "tiny-tool", "job_calls": bad})
+        assert r.status_code == 400 and "job_calls is a ceiling" in r.json()["detail"]
     r = client.post("/api/fabula/build", json={"path": "tiny-tool", "route": "cloud"})
     assert r.status_code == 403                                   # the gate's own words (no key here)
     r = client.post("/api/fabula/cancel", json={"path": "tiny-tool"})

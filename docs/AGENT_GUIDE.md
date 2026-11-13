@@ -890,8 +890,14 @@ model calls, at most 9, on this machine (g40-04)", "… on the cloud
 runs (…)"), and the CLI, `/api/thym/plan` and `thym_check` all show it.
 **`calls`** is a ceiling on the model requests of one run: a cloud plan
 whose count is open (`calls_open`) is refused until a ceiling is given;
-a fabulac build applies it to each stage's run (there is no ceiling across
-the whole build; its status reports the total). The plan-time refusal
+a fabulac build applies it to each stage's run, and since 0.7 a ceiling
+across the whole build too: `job_calls` in the build's body, by default
+`calls` times the three stages that ask (`fabulac_job.job_ceiling`; none
+when no `calls` is given, as before). Each asking stage runs under what is
+left of it; one with nothing left does not start (the result's `refusal`,
+check `calls`, and the build takes up again from it), one that reaches it
+while running is refused in the job's words. The status carries
+`job_at_most` beside the total made. The plan-time refusal
 order is `thym_host.route_refusal`: agent-free, then a shut gate ("the
 cloud is not open for this run: …"), then the missing ceiling, then the
 window (`preflight_hook`).
