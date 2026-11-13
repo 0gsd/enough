@@ -9003,6 +9003,44 @@
       min-height: 22px;
     }
 
+    /* 0.7 (P3): a run in the page, its readings in place of a job's result. */
+    #thym-modal ol.thym-readings {
+      margin: 4px 0;
+      padding-left: 1.3em;
+      font-size: 12px;
+    }
+    #thym-modal ol.thym-readings > li {
+      margin: 5px 0;
+      overflow-wrap: anywhere;
+    }
+    #thym-modal ol.thym-readings > li.fail > code {
+      color: var(--accent-error, #c0392b);
+    }
+    #thym-modal ol.thym-readings ul.thym-checks {
+      margin: 2px 0;
+    }
+    #thym-modal .thym-here-out {
+      margin: 4px 0;
+      font-size: 12px;
+    }
+    #thym-modal .thym-here-out summary {
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+    #thym-modal pre.thym-here-val {
+      margin: 4px 0;
+      padding: 5px 8px;
+      max-height: 14em;
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: var(--bg-alt, var(--bg-raise));
+      border-left: 3px solid var(--accent, var(--fg-muted));
+      border-radius: 3px;
+    }
+
     /* Thym at hand: two tabs, the moves (searchable, grouped by format) and the programs. */
     .thym-ref-tabs {
       display: flex;
@@ -20148,6 +20186,9 @@
       <div class="modal-foot">
         <button type="button" id="thym-cancel-job" hidden data-i18n="atem.card.cancel">cancel</button>
         <button type="button" id="thym-trace-btn" hidden data-i18n="thym.job.trace">show the trace</button>
+        <button type="button" id="thym-here" hidden data-i18n="thym.here.label"
+          title="run it in this page, by Thym’s own runtime, to see what it would make: nothing is written"
+          data-i18n-title="thym.here.title">run here</button>
         <button type="button" class="primary" id="thym-go" disabled></button>
         <button type="button" id="thym-close" data-i18n="atem.card.close">close</button>
       </div>
@@ -35257,6 +35298,21 @@
       return h + cosmModulesHTML(data, host, (it) => !placed.has(it.key));
     }
 
+    // A record's checks, each with its verdict and why (a trace's card; a page run's readings).
+    function thymChecksHTML(checks) {
+      return '<ul class="thym-checks">' + checks.map((c) => {
+        const ok = !!(c && c.ok === true);
+        const why = c && typeof c.why === 'string' ? c.why.trim() : '';
+        const verdict = ok ? t('thym.check.ok', 'held') : t('thym.check.failed', 'failed');
+        const whyHTML = !why ? '' : (why.length > 140
+          ? '<details class="thym-why"><summary>' + cosmEsc(why.slice(0, 120)) + '…</summary>' + cosmEsc(why) + '</details>'
+          : '<span class="thym-why">' + cosmEsc(why) + '</span>');
+        return '<li class="' + (ok ? 'ok' : 'fail') + '"><span class="thym-verdict" role="img" aria-label="'
+          + cosmEsc(verdict) + '" title="' + cosmEsc(verdict) + '">' + (ok ? '✓' : '✗') + '</span><code>'
+          + cosmEsc(String((c && c.name) || '?')) + '</code>' + whyHTML + '</li>';
+      }).join('') + '</ul>';
+    }
+
     function thymRecordHTML(rec, X, host) {
       const d = thymD(rec);
       const node = d.node != null ? X.by.get(String(d.node)) : null;
@@ -35276,17 +35332,7 @@
       let head = '<dl class="thym-facts">' + facts + '</dl>';
       const checks = Array.isArray(d.checks) ? d.checks : [];
       if (checks.length) {
-        head += '<ul class="thym-checks">' + checks.map((c) => {
-          const ok = !!(c && c.ok === true);
-          const why = c && typeof c.why === 'string' ? c.why.trim() : '';
-          const verdict = ok ? t('thym.check.ok', 'held') : t('thym.check.failed', 'failed');
-          const whyHTML = !why ? '' : (why.length > 140
-            ? '<details class="thym-why"><summary>' + cosmEsc(why.slice(0, 120)) + '…</summary>' + cosmEsc(why) + '</details>'
-            : '<span class="thym-why">' + cosmEsc(why) + '</span>');
-          return '<li class="' + (ok ? 'ok' : 'fail') + '"><span class="thym-verdict" role="img" aria-label="'
-            + cosmEsc(verdict) + '" title="' + cosmEsc(verdict) + '">' + (ok ? '✓' : '✗') + '</span><code>'
-            + cosmEsc(String((c && c.name) || '?')) + '</code>' + whyHTML + '</li>';
-        }).join('') + '</ul>';
+        head += thymChecksHTML(checks);
       } else if (d.engine === 'skipped') {
         head += '<p class="thym-meta">' + cosmEsc(t('thym.rec.skipped', 'on the branch not taken: nothing ran')) + '</p>';
       }
@@ -35894,6 +35940,10 @@
       source: null,         // the chosen program as written (its lines name a refusal's statement)
       preset: null,         // inputs the opener named ({f, said} from the dialectic card)
       told: null,           // a refused run's re-asks, read from its trace
+      // 0.7 (P3): the page's own runtime. `here` is whether it can run the
+      // plan on show ({plan, refusal} from ThymJS.planCheck, or {plan, error});
+      // `hererun` a run made in the page ({busy} | {error} | {out}).
+      here: null, hererun: null,
     };
     const thymEl = (id) => document.getElementById(id);
 
@@ -35928,7 +35978,7 @@
       THYM_PICK.seq++;
       Object.assign(THYM_PICK, { face, input: null, program: null, where: null, programName: '', fixed: false, programs: null,
         plan: null, morphs: null, morph: null, job: null, snap: null, result: null, error: null,
-        inputs: {}, takes: null, outputs: null, source: null, preset: null, told: null });
+        inputs: {}, takes: null, outputs: null, source: null, preset: null, told: null, here: null, hererun: null });
     }
 
     // "run with…": from a text (`input`), or from a program (`program`); 0.6
@@ -36119,9 +36169,11 @@
     // the shorthand: `path` is its first input), shown before anything runs.
     async function thymPlanLoad() {
       const P = THYM_PICK;
-      if (P.face !== 'run' || !P.program || !thymInputsReady()) { P.plan = null; thymPickPaint(); return; }
+      if (P.face !== 'run' || !P.program || !thymInputsReady()) { P.plan = null; P.here = null; P.hererun = null; thymPickPaint(); return; }
       const seq = ++P.seq;
       P.plan = { loading: true };
+      P.here = null;
+      P.hererun = null;
       thymPickPaint();
       const body = { program: P.program, inputs: thymInputsBody() };
       if (P.where) body.where = P.where;
@@ -36130,6 +36182,7 @@
       if (seq !== P.seq) return;
       P.plan = r.ok && r.data ? r.data : { error: thymErr(r), missing: thymMissing(r) };
       thymPickPaint();
+      void thymHereCheck();
     }
 
     function thymPlanPaint() {
@@ -36146,7 +36199,8 @@
       }
       if (!pl || pl.loading) { el.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.pick.planning', 'planning…')) + '</p>'; return; }
       if (pl.error) { el.innerHTML = '<p class="' + (pl.missing ? 'thym-unavail' : 'thym-refusal') + '">' + cosmEsc(pl.error) + '</p>'; return; }
-      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: P.where || thymProgramWhere(P.program) });
+      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: P.where || thymProgramWhere(P.program) })
+        + thymHereNoteHTML();
     }
 
     // 0.6 (U1c): a plan a person can read before it runs (THYM.md 11, 12,
@@ -36283,6 +36337,9 @@
       const running = !!(P.job && P.snap && !CANON_TERMINAL.has(P.snap.state));
       thymEl('thym-cancel-job').hidden = !running;
       thymEl('thym-trace-btn').hidden = !(P.result && P.result.run);
+      const here = thymEl('thym-here');
+      here.hidden = !thymHereCan();
+      here.disabled = !!(P.job || (P.hererun && P.hererun.busy));
     }
 
     function thymStatusPaint() {
@@ -36302,6 +36359,8 @@
         }
         h += thymOutputsHTML(res.outputs);
         h += thymToldHTML(P.told);
+      } else if (P.hererun && P.face === 'run' && !P.job) {
+        h = thymHereHTML(P.hererun);
       } else if (P.job) {
         const s = P.snap || {};
         const pct = thymPct(s);
@@ -36339,6 +36398,7 @@
       const P = THYM_PICK;
       if (!thymCanGo()) return;
       P.error = null;
+      P.hererun = null;
       if (P.face === 'run') {
         const body = { program: P.program, inputs: thymInputsBody() };
         if (P.where) body.where = P.where;
@@ -36434,6 +36494,186 @@
     }
     window.thymOpenTrace = thymOpenTrace;
 
+    // ---- 0.7 (P3, tracker thym-js-runtime): a run in the page ----
+    // Thym's runtime in JavaScript (enough/static/thym/: core.js, moves.js,
+    // runtime.js), classic scripts loaded in order the first time a plan is
+    // shown, as pele.global.js is. It runs what needs no model and no engine
+    // of the server's, from what POST /api/thym/bundle read, and lands its
+    // outputs in memory only: nothing is written.
+    let THYM_JS_LOADING = null;
+    function thymRuntimeLoad() {
+      if (window.ThymJS && typeof window.ThymJS.run === 'function' && typeof window.ThymJS.planCheck === 'function') {
+        return Promise.resolve(window.ThymJS);
+      }
+      if (THYM_JS_LOADING) return THYM_JS_LOADING;
+      const one = (name) => new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = staticUrl('/static/thym/' + name);
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('could not load /static/thym/' + name));
+        document.head.appendChild(s);
+      });
+      THYM_JS_LOADING = one('core.js').then(() => one('moves.js')).then(() => one('runtime.js')).then(() => {
+        if (!window.ThymJS || typeof window.ThymJS.run !== 'function') throw new Error('the Thym runtime loaded but defined no run');
+        return window.ThymJS;
+      }).catch((e) => { THYM_JS_LOADING = null; throw e; });
+      return THYM_JS_LOADING;
+    }
+
+    // Whether the page can run the plan on show, asked of the runtime before
+    // any input is read (ThymJS.planCheck): a step that asks a model, or a
+    // move only the server runs, is refused in the server's words.
+    async function thymHereCheck() {
+      const P = THYM_PICK;
+      const pl = P.plan;
+      P.here = null;
+      if (P.face !== 'run' || !pl || pl.loading || pl.error || !cosmIsMap(pl.plan)) return;
+      const seq = P.seq;
+      let T;
+      try { T = await thymRuntimeLoad(); } catch (err) {
+        if (seq !== P.seq || P.plan !== pl) return;
+        P.here = { plan: pl, error: String((err && err.message) || err) };
+        thymPickPaint();
+        return;
+      }
+      if (seq !== P.seq || P.plan !== pl) return;
+      const r = T.planCheck({ plan: pl.plan, program: P.source, route: pl.route || 'local' });
+      P.here = { plan: pl, refusal: r ? r.toJSON() : null };
+      thymPickPaint();
+    }
+
+    function thymHereCan() {
+      const P = THYM_PICK;
+      const pl = P.plan;
+      return !!(P.face === 'run' && pl && !pl.loading && !pl.error && cosmIsMap(pl.plan) && !cosmIsMap(pl.refusal)
+        && P.here && P.here.plan === pl && !P.here.refusal && !P.here.error);
+    }
+
+    // Under the plan: why the page cannot run it, and the run that can.
+    function thymHereNoteHTML() {
+      const P = THYM_PICK;
+      const H = P.here;
+      if (!H || H.plan !== P.plan || !(H.refusal || H.error)) return '';
+      const why = H.error || String(H.refusal.message || '');
+      return '<p class="thym-note" id="thym-here-note">' + cosmEsc(t('thym.here.cannot', 'it cannot run in the page: {why}')
+        .replace('{why}', () => why)) + (thymCanGo() ? ' ' + cosmEsc(t('thym.here.useRun', '“run” runs it as always, and writes what it makes beside the text.')) : '')
+        + '</p>';
+    }
+
+    async function thymHereGo() {
+      const P = THYM_PICK;
+      if (!thymHereCan() || P.job || (P.hererun && P.hererun.busy)) return;
+      const body = { program: P.program, inputs: thymInputsBody() };
+      if (P.where) body.where = P.where;
+      if (window.__fabReady) fabRouteBody('thym', body);
+      const seq = P.seq;
+      Object.assign(P, { error: null, result: null, told: null, hererun: { busy: true } });
+      thymPickPaint();
+      let T = null;
+      let r;
+      try {
+        [T, r] = await Promise.all([thymRuntimeLoad(), canonPost('/api/thym/bundle', body)]);
+      } catch (err) {
+        r = { ok: false, error: String((err && err.message) || err) };
+      }
+      if (seq !== P.seq) return;
+      if (!T || !r.ok || !r.data) { P.hererun = { error: thymErr(r) }; thymPickPaint(); return; }
+      const b = r.data;
+      // Let the wait paint before the walk, which holds the page while it runs.
+      await new Promise((res) => setTimeout(res, 0));
+      if (seq !== P.seq) return;
+      const out = T.run({ plan: b.plan, program: b.program, inputs: b.inputs, decls: b.decls, manifests: b.manifests,
+        route: b.route || 'local', environment: cosmIsMap(b.environment) ? b.environment : undefined });
+      P.hererun = { out };
+      thymPickPaint();
+      const st = thymEl('thym-status');
+      const first = st && st.querySelector('[data-there], button');
+      if (first) first.focus({ preventScroll: true });
+      if (st) st.scrollIntoView({ block: 'nearest' });
+    }
+
+    // The readings panel: the run's line, its refusal as the plan words one,
+    // one row per record (its statement at its line, the engine, the checks,
+    // what it made), then each output with a look at its value.
+    function thymHereHTML(H) {
+      const P = THYM_PICK;
+      if (H.busy) {
+        return '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>'
+          + cosmEsc(t('thym.here.busy', 'reading its inputs and running it in the page…')) + '</p>';
+      }
+      if (H.error) return '<p class="thym-refusal">' + cosmEsc(H.error) + '</p>';
+      const out = H.out || {};
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.here.head', 'run in the page')) + '</div>';
+      const nodes = out.trace && Array.isArray(out.trace.nodes) ? out.trace.nodes : [];
+      const root = nodes.find((n) => cosmIsMap(n) && n.type === 'trace');
+      if (root && root.summary) h += '<p class="thym-atem-line">' + cosmEsc(String(root.summary)) + '</p>';
+      const ref = out.refusal ? (typeof out.refusal.toJSON === 'function' ? out.refusal.toJSON() : out.refusal) : null;
+      if (ref) {
+        h += '<p class="thym-refusal">' + cosmEsc(t('thym.pick.refused', 'refused at {stage} ({check}), line {line}: {message}')
+          .replace('{stage}', () => String(ref.stage || '?')).replace('{check}', () => String(ref.check || '?'))
+          .replace('{line}', () => String(ref.line == null ? '?' : ref.line)).replace('{message}', () => String(ref.message || ''))) + '</p>';
+        h += thymStmtHTML(P.source, ref.line, P.program, P.where || thymProgramWhere(P.program));
+      }
+      const rows = Array.isArray(out.readings) ? out.readings : [];
+      if (rows.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.here.readings', 'what each step did')) + '</div><ol class="thym-readings">'
+          + rows.map((r) => {
+            const checks = Array.isArray(r.checks) ? r.checks : [];
+            const failed = checks.some((c) => !(c && c.ok === true)) || /^Refused/.test(String(r.summary || ''));
+            const bits = [String(r.engine || '')];
+            if (r.passes != null) bits.push(t('thym.here.passes', '{n} passes').replace('{n}', String(r.passes)));
+            let li = '<li' + (failed ? ' class="fail"' : '') + '>'
+              + (r.line != null ? '<span class="thym-plan-line">' + cosmEsc(t('cosm.span.one', 'line {n}').replace('{n}', String(r.line))) + '</span> ' : '')
+              + '<code>' + cosmEsc(String(r.statement || r.move || r.node || '')) + '</code> <span class="thym-meta-i">' + cosmEsc(bits.join(' · ')) + '</span>';
+            if (r.engine === 'skipped') li += '<span class="thym-plan-sub">' + cosmEsc(t('thym.rec.skipped', 'on the branch not taken: nothing ran')) + '</span>';
+            else if (failed && r.summary) li += '<span class="thym-plan-sub">' + cosmEsc(String(r.summary)) + '</span>';
+            if (checks.length) li += thymChecksHTML(checks);
+            const made = Array.isArray(r.outputs) ? r.outputs.filter(cosmIsMap) : [];
+            if (made.length) {
+              li += '<span class="thym-plan-sub">' + cosmEsc(t('thym.here.made', 'made {names}').replace('{names}', () => made.map((o) => String(o.name || '?')
+                + ' ' + String(o.sha256 || '').slice(0, 12)).join(', '))) + '</span>';
+            }
+            return li + '</li>';
+          }).join('') + '</ol>';
+      }
+      const outs = cosmIsMap(out.outputs) ? Object.entries(out.outputs) : [];
+      if (outs.length) {
+        const files = cosmIsMap(out.files) ? Object.keys(out.files) : [];
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.here.outputs', 'what it would write')) + '</div>';
+        for (const [name, o] of outs) {
+          const path = String((o && o.path) || '');
+          let val;
+          if (o && typeof o.text === 'string') {
+            const txt = o.text.length > 4000 ? o.text.slice(0, 4000) + '\n…' : o.text;
+            val = '<pre class="thym-here-val">' + cosmEsc(txt) + '</pre>';
+          } else {
+            const pre = 'outputs/' + path.replace(/\/$/, '') + '/';
+            const n = files.filter((k) => k.startsWith(pre)).length;
+            val = '<p class="thym-plan-sub">' + cosmEsc(t('thym.out.files', 'a folder of {n} files').replace('{n}', String(n))) + '</p>';
+          }
+          h += '<details class="thym-here-out" open><summary><code>' + cosmEsc(name) + '</code> <span class="thym-meta-i">'
+            + cosmEsc(String((o && o.type) || '')) + '</span>' + (path ? ' <span class="thym-plan-path">' + cosmEsc(path) + '</span>' : '')
+            + '</summary>' + val + '</details>';
+        }
+      }
+      h += '<p class="thym-note">' + cosmEsc(t('thym.here.nothing', 'ran in the page; nothing was written')) + '</p><div class="fab-row">';
+      if (out.traceText) h += '<button type="button" class="thym-btn" data-there="trace">' + cosmEsc(t('thym.job.trace', 'show the trace')) + '</button>';
+      if (out.ok && thymCanGo()) h += '<button type="button" class="thym-btn" data-there="land">' + cosmEsc(t('thym.here.land', 'run it to write what it made')) + '</button>';
+      return h + '</div>';
+    }
+
+    // A page run's trace in the cosm viewer, read from its text as a docs
+    // example is (POST /api/cosm/inline): the same record cards as a server run's.
+    function thymHereTrace() {
+      const out = THYM_PICK.hererun && THYM_PICK.hererun.out;
+      if (!out || !out.traceText) return;
+      const file = String(out.runId || 'page') + '.trace.cosm';
+      const key = 'inline:thym-page/' + file;
+      COSM_INLINE.set(key, { text: out.traceText, filename: file, title: file });
+      thymPickClose();
+      void enterCosmMode(key);
+    }
+
     // A run or a reading wrote files: the tree and Canon's grids catch up,
     // and the morphs the EMF face found are looked for again.
     function thymAfterWrite() {
@@ -36468,6 +36708,14 @@
     thymEl('thym-body').addEventListener('click', (e) => {
       const o = e.target.closest('[data-topen]');
       if (o) { e.preventDefault(); thymOpenOutput(o.dataset.topen, o.dataset.tkind || ''); return; }
+      // 0.7 (P3): a page run's trace, and the run that lands what it made.
+      const hb = e.target.closest('[data-there]');
+      if (hb) {
+        e.preventDefault();
+        if (hb.dataset.there === 'trace') thymHereTrace();
+        else if (hb.dataset.there === 'land') void thymGo();
+        return;
+      }
       // 0.6 (U1d): a list input's members, added and removed.
       const add = e.target.closest('[data-tin-add]');
       if (add) { e.preventDefault(); thymMemberAdd(add.dataset.tinAdd); return; }
@@ -36477,6 +36725,7 @@
       if (a) { e.preventDefault(); thymAct(a, null); }
     });
     thymEl('thym-go').addEventListener('click', () => { void thymGo(); });
+    thymEl('thym-here').addEventListener('click', () => { void thymHereGo(); });
     thymEl('thym-close').addEventListener('click', thymPickClose);
     thymEl('thym-cancel-job').addEventListener('click', () => {
       if (THYM_PICK.job && THYM_PICK.job !== 'pending') void canonCancel(THYM_PICK.job);
@@ -37086,7 +37335,7 @@
       let row = (where && named.find((p) => p.where === where)) || named[0] || null;
       Object.assign(P, { program: ref, where: where || (row && row.where) || null,
         programName: name || canonBase(ref).replace(/\.thym$/i, ''), result: null, told: null,
-        plan: null, takes: null, outputs: null, source: null, inputs: {} });
+        plan: null, takes: null, outputs: null, source: null, inputs: {}, here: null, hererun: null });
       const seq = ++P.seq;
       thymPickPaint();
       if (!row || !Array.isArray(row.takes)) {

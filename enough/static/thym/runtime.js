@@ -805,7 +805,7 @@ function newRunId(now) {
     }
 
     // -- plan time ----------------------------------------------------------------------------------------------
-    prepare() {
+    prepare(withInputs = true) {
       const [head, nodes] = planParts(this.plan);
       this.head = head;
       if (!nodes.length) return new Refusal('plan', 'plan', 'not a plan: it holds no R:node items');
@@ -824,7 +824,7 @@ function newRunId(now) {
       this.moveNames = new Set(Object.keys(this.decls).concat(Array.from(this.info.moves.keys())));
       const est = isDict(this.plan.estimate) ? this.plan.estimate : {};
       this.largestPrompt = parseInt(head.largest_prompt || est.largest_prompt || 0, 10);
-      return this.environmentCheck();
+      return this.environmentCheck(withInputs);
     }
     bodyMoves(name, seen) {
       seen = seen || new Set();
@@ -854,7 +854,7 @@ function newRunId(now) {
       }
       return this.info.moves.has(m) ? Array.from(this.bodyMoves(m)).sort(T.cmpStr) : [m];
     }
-    environmentCheck() {
+    environmentCheck(withInputs = true) {
       const asks = this.nodes.filter((n) => n.asks === true);
       if (asks.length) {
         const k = asks.length;
@@ -866,7 +866,7 @@ function newRunId(now) {
         const where = Number.isInteger(line) ? ` (line ${line})` : '';
         return new Refusal('plan', 'agent-free', `${many}, the first ${named}${where}; agent-free is on`, line);
       }
-      for (const spec of this.plan.inputs || []) {
+      for (const spec of withInputs ? this.plan.inputs || [] : []) {
         if (!isDict(spec)) continue;
         const name = String(spec.name);
         const b = this.bundles[name];
@@ -1646,6 +1646,16 @@ function newRunId(now) {
     }));
   }
 
+  /** Whether the page could run a plan, before its inputs are read: the plan-time refusal `run` would give for a
+   * step that asks a model or a move the page lacks, or null. Takes `{plan, program, decls, route}` as `run` does;
+   * the page asks it to offer its own run only where it can. */
+  function planCheck(o) {
+    const r = new Run(o || {});
+    try { return r.prepare(false); } catch (e) {
+      return new Refusal('plan', 'runtime', `the page's runtime failed: ${e && e.message ? e.message : e}`);
+    }
+  }
+
   /** Run a plan in the page (the module's docstring). Never throws for a program's fault: a refusal is a value. */
   function run(o) {
     const r = new Run(o || {});
@@ -1668,7 +1678,7 @@ function newRunId(now) {
       trace: vol, traceText: dump(vol), files, outputs, readings: readings(out.trace, r) };
   }
 
-  Object.assign(T, { run, Run, ProgramInfo, readStatement, readExpression, tokenize, stripComment, ReadError, cut,
+  Object.assign(T, { run, planCheck, Run, ProgramInfo, readStatement, readExpression, tokenize, stripComment, ReadError, cut,
     describe, exprText, condText, Trace, versionOf });
   if (typeof module === 'object' && module.exports) module.exports = T;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

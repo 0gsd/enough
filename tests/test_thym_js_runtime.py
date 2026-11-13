@@ -114,6 +114,21 @@ def test_the_suite_runs_the_same_in_the_page(name: str, form: str, tmp_path: Pat
     assert js["trace"] == py["trace"]
 
 
+@pytest.mark.parametrize("name", _programs())
+def test_the_page_says_before_reading_inputs_whether_it_can_run_a_plan(name: str) -> None:
+    """`ThymJS.planCheck`, what the page asks to offer "run here": the plan-time refusal the run would give for a step
+    that asks or a move the page lacks, in the same words, and null for a plan the page runs."""
+    src = (SUITE / "programs" / f"{name}.thym").read_text(encoding="utf-8")
+    got = _node({"planCheck": {"plan": bundle.jsonable(_plan(name)), "program": src}})["refusal"]
+    if name in NEEDS_SERVER:
+        assert got["check"] == "move" and f"the move {NEEDS_SERVER[name]} has no implementation here" in got["message"]
+    elif _asks(name):
+        b = bundle.page_bundle(_plan(name), inputs_root=SUITE, program=SUITE / "programs" / f"{name}.thym")
+        assert got == _node({"bundle": b, "runId": RID})["refusal"] and got["check"] == "agent-free"
+    else:
+        assert got is None
+
+
 REFUSING = {
     "too-short": ("""thym 1
 
