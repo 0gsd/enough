@@ -90,8 +90,9 @@ def test_tree_payload_keeps_its_wire_keys_and_flags(client: TestClient, project:
     shutil.copyfile(FIX / "emf" / "notes.md", box / "notes.md")
     shutil.copyfile(FIX / "emf" / "notes.md.cosm", box / "notes.md.cosm")
     payload = client.get("/api/canon/tree").json()
-    assert set(payload) == {"root", "project", "cacheboxes"}
-    vol = next(v for v in payload["cacheboxes"] if v["name"] == "v")
+    assert set(payload) == {"root", "project", "volumes", "cacheboxes"}   # cacheboxes: the old key, until 0.8
+    assert payload["cacheboxes"] == payload["volumes"]
+    vol = next(v for v in payload["volumes"] if v["name"] == "v")
     assert vol["catalog"] == canon.CATALOG_NAME and vol["holotype"] is False
     names = {n["name"]: n for n in vol["tree"]}
     assert "notes.md.cosm" not in names
@@ -123,24 +124,45 @@ def test_mirror_payload_has_volume_path_and_canon_source(client: TestClient):
     box = _store_volume(client, "m")
     (box / "guide").mkdir()
     (box / "guide" / "intro.md").write_text("x", encoding="utf-8")
-    p = client.get("/api/canon/mirror", params={"box": "m"}).json()
+    p = client.get("/api/canon/mirror", params={"volume": "m"}).json()
     assert p["volume_path"] == str(box) and "box_path" not in p          # box_path: removed in 0.6
     assert "source: canon:m\n" in p["text"] and "📦 m" in p["text"]
     assert all(v["path"] != canon.CATALOG_NAME for v in p["node_map"].values())
     assert not (box / canon.LEGACY_MIRROR_NAME).exists()
-    p = client.get("/api/canon/mirror", params={"box": "m", "path": "guide"}).json()
+    p = client.get("/api/canon/mirror", params={"volume": "m", "path": "guide"}).json()
     assert "source: canon:m/guide\n" in p["text"]
-    assert client.get("/api/canon/mirror", params={"box": "ghost"}).status_code == 404
+    assert client.get("/api/canon/mirror", params={"volume": "ghost"}).status_code == 404
+    assert client.get("/api/canon/mirror").status_code == 422
+
+
+def test_the_old_box_and_cacheboxes_keys_still_answer_for_one_release(client: TestClient, project: Path):
+    """0.7 renamed the Canon routes' `box` to `volume` and the tree's `cacheboxes` to `volumes`; the old keys answer
+    until 0.8 (enough/retired_names.py, `FIELDS`)."""
+    box = _store_volume(client, "old")
+    (box / "a.md").write_text("x", encoding="utf-8")
+    assert client.get("/api/canon/mirror", params={"box": "old"}).json()["volume_path"] == str(box)
+    assert client.get("/api/canon/ingest-status", params={"box": "old"}).json()["name"] == "old"
+    r = client.post("/api/canon/transfer", json={
+        "op": "copy", "src": {"root": "project", "path": "hello.md"},
+        "dst": {"root": "canon", "box": "old", "path": "hello.md"}})
+    assert r.status_code == 200, r.text
+    assert r.json()["dst"]["volume"] == r.json()["dst"]["box"] == "old"
+    assert (box / "hello.md").is_file()
+    assert any(v["name"] == "old" for v in client.get("/api/canon/tree").json()["cacheboxes"])
+    r = client.post("/api/canon/transfer", json={
+        "op": "copy", "src": {"root": "project", "path": "hello.md"}, "dst": {"root": "canon", "path": "x.md"}})
+    assert r.status_code == 400
 
 
 def test_transfer_with_canon_root(client: TestClient, project: Path):
     box = _store_volume(client, "box")
     r = client.post("/api/canon/transfer", json={
         "op": "copy", "src": {"root": "project", "path": "hello.md"},
-        "dst": {"root": "canon", "box": "box", "path": "hello.md"}})
+        "dst": {"root": "canon", "volume": "box", "path": "hello.md"}})
     assert r.status_code == 200, r.text
+    assert r.json()["dst"]["volume"] == "box"
     r = client.post("/api/canon/transfer", json={
-        "op": "copy", "src": {"root": "canon", "box": "box", "path": "hello.md"},
+        "op": "copy", "src": {"root": "canon", "volume": "box", "path": "hello.md"},
         "dst": {"root": "project", "path": "copy.md"}})
     assert r.status_code == 200, r.text
     assert client.post("/api/canon/transfer", json={       # the legacy word, removed in 0.6

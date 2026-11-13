@@ -2765,7 +2765,7 @@ Architecture notes:
   (`{nodeId → {path, is_dir}}`).
 - **Volume mirrors are drawn on demand, never persisted** (0.4.3; until
   then the box-root `_cachebox.merirmaid` was written to disk).
-  `GET /api/canon/mirror?box=…&path=…`
+  `GET /api/canon/mirror?volume=…&path=…`
   draws the volume root or a subtree fresh per request. The 30px
   **squircle** launcher on volume headers and folder tiles opens these in
   the view-only face.
@@ -3015,7 +3015,7 @@ screen's project map does not read it yet (still `folder_flowchart`; a
 recorded follow-up).
 
 **The on-demand mirror.** No merirmaid mirror is persisted any more.
-`GET /api/canon/mirror?box=&path=` draws the volume root or a subtree fresh
+`GET /api/canon/mirror?volume=&path=` draws the volume root or a subtree fresh
 per request through `canon.build_mirror(name, subpath)` (over
 `folder_flowchart`, the walker `home.py` also uses), with the payload it
 had — `text`, `node_map`, `modality: mirror`, `subpath` — and `volume_path`
@@ -3056,19 +3056,21 @@ project catalog.
 **Routes.** Every handler answers under `/api/canon/*`, registered by
 `server._canon_route` (0.4.3 stacked each pre-0.4.3 handler under
 `/api/cacheawl/*` too, for one release; 0.6 removed those aliases). The
-routes 404 in home mode. Wire keys did not move: `box=` query params, `box`
-in payloads, the tree's `cacheboxes` list.
+routes 404 in home mode. A volume is `volume` on the wire, in a query, a
+body, a transfer's `src`/`dst` and an answer, and the tree's list is
+`volumes` (0.7; the old keys answer until 0.8 through
+`retired_names.FIELDS`, and the page sends only the new ones).
 
 | Endpoint (`/api/canon/…`) | Method | Purpose |
 |---|---|---|
-| `tree` | GET | Split-view payload: project tree + every volume summary and tree in one call (key `cacheboxes`). Reconciles every volume and the project catalog first |
+| `tree` | GET | Split-view payload: project tree + every volume summary and tree in one call (key `volumes`). Reconciles every volume and the project catalog first |
 | `create` | POST | `{name}` → a new empty volume + its catalog. Names: letters/digits/spaces/hyphens/underscores, no leading symbol, ≤ 64 chars; 400 bad/duplicate |
 | `rename` | POST | `{name, new_name}`; 400 if the target exists (and for a missing volume, as before) |
 | `delete` | POST | `{name, confirm: true}` — unconfirmed → 400, missing → 404; a permanent whole-folder delete the UI gates behind a confirm |
-| `transfer` | POST | `{op: copy\|move, src, dst, overwrite?}`, each side `{root: project\|canon, box?, path}` (the legacy `cachebox` for `canon` was removed in 0.6). Traversal-checked both sides; catalogs, meta and legacy mirrors refused as source or destination; no clobber without `overwrite: true`; regenerates each touched volume's catalog (`volumes_updated`; the `boxes_updated` beside it was removed in 0.6) |
-| `ingest` | POST | `{box, type: path\|url\|wikisink, value, depth?\|all?}` — the volume is registered `ingesting` synchronously, the work runs in a thread. `all` invalid for wikisink |
-| `ingest-status` | GET | `?box=` — poll while `ingesting`; failure ends `status: "failed"` + `ingest.error`, never a phantom complete |
-| `mirror` | GET | `?box=&path=` — the on-demand root or subtree mirror above; 404 for a missing volume |
+| `transfer` | POST | `{op: copy\|move, src, dst, overwrite?}`, each side `{root: project\|canon, volume?, path}` (the legacy `cachebox` for `canon` was removed in 0.6). Traversal-checked both sides; catalogs, meta and legacy mirrors refused as source or destination; no clobber without `overwrite: true`; regenerates each touched volume's catalog (`volumes_updated`; the `boxes_updated` beside it was removed in 0.6) |
+| `ingest` | POST | `{volume, type: path\|url\|wikisink, value, depth?\|all?}` — the volume is registered `ingesting` synchronously, the work runs in a thread. `all` invalid for wikisink |
+| `ingest-status` | GET | `?volume=` — poll while `ingesting`; failure ends `status: "failed"` + `ingest.error`, never a phantom complete |
+| `mirror` | GET | `?volume=&path=` — the on-demand root or subtree mirror above; 404 for a missing volume |
 
 | New route (no alias) | Returns |
 |---|---|
@@ -3121,7 +3123,7 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   the prefix.
 - **Ingest runs in the background.** The volume is registered synchronously
   with `status: "ingesting"` before the response returns (so
-  `GET /api/canon/ingest-status?box=…` is immediately pollable); the work runs
+  `GET /api/canon/ingest-status?volume=…` is immediately pollable); the work runs
   in a thread; failure ends `status: "failed"` with `ingest.error`. Caps:
   `INGEST_URL_PAGE_CAP` 500, `INGEST_WIKI_ARTICLE_CAP` 200,
   `INGEST_PATH_FILE_CAP` 20 000. URL ingests reuse the `fetch_url` plumbing,

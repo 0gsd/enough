@@ -405,14 +405,14 @@ def test_ingest_runs_directly_and_says_its_caps(client: TestClient, tmp_path: Pa
     (src / "sub").mkdir(parents=True)
     (src / "a.md").write_text("# A\n\nalpha\n", encoding="utf-8")
     (src / "sub" / "b.txt").write_text("beta\n", encoding="utf-8")
-    r = client.post("/api/canon/ingest", json={"box": "shelf", "type": "path",
+    r = client.post("/api/canon/ingest", json={"volume": "shelf", "type": "path",
                                                "value": str(src), "depth": 2})
     assert r.status_code == 200, r.text
     assert r.json()["status"] == "ingesting"
     deadline = time.time() + 20
     status: dict = {}
     while time.time() < deadline:
-        status = client.get("/api/canon/ingest-status", params={"box": "shelf"}).json()
+        status = client.get("/api/canon/ingest-status", params={"volume": "shelf"}).json()
         if status.get("status") in ("complete", "failed"):
             break
         time.sleep(0.05)

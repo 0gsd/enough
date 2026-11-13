@@ -3841,8 +3841,9 @@ def create_app(
     # Canon — the global file store (was: cacheawl). Backend for the
     # split-view Canon UI. Contract: docs/canon-043-plan.md §6. Every route
     # answers under /api/canon/<x> (the /api/cacheawl/<x> aliases 0.4.3 kept
-    # were removed in 0.6). Query and payload keys (`box`, `cacheboxes`) are
-    # unchanged on the wire.
+    # were removed in 0.6). A volume is `volume` on the wire and the tree's
+    # list is `volumes` (0.7); `box` and `cacheboxes`, the names before, still
+    # answer for one release (retired_names.FIELDS).
     # -----------------------------------------------------------------
     _ingest_tasks: set[asyncio.Task[Any]] = set()
 
@@ -3863,8 +3864,8 @@ def create_app(
         view. Triggers a cheap reconcile per volume first so manual file
         drops the backend didn't see are reflected, and reconciles the
         project's catalog (rness/canon.cosm) — the Canon pane is one of the
-        places it is kept fresh (plan §6.7). The list stays under the key
-        `cacheboxes` for one release."""
+        places it is kept fresh (plan §6.7). The list is `volumes`, and is
+        also under its old key `cacheboxes` for one release."""
 
         def _build() -> dict[str, Any]:
             _canon.reconcile_all()
@@ -3881,11 +3882,11 @@ def create_app(
                     volumes.append(_canon.volume_tree(summary["name"]))
                 except (_canon.CanonError, OSError):
                     log.warning("canon tree: skipping volume %r", summary["name"])
-            return {
+            return _retired_names.answer({
                 "root": str(_canon.root()),
                 "project": build_file_tree(project_dir),
-                "cacheboxes": volumes,
-            }
+                "volumes": volumes,
+            })
 
         return await asyncio.to_thread(_build)
 
@@ -3928,25 +3929,29 @@ def create_app(
     async def api_canon_transfer(request: Request) -> dict[str, Any]:
         """Copy/move a file or folder between the project dir and a volume
         (either direction) or within/between volumes. Body:
-        {op, src:{root,box?,path}, dst:{root,box?,path}, overwrite?}, a
-        side's `root` being "project" or "canon"."""
+        {op, src:{root,volume?,path}, dst:{root,volume?,path}, overwrite?}, a
+        side's `root` being "project" or "canon" (`box` for `volume` is read
+        for one release)."""
         body = await request.json()
         op = (body.get("op") or "").strip()
         src = body.get("src") or {}
         dst = body.get("dst") or {}
         try:
-            return await asyncio.to_thread(
+            out = await asyncio.to_thread(
                 _canon.transfer, project_dir, op=op,
                 src_kind=(src.get("root") or "").strip(),
-                src_box=(src.get("box") or None),
+                src_box=(_retired_names.field(src, "volume") or None),
                 src_path=(src.get("path") or ""),
                 dst_kind=(dst.get("root") or "").strip(),
-                dst_box=(dst.get("box") or None),
+                dst_box=(_retired_names.field(dst, "volume") or None),
                 dst_path=(dst.get("path") or ""),
                 overwrite=bool(body.get("overwrite")),
             )
         except _canon.CanonError as e:
             raise HTTPException(400, str(e)) from None
+        for side in ("src", "dst"):
+            _retired_names.answer(out[side])
+        return out
 
     @_canon_route("POST", "ingest")
     async def api_canon_ingest(request: Request) -> dict[str, Any]:
@@ -3954,7 +3959,7 @@ def create_app(
         background; poll /api/canon/ingest-status. Obvious input errors
         fail fast with a 400."""
         body = await request.json()
-        box = (body.get("box") or "").strip()
+        box = (_retired_names.field(body, "volume") or "").strip()
         source_type = (body.get("type") or "").strip().lower()
         value = (body.get("value") or "").strip()
         depth = body.get("depth", 1)
@@ -3982,10 +3987,18 @@ def create_app(
         task = loop.create_task(asyncio.to_thread(_run))
         _ingest_tasks.add(task)
         task.add_done_callback(_ingest_tasks.discard)
-        return {"box": box, "status": "ingesting", "origin": origin}
+        return _retired_names.answer({"volume": box, "status": "ingesting", "origin": origin})
+
+    def _volume_query(request: Request) -> str:
+        """The `volume` a Canon GET names (`box` for one release); a 422 without one."""
+        volume = (_retired_names.field(request.query_params, "volume") or "").strip()
+        if not volume:
+            raise HTTPException(422, "a volume is required: ?volume=<name>.")
+        return volume
 
     @_canon_route("GET", "ingest-status")
-    async def api_canon_ingest_status(box: str = Query(...)) -> dict[str, Any]:
+    async def api_canon_ingest_status(request: Request) -> dict[str, Any]:
+        box = _volume_query(request)
         try:
             _canon.require_volume(box)
         except _canon.CanonError as e:
@@ -4029,9 +4042,7 @@ def create_app(
         return await asyncio.to_thread(_build)
 
     @_canon_route("GET", "mirror")
-    async def api_canon_mirror(
-        box: str = Query(...), path: str = Query(""),
-    ) -> dict[str, Any]:
+    async def api_canon_mirror(request: Request, path: str = Query("")) -> dict[str, Any]:
         """Read-only mirror diagram for a volume (``path`` empty) or a
         subfolder within it (``path`` set), drawn on demand from current
         contents by `canon.folder_flowchart` and never written (the volume
@@ -4040,7 +4051,9 @@ def create_app(
         ``node_map`` maps each rendered node id to ``{path, is_dir}`` (path
         relative to the volume root) so the viewer's shift-click menu can
         resolve nodes to disk. The MacroCOSM view of a volume is its catalog's lenses
-        (`/api/cosm/lens`), not this."""
+        (`/api/cosm/lens`), not this. The volume is `?volume=` (`?box=` for
+        one release)."""
+        box = _volume_query(request)
 
         def _build() -> dict[str, Any]:
             subpath = (path or "").strip().strip("/")

@@ -31158,7 +31158,7 @@
     // Fetch a volume / subfolder mirror from the backend. Returns
     // {text, node_map, volume_path, modality, subpath}.
     async function mmFetchMirror(box, subpath) {
-      const q = '/api/canon/mirror?box=' + encodeURIComponent(box)
+      const q = '/api/canon/mirror?volume=' + encodeURIComponent(box)
         + (subpath ? '&path=' + encodeURIComponent(subpath) : '');
       const r = await fetch(q);
       if (!r.ok) {
@@ -31685,10 +31685,10 @@
     // in one call (project tree + every volume tree). Mutations go through
     // POST /api/canon/transfer (copy/move) and /api/canon/create (new
     // volume); ingest is composed into the MAIN chat, not called directly.
-    // See docs/cacheawl-plan.md for the original contract. The wire keeps
-    // its old field names: `cacheboxes` in the tree, `box`.
+    // See docs/cacheawl-plan.md for the original contract. On the wire a
+    // volume is `volume`, and the tree's list `volumes` (0.7).
     // ================================================================
-    let CN_DATA = null;          // { root, project:[nodes], cacheboxes:[{...,tree}] }
+    let CN_DATA = null;          // { root, project:[nodes], volumes:[{...,tree}] }
     let CN_PROJECT_SUB = [];     // folder names descended into the project pane
     let CN_STORE_VOLUME = null;  // current volume name, or null at the volume list
     let CN_STORE_SUB = [];       // folder names descended inside the current volume
@@ -31754,7 +31754,7 @@
         }
         CN_DATA = await r.json();
       } catch (e) {
-        CN_DATA = { root: '', project: [], cacheboxes: [] };
+        CN_DATA = { root: '', project: [], volumes: [] };
         // Surface the failure in BOTH panes and STOP — falling through
         // to the normal renders would repaint the grids with their
         // generic empty states ("empty folder" / "no volumes yet"),
@@ -31771,7 +31771,7 @@
         return;
       }
       // If the volume we were viewing vanished (deleted/renamed), reset to list.
-      if (CN_STORE_VOLUME && !(CN_DATA.cacheboxes || []).some((b) => b.name === CN_STORE_VOLUME)) {
+      if (CN_STORE_VOLUME && !(CN_DATA.volumes || []).some((b) => b.name === CN_STORE_VOLUME)) {
         CN_STORE_VOLUME = null; CN_STORE_SUB = [];
       }
       cnRenderProject();
@@ -31800,7 +31800,7 @@
 
     function cnCurrentVolume() {
       if (!CN_STORE_VOLUME || !CN_DATA) return null;
-      return (CN_DATA.cacheboxes || []).find((b) => b.name === CN_STORE_VOLUME) || null;
+      return (CN_DATA.volumes || []).find((b) => b.name === CN_STORE_VOLUME) || null;
     }
 
     // ----- badge classification for file tiles -----
@@ -32000,7 +32000,7 @@
         if (CN_STORE_SUB.length) {
           boxBtn.onclick = () => { CN_STORE_SUB = []; cnRenderStore(); };
         }
-        cnWireCrumbDrop(boxBtn, { root: 'canon', box: CN_STORE_VOLUME, path: '' });
+        cnWireCrumbDrop(boxBtn, { root: 'canon', volume: CN_STORE_VOLUME, path: '' });
         nav.appendChild(boxBtn);
         CN_STORE_SUB.forEach((part, i) => {
           const s = document.createElement('span'); s.className = 'sep'; s.textContent = '›';
@@ -32013,7 +32013,7 @@
           if (i < CN_STORE_SUB.length - 1) {
             b.onclick = () => { CN_STORE_SUB = parts; cnRenderStore(); };
           }
-          cnWireCrumbDrop(b, { root: 'canon', box: CN_STORE_VOLUME, path: parts.join('/') });
+          cnWireCrumbDrop(b, { root: 'canon', volume: CN_STORE_VOLUME, path: parts.join('/') });
           nav.appendChild(b);
         });
       }
@@ -32046,7 +32046,7 @@
       const grid = document.getElementById('cn-store-grid');
       grid.innerHTML = '';
       if (CN_STORE_VOLUME === null) {
-        const boxes = (CN_DATA ? CN_DATA.cacheboxes : []) || [];
+        const boxes = (CN_DATA ? CN_DATA.volumes : []) || [];
         if (!boxes.length) {
           grid.innerHTML = '<div class="cn-empty">' + escapeHtml(t('cn.empty.store', 'no volumes yet — shift-click here to make one, or use the ingest bar below')) + '</div>';
         }
@@ -32162,10 +32162,10 @@
       // ----- drop target (only folders / volumes accept drops) -----
       if (d.is_dir || d.is_box) {
         const dst = d.is_box
-          ? { root: 'canon', box: d.name, path: '' }
+          ? { root: 'canon', volume: d.name, path: '' }
           : (d.pane === 'project'
             ? { root: 'project', path: d.path }
-            : { root: 'canon', box: CN_STORE_VOLUME, path: d.path });
+            : { root: 'canon', volume: CN_STORE_VOLUME, path: d.path });
         tile.addEventListener('dragover', (e) => {
           if (!CN_DRAG) return;
           e.preventDefault();
@@ -32224,20 +32224,20 @@
       wire(document.getElementById('cn-project-grid'),
         () => ({ root: 'project', path: CN_PROJECT_SUB.join('/') }));
       wire(document.getElementById('cn-store-grid'),
-        () => (CN_STORE_VOLUME ? { root: 'canon', box: CN_STORE_VOLUME, path: CN_STORE_SUB.join('/') } : null));
+        () => (CN_STORE_VOLUME ? { root: 'canon', volume: CN_STORE_VOLUME, path: CN_STORE_SUB.join('/') } : null));
     })();
 
     function cnDragSrc() {
       if (!CN_DRAG) return null;
       if (CN_DRAG.pane === 'project') return { root: 'project', path: CN_DRAG.path };
-      return { root: 'canon', box: CN_DRAG.box, path: CN_DRAG.path };
+      return { root: 'canon', volume: CN_DRAG.box, path: CN_DRAG.path };
     }
 
     async function cnHandleDrop(dst, moveMode) {
       const src = cnDragSrc();
       if (!src) return;
       // No-op guard: dropping onto the exact same location.
-      if (src.root === dst.root && (src.box || null) === (dst.box || null)) {
+      if (src.root === dst.root && (src.volume || null) === (dst.volume || null)) {
         const srcParent = src.path.split('/').slice(0, -1).join('/');
         if (srcParent === (dst.path || '') || src.path === (dst.path || '')) return;
       }
@@ -32499,7 +32499,7 @@
         .replace(/[^A-Za-z0-9 _-]+/g, '-').replace(/-{2,}/g, '-')
         .replace(/^[^A-Za-z0-9]+/, '').slice(0, 56).replace(/[\s_-]+$/, '');
       if (!name) name = 'ingest';
-      const taken = new Set(((CN_DATA && CN_DATA.cacheboxes) || [])
+      const taken = new Set(((CN_DATA && CN_DATA.volumes) || [])
         .map((b) => String(b.name).toLowerCase()));
       let out = name;
       for (let n = 2; taken.has(out.toLowerCase()); n++) out = name + ' ' + n;
@@ -32589,7 +32589,7 @@
         const r = await fetch('/api/canon/ingest', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ box: vol.name, type: o.type, value: o.value,
+          body: JSON.stringify({ volume: vol.name, type: o.type, value: o.value,
             depth: Number(o.depth) || 1, all: !!o.all }),
         });
         const js = await r.json().catch(() => ({}));
@@ -32619,7 +32619,7 @@
         await new Promise((res) => setTimeout(res, 1500));
         let st = null;
         try {
-          const r = await fetch('/api/canon/ingest-status?box=' + encodeURIComponent(box));
+          const r = await fetch('/api/canon/ingest-status?volume=' + encodeURIComponent(box));
           if (r.ok) st = await r.json();
         } catch (_e) { /* the next poll */ }
         if (!st) continue;

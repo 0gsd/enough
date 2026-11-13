@@ -1864,8 +1864,8 @@ def transfer(project_dir: Path, *, op: str,
 
     out: dict[str, Any] = {
         "op": op,
-        "src": {"kind": src_kind, "box": src_box, "path": src_path},
-        "dst": {"kind": dst_kind, "box": dst_box,
+        "src": {"kind": src_kind, "volume": src_box, "path": src_path},
+        "dst": {"kind": dst_kind, "volume": dst_box,
                 "path": str(dst.relative_to(dbase))},
         "volumes_updated": sorted(touched),
         "skipped": [q.relative_to(_sbase).as_posix() + ("/" if q.is_dir() else "")

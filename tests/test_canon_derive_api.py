@@ -224,7 +224,7 @@ def test_twin_state_agrees_with_the_listing(client: TestClient, project: Path):
     def listed() -> tuple[str, str]:
         tree = client.get("/api/canon/tree").json()
         proj = find(tree["project"], "notes.md")
-        lib = next(v for v in tree["cacheboxes"] if v["name"] == "lib")
+        lib = next(v for v in tree["volumes"] if v["name"] == "lib")
         guide = find(lib["tree"], "guide.md")
         return proj["emf"]["state"], guide["emf"]["state"]
 
