@@ -1155,7 +1155,7 @@ Un **isomorfo** es un holomorfo que elegiste compartir: el morfo que lleva un pa
 
 **La especificación.** El lenguaje entero está escrito en su propia especificación, `docs/THYM.md`, que viene con enough junto a la de MacroCOSM, y está en inglés.
 
-**Sin agente.** **ejecutar con…** solo lista los programas en los que ningún paso le pregunta a un modelo — open-house, por ejemplo, o uno tuyo que cuente palabras — y una línea dice cuántos dejó fuera. Esos se ejecutan por código, en un momento, y dejan sus trazas como cualquier otra ejecución. publish-story y read-my-way esperan al modelo, y **leer a través de…** dice que una lectura necesita uno (sección 12.6). En agente libre pero sin ningún modelo en marcha, un programa que pregunta sigue en la lista, y su plan dice que no hay ningún modelo que le responda. Los programas, los planes y las trazas se abren y se leen como siempre, en un caso y en el otro.
+**Sin agente.** **ejecutar con…** solo lista los programas en los que ningún paso le pregunta a un modelo — open-house, por ejemplo, o uno tuyo que cuente palabras — y una línea dice cuántos dejó fuera. Esos se ejecutan por código, en un momento, y dejan sus trazas como cualquier otra ejecución. publish-story y read-my-way esperan al modelo, y **leer a través de…** dice que una lectura necesita uno (sección 12.6). Con el interruptor en **agente libre** pero sin ningún modelo en marcha, un programa que pregunta sigue en la lista, y su plan dice que no hay ningún modelo que le responda. Los programas, los planes y las trazas se abren y se leen como siempre, en un caso y en el otro.
 
 ### 13.5 `thym 1`: carpetas, bucles y contratos
 
