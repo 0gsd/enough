@@ -4597,6 +4597,7 @@ at all (`copy_all`), replacing an earlier copy.
 | `GET /api/thym/program?path=&where=` | `{name, rel, where, why, source, volume}` (a name, a project path, a `canon:` path or a shipped file name; 404 when none) |
 | `POST /api/thym/compile {path, where?} \| {text}` | `{ok, name, refusal: {stage, check, line, message}, refusals, estimate, version, takes, outputs}`; `refusal` is the first fault, `refusals` (0.7) every independent fault the checker found, the first first (`[]` when it compiles): a parse error still stops at the first, a checking fault does not (`Refusal.more`; `check` and `thym_check` print one line each) |
 | `POST /api/thym/plan {program, where?, inputs \| path, mode?, route?, model?, calls?}` | `{ok, plan, atem, mode, fits, refusal, why?, route, models, models_line, calls, inputs, outputs, writes, version}`; rules mode refuses a plan that asks (check `agent-free` or `no-model`), model mode runs the route's checks and the preflight. `inputs` fills every input by name, each checked by its type (`thym_host.check_input`: "notes.md is a file; repo takes a folder") |
+| `POST /api/thym/bundle {program, where?, inputs \| path, route?}` | (0.7) what the page's own runtime runs: `bundle.page_bundle` of the plan made by rules (`{plan, program, version, decls, inputs, manifests}`, an input missing or changed carrying its refusal) with `route` and an agent-free `environment`; reads only, writes nothing, starts no job. A plan that asks is bundled all the same and the page's runtime refuses it; 400/404 as for a plan. The run card's "run here" (`thymHereGo`) loads `enough/static/thym/core.js`, `moves.js`, `runtime.js` once (`thymRuntimeLoad`), offers itself only where `ThymJS.planCheck` passes (no step asks, no move only the server runs; else `#thym-here-note` says why in the runtime's words), and paints the readings in `#thym-status` (`thymHereHTML`: "ran in the page; nothing was written", the trace through `COSM_INLINE` as `inline:thym-page/<run>.trace.cosm`) |
 | `POST /api/thym/run {program, where?, inputs \| path, mode?, route?, model?, calls?}` | `{job}`: a CanonJob of kind `thym`, claim key the first input's path (so a run and a decompile of one file exclude each other), the generation lock in model mode on the local route only; result `{run, trace, atem, outcome, mode, route, models, outputs: [{name, type, path, rel, files?, folder?}], refusal?}` (a folder output lands as `<stem>.<output>/`). Refused before any job: compile 400, plan 409 (asks while rules/agent-free, a shut gate, an open cloud count with no `calls`, preflight), `mode: model` with no model 409 |
 | `GET /api/thym/moves?version=0\|1` | `{version, moves: [{name, owner, format, signature, takes, gives, asks, contract, scaffold, since, versions, says, extended, …}]}`: every move a program of that grammar may call, from the declarations the compiler reads, grouped by owner in THYM 6.2's order (`thym_tools.moves_payload`, the same listing the `thym_moves` tool reads); `extended: [{owner, as}]` where another format adds to a move; 400 for any other version. Read-only. Its one reader is the page's Thym at hand (`thymRefLoad`) |
 | `GET /api/thym/runs` · `GET /api/thym/trace?run=` | the 200 newest runs, newest first (`[]` when the root is absent) · one run's head and `path: thym:runs/<run>/<run>.trace.cosm` |
@@ -5414,6 +5415,31 @@ User-facing: HELP_CENTER §13.8. A holograph opens the same `#dialectic-modal`
   /api/ascribe/isograph`; after: "written: <file>", "the release was recorded
   in the holograph first: epoch, run, N items left", "open". Not made in a
   scenario (it records a release per epoch).
+- **The allograph face** (0.7, P4): `#cosm-allo-btn` "the allograph…" beside
+  the isograph's → `dlgAlloOpen` / `dlgAlloPaint` / `dlgAlloAct`, state in
+  `DLG.allo`: the subject switch (`POST /api/ascribe/subject`; a character
+  makes an agent's allograph, which names an owner); what never enters, said
+  before the button; the holder's programs, filtered as for the isograph;
+  "make the allograph" → `POST /api/ascribe/allograph`, the document previewed
+  row by row ("stated by you"), "nothing was sent", the file and the release;
+  the Connect strip (`/api/connect/status`, never the account; sign in shows
+  the device code large with the approval page as a link, `target=_blank`,
+  never `window.open`, and polls `/api/connect/poll` every `interval`); the
+  listing (`GET /api/allograph/listing`: the form, or name, *dangler*, `#tag`,
+  the registry's own entry, `changed` true / null said in words, withdraw with
+  an in-card confirm); for a person's listing the faceplace proofs, the
+  attestations waiting, attesting someone and the agents answered for; and the
+  look-ups, which need no account. Every field keeps its value in `DLG.allo` as
+  typed and nothing repaints while typing (`dlgAlloEnable`). Errors: 401 →
+  the Connect strip is outlined and asks for the sign-in, 502 → "Connect could
+  not be reached", anything else the route's `detail` beside its control. The
+  card's mast icon follows the face (`#dlg-mast-icon`: holograph, allograph,
+  cosm); the viewer's mode icon is the holograph's on an Ascribe volume, and
+  the tree marks a holograph's folder and each `*.allograph-*.json`
+  (`dlgDecorateTree`). The `allograph-panel` scenario drives it against the
+  stand-in Connect (`scripts/uicheck/connect.py`, the client tests'
+  `FakeRegistry` behind HTTP on a loopback port, named by
+  `ENOUGH_CONNECT_URL`).
 - **The viewer's report** shows each finding's `advice` on a line of its own
   (`cosmProblemHTML`; `cosmAdviceTrim` cuts the message's copy of it).
 - **uicheck.** Seeds `self/` (sample-self, bank raised, two journal
