@@ -3782,6 +3782,8 @@ def scenario_fabulap_steps(d: Driver) -> list[str]:
             return fails
         _wait_js(d, "document.querySelectorAll('#fab-verse ol.fv-steps > li.landed').length >= 2"
                     " && !!document.querySelector('#fab-verse .fv-form')", 8000)
+        # the questions line is drawn when its own fetch answers (dlgFabLine), after the steps land
+        _wait_js(d, "!!document.getElementById('fab-dlg-open')", 8000)
         st = d.js(_FV_STATE) or {}
         if st.get("verror"):
             fails.append(f"the build failed: {st.get('verror')}")
