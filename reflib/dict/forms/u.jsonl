@@ -206,6 +206,9 @@
 {"headword": "unbolt", "form": "unbolted", "position": 1, "pronunciation": "/ʌnˈboʊltɪd/", "labels": "[\"past\"]", "synonyms": "[\"unbarred\", \"unlatched\", \"unlocked\", \"unsecured\"]"}
 {"headword": "unbolt", "form": "unbolting", "position": 2, "pronunciation": "/ʌnˈboʊltɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "unbolt", "form": "unbolts", "position": 3, "pronunciation": "/ʌnˈboʊlts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "unbond", "form": "unbonded", "position": 1, "pronunciation": "/ənˈbɑndɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "unbond", "form": "unbonding", "position": 2, "pronunciation": "/ənˈbɑndɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "unbond", "form": "unbonds", "position": 3, "pronunciation": "/ənˈbɑndz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "unbonnet", "form": "unbonneted", "position": 1, "pronunciation": "/ʌnˈbɑnɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "unbonnet", "form": "unbonneting", "position": 2, "pronunciation": "/ʌnˈbɑnɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "unbonnet", "form": "unbonnets", "position": 3, "pronunciation": "/ʌnˈbɑnɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -1206,6 +1209,9 @@
 {"headword": "unprison", "form": "unprisoned", "position": 1, "pronunciation": "/ənˈprɪzənd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "unprison", "form": "unprisoning", "position": 2, "pronunciation": "/ənˈprɪzənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "unprison", "form": "unprisons", "position": 3, "pronunciation": "/ənˈprɪzənz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "unprove", "form": "unproved", "position": 1, "pronunciation": "/ənˈpruvd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "unprove", "form": "unproves", "position": 2, "pronunciation": "/ənˈpruvz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "unprove", "form": "unproving", "position": 3, "pronunciation": "/ənˈpruvɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "unpublish", "form": "unpublished", "position": 1, "pronunciation": "/ənˈpʌblɪʃt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "unpublish", "form": "unpublishes", "position": 2, "pronunciation": "/ənˈpʌblɪʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "unpublish", "form": "unpublishing", "position": 3, "pronunciation": "/ənˈpʌblɪʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
