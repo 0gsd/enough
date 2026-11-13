@@ -182,6 +182,12 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # folder at the checkout being committed, so "the miniature is not a checkout" read the checkout's commit.
     for var in _GIT_LOCATION:
         monkeypatch.delenv(var, raising=False)
+    # The keychain (0.7): a listing's private key and Connect's token live in the OS keychain, and no test may read
+    # or write the real one. `allograph_registry.KEYCHAIN` is the one seam every use of it goes through.
+    from enough import allograph_registry as _allograph_registry
+    monkeypatch.setattr(_allograph_registry, "KEYCHAIN", _allograph_registry.MemoryKeychain())
+    monkeypatch.setattr(_allograph_registry, "_PENDING", {})
+    monkeypatch.setattr(_allograph_registry, "_SESSIONS", {})
 
 
 @pytest.fixture(autouse=True)

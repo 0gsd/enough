@@ -5565,6 +5565,12 @@ def create_app(
         emit=_emit_threadsafe,
     )
     app.include_router(_dialectic_router)
+    # The Allograph Registry (0.7; Ascribe 14.7 to 14.13): Connect's sign-in, a holograph's subject, and a listing's
+    # statements (`enough/allograph_api.py`, over `enough/allograph_registry.py`); the allograph itself is made by
+    # `POST /api/ascribe/allograph` above.
+    from . import allograph_api as _allograph_api
+    app.include_router(_allograph_api.build_router(project_dir=project_dir, jobs=canon_jobs,
+                                                   catalog_after=_canon_catalog_after))
 
     # The names a release has retired (`enough/retired_names.py`): each old path is served by its new path's handler
     # for one release; nothing documents them. The table is empty in 0.7.

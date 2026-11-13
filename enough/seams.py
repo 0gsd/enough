@@ -55,6 +55,11 @@ FIXED_SEAMS: dict[str, str] = {
     "ENOUGH_MODELS_URL_BASE": "http://127.0.0.1:1/weights",
     "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
     "ENOUGH_SPECS_SYNC": "0",
+    # Comprise Connect, which serves the Allograph Registry (0.7): a loopback port nothing listens on, so a run that
+    # forgot to replace `allograph_registry.TRANSPORT` fails at once instead of asking compriseconnect.com.
+    "ENOUGH_CONNECT_URL": "http://127.0.0.1:1",
+    # The keychain (0.7): held in memory, never the OS keychain, for a listing's key and Connect's token.
+    "ENOUGH_KEYCHAIN": "memory",
 }
 
 # Seams that change behaviour rather than location, cleared: a developer who has one exported would otherwise get
