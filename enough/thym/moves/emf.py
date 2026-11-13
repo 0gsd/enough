@@ -163,6 +163,8 @@ def derive(ctx: Any, story: Value, **mods: Any) -> Request:
     """A text decompiled into its fabula (THYM.md 6.3), by Canon's derivation over the coprocessor. A text read `as
     code` and a folder folded are the fabulac's (`code.py`, THYM 20.6)."""
     branch = _code.derive_branch(ctx, story, mods)
+    if branch is None:
+        branch = _verse.derive_branch(ctx, story, mods)     # derive poem as verse with f (THYM 20.9)
     if branch is not None:
         return branch
     canon = engine(ctx, "canon")
@@ -300,6 +302,8 @@ def derive_rules(ctx: Any, story: Value, **mods: Any) -> Value:
     text leans on, grounded in FEED, and the names it uses, each with the line of its first use; no claims. A text
     read `as code` takes `file-outline`, and a folder has no scaffold (`code.py`)."""
     branch = _code.derive_scaffold_branch(ctx, story, mods)
+    if branch is None:
+        branch = _verse.derive_branch(ctx, story, mods, rules=True)
     if branch is not None:
         return branch
     name, sha, size = _text_facts(story)
@@ -731,5 +735,6 @@ def _span_inside(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
 
 
 from enough.thym.moves import code as _code  # noqa: E402 - the fabulac's branches of derive and entail
+from enough.thym.moves import verse as _verse  # noqa: E402 - the fabulap's helper moves and derive's with branch
 
 __all__ = ["as_fabula", "atem", "cited_outline", "default_order", "derive", "entail", "expand", "ordered"]

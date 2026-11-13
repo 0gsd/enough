@@ -825,12 +825,16 @@ def canon_engine() -> Any:
         return poem, CD.verse_chunks(text, poem), CD._verse.decap(text, poem), structure
 
     def derive_passages(text: str, *, source_name: str, complete: Callable, lookup: Callable | None = None,
-                        flavour: str | None = None, pron: Callable | None = None) -> dict:
+                        flavour: str | None = None, pron: Callable | None = None, sense: bool = False) -> dict:
+        """`sense`: a poem read for what it says, against a fabulap the rules already wrote (`derive poem as verse
+        with f`, Thym 20.9): the sense prompt, and no rules items of its own."""
         lookup = lookup or _no_feed
         verse = flavour == "fabulap"
         structure: list = []
         if verse:
             _poem, parts, words_text, structure = verse_parts(text, source_name, lookup, pron)
+            if sense:
+                structure = []
         else:
             parts, words_text = CD.chunk(text), text
         table = CD._term_table(words_text, lookup)
@@ -843,7 +847,9 @@ def canon_engine() -> Any:
             for c in parts:
                 items, rm, lost = CD._read_passage(c, complete=complete, source=source_name, table=table,
                                                    workdir=work, stats=meta, on_progress=None, chunks=len(parts),
-                                                   **({"flavour": flavour} if verse else {}))
+                                                   **({"flavour": flavour} if verse else {}),
+                                                   **({"verse_system": P.VERSE_SENSE_SYSTEM} if verse and sense
+                                                      else {}))
                 dropped += lost
                 for k, v in rm.items():
                     remap.setdefault(k, v)
@@ -924,6 +930,53 @@ def canon_engine() -> Any:
     return SimpleNamespace(derive_passages=derive_passages, derive_finish=derive_finish, derive_rules=derive_rules,
                            derive_gaps=derive_gaps, compile_rules=compile_rules, outline=CD.outline, short_footer=CD.short_footer,
                            rules_atem=CD.rules_atem, read_atem=CD._read_atem)
+
+
+def verse_engine() -> Any:
+    """The verse rules (`enough.verse`, `enough.verse_forms`) as the fabulap's helper moves reach them (THYM 20.9),
+    plain data in and out, so that a run records each call and a replay needs neither the rules nor FEED:
+
+    - `outline(text, *, source, pron)`: `scan poem`'s items, with the poem's title and its number of lines;
+    - `added(word, text, items, *, source, pron)`: what `scan … as <word>` adds, `{letters: [[line, letter]],
+      items}` (the letters only for `rhyme`; the form read from the fabulap's own items);
+    - `layout(text, *, chars)`: the poem's lines `[[number, file line, C:part id]]`, its parts, its header's file
+      lines, its labels' file lines, and its groups of stanzas of at most `chars` characters (a model's requests).
+    `pron` is FEED's pronunciations (`verse.feed_pronunciations`' shape), or None for none."""
+    from types import SimpleNamespace
+
+    from . import verse as V
+    from . import verse_forms as VF
+
+    def _p(pron: Callable | None) -> Callable:
+        return pron if callable(pron) else (lambda ws: {})
+
+    def outline(text: str, *, source: str, pron: Callable | None = None) -> dict:
+        r = V.read(text, _p(pron))
+        return {"title": r.poem.title, "lines": len(r.poem.lines),
+                "items": V.outline_items(r, source=source) if r.poem.lines else []}
+
+    def added(word: str, text: str, items: list, *, source: str, pron: Callable | None = None) -> dict:
+        if word == "form":
+            it = VF.form_item(list(items), text, _p(pron), source=source)
+            return {"letters": [], "items": [it] if it else []}
+        r = V.read(text, _p(pron))
+        if word == "rhyme":
+            return {"letters": [[n, x] for n, x in V.rhyme_letters(r).items()],
+                    "items": V.rhyme_items(r, source=source)}
+        if word == "sound":
+            return {"letters": [], "items": V.sound_items(r, source=source)}
+        return {"letters": [], "items": V.recurrence_items(r, source=source)}
+
+    def layout(text: str, *, chars: int = 6000) -> dict:
+        poem = V.read_poem(text)
+        pids = V.part_ids(poem)
+        return {"title": poem.title, "header": list(poem.header) if poem.header else None,
+                "lines": [[vl.number, vl.src, pids[vl.stanza]] for vl in poem.lines],
+                "parts": [pids[st.number] for st in poem.stanzas],
+                "labels": [st.label.src for st in poem.stanzas if st.label is not None],
+                "groups": [list(g) for g in V.stanza_groups(poem, chars, text, per_line=8)]}
+
+    return SimpleNamespace(outline=outline, added=added, layout=layout)
 
 
 def docoes_engine() -> Any:
@@ -1012,7 +1065,7 @@ def engines(*, feed: Any = True, standing: Callable | None = None, catalog: Call
     dictionary is built, or the one given; `feed=None` for none). `standing` (a holotype value -> its standing, such as
     `first-party`) and `catalog` (a text's path -> the surrounding catalog excerpt) join when the host has them. The
     sibling lanes' `repo`, `syntax`, `dialectic` and `ascribe` join when their modules are there (`SIBLING_ENGINES`)."""
-    out: dict = {"canon": canon_engine(), "docoes": docoes_engine()}
+    out: dict = {"canon": canon_engine(), "docoes": docoes_engine(), "verse": verse_engine()}
     lookup = _feed() if feed is True else feed
     if lookup:
         out["feed"] = lookup
@@ -1196,7 +1249,8 @@ for _move, _builder in PROMPTS.items():
 #: it is there, exports `PROMPTS: dict[str, builder]`, the move's name -> `builder(contract, inputs) -> messages |
 #: None`. A builder returns None for a request that is not its own (a `derive` that is not `as code`), and the next
 #: one is asked: the siblings' in this order, then the host's own (`PROMPTS` above).
-PROMPT_MODULES = ("enough.fabulac_prompts", "enough.thym.moves.code", "enough.thym.moves.edit",
+PROMPT_MODULES = ("enough.fabulac_prompts", "enough.fabulap_prompts", "enough.thym.moves.code",
+                  "enough.thym.moves.edit",
                   "enough.thym.moves.dialectic", "enough.dialectic")
 
 

@@ -78,7 +78,9 @@ DEPTHS = range(1, 65)
 #: `survey`; and the depths `entail` gives only of a fabulac (a cshort, `as code`; a catem, `as line | overview |
 #: manual`).
 FLAVOUR_OF_AS = {"prose": "fabulan", "verse": "fabulap", "code": "fabulac"}
-FLAVOUR_MAKERS = {"survey": "fabulac"}
+FLAVOUR_MAKERS = {"survey": "fabulac", "scan": "fabulap", "construe": "fabulap"}
+#: The fabulap's helper moves (THYM 20.9): each gives a fabulap, and one that adds to a fabula takes only a fabulap.
+FABULAP_HELPERS = ("scan", "construe")
 FABULAC_ONLY = {"entail": ("code", "line", "overview", "manual")}
 _FLAVOUR_SAID = {"fabulan": "a fabulan, the fabula of a text", "fabulap": "a fabulap, a poem's fabula"}
 
@@ -1362,6 +1364,25 @@ class _Checker:
             made = FLAVOUR_MAKERS.get(c.move)
         if made:
             self.flavours[id(c)] = made
+        wm = c.mod("with")
+        if c.move in FABULAP_HELPERS or (c.move == "derive" and word == "verse"):
+            # only a fabulap is taken by scan … with, construe … with or derive … as verse with (THYM 7.3, 20.9)
+            known = self.flavours.get(id(strip_paren(wm.arg))) if wm is not None else None
+            if known in ("fabulan", "fabulac"):
+                said = {"fabulan": "a fabulan, the fabula of a text", "fabulac": "a fabulac, a folder's fabula"}
+                self.fail("flavour", f"{ps.render(wm.arg)} is {said[known]}; only a fabulap, a poem's fabula, is "
+                                     f"taken by {c.move} … with", c.line)
+        if c.move in FABULAP_HELPERS and first is not None:
+            said_first = ps.render(first)
+            if c.move == "scan" and word is not None and wm is None:
+                self.fail("type", f"scan … as {word} adds to what scan found: scan {said_first} as {word} with f",
+                          c.line)
+            if c.move == "scan" and word is None and wm is not None:
+                self.fail("type", f"scan {said_first} reads the poem from the start and takes no with; scan "
+                                  f"{said_first} as rhyme with f adds to it", c.line)
+            if c.move == "construe" and (word is None or wm is None):
+                self.fail("type", f"construe names its axis and takes the fabulap so far: construe {said_first} as "
+                                  f"figure with f", c.line)
         if word in FABULAC_ONLY.get(c.move, ()) and first is not None:
             known = self.flavours.get(id(strip_paren(first)))
             if known in _FLAVOUR_SAID:

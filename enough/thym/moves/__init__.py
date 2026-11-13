@@ -11,7 +11,10 @@ holds that code, one module per subject, as THYM.md 11.2 lays it out:
 - `project`: `project`, `band`, `mark`, `withhold`, and Comprise's rules as checks (`banded`, `verified-derived`,
   `verified-only-where-derived`, `standing-gate`, `epoch`);
 - `doc`: `enumerate`, `compile`;
-- `pack`: `package`, `unpack` and the accessors `fabula`, `context`, `graph`, `isomorph`, and `released`.
+- `pack`: `package`, `unpack` and the accessors `fabula`, `context`, `graph`, `isomorph`, and `released`;
+- `verse`: the fabulap's helper moves `scan` and `construe` (THYM 20.9), `derive poem as verse with f`, and the
+  checks `lines-found`, `scansion-grounded`, `sound-grounded`, `form-grounded` with the verse readings of
+  `coverage`, `no-invention` and `stance-kept`.
 
 Importing any of them imports them all, so every move and every check is registered once (`registry.MOVES`,
 `checks.CHECKS`). The deterministic moves transcode in code and never touch the coprocessor. A move that transcognizes
@@ -678,7 +681,7 @@ def as_list(v: Any) -> list:
 
 # Every module registers its moves and checks when imported; importing one imports them all. `project` stays out: it
 # implements moves a MiniCOSM declares with `code:`, so `load_all` imports it from the sidecar and a host's `code:` wins.
-from enough.thym.moves import doc, edit, emf, morph, pack  # noqa: E402,F401
+from enough.thym.moves import doc, edit, emf, morph, pack, verse  # noqa: E402,F401
 
 __all__ = ["LADDER", "RANK", "SALIENCE", "CoverMap", "EngineAdapter", "MoveError", "Sentence", "claim_bearing",
            "compose", "cover_map", "engine", "fabula_doc", "fabula_for", "first_input", "fold", "item_kind",

@@ -163,6 +163,24 @@ Every item also has span and provenance. Rules:
 - span: {{lines: "a-b"}} file lines. provenance: {{mode: derived, sources: ['{source}#La-Lb'], confidence: <0 to 1>, state: known}}
 """
 
+# `derive poem as verse with f` (Thym 20.9): what a passage of a poem SAYS, read against the outline the rules
+# wrote. Figures, images, the voice and readings are construe's, one axis a call: not asked here.
+VERSE_SENSE_SYSTEM = """\
+You read one passage of a poem or a song for what it says, and write it as fabula items. Return only a YAML `nodes:` list.
+Only what these lines hold; never invent. Each line shows its line in the file, then [n]: name that line C:line/n.
+In this order, at most: 6 terms, 4 entities, 2 concepts, 2 claims, 2 events, then one atem.
+- {{id: L:term/<slug>, type: term, name: <word>, summary: ..., sense: <the sense it has in this poem>}}
+- {{id: E:<person|org|place|work|thing>/<slug>, type: <that kind>, name: <as the poem names it>, summary: ...}}
+- {{id: K:concept/<slug>, type: concept, name: ..., summary: <the idea the lines use>}}
+- {{id: P:claim/<slug>, type: claim, name: ..., summary: ..., stance: observed, salience: normal}}: only what the poem states outright.
+- {{id: T:event/<slug>, type: event, name: ..., summary: ...}}: only what it narrates.
+- {{id: X:atem/<n>, type: atem, name: ..., summary: ..., line: <15-25 words>, focus: ..., push: ..., pull: ...}}
+- From the header only, where it names them: {{id: R:maker/<slug>, type: maker, name: ..., summary: ..., stance: observed, capacity: author}}; {{id: R:release/<slug>, type: release, name: ..., summary: ..., stance: observed, venue: ..., at: <the year>}}.
+No devices, no voice, no readings: other readings find them. A word whose sense is open: sense: {{pending: "<the question>"}}.
+Every item also has span: {{lines: "a-b"}} (file lines) and provenance: {{mode: derived, sources: ['{source}#La-Lb'], confidence: <0 to 1>, state: known}}.
+stance, one of: axiom, observed, deduced, opinion, assumed, hearsay. No pronouns in a claim's summary: name every participant.
+"""
+
 VERSE_USER = """\
 Words of this passage that FEED, enough's dictionary, holds (word, part of speech: definition):
 {terms}
