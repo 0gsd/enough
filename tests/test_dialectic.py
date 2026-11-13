@@ -306,6 +306,50 @@ def _from(r, frm: str) -> list[dict]:
     return [q for q in r.questions if q["raised"]["from"] == frm]
 
 
+# 0.7: a case and a behaviour it cites that say different counts of one thing raise a question for the person.
+UNDO_CASE = ("    summary: After two adds, the first undo names line 2, the second line 1, the third finds nothing, and "
+             "every total is 0.\n")
+UNDO_DOES = ("    summary: tally undo looks back from the newest line for an add that is neither an undo nor already "
+             "undone, and appends its opposite naming its line.\n")
+
+
+def _tally(case_says: str = "", behaviour_says: str = "") -> dl.Twin:
+    text = TALLY.read_text(encoding="utf-8")
+    assert UNDO_CASE in text and UNDO_DOES in text
+    text = text.replace(UNDO_CASE, UNDO_CASE.rstrip("\n") + case_says + "\n", 1)
+    text = text.replace(UNDO_DOES, UNDO_DOES.rstrip("\n") + behaviour_says + "\n", 1)
+    return dl.twin_from_text(text, filename=TALLY.name)
+
+
+def _conflicts(r) -> list[dict]:
+    return [q for q in r.questions if q["why"] == "conflict"]
+
+
+def test_a_case_and_the_behaviour_it_cites_that_count_differently_raise_a_question():
+    t = _tally(" The ledger then holds four lines.", " An undo on a ledger of two adds leaves five lines.")
+    (q,) = _conflicts(dl.raise_questions(t, at=AT, banks=[], pending=False, unsure=False))
+    assert q["about"] == "P:case/undo-walks-back" and q["id"] == "D:question/undo-walks-back-conflict"
+    assert q["asks"] == ("Undo walks back, never undoing an undo says four lines, and Undo walks back, which it "
+                         "cites, says five lines. Which is right?")
+    assert q["kind"] == "text" and q["hint"] == "P:case/undo-walks-back against C:behaviour/undo"
+    assert q["raised"]["by"] == "move" and q["raised"]["from"] == "question"
+    # landed, it stands; raised again, it is not asked twice
+    dl.land(t, [q])
+    assert not _conflicts(dl.raise_questions(t, at=AT, banks=[], pending=False, unsure=False))
+    assert not _conflicts(dl.raise_questions(_tally(" Four lines.", " Five lines."), at=AT, banks=[],
+                                             conflicts=False))
+
+
+def test_counts_that_agree_or_are_not_claims_raise_nothing():
+    assert not _conflicts(dl.raise_questions(dl.open_twin(TALLY), at=AT))           # the real fabulac: none
+    quiet = [(" The ledger then holds three lines.", " It leaves three lines."),     # the same count
+             (" The ledger holds three lines.", " It appends one line per undo."),   # a rate is not a count
+             (" First two lines, then three lines.", " It leaves five lines."),      # two counts: a scenario
+             (" The ledger holds three lines.", " It names 2 entries.")]             # different things
+    for case_says, behaviour_says in quiet:
+        assert not _conflicts(dl.raise_questions(_tally(case_says, behaviour_says), at=AT, banks=[])), case_says
+
+
 def test_words_that_name_no_item_are_asked_once_about_the_module():
     """The conductor's ruling on the question stage: a bank question whose words name no item is asked once of the
     volume, about the module, when the volume holds an item it would be asked of; one that names `{name}` (or any

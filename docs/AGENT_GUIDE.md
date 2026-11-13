@@ -5106,7 +5106,11 @@ answers it `unknown` and leaves the field pending in the person's own words;
 fabulap, 17 fabulac; each entry says which kind it writes), Ascribe's 44
 are one bank (`ascribe`, put to the holder alone), Comprise's are named by
 its manifest. Beside a bank, the core's rules raise one question per
-pending field and one per unsure item.
+pending field and one per unsure item, and (0.7) one `why: conflict` per
+case that says a different count of a thing than a behaviour it cites
+("four lines" against "five lines": `dialectic.count_conflicts`, read from
+their words, never the case's code; only where each side says one count of
+it, and never a rate such as "one line per add").
 
 **Two runs with a person between them, never a suspended run.** A run lands
 questions; a person answers them (in the page, through an agent, or with

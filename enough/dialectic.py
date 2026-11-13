@@ -1104,6 +1104,77 @@ def _items_of_kind(led: Ledger, module: str, kind: str | None) -> list[dict]:
     return out
 
 
+#: Counts a case and the behaviour it cites can both say (0.7): a number, in digits or in words to twelve, and the word
+#: after it. "one entry per line" says a rate, not a count, and is not read.
+_NUMBER_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9,
+                 "ten": 10, "eleven": 11, "twelve": 12}
+_COUNT = re.compile(r"(?<![\w.\-])(\d+|" + "|".join(_NUMBER_WORDS) + r")\s+([a-z][a-z\-]{2,})\b(?:\s+(\w+))?",
+                    re.IGNORECASE)
+_NOT_COUNTED = {"and", "or", "of", "to", "the", "than", "more", "less", "times", "per", "is", "are", "was", "in", "on",
+                "at", "by", "for", "with", "then", "if", "else", "from", "into", "a", "an"}
+_RATE = {"per", "each", "every", "for"}
+
+
+def _noun(word: str) -> str:
+    w = word.lower()
+    if w.endswith("ies") and len(w) > 4:
+        return w[:-3] + "y"
+    if w.endswith("s") and not w.endswith("ss") and len(w) > 3:
+        return w[:-1]
+    return w
+
+
+def _counts(texts: Iterable[str]) -> dict[str, dict[int, str]]:
+    """Every "<number> <word>" the texts say, by the word's singular: `{noun: {n: the words as written}}`."""
+    out: dict[str, dict[int, str]] = {}
+    for text in texts:
+        for m in _COUNT.finditer(text):
+            num, word, after = m.group(1), m.group(2), m.group(3)
+            if word.lower() in _NOT_COUNTED or (after or "").lower() in _RATE:
+                continue
+            n = int(num) if num.isdigit() else _NUMBER_WORDS[num.lower()]
+            out.setdefault(_noun(word), {}).setdefault(n, f"{num} {word}")
+    return out
+
+
+def _strings(v: Any) -> list[str]:
+    if isinstance(v, str):
+        return [v]
+    if isinstance(v, dict):
+        return [s for x in v.values() for s in _strings(x)]
+    if isinstance(v, list):
+        return [s for x in v for s in _strings(x)]
+    return []
+
+
+def count_conflicts(led: Ledger) -> list[tuple[dict, dict, str, str]]:
+    """Where a case and a behaviour it cites (`of`) say a different count of the same thing (0.7): `(case,
+    behaviour, what the case says, what the behaviour says)`, the first such count of each pair. Read by rules from
+    their words (a case's name, summary and expect; a behaviour's name, summary, when and does; never the code a
+    case gives), and only where each says one count of that thing: two counts on one side are a scenario, not a
+    claim to set against the other."""
+    by_id = {d["id"]: d for d in led.items if isinstance(d, dict) and isinstance(d.get("id"), str)}
+    out = []
+    for c in led.items:
+        if not isinstance(c, dict) or c.get("type") != "case" or is_d_item(c):
+            continue
+        cited = c.get("of") if isinstance(c.get("of"), list) else [c.get("of")]
+        mine = None
+        for ref in cited:
+            b = by_id.get(ref) if isinstance(ref, str) else None
+            if not b or b.get("type") != "behaviour":
+                continue
+            if mine is None:
+                mine = _counts(_strings([c.get("name"), c.get("summary"), c.get("expect")]))
+            theirs = _counts(_strings([b.get("name"), b.get("summary"), b.get("when"), b.get("does")]))
+            for noun, ns in mine.items():
+                other = theirs.get(noun)
+                if other and len(ns) == 1 and len(other) == 1 and set(ns) != set(other):
+                    out.append((c, b, next(iter(ns.values())), next(iter(other.values()))))
+                    break
+    return out
+
+
 def _unsure(d: dict) -> bool:
     prov = d.get("provenance")
     conf = prov.get("confidence") if isinstance(prov, dict) else d.get("confidence")
@@ -1212,7 +1283,8 @@ def default_to(src: Any) -> str:
 
 
 def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None = None, pending: bool = True,
-                    unsure: bool = True, to: str | None = None, author_unavailable: bool = False,
+                    unsure: bool = True, conflicts: bool = True, to: str | None = None,
+                    author_unavailable: bool = False,
                     run: str | None = None, at: Any = None, proposed: Any = None,
                     checker: Checker | None = None) -> Raised:
     """The move `question` without a model (Thym 22.1; MacroCOSM 18.6.3, 18.6.5, 18.6.6). Reads the volume and gives
@@ -1241,6 +1313,9 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
     3. (`unsure`) from every item below confidence 0.5 or with `provenance.state: pending` that holds no pending of its
        own (its pendings already ask what is unsure): `about: <item>`, `why: unsure`, `kind: text`. Id
        `<item slug>-unsure`.
+    3b. (`conflicts`, 0.7) from every case that says a different count of a thing than a behaviour it cites
+       (`count_conflicts`: "four events" against "five events"): `about: <case>`, `why: conflict`, `kind: text`,
+       asking which is right in both their words. Id `<case slug>-conflict`.
     4. `proposed`: questions a model raised (a list of mappings, or a callable given (ledger, the rule questions) that
        returns one): each needs `about`, `asks`, `why`, `kind` and may give `options`, `options-open`, `many`,
        `range`, `hint`, `to`, `from` (the stage, default `read`), `id`. `raised: {by: model}`. Each is validated by
@@ -1369,6 +1444,16 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
             slug = _unique_slug(f"{_bare(d['id']).split('/', 1)[-1]}-unsure", taken, led)
             add(_question_item(Q_PREFIX + slug, d["id"], asks, "unsure", {"kind": "text"}, who(None),
                                dict(raised_base, by="move", **{"from": "question"})), f"unsure {d['id']}")
+    if rules and conflicts:
+        for c, b, says, against in count_conflicts(led):
+            if _about_key(c["id"]) in by_about:
+                continue
+            asks = (f"{c.get('name') or c['id']} says {says}, and {b.get('name') or b['id']}, which it cites, says "
+                    f"{against}. Which is right?")
+            slug = _unique_slug(f"{_bare(c['id']).split('/', 1)[-1]}-conflict", taken, led)
+            add(_question_item(Q_PREFIX + slug, c["id"], asks, "conflict",
+                               {"kind": "text", "hint": f"{c['id']} against {b['id']}"}, who(None),
+                               dict(raised_base, by="move", **{"from": "question"})), f"conflict {c['id']}")
     props = proposed(led, list(out.questions)) if callable(proposed) else (proposed or [])
     first_model = len(out.questions)
     for p in props:
