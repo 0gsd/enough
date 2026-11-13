@@ -686,3 +686,20 @@ def test_the_word_key_takes_a_contraction_a_leading_apostrophe_and_one_space():
     assert D.normalize("  Don’t, ") == ["don't"]
     assert D.normalize("Terza   Rima") == ["terza rima"]
     assert D.normalize("“Hello”") == ["hello"]
+
+
+def test_alphabetical_files_a_leading_apostrophe_under_its_letter(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """'tis is filed under t (the lexicon's rule 4, 0.7): alphabetical order is by that letter, then the word, so it
+    heads T instead of sorting before a, and each letter stays one group."""
+    lex = write_lexicon(tmp_path / "lexicon", WORDS + [W("'tis", letter="t")])
+    out = tmp_path / "reflib-dict"
+    sync_dictionary.sync(lex, out)
+    monkeypatch.setenv("ENOUGH_DICT_SOURCE", str(out))
+    assert D.ensure_built()["ready"]
+    groups = D.index(sort="alpha")
+    keys = [g["key"] for g in groups]
+    assert len(keys) == len(set(keys)), keys
+    assert keys[0] == "a"
+    t = next(g for g in groups if g["key"] == "t")
+    assert D.entries(sort="alpha", offset=t["offset"], limit=2)["rows"][0]["word"] == "'tis"
+    assert [r["word"] for r in D.entries(letter="t")["rows"]][:2] == ["'tis", "termite"]

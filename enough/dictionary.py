@@ -652,7 +652,11 @@ def _ordered(con: sqlite3.Connection, has_user: bool, *, sort: str, then: str | 
             if not k:
                 continue
             expr = _GROUPED_EXPR[k] if (grouped and i == 0) else _SORT_EXPR[k]
-            if expr != "word":
+            if expr == "word":
+                # alphabetical is by the letter a word is filed under, then the word: 'tis heads T rather than
+                # sorting before a (the lexicon's rule 4, 0.7), so each letter is one group
+                order.append(f"letter {kd.upper()}")
+            else:
                 order.append(f"({expr}) IS NULL")
             order.append(f"{expr} {kd.upper()}")
         if then != "alpha" and (sort != "alpha" or grouped):
