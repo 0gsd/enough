@@ -707,12 +707,13 @@ FABULA_TOOL_INSTRUCTIONS = """\
 or two to the person, then record their words (or `<state>` unknown,
 declined, skip). Never answer for them; `<do>settle</do>` folds answers
 in. `fabulac` `<do>`: build, status, compile (`<what>` code or a depth),
-cancel; `<model>cloud` only when asked.
+cancel; `<model>cloud` only when asked. `fabulap` does build, status,
+cancel for a poem's `<path>`: scan, hear, then read closely.
 """
 
-#: With the skill off: the two names, and where they come from (as the wiki tools are named without an archive).
+#: With the skill off: the three names, and where they come from (as the wiki tools are named without an archive).
 FABULA_ABSENT_INSTRUCTIONS = """\
-`dialectic` and `fabulac` come with the macrocosm-oes skill.
+`dialectic`, `fabulac` and `fabulap` come with the macrocosm-oes skill.
 """
 
 

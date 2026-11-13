@@ -121,6 +121,12 @@ files, 6,000 lines): `tool/` → `tool.fabulac.cosm`. Only when asked:
   a catem's depth: `line`, `overview`, `manual`.
 - Nothing read or entailed is ever run: a cshort is text to read.
 
+A poem can be decompiled in steps too, only when asked: `fabulap`
+`<do>build</do>` with the poem's `<path>` scans it and hears it by rule,
+then reads it closely with a model (without one it stops after hearing).
+`status` and `cancel` as for a fabulac; a poem decompiled in one call is
+rebuilt in steps only with `<restart>yes</restart>`.
+
 ## Thym programs
 
 A **Thym program** is a `.thym` file: a recipe of moves over documents. It
@@ -150,14 +156,14 @@ refuses the plan; say what was refused and what would make it run.
 ## The tools, in order
 
 Their tags are in the Tools section. With this skill off, this guide is one
-`cosm_guide` call away, and `dialectic`, `fabulac` and the Thym tools do not
-run.
+`cosm_guide` call away, and `dialectic`, `fabulac`, `fabulap` and the Thym
+tools do not run.
 
 1. `cosm_read` — the tree, or one item with `<item>`. Start here.
 2. `cosm_lint` — the checks: a fabula's and a holograph's own, else the
    generic ones.
 3. `fabula_derive` or `atem` — only on request.
-4. `dialectic`, `fabulac` — only on request.
+4. `dialectic`, `fabulac`, `fabulap` — only on request.
 5. `thym_moves`, `thym_check`, then `thym_run` — runs only on request.
 
 `doc_lookup` answers "what is X" from the specs and the manual. Writing into

@@ -5207,7 +5207,8 @@ def create_app(
                       and _model_route.holds_generation_lock(route or "local") else None),
                 message=_canon_start_message(mode, why, doing), reason=reason,
                 extra=({"route": _job_route(mode, route), "flavour": flavour, "what": what, **(extra or {})}
-                       if kind in ("emf", "atem", "compile", "fabulac", "dialectic") else None))   # Thym's runs: their lane's
+                       if kind in ("emf", "atem", "compile", "fabulac", "dialectic", "fabulap")
+                       else None))   # Thym's runs: their lane's
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
         return {"job": snap}
@@ -5572,6 +5573,14 @@ def create_app(
         compile_short=_compile_short,
     )
     app.include_router(_fabula_router)
+    # 0.7: a poem decompiled in steps, the five programs of decompile-verse.thym (`enough/fabulap_job.py`,
+    # `/api/fabula/verse/build|resume|cancel`; a build is a CanonJob of kind `fabulap`, keyed by the poem).
+    from . import fabulap_job as _fabulap_job
+    _fabulap_router = _fabulap_job.build_router(
+        project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
+        start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
+    )
+    app.include_router(_fabulap_router)
     _dialectic_router = _dialectic_api.build_router(
         project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
         start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
@@ -5609,6 +5618,7 @@ def create_app(
         from . import fabula_tools as _fabula_tools
         _fabula_tools.configure(project_dir=project_dir, start=_start_from_tool,
                                 build=_fabula_router.start_build, compile=_fabula_router.start_compile,
+                                verse=_fabulap_router.start_build,
                                 settle=_dialectic_router.start_settle, jobs=canon_jobs, emit=_emit_threadsafe)
 
     @app.get("/api/canon/job/{job_id}")

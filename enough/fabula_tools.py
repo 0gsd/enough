@@ -1,4 +1,4 @@
-"""The readvisor's fabula-round tools (0.6): `dialectic` and `fabulac`.
+"""The readvisor's fabula-round tools (0.6): `dialectic` and `fabulac`; and `fabulap` (0.7).
 
 **`dialectic`** (pins P4.7): a readvisor puts one or two questions at a time to the person and records what they say.
 Called with a `<path>` alone it shows the next one or two open questions of that volume (a text's fabula, a fabulac, a
@@ -16,6 +16,10 @@ A build and a compile run as jobs, the same jobs the page starts (`fabulac_job`)
 thread, they wait for the model the turn holds (local) and run when the turn ends. `<model>cloud` asks the cloud, only
 when the person chose it for this job and the gate is open. Nothing told is ever run.
 
+**`fabulap`** (0.7): a poem decompiled into its fabulap in steps (`<do>build</do>`, which also takes a stopped build
+up again), how it stands (`status`, the default) or cancelled: the five programs of `decompile-verse.thym`, the same
+job the page starts (`fabulap_job`). Scan and hear run by rule; reading closely asks a model, and waits without one.
+
 Registered into `tools._DISPATCH` the way `canon_tools` is, documented in `prompt.FABULA_TOOL_INSTRUCTIONS`, beside the
 MacroCOSM block in both profiles while the `macrocosm-oes` skill is on (their guide, as for Thym's tools: with it off a
 runner says how to switch it on and runs nothing, and a fresh project's prompt pays nothing for them).
@@ -28,7 +32,7 @@ from typing import Any, Callable
 
 log = logging.getLogger("enough.fabula_tools")
 
-TOOL_NAMES: tuple[str, ...] = ("dialectic", "fabulac")
+TOOL_NAMES: tuple[str, ...] = ("dialectic", "fabulac", "fabulap")
 #: Questions shown at a time: one or two (P4.7, Ascribe 8.2).
 SHOWN = 2
 STATES = {"unknown": "dont_know", "dont-know": "dont_know", "i don't know": "dont_know", "declined": "declined",
@@ -40,12 +44,13 @@ _conf: dict[str, Any] = {}
 
 def configure(*, project_dir: Path | None = None, start: Callable | None = None, build: Callable | None = None,
               compile: Callable | None = None, settle: Callable | None = None, jobs: Any = None,
-              emit: Callable | None = None) -> None:
+              emit: Callable | None = None, verse: Callable | None = None) -> None:
     """Hand the tools the app's job starters and its event sender (`emit(event, data)`, for the `dialectic` event a
     recorded sitting sends); `configure()` with nothing resets them: tests."""
     _conf.clear()
     _conf.update({k: v for k, v in {"project_dir": project_dir, "start": start, "build": build, "compile": compile,
-                                     "settle": settle, "jobs": jobs, "emit": emit}.items() if v is not None})
+                                     "settle": settle, "jobs": jobs, "emit": emit, "verse": verse}.items()
+                  if v is not None})
 
 
 def _ct():
@@ -251,7 +256,63 @@ def run_fabulac(project_dir: Path, call: Any) -> Any:
                                                            if do in ("build", "compile") else ""))
 
 
-_RUNNERS = {"dialectic": run_dialectic, "fabulac": run_fabulac}
+# ---------------------------------------------------------------------------
+# fabulap
+# ---------------------------------------------------------------------------
+
+def run_fabulap(project_dir: Path, call: Any) -> Any:
+    from . import fabulap_job as P
+    extra = getattr(call, "extra", None) or {}
+    raw = _ct()._tool_path(project_dir, call.path)
+    if not _skill_on(project_dir):
+        return _skill_off("fabulap", raw)
+    if not raw:
+        return _err("fabulap", "", "fabulap needs a <path>: a poem in the project, or its .fabulap.cosm.")
+    do = (extra.get("do") or "status").strip().lower()
+    route = (extra.get("model") or "").strip() or None
+    try:
+        poem, fab, t = P.target_of(project_dir, raw)
+        if do == "status":
+            state = P.build_state(project_dir, poem, fab)
+            if not state["exists"]:
+                lines = [f"{state['poem']} has no fabulap yet."]
+            elif not state["built"]:
+                lines = [f"{state['fabulap']} was decompiled in one call; <do>build</do> with <restart>yes</restart> "
+                         "builds it in steps and replaces it."]
+            else:
+                landed = [s["stage"] for s in state["stages"] if s["landed"]]
+                lines = [f"{state['fabulap']}: {', '.join(landed) or 'nothing'} landed"
+                         + ("; every step" if state["complete"]
+                            else f"; next {P.STAGE_WORDS.get(state['next'], state['next'])}")]
+            if state.get("moved"):
+                lines.append("the poem changed since the scan: a build starts again from the scan")
+            jobs = _conf.get("jobs")
+            jid = jobs.running_for(str(t["key"])) if jobs is not None else None
+            if jid:
+                lines.append(_job_line(jobs.snapshot(jid)))
+            return _result("fabulap", raw, True, "\n".join(lines))
+        if do == "build":
+            body: dict[str, Any] = {"path": raw, **({"route": route} if route else {})}
+            if (extra.get("restart") or "").strip().lower() in ("yes", "true", "1"):
+                body["restart"] = True
+            got = _start("verse", body)
+        elif do == "cancel":
+            jobs = _conf.get("jobs")
+            jid = jobs.running_for(str(t["key"])) if jobs is not None else None
+            if not jid:
+                return _err("fabulap", raw, f"no decompile of {poem.name} is running")
+            got = {"job": jobs.cancel(jid)}
+        else:
+            return _err("fabulap", raw, f"<do> is build, status or cancel, not {do!r}")
+    except P.BuildError as e:
+        return _err("fabulap", raw, str(e))
+    if isinstance(got, str):
+        return _err("fabulap", raw, got)
+    return _result("fabulap", raw, True, _job_line(got) + (". It runs after this turn; ask for its status later."
+                                                           if do == "build" else ""))
+
+
+_RUNNERS = {"dialectic": run_dialectic, "fabulac": run_fabulac, "fabulap": run_fabulap}
 
 
 def register() -> None:
@@ -262,4 +323,4 @@ def register() -> None:
         _t._TRACE_TOGGLE.setdefault(name, "trace_log_enabled")
 
 
-__all__ = ["TOOL_NAMES", "configure", "register", "run_dialectic", "run_fabulac"]
+__all__ = ["TOOL_NAMES", "configure", "register", "run_dialectic", "run_fabulac", "run_fabulap"]
