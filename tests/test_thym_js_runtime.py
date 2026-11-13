@@ -301,3 +301,29 @@ def test_the_page_dumps_as_macrocosm_does() -> None:
             "rows": [{"k": "v", "w": ["x", "y"]}, ["deep", ["deeper"]]]}
     got = _node({"dump": bundle.jsonable(data)})["text"]
     assert got == mc.dump(data)
+
+
+@pytest.mark.parametrize("program, check, words", [
+    ("scan-the-poem", "move", "the move scan has no implementation here"),
+    ("hear-the-poem", "move", "the move scan has no implementation here"),
+    ("read-closely", "agent-free", "ask a model"),
+])
+def test_the_poems_programs_are_refused_in_the_page_with_the_reason(program: str, check: str, words: str,
+                                                                    tmp_path: Path) -> None:
+    """0.7: `scan` reads FEED's pronunciations, which only the server holds, so the page refuses it with that reason;
+    `construe` asks a model, and planCheck refuses it as every step that asks is refused (agent-free's words)."""
+    from enough.thym import check_file
+    from enough.thym import plan as P
+    src = ROOT / "defaults" / "thym" / "decompile-verse.thym"
+    poem = ROOT / "tests" / "fixtures" / "fabula" / "verse" / "nobody.txt"
+    work = tmp_path / "f.cosm"
+    work.write_text("oes: fabula/1\nflavour: fabulap\nnodes: []\n", encoding="utf-8")
+    rows = [{"name": "poem", "type": "text", "path": str(poem), "sha256": digest_path(poem)}]
+    if program != "scan-the-poem":
+        rows.append({"name": "f", "type": "fabula", "path": str(work), "sha256": digest_path(work)})
+    plan = P.plan(check_file(src), rows, program=program)
+    assert not isinstance(plan, Refusal), plan
+    got = _node({"planCheck": {"plan": bundle.jsonable(plan), "program": src.read_text(encoding="utf-8")}})["refusal"]
+    assert got["stage"] == "plan" and got["check"] == check and words in got["message"], got
+    if check == "move":
+        assert "FEED's pronunciations, which the server holds" in got["message"]
