@@ -81,7 +81,7 @@ ASCRIBE_CHECKS = ("form-anchored", "relation-declared", "when-shape", "strength-
 ASCRIBE_SEVERITY = {"form-anchored": "error", "relation-declared": "error", "when-shape": "error",
                     "strength-range": "error", "release-shape": "error", "no-pii": "warning",
                     "private-marker": "note"}
-ADVICE = "people appear by role or by a pseudonym you declare"
+ADVICE = "describe people by what they are to you, or by a pseudonym you declare"   # Ascribe 10.3
 
 HID_RE = re.compile(r"^[a-z2-7]{26}$")                     # Connect's hid: 26 characters of lowercase base32
 HANDLE_RE = re.compile(r"^[a-z]+(?:-[a-z]+)*$")            # lowercase words joined by hyphens

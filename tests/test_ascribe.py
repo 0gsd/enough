@@ -213,6 +213,7 @@ def test_the_pii_holograph_trips_every_pattern_once():
     kinds = Counter(k for p in rep.warnings for k, what in A.PII_WHAT.items() if f"reads as {what}" in p.message)
     assert kinds == Counter(dict.fromkeys(A.PII_WHAT, 1))
     assert all(p.message.endswith(A.ADVICE) for p in rep.warnings)
+    assert A.ADVICE == "describe people by what they are to you, or by a pseudonym you declare"   # Ascribe 10.3
 
 
 # ---------------------------------------------------------------------------
