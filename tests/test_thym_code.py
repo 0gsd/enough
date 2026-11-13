@@ -1,5 +1,5 @@
 """The fabulac moves (THYM 6.3, 7.3, 20; MacroCOSM OES 18.4.7): `survey`, `history`, `derive t as code with f`,
-`derive repo with f`, `tell f as code` and the catems, and the two shipped programs, `decompile-python.thym` and
+`derive repo with f`, `entail f as code` and the catems, and the two shipped programs, `decompile-python.thym` and
 `compile-python.thym`, end to end on `tests/fixtures/thym/inputs/tiny-tool/`.
 
 A scripted coprocessor stands in for the model: it answers each request by the step it names (`read`, `fold`, `code`,
@@ -656,7 +656,7 @@ def test_derive_of_a_folder_without_with_is_refused(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# tell f as code, and the catems
+# entail f as code, and the catems
 # ---------------------------------------------------------------------------
 
 @pytest.fixture(scope="module")
@@ -670,7 +670,7 @@ def compile_run(tmp: Path, f: Path, cp: Scripted, **kw):
     return run_stage(tmp, COMPILE, None, [{"name": "f", "type": "fabula", "path": str(f.relative_to(tmp))}], cp, **kw)
 
 
-def test_tell_as_code_writes_the_cshort_file_by_file(built, tmp_path):
+def test_entail_as_code_writes_the_cshort_file_by_file(built, tmp_path):
     tmp, f, _runs = built
     cp = Scripted(answers())
     t = compile_run(tmp, f, cp)
@@ -691,7 +691,7 @@ def test_tell_as_code_writes_the_cshort_file_by_file(built, tmp_path):
     assert '"test" = ["pytest>=8"]' in pack and 'packages = ["tiny"]' in pack
     assert not [k for s, k, _c in cp.sent if k == "pyproject.toml"]
     assert [s for s, _k, _c in cp.sent].count("code") == 4 and [s for s, _k, _c in cp.sent].count("readme") == 1
-    rec = next(r for r in t.records if r.get("name") == "tell f as code")
+    rec = next(r for r in t.records if r.get("name") == "entail f as code")
     assert [c["name"] for c in rec["checks"]] == ["parses", "interfaces-present", "files-present", "footer",
                                                   "provenance"] and all(c["ok"] for c in rec["checks"])
     manual = (t.dir / "outputs" / "manual.md").read_text()
@@ -729,7 +729,7 @@ def test_a_catem_at_each_depth(built, tmp_path):
     tmp, f, _runs = built
     for depth in ("line", "overview", "manual"):
         p = tmp_path / f"{depth}.thym"
-        p.write_text(f"thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give tell f as {depth}\nend\n")
+        p.write_text(f"thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give entail f as {depth}\nend\n")
         cp = Scripted(answers())
         t = run_stage(tmp, p, None, [{"name": "f", "type": "fabula", "path": str(f.relative_to(tmp))}], cp)
         out = landed(t, "c").read_text()
@@ -745,16 +745,16 @@ def test_a_catem_at_each_depth(built, tmp_path):
 
 
 def test_a_catem_at_depth_line_is_the_atems_line_and_asks_no_model(built):
-    """`tell f as line` (THYM 20.7) asks no model. `line` is also a type of `thym 1`; in a declaration's list of
+    """`entail f as line` (THYM 20.7) asks no model. `line` is also a type of `thym 1`; in a declaration's list of
     words it is a word (`types.accepts`), while a type's name that the list does not hold is still refused."""
     tmp = built[0]
     p = tmp / "text.thym"
-    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give tell f as text\nend\n")
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give entail f as text\nend\n")
     r = thym.check_file(p)
     assert isinstance(r, Refusal) and r.check == "type" and "`text` is not one" in r.message
     _tmp, f, _runs = built
     fab = Value("fabula", mc.yaml_load(f.read_text()), path=f)
-    v = CODE.tell_catem(type("Ctx", (), {"now": NOW})(), fab, "line")
+    v = CODE.entail_catem(type("Ctx", (), {"now": NOW})(), fab, "line")
     lines = v.text().strip().split("\n")
     assert lines[0].startswith("tiny counts the words") and lines[-1].startswith("*a catem of g.cosm, at depth line")
     assert C.verdict("uses-told", v, {}, {}, None) == (True, "") and C.verdict("footer", v, {}, {}, None)[0]
@@ -765,7 +765,7 @@ def test_a_catem_that_leaves_a_use_untold_is_asked_again(built, tmp_path):
     short = CATEM["overview"].split("  - heading: List")[0]
     cp = Scripted(answers({("catem", "overview"): [short, CATEM["overview"]]}))
     p = tmp_path / "o.thym"
-    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give tell f as overview\nend\n")
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give entail f as overview\nend\n")
     t = run_stage(tmp, p, None, [{"name": "f", "type": "fabula", "path": str(f.relative_to(tmp))}], cp)
     landed(t, "c")
     failed = cp.asked("catem")[1]["repair"]["failed"]
@@ -775,9 +775,9 @@ def test_a_catem_that_leaves_a_use_untold_is_asked_again(built, tmp_path):
 def test_a_catem_of_a_poem_is_refused_for_its_flavour(tmp_path):
     p = tmp_path / "v.thym"
     p.write_text("thym 1\n\nprogram p\n  takes poem: text\n  gives c: short\n\n  let f = derive poem as verse\n"
-                 "  give tell f as manual\nend\n")
+                 "  give entail f as manual\nend\n")
     r = thym.check_file(p)
-    assert isinstance(r, Refusal) and r.check == "flavour" and "a catem is told from a fabulac" in r.message
+    assert isinstance(r, Refusal) and r.check == "flavour" and "only a fabulac entails a catem" in r.message
 
 
 def test_rules_mode_refuses_code_and_tells_a_catem_by_its_outline(built, tmp_path):
@@ -792,13 +792,13 @@ def test_rules_mode_refuses_code_and_tells_a_catem_by_its_outline(built, tmp_pat
 
 
 def test_rules_refuses_a_folder_derive_and_tell_as_code_at_plan_time(built, tmp_path):
-    """`scaffold-when` may say `none` (the conductor's ruling L6): `derive` of a folder and `tell … as code` have no
+    """`scaffold-when` may say `none` (the conductor's ruling L6): `derive` of a folder and `entail … as code` have no
     rules scaffold, so `--rules` refuses them at plan time, in the words a move without a scaffold gets, and asks
-    and writes nothing; `tell f as manual` keeps its scaffold, `uses-outline`."""
+    and writes nothing; `entail f as manual` keeps its scaffold, `uses-outline`."""
     tmp, f, _runs = built
     t = compile_run(tmp, f, Scripted({}), rules=True)
     assert isinstance(t, Refusal) and (t.stage, t.check, t.line) == ("plan", "rules", 12), t
-    assert t.message == ("1 step asks a model and has no scaffold: give code: tell f as code (line 12); --rules runs "
+    assert t.message == ("1 step asks a model and has no scaffold: give code: entail f as code (line 12); --rules runs "
                          "no model")
     rows = [{"name": "repo", "type": "folder", "path": "tiny-tool"},
             {"name": "f", "type": "fabula", "path": str(f.relative_to(tmp)), "sha256": digest_path(f)}]
@@ -806,7 +806,7 @@ def test_rules_refuses_a_folder_derive_and_tell_as_code_at_plan_time(built, tmp_
     r = RUN.run(p, inputs_root=tmp, root=tmp / "root", program=DECOMPILE, rules=True, engines=engines(), now=NOW)
     assert isinstance(r, Refusal) and (r.stage, r.check) == ("plan", "rules"), r
     assert r.message.startswith("1 step asks a model and has no scaffold: give derive repo with f (line ")
-    decl = R.declarations()["tell"]
+    decl = R.declarations()["entail"]
     assert dc.chosen(decl.view(1), as_word="code")["scaffold"] is None
     assert dc.chosen(decl.view(1), as_word="manual")["scaffold"] == "uses-outline"
     assert dc.chosen(R.declarations()["derive"].view(1), first_type="folder")["scaffold"] is None
@@ -851,23 +851,23 @@ def test_the_prompts_are_built_for_each_step_and_stay_lean():
     assert msgs[0]["content"] == FP.READ_SYSTEM and "1| x = 1" in msgs[1]["content"]
     assert "enrich:" in msgs[1]["content"] and "raises: [{error" in msgs[1]["content"]
     assert FP.messages({}, {"text": v("x")}) is None
-    assert FP.PROMPTS == {"derive": FP.messages, "tell": FP.messages}
+    assert FP.PROMPTS == {"derive": FP.messages, "entail": FP.messages}
 
 
 def test_the_host_finds_the_engines_and_the_prompts_by_name():
     """enough/thym_host.py looks the code lane's modules up by name (`SIBLING_ENGINES`, `PROMPT_MODULES`): the
-    engines join every run's, and the fabulac's builders stand in front of the host's own for derive and tell."""
+    engines join every run's, and the fabulac's builders stand in front of the host's own for derive and entail."""
     eng = H.engines(feed=None)
     assert eng["repo"] is RE.REPO and eng["syntax"] is RE.SYNTAX
-    assert {"derive", "tell"} <= set(H.register_prompts())
+    assert {"derive", "entail"} <= set(H.register_prompts())
     seen = []
     cp = H.ModelCoprocessor(lambda msgs, **kw: (seen.append(msgs) or "```python\nx = 1\n```", {"model": "m"}))
-    cand = cp.complete({"move": "tell", "schema": {"format": "markdown"}},
+    cand = cp.complete({"move": "entail", "schema": {"format": "markdown"}},
                        {"fabulac": (Value("string", "code"), ""), "path": (Value("string", "a.py"), ""),
                         "name": (Value("string", "t"), ""), "brief": (Value("string", "{}"), ""),
                         "atem": (Value("string", "{}"), "")}, budget={})
     assert seen[0][0]["content"] == FP.CODE_SYSTEM and cand["output"] == "x = 1\n"
-    assert cp.messages({"move": "tell", "schema": {"format": "yaml"}},
+    assert cp.messages({"move": "entail", "schema": {"format": "yaml"}},
                        {"outline": (Value("string", "- [P:claim/a] a"), ""), "order": (Value("string", "told"), "")}
                        )[0]["content"] != FP.CODE_SYSTEM
 
@@ -877,7 +877,7 @@ def test_the_declarations_keep_thym_0s_view_and_add_thym_1s():
     decls = D.load()
     assert decls["survey"].view(0) is None and decls["history"].view(0) is None
     assert decls["derive"].view(0).contract[-2] == "emf-checks" and decls["derive"].view(0).takes == (("text",),)
-    d1, t1 = decls["derive"].view(1), decls["tell"].view(1)
+    d1, t1 = decls["derive"].view(1), decls["entail"].view(1)
     assert D.chosen(d1, as_word="code")["contract"] == ("code-span", "outline-cited", "coverage", "terms-grounded",
                                                          "stance-closed", "fabula-checks", "provenance")
     assert D.chosen(d1, first_type="folder")["contract"][0] == "fold-grounded"

@@ -146,9 +146,9 @@ def test_contract_blocks_and_keeps_need_thym_1():
 BRIEF = """thym 1
 
 contract brief(s: short)
-  why: a telling of a dozen words or fewer.
+  why: a short of a dozen words or fewer.
 
-  assert words s < 13 else "the telling runs past twelve words"
+  assert words s < 13 else "the short runs past twelve words"
 end
 
 program told-briefly
@@ -159,7 +159,7 @@ program told-briefly
 
   move briefly(x: fabula): short
     keeps brief
-    give tell x as told
+    give entail x as told
   end
 
   give briefly f
@@ -181,7 +181,7 @@ class Scripted:
 def tell_moves() -> R.Moves:
     mv = R.MOVES.copy()
     R.load_all(R.declarations(), moves=mv)
-    mv.add("tell", lambda ctx, *ops, **m: Request(contract={"schema": {"format": "markdown"}},
+    mv.add("entail", lambda ctx, *ops, **m: Request(contract={"schema": {"format": "markdown"}},
                                                   inputs={f"in{k}": v for k, v in enumerate(ops)}))
     return mv
 
@@ -214,9 +214,9 @@ def test_a_failed_kept_contract_re_asks_and_what_failed_reaches_the_model(tmp_pa
     assert t.outputs["s"].read_text(encoding="utf-8").startswith("The orchard gave more juice.")
     assert cp.sent[0]["repair"]["failed"] == []
     assert cp.sent[1]["repair"]["failed"] == [{"name": "brief", "ok": False,
-                                               "why": "the telling runs past twelve words"}]
+                                               "why": "the short runs past twelve words"}]
     rec = t.records[0]
-    assert rec["tries"] == [{"attempt": 1, "failed": [{"name": "brief", "why": "the telling runs past twelve words"}]}]
+    assert rec["tries"] == [{"attempt": 1, "failed": [{"name": "brief", "why": "the short runs past twelve words"}]}]
     assert {"name": "brief", "ok": True, "why": ""} in rec["checks"]
     keys = sorted(x.name for x in (t.dir / "candidates").glob("*.cosm"))
     assert keys == ["1-1.1.cosm", "1.1.cosm"]                                # the re-run's call keeps counting
@@ -230,7 +230,7 @@ def test_every_attempt_failing_refuses_in_the_contracts_own_words(tmp_path):
     assert isinstance(t, T.Trace) and not t.landed and len(cp.sent) == 3
     r = t.refusal
     assert (r.check, r.line) == ("brief", 20) and not FORBIDDEN.search(r.message)
-    assert r.message == ("give briefly f (line 20): briefly still fails brief after 3 attempts: the telling runs past "
+    assert r.message == ("give briefly f (line 20): briefly still fails brief after 3 attempts: the short runs past "
                          "twelve words")
     assert [x["attempt"] for x in t.records[0]["tries"]] == [1, 2, 3]
     assert not (t.dir / "outputs").exists()
@@ -327,14 +327,14 @@ def test_a_cycle_of_moves_shares_its_calls_and_checks_and_plans_finitely():
             "      give count [x]\n    end\n  end\n"
             "  move b(x: short): number\n    depth: 2\n    assert (words (atem x)) > 0\n"
             "    give a (cut x to 5 words)\n  end\n"
-            "  give a (tell (derive t) as told)\nend\n")
+            "  give a (entail (derive t) as told)\nend\n")
     c = ok(text)
     a, b = c.local["p"]["a"], c.local["p"]["b"]
     assert a.calls == b.calls and a.checks == b.checks and a.asks and b.asks
     assert ("a move that calls itself (move a)") in [f[1] for f in c.module.features]
     plan = pl.plan(c, [{"name": "t", "type": "text", "path": str(NOTES), "sha256": digest_path(NOTES)}])
     n = RUN.plan_parts(plan)[1]
-    assert [x["move"] for x in n] == ["derive", "tell", "a"]
+    assert [x["move"] for x in n] == ["derive", "entail", "a"]
     assert n[-1]["budget"] == {"attempts": 3, "output_words": 0, "depth": 3}
 
 
@@ -355,7 +355,7 @@ def test_a_run_past_its_ceiling_of_model_calls_is_refused(tmp_path):
 
 
 def test_a_move_that_asks_several_times_is_called_again_with_what_failed(tmp_path):
-    """`ctx.ask` (the hook for `tell f as code`, one request per file): every request is keyed on the node's counter
+    """`ctx.ask` (the hook for `entail f as code`, one request per file): every request is keyed on the node's counter
     and recorded; a value that fails the contract calls the move again with `ctx.failed`, `ctx.previous` and
     `ctx.attempt`, within the node's attempts, and the replay meets every request in order."""
     seen: list[tuple[int, list, bool]] = []
@@ -370,12 +370,12 @@ def test_a_move_that_asks_several_times_is_called_again_with_what_failed(tmp_pat
 
     def moves() -> R.Moves:
         mv = tell_moves()
-        mv.add("tell", tell)
+        mv.add("entail", tell)
         return mv
 
-    footer = lambda out, *a: (out.text().rstrip().endswith("*"), "the telling has no footer line")  # noqa: E731
+    footer = lambda out, *a: (out.text().rstrip().endswith("*"), "the short has no footer line")  # noqa: E731
     p = tmp_path / "p.thym"
-    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give tell f as told\nend\n",
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give entail f as told\nend\n",
                  encoding="utf-8")
     plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
     cp = Scripted(["One part.\n", "Two parts.\n", "*a footer*\n"])
@@ -384,7 +384,7 @@ def test_a_move_that_asks_several_times_is_called_again_with_what_failed(tmp_pat
     assert isinstance(t, T.Trace) and t.landed, getattr(t, "refusal", t)
     assert seen == [(1, [], False), (2, ["footer"], True)]
     assert [c["repair"]["failed"] for c in cp.sent] == [[], [], [{"name": "footer", "ok": False,
-                                                                  "why": "the telling has no footer line"}]]
+                                                                  "why": "the short has no footer line"}]]
     assert sorted(x.name for x in (t.dir / "candidates").glob("*.cosm")) == ["1-1.1.cosm", "1-2.1.cosm", "1.1.cosm"]
     rec = t.records[0]
     assert (rec["engine"], rec["attempts"]) == ("model:scripted-1", 2) and [x["attempt"] for x in rec["tries"]] == [1]
@@ -410,11 +410,11 @@ def test_a_re_ask_carries_why_the_move_could_not_take_the_last_answer(tmp_path):
 
     def moves() -> R.Moves:
         mv = tell_moves()
-        mv.add("tell", tell)
+        mv.add("entail", tell)
         return mv
 
     p = tmp_path / "p.thym"
-    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give tell f as told\nend\n",
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give entail f as told\nend\n",
                  encoding="utf-8")
     plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
     cp = Scripted(["not it\n", "Told.\n", "*a footer*\n"])
@@ -445,19 +445,19 @@ def test_a_move_may_say_which_verdicts_its_re_ask_carries(tmp_path):
 
     def moves() -> R.Moves:
         mv = tell_moves()
-        mv.add("tell", tell)
+        mv.add("entail", tell)
         return mv
 
-    footer = lambda out, *a: (out.text().rstrip().endswith("*"), "the telling has no footer line")  # noqa: E731
+    footer = lambda out, *a: (out.text().rstrip().endswith("*"), "the short has no footer line")  # noqa: E731
     p = tmp_path / "p.thym"
-    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give tell f as told\nend\n",
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives s: short\n\n  give entail f as told\nend\n",
                  encoding="utf-8")
     plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
     cp = Scripted(["One part.\n", "Two.\n", "*a footer*\n"])
     t = RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", program=p, coprocessor=cp, moves=moves(),
                 checks=easy_checks(footer=footer), engines=H.engines(feed=None), now=NOW)
     assert isinstance(t, T.Trace) and t.landed, getattr(t, "refusal", t)
-    footer_failed = {"name": "footer", "ok": False, "why": "the telling has no footer line"}
+    footer_failed = {"name": "footer", "ok": False, "why": "the short has no footer line"}
     own = {"name": "answer", "ok": False, "why": "part 2 only"}
     assert [c["repair"] for c in cp.sent] == [
         {"allowed": [], "failed": []},
@@ -476,10 +476,10 @@ def test_the_plan_counts_its_model_calls_for_the_route_it_is_given():
                               "window": 16384}
     assert "models" not in pl.normalise(plan) and "models" not in pl.plan(c, rows)
     text = BRIEF.replace("  give briefly f\n", "  let ts = for each x in [f, f, f]\n    keep briefly x\n  end\n"
-                         "  give cut (tell f as told) to 10 words\n")
+                         "  give cut (entail f as told) to 10 words\n")
     plan = pl.plan(ok(text), rows, models={"route": "cloud"})
     assert plan["models"] == {"route": "cloud", "calls": 4, "at_most": 12, "calls_open": []}
-    plan = pl.plan(ok(AGAIN.format(d=2).replace("give words x", "give words (tell (derive x) as told)")),
+    plan = pl.plan(ok(AGAIN.format(d=2).replace("give words x", "give words (entail (derive x) as told)")),
                    [{"name": "t", "type": "text", "path": str(NOTES), "sha256": digest_path(NOTES)}],
                    models={"route": "cloud"})
     assert plan["models"]["calls_open"] == ["R:node/1"]                 # a move that calls itself and asks
@@ -487,7 +487,7 @@ def test_the_plan_counts_its_model_calls_for_the_route_it_is_given():
 
 def test_agent_free_refuses_a_loop_node_that_asks_at_plan_time(tmp_path):
     p = tmp_path / "p.thym"
-    p.write_text(prog("  let ts = for each x in [f, f]\n    keep tell x as told\n  end\n", contracts="",
+    p.write_text(prog("  let ts = for each x in [f, f]\n    keep entail x as told\n  end\n", contracts="",
                       takes="f: fabula", gives="n: number", give="give count ts"), encoding="utf-8")
     plan = thym.plan_file(p, [{"name": "f", "type": "fabula", "path": str(TWIN), "sha256": digest_path(TWIN)}])
     r = RUN.run(plan, inputs_root=SUITE, root=tmp_path / "root", program=p, agent_free=True,

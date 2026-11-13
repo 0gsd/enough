@@ -149,7 +149,7 @@ modules:
       check: {refs: [steps], checked: [params, body, lines, order]}         # a contract block of a thym 1 program
   M:
     name: Morphs
-    subtitle: How a telling departs from the plainest one
+    subtitle: How a text departs from the plainest short
     kinds:
       morph: {refs: [], checked: [scales, evidence, basis, confidence, pinned, toward, shared]}
   C:
@@ -232,7 +232,7 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     contract: [coverage, no-invention, stance-kept, null-pinned, provenance]
     scaffold: outline
     code: enough.thym.moves.morph:null
-    says: the plainest telling of a fabula, the reference every morph is measured against
+    says: the plainest entailment of a fabula, the reference every morph is measured against
   - name: measure
     takes: [text]
     gives: morph
@@ -241,7 +241,7 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     contract: [scale-range, scale-evidence, provenance]
     scaffold: statistics
     code: enough.thym.moves.morph:measure
-    says: a text's departure from the null telling on ten scales, with evidence
+    says: a text's departure from the null short on ten scales, with evidence
   - name: morph
     takes: [short]
     gives: short
@@ -249,7 +249,7 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     asks: true
     contract: [coverage, no-invention, stance-kept, scales-met, provenance]
     code: enough.thym.moves.morph:morph
-    says: a short told again in a morph
+    says: a short said again in a morph
   - name: read
     takes: [fabula]
     gives: short
@@ -257,7 +257,7 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     asks: true
     contract: [coverage, no-invention, stance-kept, scales-met, labelled, never-source, provenance]
     code: enough.thym.moves.morph:read
-    says: someone else's fabula told in your morph, for this occasion, labelled a reading
+    says: someone else's fabula entailed in your morph, for this occasion, labelled a reading
   - name: package
     takes: [text, fabula, morph, context, graph]
     gives: package

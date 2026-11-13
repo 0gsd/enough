@@ -3,7 +3,7 @@
 A manifest declares a move (its `moves:` block) and names its code (`code: enough.thym.moves.emf:derive`); this package
 holds that code, one module per subject, as THYM.md 11.2 lays it out:
 
-- `emf`: `derive`, `tell`, `atem`, `expand`, and the checks a telling carries (`coverage`, `no-invention`,
+- `emf`: `derive`, `entail`, `atem`, `expand`, and the checks an entailment carries (`coverage`, `no-invention`,
   `stance-kept`, `footer`, `span-resolves`, `stance-closed`, `terms-grounded`, `atem-shape`, `span-inside`);
 - `edit`: `cut`, `count`, `words`, `digest`, `lint`, `trace`, and `weight-order`;
 - `morph`: `null`, `measure`, `morph`, `read`, the ten scales with their word lists, and `null-pinned`,
@@ -24,7 +24,7 @@ when the host has them, `standing` and `catalog`), which `enough/thym_host.py` f
 
 This module holds what the moves share: the sentence rule (where a text's sentences are, line by line), the
 sentence-to-item map that `coverage` and `assert f covers t` both compute (`cover_map`), the stance ladder and the
-words that say a stance, what a telling carries beside its text, and the reading of a model's sentences.
+words that say a stance, what an entailment carries beside its text, and the reading of a model's sentences.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
 """
@@ -43,7 +43,7 @@ from enough.thym.registry import decl_get
 from enough.thym.trace import node_number
 from enough.thym.values import Value, plain, wrap
 
-#: The stance ladder of THYM.md 7.2, weakest first: a telling may say a claim more weakly than its fabula, never more
+#: The stance ladder of THYM.md 7.2, weakest first: an entailment may say a claim more weakly than its fabula, never more
 #: strongly.
 LADDER = ("hearsay", "assumed", "opinion", "deduced", "observed", "axiom")
 RANK = {s: i for i, s in enumerate(LADDER)}
@@ -248,7 +248,7 @@ def claim_bearing(s: Sentence | str) -> bool:
 
 def fabula_doc(v: Value | None) -> tuple[dict, list[dict]]:
     """A fabula's catalog and items, from a value holding an `emf/1` mapping, a loaded volume, or one item (an
-    item is told as a fabula of one). `({}, [])` for anything else."""
+    item is read as a fabula of one). `({}, [])` for anything else."""
     if v is None or not isinstance(v, Value) or v.is_nothing:
         return {}, []
     p = v.payload
@@ -301,8 +301,8 @@ def source_name(cat: dict, v: Value | None = None) -> str:
 
 
 def text_blob(cat: dict, items: list[dict]) -> str:
-    """Every word a fabula holds (its items' strings, its name and its atem), lowercased: what `no-invention` looks a
-    telling's names and numbers up in."""
+    """Every word a fabula holds (its items' strings, its name and its atem), lowercased: what `no-invention` looks an
+    entailment's names and numbers up in."""
     out: list[str] = [str(cat.get("name") or "")]
     def walk(x: Any) -> None:
         if isinstance(x, str):
@@ -320,38 +320,38 @@ def text_blob(cat: dict, items: list[dict]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# What a telling carries beside its text (THYM.md 5.1: a short carries its fabula, its order and its morph)
+# What an entailment carries beside its text (THYM.md 5.1: a short carries its fabula, its order and its morph)
 # ---------------------------------------------------------------------------
 
-def telling_of(v: Value | None) -> dict | None:
+def entailment_of(v: Value | None) -> dict | None:
     """What a short made in this run carries beside its text: `{fabula, sentences, covers, order, morph}`; None for a
     short read from disk. A value's `made` is the runtime's, so this rides in `origin`, which the runtime keeps."""
     if not isinstance(v, Value):
         return None
-    t = (v.origin or {}).get("telling")
+    t = (v.origin or {}).get("entailment")
     return t if isinstance(t, dict) else None
 
 
 def short_value(text: str, *, fabula: Value | None, sentences: list[str] | None = None,
                 covers: list[list[str]] | None = None, order: str | None = None, morph: str | None = None,
                 **extra: Any) -> Value:
-    """A short as a value: its markdown, and beside it what it was told from and which items each sentence says."""
-    tell: dict = {"fabula": fabula, "order": order, "morph": morph or "null"}
+    """A short as a value: its markdown, and beside it what it was entailed from and which items each sentence says."""
+    said: dict = {"fabula": fabula, "order": order, "morph": morph or "null"}
     if sentences is not None:
-        tell["sentences"] = list(sentences)
-        tell["covers"] = [list(c) for c in (covers or [[] for _ in sentences])]
-    tell.update(extra)
-    return Value("short", text, origin={"telling": tell})
+        said["sentences"] = list(sentences)
+        said["covers"] = [list(c) for c in (covers or [[] for _ in sentences])]
+    said.update(extra)
+    return Value("short", text, origin={"entailment": said})
 
 
 def fabula_for(output: Value, inputs: dict) -> Value | None:
-    """The fabula a check reads a telling against: one among the inputs (an operand or a `with`/`of` value), else
+    """The fabula a check reads an entailment against: one among the inputs (an operand or a `with`/`of` value), else
     the one the output or an input short carries."""
     for v in inputs.values():
         if isinstance(v, Value) and v.type == "fabula":
             return v
     for v in [output, *inputs.values()]:
-        t = telling_of(v)
+        t = entailment_of(v)
         if t and isinstance(t.get("fabula"), Value):
             return t["fabula"]
     return None
@@ -391,7 +391,7 @@ def _content(s: str) -> set[str]:
 
 @dataclass
 class CoverMap:
-    """Which items of a fabula each claim-bearing sentence of a telling says. `how` is `citations` (the model cited
+    """Which items of a fabula each claim-bearing sentence of an entailment says. `how` is `citations` (the model cited
     them, sentence by sentence), `spans` (the author's text: an item covers the sentences its span's lines touch) or
     `words` (a short with no citations: the items whose names and content words it shares). `unknown` holds the cited
     ids no item has."""
@@ -421,8 +421,8 @@ class CoverMap:
         return out
 
 
-def cover_map(fabula: Value, telling: Value) -> CoverMap:
-    """The sentence-to-item map of a telling against its fabula, one computation for `coverage` and for `assert f
+def cover_map(fabula: Value, said: Value) -> CoverMap:
+    """The sentence-to-item map of a text or a short against its fabula, one computation for `coverage` and for `assert f
     covers t`. A short that carries its citations is read by them; the author's text (a `text`, or a short whose
     sha256 is the fabula's `source.sha256`) by spans; any other short by the words it shares with the items. Only
     claim-bearing sentences are mapped (`claim_bearing`), and pinned atems never cover anything: they reduce the
@@ -430,7 +430,7 @@ def cover_map(fabula: Value, telling: Value) -> CoverMap:
     cat, items = fabula_doc(fabula)
     items = [it for it in items if item_kind(it) != "atem" and isinstance(it.get("id"), str)]
     ids = {it["id"] for it in items}
-    t = telling_of(telling)
+    t = entailment_of(said)
     cm = CoverMap()
     if t and t.get("covers") is not None:
         cm.how = "citations"
@@ -444,8 +444,8 @@ def cover_map(fabula: Value, telling: Value) -> CoverMap:
             cm.rows.append((s, None, good))
         return cm
     src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
-    text = telling.text()
-    if telling.type == "text" or (src.get("sha256") and src.get("sha256") == telling.sha256):
+    text = said.text()
+    if said.type == "text" or (src.get("sha256") and src.get("sha256") == said.sha256):
         cm.how = "spans"
         placed = [(span_lines(it), it) for it in items]
         quotes = []
@@ -479,7 +479,7 @@ def cover_map(fabula: Value, telling: Value) -> CoverMap:
 
 
 # ---------------------------------------------------------------------------
-# Stance: the words a telling says it in (THYM.md 7.2, law 3)
+# Stance: the words an entailment says it in (THYM.md 7.2, law 3)
 # ---------------------------------------------------------------------------
 
 #: The words that say a stance, weakest first. A sentence is said at the weakest stance its words mark; a sentence
@@ -501,7 +501,7 @@ STANCE_MARKERS: tuple[tuple[str, re.Pattern], ...] = (
 )
 
 
-def telling_stance(sentence: str) -> str:
+def entailment_stance(sentence: str) -> str:
     """The stance a sentence says its claim at: the weakest its words mark, else `observed` (a plain assertion)."""
     found = [st for st, rx in STANCE_MARKERS if rx.search(sentence)]
     if not found:
@@ -541,7 +541,7 @@ def model_of(data: dict) -> str | None:
 
 
 def read_sentences(out: Any) -> tuple[list[list[str]], list[list[str]]]:
-    """A model's told sentences: `(paragraphs, covers)`, the paragraphs a list of lists of sentences and the covers
+    """A model's sentences: `(paragraphs, covers)`, the paragraphs a list of lists of sentences and the covers
     one list of cited ids per sentence, in order. ValueError when the answer holds no sentence."""
     data = answer_mapping(out)
     rows = data.get("sentences")
@@ -682,5 +682,5 @@ from enough.thym.moves import doc, edit, emf, morph, pack  # noqa: E402,F401
 
 __all__ = ["LADDER", "RANK", "SALIENCE", "CoverMap", "EngineAdapter", "MoveError", "Sentence", "claim_bearing",
            "compose", "cover_map", "engine", "fabula_doc", "fabula_for", "first_input", "fold", "item_kind",
-           "names_and_numbers", "read_sentences", "segment", "short_value", "span_lines", "telling_of",
-           "telling_stance", "utc_day", "wrap"]
+           "names_and_numbers", "read_sentences", "segment", "short_value", "span_lines", "entailment_of",
+           "entailment_stance", "utc_day", "wrap"]

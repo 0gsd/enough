@@ -292,7 +292,7 @@ class Scripted:
 def tell_moves() -> R.Moves:
     mv = R.MOVES.copy()
     R.load_all(R.declarations(), moves=mv)
-    mv.add("tell", lambda ctx, *ops, **m: Request(contract={"schema": {"format": "markdown"}},
+    mv.add("entail", lambda ctx, *ops, **m: Request(contract={"schema": {"format": "markdown"}},
                                                   inputs={f"in{k}": v for k, v in enumerate(ops)}))
     return mv
 
@@ -305,11 +305,11 @@ def easy_checks() -> C.Checks:
 
 
 def test_model_calls_in_a_loop_node_are_keyed_per_member_and_replay(tmp_path):
-    body = "  let tellings = for each x in [f, f]\n    keep tell x as told\n  end\n"
+    body = "  let tellings = for each x in [f, f]\n    keep entail x as told\n  end\n"
     text = prog(1, body, takes="f: fabula", gives="n: number", give="give count tellings")
     p, plan = plan_of(tmp_path, text, "f")
     n = nodes(plan)
-    assert (n[0]["asks"], n[0]["budget"]["attempts"], n[0]["calls"]) == (True, 3, ["tell"])
+    assert (n[0]["asks"], n[0]["budget"]["attempts"], n[0]["calls"]) == (True, 3, ["entail"])
     cp = Scripted(["The first telling.\n", "The second telling.\n"])
     t = landed(run(p, plan, coprocessor=cp, moves=tell_moves(), checks=easy_checks()))
     keys = sorted(x.name for x in (t.dir / "candidates").glob("*.cosm"))

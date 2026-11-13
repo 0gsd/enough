@@ -1,4 +1,5 @@
-"""The moves `emf/1` declares: `derive`, `tell`, `atem`, `expand` (docs/THYM.md 6.3, 7.3, 19; MacroCOSM 18.3.5, 18.4).
+"""The moves `emf/1` declares: `derive`, `entail`, `atem`, `expand` (docs/THYM.md 6.3, 7.3, 19; MacroCOSM 18.3.5, 18.4).
+`tell`, `entail`'s earlier spelling, reaches `entail`: the compiler reads it as `entail` (THYM 6.3).
 
 All four transcognize, so each returns a `Request` and the runtime asks the coprocessor under the move's contract;
 each has the rules-mode stand-in its declaration names, except `expand`, which has none (THYM.md 19).
@@ -11,15 +12,15 @@ each has the rules-mode stand-in its declaration names, except `expand`, which h
   passage. The fabula records its sentence-to-item map in `derived.covers` (the same computation `coverage` runs).
   Its scaffold,
   `rules-twin`, is Canon's rules-mode twin (`derived.mode: rules`, completeness `full`, terms and entities only).
-- `tell` tells a fabula (or one item, or an EMF volume) in an order, `told` or `weight`, and in a morph when one is
-  given: the model is shown the fabula's items with their ids and answers sentence by sentence with the ids each
+- `entail` makes a short of a fabula (or of one item, or of an EMF volume) in an order, `told` or `weight`, and in a
+  morph when one is given: the model is shown the fabula's items with their ids and answers sentence by sentence with the ids each
   sentence says; the short ends with MacroCOSM 18.4.4's footer (`short_footer`). Its scaffold, `outline`, is Canon's
-  rules-mode short. A morph's scales are asked for; `scales-met` is not in `tell`'s contract.
+  rules-mode short. A morph's scales are asked for; `scales-met` is not in `entail`'s contract.
 - `atem` reduces a text, a short, a fabula or an item to its line, focus, push and pull, through Canon's atem prompt;
   of a fabula it also names the items it centres on (`of`). Its scaffold, `first-sentence`, is `rules_atem`.
-- `expand` opens an atem out into a short of about `to N words`, told from the fabula `with` it.
+- `expand` opens an atem out into a short of about `to N words`, entailed by the fabula `with` it.
 
-The checks a telling carries live here too: `coverage`, `no-invention`, `stance-kept`, `footer`, `span-resolves`,
+The checks an entailment carries live here too: `coverage`, `no-invention`, `stance-kept`, `footer`, `span-resolves`,
 `stance-closed`, `terms-grounded`, `atem-shape`, `span-inside`.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
@@ -36,12 +37,12 @@ from enough.thym.moves import (LADDER, RANK, SENTENCES_SAYS, EngineAdapter, Move
                                cover_map, engine, fabula_doc, fabula_for, first_input, fold, item_kind,
                                messages_value, model_of, names_and_numbers, plain_text, read_sentences,
                                segment,
-                               short_value, source_name, span_lines, telling_of, telling_stance, text_blob, utc_day,
+                               short_value, source_name, span_lines, entailment_of, entailment_stance, text_blob, utc_day,
                                words_in)
 from enough.thym.registry import Amount, Request, implements
 from enough.thym.values import Value
 
-#: What a telling move asks back (THYM.md 12.2): its sentences with the ids each one says. `stamp: engine` asks the
+#: What an entailing move asks back (THYM.md 12.2): its sentences with the ids each one says. `stamp: engine` asks the
 #: host's coprocessor to write the model's id into the answer, so the footer can name it and a replay names it again.
 SENTENCES_SCHEMA = {"format": "yaml", "stamp": "engine", "says": SENTENCES_SAYS}
 ATEM_SCHEMA = {"format": "yaml", "stamp": "engine",
@@ -52,16 +53,16 @@ _KIND_RANK = {"term": 0, **{k: 1 for k in ("person", "org", "place", "work", "th
 
 
 # ---------------------------------------------------------------------------
-# Shared by the telling moves
+# Shared by the entailing moves
 # ---------------------------------------------------------------------------
 
 def as_fabula(x: Value) -> Value:
-    """The fabula a telling is told from: a fabula as it is; an item as a fabula of one; an EMF volume read as one."""
+    """The fabula a short is entailed from: a fabula as it is; an item as a fabula of one; an EMF volume read as one."""
     if x.type == "fabula":
         return x
     cat, items = fabula_doc(x)
     if not items:
-        raise MoveError(f"a {x.type} with no items has nothing to tell")
+        raise MoveError(f"a {x.type} with no items entails nothing")
     return Value("fabula", cat if isinstance(x.payload, dict) and "nodes" in x.payload else
                  {**cat, "nodes": items}, path=x.path, made=x.made, state=x.state)
 
@@ -93,7 +94,7 @@ def ordered(items: list[dict], order: str) -> list[dict]:
 
 def cited_outline(cat: dict, items: list[dict], order: str) -> str:
     """The fabula as the model is shown it: its name and atem line, then one line per item in the order, each with
-    its id, kind, stance and salience, so that every sentence it tells can cite what it says."""
+    its id, kind, stance and salience, so that every sentence it writes can cite what it says."""
     out = [f"# {cat.get('name') or 'untitled'}"]
     atem = cat.get("atem") if isinstance(cat.get("atem"), dict) else {}
     if isinstance(atem.get("line"), str) and atem["line"].strip():
@@ -121,10 +122,10 @@ def footer_line(ctx: Any, cat: dict, fab: Value, order: str, model: str | None) 
                                              day=utc_day(ctx), model=model, mode="model")
 
 
-def telling(ctx: Any, out: Any, fab: Value, *, footer: Any, order: str | None, morph: str | None = None,
-            front: dict | None = None, one_paragraph: bool = False, **extra: Any) -> Value:
+def entailment(ctx: Any, out: Any, fab: Value, *, footer: Any, order: str | None, morph: str | None = None,
+               front: dict | None = None, one_paragraph: bool = False, **extra: Any) -> Value:
     """A model's sentences as a short: composed, footed, and carrying its fabula and each sentence's citations.
-    `one_paragraph` folds the model's paragraph marks away (the null telling, THYM.md 13.1)."""
+    `one_paragraph` folds the model's paragraph marks away (the null short, THYM.md 13.1)."""
     paras, covers = read_sentences(out)
     if one_paragraph:
         paras = [[s for p in paras for s in p]]
@@ -308,21 +309,21 @@ def derive_rules(ctx: Any, story: Value, **mods: Any) -> Value:
 
 
 # ---------------------------------------------------------------------------
-# tell
+# entail
 # ---------------------------------------------------------------------------
 
-@implements("tell")
-def tell(ctx: Any, x: Value, **mods: Any) -> Request:
-    """A telling of a fabula, in an order, in a morph (THYM.md 6.3), cited sentence by sentence. `as code` and a
+@implements("entail")
+def entail(ctx: Any, x: Value, **mods: Any) -> Request:
+    """An entailment of a fabula, in an order, in a morph (THYM.md 6.3), cited sentence by sentence. `as code` and a
     catem's depths are the fabulac's (`code.py`, THYM 20.7)."""
-    branch = _code.tell_branch(ctx, x, mods)
+    branch = _code.entail_branch(ctx, x, mods)
     if branch is not None:
         return branch
     fab = as_fabula(x)
     cat, items = fabula_doc(fab)
     order = mods.get("as") or mods.get("by") or default_order(cat, items)
     if order not in ("told", "weight"):
-        raise MoveError(f"tell tells as told or by weight, not {order}")
+        raise MoveError(f"entail takes the order told or weight, not {order}")
     m = mods.get("with")
     inputs: dict = {"fabula": fab, "outline": Value("string", cited_outline(cat, items, order)),
                     "order": Value("word", order)}
@@ -332,18 +333,18 @@ def tell(ctx: Any, x: Value, **mods: Any) -> Request:
         inputs["asks"] = Value("string", asks_for(m))
 
     def parse(out: Any) -> Value:
-        return telling(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, order, model), order=order,
-                       morph=morph_name(m))
+        return entailment(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, order, model), order=order,
+                          morph=morph_name(m))
     return Request(contract={"schema": SENTENCES_SCHEMA, "repair": []}, inputs=inputs, parse=parse)
 
 
-@implements("tell.scaffold")
+@implements("entail.scaffold")
 @implements("outline")
-def tell_outline(ctx: Any, x: Value, **mods: Any) -> Value:
+def entail_outline(ctx: Any, x: Value, **mods: Any) -> Value:
     """`outline`: Canon's rules-mode short, the ordered outline said in the items' own sentences with the footer that
     says "by rules, without a model". A morph cannot be kept by rules, and is not. A catem's depth takes
     `uses-outline`, and `as code` has no scaffold (`code.py`)."""
-    branch = _code.tell_scaffold_branch(ctx, x, mods)
+    branch = _code.entail_scaffold_branch(ctx, x, mods)
     if branch is not None:
         return branch
     fab = as_fabula(x)
@@ -363,7 +364,7 @@ def _atem_source(x: Value) -> tuple[str, Value | None]:
         fab = as_fabula(x)
         cat, items = fabula_doc(fab)
         return cited_outline(cat, items, default_order(cat, items)), fab
-    t = telling_of(x)
+    t = entailment_of(x)
     text = body(x.text()) if x.type == "short" else x.text()
     return text, (t.get("fabula") if t else None)
 
@@ -432,7 +433,7 @@ def expand(ctx: Any, a: Value, **mods: Any) -> Request:
     """An atem opened out into a short of about `to N words`, from the fabula `with` it (THYM.md 6.3)."""
     fab = mods.get("with")
     if not isinstance(fab, Value) or fab.type != "fabula":
-        raise MoveError("expand needs the fabula to tell from: expand <atem> with <fabula> to N words")
+        raise MoveError("expand needs the fabula the atem reduces: expand <atem> with <fabula> to N words")
     to = mods.get("to")
     n = to.n if isinstance(to, Amount) else 300
     cat, items = fabula_doc(fab)
@@ -447,17 +448,17 @@ def expand(ctx: Any, a: Value, **mods: Any) -> Request:
                f"{utc_day(ctx)} {who}*"
 
     def parse(out: Any) -> Value:
-        return telling(ctx, out, fab, footer=foot, order="told", atem=a)
+        return entailment(ctx, out, fab, footer=foot, order="told", atem=a)
     return Request(contract={"schema": SENTENCES_SCHEMA, "repair": []}, inputs=inputs, parse=parse,
                    budget={"output_words": n})
 
 
 # ---------------------------------------------------------------------------
-# The checks a telling carries (THYM.md 7.3)
+# The checks an entailment carries (THYM.md 7.3)
 # ---------------------------------------------------------------------------
 
 def _pair(output: Value, inputs: dict) -> tuple[Value | None, Value | None]:
-    """(fabula, telling) for `coverage`: derive gives a fabula of a text; a telling move gives a short of a fabula;
+    """(fabula, what it covers) for `coverage`: derive gives a fabula of a text; an entailing move gives a short of a fabula;
     `assert f covers t` asks of `t` with `f` beside it."""
     if output.type == "fabula":
         return output, first_input(inputs, "text", "short")
@@ -466,7 +467,7 @@ def _pair(output: Value, inputs: dict) -> tuple[Value | None, Value | None]:
 
 @check("coverage")
 def _coverage(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """Every claim-bearing sentence of a telling traces to one or more items of its fabula (THYM.md 7.2 law 1, 7.3);
+    """Every claim-bearing sentence of an entailment traces to one or more items of its fabula (THYM.md 7.2 law 1, 7.3);
     as a condition, `f covers t`. The map (`cover_map`) is the one `derived.covers` records, and on success the
     verdict's why is the map itself, so the trace records it. A scaffold's output promises no coverage: rules cannot
     read claims, and say so."""
@@ -474,7 +475,7 @@ def _coverage(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> t
         return _code.code_coverage(output, inputs)          # a file read as code (THYM 20.6)
     fab, tel = _pair(output, inputs)
     if fab is None or tel is None:
-        return False, "no fabula and telling to lay over each other" if fab is None else "no telling to cover"
+        return False, "no fabula and text to lay over each other" if fab is None else "no text or short to cover"
     if fab.state == "pending" or tel.state == "pending":
         return True, "a scaffold makes no coverage promise: rules cannot read claims"
     cm = cover_map(fab, tel)
@@ -482,7 +483,7 @@ def _coverage(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> t
         s, bad = cm.unknown[0]
         return False, f"a sentence cites {', '.join(bad)}, which the fabula does not hold: {s[:80]}"
     if not cm.rows:
-        return True, "the telling has no claim-bearing sentence"
+        return True, "the text has no claim-bearing sentence"
     if cm.missing:
         k = len(cm.missing)
         return False, (f"{k} claim-bearing sentence{'s' if k != 1 else ''} trace{'s' if k == 1 else ''} to no item of "
@@ -492,17 +493,17 @@ def _coverage(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> t
 
 @check("no-invention")
 def _no_invention(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """The telling names no entity, claim or event its fabula lacks (THYM.md 7.3): every sentence cites at least one
+    """The entailment names no entity, claim or event its fabula lacks (THYM.md 7.3): every sentence cites at least one
     item, every cited id is an item of the fabula, and every name and number a sentence uses is one the fabula holds
     (in its items' names, summaries, roles or times)."""
     fab = fabula_for(output, inputs)
     if fab is None:
-        return False, "no fabula to look the telling up in"
+        return False, "no fabula to look the short up in"
     if output.state == "pending":
-        return True, "a scaffold tells the items' own sentences"
-    t = telling_of(output)
+        return True, "a scaffold says the items' own sentences"
+    t = entailment_of(output)
     if not t or t.get("covers") is None:
-        return False, "the telling carries no citations, sentence by sentence"
+        return False, "the short carries no citations, sentence by sentence"
     cat, items = fabula_doc(fab)
     ids = {it.get("id") for it in items}
     blob = text_blob(cat, items)
@@ -533,17 +534,17 @@ def _stance_kept(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
         return True, "a scaffold says each claim's stance in Canon's own stance words"
     _cat, items = fabula_doc(fab)
     stance = {it.get("id"): it.get("stance") for it in items if item_kind(it) == "claim"}
-    t = telling_of(output)
+    t = entailment_of(output)
     if t and t.get("covers") is not None:
         rows = list(zip(t.get("sentences") or [], t.get("covers") or []))
     else:
         cm = cover_map(fab, output)
         rows = [(s, ids) for s, _ln, ids in cm.rows]
-    # A claim told over several sentences is said at the weakest stance any of them marks: "Reportedly the Bramley
+    # A claim said over several sentences is said at the weakest stance any of them marks: "Reportedly the Bramley
     # is the oldest tree; the records do not say when it was planted" keeps the claim at hearsay.
     said_by_claim: dict[str, tuple[int, str, str]] = {}
     for s, cites in rows:
-        said = telling_stance(s)
+        said = entailment_stance(s)
         for c in cites:
             best = said_by_claim.get(c)
             if best is None or RANK[said] < best[0]:
@@ -551,7 +552,7 @@ def _stance_kept(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
     for c, (rank, said, s) in said_by_claim.items():
         held = stance.get(c)
         if held in RANK and rank > RANK[held]:
-            return False, (f"{c} is {held} in the fabula and the telling says it as {said}: {s[:80]} "
+            return False, (f"{c} is {held} in the fabula and the short says it as {said}: {s[:80]} "
                            f"(say it with the stance's phrase: reportedly, it is assumed that, the author holds that)")
     return True, ""
 
@@ -567,7 +568,7 @@ def _footer(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tup
     """A short ends with MacroCOSM 18.4.4's footer line: what it is a short of, in which order, when, and by which
     model or by rules (`*a short of notes.md, told as the author told it, compiled from its fabula on 2026-10-23 by
     g40-04*`; the earlier edition's "from its EMF twin" reads the same). A cshort's and a catem's footers are MacroCOSM 18.4.7's (`code.py`)."""
-    if _code.is_code_telling(output):
+    if _code.is_code_entailment(output):
         why = _code.footer_problem(output, inputs, ctx)
         return (why is None), (why or "")
     lines = [ln.strip() for ln in output.text().replace("\r\n", "\n").split("\n") if ln.strip()]
@@ -721,7 +722,7 @@ def _span_inside(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
                      and i not in want]
     if not want:
         return True, "the atem names no claim of the fabula"
-    t = telling_of(output)
+    t = entailment_of(output)
     cited = {c for cs in ((t or {}).get("covers") or []) for c in cs}
     lost = [i for i in want if i not in cited]
     if lost:
@@ -729,6 +730,6 @@ def _span_inside(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
     return True, ""
 
 
-from enough.thym.moves import code as _code  # noqa: E402 - the fabulac's branches of derive and tell
+from enough.thym.moves import code as _code  # noqa: E402 - the fabulac's branches of derive and entail
 
-__all__ = ["as_fabula", "atem", "cited_outline", "default_order", "derive", "expand", "ordered", "tell"]
+__all__ = ["as_fabula", "atem", "cited_outline", "default_order", "derive", "entail", "expand", "ordered"]

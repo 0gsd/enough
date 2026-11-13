@@ -112,7 +112,7 @@ def test_a_kind_another_owner_adds_extends_a_move_it_does_not_declare():
 def test_moves_are_declared_by_their_owners():
     moves = _declared_moves()
     owners = {n: o for n, (o, _) in moves.items()}
-    assert {owners[n] for n in ("derive", "tell", "atem", "expand")} == {"fabula"}
+    assert {owners[n] for n in ("derive", "entail", "atem", "expand")} == {"fabula"}
     assert {owners[n] for n in ("enumerate", "compile")} == {"doc"}
     assert {owners[n] for n in ("project", "band", "mark", "withhold")} == {"comprise"}
     assert {owners[n] for n in ("cut", "null", "measure", "morph", "read", "package", "unpack", "lint", "trace",

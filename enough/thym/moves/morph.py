@@ -14,12 +14,12 @@ For every scale `measure` gives a value, a basis (`statistics` or `judgement`), 
 moved it (the first sentence, when nothing did), and a confidence per hundred (0 to 100: a `.cosm` holds no float),
 at most 50 for a statistics scale and 40 for a judgement scale under 300 words or three paragraphs (13.3).
 
-**The moves.** `null` tells a fabula as plainly as it can be told (13.1), cited sentence by sentence; its contract
-`null-pinned` measures the telling and holds every statistics scale to 1 (the judgement scales are assumed 1, and the
+**The moves.** `null` entails a fabula's plainest short (13.1), cited sentence by sentence; its contract
+`null-pinned` measures that short and holds every statistics scale to 1 (the judgement scales are assumed 1, and the
 why says so). `measure` gives a text's morph against the null of its fabula: the seven statistics in code, the three
 judgements in one request with examples; its scaffold, `statistics`, gives the seven and leaves the three as open
-questions. `morph` tells a short again in a morph (the short must carry its fabula: one told in this run). `read`
-tells someone else's fabula in the reader's morph, for an occasion, and labels it: `read_through:` in its front
+questions. `morph` says a short again in a morph (the short must carry its fabula: one entailed in this run). `read`
+entails someone else's fabula in the reader's morph, for an occasion, and labels it: `read_through:` in its front
 matter and the reading footer of THYM.md 14 at its end; it is never written over a source.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
@@ -33,9 +33,9 @@ from typing import Any, Iterable
 from enough import macrocosm as mc
 from enough.thym.checks import body, check
 from enough.thym.moves import (MoveError, Sentence, answer_mapping, fabula_doc, fabula_for,
-                               first_input, fold, item_kind, model_of, segment, source_name, span_lines, telling_of,
+                               first_input, fold, item_kind, model_of, segment, source_name, span_lines, entailment_of,
                                utc_day, words_in)
-from enough.thym.moves.emf import SENTENCES_SCHEMA, cited_outline, footer_line, tell_outline, telling
+from enough.thym.moves.emf import SENTENCES_SCHEMA, cited_outline, entail_outline, entailment, footer_line
 from enough.thym.registry import implements, Request
 from enough.thym.values import Value
 
@@ -147,12 +147,12 @@ def _phrase_count(toks: list[str], phrase: tuple[str, ...]) -> int:
 
 
 def statistics(text: str, *, feed: Any = None, fabula: Value | None = None, exempt: Iterable[str] = (),
-               telling: bool = False, sentences: list[Sentence] | None = None) -> dict[str, dict]:
+               short: bool = False, sentences: list[Sentence] | None = None) -> dict[str, dict]:
     """The seven statistics scales of a text (THYM.md 13.3): `{scale: {value, basis, evidence, confidence}}`, with
-    `toward` on `formality` when it departs from plain. `telling` reads a short (front matter and footer left out);
+    `toward` on `formality` when it departs from plain. `short` reads a short (front matter and footer left out);
     `exempt` names words `register` does not count (the null's own names and terms); `fabula` gives
     `analytical-depth`; `feed` is FEED's batch lookup (`ctx.engines["feed"]`), or None for the letter rule."""
-    sents = sentences if sentences is not None else [s for s in segment(text, footer=not telling)
+    sents = sentences if sentences is not None else [s for s in segment(text, footer=not short)
                                                      if s.kind != "heading"]
     toks_by = [_tokens(s) for s in sents]
     n_words = sum(len(t) for t in toks_by)
@@ -410,30 +410,30 @@ MEASURE_SCHEMA = {"format": "yaml", "stamp": "engine",
 
 @implements("null")
 def null(ctx: Any, **mods: Any) -> Request:
-    """The null telling of a fabula (THYM.md 13.1): told order, one claim per sentence, the commonest words, every
+    """The null short of a fabula (THYM.md 13.1): told order, one claim per sentence, the commonest words, every
     stance in a fixed phrase; no figure, humour, allusion or contraction; the third person."""
     fab = mods.get("of")
     if not isinstance(fab, Value) or fab.type != "fabula":
-        raise MoveError("null tells a fabula: null of <fabula>")
+        raise MoveError("null entails a fabula's plainest short: null of <fabula>")
     cat, items = fabula_doc(fab)
     inputs = {"fabula": fab, "outline": Value("string", cited_outline(cat, items, "told"))}
 
     def parse(out: Any) -> Value:
         # The null is one paragraph by definition (THYM.md 13.1): paragraph marks the model adds are not a departure
         # it can be asked to undo, they are read as none, so `paragraph-rhythm` is 1 by construction.
-        return telling(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, "told", model), order="told",
-                       morph="null", one_paragraph=True)
+        return entailment(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, "told", model), order="told",
+                          morph="null", one_paragraph=True)
     return Request(contract={"schema": SENTENCES_SCHEMA, "repair": []}, inputs=inputs, parse=parse)
 
 
 @implements("null.scaffold")
 def null_outline(ctx: Any, **mods: Any) -> Value:
     """The null's scaffold, `outline`: the fabula's told outline in the items' own sentences (THYM.md 13.1, 19)."""
-    return tell_outline(ctx, mods.get("of"), **{"as": "told"})
+    return entail_outline(ctx, mods.get("of"), **{"as": "told"})
 
 
 def _measure_parts(ctx: Any, t: Value, against: Value | None) -> tuple[list[Sentence], int, bool, dict, Value | None]:
-    fab = (telling_of(against) or {}).get("fabula") if isinstance(against, Value) else None
+    fab = (entailment_of(against) or {}).get("fabula") if isinstance(against, Value) else None
     sents = [s for s in segment(t.text(), footer=True) if s.kind != "heading"]
     n_words = sum(len(words_in(s.text)) for s in sents)
     short = n_words < 300 or len({s.para for s in sents}) < 3
@@ -472,12 +472,12 @@ def measure_statistics(ctx: Any, t: Value, **mods: Any) -> Value:
 
 @implements("morph")
 def morph(ctx: Any, s: Value, **mods: Any) -> Request:
-    """A short told again in a morph (THYM.md 6.3): the same items, the same citations, the morph's scales."""
+    """A short said again in a morph (THYM.md 6.3): the same items, the same citations, the morph's scales."""
     m = mods.get("with")
-    t = telling_of(s)
+    t = entailment_of(s)
     fab = t.get("fabula") if t else None
     if not isinstance(fab, Value):
-        raise MoveError("morph tells again a short that carries its fabula, one told in this run; tell it first")
+        raise MoveError("morph says again a short that carries its fabula, one entailed in this run; entail it first")
     cat, _items = fabula_doc(fab)
     rows = list(zip(t.get("sentences") or [], t.get("covers") or [])) if t.get("covers") is not None else \
         [(x.text, []) for x in segment(body(s.text()))]
@@ -488,8 +488,8 @@ def morph(ctx: Any, s: Value, **mods: Any) -> Request:
     name = morph_scales(m)[0]
 
     def parse(out: Any) -> Value:
-        return telling(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, order, model), order=order,
-                       morph=name)
+        return entailment(ctx, out, fab, footer=lambda model: footer_line(ctx, cat, fab, order, model), order=order,
+                          morph=name)
     return Request(contract={"schema": SENTENCES_SCHEMA, "repair": []}, inputs=inputs, parse=parse)
 
 
@@ -514,7 +514,7 @@ def _budget(c: Value | None) -> int | None:
 
 @implements("read")
 def read(ctx: Any, f: Value, **mods: Any) -> Request:
-    """Someone else's fabula told in the reader's morph, for an occasion, labelled a reading (THYM.md 14)."""
+    """Someone else's fabula entailed in the reader's morph, for an occasion, labelled a reading (THYM.md 14)."""
     m = mods.get("with")
     c = mods.get("in")
     if not isinstance(f, Value) or f.type != "fabula":
@@ -532,7 +532,7 @@ def read(ctx: Any, f: Value, **mods: Any) -> Request:
                 f"{utc_day(ctx)} by {model or 'a model'}; the text stands unchanged*")
 
     def parse(out: Any) -> Value:
-        return telling(ctx, out, f, footer=foot, order="told", morph=name, front={"read_through": name})
+        return entailment(ctx, out, f, footer=foot, order="told", morph=name, front={"read_through": name})
     return Request(contract={"schema": SENTENCES_SCHEMA, "repair": []}, inputs=inputs, parse=parse,
                    budget={"output_words": words} if words else None)
 
@@ -543,15 +543,15 @@ def read(ctx: Any, f: Value, **mods: Any) -> Request:
 
 def _measured(output: Value, ctx: Any, exempt: Iterable[str] = ()) -> dict[str, dict]:
     feed = (getattr(ctx, "engines", None) or {}).get("feed")
-    return statistics(output.text(), feed=feed, exempt=exempt, telling=True)
+    return statistics(output.text(), feed=feed, exempt=exempt, short=True)
 
 
 @check("null-pinned")
 def _null_pinned(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """Every scale of the null telling is 1 (THYM.md 13.1, 13.4): the statistics scales, measured on the telling (the
+    """Every scale of the null short is 1 (THYM.md 13.1, 13.4): the statistics scales, measured on the short (the
     fabula's own words, its items' names, summaries and senses, are not counted as rare: the null must say them);
     `analytical-depth` is 1 because
-    the null tells claims without their reasons; the judgement scales are assumed 1 and not asked; `person-voice` is
+    the null says claims without their reasons; the judgement scales are assumed 1 and not asked; `person-voice` is
     let be when the fabula's own claims are in the first person."""
     if output.state == "pending":
         return True, "a scaffold is the outline in the items' own sentences; the pin is the model's to keep"
@@ -570,11 +570,11 @@ def _null_pinned(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
             continue
         said = f"{s} {got[s]['value']}"
         if s == "register" and got[s].get("words"):
-            # the re-ask can act on words, not on a number: the rare ones, commonest first in the telling
+            # the re-ask can act on words, not on a number: the rare ones, commonest first in the short
             said += " (rare words: " + ", ".join(got[s]["words"]) + "; say them in commoner words or the items' own)"
         off.append(said)
     if off:
-        return False, f"the null telling departs: {'; '.join(off)} (every scale must be 1)"
+        return False, f"the null short departs: {'; '.join(off)} (every scale must be 1)"
     return True, "statistics all 1; figurative-density, humour and allusion assumed 1 (judgement, not asked)"
 
 
@@ -604,7 +604,7 @@ def _scales_met(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) ->
         elif abs(g - asked[s]) > 1:
             off.append(f"{s} {g} against {asked[s]}")
     if off:
-        return False, f"the telling misses {name}: {', '.join(off)}"
+        return False, f"the short misses {name}: {', '.join(off)}"
     return True, (f"{name}'s statistics met within one step; figurative-density, humour and allusion are judgement "
                   "scales and were not measured; analytical-depth is the fabula's")
 

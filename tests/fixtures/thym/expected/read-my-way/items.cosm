@@ -5,7 +5,7 @@ name: read-my-way
 # The enumeration of programs/read-my-way.thym, written by hand for the conformance suite (docs/THYM.md 10, 17.3).
 # A context block declared in the file is a C:context item with a body and an order like any top-level block; an if
 # is one step whose branches hold the steps inside it, and else and end are structure, not steps.
-source: {path: read-my-way.thym, sha256: 5c0cce9cf1b2cfccdb18e8a531c7e68d2583d92c6496a20868f6b1fd963283de, size: 603}
+source: {path: read-my-way.thym, sha256: f91310228643a513239cc564819f24cd3e0e754ce794b8236be509e5ab3af9a1, size: 611}
 front: |+
   thym 0
 
@@ -35,8 +35,8 @@ nodes:
   - id: P:program/read-my-way
     type: program
     name: read-my-way
-    summary: "A package is read on the reader's terms: in a hurry, the short way in; otherwise a telling in the reader's own morph, for this occasion."
-    why: "a package is read on the reader's terms: in a hurry, the short way in; otherwise a telling in the reader's own morph, for this occasion."
+    summary: "A package is read on the reader's terms: in a hurry, the short way in; otherwise an entailment in the reader's own morph, for this occasion."
+    why: "a package is read on the reader's terms: in a hurry, the short way in; otherwise an entailment in the reader's own morph, for this occasion."
     must: []
     decided: []
     takes: [{name: p, type: package}, {name: mine, type: morph}, {name: now, type: context}]
@@ -46,7 +46,7 @@ nodes:
     body: |
       program read-my-way
         why: a package is read on the reader's terms: in a hurry, the short way in;
-             otherwise a telling in the reader's own morph, for this occasion.
+             otherwise an entailment in the reader's own morph, for this occasion.
 
         takes p: package, mine: morph, now: context
         gives r: short
@@ -55,7 +55,7 @@ nodes:
         if now.medium is "phone" and now.hurry then
           give expand (atem f) with f to 300 words     -- the short way in
         else
-          give read f with mine in now                 -- a telling in my morph, labelled a reading
+          give read f with mine in now                 -- an entailment in my morph, labelled a reading
         end
       end
     steps: [P:step/read-my-way.1, P:step/read-my-way.2]
@@ -111,10 +111,10 @@ nodes:
   - id: P:step/read-my-way.4
     type: step
     name: give read f with mine in now
-    summary: "a telling in my morph, labelled a reading"
+    summary: "an entailment in my morph, labelled a reading"
     of: P:program/read-my-way
     n: 4
-    text: "    give read f with mine in now                 -- a telling in my morph, labelled a reading"
+    text: "    give read f with mine in now                 -- an entailment in my morph, labelled a reading"
     line: 22
     form: give
     move: read

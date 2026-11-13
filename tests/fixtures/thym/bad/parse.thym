@@ -6,5 +6,5 @@ program broken
   takes t: text
   gives s: short
   let = derive t
-  give tell (derive t) as told
+  give entail (derive t) as told
 end

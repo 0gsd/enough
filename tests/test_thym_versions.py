@@ -179,7 +179,7 @@ moves:
   - {name: scry-two, takes: [text], gives: fabula, since: 1, contract: [fabula-checks]}
   - {name: derive-two, takes: [text], gives: fabula, contract: [coverage, emf-checks],
      thym-1: {contract: [coverage, fabula-checks]}}
-  - {name: tell-two, takes: [fabula], gives: short, modifiers: {as: order},
+  - {name: entail-two, takes: [fabula], gives: short, modifiers: {as: order},
      thym-1: {modifiers: {as: "order | code"}}}
   - {name: count-two, takes: [volume], gives: number, thym-1: {takes: ["volume | text"]}}
   - {name: broken, takes: [text], gives: number, since: 7}
@@ -228,11 +228,11 @@ def test_a_move_only_thym_1_sees_is_free_in_thym_0_and_needs_thym_1_when_called(
 
 def test_a_word_or_an_operand_only_the_thym_1_view_takes_needs_thym_1(scratch_decls):
     d = scratch_decls
-    text = prog(0, "  let f = derive-two t\n  let s = tell-two f as code\n", gives="s2: short", give="give s")
+    text = prog(0, "  let f = derive-two t\n  let s = entail-two f as code\n", gives="s2: short", give="give s")
     r = refused(text, decls=d)
     assert (r.check, r.line) == ("version", 7)
-    assert "the word code after as of tell-two, which thym 1 adds at line 7" in r.message
-    ok(prog(0, "  let f = derive-two t\n  let s = tell-two f as told\n", gives="s2: short", give="give s"), decls=d)
+    assert "the word code after as of entail-two, which thym 1 adds at line 7" in r.message
+    ok(prog(0, "  let f = derive-two t\n  let s = entail-two f as told\n", gives="s2: short", give="give s"), decls=d)
     r = refused(prog(0, "  let n = count-two t\n", give="give n"), decls=d)
     assert r.check == "version" and "count-two t (a text), which thym 1 allows at line 6" in r.message
 

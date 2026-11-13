@@ -43,6 +43,7 @@ from typing import Any, Protocol, TypedDict, runtime_checkable
 
 from enough import macrocosm as mc
 from enough.thym import Refusal
+from enough.thym.types import move_now
 from enough.thym.values import plain
 
 
@@ -239,7 +240,8 @@ class ReplayCoprocessor:
             return Refusal("run", "replay", f"the candidate for node {key}, attempt {attempt} could not be read: {e}")
         if not isinstance(rec, dict):
             return Refusal("run", "replay", f"the candidate for node {key}, attempt {attempt} is not a mapping")
-        want = rec.get("contract") or {}
+        want = dict(rec.get("contract") or {})
+        want["move"] = move_now(want.get("move"))     # a candidate recorded for `tell` answers `entail` (THYM 6.3)
         got = contract_key(contract)
         for k in ("move", "schema", "checks"):
             if plain(want.get(k)) != got[k]:

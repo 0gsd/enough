@@ -1,7 +1,7 @@
 """Thym's runtime (docs/THYM.md 12, 19, 20.2): `enough/thym/` values, registry, checks, coprocessors, run, trace,
 conform and CLI, and `enough/thym_host.py`.
 
-Every move here is a fake registered in a test registry (a `derive` that answers with the orchard twin, a `tell`, a
+Every move here is a fake registered in a test registry (a `derive` that answers with the orchard twin, a `entail`, a
 deterministic `count`/`band`/`mark`/`withhold`/`project` that build a projection), every model answer comes from a
 `FakeCoprocessor`, and the engine-backed checks the moves lane will bring are stood in for by fakes. Every run lands
 in a tmp root (conftest points ENOUGH_THYM_ROOT there); nothing touches ~/enough and no model is started.
@@ -91,7 +91,7 @@ def fake_moves() -> R.Moves:
         twin["derived"] = {**twin["derived"], "mode": "rules"}
         return Value("fabula", twin)
 
-    for name in ("tell", "expand", "read"):
+    for name in ("entail", "expand", "read"):
         mv.add(name, lambda ctx, *ops, _n=name, **m: Request(contract={"schema": {"format": "markdown"}},
                                                              inputs={f"in{k}": v for k, v in enumerate(ops)}))
 
@@ -168,7 +168,7 @@ def hand_plan(*nodes: dict, name: str = "brief", inputs=None) -> dict:
 
 def brief_plan() -> dict:
     return hand_plan(node(1, "derive story", "derive", asks=True, takes=["story"], gives="f", line=5),
-                     node(2, "tell f as told", "tell", asks=True, takes=["f"], gives="s", after=["R:node/1"], line=6))
+                     node(2, "entail f as told", "entail", asks=True, takes=["f"], gives="s", after=["R:node/1"], line=6))
 
 
 @pytest.fixture
@@ -308,7 +308,7 @@ def test_preflight_refuses_a_prompt_the_model_cannot_hold(root):
 
 def test_a_move_with_no_implementation_is_refused_at_plan_time(root):
     mv = fake_moves()
-    mv.remove("tell")
+    mv.remove("entail")
     r = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=FakeCoprocessor({}), moves=mv,
                 checks=fake_checks())
     assert isinstance(r, Refusal) and (r.stage, r.check, r.line) == ("plan", "move", 6)
@@ -319,13 +319,13 @@ def test_a_move_with_no_implementation_is_refused_at_plan_time(root):
 # ---------------------------------------------------------------------------
 
 def test_a_failing_check_refuses_the_whole_run_and_nothing_lands(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling(footer=False)})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling(footer=False)})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert isinstance(t, T.Trace) and t.outcome == "refused"
     assert (t.refusal.stage, t.refusal.check, t.refusal.line) == ("run", "footer", 6)
     assert "after 3 attempts" in t.refusal.message
     assert t.stopped_at == "R:record/2"
-    assert [m for m, _ in cp.calls] == ["derive", "tell", "tell", "tell"]   # attempts are bounded
+    assert [m for m, _ in cp.calls] == ["derive", "entail", "entail", "entail"]   # attempts are bounded
     assert not (t.dir / "outputs").exists() and not (t.dir / "stage").exists()
     vol = T.read(t.run_id, root=root)
     head = T.root_item(vol)
@@ -341,7 +341,7 @@ def test_a_failing_check_refuses_the_whole_run_and_nothing_lands(root):
 
 def test_a_second_attempt_carries_the_failed_checks_and_lands(root):
     cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"),
-                          "tell": [telling(footer=False), telling()]})
+                          "entail": [telling(footer=False), telling()]})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert t.landed, t.refusal
     second = cp.calls[2][1]
@@ -358,18 +358,18 @@ def test_a_second_attempt_carries_the_failed_checks_and_lands(root):
 def test_a_check_the_registry_lacks_refuses_never_passes(root):
     ck = fake_checks()
     ck._fns.pop("no-invention")
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling()})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=ck)
     assert t.outcome == "refused"
     assert (t.refusal.stage, t.refusal.check, t.refusal.message) == ("run", "no-invention",
-                                                                      "tell f as told (line 6): check not implemented")
+                                                                      "entail f as told (line 6): check not implemented")
 
 
 def test_model_output_carries_made_with_its_engine(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling()})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert t.landed
-    assert t.values["s"].made == {"move": "tell", "run": t.run_id, "step": 2, "node": "2", "engine": "model:fake-1"}
+    assert t.values["s"].made == {"move": "entail", "run": t.run_id, "step": 2, "node": "2", "engine": "model:fake-1"}
     assert sorted(p.name for p in (t.dir / "candidates").iterdir()) == ["1.1.cosm", "2.1.cosm"]
 
 
@@ -378,7 +378,7 @@ def test_model_output_carries_made_with_its_engine(root):
 # ---------------------------------------------------------------------------
 
 def test_a_recorded_run_replays_to_byte_identical_outputs(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": [telling(footer=False), telling()]})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert t.landed
     again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=fake_moves(), checks=fake_checks())
@@ -394,7 +394,7 @@ def test_a_replay_says_its_own_time_and_its_moves_the_recorded_clock(root):
     """0.7: a replay's trace reported the seconds since the recorded run started, its moves' clock; it says its own."""
     import datetime as dt
     long_ago = dt.datetime(2026, 1, 2, 3, 4, 5, tzinfo=dt.timezone.utc)
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": [telling(footer=False), telling()]})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks(),
                 now=long_ago)
     assert t.landed and t.started == long_ago
@@ -409,7 +409,7 @@ def test_a_trace_names_its_inputs_root_relative_to_the_runs_root_never_the_machi
     """0.7: `inputs_root` was the absolute folder on the recording machine. It is written relative to the run's root
     when the inputs lie under it, else `.` (the replayer names the folder); a trace written before still replays."""
     import shutil
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": [telling(footer=False), telling()]})
     # inputs elsewhere: `.`, and the replay is given its inputs root
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     assert t.landed
@@ -419,7 +419,7 @@ def test_a_trace_names_its_inputs_root_relative_to_the_runs_root_never_the_machi
     assert again.replay["identical"], again.replay
     # inputs under the run's root: the folder relative to it, and the replay finds them with no help
     shutil.copytree(SUITE / "inputs", root / "work" / "inputs")
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": [telling(footer=False), telling()]})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": [telling(footer=False), telling()]})
     t2 = RUN.run(brief_plan(), inputs_root=root / "work", root=root, coprocessor=cp, moves=fake_moves(),
                  checks=fake_checks())
     assert t2.landed and T.root_item(T.load(t2.path))["inputs_root"] == "work"
@@ -435,8 +435,28 @@ def test_a_trace_names_its_inputs_root_relative_to_the_runs_root_never_the_machi
     assert T.recorded_inputs_root("work", t.dir) == (root / "work").absolute()
 
 
+def test_a_run_recorded_with_tell_reads_and_replays_as_entail(root):
+    """THYM 6.3, "`entail`, once `tell`": a plan, a trace and a candidate written before 0.7 name the move `tell`,
+    and read as `entail`; such a run replays to its recorded outputs, and the replay writes `entail`."""
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": [telling(footer=False), telling()]})
+    t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
+    assert t.landed
+    written = [t.dir / f"{t.run_id}.plan.cosm", t.path, *sorted((t.dir / "candidates").glob("*.cosm"))]
+    for p in written:
+        text = p.read_text(encoding="utf-8")
+        p.write_text(text.replace("move: entail", "move: tell"), encoding="utf-8")
+    assert any("move: tell" in p.read_text(encoding="utf-8") for p in written)
+    assert [r["move"] for r in T.records_of(T.load(t.path))] == ["derive", "entail"]
+    again = RUN.replay(t.dir, root=root, inputs_root=SUITE, moves=fake_moves(), checks=fake_checks())
+    assert isinstance(again, T.Trace) and again.landed, getattr(again, "refusal", again)
+    assert again.replay == {"of": t.run_id, "identical": True, "differences": []}
+    assert [r["move"] for r in again.records] == ["derive", "entail"]
+    assert "move: tell" not in (again.dir / f"{again.run_id}.plan.cosm").read_text(encoding="utf-8")
+    assert again.values["s"].made["move"] == "entail"
+
+
 def test_the_replay_coprocessor_refuses_a_changed_input_or_contract(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling()})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=fake_checks())
     rc = ReplayCoprocessor(t.dir)
     story = load_input(brief_plan()["inputs"][0], SUITE)
@@ -519,8 +539,8 @@ program story-in-brief
   gives brief: short
 
   move plain-paragraph(f: fabula): short
-    let plain = tell f as told
-    assert f covers plain else "the telling lost part of the fabula"
+    let plain = entail f as told
+    assert f covers plain else "the short lost part of the fabula"
     give cut plain to 120 words
   end
 
@@ -537,7 +557,7 @@ def brief_move_plan() -> dict:
 
 
 def test_a_user_move_runs_its_body_with_its_asks_and_asserts(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling()})
     t = RUN.run(brief_move_plan(), inputs_root=SUITE, root=root, coprocessor=cp, program=STORY_IN_BRIEF,
                 moves=fake_moves(), checks=fake_checks())
     assert t.landed, t.refusal
@@ -550,14 +570,14 @@ def test_a_user_move_runs_its_body_with_its_asks_and_asserts(root):
 
 
 def test_a_failed_assert_inside_a_user_move_refuses_with_its_message(root):
-    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
+    cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "entail": telling()})
     # coverage holds as every move's contract check (a declaration is given) and fails as the assert's `covers`
     ck = fake_checks(coverage=lambda out, inputs, node, decl, ctx: (decl is not None, "sentence 2 traces to no item"))
     t = RUN.run(brief_move_plan(), inputs_root=SUITE, root=root, coprocessor=cp, program=STORY_IN_BRIEF,
                 moves=fake_moves(), checks=ck)
     assert t.outcome == "refused" and t.stopped_at == "R:record/2"
     assert (t.refusal.stage, t.refusal.check, t.refusal.line) == ("run", "coverage", 16)
-    assert t.refusal.message == ("give plain-paragraph f (line 16): the telling lost part of the fabula (sentence 2 "
+    assert t.refusal.message == ("give plain-paragraph f (line 16): the short lost part of the fabula (sentence 2 "
                                  "traces to no item)")
     assert not (t.dir / "outputs").exists()
 
@@ -567,7 +587,7 @@ def test_rules_looks_inside_a_user_move_for_scaffolds(root):
     r = RUN.run(brief_move_plan(), inputs_root=SUITE, root=root, rules=True, program=STORY_IN_BRIEF, moves=mv,
                 checks=fake_checks())
     assert isinstance(r, Refusal) and (r.stage, r.check, r.line) == ("plan", "move", 16)
-    assert "scaffold of tell (outline)" in r.message
+    assert "scaffold of entail (outline)" in r.message
     mv.add("outline", lambda ctx, f, **m: Value("short", telling()))          # registered under the scaffold's name
     t = RUN.run(brief_move_plan(), inputs_root=SUITE, root=root, rules=True, program=STORY_IN_BRIEF, moves=mv,
                 checks=fake_checks())
@@ -611,7 +631,7 @@ def test_the_engine_free_checks():
     assert ok("scale-range", Value("morph", {"scales": {"register": 6}}))[0] is False
     reading = Value("short", "---\nread_through: plain-letter\n---\nText.\n\n*a reading of notes.md through plain-letter, made here on 2026-11-01 by g40-04; the text stands unchanged*\n")
     assert ok("labelled", reading) == (True, "") and ok("labelled", Value("short", "Text.\n"))[0] is False
-    assert ok("provenance", Value("short", "x", made={"move": "tell", "run": "r", "step": 1}))[0] is True
+    assert ok("provenance", Value("short", "x", made={"move": "entail", "run": "r", "step": 1}))[0] is True
     assert ok("provenance", Value("short", "x"))[0] is False
     pkg = read_value(SUITE / "inputs" / "orchard-notes.thym", "package")
     assert ok("digests", pkg) == (True, "")
@@ -650,7 +670,7 @@ def test_model_coprocessor_over_a_fake_complete():
     assert cand["output"]["nodes"] == [{"id": "K:claim/a", "stance": "observed", "span": {"lines": "1"}}]
     assert "coverage: line 1 is not covered" in seen[0][-1]["content"]
     md = thym_host.ModelCoprocessor(lambda m: ("```markdown\nA telling.\n```", {}))
-    out = md.complete({"move": "tell", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
+    out = md.complete({"move": "entail", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
                       budget={"attempts": 1, "output_words": 0, "prompt_tokens_max": 0, "seconds": 1})
     assert out["output"] == "A telling.\n" and out["engine"] == "model:unknown"
 

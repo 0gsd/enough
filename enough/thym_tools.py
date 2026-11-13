@@ -524,7 +524,7 @@ def _alts(alts: Any) -> str:
 
 
 def move_signature(d: Any) -> str:
-    """A declared move as a program calls it: `tell <fabula | item | volume> [as <order>] [by <order>] [with
+    """A declared move as a program calls it: `entail <fabula | item | volume> [as <order>] [by <order>] [with
     <morph>]`, then what it gives; a move whose argument is its `of` reads `context of <text | package>`."""
     mods = dict(getattr(d, "modifiers", None) or {})
     parts = [d.name]

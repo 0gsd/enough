@@ -431,7 +431,7 @@ def emf_twins(entries: list[Path]) -> dict[str, Path]:
     return dict(_names.folder_twins(entries).primary)
 
 
-# A SHORT: a telling compiled from an EMF twin, written beside its text as
+# A SHORT: an entailment of an EMF twin, compiled from it and written beside its text as
 # `<text-stem>.short-YYYY-MM-DD-HHMM.md` (`-2`, `-3` on a collision; plan §15,
 # `canon_derive.short_path`). It stays an ordinary, visible file — the person's
 # to read and edit — and the catalogs only mark it (`short_of`) and its text

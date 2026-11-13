@@ -7,7 +7,7 @@ name: read-my-way on orchard-notes.thym
 # a package's is its catalog file's (package.cosm). An if gives a node for its condition and the
 # nodes of each branch say which branch they belong to; both branches give r. Compared without run ids, timestamps
 # and prompt token counts.
-program: {name: read-my-way, sha256: 5c0cce9cf1b2cfccdb18e8a531c7e68d2583d92c6496a20868f6b1fd963283de}
+program: {name: read-my-way, sha256: f91310228643a513239cc564819f24cd3e0e754ce794b8236be509e5ab3af9a1}
 inputs:
   - {name: p, type: package, path: inputs/orchard-notes.thym, sha256: 88cf873f685fd93cb0da5bf9e0c4513efdb94e586276f35f73c8c9accc1a3e18}
   - {name: mine, type: morph, path: inputs/plain-letter.morph.cosm, sha256: cd4465f4f2fe4ad36b7ba01007eac9678991a6b21f2bf8d9c71056c713ef644d}
@@ -78,7 +78,7 @@ nodes:
   - id: R:node/5
     type: node
     name: read f with mine in now
-    summary: "a telling in my morph, labelled a reading"
+    summary: "an entailment in my morph, labelled a reading"
     step: {program: read-my-way, n: 4}
     branch: else
     move: read

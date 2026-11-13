@@ -77,7 +77,7 @@ catalog:
   shorts-fields: [path, at, by, mode, order, route, language, files]
   shorts-path: '<text-stem>.short-<YYYY-MM-DD-HHMM>.md; a cshort: <folder>.cshort-<YYYY-MM-DD-HHMM>/'
   shorts-modes: [model, rules]
-  shorts-orders: [told, weight, code]                              # code: a cshort, told file by file
+  shorts-orders: [told, weight, code]                              # code: a cshort, compiled file by file
   catems-fields: [path, at, by, mode, route, depth]
   catems-path: '<folder>.catem-<YYYY-MM-DD-HHMM>.md'
   catems-depths: [line, overview, manual]
@@ -335,16 +335,16 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
       scaffold-when:                    # a folder has none: nothing but a model reads intent, and --rules refuses it
         - {as: [code], scaffold: file-outline}
         - {takes: folder, scaffold: none}
-  - name: tell
+  - name: entail                        # `tell`, its earlier spelling, reads as entail and is never written (THYM 6.3)
     takes: ['fabula | item | volume']
     gives: short
     modifiers: {as: order, by: order, with: morph}
     asks: true
     contract: [coverage, no-invention, stance-kept, scales-met, footer, provenance]
     scaffold: outline
-    code: enough.thym.moves.emf:tell
-    says: a telling of the fabula, in an order, in a morph
-    thym-1:                             # thym 1: a fabulac told as code (a cshort, a folder) or as a catem (THYM 6.3, 20.7)
+    code: enough.thym.moves.emf:entail
+    says: an entailment of the fabula, in an order, in a morph
+    thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7)
       modifiers: {as: 'order | code | line | overview | manual', by: order, with: morph}
       gives-when:
         - {as: [code], gives: folder}

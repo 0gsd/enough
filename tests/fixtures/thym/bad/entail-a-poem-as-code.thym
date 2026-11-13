@@ -2,11 +2,11 @@
 thym 1
 
 program poem-as-code
-  why: only a fabulac is told as code.
+  why: only a fabulac entails code.
 
   takes poem: text
   gives code: folder
 
   let f = derive poem as verse
-  give tell f as code
+  give entail f as code
 end

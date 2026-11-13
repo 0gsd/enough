@@ -42,6 +42,10 @@ UNITS = ("words", "sentences")
 WORD_CLASSES = {"order": ORDERS, "marking": MARKINGS, "density": DENSITIES, "stance": STANCES}
 # Words that are literals wherever they stand as values, and so are reserved (section 4.7).
 LITERAL_WORDS = frozenset(DENSITIES + ORDERS + MARKINGS + STANCES)
+#: A standard move's earlier spelling, by the move it names (THYM 6.3, "`entail`, once `tell`"): read for good under
+#: every grammar version as that move, and never written. A call, a plan's node, a trace's record and a value's `made`
+#: that say `tell` say `entail`; a program's own text keeps its words. An earlier spelling stays reserved (4.7).
+EARLIER_SPELLINGS = {"tell": "entail"}
 # The operand types that accept `nothing`: the last three parts of a package (section 6.3).
 OPTIONAL = ("morph", "context", "graph")
 
@@ -49,6 +53,12 @@ ANY = "any"
 NOTHING = "nothing"
 WORD = "word"
 CONDITION = "condition"
+
+
+def move_now(name: object) -> object:
+    """A move's name as the compiler writes it: an earlier spelling as the move it names (`tell` is `entail`), any
+    other name, or anything that is not a string, as it is."""
+    return EARLIER_SPELLINGS.get(name, name) if isinstance(name, str) else name
 
 
 def list_of(t: str) -> str:
@@ -146,15 +156,23 @@ def _article(t: str) -> str:
 
 _HINTS = {
     ("text", "fabula"): "derive it first",
-    ("text", "short"): "derive it, then tell it",
+    ("text", "short"): "derive it, then entail it",
     ("text", "atem"): "derive it, then atem it",
-    ("fabula", "short"): "tell it first",
+    ("fabula", "short"): "entail it first",
     ("fabula", "atem"): "atem it first",
     ("short", "atem"): "atem it first",
     ("atem", "short"): "expand it first",
-    ("short", "fabula"): "a short is a telling, not a fabula: derive its text instead",
+    ("short", "fabula"): "a short is an entailment of a fabula, not a fabula: derive its text instead",
     ("number", "word"): "band it first",
 }
+
+
+#: The fix for one move given a value of the wrong density, where the move itself is the mistake (THYM 6.3): DocOES's
+#: byte-exact `compile` given a fabula.
+MOVE_HINTS = {("compile", "fabula"): "to compile a fabula into a short, use entail"}
+#: The move meant by a name no manifest declares, where spelling alone would not find it (THYM 6.4): a program that
+#: says `summarise` means `entail`, whatever difflib finds nearest.
+MEANT = {"summarise": "entail", "summarize": "entail", "retell": "entail"}
 
 
 def hint(actual: str | None, alts: list[str]) -> str | None:

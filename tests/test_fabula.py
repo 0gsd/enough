@@ -323,7 +323,7 @@ def test_the_core_modules_file_is_not_a_manifest_nor_a_moves_sidecar():
     assert not M.CORE_MODULES_FILE.endswith((".manifest.cosm", ".moves.cosm"))
     decls = dc.load()
     assert decls.problems == []
-    assert {decls[n].owner for n in ("derive", "tell", "atem", "expand")} == {"fabula"}
+    assert {decls[n].owner for n in ("derive", "entail", "atem", "expand")} == {"fabula"}
 
 
 def test_a_broken_core_modules_file_is_a_problem_never_a_crash(tmp_path):
@@ -436,7 +436,7 @@ def test_the_fabula_manifest():
         for k, spec in m.kinds(L).items():
             assert spec["flavours"] == list(fabula.FLAVOURS), (L, k)
     # the four emf/1 declared, and the fabulac's two stages, thym 1 only (THYM 6.2, 6.3)
-    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "tell", "atem", "expand", "survey", "history"]
+    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "entail", "atem", "expand", "survey", "history"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
     assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:])
     assert "emf-checks" in m.data["moves"][0]["contract"]

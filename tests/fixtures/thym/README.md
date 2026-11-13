@@ -55,8 +55,10 @@ The dialectic's static refusals (THYM 22) are `bad/question-in-zero.thym` (`comp
 test file, a README, a change log, an MIT licence and a `pyproject.toml`), never run: `inputs/conftest.py` keeps pytest
 from collecting its test. `tests/test_thym_code.py` builds its whole fabulac with `defaults/thym/decompile-python.thym`
 and compiles it back with `compile-python.thym` under a scripted coprocessor, and makes a clone of it in a temporary
-folder for the history. The fabulac's static refusals are `bad/tell-a-poem-as-code.thym` (`compile flavour`) and
-`bad/cshort-as-a-short.thym` (`compile type`: `tell … as code` gives a folder).
+folder for the history. The fabulac's static refusals are `bad/entail-a-poem-as-code.thym` (`compile flavour`) and
+`bad/cshort-as-a-short.thym` (`compile type`: `entail … as code` gives a folder). The second is written with `tell`,
+`entail`'s earlier spelling (THYM 6.3), which the compiler reads as `entail` for good, so the suite holds one program
+that still says it.
 
 The orchard text and its twin are copies of `../cosm/emf/notes.md` and `notes.md.cosm`; inside the package the twin's
 `source.path` and its spans say `text.md`, as a package's fabula must.

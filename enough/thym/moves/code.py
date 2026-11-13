@@ -11,10 +11,10 @@ catems (THYM 6.3, 7.3, 20; MacroCOSM OES 18.4.1, 18.4.7, 18.4.8).
   and events, read against the outline.
 - `derive repo with f` (asks): the fold, aims, audience, uses, requirements, decisions, exclusions, inspiration and
   the atem, each grounded in what the fabulac and the documents hold.
-- `tell f as code` (asks, once per file): the cshort, a folder with `CSHORT.md`; `tell f as line | overview | manual`:
-  the catem at that depth.
+- `entail f as code` (asks, once per file): the cshort, a folder with `CSHORT.md`; `entail f as line | overview |
+  manual`: the catem at that depth.
 
-`emf.py`'s `derive` and `tell` reach the four asking branches here; `survey` and `history` are declared with their
+`emf.py`'s `derive` and `entail` reach the four asking branches here; `survey` and `history` are declared with their
 own `code:`. The checks of THYM 7.3 these moves keep are registered here: `files-found`, `code-span`,
 `licence-recorded`, `outline-cited`, `fold-grounded`, `history-grounded`, `parses`, `interfaces-present`,
 `files-present`, `uses-told`, `flavour`, and the code readings of `coverage`, `footer` and `atem-shape` that
@@ -24,7 +24,7 @@ own `code:`. The checks of THYM 7.3 these moves keep are registered here: `files
 snapshot), and reach anything else only through `ctx.engines`: `repo` (a clone's history and MacroCOSM's file
 counts) and `syntax` (a file's outline, a parse, a packaging file), which the host provides and the runtime records,
 so that a replay needs neither the repository, nor git, nor a parser. Without those engines a move refuses, saying
-which engine is missing. Nothing told is run either: `parses` and `interfaces-present` read the syntax engine's
+which engine is missing. Nothing entailed is run either: `parses` and `interfaces-present` read the syntax engine's
 answers about the cshort's text.
 
 Standalone: the standard library, PyYAML and the MacroCOSM reader the package already uses.
@@ -42,7 +42,7 @@ from enough.thym.checks import CHECKS as _CHECKS
 from enough.thym.checks import check
 from enough.thym.folder import Folder, digest_of, lines_in, path_key
 from enough.thym.moves import (LADDER, MoveError, answer_mapping, engine, fabula_doc, fold, item_kind, model_of,
-                               short_value, telling_of, utc_day, words_in)
+                               short_value, entailment_of, utc_day, words_in)
 from enough.thym.registry import Request, implements
 from enough.thym.values import Value, plain
 
@@ -2375,7 +2375,7 @@ def _drop_unresolved_fold(v: Value, failed: list, taken: set[str]) -> Value | No
 
 
 # ---------------------------------------------------------------------------
-# tell f as code: the cshort (asks, once per file)
+# entail f as code: the cshort (asks, once per file)
 # ---------------------------------------------------------------------------
 
 def fabulac_file(cat: dict, fab: Value) -> str:
@@ -2596,11 +2596,11 @@ def _failed_paths(failed: list, paths: list[str]) -> set[str]:
     return out
 
 
-def tell_code(ctx: Any, fab: Value, **mods: Any) -> Value:
-    """`tell f as code`: the cshort (THYM 20.7): one request per file it rebuilds, the files assembled into a folder
+def entail_code(ctx: Any, fab: Value, **mods: Any) -> Value:
+    """`entail f as code`: the cshort (THYM 20.7): one request per file it rebuilds, the files assembled into a folder
     with `CSHORT.md`. Called again with what failed, it asks again only for the files the failures name."""
-    cat, items = _fabula(fab, "tell … as code tells a fabulac")
-    _need_fabulac(cat, "f", "only a fabulac is told as code")
+    cat, items = _fabula(fab, "entail … as code takes a fabulac")
+    _need_fabulac(cat, "f", "only a fabulac entails code")
     want, rest = rebuilt(items)
     if not [x for x in want if x.get("language") == "python"]:
         raise MoveError("the fabulac names no Python file to rebuild")
@@ -2710,7 +2710,7 @@ def cshort_md(ctx: Any, cat: dict, fab: Value, rows: list[tuple[str, str]], text
 
 
 # ---------------------------------------------------------------------------
-# tell f as line | overview | manual: the catem
+# entail f as line | overview | manual: the catem
 # ---------------------------------------------------------------------------
 
 CATEM_SAYS = ("a YAML mapping: intro, a list of sentences; sections, a list of {heading, sentences}; every sentence "
@@ -2727,7 +2727,7 @@ def reached(items: list[dict]) -> list[dict]:
             and it.get("exported") is not False]
 
 
-def must_tell(items: list[dict], depth: str) -> list[str]:
+def must_say(items: list[dict], depth: str) -> list[str]:
     uses = [it["id"] for it in items if item_kind(it) == "use"]
     if depth == "manual":
         return uses + [it["id"] for it in reached(items)]
@@ -2750,11 +2750,11 @@ def _catem_outline(items: list[dict], depth: str) -> str:
     return _yaml(plain([_compact(it) for it in rows if not (it["id"] in seen or seen.add(it["id"]))]))
 
 
-def tell_catem(ctx: Any, fab: Value, depth: str, **mods: Any) -> Request | Value:
-    """`tell f as line | overview | manual`: the catem (THYM 20.7). `line` is the atem's line, asked of no model;
-    the other two are told, sentence by sentence with the ids each says, and composed under headings."""
-    cat, items = _fabula(fab, f"tell … as {depth} tells a fabulac")
-    _need_fabulac(cat, "f", "a catem is told from a fabulac")
+def entail_catem(ctx: Any, fab: Value, depth: str, **mods: Any) -> Request | Value:
+    """`entail f as line | overview | manual`: the catem (THYM 20.7). `line` is the atem's line, asked of no model;
+    the other two are asked for, sentence by sentence with the ids each says, and composed under headings."""
+    cat, items = _fabula(fab, f"entail … as {depth} takes a fabulac")
+    _need_fabulac(cat, "f", "only a fabulac entails a catem")
     atem = cat.get("atem") if isinstance(cat.get("atem"), dict) else {}
     uses = [it["id"] for it in items if item_kind(it) == "use"]
     if depth == "line":
@@ -2768,7 +2768,7 @@ def tell_catem(ctx: Any, fab: Value, depth: str, **mods: Any) -> Request | Value
     inputs = {"fabulac": Value("string", "catem"), "depth": Value("string", depth),
               "name": Value("string", str(cat.get("name") or "the program")),
               "atem": Value("string", _yaml(plain(atem))), "outline": Value("string", _catem_outline(items, depth)),
-              "must": Value("string", _yaml(must_tell(items, depth)))}
+              "must": Value("string", _yaml(must_say(items, depth)))}
 
     def parse(out: Any) -> Value:
         data = answer_mapping(out)
@@ -2833,8 +2833,8 @@ def uses_outline(ctx: Any, fab: Value, **mods: Any) -> Value:
     """`uses-outline`, the catem's scaffold: the uses and the interfaces a person reaches, in told order, in their
     own words, with a footer that says rules made it."""
     depth = mods.get("as") if mods.get("as") in CATEM_DEPTHS else "overview"
-    cat, items = _fabula(fab, "a catem is told from a fabulac")
-    _need_fabulac(cat, "f", "a catem is told from a fabulac")
+    cat, items = _fabula(fab, "only a fabulac entails a catem")
+    _need_fabulac(cat, "f", "only a fabulac entails a catem")
     name = str(cat.get("name") or "the program")
     md, sents, covers = [f"# What you can do with {name}", ""], [], []
     atem = cat.get("atem") if isinstance(cat.get("atem"), dict) else {}
@@ -3126,7 +3126,7 @@ def _history_grounded(output: Value, inputs: dict, node: dict, decl: Any, ctx: A
 def _cshort_parts(output: Value, inputs: dict) -> tuple[Folder | None, dict, list[dict], Value | None]:
     fab = _first(inputs, "fabula")
     if fab is None:
-        t = telling_of(output)
+        t = entailment_of(output)
         fab = t.get("fabula") if t else None
     f = output.payload if isinstance(output.payload, Folder) else None
     cat, items = fabula_doc(fab) if fab is not None else ({}, [])
@@ -3303,49 +3303,50 @@ def footer_problem(output: Value, inputs: dict, ctx: Any) -> str | None:
         if fab is not None and lines[-1] != licence_line(cat):
             return f"CSHORT.md's last line is not the licence line: {lines[-1][:80]}"
         return None
-    t = telling_of(output)
+    t = entailment_of(output)
     lines = [ln.strip() for ln in output.text().replace("\r\n", "\n").split("\n") if ln.strip()]
     m = _CATEM_FOOT.match(lines[-1]) if lines else None
     if not m:
         return f"the last line is not a catem's footer: {lines[-1][:80] if lines else ''}"
     depth = (t or {}).get("depth")
     if depth and m.group("depth") != depth:
-        return f"the footer says depth {m.group('depth')}, and the catem is told at {depth}"
+        return f"the footer says depth {m.group('depth')}, and the catem is entailed at {depth}"
     return None
 
 
-def is_code_telling(output: Value) -> bool:
+def is_code_entailment(output: Value) -> bool:
     """A cshort (a folder) or a catem (a short that carries its depth): what `footer` reads with this module's rule."""
-    return isinstance(output.payload, Folder) or bool((telling_of(output) or {}).get("depth"))
+    return isinstance(output.payload, Folder) or bool((entailment_of(output) or {}).get("depth"))
 
 
 @check("uses-told")
 def _uses_told(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """A catem tells everything its depth asks for: at `overview` every use, at `manual` every use and every
+    """A catem says everything its depth asks for: at `overview` every use, at `manual` every use and every
     interface a person reaches (THYM 7.3)."""
-    t = telling_of(output) or {}
+    t = entailment_of(output) or {}
     depth = t.get("depth")
     fab = t.get("fabula") if isinstance(t.get("fabula"), Value) else _first(inputs, "fabula")
     if depth not in CATEM_DEPTHS or fab is None:
-        return False, "the telling is no catem"
+        return False, "the short is no catem"
     _cat, items = fabula_doc(fab)
     told = {c for cs in t.get("covers") or [] for c in cs}
-    missing = [i for i in must_tell(items, depth) if i not in told]
+    missing = [i for i in must_say(items, depth) if i not in told]
     if missing:
-        return False, f"the catem at depth {depth} does not tell {', '.join(missing[:6])}"
+        return False, f"the catem at depth {depth} does not say {', '.join(missing[:6])}"
     return True, ""
 
 
 @check("flavour")
 def _flavour(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """The fabula's flavour is one the move takes: only a fabulac is told as code or at a catem's depth (THYM 7.3)."""
+    """The fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth (THYM 7.3)."""
     fab = _first(inputs, "fabula")
     if fab is None:
         return True, ""
     fl = flavour_of(fabula_doc(fab)[0])
     as_ = ((node or {}).get("modifiers") or {}).get("as")
     if (as_ == "code" or as_ in CATEM_DEPTHS) and fl != "fabulac":
-        return False, f"the fabula is a {fl}; only a fabulac is told as {as_}"
+        return False, f"the fabula is a {fl}; " + ("only a fabulac entails code" if as_ == "code" else
+                                                     "only a fabulac entails a catem")
     return True, ""
 
 
@@ -3396,7 +3397,7 @@ _fabula_checks_joined._core = _CORE_FABULA_CHECKS          # type: ignore[attr-d
 
 
 # ---------------------------------------------------------------------------
-# Dispatch: what `derive` and `tell` hand on to this module (emf.py calls these)
+# Dispatch: what `derive` and `entail` hand on to this module (emf.py calls these)
 # ---------------------------------------------------------------------------
 
 def derive_branch(ctx: Any, x: Value, mods: dict) -> Any:
@@ -3417,29 +3418,29 @@ def derive_scaffold_branch(ctx: Any, x: Value, mods: dict) -> Any:
     return None
 
 
-def tell_branch(ctx: Any, x: Value, mods: dict) -> Any:
+def entail_branch(ctx: Any, x: Value, mods: dict) -> Any:
     a = mods.get("as")
     if a == "code":
-        return tell_code(ctx, x, **mods)
+        return entail_code(ctx, x, **mods)
     if a in CATEM_DEPTHS:
-        return tell_catem(ctx, x, a, **mods)
+        return entail_catem(ctx, x, a, **mods)
     if isinstance(x, Value) and x.type == "fabula" and flavour_of(fabula_doc(x)[0]) == "fabulac" and a is None:
         return None
     return None
 
 
-def tell_scaffold_branch(ctx: Any, x: Value, mods: dict) -> Any:
+def entail_scaffold_branch(ctx: Any, x: Value, mods: dict) -> Any:
     a = mods.get("as")
     if a == "code":
-        raise MoveError("tell … as code has no scaffold: only a model writes code, so a run with --rules cannot tell "
-                        "it")
+        raise MoveError("entail … as code has no scaffold: only a model writes code, so a run with --rules cannot "
+                        "entail it")
     if a in CATEM_DEPTHS:
         return uses_outline(ctx, x, **mods)
     return None
 
 
 __all__ = ["BAND_FILES", "BAND_LINES", "CHUNK_LINES", "atem_of", "chunks_of", "code_coverage", "code_span_problem",
-           "derive_branch", "derive_scaffold_branch", "file_brief", "file_outline", "fold_folder", "footer_problem",
-           "history", "is_code_telling", "is_test", "local_outline", "module_name", "must_tell", "parse_fold",
-           "parse_reading", "read_file", "read_licence", "rebuilt", "slug", "survey", "tell_branch", "tell_catem",
-           "tell_code", "tell_scaffold_branch", "uses_outline"]
+           "derive_branch", "derive_scaffold_branch", "entail_branch", "entail_catem", "entail_code",
+           "entail_scaffold_branch", "file_brief", "file_outline", "fold_folder", "footer_problem", "history",
+           "is_code_entailment", "is_test", "local_outline", "module_name", "must_say", "parse_fold", "parse_reading",
+           "read_file", "read_licence", "rebuilt", "slug", "survey", "uses_outline"]

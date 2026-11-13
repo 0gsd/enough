@@ -592,11 +592,11 @@ def test_moves_lists_every_move_of_a_version_as_the_tool_does(client: TestClient
     owners = list(dict.fromkeys(m["owner"] for m in body["moves"]))
     assert owners[:3] == ["thym", "fabula", "doc"], owners           # THYM 6.2's order, each owner's moves together
     assert len(owners) == len({m["owner"] for m in body["moves"]})
-    tell = next(m for m in body["moves"] if m["name"] == "tell")
+    tell = next(m for m in body["moves"] if m["name"] == "entail")
     assert set(tell) == {"name", "owner", "format", "source", "since", "versions", "signature", "takes", "of",
                          "modifiers", "gives", "asks", "scaffold", "contract", "says", "extended"}
     assert tell["format"] == "fabula/1" and tell["versions"] == [0, 1] and tell["asks"] is True
-    assert tell["signature"].startswith("tell <fabula | item | volume") and tell["source"].endswith(".cosm")
+    assert tell["signature"].startswith("entail <fabula | item | volume") and tell["source"].endswith(".cosm")
     ctx = next(m for m in body["moves"] if m["name"] == "context")
     assert ctx["takes"] == [] and ctx["of"] and "of" not in ctx["modifiers"]
     project_move = next(m for m in body["moves"] if m["name"] == "project")

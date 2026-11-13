@@ -27,6 +27,7 @@ from typing import Any
 
 from enough import macrocosm as mc
 from enough.thym import MINICOSM, Refusal
+from enough.thym.types import move_now
 from enough.thym.values import Value, plain, posix_path
 
 
@@ -259,6 +260,8 @@ def load(path: Path) -> dict | Refusal:
         return Refusal("run", "trace", f"{path} could not be read: {e}")
     if not isinstance(data, dict) or data.get("kind") != "trace":
         return Refusal("run", "trace", f"{path} is not a trace volume")
+    for rec in records_of(data):          # a record of `tell`, entail's earlier spelling, reads as entail (THYM 6.3)
+        rec["move"] = move_now(rec.get("move"))
     return data
 
 

@@ -710,7 +710,7 @@ def _no_feed(words: list) -> dict:
 #: The fields of a FEED entry that anything a run reaches reads, and so all the feed engine answers with. A recorded run
 #: writes every answer into its trace (`candidates/<node>-e<k>.1.cosm`), so a whole entry (rhymes, forms, six
 #: languages' definitions) would make the record many times the run. The readers, all of them:
-#: - `moves/morph.py` `statistics` (measure, and `null-pinned`'s and `scales-met`'s count of a telling): `frequency_rank`;
+#: - `moves/morph.py` `statistics` (measure, and `null-pinned`'s and `scales-met`'s count of a short): `frequency_rank`;
 #: - `moves/emf.py` `_term_problem` (`terms-grounded`): only whether a word has an entry (any mapping);
 #: - `canon_derive` through the `canon` engine (`derive_passages`, `derive_rules`, `derive_gaps`, `derive_finish`):
 #:   `_term_table` reads `word` and `frequency_rank`, `_passage_terms` `definition`, `pos_primary` and `pos`,
@@ -1066,7 +1066,7 @@ _ORDER_SAID = {"told": "Tell the items in the order given: the order the author 
                "weight": "Tell the claims in the order given, the weightiest first; then the events; then the terms."}
 
 
-def _tell_messages(contract: dict, inputs: dict) -> list[dict]:
+def _entail_messages(contract: dict, inputs: dict) -> list[dict]:
     if (msgs := _passthrough(inputs)) is not None:
         return msgs
     order = _in(inputs, "order") or "told"
@@ -1083,8 +1083,8 @@ def _tell_messages(contract: dict, inputs: dict) -> list[dict]:
 def _null_messages(contract: dict, inputs: dict) -> list[dict]:
     if (msgs := _passthrough(inputs)) is not None:
         return msgs
-    system = ("You write the null telling of a fabula: the plainest telling that keeps every item, the reference "
-              "every other telling is measured against.\n"
+    system = ("You write the null short of a fabula: the plainest short that keeps every item, the reference "
+              "every other short is measured against.\n"
               "- Tell the items in the order given, one claim per sentence.\n"
               "- Use the commonest words that still say it; keep the items' own names and terms.\n"
               "- Short sentences: ten words or fewer on average. Split a long claim into two sentences.\n"
@@ -1150,7 +1150,7 @@ def _measure_messages(contract: dict, inputs: dict) -> list[dict]:
 def _morph_messages(contract: dict, inputs: dict) -> list[dict]:
     if (msgs := _passthrough(inputs)) is not None:
         return msgs
-    system = ("You tell a short again in a morph. Keep its items: each sentence of the new telling cites the ids it "
+    system = ("You tell a short again in a morph. Keep its items: each sentence of the new short cites the ids it "
               "says, from the ids the numbered sentences carry in square brackets. Say nothing they do not hold, and "
               f"say no claim more strongly than it was said.\n{_in(inputs, 'asks')}\n{_STANCES_SAID}\n"
               + _SENTENCES_FORM)
@@ -1163,7 +1163,7 @@ def _read_messages(contract: dict, inputs: dict) -> list[dict]:
         return msgs
     words = _in(inputs, "words")
     system = ("You make a reading: someone else's fabula told in the reader's own morph, for the reader's occasion. "
-              "It is the reader's telling, never the author's text: say nothing the items do not hold.\n"
+              "It is the reader's own short, never the author's text: say nothing the items do not hold.\n"
               f"Tell it in this morph, keeping each scale near its number:\n{_in(inputs, 'asks')}\n"
               f"The occasion:\n{_in(inputs, 'occasion')}\n"
               + (f"About {words} words.\n" if words else "") + f"{_STANCES_SAID}\n"
@@ -1187,7 +1187,7 @@ def _derive_messages(contract: dict, inputs: dict) -> list[dict]:
                                                           passage=numbered)}]
 
 
-PROMPTS = {"derive": _derive_messages, "tell": _tell_messages, "null": _null_messages, "expand": _expand_messages,
+PROMPTS = {"derive": _derive_messages, "entail": _entail_messages, "null": _null_messages, "expand": _expand_messages,
            "atem": _atem_messages, "measure": _measure_messages, "morph": _morph_messages, "read": _read_messages}
 for _move, _builder in PROMPTS.items():
     _registry.prompt_for(_move)(_builder)

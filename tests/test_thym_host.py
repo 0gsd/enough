@@ -115,7 +115,7 @@ program tree
     if more then
       give again x, false
     else
-      give words (tell (derive x) as told)
+      give words (entail (derive x) as told)
     end
   end
 
@@ -293,7 +293,7 @@ def test_local_runs_on_llama_server_whatever_the_chats_slot(live, monkeypatch):
         return "A telling.", {"model": "g40-04", "route": "local", "usage": {"total_tokens": 9}}
     monkeypatch.setattr(llm, "complete_local", complete_local)
     cop = H.runtime_kwargs(route="local", llm_url="http://127.0.0.1:9")["coprocessor"]
-    cand = cop.complete({"move": "tell", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
+    cand = cop.complete({"move": "entail", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
                         budget={"attempts": 1, "output_words": 0, "prompt_tokens_max": 0, "seconds": 1})
     assert seen == ["http://127.0.0.1:9"]
     assert (cand["engine"], cand["route"], cand["tokens"]) == ("model:g40-04", "local", 9) and "provider" not in cand
@@ -305,7 +305,7 @@ def test_a_cloud_candidate_says_its_route_provider_and_the_models_own_id(live, m
         "model": "vendor/large-model-2026", "usage": {"total_tokens": 21},
         "choices": [{"finish_reason": "stop", "message": {"content": "A telling."}}]})
     cop = H.runtime_kwargs(route="cloud", model="vendor/large-model", project_dir=tmp_path)["coprocessor"]
-    cand = cop.complete({"move": "tell", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
+    cand = cop.complete({"move": "entail", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
                         budget={"attempts": 1, "output_words": 0, "prompt_tokens_max": 0, "seconds": 1})
     assert (cand["engine"], cand["route"], cand["provider"]) == ("model:vendor/large-model-2026", "cloud",
                                                                   "openrouter")
@@ -315,7 +315,7 @@ def test_a_cloud_candidate_says_its_route_provider_and_the_models_own_id(live, m
 
 def test_a_coprocessor_with_no_route_says_none_as_before():
     cop = H.ModelCoprocessor(lambda m: ("A telling.", {"model": "m1"}))
-    cand = cop.complete({"move": "tell", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
+    cand = cop.complete({"move": "entail", "schema": {"format": "markdown"}, "checks": [], "repair": {}}, {},
                         budget={})
     assert "route" not in cand and "provider" not in cand and cand["engine"] == "model:m1"
 
@@ -360,7 +360,7 @@ def test_made_and_the_recorded_candidate_carry_the_route(live, tmp_path, monkeyp
 
 def test_a_run_recorded_before_routes_replays_without_one(tmp_path):
     import test_thym_run as TR
-    cp = TR.FakeCoprocessor({"derive": TR.TWIN.read_text(encoding="utf-8"), "tell": TR.telling()})
+    cp = TR.FakeCoprocessor({"derive": TR.TWIN.read_text(encoding="utf-8"), "entail": TR.telling()})
     t = RUN.run(TR.brief_plan(), inputs_root=TR.SUITE, root=tmp_path / "thym", coprocessor=cp,
                 moves=TR.fake_moves(), checks=TR.fake_checks())
     assert "route" not in (t.dir / "candidates" / "2.1.cosm").read_text(encoding="utf-8")

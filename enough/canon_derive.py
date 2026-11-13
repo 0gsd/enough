@@ -2358,7 +2358,7 @@ def _verse_prose(poem: _verse.Poem | None, text: str) -> str:
 
 def _carried_shorts(previous: str | None) -> list | None:
     """The `shorts:` list of the twin a derivation replaces (the same name refreshed, or an old-named twin replaced
-    by one under the new name), carried as it is: a fabula records every telling compiled from it (MacroCOSM OES
+    by one under the new name), carried as it is: a fabula records every entailment compiled from it (MacroCOSM OES
     18.4, 18.4.4). None when there is none or it cannot be read."""
     if not previous:
         return None
@@ -2734,7 +2734,7 @@ def source_path(emf_path: Path | str, volume_or_text: Any = None) -> Path | None
 
 def default_order(volume_or_text: Any, *, source_readable: bool = True) -> str:
     """The order a compile tells in when nobody chose (owner decision 4): `told`, the author's own order, when
-    the EMF has a `source` and its text can be read; `weight` for a standalone EMF (no telling to follow)."""
+    the EMF has a `source` and its text can be read; `weight` for a standalone EMF (no author's order to follow)."""
     cat, _items = _as_doc(volume_or_text)
     return "told" if _source_of(cat) and source_readable else "weight"
 
@@ -2872,11 +2872,11 @@ def _event_order(events: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# SHORT: a telling compiled from the fabula (plan §15)
+# SHORT: an entailment of the fabula, compiled from it (plan §15)
 # ---------------------------------------------------------------------------
 #
 # An EMF twin is the fabula: the order-free material of a text, every item with a `span` saying where in the
-# telling it was found. A SHORT (syuzhetic-hermeneutic open readable text) is a telling enough compiles from it:
+# text it was found. A SHORT (syuzhetic-hermeneutic open readable text) is an entailment enough compiles from it:
 # an arrangement that says how each thing is known as it tells it, in plain markdown, yours to edit, honest about
 # its gaps and open to the reader's own reading. Two orders: `told` (the author's, by span) and `weight` (salience,
 # grouped by concept, then events, then terms). The atem leads both and belongs to neither.
@@ -2931,7 +2931,7 @@ def _folded_lines(source_text: str) -> tuple[str, list[int]]:
 
 
 def _span_place(span: Any, folded: tuple[str, list[int]] | None) -> tuple[int, int] | None:
-    """Where an item sits in the telling, as `(first line, last line)`: its span's `lines`, else (with the text at
+    """Where an item sits in the author's text, as `(first line, last line)`: its span's `lines`, else (with the text at
     hand) the lines its `start` and `end` quotes are found on. None: the span does not place it."""
     if not isinstance(span, dict):
         return None
@@ -2956,7 +2956,7 @@ def _span_place(span: Any, folded: tuple[str, list[int]] | None) -> tuple[int, i
 
 
 def _told_item(it: dict, by_id: dict, names: set[str]) -> str | None:
-    """One item of the fabula, said as a line of the telling; None when it has nothing to say."""
+    """One item of the fabula, said as a line of the short; None when it has nothing to say."""
     kind = it.get("type")
     summary = it.get("summary") if isinstance(it.get("summary"), str) and it["summary"].strip() else None
     name = str(it.get("name") or "").strip()
@@ -2981,7 +2981,7 @@ def _told_lines(items: list[dict], by_id: dict, names: set[str], *, title: str,
     then words, names, ideas, claims, events, then the twin's own order), grouped under the text's headings — the
     one an item's span names (`span.heading`, when a twin records it), else the heading it falls under in the text,
     when the text is at hand, else none; then the items no span places, under "Also in the fabula". The atem is
-    not among them: it is the breath of the whole, outside the telling. Pinned passage atems (X) likewise."""
+    not among them: it is the breath of the whole, outside the short. Pinned passage atems (X) likewise."""
     folded = _folded_lines(source_text) if source_text else None
     heads = _source_headings(source_text, title)
     chains: list[list[_Heading]] = []
@@ -3050,7 +3050,7 @@ def _reading_said(r: dict) -> str:
 
 
 def _verse_said(it: dict, by_id: dict, names: set[str]) -> str | None:
-    """One item of a fabulap, said as a line of its telling."""
+    """One item of a fabulap, said as a line of its short."""
     kind = it.get("type")
     summary = it.get("summary") if isinstance(it.get("summary"), str) and it["summary"].strip() else None
     if kind == "line":
@@ -3198,7 +3198,7 @@ def compile_text(volume_or_text: Any, *, complete: CompleteFn | None = None, sou
 
 
 # ---------------------------------------------------------------------------
-# The fabula records its tellings: the twin's `shorts:` list
+# The fabula records its entailments: the twin's `shorts:` list
 # ---------------------------------------------------------------------------
 
 _PLAIN_SCALAR = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.@/+-]*$")
@@ -3228,7 +3228,7 @@ def _flow_entry(entry: dict) -> str:
 
 def record_short(twin_text: str, *, path: str, at: dt.datetime | None = None, by: str, mode: str,
                  order: str, route: str | None = None) -> str:
-    """Append one telling to the EMF's `shorts:` list — `{path, at, by, mode, order}`: the short's file name
+    """Append one short to the EMF's `shorts:` list — `{path, at, by, mode, order}`: the short's file name
     beside the twin, when (UTC), the model's id or `rules`, `model` | `rules`, `told` | `weight` — and return the
     EMF's new text. The list is made just above `nodes:` when there is none. Everything else stays byte for byte:
     the change is made in the text, never by loading and dumping the twin (its comments, quoting and order are

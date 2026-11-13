@@ -18,7 +18,7 @@ line (its prompt builder is registered here, `reword.prompt`).
 
 - `cut` shortens a short by whole sentences, the lightest first, until it fits `to N words` or `to N sentences`. A
   sentence weighs what the heaviest item it says weighs (EMF's salience: critical, high, normal, low), read from the
-  citations the short carries beside its text (`telling_of`); among sentences of one weight the later goes first, so
+  citations the short carries beside its text (`entailment_of`); among sentences of one weight the later goes first, so
   the opening stays. A short read from disk carries no citations, and every sentence weighs the same. Headings are
   structure: one goes only when nothing is left under it. The footer stays.
 - `count` counts a volume's items, a fabula's items, a short's lines or a list's members; `words` counts a text's,
@@ -38,7 +38,7 @@ from typing import Any
 from enough import macrocosm as mc
 from enough.thym import checks as C
 from enough.thym.checks import body, check
-from enough.thym.moves import SALIENCE, MoveError, fabula_doc, fold, short_value, telling_of
+from enough.thym.moves import SALIENCE, MoveError, fabula_doc, fold, short_value, entailment_of
 from enough.thym.registry import Amount, Request, implements, prompt_for
 from enough.thym.values import (
     CHANGE_DOES,
@@ -73,7 +73,7 @@ def _units(text: str) -> tuple[str, list[list[str]], str]:
 def _weights(short: Value, units: list[str]) -> list[int]:
     """Each unit's weight: the heaviest salience among the items its sentence cites (normal for an item without one);
     every unit weighs `normal` when the short carries no citations."""
-    t = telling_of(short)
+    t = entailment_of(short)
     if not t or t.get("covers") is None:
         return [SALIENCE["normal"]] * len(units)
     fab = t.get("fabula")
@@ -92,7 +92,7 @@ def _is_heading(u: str) -> bool:
 
 
 def _cites_of(short: Value, kept: list[str]) -> tuple[list[str], list[list[str]]] | None:
-    t = telling_of(short)
+    t = entailment_of(short)
     if not t or t.get("covers") is None:
         return None
     said = [(fold(s), c) for s, c in zip(t.get("sentences") or [], t.get("covers") or [])]
@@ -144,7 +144,7 @@ def cut(ctx: Any, short: Value, **mods: Any) -> Value:
     if front and not text.startswith(front):
         text = front + text
     kept = [u for pi, ui, u in flat if (pi, ui) in alive]
-    t = telling_of(short) or {}
+    t = entailment_of(short) or {}
     cites = _cites_of(short, kept)
     extra = {k: v for k, v in t.items() if k not in ("fabula", "sentences", "covers", "order", "morph")}
     extra["cut_from"] = short.sha256
@@ -167,7 +167,7 @@ def _weight_order(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
     kept_text = {fold(u) for p in _units(output.text())[1] for u in p}
     removed = [w for u, w in zip(units, weights) if fold(u) not in kept_text and not _is_heading(u)]
     kept = [w for u, w in zip(units, weights) if fold(u) in kept_text and not _is_heading(u)]
-    if not telling_of(src) or telling_of(src).get("covers") is None:
+    if not entailment_of(src) or entailment_of(src).get("covers") is None:
         return True, "the short carries no citations, so every sentence weighed the same"
     if removed and kept and max(removed) > min(kept):
         names = {v: k for k, v in SALIENCE.items()}

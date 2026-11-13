@@ -174,7 +174,7 @@ def test_check_file_and_plan_file():
 def test_prose_heads_run_to_a_blank_line_a_head_or_end():
     checked = ok(V + "program p\n  why: one line\n  must: a constraint\n       continued here\n"
                  "  decided 2026-11-01: a decision\n  takes t: text\n  gives s: short\n"
-                 "  give tell (derive t) as told\nend\n")
+                 "  give entail (derive t) as told\nend\n")
     b = checked.programs()[0]
     assert b.why.text == "one line"
     assert [m.text for m in b.musts] == ["a constraint continued here"]
@@ -184,7 +184,7 @@ def test_prose_heads_run_to_a_blank_line_a_head_or_end():
 
 def test_a_prose_line_that_begins_with_a_statement_keyword_warns():
     module = ps.parse(V + "program p\n  why: the reason\n  give the reader something\n  takes t: text\n"
-                      "  gives s: short\n\n  give tell (derive t) as told\nend\n")
+                      "  gives s: short\n\n  give entail (derive t) as told\nend\n")
     assert isinstance(module, ps.Module)
     assert module.programs()[0].why.text == "the reason give the reader something"
     assert [w.line for w in module.warnings] == [5] and "give" in module.warnings[0].message
@@ -239,9 +239,9 @@ def test_null_of_takes_its_argument_through_of_and_the_modifier_rule():
 
 
 @pytest.mark.parametrize("body, line", [
-    ("  give tell (derive t) as told with plain\n", 6),          # a typo never becomes a word
-    ("  let x = aim\n  give tell (derive t) as told\n", 6),
-    ("  if kind is aim then\n    give tell (derive t) as told\n  else\n    give tell (derive t) as told\n  end\n", 6),
+    ("  give entail (derive t) as told with plain\n", 6),          # a typo never becomes a word
+    ("  let x = aim\n  give entail (derive t) as told\n", 6),
+    ("  if kind is aim then\n    give entail (derive t) as told\n  else\n    give entail (derive t) as told\n  end\n", 6),
 ])
 def test_bare_words_are_refused_outside_their_places(body, line):
     r = refused(V + "program p\n  takes t: text\n  gives s: short\n" + body + "end\n")
@@ -262,7 +262,7 @@ def test_bare_words_stand_for_themselves_in_their_places():
     (V + "program p\n  takes t: text\n  gives f: fabula\n  give derive t\n", "parse", 3),
     (V + "program p\n  takes h: volume\n  gives i: volume\n  if count h > 3 then\n    give project h as isotype\n"
          "  else\n    give project h as paratype\n  end\nend\n", "version", 6),    # thym 1 reads it (THYM 4.9)
-    (V + "program p\n  takes t: text\n  gives s: short\n  give tell derive t as told\nend\n", "parse", 6),
+    (V + "program p\n  takes t: text\n  gives s: short\n  give entail derive t as told\nend\n", "parse", 6),
     (V + "program p\n  takes t: text\n  gives f: fabula\n  let f = derive t\n  move m(x: text): fabula\n"
          "    give derive x\n  end\n  give f\nend\n", "parse", 7),
     (V + "program p\n  takes my_t: text\n  gives f: fabula\n  give derive my_t\nend\n", "parse", 4),
@@ -302,16 +302,16 @@ def test_morph_and_context_blocks_enumerate():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("body, check, line", [
-    ("  give tell (derive t) as verified\n", "type", 6),                          # as takes an order
-    ("  give tell (derive t) with m as told\n", "type", 6),                       # modifiers in declared order
-    ("  give tell (derive t) to 30 words\n", "type", 6),                          # tell takes no to
-    ("  let told = derive t\n  give tell told as told\n", "type", 6),             # a reserved name
-    ("  let f = derive t\n  if true then\n    let f = derive t\n  end\n  give tell f as told\n", "rebound", 8),
+    ("  give entail (derive t) as verified\n", "type", 6),                          # as takes an order
+    ("  give entail (derive t) with m as told\n", "type", 6),                       # modifiers in declared order
+    ("  give entail (derive t) to 30 words\n", "type", 6),                          # entail takes no to
+    ("  let told = derive t\n  give entail told as told\n", "type", 6),             # a reserved name
+    ("  let f = derive t\n  if true then\n    let f = derive t\n  end\n  give entail f as told\n", "rebound", 8),
     ("  give atem (derive t)\n", "type", 6),                                       # gives an atem, not a short
     ("  give fabula\n", "type", 6),                                                # an accessor without of
     ("  give count [1, \"a\"]\n", "type", 6),                                      # a list of one type
-    ("  if true then\n    give tell (derive t) as told\n  end\n", "no-give", 3),   # no else, no give
-    ("  give tell (derive t) as told with nothing\n", "type", 6),                  # nothing is no morph here
+    ("  if true then\n    give entail (derive t) as told\n  end\n", "no-give", 3),   # no else, no give
+    ("  give entail (derive t) as told with nothing\n", "type", 6),                  # nothing is no morph here
 ])
 def test_check_refusals(body, check, line):
     r = refused(V + "program p\n  takes t: text, m: morph\n  gives s: short\n" + body + "end\n")
@@ -328,7 +328,7 @@ def test_a_loop_body_may_not_give_and_an_unmarked_word_is_not_emitted():
 
 
 def test_summaries_follow_the_rule_of_section_10():
-    checked = ok(V + "move m(f: fabula): short\n  give tell f as told\nend\n\nprogram p\n  why: one. two.\n"
+    checked = ok(V + "move m(f: fabula): short\n  give entail f as told\nend\n\nprogram p\n  why: one. two.\n"
                  "  takes t: text\n  gives s: short\n  let f = derive t      -- the fabula\n  assert f covers t\n"
                  "  give m f\nend\n")
     vol = en.enumerate_checked(checked)
@@ -378,21 +378,70 @@ def test_morph_scales_are_the_ten_names_from_one_to_five(body, check, line):
 
 
 def test_unknown_move_names_the_nearest():
-    r = refused(V + "program p\n  takes f: fabula\n  gives s: short\n  give tel f as told\nend\n")
-    assert (r.check, r.line) == ("unknown-move", 6) and "`tell`" in r.message
+    r = refused(V + "program p\n  takes f: fabula\n  gives s: short\n  give ential f as told\nend\n")
+    assert (r.check, r.line) == ("unknown-move", 6) and "`entail`" in r.message
+    # the text's own example (THYM 6.4): a word for the act names the move, whatever is nearest by spelling
+    r = refused(V + "program p\n  takes f: fabula\n  gives s: short\n  give summarise f\nend\n")
+    assert r.message == "unknown move `summarise`; did you mean `entail`?"
+
+
+def test_compile_given_a_fabula_says_to_use_entail():
+    r = refused(V + "program p\n  takes f: fabula\n  gives s: short\n  give compile f\nend\n")
+    assert (r.check, r.line) == ("type", 6)
+    assert r.message.endswith("f is a fabula: to compile a fabula into a short, use entail"), r.message
+
+
+TELL = V + "program p\n  takes t: text\n  gives s: short\n\n  let f = derive t\n  give tell f as told\nend\n"
+
+
+def test_tell_is_entails_earlier_spelling_and_compiles_to_the_same_items_plan_and_contract():
+    """THYM 6.3, \"`entail`, once `tell`\": the compiler reads `tell` and never writes it. A step's move and calls, the
+    contract and the plan's nodes say `entail`; the program's own text keeps its words, and compiles back byte for
+    byte."""
+    old, new = ok(TELL), ok(TELL.replace("give tell", "give entail"))
+    vo, vn = en.enumerate_checked(old), en.enumerate_checked(new)
+
+    def said(vol: dict) -> list:
+        return [{k: v for k, v in it.items() if k not in ("text", "name", "summary", "body")}
+                for it in vol["nodes"]]
+    assert said(vo) == said(vn)
+    step = next(it for it in vo["nodes"] if it["id"] == "P:step/p.2")
+    assert (step["move"], step["calls"], step["text"]) == ("entail", ["entail"], "  give tell f as told")
+    assert next(it for it in vo["nodes"] if it["type"] == "contract" and it["move"] == "entail")
+    assert en.compile_volume(vo) == TELL, "a program's own text keeps its words"
+    po, pn = pl.plan(old, _inputs_of(old)), pl.plan(new, _inputs_of(new))
+    nodes = [n for n in po["nodes"] if n["type"] == "node"]
+    assert [n["move"] for n in nodes] == ["derive", "entail"]
+    assert "tell" not in str([{k: v for k, v in n.items() if k not in ("name", "summary")} for n in po["nodes"]])
+    strip = ("name", "summary", "sha256")
+    assert [{k: v for k, v in n.items() if k not in strip} for n in nodes] == \
+        [{k: v for k, v in n.items() if k not in strip} for n in pn["nodes"] if n["type"] == "node"]
+    for version in ("thym 0", "thym 1"):
+        assert not isinstance(compile_text(TELL.replace("thym 0", version)), Refusal), version
+
+
+@pytest.mark.parametrize("line", ["  let tell = derive t\n", "  move tell(f: fabula): short\n    give entail f\n  end\n"])
+def test_the_earlier_spelling_stays_reserved(line):
+    r = refused(V + "program p\n  takes t: text\n  gives s: short\n\n" + line + "  give entail (derive t)\nend\n")
+    assert r.check == "type" and "`tell` is a standard move (entail's earlier spelling)" in r.message, r
+
+
+def test_entail_is_reserved_too():
+    r = refused(V + "program p\n  takes t: text\n  gives s: short\n\n  let entail = derive t\n  give entail (derive t)\nend\n")
+    assert r.check in ("type", "parse"), r
 
 
 def test_a_move_sees_its_parameters_and_never_its_caller():
     r = refused(V + "program p\n  takes t: text\n  gives s: short\n  move m(f: fabula): short\n"
-                "    give tell f as told with t\n  end\n  give m (derive t)\nend\n")
+                "    give entail f as told with t\n  end\n  give m (derive t)\nend\n")
     assert (r.check, r.line) == ("unbound", 7)
 
 
 def test_user_moves_inherit_contracts_calls_and_asks():
-    checked = ok(V + "move plainly(f: fabula): short\n  let s = tell f as told\n  assert f covers s\n  give s\nend\n\n"
+    checked = ok(V + "move plainly(f: fabula): short\n  let s = entail f as told\n  assert f covers s\n  give s\nend\n\n"
                  "program p\n  takes t: text\n  gives s: short\n  give plainly (derive t)\nend\n")
     mv = checked.moves["plainly"]
-    assert mv.calls == ["tell"] and mv.asks is True
+    assert mv.calls == ["entail"] and mv.asks is True
     assert mv.checks == ["coverage", "no-invention", "stance-kept", "scales-met", "footer", "provenance"]
     vol = en.enumerate_checked(checked)
     contract = next(i for i in vol["nodes"] if i["id"] == "P:contract/p.1")
@@ -408,7 +457,7 @@ def test_user_moves_inherit_contracts_calls_and_asks():
 @pytest.fixture
 def house(tmp_path) -> Path:
     (tmp_path / "house.thym").write_text(V + "morph rosa\n  why: the house voice.\n  person-voice 3\nend\n\n"
-                                         "move plainly(f: fabula): short\n  give tell f as told with rosa\nend\n")
+                                         "move plainly(f: fabula): short\n  give entail f as told with rosa\nend\n")
     (tmp_path / "voices.morph.cosm").write_text(
         "oes: thym/1\nkind: morph\nid: thym/voices\nname: voices\nnodes:\n"
         "  - {id: M:morph/rosa, type: morph, name: rosa, summary: Rosa.}\n"
@@ -430,16 +479,16 @@ def test_use_of_a_sibling_file_brings_its_moves_and_morphs(house):
     assert set(checked.moves) == {"plainly"} and "rosa" in checked.names
     vol = en.enumerate_file(p)
     step = next(i for i in vol["nodes"] if i["id"] == "P:step/brief.2")
-    assert step["calls"] == ["plainly", "tell"] and step["asks"] is True
+    assert step["calls"] == ["plainly", "entail"] and step["asks"] is True
     assert vol["front"] == "thym 0\nuse house.thym\n\n"
 
 
 def test_use_of_a_thym_volume_brings_its_morphs_and_contexts(house):
     p = _write(house, "vol.thym", "thym 0\nuse oes:thym/voices\n\nprogram brief\n  takes t: text\n  gives s: short\n"
-               "  give tell (derive t) as told with plain\nend\n")
+               "  give entail (derive t) as told with plain\nend\n")
     assert isinstance(thym.check_file(p), ck.Checked)
     text = "thym 0\nuse oes:thym/house\n\nprogram p\n  takes t: text\n  gives s: short\n" \
-           "  give tell (derive t) as told with rosa\nend\n"
+           "  give entail (derive t) as told with rosa\nend\n"
     assert isinstance(compile_text(text, volumes={"oes:thym/house": HOUSE}), ck.Checked)
     assert isinstance(compile_text(text, volumes=lambda uri: HOUSE if uri == "oes:thym/house" else None), ck.Checked)
 
@@ -539,10 +588,10 @@ def test_largest_prompt_and_the_run_id():
 
 def test_a_loop_over_a_written_list_unrolls_and_a_call_less_give_is_a_node():
     checked = ok(V + "program p\n  takes f: fabula\n  gives f2: fabula\n  for each o in [told, weight]\n"
-                 "    tell f as told\n  end\n  give f\nend\n")
+                 "    entail f as told\n  end\n  give f\nend\n")
     plan = pl.plan(checked, [{"name": "f", "type": "fabula", "path": "f.cosm", "sha256": "0" * 64}])
     nodes = plan["nodes"][1:]
-    assert [n["move"] for n in nodes] == ["tell", "tell", "give"]
+    assert [n["move"] for n in nodes] == ["entail", "entail", "give"]
     assert not any(n.get("repeats") for n in nodes)
     assert nodes[-1]["gives"] == "f2"
 
@@ -574,7 +623,7 @@ def test_declarations_load_from_the_real_manifests():
     assert set(decls) - set(decls.view(0)) == {"survey", "history", "gather", "question", "record", "settle", "lines",
                                                "replace", "drop", "insert", "edit", "reword", "join", "say",
                                                "folders", "propose"}
-    tell = decls["tell"]
+    tell = decls["entail"]
     assert tell.owner == "fabula" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)
     assert list(tell.modifiers) == ["as", "by", "with"] and tell.modifiers["with"] == ("morph",)
     assert decls["band"].modifiers["as"] == ("list of word",) and decls["band"].owner == "comprise"
@@ -589,12 +638,12 @@ def test_a_manifest_block_wins_over_a_sidecar_and_a_move_declared_twice_is_repor
         shutil.copy(p, tmp_path / p.name)
     (tmp_path / "fabula.moves.cosm").write_text("moves-of: fabula/1\nmoves:\n  - {name: retell, takes: [fabula], "
                                              "gives: short, says: again}\n")
-    (tmp_path / "zzz.moves.cosm").write_text("moves-of: zzz/1\nmoves:\n  - {name: tell, takes: [text], "
+    (tmp_path / "zzz.moves.cosm").write_text("moves-of: zzz/1\nmoves:\n  - {name: entail, takes: [text], "
                                              "gives: short, says: twice}\n")
     decls = dc.load(mc.Registry([tmp_path]))
-    assert "retell" not in decls and decls["tell"].owner == "fabula"
+    assert "retell" not in decls and decls["entail"].owner == "fabula"
     joined = " | ".join(decls.problems)
-    assert "fabula.moves.cosm" in joined and "tell is declared again" in joined
+    assert "fabula.moves.cosm" in joined and "entail is declared again" in joined
     assert "fabula.moves.cosm: fabula's manifest declares its own moves, which win; this sidecar is not read" in joined
 
 

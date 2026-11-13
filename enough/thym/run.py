@@ -92,6 +92,7 @@ from enough.thym.coprocessor import where as _coproc_where
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
+from enough.thym.types import EARLIER_SPELLINGS, move_now
 from enough.thym.values import (NOTHING, Value, canonical, filter_folder, is_list_input, item_id, item_key, load_input,
                                  load_list_input, member_name, member_snapshot, members, plain, posix_path,
                                  sha256_bytes, stamp, wrap, write_snapshot)
@@ -1094,7 +1095,7 @@ class MoveContext:
     #: the node's call counter (`engines.CallCounter`): the keys of its requests, its engines' model calls and its
     #: engine calls, so that none collide (THYM.md 12.4); `EngineAdapter` takes its keys here
     calls: Any = field(default=None, repr=False)
-    #: a model-backed move that asks more than once (a request per file, `tell f as code`) asks through `ask`; when
+    #: a model-backed move that asks more than once (a request per file, `entail f as code`) asks through `ask`; when
     #: what it gives then fails its contract, the runtime calls it again, within the node's attempts, with the failed
     #: verdicts in `failed`, what it gave last in `previous` and the attempt's number in `attempt` (1 the first time),
     #: so that it may ask again for only the parts the failures name
@@ -1194,6 +1195,27 @@ def new_run_id(now: _dt.datetime | None = None) -> str:
     return f"{t:%Y-%m-%d-%H%M}-{secrets.token_hex(2)}"
 
 
+def spelled_now(plan: dict) -> dict:
+    """A plan whose nodes name a move by its earlier spelling (`move: tell`, or `tell` among its `calls`), with each
+    node read as the move it names (THYM 6.3: `entail`, once `tell`); the plan itself, untouched, when none does. A
+    plan written before 0.7 runs and replays as one written today."""
+    rows = plan.get("nodes") if isinstance(plan, dict) else None
+
+    def old(n: Any) -> bool:
+        return isinstance(n, dict) and (n.get("move") in EARLIER_SPELLINGS or any(
+            c in EARLIER_SPELLINGS for c in n.get("calls") or [] if isinstance(c, str)))
+    if not isinstance(rows, list) or not any(old(n) for n in rows):
+        return plan
+    nodes = []
+    for n in rows:
+        if old(n):
+            n = {**n, "move": move_now(n.get("move"))}
+            if isinstance(n.get("calls"), list):
+                n["calls"] = [move_now(c) for c in n["calls"]]
+        nodes.append(n)
+    return {**plan, "nodes": nodes}
+
+
 def plan_parts(plan: dict) -> tuple[dict, list[dict]]:
     """A plan volume's `R:plan` item and its `R:node` items, in plan order."""
     rows = [n for n in plan.get("nodes") or [] if isinstance(n, dict)]
@@ -1260,7 +1282,7 @@ def _plain_mods(mods: dict) -> dict:
 
 class _Run:
     def __init__(self, plan: dict, **kw: Any) -> None:
-        self.plan = plan
+        self.plan = spelled_now(plan)
         self.inputs_root = Path(kw["inputs_root"]).absolute()
         self.root = Path(kw["root"] or default_root()).absolute()
         self.coproc = kw["coprocessor"] if kw["coprocessor"] is not None else RefusingCoprocessor()

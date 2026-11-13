@@ -186,7 +186,7 @@ def propose(ctx: Any, f: Value, **mods: Any) -> Request:
         covers = [cites[index[d["id"]]] for d in nodes if d.get("id") in index]
         members = [Value("item", d, origin={"id": d.get("id"), "kind": d.get("type"), "oes": HOLOGRAPH_OES})
                    for d in nodes]
-        return Value("list", members, origin={"telling": {"fabula": f, "sentences": sentences, "covers": covers,
+        return Value("list", members, origin={"entailment": {"fabula": f, "sentences": sentences, "covers": covers,
                                                           "order": None, "morph": "null"}})
 
     return Request(contract={"schema": {"format": "yaml", "shape": "candidates: [{kind, name, summary, form, span, "

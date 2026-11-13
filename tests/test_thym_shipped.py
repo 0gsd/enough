@@ -53,7 +53,7 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
         if "·" not in scaffold:
             want = re.findall(r"`([a-z-]+)`", scaffold)
             assert ([v.scaffold] if v.scaffold else []) == want, name
-    derive, tell = d["derive"].view(1), d["tell"].view(1)
+    derive, tell = d["derive"].view(1), d["entail"].view(1)
     assert dc.chosen(derive, as_word="code")["contract"] == ("code-span", "outline-cited", "coverage",
                                                              "terms-grounded", "stance-closed", "fabula-checks",
                                                              "provenance")
@@ -64,7 +64,7 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
     assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "uses-told", "footer",
                                                              "provenance")
     assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
-    assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "tell", "count", "words"}
+    assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "entail", "count", "words"}
 
 
 def compile_with(text: str, decls: dc.Declarations, path: str | None = None):
@@ -181,18 +181,18 @@ def test_the_shipped_programs_plan_as_the_text_says():
     assert mv["keeps"] == ["its-own-file"]
 
 
-@pytest.mark.parametrize("depth, words", [("code", "only a fabulac is told as code"),
-                                          ("manual", "a catem is told from a fabulac")])
-def test_a_fabula_known_to_be_a_fabulap_is_never_told_as_a_fabulacs(depth, words):
-    """The flavour as a static note (THYM 20.5): `derive … as verse` gives a fabulap, and `tell` of a fabulac's depth
+@pytest.mark.parametrize("depth, words", [("code", "only a fabulac entails code"),
+                                          ("manual", "only a fabulac entails a catem")])
+def test_a_fabula_known_to_be_a_fabulap_never_entails_what_a_fabulac_does(depth, words):
+    """The flavour as a static note (THYM 20.5): `derive … as verse` gives a fabulap, and `entail` of a fabulac's depth
     is refused at compile (`flavour`); a fabula input's flavour is the run's to find."""
     text = ("thym 1\n\nprogram p\n  takes poem: text\n  gives s: short\n\n  let f = derive poem as verse\n"
-            f"  give tell f as {depth}\nend\n")
+            f"  give entail f as {depth}\nend\n")
     if depth == "code":
         text = text.replace("gives s: short", "gives s: folder")
     r = compile_with(text, scratch_decls())
     assert isinstance(r, Refusal) and (r.check, r.line) == ("flavour", 8), r
     assert r.message == f"f is a fabulap, a poem's fabula; {words}"
     ok = compile_with(text.replace("takes poem: text", "takes poem: text, g: fabula").replace(
-        f"tell f as {depth}", f"tell g as {depth}"), scratch_decls())
+        f"entail f as {depth}", f"entail g as {depth}"), scratch_decls())
     assert not isinstance(ok, Refusal), ok

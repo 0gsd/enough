@@ -44,7 +44,7 @@ and type (THYM 7.5); a move's `checks` list its kept contracts after the inherit
 calls says `depth:` (1 to 64), as does every move on the cycle; a move that says it and never calls itself, and a
 program that says it, are refused (`type`); a recursive move's calls, checks and asks are those of its whole cycle
 (THYM 8.3). The flavour of a fabula, where the call that made it says it (`derive … as verse`, `derive` of a folder,
-`survey`), is a static note: `tell f as code` (or a catem's depth) of a fabula known to be a fabulan or a fabulap is
+`survey`), is a static note: `entail f as code` (or a catem's depth) of a fabula known to be a fabulan or a fabulap is
 refused, check `flavour` (THYM 20.5).
 """
 from __future__ import annotations
@@ -75,11 +75,11 @@ TEXTUAL = ("text", "string", "short", "line")
 #: The depth a move that calls itself may say (THYM 8.3).
 DEPTHS = range(1, 65)
 #: A fabula's flavour, where the call that made it says it (THYM 20.5): `derive … as <word>`, `derive` of a folder,
-#: `survey`; and the depths `tell` gives only of a fabulac (a cshort, `as code`; a catem, `as line | overview |
+#: `survey`; and the depths `entail` gives only of a fabulac (a cshort, `as code`; a catem, `as line | overview |
 #: manual`).
 FLAVOUR_OF_AS = {"prose": "fabulan", "verse": "fabulap", "code": "fabulac"}
 FLAVOUR_MAKERS = {"survey": "fabulac"}
-FABULAC_ONLY = {"tell": ("code", "line", "overview", "manual")}
+FABULAC_ONLY = {"entail": ("code", "line", "overview", "manual")}
 _FLAVOUR_SAID = {"fabulan": "a fabulan, the fabula of a text", "fabulap": "a fabulap, a poem's fabula"}
 
 
@@ -472,7 +472,7 @@ class _Checker:
         self.m, self.decls, self.volumes, self.seen = module, decls, volumes, seen
         self.file = module.path
         self.g = module.grammar
-        self.reserved = set(self.g.keywords) | set(decls) | set(ty.LITERAL_WORDS)
+        self.reserved = set(self.g.keywords) | set(decls) | set(ty.LITERAL_WORDS) | set(ty.EARLIER_SPELLINGS)
         self.names: dict[str, Binding] = {}
         self.moves: dict[str, UserMove] = {}
         self.local: dict[str, dict[str, UserMove]] = {}
@@ -506,6 +506,8 @@ class _Checker:
             return "keyword"
         if name in self.decls:
             return "standard move"
+        if name in ty.EARLIER_SPELLINGS:
+            return f"standard move ({ty.EARLIER_SPELLINGS[name]}'s earlier spelling)"
         if name in ty.DENSITIES:
             return "density"
         if name in ty.ORDERS:
@@ -1281,7 +1283,9 @@ class _Checker:
     def call(self, c: ps.Call, scope: _Scope, ctx: _Ctx) -> str:
         target = self.find_move(c.move, ctx)
         if target is None:
-            near = difflib.get_close_matches(c.move, self.visible_moves(ctx), n=1, cutoff=0.4)
+            visible = self.visible_moves(ctx)
+            meant = ty.MEANT.get(c.move)
+            near = [meant] if meant in visible else difflib.get_close_matches(c.move, visible, n=1, cutoff=0.4)
             self.fail("unknown-move", f"unknown move `{c.move}`" + (f"; did you mean `{near[0]}`?" if near else
                       "; no manifest declares it and no move block of this file is named so"), c.line)
         c.target = target
@@ -1313,7 +1317,7 @@ class _Checker:
             w = strip_paren(op)
             word = w.name if isinstance(w, ps.Name) and w.kind == "word" else None
             if not ty.accepts(alts, t, word=word):
-                fix = ty.hint(t, alts)
+                fix = ty.MOVE_HINTS.get((c.move, t)) or ty.hint(t, alts)
                 self.fail("type", f"{c.move} takes {ty.show(alts)}, and {ps.render(op)} is a {t}"
                           + (f": {fix}" if fix else ""), op.line)
         declared = list(target.modifiers)
@@ -1347,7 +1351,7 @@ class _Checker:
 
     def flavour(self, c: ps.Call) -> None:
         """The flavour of the fabula a call gives, where the call says it (THYM 20.5), noted for what reads it; and a
-        `tell` of a depth only a fabulac has, of a fabula known to be a fabulan or a fabulap, refused (`flavour`)."""
+        `entail` of a depth only a fabulac has, of a fabula known to be a fabulan or a fabulap, refused (`flavour`)."""
         as_mod = c.mod("as")
         word = as_mod.arg.word if as_mod is not None and isinstance(as_mod.arg, ps.Word) else None
         first = c.operands[0] if c.operands else None
@@ -1361,7 +1365,7 @@ class _Checker:
         if word in FABULAC_ONLY.get(c.move, ()) and first is not None:
             known = self.flavours.get(id(strip_paren(first)))
             if known in _FLAVOUR_SAID:
-                what = "only a fabulac is told as code" if word == "code" else "a catem is told from a fabulac"
+                what = "only a fabulac entails code" if word == "code" else "only a fabulac entails a catem"
                 self.fail("flavour", f"{ps.render(first)} is {_FLAVOUR_SAID[known]}; {what}", c.line)
 
     @staticmethod

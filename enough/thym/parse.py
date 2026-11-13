@@ -755,6 +755,8 @@ class _Parser:
         else:
             self.in_moves = _in_moves(self.g.version) & self.moves
         self.where_moves = _in_moves(self.g.version, "where") & self.moves
+        # a move's earlier spelling reads as the move it names, wherever that move is known (THYM 6.3: `tell`)
+        self.moves = self.moves | {old for old, now in ty.EARLIER_SPELLINGS.items() if now in self.moves}
         version_line = i + 1
         i += 1
         uses: list[Use] = []
@@ -1181,7 +1183,8 @@ class _Parser:
         """A move call. On a side of a comparison (`side`, `thym 1`) it ends at a word a condition is built with, and
         at `in` unless the move declares an `in` modifier (THYM 4.5)."""
         head = ts.next()
-        c = Call(line=head.line, move=head.text, known=known)
+        now = ty.move_now(head.text)
+        c = Call(line=head.line, move=now if now in self.moves else head.text, known=known)
         if _operand_start(ts.peek(), self.g.keywords):
             c.operands.append(self.operand(ts))
             while ts.is_punct(","):

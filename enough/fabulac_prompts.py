@@ -6,8 +6,8 @@ Four steps ask a model, and each request names its step in the input `fabulac`:
   terms, concepts, claims, events, in a strict YAML shape (`enough.thym.moves.code.parse_reading` checks it);
 - `fold`: the whole program read from the fabulac so far and its own documents (`derive repo with f`): aims,
   audiences, uses, requirements, decisions, exclusions, influences, occasions, and the atem (`parse_fold`);
-- `code` and `readme`: one file of the cshort written from the fabulac alone (`tell f as code`);
-- `catem`: what a user can do, at depth `overview` or `manual` (`tell f as overview|manual`).
+- `code` and `readme`: one file of the cshort written from the fabulac alone (`entail f as code`);
+- `catem`: what a user can do, at depth `overview` or `manual` (`entail f as overview|manual`).
 
 The detail they ask for is MacroCOSM OES 18.4.7's "how much detail is enough": everything a user or a caller can
 observe, exactly (signatures, parameters with their types and defaults, what is returned, every error with the words a
@@ -19,7 +19,7 @@ local model's window is spent on the code and the outline, not on instructions; 
 as a template, in the user message.
 
 Host wiring: `enough/thym_host.py` finds `PROMPTS` here by name (`PROMPT_MODULES`) and chains it in front of its own
-builders for `derive` and `tell`; a request that names no fabulac step gets None here, and the host's builder.
+builders for `derive` and `entail`; a request that names no fabulac step gets None here, and the host's builder.
 """
 from __future__ import annotations
 
@@ -299,7 +299,7 @@ def messages(contract: dict, inputs: dict) -> list[dict] | None:
 
 #: The host's table (enough/thym_host.py, `PROMPT_MODULES`): move → builder, None for a request that is not a
 #: fabulac step, so that the host asks the next builder.
-PROMPTS: dict[str, Callable[[dict, dict], list[dict] | None]] = {"derive": messages, "tell": messages}
+PROMPTS: dict[str, Callable[[dict, dict], list[dict] | None]] = {"derive": messages, "entail": messages}
 
 
 __all__ = ["BUILDERS", "CATEM_SYSTEM", "CODE_SYSTEM", "FOLD_SYSTEM", "PROMPTS", "READ_SYSTEM", "README_SYSTEM",

@@ -2,8 +2,8 @@
 
 Every deterministic move runs on the conformance fixtures. Every model-backed move runs against a `FakeCoprocessor`
 (the runtime's own test fake, `tests/test_thym_run.py`) whose candidates are written here by hand: Canon's passage
-answer and whole-text atem for the orchard text, a cited null telling, a judgement of three scales, an atem, an
-expansion, a reading, a morph's telling. For each contract check one candidate passes and one fails, and the run is
+answer and whole-text atem for the orchard text, a cited null short, a judgement of three scales, an atem, an
+expansion, a reading, a short said again in a morph. For each contract check one candidate passes and one fails, and the run is
 refused with the check's name; where a move's own narrow repair makes a failure unreachable through the run (a
 span outside the text, a stance word), the check is held to it directly. `open-house` over the sample Holotype lands
 exactly `expected/open-house/outputs/`; `publish-story` and `read-my-way` run end to end; `--rules` runs the
@@ -224,7 +224,7 @@ def test_every_declared_move_scaffold_and_check_is_implemented():
         for chk in d.get("contract") or []:
             assert C.CHECKS.lookup(chk) is not None, (name, chk)
         assert R.resolve(d["code"]) is not None, d["code"]
-    assert {"derive", "tell", "null", "expand", "atem", "measure", "morph", "read"} <= {
+    assert {"derive", "entail", "null", "expand", "atem", "measure", "morph", "read"} <= {
         n[:-len(".prompt")] for n in R.MOVES.names() if n.endswith(".prompt")}
 
 
@@ -299,12 +299,12 @@ def test_coverage_is_one_computation_for_the_check_and_the_assert(tmp_path):
 
 
 def test_telling_stance_reads_the_weakest_marker():
-    assert M.telling_stance("The orchard pressed 140 litres.") == "observed"
-    assert M.telling_stance("Reportedly, the Bramley is the oldest tree.") == "hearsay"
-    assert M.telling_stance("Mara thinks the mulch helped, because the spring was wet.") == "opinion"
-    assert M.telling_stance("It follows that mowing would harm the orchard.") == "deduced"
-    assert M.telling_stance("It is taken as given that apples need a second variety.") == "axiom"
-    assert M.telling_stance("Perhaps the strip feeds the bees.") == "hearsay"
+    assert M.entailment_stance("The orchard pressed 140 litres.") == "observed"
+    assert M.entailment_stance("Reportedly, the Bramley is the oldest tree.") == "hearsay"
+    assert M.entailment_stance("Mara thinks the mulch helped, because the spring was wet.") == "opinion"
+    assert M.entailment_stance("It follows that mowing would harm the orchard.") == "deduced"
+    assert M.entailment_stance("It is taken as given that apples need a second variety.") == "axiom"
+    assert M.entailment_stance("Perhaps the strip feeds the bees.") == "hearsay"
 
 
 # ---------------------------------------------------------------------------
@@ -352,13 +352,13 @@ def test_cut_removes_the_lightest_sentences_first(tmp_path):
     assert body == ("The orchard pressed 140 litres of juice this year.\n\n"
                     "Mowing the meadow strip in July would starve the pollinators.")
     assert out.text().rstrip().endswith("by a model*")              # the footer stays
-    assert M.telling_of(out)["covers"] == [["P:claim/juice-rose-to-140-litres"],
+    assert M.entailment_of(out)["covers"] == [["P:claim/juice-rose-to-140-litres"],
                                            ["P:claim/july-mowing-harms-the-orchard"]]
     inputs = {"s": s}
     for name in ("whole-sentences", "weight-order", "coverage"):
         assert verdict(name, out, inputs)[0], name
     worse = M.short_value(C.sentences(C.body(s.text()))[0] + "\n", fabula=fab,
-                          sentences=[M.telling_of(s)["sentences"][0]], covers=[["P:claim/bramley-is-oldest"]])
+                          sentences=[M.entailment_of(s)["sentences"][0]], covers=[["P:claim/bramley-is-oldest"]])
     ok, why = verdict("weight-order", worse, inputs)
     assert not ok and "critical sentence was removed while a low one was kept" in why
     words = edit.cut(ctx, s, to=Amount(25, "words"))
@@ -622,8 +622,8 @@ def test_derive_is_refused_when_its_fabula_does_not_cover_the_text(root, engines
 
 
 def test_the_null_is_one_paragraph_whatever_marks_the_model_adds(root, engines):
-    """THYM.md 13.1: a paragraph mark on the null telling is read as none, so paragraph-rhythm is 1 by construction
-    and the run lands; the telling is one paragraph and the footer."""
+    """THYM.md 13.1: a paragraph mark on the null short is read as none, so paragraph-rhythm is 1 by construction
+    and the run lands; the short is one paragraph and the footer."""
     marked = null_answer()
     for i in (2, 5, 7):
         marked["sentences"][i] = {**marked["sentences"][i], "paragraph": True}
@@ -683,7 +683,7 @@ def test_fabula_checks_holds_any_volume_to_its_own_manifest(tmp_path):
 
 
 # ---------------------------------------------------------------------------
-# tell, atem, expand: hand-made plans over the orchard twin
+# entail, atem, expand: hand-made plans over the orchard twin
 # ---------------------------------------------------------------------------
 
 def twin_plan(*nodes: dict, extra: list | None = None) -> dict:
@@ -711,20 +711,20 @@ GOOD_TELL = tell_answer(
     (tell_answer(("Mara Okafor and Bob Jones run the orchard.", ["E:person/mara-okafor"])), "no-invention",
      "the name Bob"),
     (tell_answer(("The Bramley by the gate is the oldest tree on Hollins Lane.", ["P:claim/bramley-is-oldest"])),
-     "stance-kept", "hearsay in the fabula and the telling says it as observed"),
+     "stance-kept", "hearsay in the fabula and the short says it as observed"),
 ])
-def test_tell_contract_checks_refuse_the_run(root, engines, answer, check, words):
-    plan = twin_plan(node(1, "tell f as told", "tell", asks=True, takes=["f"], gives="s", line=4))
-    t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=FakeCoprocessor({"tell": [answer] * 3}),
+def test_entail_contract_checks_refuse_the_run(root, engines, answer, check, words):
+    plan = twin_plan(node(1, "entail f as told", "entail", asks=True, takes=["f"], gives="s", line=4))
+    t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=FakeCoprocessor({"entail": [answer] * 3}),
                 engines=engines, now=NOW)
     assert t.outcome == "refused" and t.refusal.check == check, t.refusal
     assert words in t.refusal.message
 
 
-def test_tell_lands_a_cited_short_with_its_footer(root, engines):
-    plan = twin_plan(node(1, "tell f by weight", "tell", asks=True, takes=["f"], gives="s", line=4))
+def test_entail_lands_a_cited_short_with_its_footer(root, engines):
+    plan = twin_plan(node(1, "entail f by weight", "entail", asks=True, takes=["f"], gives="s", line=4))
     stamped = {**GOOD_TELL, "engine": "model:g40-04"}
-    cp = FakeCoprocessor({"tell": stamped})
+    cp = FakeCoprocessor({"entail": stamped})
     t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=cp, engines=engines, now=NOW)
     assert t.landed, t.refusal
     text = t.outputs["s"].read_text(encoding="utf-8")
@@ -736,8 +736,8 @@ def test_tell_lands_a_cited_short_with_its_footer(root, engines):
     assert verdict("footer", Value("short", text))[0] is True
 
 
-def test_tell_under_rules_gives_the_outline(root, engines):
-    plan = twin_plan(node(1, "tell f as told", "tell", asks=True, takes=["f"], gives="s", line=4))
+def test_entail_under_rules_gives_the_outline(root, engines):
+    plan = twin_plan(node(1, "entail f as told", "entail", asks=True, takes=["f"], gives="s", line=4))
     t = RUN.run(plan, inputs_root=SUITE, root=root, rules=True, engines=engines, now=NOW)
     assert t.landed, t.refusal
     text = t.outputs["s"].read_text(encoding="utf-8")
@@ -863,14 +863,14 @@ def test_statistics_follow_the_thresholds_of_13_3():
     assert [morph.scale_value("register", r) for r in (1, 2, 4, 5, 19, 20)] == [1, 2, 2, 3, 4, 5]
     assert [morph.scale_value("humour", r, c) for r, c in ((0, 0), (0, 1), (2, 2), (3, 3), (25, 9))] == [1, 2, 2, 3, 5]
     plain_ = "The orchard pressed juice. The council will mow. The bees fed. The trees grew.\n"
-    st = morph.statistics(plain_, telling=True)
+    st = morph.statistics(plain_, short=True)
     assert {s: st[s]["value"] for s in morph.STATISTICS} == dict.fromkeys(morph.STATISTICS, 1)
     chatty = ("I think we're gonna be okay, you know. Maybe it's fine. Perhaps you'd agree, and I suspect we might. "
               "Yeah, we probably could.\n")
-    st = morph.statistics(chatty, telling=True)
+    st = morph.statistics(chatty, short=True)
     assert st["person-voice"]["value"] == 5 and st["stance-style"]["value"] == 5
     assert st["formality"]["value"] == 5 and st["formality"]["toward"] == "casual"
-    assert "toward" not in morph.statistics(plain_, telling=True)["formality"]
+    assert "toward" not in morph.statistics(plain_, short=True)["formality"]
     assert "person-voice 4: between impersonal and personal; 30 to 59" in morph.asks_for(read_value(MORPH, "morph"))
 
 
@@ -930,17 +930,17 @@ def test_read_is_refused_when_it_misses_the_morph(tmp_path, root, engines):
 
 
 def test_morph_tells_a_short_again_and_keeps_the_scales(root, engines, tmp_path):
-    plan = twin_plan(node(1, "tell f as told", "tell", asks=True, takes=["f"], gives="s", line=4),
+    plan = twin_plan(node(1, "entail f as told", "entail", asks=True, takes=["f"], gives="s", line=4),
                      node(2, "morph s with mine", "morph", asks=True, takes=["s", "mine"], gives="r",
                           after=["R:node/1"], line=5),
                      extra=[{"name": "mine", "type": "morph", "path": "inputs/plain-letter.morph.cosm",
                              "sha256": sha(MORPH)}])
     t = RUN.run(plan, inputs_root=SUITE, root=root, engines=engines, now=NOW,
-                coprocessor=FakeCoprocessor({"tell": GOOD_TELL, "morph": GOOD_READING}))
+                coprocessor=FakeCoprocessor({"entail": GOOD_TELL, "morph": GOOD_READING}))
     assert t.landed, t.refusal
     assert t.outputs["r"].read_text(encoding="utf-8").rstrip().endswith("by a model*")
     t = RUN.run(plan, inputs_root=SUITE, root=root, engines=engines, now=NOW,
-                coprocessor=FakeCoprocessor({"tell": GOOD_TELL, "morph": [GOOD_TELL] * 3}))
+                coprocessor=FakeCoprocessor({"entail": GOOD_TELL, "morph": [GOOD_TELL] * 3}))
     assert t.outcome == "refused" and t.refusal.check == "scales-met"
 
 
@@ -1007,7 +1007,7 @@ def test_the_prompt_builders_write_every_model_backed_moves_messages(tmp_path, e
 
     mcp = H.ModelCoprocessor(complete)
     short = _cited_short(fab)
-    requests = {"tell": emf.tell(ctx, fab, **{"as": "told", "with": mine}), "null": morph.null(ctx, of=fab),
+    requests = {"entail": emf.entail(ctx, fab, **{"as": "told", "with": mine}), "null": morph.null(ctx, of=fab),
                 "expand": emf.expand(ctx, Value("atem", GOOD_ATEM), **{"with": fab, "to": Amount(300, "words")}),
                 "atem": emf.atem(ctx, fab), "measure": morph.measure(ctx, story),
                 "morph": morph.morph(ctx, short, **{"with": mine}),
@@ -1023,9 +1023,9 @@ def test_the_prompt_builders_write_every_model_backed_moves_messages(tmp_path, e
             assert cand["output"]["engine"] == "model:g40-04", move      # the footer can name the model
         system, user = seen[-1][0]["content"], seen[-1][-1]["content"]
         assert system and user, move
-        if move in ("tell", "null", "expand", "read", "atem"):
+        if move in ("entail", "null", "expand", "read", "atem"):
             assert "[P:claim/juice-rose-to-140-litres]" in user, move
-        if move in ("tell", "read", "morph"):
+        if move in ("entail", "read", "morph"):
             assert "person-voice 4" in system, move
     assert "About 120 words." in seen[-1][0]["content"] and "words: 120" in seen[-1][0]["content"]
     assert "1. Mara Okafor, who has kept" in requests["measure"].inputs["sentences"].payload
@@ -1113,8 +1113,8 @@ program twice
 
   move told-twice(t: text): short
     let f = derive t
-    let a = tell f as told
-    give tell f as told
+    let a = entail f as told
+    give entail f as told
   end
 
   give told-twice story
@@ -1125,7 +1125,7 @@ end
 def test_engine_calls_and_two_requests_in_one_node_never_collide(root):
     """Two passages read through the engine, then three requests, all in node 1 (THYM.md 12.4): every key its own."""
     mv = R.Moves()
-    for name in ("tell",):
+    for name in ("entail",):
         mv.add(name, lambda ctx, *ops, **m: Request(contract={"schema": {"format": "markdown"}},
                                                     inputs={f"in{k}": v for k, v in enumerate(ops)}))
 
@@ -1140,13 +1140,13 @@ def test_engine_calls_and_two_requests_in_one_node_never_collide(root):
     plan = hand_plan(node(1, "told-twice story", "told-twice", asks=True, takes=["story"], gives="s", line=15),
                      name="twice")
     cp = FakeCoprocessor({"derive": ["nodes: []\n", "nodes: []\n", TWIN.read_text(encoding="utf-8")],
-                          "tell": [telling(), telling()]})
+                          "entail": [telling(), telling()]})
     t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=cp, program=TWICE, moves=mv, checks=fake_checks())
     assert t.landed, t.refusal
     names = sorted(p.name for p in (t.dir / "candidates").iterdir())
     assert names == ["1-1.1.cosm", "1-2.1.cosm", "1-3.1.cosm", "1-4.1.cosm", "1.1.cosm"]
     moves = [mc.yaml_load((t.dir / "candidates" / n).read_text(encoding="utf-8"))["contract"]["move"] for n in names]
-    assert moves == ["derive", "derive", "tell", "tell", "derive"]
+    assert moves == ["derive", "derive", "entail", "entail", "derive"]
     rec = next(r for r in t.records if r["id"] == "R:record/1")
     assert rec["tokens"] == 50, "two passages and three requests at 10 tokens each: the engine's calls count too"
     again = RUN.replay(t.dir, inputs_root=SUITE, root=root, moves=mv, checks=fake_checks())
@@ -1158,7 +1158,7 @@ def test_the_model_coprocessor_reports_the_tokens_the_engine_reports():
     assert H.reported_tokens({"usage": {"prompt_tokens": 60, "completion_tokens": 17}}) == 77
     assert H.reported_tokens({"model": "x"}) is None
     mc_ = H.ModelCoprocessor(lambda messages, max_tokens=None: ("text", {"model": "m", "usage": {"total_tokens": 77}}))
-    cand = mc_.complete({"move": "tell", "schema": {"format": "markdown"}, "checks": []}, {}, budget={})
+    cand = mc_.complete({"move": "entail", "schema": {"format": "markdown"}, "checks": []}, {}, budget={})
     assert cand["tokens"] == 77
 
 
@@ -1200,7 +1200,7 @@ def test_prose_around_the_yaml_fails_schema_at_once_and_is_asked_again(root, eng
     clean = mc.dump(GOOD_TELL)
     narrated = "Thinking Process: the user wants a telling, so I will list the claims.\n\n```yaml\n" + clean + "```\n"
     complete, calls = _narrating([narrated, clean])
-    plan = twin_plan(node(1, "tell f by weight", "tell", asks=True, takes=["f"], gives="s", line=4))
+    plan = twin_plan(node(1, "entail f by weight", "entail", asks=True, takes=["f"], gives="s", line=4))
     t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=H.ModelCoprocessor(complete), engines=engines,
                 now=NOW)
     assert t.landed, t.refusal
@@ -1216,7 +1216,7 @@ def test_prose_around_the_yaml_fails_schema_at_once_and_is_asked_again(root, eng
 
 def test_a_model_that_only_narrates_is_refused_on_schema_never_on_coverage(root, engines):
     complete, calls = _narrating(["Here is the YAML you asked for:\n" + mc.dump(GOOD_TELL)])
-    plan = twin_plan(node(1, "tell f by weight", "tell", asks=True, takes=["f"], gives="s", line=4))
+    plan = twin_plan(node(1, "entail f by weight", "entail", asks=True, takes=["f"], gives="s", line=4))
     t = RUN.run(plan, inputs_root=SUITE, root=root, coprocessor=H.ModelCoprocessor(complete), engines=engines,
                 now=NOW)
     assert t.outcome == "refused" and t.refusal.check == "schema" and len(calls) == 3

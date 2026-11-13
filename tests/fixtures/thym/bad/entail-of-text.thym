@@ -1,0 +1,9 @@
+-- refused: compile type line 8
+thym 0
+
+program underived
+  why: a text must be derived before its fabula entails a short.
+  takes t: text
+  gives s: short
+  give entail t as told
+end

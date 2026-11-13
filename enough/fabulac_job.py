@@ -19,11 +19,11 @@ the build stops after them with the outline (`derived.completeness: outline`, 18
 first two stages only"), and the stage that would ask a model is refused in the words the host already uses for a plan
 that asks ("3 steps ask a model on the local route, the first `…` (line 51); agent-free is on").
 
-**Compiling.** `compile-python.thym` tells the fabulac as code and as its manual: the code lands beside the fabulac as
+**Compiling.** `compile-python.thym` compiles the fabulac into code and into its manual: the code lands beside the fabulac as
 the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/` and the manual as `<name>.catem-<YYYY-MM-DD-HHMM>.md` (UTC, `-2`, `-3` on a
 collision), and the host records them in the fabulac's `shorts:` and `catems:` (18.4.1; the moves give the values, the
-host writes the entries). A catem at one depth (`line`, `overview`, `manual`) runs `tell f as <depth>` alone. Nothing
-told is ever run, imported or installed: the cshort is read here, as text.
+host writes the entries). A catem at one depth (`line`, `overview`, `manual`) runs `entail f as <depth>` alone. Nothing
+it entails is ever run, imported or installed: the cshort is read here, as text.
 
 The plain functions are what the routes translate, and what a test or a tool calls without the app; `build_router`
 closes over what `create_app` owns, as `thym_api.build_router` does.
@@ -639,14 +639,14 @@ def _stopped(stage: str, r: Any, i: int) -> str:
 # ---------------------------------------------------------------------------
 
 def catem_program(depth: str) -> str:
-    """The program a catem at one depth runs: `tell f as <depth>` (THYM 20.7)."""
+    """The program a catem at one depth runs: `entail f as <depth>` (THYM 20.7)."""
     if depth not in DEPTHS:
         raise BuildError(f"a catem's depth is line, overview or manual, not {depth!r}")
     return ("thym 1\n\nprogram catem\n"
-            f"  why: a fabulac told at depth {depth}, the catem a person reads.\n"
-            "  must: nothing told is run, imported or installed.\n\n"
+            f"  why: a fabulac entailed at depth {depth}, the catem a person reads.\n"
+            "  must: nothing it entails is run, imported or installed.\n\n"
             "  takes f: fabula\n  gives c: short\n\n"
-            f"  give tell f as {depth}\nend\n")
+            f"  give entail f as {depth}\nend\n")
 
 
 def compiled_name(fab: Path) -> str:
@@ -680,7 +680,7 @@ def fabulac_of(project_dir: Path, rel: str) -> Path:
     head = _load(p)
     if head.get("flavour") != "fabulac":
         raise BuildError(f"{p.name} is not a fabulac (its flavour is {head.get('flavour') or 'fabulan'}); only a "
-                         "fabulac is told as code or as a catem")
+                         "fabulac entails code or a catem")
     return p
 
 
@@ -717,7 +717,7 @@ def run_compile(project_dir: Path, fab: Path, *, what: str, mode: str, why: str 
     if asks and not use_model:
         r = _thym_api.scaffold_refusal(plan) if (scaffolds or mode != "model") else None
         if r is not None and not scaffolds:
-            # No model: a catem by its scaffold, a cshort refused (`tell … as code` has no scaffold), as a run with
+            # No model: a catem by its scaffold, a cshort refused (`entail … as code` has no scaffold), as a run with
             # --rules is; the words say why there is no model.
             no = _thym_api.asks_refusal(plan, why, route=route, program=prog)
             if no is not None:
@@ -1080,7 +1080,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             raise _http(e) from None
         mode, why, scaffolds = await decide(body, route)
         if what == "code" and (mode != "model" or scaffolds):
-            plan_words = ("tell … as code has no scaffold, so a cshort needs a model" if scaffolds else
+            plan_words = ("entail … as code has no scaffold, so a cshort needs a model" if scaffolds else
                           f"a cshort needs a model, and none is answering ({'agent-free is on' if why == _agent_free.REASON else why})")
             raise HTTPException(409, plan_words)
         complete = complete_for(route, model) if mode == "model" and not scaffolds else None

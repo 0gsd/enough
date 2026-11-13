@@ -129,7 +129,7 @@ def _is_footer(line: str) -> bool:
 
 
 def body(text: str, *, footer: bool = False) -> str:
-    """The text a telling says: without its front matter and, unless `footer`, without its closing footer (a last
+    """The text a short says: without its front matter and, unless `footer`, without its closing footer (a last
     paragraph in italics, `*...*`, on one line or several, as MacroCOSM 18.4.4's and THYM.md 14's footers are)."""
     _, rest = front_matter(text)
     rest = rest.rstrip()

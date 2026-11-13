@@ -389,7 +389,7 @@ def test_a_where_after_a_call_in_a_loop_header_belongs_to_the_loop():
 
 SIDECAR = """moves-of: testing/1
 moves:
-  - {name: tell-two, takes: [fabula], gives: short, modifiers: {as: order}, asks: true, contract: [coverage],
+  - {name: entail-two, takes: [fabula], gives: short, modifiers: {as: order}, asks: true, contract: [coverage],
      scaffold: outline,
      thym-1: {modifiers: {as: 'order | code'}, gives-when: [{as: code, gives: folder}],
               contract-when: [{as: code, contract: [parses, provenance]}], scaffold-when: [{as: code, scaffold: none}]}}
@@ -410,7 +410,7 @@ def scratch_decls(tmp_path):
 
 
 def test_the_when_keys_are_read_into_the_views(scratch_decls):
-    t = scratch_decls["tell-two"]
+    t = scratch_decls["entail-two"]
     assert t.gives_when == () and t.view(1).gives_when == (("as", ("code",), ("folder",)),)
     # `scaffold: none` in a when-rule: the call has no rules scaffold (the conductor's ruling L6)
     assert dc.chosen(t.view(1), as_word="code") == {"gives": ("folder",), "contract": ("parses", "provenance"),
@@ -426,16 +426,16 @@ def test_the_when_keys_are_read_into_the_views(scratch_decls):
 
 def test_a_call_is_typed_and_contracted_from_its_declaration(scratch_decls):
     text = ("thym 1\n\nprogram p\n  takes f: fabula\n  gives code: folder, manual: short\n\n"
-            "  give code: tell-two f as code\n  give manual: tell-two f as told\nend\n")
+            "  give code: entail-two f as code\n  give manual: entail-two f as told\nend\n")
     checked = ok(text, decls=scratch_decls)
     items = en.enumerate_checked(checked)
     contracts = {it["of"]: it["checks"] for it in items["nodes"] if it.get("type") == "contract"}
     assert contracts == {"P:step/p.1": ["parses", "provenance"], "P:step/p.2": ["coverage"]}
     r = refused(text.replace("gives code: folder", "gives code: short"), decls=scratch_decls)
-    assert r.check == "type" and "tell-two f as code is a folder" in r.message
-    r = refused("thym 0\n\nprogram p\n  takes f: fabula\n  gives n: number\n\n  let c = tell-two f as code\n"
+    assert r.check == "type" and "entail-two f as code is a folder" in r.message
+    r = refused("thym 0\n\nprogram p\n  takes f: fabula\n  gives n: number\n\n  let c = entail-two f as code\n"
                 "  give 0\nend\n", decls=scratch_decls)
-    assert r.check == "version" and "the word code after as of tell-two, which thym 1 adds" in r.message
+    assert r.check == "version" and "the word code after as of entail-two, which thym 1 adds" in r.message
     ok("thym 1\n\nprogram p\n  takes xs: list of item, v: volume\n  gives out: volume\n\n"
        "  give gather-two xs with v\nend\n", decls=scratch_decls)
     ok("thym 1\n\nprogram p\n  takes repo: folder\n  gives n: list of word\n\n  give count-two repo\nend\n",
