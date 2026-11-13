@@ -69,7 +69,8 @@ catalog:
   derived-fields: [at, by, model, route, provider, program, run, mode, completeness, chunks, dropped, runs]
   derived-modes: [model, rules]
   derived-routes: [local, cloud]                                   # absent in rules mode
-  derived-completeness: [full, atem, outline]                      # outline: a fabulac's rules-only skeleton
+  derived-completeness: [full, atem, outline]                      # outline: a rules-only skeleton, a fabulac's or a
+                                                                   # fabulap's (scan: its lines, sounds and form)
   derived-runs-fields: [program, run, at, model, route, provider] # one per run that wrote into the fabula, a settle
                                                                    # run included; the single keys describe the last
                                                                    # run that derived the fabula from its source
@@ -150,7 +151,9 @@ closed-lists:
   salience: [critical, high, normal, low]
   feed.origin: [feed, user]
   whose.by: [author, expert, critic, model, reader]                       # P:reading
-  intended: [true, false]                                                 # C:behaviour, P:reading
+  intended: [true, false]                                                 # C:behaviour, C:device, C:form, P:reading
+  senses: [sight, hearing, touch, taste, smell, movement]                 # C:device: the senses an image reaches
+  rules.held: [true, false]                                               # C:form: a rule of its form kept or not
   division: [chapter, section, paragraph, scene, list, quotation, stanza, verse, chorus, refrain, bridge, other]
   foot: [iamb, trochee, anapaest, dactyl, spondee, amphibrach, mixed, none]
   basis: [accentual-syllabic, accentual, syllabic, quantitative, free]
@@ -227,7 +230,7 @@ modules:
     kinds:
       part: {refs: [of], checked: [division, number, heading, stance], flavours: [fabulan, fabulap],
              required: [id, type, name, summary, provenance, stance, division]}
-      device: {refs: [where], checked: [figure, effect, stance], flavours: [fabulan, fabulap],
+      device: {refs: [where], checked: [figure, effect, cue, senses, intended, stance], flavours: [fabulan, fabulap],
                required: [id, type, name, summary, provenance, stance, figure]}
       voice: {refs: [roles.*], checked: [perspective, tone, stance], flavours: [fabulan, fabulap],
               required: [id, type, name, summary, provenance, stance]}
@@ -237,6 +240,8 @@ modules:
               required: [id, type, name, summary, provenance, stance]}
       rhyme: {refs: [lines], checked: [scheme, sound, quality, placement, stance], flavours: [fabulap],
               required: [id, type, name, summary, provenance, stance]}
+      form: {refs: [parts, metre, departures.at], checked: [form, scheme, rules, intended, stance], flavours: [fabulap],
+             required: [id, type, name, summary, provenance, stance, form]}
       file: {refs: [component], checked: [path, language, holds, length, sha256, entry, stance], flavours: [fabulac],
              required: [id, type, name, summary, provenance, stance, path]}
       component: {refs: [files, of, exposes, uses], checked: [does, stance], flavours: [fabulac],
@@ -329,9 +334,10 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
       takes: ['text | folder']
       modifiers: {as: 'prose | verse | code', with: fabula}
       contract: [span-resolves, stance-closed, terms-grounded, coverage, fabula-checks, provenance]
-      contract-when:
+      contract-when:                    # a rule may also say with: <type>, met only by a call that writes that with
         - {as: [code], contract: [code-span, outline-cited, coverage, terms-grounded, stance-closed, fabula-checks, provenance]}
         - {takes: folder, contract: [fold-grounded, atem-shape, licence-recorded, fabula-checks, provenance]}
+        - {as: [verse], with: fabula, contract: [span-resolves, stance-closed, terms-grounded, coverage, fabula-checks, provenance, nothing-lost]}
       scaffold-when:                    # a folder has none: nothing but a model reads intent, and --rules refuses it
         - {as: [code], scaffold: file-outline}
         - {takes: folder, scaffold: none}
@@ -386,15 +392,42 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.code:history
     says: the fabula so far with a clone's history, its changes in episodes, its releases and its makers
     since: 1
+  # thym 1 only (since: 1; THYM 6.3, 20.9): the fabulap's helper moves, one `as` word per axis of a poem. scan reads
+  # by rule (no model; a scan with an as adds to the fabulap it is given); construe asks a model, has no scaffold,
+  # and so --rules refuses it at plan time
+  - name: scan
+    takes: [text]
+    gives: fabula
+    modifiers: {as: 'rhyme | sound | recurrence | form', with: fabula}
+    contract: [lines-found, scansion-grounded, span-resolves, fabula-checks, provenance]
+    contract-when:
+      - {as: [rhyme, sound, recurrence], contract: [sound-grounded, nothing-lost, fabula-checks, provenance]}
+      - {as: [form], contract: [form-grounded, nothing-lost, fabula-checks, provenance]}
+    code: enough.thym.moves.verse:scan
+    says: a poem read by rule, its lines, stresses, metre, rhymes, sounds, repetitions and form
+    since: 1
+  - name: construe
+    takes: [text]
+    gives: fabula
+    modifiers: {as: 'figure | image | allusion | voice | turn | meaning | ambiguity', with: fabula}
+    asks: true
+    contract: [span-resolves, no-invention, stance-kept, coverage, terms-grounded, nothing-lost, fabula-checks, provenance]
+    code: enough.thym.moves.verse:construe
+    says: one axis of a poem read by a model, every reading held as the model's own
+    since: 1
 
 # The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
 # about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
 # the volume once; about a kind, of each item of it; about a field, of each item where the field is absent or pending,
 # and {name} is filled from the item. The answer is written as the dialectic says (docs/fabula-pins-schema.md part 5).
+# only-where: {<field>: [words]} asks an entry only of items whose field holds one of the words; sets: {<field>:
+# <value>} gives a new item written from an answer about a module the fields the answer cannot (a device's figure).
+# A yes-no, number, date, ref or span answer is always about a field (MacroCOSM OES 18.6.4): an entry about a module
+# or a kind asks for text or a choice.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, only-with, at-most]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most]
   banks:
     fabulan:
       for: {flavour: fabulan}
@@ -413,7 +446,7 @@ dialectic:
         - {id: release, about: R, asks: "Where and when was it first published?", kind: text, why: missing, writes: release}
         - {id: drafts, about: R, asks: "What changed between drafts?", kind: text, why: missing, writes: change}
         - {id: licence, about: R, asks: "May others copy it, and on what terms?", kind: text, why: missing, writes: licence}
-        - {id: weight, about: P, asks: "Which claim matters most to you?", kind: ref, why: intent}
+        - {id: weight, about: P, asks: "Which claim matters most to you, and why?", kind: text, why: intent, writes: N:aim}
         - {id: stand-by, about: P:claim, asks: "Would you still stand behind this: {name}?", kind: yes-no, why: unsure}
         - {id: refuse, about: P, asks: "Is there a reading of it you would refuse?", kind: text, why: intent, writes: reading}
         - {id: sense, about: L:term#sense, asks: "Do you use {name} in a sense of your own? Which?", kind: text, why: unsure}
@@ -421,31 +454,49 @@ dialectic:
       for: {flavour: fabulap}
       to: author                  # an expert in the poet's work when the author cannot be asked
       questions:
+        # inspiration (I)
         - {id: spark, about: I, asks: "What set the poem going: something seen, heard, read, or a line that came first?", kind: text, why: missing, writes: occasion}
         - {id: ear, about: I, asks: "Which poets or poems were in your ear while you wrote it?", kind: text, why: missing, writes: influence}
-        - {id: echo, about: I:allusion, asks: "Does {name} echo another text on purpose?", kind: yes-no, why: intent}
         - {id: for-whom, about: I, asks: "Was it written for a person or an occasion?", kind: text, why: missing, writes: occasion}
+        - {id: tradition, about: I, asks: "Did you write it in, or against, a tradition or a form: an elegy, a hymn, a ballad, a sonnet?", kind: text, why: intent, writes: influence}
+        - {id: echo, about: I:allusion#roles.to, asks: "Does {name} echo another text on purpose? Which one?", kind: text, why: intent}
+        # intent (N)
         - {id: last-line, about: N, asks: "What did you want a reader to feel by the last line?", kind: text, why: intent, writes: aim}
         - {id: listener, about: N, asks: "Whom did you imagine reading it, or hearing it?", kind: text, why: missing, writes: audience}
         - {id: unsaid, about: N, asks: "Is there something the poem is careful not to say?", kind: text, why: intent, writes: exclusion}
+        # voice (C:voice)
         - {id: speaker, about: C:voice#roles.speaker, asks: "Who speaks the poem: you, a character, or no one in particular?", kind: text, why: unsure}
         - {id: addressee, about: C:voice#roles.addressee, asks: "Whom does the poem address, and is that one listening?", kind: text, why: unsure}
-        - {id: shift, about: C:voice, asks: "Does the speaker or the tone change anywhere? Where?", kind: span, why: unsure}
+        - {id: overheard, about: C:voice#roles.listener, asks: "Is anyone meant to overhear {name}, beside the one it speaks to?", kind: text, why: missing, at-most: 2}
+        - {id: shift, about: C:voice, asks: "Does the speaker or the tone change anywhere? Where?", kind: text, why: unsure, writes: voice}
+        - {id: tone, about: C:voice#tone, asks: "In what tone should {name} be heard?", kind: text, why: unsure}
+        # sound and form (C:line, C:rhyme, C:metre, C:form, C:part)
+        - {id: stresses, about: C:line#stresses, asks: "How should line {number} be read aloud: where do the stresses fall?", kind: text, why: unsure}
         - {id: breaks, about: C:line, asks: "Why do the lines break where they do?", kind: text, why: intent}
         - {id: stanza, about: C:part, asks: "Why this stanza shape, and these lengths?", kind: text, why: intent}
         - {id: rhyme, about: C:rhyme, asks: "Was the rhyme (or its absence) chosen early or late, and why?", kind: text, why: intent}
         - {id: metre-break, about: C:metre#departures, asks: "Where the metre breaks, is that on purpose?", kind: yes-no, why: intent}
-        - {id: stresses, about: C:line#stresses, asks: "How should line {number} be read aloud: where do the stresses fall?", kind: text, why: unsure}
-        - {id: image, about: C:device, asks: "Which image carries the most weight for you?", kind: ref, why: intent}
-        - {id: stands-for, about: C:device, asks: "Is {name} meant to stand for something beyond itself? What?", kind: text, why: ambiguous}
-        - {id: both, about: P:reading#intended, asks: "Is this reading one you meant: {name}?", kind: yes-no, why: ambiguous}
-        - {id: refuse, about: P, asks: "Is there a reading of the poem you would refuse?", kind: text, why: intent, writes: reading}
-        - {id: title, about: P, asks: "How does the title change the way the poem reads?", kind: text, why: intent, writes: reading}
+        - {id: form, about: C:form#intended, asks: "Did you set out to write it as {name}?", kind: yes-no, why: intent}
+        # figure, image, turn (C:device)
+        - {id: meant, about: C:device#intended, asks: "Did you mean {name}?", kind: yes-no, why: intent, at-most: 6}
+        - {id: image, about: C:device, only-where: {figure: [image]}, asks: "Which image carries the most weight for you, and why?", kind: text, why: intent, writes: N:aim}
+        - {id: stands-for, about: C:device, only-where: {figure: [symbol, metaphor, image]}, asks: "Is {name} meant to stand for something beyond itself? What?", kind: text, why: ambiguous}
+        - {id: turn, about: C, asks: "Where does the poem turn, and from what to what?", kind: text, why: intent, writes: device, sets: {figure: turn}}
+        # reference and production (R)
+        - {id: editor, about: R, to: expert, asks: "Is every word as the poet left it, or did an editor or a printer change any? Which?", kind: text, why: missing, writes: change}
         - {id: cut, about: R, asks: "What did you cut from earlier drafts, and why?", kind: text, why: missing, writes: change}
         - {id: drafts, about: R, asks: "How many drafts did it go through, and what changed most?", kind: text, why: missing, writes: change}
         - {id: published, about: R, asks: "Where and when was it first published or performed?", kind: text, why: missing, writes: release}
-        - {id: music, about: R, asks: "Is it set to music, or meant to be?", kind: yes-no, why: missing}
+        # what is left open (P, L)
+        - {id: both, about: P:reading#intended, asks: "Is this reading one you meant: {name}?", kind: yes-no, why: ambiguous, at-most: 6}
+        - {id: refuse, about: P, asks: "Is there a reading of the poem you would refuse?", kind: text, why: intent, writes: reading}
+        - {id: title, about: P, asks: "How does the title change the way the poem reads?", kind: text, why: intent, writes: reading}
         - {id: word, about: L:term#sense, asks: "Is {name} used in an old, regional or private sense?", kind: text, why: unsure}
+        # a lyric
+        - {id: music, about: R, asks: "Is it sung? To what tune or setting, and whose?", kind: text, why: missing, writes: means}
+        - {id: hook, about: C:device#intended, only-where: {figure: [hook]}, asks: "Is {name} the hook, the line you want a listener to keep?", kind: yes-no, why: intent}
+        - {id: sung, about: C, asks: "Where does the tune move a word's stress, or hold one syllable over several notes?", kind: text, why: missing, writes: device, sets: {figure: sung stress}}
+        - {id: performed, about: R, asks: "Is it sung as written, or are lines repeated, cut or added when it is performed?", kind: text, why: missing, writes: change}
     fabulac:
       for: {flavour: fabulac}
       to: maker
@@ -461,12 +512,12 @@ dialectic:
         - {id: public, about: C:interface#exported, asks: "Is {name} meant for others to call, or internal?", kind: yes-no, why: unsure, at-most: 5}
         - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing, only-with: takes, at-most: 5}
         - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure, at-most: 5}
-        - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
+        - {id: first-read, about: C, asks: "Which file should a newcomer read first, and why?", kind: text, why: missing, writes: N:audience}
         - {id: changed, about: R:change#because, asks: "Why was this change made: {name}?", kind: text, why: missing, at-most: 5}
         - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing, writes: maker}
         - {id: licence, about: R:licence#identifier, asks: "Under which licence may it be used?", kind: text, why: missing}
         - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}
-        - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most?", kind: ref, why: intent}
+        - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most, and why?", kind: text, why: intent, writes: N:requirement, sets: {force: must}}
 
 extension:
   status: not built

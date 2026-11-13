@@ -202,7 +202,7 @@ def test_a_volume_with_nothing_to_ask():
 # B. Raising
 # ---------------------------------------------------------------------------
 
-@pytest.mark.parametrize("path,flavour,n", [(CLOSE, "fabulan", 17), (ROSE, "fabulap", 25), (TALLY, "fabulac", 17)])
+@pytest.mark.parametrize("path,flavour,n", [(CLOSE, "fabulan", 17), (ROSE, "fabulap", 35), (TALLY, "fabulac", 17)])
 def test_the_bank_is_chosen_by_flavour(path, flavour, n):
     banks = dl.banks_for(dl.open_twin(path))
     assert [b["name"] for b in banks] == [flavour] and len(banks[0]["questions"]) == n
@@ -357,10 +357,12 @@ def test_words_that_name_no_item_are_asked_once_about_the_module():
     t = dl.open_twin(TALLY)
     r = dl.raise_questions(t, at=AT, pending=False, unsure=False)
     worry = _from(r, "fabulac/worry")
-    assert [(q["about"], q["id"], q["kind"]) for q in worry] == [("P", "D:question/worry", "ref")]
+    assert [(q["about"], q["id"], q["kind"]) for q in worry] == [("P", "D:question/worry", "text")]
     rose = dl.raise_questions(dl.open_twin(ROSE), at=AT, pending=False, unsure=False)
     assert [q["about"] for q in _from(rose, "fabulap/breaks")] == ["C"]          # was one per line
-    assert len(_from(rose, "fabulap/stands-for")) == 2                           # names {name}: per device
+    # names {name}: per device, and only of a symbol, a metaphor or an image (only-where): the symbol, not the
+    # apostrophe
+    assert [q["about"] for q in _from(rose, "fabulap/stands-for")] == ["C:device/the-worm-as-symbol"]
     # a volume with no item of the kind is not asked; one asked already is not asked again
     no_cases = t.render().replace("P:case/", "P:claim/").replace("type: case", "type: claim")
     assert not _from(dl.raise_questions(dl.twin_from_text(no_cases, filename=t.ledger.filename), at=AT),
@@ -402,7 +404,11 @@ def test_a_bank_entry_bounds_itself():
     assert dl._salient([{"id": "a"}, {"id": "b"}, {"id": "c"}], 2) == [{"id": "b"}, {"id": "c"}]     # ties: newest
     assert dl._entry_bound({"at-most": 0}) == "a bank entry's at-most is a whole number above 0"
     assert dl._entry_bound({"only-with": ""}) == "a bank entry's only-with names a field"
-    assert dl._entry_bound({"only-with": "takes", "at-most": 5}) == ("takes", 5)
+    assert dl._entry_bound({"only-with": "takes", "at-most": 5}) == ("takes", 5, None)
+    assert dl._entry_bound({"only-where": {"figure": ["hook"]}}) == (None, None, {"figure": ["hook"]})
+    assert dl._entry_bound({"only-where": {"figure": "hook"}}) == (None, None, {"figure": ["hook"]})
+    assert dl._entry_bound({"only-where": ["figure"]}) == ("a bank entry's only-where maps a field to the words it "
+                                                          "may hold")
 
 
 def test_no_duplicate():
@@ -798,20 +804,24 @@ def test_a_bank_entry_about_a_module_says_which_kind_its_answer_writes(entry, wr
 
 def test_the_fabula_banks_say_what_each_module_entry_writes():
     """Every fabula bank entry about a module whose answer can make an item (text or choice) names a kind the format
-    declares (ruling 3); an entry of another kind writes no item and names none."""
+    declares (ruling 3); an entry of another kind writes no item and names none. An entry about a kind whose words
+    name no item is asked of the module (18.6.6), and is held to the same rule; one about a field, or whose words name
+    the item, writes nothing new. Every answer about a module or a kind is text or a choice (18.6.4; D5 of the
+    fabulap's design: `image`, `weight`, `first-read` and `worry` were refs, `music` a yes-no)."""
     led = mini().ledger
     m = led.manifest
     seen = 0
     for b in m.banks():
         for e in b["questions"]:
-            if ":" in e["about"] or "#" in e["about"]:
-                assert "writes" not in e, (b["name"], e["id"])
+            head = e["about"].split("#")[0]
+            if "#" in e["about"] or (":" in head and "{" in e["asks"]):
+                assert "writes" not in e and "sets" not in e, (b["name"], e["id"])
                 continue
-            if e.get("kind") not in ("text", "choice"):
-                assert "writes" not in e, (b["name"], e["id"])
+            assert e.get("kind") in ("text", "choice"), (b["name"], e["id"])
+            if "writes" not in e:
                 continue
             mod, _, k = str(e["writes"]).partition(":")
-            mod, k = (mod, k) if k else (e["about"], mod)
+            mod, k = (mod, k) if k else (head.split(":")[0], mod)
             assert k in m.kinds(mod), (b["name"], e["id"], e["writes"])
             seen += 1
     assert seen >= 30
@@ -1316,3 +1326,27 @@ def test_a_pending_that_is_no_question_is_asked_as_one_and_the_bank_does_not_ask
     assert f"{dec['id']}#over[0].because" in about and f"{dec['id']}#because" not in about   # the pending asks it
     q = next(q for q in r.questions if q["about"] == f"{dec['id']}#over[0].because")
     assert q["asks"].endswith("?") and q["hint"] == "The reason is not given"
+
+
+def test_a_bank_entry_sets_what_the_answer_cannot_say_and_asks_only_where_a_field_holds_its_words():
+    """MacroCOSM 18.6.6, the fabulap's design (D5): `sets: {figure: turn}` gives the C:device an answer about module C
+    writes the figure the answer cannot say; `only-where: {figure: [hook]}` asks `hook` only of a hook."""
+    t = dl.open_twin(ROSE)
+    r = dl.raise_questions(t, at=AT, pending=False, unsure=False)
+    (turn,) = _from(r, "fabulap/turn")
+    assert (turn["about"], turn["kind"]) == ("C", "text")
+    assert not _from(r, "fabulap/hook")                                   # the rose has no hook
+    dl.land(t, [turn])
+    dl.record(t, [{"question": turn["id"], "value": "At line 5, from the worm's flight to what it finds."}],
+              session={"with": {"to": "expert", "who": "a reader of Blake"}}, at=AT)
+    res = dl.settle(t, at="2026-11-05T13:00:00Z")
+    (wrote,) = [w for _q, w in res.settled]
+    dev = t.ledger.item(wrote[0])
+    assert wrote[0].startswith("C:device/") and dev["figure"] == "turn" and dev["stance"] == "hearsay"
+    assert dev["summary"] == "At line 5, from the worm's flight to what it finds."
+    assert [str(p) for p in t.lint().errors] == []
+    # a hook, only of a device whose figure says so
+    text = dl.open_twin(ROSE).render().replace("figure: apostrophe", "figure: hook", 1)
+    hooked = dl.raise_questions(dl.twin_from_text(text, filename=ROSE.name), at=AT, pending=False, unsure=False)
+    (h,) = _from(hooked, "fabulap/hook")
+    assert h["about"].endswith("#intended") and h["kind"] == "yes-no"

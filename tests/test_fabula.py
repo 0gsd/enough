@@ -381,9 +381,9 @@ def test_the_tree_digest_reads_exactly_the_files_the_spec_names(tmp_path):
 def test_the_fabula_carries_a_bank_per_flavour():
     banks = M.default_registry().get("fabula").banks()
     assert [(b["name"], b["for"], b["to"], len(b["questions"])) for b in banks] == [
-        ("fabulan", {"flavour": "fabulan"}, "author", 17), ("fabulap", {"flavour": "fabulap"}, "author", 25),
+        ("fabulan", {"flavour": "fabulan"}, "author", 17), ("fabulap", {"flavour": "fabulap"}, "author", 35),
         ("fabulac", {"flavour": "fabulac"}, "maker", 17)]
-    first = banks[1]["questions"][7]
+    first = banks[1]["questions"][8]
     assert (first["id"], first["about"], first["kind"], first["to"]) == ("speaker", "C:voice#roles.speaker", "text",
                                                                        "author")
 
@@ -435,10 +435,13 @@ def test_the_fabula_manifest():
     for L in "LEKX":
         for k, spec in m.kinds(L).items():
             assert spec["flavours"] == list(fabula.FLAVOURS), (L, k)
-    # the four emf/1 declared, and the fabulac's two stages, thym 1 only (THYM 6.2, 6.3)
-    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "entail", "atem", "expand", "survey", "history"]
+    # the four emf/1 declared, the fabulac's two stages and the fabulap's two helper moves, thym 1 only (THYM 6.2,
+    # 6.3, 20.9)
+    assert [mv["name"] for mv in m.data["moves"]] == ["derive", "entail", "atem", "expand", "survey", "history", "scan",
+                                                      "construe"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
-    assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:])
+    assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:6])
+    assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:])
     assert "emf-checks" in m.data["moves"][0]["contract"]
     assert all(m.matches_catalog(n) for n in ("close.md.fabulan.cosm", "rose.txt.fabulap.cosm",
                                                "tool.fabulac.cosm", "close.md.cosm"))

@@ -21,7 +21,8 @@ program of that version sees: a `thym 0` program sees each entry without its `th
 **What a call gives and keeps, by the call** (THYM 17.6; the design's 3.1). `gives-when`, `contract-when` and
 `scaffold-when` are lists of rules, `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}` (and the same
 with `contract: [...]` or `scaffold: <name>`): the first rule whose `as` word is the call's, or whose type its first
-operand fits, chooses; else the entry's own key holds. A `scaffold-when` rule may say `scaffold: none`: a call it
+operand fits, chooses; else the entry's own key holds. A rule may add `with: <type>`, and then a call meets it only
+when it writes a `with` of that type (`derive poem as verse with f` keeps `nothing-lost`, THYM 6.3). A `scaffold-when` rule may say `scaffold: none`: a call it
 matches has no rules scaffold (read as None), and `--rules` refuses it at plan time (the conductor's ruling L6).
 `gives: same-as-with` (or `same-as-in`) gives the type of the call's `with` (or `in`) value. The compiler chooses
 statically, from the call as written (`chosen`), and the plan's `P:contract` lists the chosen contract; the
@@ -116,8 +117,12 @@ class MoveDecl:
         return self.base.view(0)
 
 
-def _matches(rule: tuple, as_word: Any, first_type: str | None) -> bool:
-    on, what, _ = rule
+def _matches(rule: tuple, as_word: Any, first_type: str | None, with_type: str | None = None) -> bool:
+    on, what = rule[0], rule[1]
+    if len(rule) > 3 and rule[3]:
+        # a rule that says `with: <type>` is met only by a call that writes a `with` of that type
+        if with_type is None or not ty.accepts(list(rule[3]), with_type):
+            return False
     if on == "as":
         words = as_word if isinstance(as_word, (list, tuple)) else [as_word]
         return any(isinstance(w, str) and w in what for w in words)
@@ -140,7 +145,7 @@ def chosen(decl: Any, *, as_word: Any = None, first_type: str | None = None, wit
         if isinstance(decl, dict):
             rules = _rules(rules, what) or ()
         for rule in rules or ():
-            if _matches(rule, as_word, first_type):
+            if _matches(rule, as_word, first_type, with_type):
                 out[what] = rule[2]
                 break
     if len(out["gives"]) == 1 and out["gives"][0] in SAME_AS:
@@ -250,6 +255,11 @@ def _rules(raw: Any, what: str) -> tuple | None:
                                                                         if isinstance(sel, list) else None)
         if not sel:
             return None
+        with_ = r.get("with")
+        if with_ is not None:
+            with_ = tuple(ty.alternatives(with_)) if isinstance(with_, str) and with_.strip() else None
+            if with_ is None:
+                return None
         v = r[what]
         if what == "gives":
             if not isinstance(v, str) or not v.strip():
@@ -263,7 +273,7 @@ def _rules(raw: Any, what: str) -> tuple | None:
             return None
         elif v.strip() == "none":
             v = None                    # `scaffold: none`: a call the rule matches has no rules scaffold (THYM 17.6)
-        out.append((on, sel, v))
+        out.append((on, sel, v) + ((with_,) if with_ else ()))
     return tuple(out)
 
 

@@ -27,6 +27,7 @@ CHECKS = (
     "provenance", "fabula-checks", "flavour", "files-found", "code-span", "licence-recorded", "outline-cited",
     "fold-grounded", "history-grounded", "parses", "interfaces-present", "files-present", "uses-told", "nothing-lost",
     "ids-unique", "addressed", "no-duplicate", "only-the-asked", "only-the-changed", "one-line", "nothing-added",
+    "lines-found", "scansion-grounded", "sound-grounded", "form-grounded",
 )
 
 # The checks a shipped declaration names ahead of the text: an owner's ruling that section 7.3's table does not hold

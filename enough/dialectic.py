@@ -1183,16 +1183,41 @@ def _unsure(d: dict) -> bool:
     return low or state == "pending"
 
 
-def _entry_bound(e: dict) -> tuple[str | None, int | None] | str:
+def _entry_bound(e: dict) -> tuple[str | None, int | None, dict[str, list[str]] | None] | str:
     """A bank entry's bounds (MacroCOSM 18.6.6): `only-with: <field>`, asked only of an item whose field holds a
-    value, and `at-most: <n>`, asked of at most n items, those a person can best speak to (`_salient`). `(field or
-    None, n or None)`, or why the entry cannot be read."""
-    ow, am = e.get("only-with"), e.get("at-most")
+    value; `only-where: {<field>: [words]}`, asked only of an item whose field holds one of the words (a device's
+    `figure`: the fabulap's `stands-for` of a symbol, a metaphor or an image); and `at-most: <n>`, asked of at most n
+    items, those a person can best speak to (`_salient`). `(field or None, n or None, {field: words} or None)`, or why
+    the entry cannot be read."""
+    ow, am, wh = e.get("only-with"), e.get("at-most"), e.get("only-where")
     if ow is not None and not (isinstance(ow, str) and ow.strip()):
         return "a bank entry's only-with names a field"
     if am is not None and (isinstance(am, bool) or not isinstance(am, int) or am < 1):
         return "a bank entry's at-most is a whole number above 0"
-    return (ow.strip() if isinstance(ow, str) else None), am
+    where: dict[str, list[str]] | None = None
+    if wh is not None:
+        if not isinstance(wh, dict) or not wh:
+            return "a bank entry's only-where maps a field to the words it may hold"
+        where = {}
+        for k, v in wh.items():
+            words = [v] if isinstance(v, str) else v
+            if not (isinstance(k, str) and k.strip() and isinstance(words, list) and words
+                    and all(isinstance(w, str) and w.strip() for w in words)):
+                return "a bank entry's only-where maps a field to the words it may hold"
+            where[k.strip()] = [w.strip() for w in words]
+    return (ow.strip() if isinstance(ow, str) else None), am, where
+
+
+def _holds_one_of(d: dict, where: dict[str, list[str]]) -> bool:
+    """Whether every field `only-where` names holds one of its words (a list field: any of its values)."""
+    for fpath, words in where.items():
+        found, v = get_field(d, fpath)
+        if not found or mc.is_pending(v):
+            return False
+        vals = v if isinstance(v, list) else [v]
+        if not any(isinstance(x, str) and x.strip().lower() in {w.lower() for w in words} for x in vals):
+            return False
+    return True
 
 
 def _holds(d: dict, fpath: str) -> bool:
@@ -1296,7 +1321,8 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
        where the field is absent or pending. A kind entry with no item of its kind raises nothing, and one whose
        words name no item (no `{name}`, no `{<field>}`) is asked once of the volume, about the kind's module (a
        question asked of each test case alike is one question). An entry may bound itself: `only-with: <field>`
-       asks it only of an item whose field holds a value, and `at-most: <n>` of at most n items, those a person can
+       asks it only of an item whose field holds a value, `only-where: {<field>: [words]}` only of an item whose
+       field holds one of the words, and `at-most: <n>` of at most n items, those a person can
        best speak to (`reach_rank`: a command, then a public name at the top of its module, then a public method,
        never first a private, dunder or abstract one; a setting a user sets before a constant; a change whose words
        say something before a release or a change-log entry; then one marked unsure, then one carrying an edge;
@@ -1385,7 +1411,7 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                 if isinstance(bound, str):
                     out.skipped.append((frm, bound))
                     continue
-                only_with, at_most = bound
+                only_with, at_most, only_where = bound
                 cands = []
                 for d in _items_of_kind(led, module, kind or None):
                     if sep:
@@ -1395,6 +1421,8 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                         if pending and _pends_on(d, fpath):
                             continue                  # the reader's own pending asks it (raised below)
                     if only_with is not None and not _holds(d, only_with):
+                        continue
+                    if only_where is not None and not _holds_one_of(d, only_where):
                         continue
                     cands.append(d)
                 if not sep and not _PLACEHOLDER.search(e["asks"]):
@@ -2132,6 +2160,21 @@ def _new_item_kind(led: Ledger, w: Where, frm: str | None) -> tuple[str | None, 
     return (w.module, kinds[0]) if kinds else (None, None)
 
 
+#: The fields `sets` may never give: the envelope's own, which the answer and the session write.
+_NOT_SET = frozenset(("id", "type", "name", "summary", "provenance", "stance", "pending", "withheld", "links"))
+
+
+def _entry_sets(led: Ledger, frm: str | None) -> dict:
+    """What a bank entry's `sets: {<field>: <value>}` gives the new item an answer about a module or a kind writes
+    (MacroCOSM 18.6.6): the fields the answer cannot fill, the fabulap's `turn` writing a `C:device` of figure
+    `turn`. The envelope's own fields are never set this way."""
+    _bank, e = _bank_entry(led, frm)
+    sets = (e or {}).get("sets")
+    if not isinstance(sets, dict):
+        return {}
+    return {str(k): v for k, v in sets.items() if isinstance(k, str) and k not in _NOT_SET}
+
+
 def _first_words(s: str, n: int = 6) -> str:
     words = re.sub(r"\s+", " ", s).strip().split(" ")
     out = " ".join(words[:n]).rstrip(".,;:!?")
@@ -2214,6 +2257,8 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
         required = led.manifest.required_fields(mod, k)
         if "stance" in required:
             item["stance"] = "hearsay"
+        for f, v in _entry_sets(led, ((question or {}).get("raised") or {}).get("from")).items():
+            item[f] = copy.deepcopy(v)              # what the answer cannot say: a device's figure (`sets`, 18.6.6)
         for f in required:                          # a field the answer cannot fill stays an open question (ruling 3)
             if f not in item and f not in ("id", "type", "provenance"):
                 item[f] = {"pending": f"what is the {f} of this {k}?"}
