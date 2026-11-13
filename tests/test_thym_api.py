@@ -150,7 +150,7 @@ def test_program_gives_its_source_and_its_volume(client: TestClient):
 
 def test_compile_answers_ok_or_the_refusal_with_its_line(client: TestClient):
     ok = client.post("/api/thym/compile", json={"path": "tools/count-words.thym"}).json()
-    assert ok == {"ok": True, "name": "count-words", "refusal": None,
+    assert ok == {"ok": True, "name": "count-words", "refusal": None, "refusals": [],
                   "estimate": {"steps": 1, "asks": 0, "largest_prompt": 0, "output_words": 0}, "version": 0,
                   "takes": [{"name": "story", "type": "text", "accepts": "a text (a markdown or plain file)"}],
                   "outputs": [{"name": "n", "type": "number"}]}

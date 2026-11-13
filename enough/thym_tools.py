@@ -319,8 +319,8 @@ def run_thym_check(project_dir: Path, call: Any) -> Any:
     except Exception as e:  # noqa: BLE001 — a compiler fault is said in words, never as a trace
         log.exception("thym_check failed")
         return _err("thym_check", ref, f"{label} could not be checked ({type(e).__name__}).")
-    if isinstance(checked, Refusal):
-        return _result("thym_check", ref, True, str(_named(checked, label)))
+    if isinstance(checked, Refusal):                 # every fault the checker found, one line each, first first
+        return _result("thym_check", ref, True, "\n".join(str(_named(r, label)) for r in checked.all()))
     takes, gives = _takes(checked), _gives(checked)
     route = _route(extra)
     if isinstance(route, str):

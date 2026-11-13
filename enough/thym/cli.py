@@ -1,6 +1,6 @@
 """The command line (docs/THYM.md 11.3).
 
-    python -m enough.thym check     <program.thym>                     compile only; prints the refusal or "ok"
+    python -m enough.thym check     <program.thym>                     compile only; prints every fault, or "ok"
     python -m enough.thym plan      <program.thym> <inputs…>           compile and plan; prints the atem and cost
     python -m enough.thym run       <program.thym> <inputs…> [--rules]
                                                                        run; prints the trace's atem; writes outputs
@@ -19,8 +19,8 @@ is not importable here (the folder is never put on the import path) is known to 
 `run` refuses it, saying the application's implementation must be installed.
 
 Every command reads `--root`, else `ENOUGH_THYM_ROOT`, else `~/enough/thym/`, for where runs live, and writes nowhere
-else unless it is given the path. A refusal is printed as one line and exits 2; a conformance failure or a replay
-that differs exits 1. The compiler's parts (`check`, `plan`, `enumerate`, `compile`) and enough's host (the model
+else unless it is given the path. A refusal is printed as one line and exits 2 (`check` prints one line for each
+fault the checker found); a conformance failure or a replay that differs exits 1. The compiler's parts (`check`, `plan`, `enumerate`, `compile`) and enough's host (the model
 coprocessor, the preflight, the agent-free switch: `enough.thym_host`) are found when they are there; the runtime
 works without either, with no model.
 
@@ -339,7 +339,8 @@ def cmd_check(args: argparse.Namespace) -> int:
     if r is None:
         return 1
     if isinstance(r, Refusal):
-        _say(str(r))
+        for one in r.all():                  # every independent fault the checker found, one line each, first first
+            _say(str(one))
         return 2
     _say("ok")
     return 0

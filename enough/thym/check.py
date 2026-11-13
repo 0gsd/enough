@@ -190,6 +190,24 @@ class _Fail(Exception):
         self.refusal = refusal
 
 
+class _Trap:
+    """`with checker.trap() as t:` — a refusal raised inside is kept in the checker's faults and the check goes on
+    after the block (`t.failed` says it happened); anything else propagates."""
+
+    def __init__(self, faults: list[Refusal]):
+        self.faults, self.failed = faults, False
+
+    def __enter__(self) -> "_Trap":
+        return self
+
+    def __exit__(self, kind: Any, value: Any, _tb: Any) -> bool:
+        if kind is not None and issubclass(kind, _Fail):
+            self.faults.append(value.refusal)
+            self.failed = True
+            return True
+        return False
+
+
 class _Scope:
     def __init__(self, parent: "_Scope | None" = None, sink: dict | None = None):
         self.parent, self.names, self.sink = parent, {}, sink
@@ -220,6 +238,9 @@ class _Ctx:
     collect: list = field(default_factory=list)
     #: every loop around it, innermost last
     loops: list = field(default_factory=list)
+    #: the names a refused statement of this block would have bound: a later statement that uses one is not checked,
+    #: since its fault would only repeat the first in other words
+    poisoned: set = field(default_factory=set)
 
 
 # ---------------------------------------------------------------------------
@@ -384,6 +405,33 @@ def names_used(st: ps.Stmt) -> list[str]:
     return out
 
 
+def _mentions(st: ps.Stmt) -> set[str]:
+    """Every bare name a statement's own expressions hold, whatever the checker would make of it (a binding, a word,
+    a field): wider than `names_used`, which reads what the checker decided, and so usable on a statement never
+    checked."""
+    out: set[str] = set()
+
+    def visit(x: Any) -> None:
+        if isinstance(x, ps.Name):
+            out.add(x.name)
+            return
+        for c in children(x):
+            visit(c)
+
+    for p in parts(st):
+        visit(p)
+    return out
+
+
+def _binds(st: ps.Stmt) -> set[str]:
+    """The names a statement binds in the scope it stands in: a `let`'s, a collecting loop's."""
+    if isinstance(st, ps.Let):
+        return {st.name}
+    if isinstance(st, ps.For) and st.collect:
+        return {st.collect}
+    return set()
+
+
 def reaches_give(stmts: list[ps.Stmt], output: str | None = None) -> bool:
     """True when every path through these statements reaches a `give` (THYM.md 8.2); with `output`, a `give` of that
     output (a labelled one, `give <output>: …`)."""
@@ -436,11 +484,22 @@ class _Checker:
         self.contracts: dict[str, ps.Block] = {}
         self.local_contracts: dict[str, dict[str, ps.Block]] = {}
         self.flavours: dict[int, str] = {}        # id(expr) → the flavour of the fabula it gives, where known
+        self.faults: list[Refusal] = []           # every independent fault found so far, in the order found
+        self.skipped = 0                          # statements not checked, for using a refused statement's name
 
     # -- refusals ----------------------------------------------------------
 
     def fail(self, check: str, message: str, line: int | None, file: str | None = None) -> None:
         raise _Fail(Refusal("compile", check, message, line, file or self.file))
+
+    def trap(self) -> _Trap:
+        return _Trap(self.faults)
+
+    def stop_if_faulted(self) -> None:
+        """Refuse with every fault found so far, the first first, when there is one."""
+        if self.faults:
+            first, *rest = self.faults
+            raise _Fail(Refusal(first.stage, first.check, first.message, first.line, first.file, more=tuple(rest)))
 
     def what_is(self, name: str) -> str | None:
         if name in self.g.keywords:
@@ -466,46 +525,59 @@ class _Checker:
     # -- the whole file ----------------------------------------------------
 
     def run(self) -> Checked:
+        """Three phases (0.7: every independent fault is reported, not only the first). The file's shape (its names,
+        its `use`s, its blocks' heads): each fault kept, and the check stops after the phase when there was one,
+        since every block reads what it settles. Each block's body, whatever another block said, and within a body
+        each statement, whatever another said (`stmts`). Then what reads the whole file at once (recursion, what
+        each move inherits, contracts that ask), only when nothing before it failed."""
         m = self.m
         blocks_by_name: dict[str, ps.Block] = {}
         for b in m.blocks:
-            self.name_ok(b.name, b.line, f"a {b.kind}")
-            if b.name in blocks_by_name:
-                first = blocks_by_name[b.name]
-                self.fail("rebound", f"`{b.name}` already names the {first.kind} at line {first.line}; a name is "
-                          "unique among the blocks of its file", b.line)
-            blocks_by_name[b.name] = b
+            with self.trap():
+                self.name_ok(b.name, b.line, f"a {b.kind}")
+                if b.name in blocks_by_name:
+                    first = blocks_by_name[b.name]
+                    self.fail("rebound", f"`{b.name}` already names the {first.kind} at line {first.line}; a name is "
+                              "unique among the blocks of its file", b.line)
+                blocks_by_name[b.name] = b
         checks_known = known_checks(self.decls) if m.version >= 1 else set()
         for b in m.blocks:
             locals_ = b.moves + b.contracts
             for lm in locals_:
-                self.name_ok(lm.name, lm.line, f"a {lm.kind}")
-                if lm.name in blocks_by_name or any(o is not lm and o.name == lm.name for o in locals_):
-                    self.fail("rebound", f"`{lm.name}` already names a block of this file", lm.line)
+                with self.trap():
+                    self.name_ok(lm.name, lm.line, f"a {lm.kind}")
+                    if lm.name in blocks_by_name or any(o is not lm and o.name == lm.name for o in locals_):
+                        self.fail("rebound", f"`{lm.name}` already names a block of this file", lm.line)
             for cb in [b] + b.contracts:
-                if cb.kind == "contract" and cb.name in checks_known:
-                    self.fail("type", f"contract {cb.name} has the name of a standard check; name it otherwise",
-                              cb.line)
+                with self.trap():
+                    if cb.kind == "contract" and cb.name in checks_known:
+                        self.fail("type", f"contract {cb.name} has the name of a standard check; name it otherwise",
+                                  cb.line)
         for u in m.uses:
-            self.use(u, blocks_by_name)
+            with self.trap():
+                self.use(u, blocks_by_name)
         for b in m.blocks:
-            self.origin.setdefault(b.name, Path(self.file).name if self.file else "this file")
-            if b.kind == "morph":
-                self.add_name(Binding(b.name, "morph", "morph", b.line, self.file, source=b))
-            elif b.kind == "context":
-                fields = {f.field: self.value_type(f.value) for f in b.fields}
-                self.add_name(Binding(b.name, "context", "context", b.line, self.file, fields=fields, source=b))
-            elif b.kind == "move":
-                mv = self.user_move(b, None)
-                self.moves[b.name] = mv
-            elif b.kind == "contract":
-                self.contracts[b.name] = b
+            with self.trap():
+                self.origin.setdefault(b.name, Path(self.file).name if self.file else "this file")
+                if b.kind == "morph":
+                    self.add_name(Binding(b.name, "morph", "morph", b.line, self.file, source=b))
+                elif b.kind == "context":
+                    fields = {f.field: self.value_type(f.value) for f in b.fields}
+                    self.add_name(Binding(b.name, "context", "context", b.line, self.file, fields=fields, source=b))
+                elif b.kind == "move":
+                    mv = self.user_move(b, None)
+                    self.moves[b.name] = mv
+                elif b.kind == "contract":
+                    self.contracts[b.name] = b
         for b in m.blocks:
             if b.kind == "program":
-                self.local[b.name] = {lm.name: self.user_move(lm, b.name) for lm in b.moves}
-                self.local_contracts[b.name] = {lc.name: lc for lc in b.contracts}
+                with self.trap():
+                    self.local[b.name] = {lm.name: self.user_move(lm, b.name) for lm in b.moves}
+                    self.local_contracts[b.name] = {lc.name: lc for lc in b.contracts}
+        self.stop_if_faulted()
         for b in m.blocks:
             self.check_block(b)
+        self.stop_if_faulted()
         self.no_recursion()
         for mv in self.user_moves:
             self.inherit(mv, set())
@@ -690,20 +762,29 @@ class _Checker:
     # -- blocks ------------------------------------------------------------
 
     def check_block(self, b: ps.Block) -> None:
+        """One block, each of its parts checked whatever another part said (a program's own moves and contracts,
+        then its body); a fault is kept in `faults`."""
         if b.kind == "morph":
-            self.morph(b)
+            with self.trap():
+                self.morph(b)
         elif b.kind == "context":
-            self.context(b)
+            with self.trap():
+                self.context(b)
         elif b.kind == "move":
-            self.body(b, None)
+            with self.trap():
+                self.body(b, None)
         elif b.kind == "contract":
-            self.contract(b, None)
+            with self.trap():
+                self.contract(b, None)
         else:
             for lm in b.moves:
-                self.body(lm, b.name)
+                with self.trap():
+                    self.body(lm, b.name)
             for lc in b.contracts:
-                self.contract(lc, b.name)
-            self.body(b, b.name)
+                with self.trap():
+                    self.contract(lc, b.name)
+            with self.trap():
+                self.body(b, b.name)
 
     def morph(self, b: ps.Block) -> None:
         seen: dict[str, int] = {}
@@ -745,20 +826,28 @@ class _Checker:
         (`contract_never_asks`)."""
         what = {"keep": "a keep", "if": "an if", "emit": "an emit", "give": "a give", "withhold": "a withhold",
                 "effect": "a move run for its effect"}
+        before = len(self.faults)
         for st in walk(b.stmts):
             form = "a loop that collects" if isinstance(st, ps.For) and st.collect else what.get(st.form)
             if form:
-                self.fail("type", f"a contract holds let, assert and for each lines; line {st.line} is {form}",
-                          st.line)
+                with self.trap():
+                    self.fail("type", f"a contract holds let, assert and for each lines; line {st.line} is {form}",
+                              st.line)
+        if len(self.faults) > before:
+            return                                   # a body of the wrong lines is not typed: it would only say so again
         sink: dict[str, Binding] = {}
         self.symbols[b.qualified] = sink
         scope = _Scope(self.file_scope, sink)
+        ctx = _Ctx(block=b, program=program)
         for p in b.params:
-            self.name_ok(p.name, p.line, "a parameter")
-            if scope.lookup(p.name) is not None:
-                self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
-            scope.add(Binding(p.name, p.type, "param", p.line, self.file))
-        self.stmts(b.stmts, scope, _Ctx(block=b, program=program))
+            with self.trap() as t:
+                self.name_ok(p.name, p.line, "a parameter")
+                if scope.lookup(p.name) is not None:
+                    self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
+                scope.add(Binding(p.name, p.type, "param", p.line, self.file))
+            if t.failed:
+                ctx.poisoned.add(p.name)
+        self.stmts(b.stmts, scope, ctx)
 
     def contract_never_asks(self, b: ps.Block) -> None:
         """A contract checks, and never asks: no call in its body asks a model, directly or through a user move."""
@@ -842,34 +931,46 @@ class _Checker:
         sink: dict[str, Binding] = {}
         self.symbols[b.qualified] = sink
         scope = _Scope(self.file_scope, sink)
-        for p in (b.params if b.kind == "move" else b.takes):
-            self.name_ok(p.name, p.line, "an input" if b.kind == "program" else "a parameter")
-            if scope.lookup(p.name) is not None:
-                self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
-            scope.add(Binding(p.name, p.type, "param" if b.kind == "move" else "takes", p.line, self.file))
         ctx = _Ctx(block=b, program=program)
+        for p in (b.params if b.kind == "move" else b.takes):
+            with self.trap() as t:
+                self.name_ok(p.name, p.line, "an input" if b.kind == "program" else "a parameter")
+                if scope.lookup(p.name) is not None:
+                    self.fail("rebound", f"`{p.name}` is already bound; a name is bound once", p.line)
+                scope.add(Binding(p.name, p.type, "param" if b.kind == "move" else "takes", p.line, self.file))
+            if t.failed:
+                ctx.poisoned.add(p.name)
         outs = b.outputs or ([b.gives] if b.gives is not None else [])
         seen_out: dict[str, int] = {}
         for o in outs:
-            if o.name in seen_out:
-                self.fail("rebound", f"`{o.name}` already names an output of {b.kind} {b.name}, at line "
-                          f"{seen_out[o.name]}", o.line)
-            seen_out[o.name] = o.line
+            with self.trap():
+                if o.name in seen_out:
+                    self.fail("rebound", f"`{o.name}` already names an output of {b.kind} {b.name}, at line "
+                              f"{seen_out[o.name]}", o.line)
+                seen_out[o.name] = o.line
+        before = len(self.faults)
         self.stmts(b.stmts, scope, ctx)
-        self.depth(b)
-        self.keeps(b, program)
+        typed = len(self.faults) == before           # every statement of the body was typed
+        with self.trap():
+            self.depth(b)
+        with self.trap():
+            self.keeps(b, program)
         if len(outs) > 1:
             names = [o.name for o in outs]
             for o in outs:
-                if not reaches_give(b.stmts, o.name):
-                    at = missed_at(b.stmts, o.name)
-                    self.fail("no-give", f"{b.kind} {b.name} gives {_and(names)}; the path through line {at} never "
-                              f"gives {o.name}", b.line)
-            self.gives_once(b.stmts, set(), b)
+                with self.trap():
+                    if not reaches_give(b.stmts, o.name):
+                        at = missed_at(b.stmts, o.name)
+                        self.fail("no-give", f"{b.kind} {b.name} gives {_and(names)}; the path through line {at} "
+                                  f"never gives {o.name}", b.line)
+            with self.trap():
+                self.gives_once(b.stmts, set(), b)
         elif b.gives is not None and not reaches_give(b.stmts):
-            self.fail("no-give", f"{b.kind} {b.name} gives {b.gives.name}: {b.gives.type}, and a path through it "
-                      "never reaches a give", b.line)
-        if b.kind == "program":
+            with self.trap():
+                self.fail("no-give", f"{b.kind} {b.name} gives {b.gives.name}: {b.gives.type}, and a path through "
+                          "it never reaches a give", b.line)
+        if b.kind == "program" and typed:
+            # what reaches the projection is read from the typed calls: a body with a refused statement is not read
             self.emits_and_counts(b, ctx)
 
     def gives_once(self, stmts: list[ps.Stmt], given: set[str], b: ps.Block) -> set[str]:
@@ -924,8 +1025,18 @@ class _Checker:
     # -- statements --------------------------------------------------------
 
     def stmts(self, stmts: list[ps.Stmt], scope: _Scope, ctx: _Ctx) -> None:
+        """Each statement whatever another said (0.7): a refused one is kept in `faults` and what it would have
+        bound is poisoned; a later statement that mentions a poisoned name is not checked (its fault would repeat
+        the first) and poisons what it binds in turn."""
         for s in stmts:
-            self.stmt(s, scope, ctx)
+            if ctx.poisoned and _mentions(s) & ctx.poisoned:
+                ctx.poisoned |= _binds(s)
+                self.skipped += 1
+                continue
+            with self.trap() as t:
+                self.stmt(s, scope, ctx)
+            if t.failed:
+                ctx.poisoned |= _binds(s)
 
     def bind(self, scope: _Scope, name: str, t: str, kind: str, line: int, ctx: _Ctx) -> Binding:
         self.name_ok(name, line, "a binding")
@@ -971,6 +1082,7 @@ class _Checker:
             if frame is not None:
                 ctx.collect.append(frame)
             ctx.loops.append(s)
+            marks = (len(self.faults), self.skipped)
             try:
                 self.stmts(s.body, inner, ctx)
             finally:
@@ -979,6 +1091,10 @@ class _Checker:
                     ctx.collect.pop()
             ctx.in_loop = was
             if frame is not None:
+                if (len(self.faults), self.skipped) != marks:
+                    # a keep refused or not checked: what the loop collects is unknown, and is not said twice
+                    ctx.poisoned.add(s.collect)
+                    return
                 self.collected(s, frame, scope, ctx)
         elif isinstance(s, ps.Emit):
             t = self.expr(s.expr, scope, ctx)

@@ -198,16 +198,20 @@ def program_row(entry: dict) -> dict:
 
 
 def compile_payload(*, path: Path | None = None, text: str | None = None) -> dict:
-    """`POST /api/thym/compile`: `{ok, name, refusal, estimate}`."""
+    """`POST /api/thym/compile`: `{ok, name, refusal, refusals, estimate}`. `refusal` is the first fault, where it
+    always was; `refusals` (0.7) every independent fault the checker found, the first first (`[]` when it compiles),
+    which the editor's strip steps through."""
     checked = _checked(path, text)
     if isinstance(checked, Refusal):
         return {"ok": False, "name": None, "refusal": refusal_dict(checked),
+                "refusals": [refusal_dict(r) for r in checked.all()],
                 "estimate": {"steps": 0, "asks": 0, "largest_prompt": 0, "output_words": 0}}
     block = _block(checked)
     if block is None:
         r = Refusal("plan", "no-program", "there is nothing to run: the file has no program block")
-        return {"ok": False, "name": None, "refusal": refusal_dict(r), "estimate": estimate(checked)}
-    return {"ok": True, "name": block.name, "refusal": None, "estimate": estimate(checked),
+        return {"ok": False, "name": None, "refusal": refusal_dict(r), "refusals": [refusal_dict(r)],
+                "estimate": estimate(checked)}
+    return {"ok": True, "name": block.name, "refusal": None, "refusals": [], "estimate": estimate(checked),
             "version": version_of(checked), "takes": takes_rows(block), "outputs": outputs_rows(block)}
 
 

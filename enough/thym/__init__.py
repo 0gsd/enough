@@ -23,7 +23,7 @@ by one are `parse.parse`, `check.check`, `enumerate.enumerate_file` and `plan.pl
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 FORMAT = "thym 0"                      # the version line every program starts with (THYM.md 4.1)
 MINICOSM = "thym/1"                    # the MiniCOSM programs, morphs, contexts, plans, traces and packages are written in
@@ -32,16 +32,23 @@ MINICOSM = "thym/1"                    # the MiniCOSM programs, morphs, contexts
 @dataclass(frozen=True)
 class Refusal:
     """A plain no, as a value: the stage (`compile`, `plan` or `run`), the check that failed (the names of THYM.md
-    9 and 7.3), the message, and, when one is known, the line and the file."""
+    9 and 7.3), the message, and, when one is known, the line and the file. The checker reports every independent
+    fault it finds (0.7): this refusal is the first, and `more` the others, in the order found; `all()` gives them
+    together. `more` takes no part in comparing, hashing or printing a refusal, which say what they always said."""
     stage: str
     check: str
     message: str
     line: int | None = None
     file: str | None = None
+    more: tuple = field(default=(), compare=False, repr=False)
 
     def __str__(self) -> str:
         where = f"{self.file or '<program>'}:{self.line}" if self.line else (self.file or "<program>")
         return f"{where}: refused at {self.stage} ({self.check}): {self.message}"
+
+    def all(self) -> list:
+        """This refusal and every other fault found with it, the first first."""
+        return [self, *self.more]
 
 
 def _read(path) -> "tuple[str | None, Refusal | None]":
