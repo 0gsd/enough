@@ -138,7 +138,8 @@ name.
 
 ### 1.3 Stewardship
 
-Thym is stewarded by Verroes (Graham Smith). The specification is revised at its home, https://thym.cosmoes.org/; each
+Thym is stewarded by Verroes (Graham Smith). The text is licensed under CC BY 4.0, the author makes the OWFa 1.0
+promise, and the names are not licensed (see the colophon). The specification is revised at its home, https://thym.cosmoes.org/; each
 revision is an edition, and the Changes appendix (section 25) records what each edition changed. A program's version
 line pins the grammar it is written in, `thym 0` or `thym 1` (section 4.9): a program written under a grammar version
 must compile under every later conforming compiler, and compile the same way. The language grows by moves, which the
@@ -2663,5 +2664,4 @@ in a program.
 ## Colophon
 
 <!-- atem: copyright, the canonical edition and its source -->
-Thym — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
-https://thym.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.
+Thym — Copyright © 2026 Graham Smith. The text is licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). A copy carries the author, Graham Smith; the text's name and edition; and a link to its home, https://thym.cosmoes.org/. For Thym, the author makes the Open Web Foundation Final Specification Agreement 1.0 (OWFa 1.0) promise (https://www.openwebfoundation.org/the-agreements/the-owf-1-0-agreements-granted-claims/owfa-1-0). The names of the family are not licensed by either; the author holds them for now. The canonical edition is published at https://thym.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

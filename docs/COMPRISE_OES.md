@@ -1755,5 +1755,4 @@ write down rulings made on 2026-11-02; Comprise 0.3.0, the reference implementat
 
 ## Colophon
 
-Comprise OES — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
-https://comprise.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.
+Comprise OES — Copyright © 2026 Graham Smith. The text is licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). A copy carries the author, Graham Smith; the text's name and edition; and a link to its home, https://comprise.cosmoes.org/. For Comprise OES, the author makes the Open Web Foundation Final Specification Agreement 1.0 (OWFa 1.0) promise (https://www.openwebfoundation.org/the-agreements/the-owf-1-0-agreements-granted-claims/owfa-1-0). The names of the family are not licensed by either; the author holds them for now. The canonical edition is published at https://comprise.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

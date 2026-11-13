@@ -128,7 +128,8 @@ scale keeps the order of the larger and adds to it.
 ### 1.3 Stewardship
 
 MacroCOSM OES is stewarded by Verroes (Graham Smith). The specification, the manifests registered in sections 18 and 19
-and the names of the family are his (see the colophon). Its canonical edition is published at
+and the names of the family are his. The texts and the manifests are licensed under CC BY 4.0, the author makes the
+OWFa 1.0 promise, and the names are not licensed (see the colophon). Its canonical edition is published at
 https://macro.cosmoes.org/; each edition says what changed in the Changes appendix (section 21). The reference
 implementation is enough (https://github.com/0gsd/enough).
 
@@ -4478,5 +4479,4 @@ of them, keeps them, and leaves their meaning to Comprise.
 ## Colophon
 
 <!-- atem: copyright, the canonical edition and its source -->
-MacroCOSM OES — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
-https://macro.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.
+MacroCOSM OES — Copyright © 2026 Graham Smith. The text and its manifests are licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). A copy carries the author, Graham Smith; the text's name and edition; and a link to its home, https://macro.cosmoes.org/. For MacroCOSM OES, the author makes the Open Web Foundation Final Specification Agreement 1.0 (OWFa 1.0) promise (https://www.openwebfoundation.org/the-agreements/the-owf-1-0-agreements-granted-claims/owfa-1-0). The names of the family are not licensed by either; the author holds them for now. The canonical edition is published at https://macro.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

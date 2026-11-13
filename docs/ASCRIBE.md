@@ -89,7 +89,8 @@ its name in prose, as *Comprise OES* is Comprise's; `ascribe/1` is its declarati
 To *ascribe* is to set something down as belonging to someone. A holograph ascribes qualities to a self without saying
 whose self it is.
 
-Ascribe is stewarded by Verroes (Graham Smith). Its canonical edition is published at https://ascribe.cosmoes.org/
+Ascribe is stewarded by Verroes (Graham Smith). The text is licensed under CC BY 4.0, the author makes the OWFa 1.0
+promise, and the names are not licensed (see the colophon). Its canonical edition is published at https://ascribe.cosmoes.org/
 (see the colophon); each revision is an edition, and the Changes appendix (section 17) records what each edition
 changed.
 
@@ -1512,5 +1513,4 @@ the match-token list `ascribe-tokens/0` and a seek answered by an isograph are w
 ## Colophon
 
 <!-- atem: copyright, the canonical edition and its source -->
-Ascribe — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
-https://ascribe.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.
+Ascribe — Copyright © 2026 Graham Smith. The text is licensed under the Creative Commons Attribution 4.0 International licence (CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). A copy carries the author, Graham Smith; the text's name and edition; and a link to its home, https://ascribe.cosmoes.org/. For Ascribe, the author makes the Open Web Foundation Final Specification Agreement 1.0 (OWFa 1.0) promise (https://www.openwebfoundation.org/the-agreements/the-owf-1-0-agreements-granted-claims/owfa-1-0). The names of the family are not licensed by either; the author holds them for now. The canonical edition is published at https://ascribe.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.
