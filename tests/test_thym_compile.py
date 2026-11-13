@@ -681,11 +681,13 @@ def test_types_accept_by_density_and_never_coerce():
 def test_the_contracts_constant_equals_the_table_of_section_7_3():
     assert list(ct.CHECKS) == _table_rows("### 7.3 The named checks", "### 7.4")
     decls = dc.load()
-    # every check a real declaration names, in either version's view, is a row of 7.3 (or its old name)
+    # every check a real declaration names, in either version's view, is a row of 7.3 (or its old name, or one an
+    # owner's ruling put ahead of the text, which is no row of it yet)
     views = [w for d in decls.values() for w in (d, d.view(0), d.view(1)) if w is not None]
     every = {c for w in views for c in w.contract}
     every |= {c for w in views for rule in (w.contract_when or ()) for c in (rule[2] or ())}
-    assert every <= set(ct.CHECKS) | set(ct.OLD_NAMES)
+    assert every <= set(ct.CHECKS) | set(ct.OLD_NAMES) | set(ct.AHEAD)
+    assert not set(ct.AHEAD) & set(ct.CHECKS) and set(ct.AHEAD) <= every
     assert set(ct.OLD_NAMES.values()) <= set(ct.CHECKS)
     compile_row = next(ln for ln in _text(SPEC).splitlines() if ln.startswith("| **compile** |"))
     named = re.findall(r"\(`([a-z-]+)`\)", compile_row)

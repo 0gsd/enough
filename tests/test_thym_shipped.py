@@ -61,8 +61,8 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
                                                                   "fabula-checks", "provenance")
     assert dc.chosen(tell, as_word="code")["contract"] == ("parses", "interfaces-present", "files-present", "footer",
                                                            "provenance")
-    assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "uses-told", "footer",
-                                                             "provenance")
+    assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "quotes-held", "uses-told",
+                                                             "footer", "provenance")
     assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
     assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "entail", "count", "words"}
 

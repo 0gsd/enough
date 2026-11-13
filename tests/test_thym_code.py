@@ -772,6 +772,27 @@ def test_a_catem_that_leaves_a_use_untold_is_asked_again(built, tmp_path):
     assert [x["name"] for x in failed] == ["uses-told"] and "N:use/top-words" in failed[0]["why"]
 
 
+def test_a_catem_that_quotes_a_name_its_fabulac_lacks_is_asked_again(built, tmp_path):
+    """`quotes-held` (the owner's ruling, 0.7): every name inside a catem's code spans is in its fabulac, by rules; one
+    that quotes what the fabulac lacks fails, and the model is asked again with why, like any other output it made."""
+    tmp, f, _runs = built
+    invented = CATEM["overview"].replace("`tiny top notes.txt -n 2` lists", "`tiny top notes.txt --sort-by-length` lists")
+    cp = Scripted(answers({("catem", "overview"): [invented, CATEM["overview"]]}))
+    p = tmp_path / "o.thym"
+    p.write_text("thym 1\n\nprogram p\n  takes f: fabula\n  gives c: short\n\n  give tell f as overview\nend\n")
+    t = run_stage(tmp, p, None, [{"name": "f", "type": "fabula", "path": str(f.relative_to(tmp))}], cp)
+    landed(t, "c")
+    failed = cp.asked("catem")[1]["repair"]["failed"]
+    assert [x["name"] for x in failed] == ["quotes-held"]
+    assert failed[0]["why"] == "the catem quotes `--sort-by-length`, which is not in its fabulac"
+    assert CODE.quoted_names("`tiny top FILE -n N` lists N words, `3` when left out.\n") == ["tiny", "top", "FILE",
+                                                                                              "-n", "N"]
+    fixtures = REPO / "tests" / "fixtures" / "fabula"
+    tally = Value("fabula", mc.yaml_load((fixtures / "tally.fabulac.cosm").read_text(encoding="utf-8")))
+    catem = Value("short", (fixtures / "tally.catem-2026-11-05-1415.md").read_text(encoding="utf-8"))
+    assert C.verdict("quotes-held", catem, {"f": tally}, {}, None) == (True, "")
+
+
 def test_a_catem_of_a_poem_is_refused_for_its_flavour(tmp_path):
     p = tmp_path / "v.thym"
     p.write_text("thym 1\n\nprogram p\n  takes poem: text\n  gives c: short\n\n  let f = derive poem as verse\n"
@@ -884,7 +905,7 @@ def test_the_declarations_keep_thym_0s_view_and_add_thym_1s():
     assert D.chosen(t1, as_word="code")["gives"] == ("folder",)
     assert D.chosen(t1, as_word="manual")["scaffold"] == "uses-outline"
     for name in ("files-found", "code-span", "licence-recorded", "outline-cited", "fold-grounded", "history-grounded",
-                 "parses", "interfaces-present", "files-present", "uses-told", "flavour"):
+                 "parses", "interfaces-present", "files-present", "uses-told", "quotes-held", "flavour"):
         assert C.CHECKS.lookup(name) is not None, name
 
 

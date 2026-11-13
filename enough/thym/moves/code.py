@@ -17,7 +17,7 @@ catems (THYM 6.3, 7.3, 20; MacroCOSM OES 18.4.1, 18.4.7, 18.4.8).
 `emf.py`'s `derive` and `entail` reach the four asking branches here; `survey` and `history` are declared with their
 own `code:`. The checks of THYM 7.3 these moves keep are registered here: `files-found`, `code-span`,
 `licence-recorded`, `outline-cited`, `fold-grounded`, `history-grounded`, `parses`, `interfaces-present`,
-`files-present`, `uses-told`, `flavour`, and the code readings of `coverage`, `footer` and `atem-shape` that
+`files-present`, `uses-told`, `quotes-held`, `flavour`, and the code readings of `coverage`, `footer` and `atem-shape` that
 `emf.py`'s checks hand on to.
 
 **Nothing in a repository is run.** The moves read a folder only as the folder value holds it (in a replay, its
@@ -42,7 +42,7 @@ from enough.thym.checks import CHECKS as _CHECKS
 from enough.thym.checks import check
 from enough.thym.folder import Folder, digest_of, lines_in, path_key
 from enough.thym.moves import (LADDER, MoveError, answer_mapping, engine, fabula_doc, fold, item_kind, model_of,
-                               short_value, entailment_of, utc_day, words_in)
+                               short_value, entailment_of, text_blob, utc_day, words_in)
 from enough.thym.registry import Request, implements
 from enough.thym.values import Value, plain
 
@@ -3333,6 +3333,52 @@ def _uses_told(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> 
     missing = [i for i in must_say(items, depth) if i not in told]
     if missing:
         return False, f"the catem at depth {depth} does not say {', '.join(missing[:6])}"
+    return True, ""
+
+
+#: a code span in a catem's markdown (one or more backticks, closed by as many)
+_CODE_SPAN = re.compile(r"(`+)(.+?)\1", re.S)
+#: a name inside one: a run of letters, digits and `_ . / ~ -` holding a letter (`top_words`, `--lines`,
+#: `~/.tally.jsonl`, `TALLY_FILE`); a number, a sign or punctuation alone is no name
+_QUOTED_NAME = re.compile(r"[\w./~-]*[^\W\d_][\w./~-]*")
+
+
+def quoted_names(text: str) -> list[str]:
+    """The names a catem quotes: every name inside its code spans (`tiny top FILE -n N` quotes tiny, top, FILE, -n and
+    N), in order, each once, a trailing `.`, `/` or `-` dropped. The footer, the last line, is the runtime's and quotes
+    nothing."""
+    lines = text.replace("\r\n", "\n").rstrip().split("\n")
+    if lines and _CATEM_FOOT.match(lines[-1].strip()):
+        lines = lines[:-1]
+    out: list[str] = []
+    for m in _CODE_SPAN.finditer("\n".join(lines)):
+        for w in _QUOTED_NAME.findall(m.group(2)):
+            w = w.rstrip("./-")
+            if w and w not in out:
+                out.append(w)
+    return out
+
+
+@check("quotes-held")
+def _quotes_held(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Every name a catem quotes is in its fabulac (the owner's ruling, 0.7): each name inside a code span (a
+    command, an option, a function, a setting, a path, a message's words) is one the fabulac holds, in its items'
+    names, summaries, signatures, steps or examples, read as `no-invention` reads names. By rules; a catem that
+    quotes what its fabulac lacks is asked again, like any other output a model made."""
+    t = entailment_of(output) or {}
+    if output.state == "pending":
+        return True, "a scaffold quotes the fabulac's own words"
+    fab = t.get("fabula") if isinstance(t.get("fabula"), Value) else _first(inputs, "fabula")
+    if fab is None:
+        return False, "no fabulac to look the catem's quoted names up in"
+    cat, items = fabula_doc(fab)
+    blob = text_blob(cat, items)
+    lacking = [w for w in quoted_names(output.text())
+               if not re.search(rf"(?<![\w]){re.escape(w.lower())}(?![\w])", blob)]
+    if lacking:
+        k = len(lacking)
+        return False, (f"the catem quotes {', '.join(f'`{w}`' for w in lacking[:6])}, which "
+                       f"{'is' if k == 1 else 'are'} not in its fabulac")
     return True, ""
 
 

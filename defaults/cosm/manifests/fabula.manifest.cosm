@@ -350,7 +350,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {as: [code], gives: folder}
       contract-when:
         - {as: [code], contract: [parses, interfaces-present, files-present, footer, provenance]}
-        - {as: [line, overview, manual], contract: [coverage, no-invention, uses-told, footer, provenance]}
+        - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
       scaffold-when:                    # code has none: --rules refuses it
         - {as: [line, overview, manual], scaffold: uses-outline}
         - {as: [code], scaffold: none}
