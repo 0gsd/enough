@@ -1,8 +1,8 @@
 {
   "source": "cosmoes-site",
-  "commit": "ef63290",
+  "commit": "2a2c4e8",
   "dirty": false,
-  "synced": "2026-11-06",
+  "synced": "2026-11-12",
   "client": {
     "path": "enough/cosmoes_client.py",
     "source": "client/cosmoes_client.py",
@@ -23,7 +23,7 @@
       "reference": true,
       "path": "docs/MACROCOSM_OES.md",
       "source": "specs/macrocosm-oes.md",
-      "sha256": "3a8397bacdc3ca99f3eb646dbed7dd8a5efc9a58eeafa693881e91dc36533548"
+      "sha256": "006c02eff60ddc53c70b41a423cebca1531dd7044919263b24ebda2f8c05ef1c"
     },
     {
       "slug": "thym",
@@ -37,7 +37,7 @@
       "revised": "2026-11-06",
       "path": "docs/THYM.md",
       "source": "specs/thym.md",
-      "sha256": "0f8ea46718e30ebc75e454fff7d6f745ea86771e58160a255494b507a0c2b09c"
+      "sha256": "59f983ba9174cc530c0154dc87ed1a2fc2218e60023a3bc60100a5d8c34f8ef4"
     },
     {
       "slug": "ascribe",
@@ -51,7 +51,7 @@
       "revised": "2026-11-06",
       "path": "docs/ASCRIBE.md",
       "source": "specs/ascribe.md",
-      "sha256": "a402376176f892a399f20645e38871991487dbccee3105efa441abb18679c490"
+      "sha256": "5e4e9a088e075562eb83cc0eef2bfe2bf579566ee606dea7bc7c490ad2184ae1"
     },
     {
       "slug": "comprise-oes",
@@ -65,7 +65,7 @@
       "revised": "2026-11-06",
       "path": "docs/COMPRISE_OES.md",
       "source": "specs/comprise-oes.md",
-      "sha256": "4892a4a962cba5397d859d6dcba5e49145ef4d28e5e133b56632bcc859ef113f"
+      "sha256": "02ff22920a72b1035c4ae97fa20127fd69bc3dde17a6d8154d781fe0d5649447"
     }
   ]
 }

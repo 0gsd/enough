@@ -64,23 +64,30 @@ the checks do not enforce.
 means encrypted everywhere, and there is no outsider's graph of a person.
 
 **The words of a text.** A text's meaning has MacroCOSM's three densities: the **fabula** (the text's twin: order-free
-material with stances and spans), the **short** (a telling) and the **atem** (one line, with focus, push and pull).
-The author's text is a telling too, and is never called a short. Thym counts the text as a density as well, so a text
-has four (section 5.2). To decompile is to make a fabula from an input, and to compile is to tell a short from a fabula:
-those are the plain words, and in a program the moves are `derive` and `tell` (DocOES's byte-exact `enumerate` and
-`compile` keep their names). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for prose,
+material with stances and spans), the **short** (an entailment of the fabula) and the **atem** (one line, with
+focus, push and pull). The author's text arranges the same material too, and is never called a short: the text entails
+its fabula, and the fabula entails a short. Thym counts the text as a density as well, so a text has four (section
+5.2). To decompile is to make a fabula from an input, and to compile is to make a short of a fabula: those are the
+plain words, and in a program the moves are `derive` and `entail` (DocOES's byte-exact `enumerate` and `compile` keep
+their names). Each of these steps is an entailment, the step that expands meaning by reducing data: the whole entails
+what is made from it (MacroCOSM OES, its section 18.1). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for prose,
 `fabulap` for verse, `fabulac` for code (MacroCOSM OES, its section 18.4). A fabulac's short is a `cshort`, source code
 rebuilt from it and never run, and its atem at depth is a `catem`, a text saying what a person can do with the program
 (section 20). Thym adds three nouns and three verbs:
 
-- a **reading** is a telling of someone else's fabula in your morph, local and labelled (section 14);
-- the **null morph** is the plainest telling that conforms, Thym's reference (section 13);
+- a **reading** is an entailment of someone else's fabula in your morph, local and labelled (section 14);
+- the **null morph** is the plainest entailment that conforms, Thym's reference (section 13);
 - a **package** is the self-contained export of a text with its fabula, morph, context and released graph (section 15);
 - to **transcode** is to move a value mechanically: a deterministic move, the same answer every time (`enumerate`,
   `compile`, `cut`, `project`, `band`);
 - to **transcognize** is to re-represent a value by choices a mind makes: a move that asks the model, behind a
-  contract (`derive`, `tell`, `atem`, `expand`, `null`, `morph`, `read`); the heavy lifting of re-cognition;
+  contract (`derive`, `entail`, `atem`, `expand`, `null`, `morph`, `read`); the heavy lifting of re-cognition;
 - to **transconceptualize** is to transcognize with a change of frame: another morph, language, audience or occasion.
+
+Transcoding and transcognizing meet in entailment, and the line between them stays where it is. A projection
+(`project`, section 18) is an entailment made by rule, and holds by construction. `entail` makes an entailment by a
+model under contract, and what it makes holds only because its checks hold it: `coverage`, `no-invention` and
+`stance-kept` (section 7.3).
 
 Move, program, plan, trace and coprocessor are the words of the model itself; section 2 says what each one is. The
 second grammar, `thym 1`, adds a few more: a `folder` (a directory tree read under one fixed rule, section 20), a
@@ -148,10 +155,10 @@ next grammar version, and every `thym 0` program compiles under every later comp
    author's side                   the three densities                  interpreter's side
    context · graph · morph        fabula · short · atem                 context · graph · morph
         │                               ▲      │                              │
-        └── derive ── tell ── atem ─────┘      └── read ── expand ── cut ─────┘
+        └── derive ── entail ── atem ───┘      └── read ── expand ── cut ─────┘
                  (moves, each with a signature and a contract)
 
-   a folder of code ── derive ──▶ fabula (a fabulac) ── tell ──▶ cshort (code, never run) · catem (what it does)
+   a folder of code ── derive ──▶ fabula (a fabulac) ── entail ──▶ cshort (code, never run) · catem (what it does)
    a fabula ── question ──▶ open questions ⇢ a person answers ⇢ record · settle ──▶ the fabula, settled
                  (two runs with a person between them; no run waits)
 
@@ -301,8 +308,8 @@ move's name, then its operands separated by commas, then its modifiers in the or
 
 ```text
 derive story
-tell f as told
-tell f by weight with rosa
+entail f as told
+entail f by weight with rosa
 expand (atem f) with f to 300 words
 measure story against null of f
 read f with mine in now
@@ -312,9 +319,9 @@ project h as isotype
 
 | modifier | after it | used by |
 |---|---|---|
-| `as` | a word or a list of words: an order (`told`, `weight`), a kind (`isotype`, `paratype`, `isograph`), a marking (`verified`, `stated`), the words of a band | `tell`, `project`, `mark`, `band` |
-| `by` | an order | `tell` |
-| `with` | a value: a morph, or a fabula | `tell`, `morph`, `read` (a morph); `expand` (a fabula) |
+| `as` | a word or a list of words: an order (`told`, `weight`), a kind (`isotype`, `paratype`, `isograph`), a marking (`verified`, `stated`), the words of a band | `entail`, `project`, `mark`, `band` |
+| `by` | an order | `entail` |
+| `with` | a value: a morph, or a fabula | `entail`, `morph`, `read` (a morph); `expand` (a fabula) |
 | `to` | a number and a unit: `300 words`, `12 sentences` | `cut` (words or sentences); `expand` (words) |
 | `against` | a short: the null (`null of f`) | `measure` |
 | `of` | a value | `null` and the accessors `fabula`, `context`, `graph`, `isomorph`, which take no operand: `of` is their argument |
@@ -323,7 +330,7 @@ project h as isotype
 | `marked` | a marking: `verified`, `stated` | any expression that gives an item or a word; short for `mark … as …` |
 | `before`, `after` | a line | `thym 1`: `insert` (exactly one of the two, section 21) |
 
-In `thym 1`, `as` also takes a flavour's word: `derive t as prose`, `derive t as verse`, `derive t as code`; and `tell`
+In `thym 1`, `as` also takes a flavour's word: `derive t as prose`, `derive t as verse`, `derive t as code`; and `entail`
 takes `as code` and the catem's depths `as line`, `as overview`, `as manual` (section 20). The flavour names themselves
 are never keywords or moves.
 
@@ -396,7 +403,10 @@ keep keeps contract depth before after
 `contract` opens a block, `keeps` and `depth` are heads, `keep` is a statement, and `before` and `after` are
 modifiers. `depth` is the head only where a `:` follows it; anywhere else it is a value, the field of a folder's file
 (section 20.1), so `repo where depth is 0` holds the files at the folder's top. The standard moves a program sees (section 6.3), the densities, the orders, the markings and the stances
-are reserved too: no block, binding or user move may take one of these names. A few words are both a keyword or a type and a move (`morph`,
+are reserved too: no block, binding or user move may take one of these names. `entail` is a standard move from 0.7,
+and so reserved: a program that used `entail` as a name before 0.7 must rename it. That is the only
+incompatibility the move's new spelling brings, and none is known. `tell`, its earlier spelling (section 6.3), stays
+reserved. A few words are both a keyword or a type and a move (`morph`,
 `context`, `package`, `graph`, `fabula`, `trace`); where the word stands decides which it is.
 
 ### 4.8 The grammar in full
@@ -540,7 +550,7 @@ pass order. The items are the same; their order in the output volume may differ.
 |---|---|---|
 | `text` | a markdown text | path or bytes, sha256 |
 | `fabula` | a `fabula/1` volume of one flavour; an `emf/1` volume, the old spelling, is read as a fabulan | its source's sha256 (spans resolve against it); for a fabulac, the folder's tree digest |
-| `short` | a telling | its fabula's sha256, its order, its morph (the null's when none was given) |
+| `short` | an entailment of a fabula | its fabula's sha256, its order, its morph (the null's when none was given) |
 | `atem` | line + focus + push + pull | its source's sha256 and span |
 | `item`, `volume` | any OES item or volume | URI, format, kind |
 | `morph` | a `thym/1` morph: the ten scales | derived-from (text digests) or declared (a `morph` block) |
@@ -562,12 +572,12 @@ fits wherever a `string` is taken: it is a string with a place.
 value, read as `f.flavour`. The compiler carries it as a note on the `fabula` type where it knows it: a fabula from
 `derive … as verse` is a fabulap, one from `derive <folder>` or `survey` a fabulac, and a `fabula` input's flavour is
 unknown until run time. It refuses at compile time what it can prove wrong ("f is a fabulan, the fabula of a text; only
-a fabulac is told as code"), and the runtime refuses the rest with the check `flavour`.
+a fabulac entails code"), and the runtime refuses the rest with the check `flavour`.
 
 ### 5.2 Densities and what fits where
 
 The four densities, `text`, `fabula`, `short` and `atem`, are types, and each move's signature says which it takes
-(section 6.3). A value of one density is never silently read as another: `tell story`, where `story` is a `text`, is a
+(section 6.3). A value of one density is never silently read as another: `entail story`, where `story` is a `text`, is a
 type error, and the message gives the fix ("derive it first").
 
 ### 5.3 Provenance
@@ -579,7 +589,7 @@ and every other format keeps as an unknown field:
 
 ```yaml
 provenance: {mode: derived, sources: ["notes.md#sha256:54055e8…", "oes:thym/2026-11-01-1042-7f3a/R/record/3"], confidence: 0.9}
-made: {move: tell, run: 2026-11-01-1042-7f3a, step: 3, node: R:node/4, engine: "model:g40-04", route: local}
+made: {move: entail, run: 2026-11-01-1042-7f3a, step: 3, node: R:node/4, engine: "model:g40-04", route: local}
 ```
 
 `engine` is `model:<id>` for a model-backed value, where the id is the model's own: the name a local model is known by,
@@ -587,8 +597,8 @@ or the provider's resolved id for a cloud model. A model-backed value also says 
 cloud one its `provider` (section 23). A value made before this edition has neither key, and a replay of it writes
 none.
 
-`made` is the law of provenance (section 7.2) in one field: the home file system (Canon) never holds a telling that
-does not say what it is a telling of. A value a person wrote by hand has `made: {move: none}`, and a value read from disk without `made` is
+`made` is the law of provenance (section 7.2) in one field: the home file system (Canon) never holds an entailment that
+does not say what it is an entailment of. A value a person wrote by hand has `made: {move: none}`, and a value read from disk without `made` is
 treated as hand-made.
 
 ### 5.4 Bindings
@@ -617,16 +627,16 @@ stand-in with a weaker output, which a run with `--rules` uses instead (section 
 | owner | what it is | moves |
 |---|---|---|
 | `thym/1` | a built-in of the core | `cut`, `count`, `words`, `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace`, and the accessors `fabula`, `context`, `graph`, `isomorph`; for `thym 1`, the dialectic's `question`, `record` and `settle`, the editing moves `lines`, `replace`, `drop`, `insert`, `edit`, `reword`, and `gather`, `join`, `say`, `folders` |
-| `fabula/1` | a built-in of the core | `derive`, `tell`, `atem`, `expand`; for `thym 1`, `survey` and `history` |
+| `fabula/1` | a built-in of the core | `derive`, `entail`, `atem`, `expand`; for `thym 1`, `survey` and `history` |
 | `doc/1` | a built-in of the core | `enumerate`, `compile` |
 | `comprise/1` | a MiniCOSM | `project`, `band`, `mark`, `withhold`, in a sidecar (section 17.6), since `comprise/1`'s manifest belongs to Comprise OES |
-| `ascribe/1` | a MiniCOSM | for `thym 1`, `propose`, in its own manifest (Ascribe, https://ascribe.cosmoes.org/) |
+| `ascribe/1` | a MiniCOSM | for `thym 1`, `propose`, and the kinds `isograph` and `allograph` of `project`, by an entry that `extends` it, in its own manifest (Ascribe, https://ascribe.cosmoes.org/) |
 
 `fabula/1`'s manifest declares the four moves that `emf/1`'s declared under the old name, unchanged in their `thym 0`
-view. The dialectic's moves sit with `thym/1`'s because any volume may carry the dialectic's questions, so no single
+view; the one that `emf/1` named `tell` is spelled `entail` (section 6.3). The dialectic's moves sit with `thym/1`'s because any volume may carry the dialectic's questions, so no single
 format owns them. Section 17.6 gives the `moves:` block that declares them all.
 `project` takes as its kind what each MiniCOSM declares that it projects: `isotype` and `paratype` are Comprise OES's,
-and `isograph` is Ascribe's (section 18).
+and `isograph` and `allograph` are Ascribe's (section 18).
 
 ### 6.3 The standard moves
 
@@ -637,7 +647,7 @@ additions of the second table.
 | move | signature | asks | contract |
 |---|---|---|---|
 | `derive` | text → fabula | yes | `span-resolves` `stance-closed` `terms-grounded` `coverage` `fabula-checks` `provenance` (in the `thym 0` view the fifth check keeps its old name, `emf-checks`; it is the same check) |
-| `tell` | fabula \| item \| volume → short; `as` order or `by` order; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` (with a morph) `footer` `provenance` |
+| `entail` | fabula \| item \| volume → short; `as` order or `by` order; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` (with a morph) `footer` `provenance` |
 | `atem` | text \| fabula \| short \| item → atem | yes | `atem-shape` `span-resolves` `provenance` |
 | `expand` | atem → short; `with` fabula; `to` N words | yes | `coverage` `no-invention` `stance-kept` `length` `span-inside` `provenance` |
 | `cut` | short → short; `to` N words or N sentences | no | `whole-sentences` `weight-order` `coverage` `provenance` |
@@ -645,7 +655,7 @@ additions of the second table.
 | `measure` | text → morph; `against` short (the null) | yes | `scale-range` `scale-evidence` `provenance` |
 | `morph` | short → short; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` `provenance` |
 | `read` | fabula → short; `with` morph; `in` context | yes | `coverage` `no-invention` `stance-kept` `scales-met` `labelled` `never-source` `provenance` |
-| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: for `isotype` and `paratype`, `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance`; for `isograph`, `default-deny` `no-counts` `no-mark` `epoch` `provenance`. A check holds by the rules of the kind the call names: for an isograph, those of `ascribe-isograph/0`. For an isograph, the ids of the items that leave are handed to the host with the value, as the release's `items` (Ascribe, its section 14.1) |
+| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph` or `allograph`, Ascribe's) | no | the target schema's rules: for `isotype` and `paratype`, `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance`; for `isograph` and `allograph`, `default-deny` `no-counts` `no-mark` `epoch` `provenance`. A check holds by the rules of the kind the call names: for an isograph, those of `ascribe-isograph/0`; for an allograph, those of `ascribe-allograph/0`. For an isograph or an allograph, the ids of the items that leave are handed to the host with the value, as the release's `items` (Ascribe, its sections 14.1 and 14.6) |
 | `band` | number → word; `as` a list of words (`[none, some]`: 0 is `none`; any other list: equal steps of ten) | no | `banded` |
 | `mark` | item \| word → the same; `as` marking | no | `verified-only-where-derived` |
 | `withhold` | item \| volume → nothing; `where` condition | no | `no-mark` |
@@ -667,15 +677,25 @@ The accessors are read-only and may give `nothing`. `context of` a text gives th
 (section 16.1), and of a package the context the package carries; `isomorph of` a package gives the author's shared
 morph. `measure` asks the model only for its three judgement scales; the other seven are statistics, computed in code
 (section 13.2), and its scaffold gives those seven with the three pending. `compile` given a fabula is refused with the
-fix: "to compile a fabula into a short, use tell".
+fix: "to compile a fabula into a short, use entail". `tell` is `entail`'s earlier spelling: the compiler reads it as
+`entail` and never writes it.
 
-The moves `thym 1` adds or extends. Every move in this table carries `since: 1` except `derive`, `tell`, `count` and
+**`entail`, once `tell`.** The move that makes a short of a fabula was first spelled `tell`. `tell`, the earlier
+spelling, names the same move as `entail`, under `thym 0` and `thym 1` alike and for good: `tell f as told` compiles to
+the same items, the same plan and the same contract as `entail f as told`. The compiler reads `tell` and never writes
+it. A step's `move` and `calls`, a plan's nodes, a record and a value's `made` say `entail`, and a trace or a value
+recorded with `move: tell` reads as `entail`. A program's own text keeps its words, so `compile` still gives its file
+back byte for byte (section 10). No version line marks the change, since moves are declarations and not syntax
+(section 4.9). What `entail` makes is an entailment made by a model under contract, and it holds only because its
+checks hold it; what `project` makes is an entailment made by rule, and it holds by construction (section 18).
+
+The moves `thym 1` adds or extends. Every move in this table carries `since: 1` except `derive`, `entail`, `count` and
 `words`, which carry their additions under `thym-1:` (section 17.6):
 
 | move | signature | asks | contract | scaffold |
 |---|---|---|---|---|
 | `derive` | text \| folder → fabula; `as` prose \| verse \| code; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · a folder: none |
-| `tell` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview` or `manual`; `by` order; `with` morph; `as code` gives a folder | yes | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `provenance` · as line, overview or manual: `coverage` `no-invention` `uses-told` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` |
+| `entail` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview` or `manual`; `by` order; `with` morph; `as code` gives a folder | yes | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `provenance` · as line, overview or manual: `coverage` `no-invention` `uses-told` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` |
 | `survey` | folder → fabula (a fabulac outline) | no | `files-found` `code-span` `licence-recorded` `fabula-checks` `provenance` | — |
 | `history` | folder → fabula; `with` fabula | no | `history-grounded` `fabula-checks` `provenance` | — |
 | `gather` | list of fabula \| list of item → the type of `with`; `with` fabula \| volume | no | `nothing-lost` `ids-unique` `fabula-checks` `provenance` | — |
@@ -705,30 +725,30 @@ scaffold, and `--rules` refuses it at plan time (section 19). Sections 20, 21 an
 
 ### 6.4 Signatures in the manifest
 
-A move's declaration is one mapping in a `moves:` list (section 17.6). `tell`'s `thym 0` view, from `fabula/1`'s
+A move's declaration is one mapping in a `moves:` list (section 17.6). `entail`'s `thym 0` view, from `fabula/1`'s
 manifest:
 
 ```yaml
 moves:
-  - name: tell
+  - name: entail
     takes: ['fabula | item | volume']
     gives: short
     modifiers: {as: order, by: order, with: morph}
     asks: true
     contract: [coverage, no-invention, stance-kept, footer, provenance]
     scaffold: outline                      # the rules-mode stand-in, or absent
-    code: enough.thym.moves.emf:tell
-    says: a telling of the fabula, in an order, in a morph
+    code: enough.thym.moves.emf:entail
+    says: an entailment of the fabula, in an order, in a morph
 ```
 
 The compiler reads every manifest's moves when it resolves names. A program that names a move no manifest declares is
-refused with the nearest name: "unknown move `summarise`; did you mean `tell`?" (check `unknown-move`).
+refused with the nearest name: "unknown move `summarise`; did you mean `entail`?" (check `unknown-move`).
 
 A declaration may also say `since: 1` (only `thym 1` programs see the move) and carry a `thym-1:` mapping of the keys a
 `thym 1` program sees in addition to its own; inside it, `gives-when`, `contract-when` and `scaffold-when` choose a
 call's type, contract and scaffold by its `as` word or its first operand's type. Section 17.6 lists the keys, and
 section 4.9 says what each version sees. A word a declaration lists among a modifier's words is that word even when it
-is also a type's name: `tell f as line` names the catem's depth, since `tell`'s `as` lists `line` among its words.
+is also a type's name: `entail f as line` names the catem's depth, since `entail`'s `as` lists `line` among its words.
 
 ---
 
@@ -739,7 +759,7 @@ is also a type's name: `tell f as line` names the catem's depth, since `tell`'s 
 ### 7.1 What a contract is
 
 A contract is a list of named checks that must hold on a move's output before the output becomes a value. The
-compiler checks the **static** part: it refuses a composition that cannot satisfy a contract, such as a `tell` whose
+compiler checks the **static** part: it refuses a composition that cannot satisfy a contract, such as an `entail` whose
 input is a `text`, or a `project … as isotype` that emits a bare count. The runtime checks the **dynamic** part on every
 output. A model-backed output that fails is repaired narrowly, retried within its budget, and then refuses the run
 (section 9). Most checks exist as code in enough and Comprise; Thym names them and attaches them to moves. In `thym 1`
@@ -748,10 +768,10 @@ a program may also define a check of its own, as a contract block, and promise t
 
 ### 7.2 The six laws
 
-1. **Coverage.** A telling says nothing its fabula does not hold.
+1. **Coverage.** An entailment says nothing its fabula does not hold.
 2. **Grounding.** Every span exists in its text; every term is in FEED or is a named entity.
 3. **Monotone stance.** No move strengthens a claim's stance. The ladder, weakest first, is `hearsay` `assumed`
-   `opinion` `deduced` `observed` `axiom`. A telling may say a claim more weakly than its fabula does, never more
+   `opinion` `deduced` `observed` `axiom`. An entailment may say a claim more weakly than its fabula does, never more
    strongly.
 4. **Round trip.** A package gives back its text (section 15.4), `compile` gives back a doc volume's markdown, and
    `compile` on a program's items gives back the `.thym` file: each byte for byte.
@@ -766,9 +786,9 @@ a program may also define a check of its own, as a contract block, and promise t
 | `span-resolves` | every `span` names lines or quotes that exist in the source text | enough (Canon's derivation) |
 | `stance-closed` | every claim's stance is in the fabula's closed list | MacroCOSM's generic `closed-list` check |
 | `terms-grounded` | every `L:term` is in FEED, or carries `{pending: "not in FEED"}`, or is a named entity | enough (the lexicon floor) |
-| `coverage` | every sentence of a telling traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | Thym's own; the trace records the sentence → item map |
-| `no-invention` | the telling names no entity, claim or event the fabula lacks; for `propose`, no candidate or question says what its fabula lacks | Thym's own |
-| `stance-kept` | each claim's stance in the telling is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim told over several sentences is said at the weakest any of them marks | Thym's own |
+| `coverage` | every sentence of an entailment traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | Thym's own; the trace records the sentence → item map |
+| `no-invention` | the entailment names no entity, claim or event the fabula lacks; for `propose`, no candidate or question says what its fabula lacks | Thym's own |
+| `stance-kept` | each claim's stance in the entailment is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim said over several sentences is said at the weakest any of them marks | Thym's own |
 | `footer` | a short ends with the footer line of MacroCOSM OES, its section 18.4.4 | enough (the short footer) |
 | `byte-exact` | the compiled bytes equal the source bytes | DocOES (MacroCOSM OES, its section 18.5) |
 | `atem-shape` | the line is 15 to 25 words; focus is at most two sentences; push is one; pull is one | the rule of MacroCOSM OES, its section 18.3.5 |
@@ -778,7 +798,7 @@ a program may also define a check of its own, as a contract block, and promise t
 | `weight-order` | `cut` removed the lowest-salience sentences first (by their items' salience) | Thym's own |
 | `scale-range` | every scale is an integer from 1 to 5 | Thym's own |
 | `scale-evidence` | every scale cites one to three sentences of the measured text, and gives its basis and confidence | Thym's own |
-| `null-pinned` | every scale of the null telling is 1 (section 13.4 says why `analytical-depth` is) | Thym's own; the null morph's contract |
+| `null-pinned` | every scale of the null short is 1 (section 13.4 says why `analytical-depth` is) | Thym's own; the null morph's contract |
 | `scales-met` | each scale of the output, measured, is within one step of the morph asked for; `analytical-depth` excepted, since the fabula sets it (section 13.4) | Thym's own |
 | `labelled` | a reading carries `read_through: <morph name>` and the reading footer (section 14) | Thym's own |
 | `never-source` | a reading's output path is not the path of any input, and no input file changed | Thym's own |
@@ -799,7 +819,7 @@ The checks the moves of `thym 1` add:
 
 | check | holds when | where it comes from |
 |---|---|---|
-| `flavour` | the fabula's flavour is one the move takes: only a fabulac is told `as code` or at a catem's depth | MacroCOSM OES, its section 18.4.8 |
+| `flavour` | the fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth | MacroCOSM OES, its section 18.4.8 |
 | `files-found` | every file the folder rule keeps (section 20.1) has a `C:file` item whose sha256 is the file's, and no `C:file` names a file the tree lacks | Thym's own |
 | `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it | MacroCOSM OES, its section 18.4.8 |
 | `licence-recorded` | the fabulac's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
@@ -809,7 +829,7 @@ The checks the moves of `thym 1` add:
 | `parses` | every file of a cshort in a language the fabulac names is read by that language's parser without a syntax error; parsing is not running, and nothing is imported or executed | Thym's own; the host's syntax engine |
 | `interfaces-present` | every interface of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
 | `files-present` | the cshort holds every file it is required to rebuild, at its path (every `C:file` in a programming language that is not a test, a type stub or the repository's own tooling, and the README; MacroCOSM OES, its section 18.4.7), and the packaging file rules write whenever the fabulac records enough for one, exactly as they write it, with `CSHORT.md`, and the digests `CSHORT.md` lists are the files' | Thym's own |
-| `uses-told` | a catem tells everything its depth asks for: at `overview` every use, at `manual` every use and every interface a person reaches | Thym's own |
+| `uses-told` | a catem says everything its depth asks for: at `overview` every use, at `manual` every use and every interface a person reaches | Thym's own |
 | `nothing-lost` | every item of every part gathered, and of the `with` volume, is in the output with every field it carries, as it carries it (`made` aside); the output's item may say more | Thym's own |
 | `ids-unique` | no two different items of the output share an id (two byte-equal ones, `made` aside, are one; `gather` merges two that say the same item before they land, section 20.6) | Thym's own |
 | `addressed` | every question's `about` resolves (an item, an `<item>#<field>`, a span of the source, or a module or kind the format declares), and every answer names a question that is `open` and fits the question's `kind` | Thym's own; the dialectic is MacroCOSM OES's, its section 18.6 |
@@ -878,7 +898,7 @@ implements. Both kinds of name stand in the same places: a plan node's contract 
 thym 1
 
 contract plain-enough(s: short)
-  why: a telling for the help pages stays short and never shouts.
+  why: a help page stays short and never shouts.
 
   assert words s < 301 else "over three hundred words"
   for each l in lines of s
@@ -886,8 +906,8 @@ contract plain-enough(s: short)
   end
 end
 
-program help-telling
-  why: a guide told plainly for the help pages, asked again until it is plain enough.
+program help-page
+  why: a guide said plainly for the help pages, asked again until it is plain enough.
 
   takes guide: text
   gives page: short
@@ -895,7 +915,7 @@ program help-telling
   move told-plainly(f: fabula): short
     keeps plain-enough
     keeps no-invention against f
-    give tell f as told
+    give entail f as told
   end
 
   give told-plainly (derive guide)
@@ -969,7 +989,7 @@ program's output volume, or, with a slot (`emit employees: band …`), sets a fi
 mark.
 
 **Several outputs** (`thym 1`). A program may give several outputs, `gives code: folder, manual: short`, and gives each
-with a labelled `give`, shaped like the labelled `emit`: `give code: tell f as code`. Every path gives each output
+with a labelled `give`, shaped like the labelled `emit`: `give code: entail f as code`. Every path gives each output
 exactly once, by name; a path that misses one is refused (`no-give`), and a second `give` of the same output on one
 path, or a `give` naming no output of the program, is refused (`type`). A block with one output may label its `give` or not. A user move gives one value, since its signature
 says one type. All of a program's outputs land at once, or none do.
@@ -1020,14 +1040,14 @@ end
 thym 0
 
 program story-in-brief
-  why: a story, told plainly and then cut to a paragraph, for a listing.
+  why: a story, put plainly and then cut to a paragraph, for a listing.
 
   takes story: text
   gives brief: short
 
   move plain-paragraph(f: fabula): short
-    let plain = tell f as told
-    assert f covers plain else "the telling lost part of the fabula"
+    let plain = entail f as told
+    assert f covers plain else "the short lost part of the fabula"
     give cut plain to 120 words
   end
 
@@ -1049,14 +1069,14 @@ its own version line, and a `thym 0` program may not use a `thym 1` file (sectio
 thym 0
 use oes:thym/house
 
-program tell-like-rosa
-  why: a text told again in the house voice, for the help pages.
+program like-rosa
+  why: a text said again in the house voice, for the help pages.
 
   takes t: text
   gives s: short
 
   let f = derive t
-  give tell f as told with rosa
+  give entail f as told with rosa
 end
 ```
 
@@ -1362,17 +1382,17 @@ page.
 
 ## 13. The null morph, the ten scales, morphs
 
-<!-- atem: the plainest telling is the reference; a morph is a measured departure -->
+<!-- atem: the plainest entailment is the reference; a morph is a measured departure -->
 
 ### 13.1 The null morph
 
-The **null morph** is Thym's reference telling of a fabula. It tells in `told` order, one claim per sentence, in the
+The **null morph** is Thym's reference entailment of a fabula. It goes in `told` order, one claim per sentence, in the
 commonest FEED words that still say it. It says every stance in a fixed phrase ("the author holds that", "it is assumed
 that", "reportedly"). It has no figure, no humour, no allusion and no contraction, and it is in the third person unless
 the fabula's claims are in the first. It is one paragraph: a paragraph mark the model adds is read as none,
 never as a departure. It is model-backed, with the tightest contract in the language, `null-pinned`:
-every scale is 1. Its scaffold is the ordered outline told in the items' own sentences, which `--rules` gives (section
-19). The null morph exists so that morphs are *differences*: a morph is what a text does that the null telling of its
+every scale is 1. Its scaffold is the ordered outline said in the items' own sentences, which `--rules` gives (section
+19). The null morph exists so that morphs are *differences*: a morph is what a text does that the null short of its
 fabula does not.
 
 ### 13.2 The ten scales
@@ -1404,7 +1424,7 @@ suite pins them, and a later edition may move them only with an entry in the Cha
 
 | scale | measure | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|---|
-| `register` | the share of distinct words outside FEED's common band (FEED's bands 4 and up are common; a word with no band is rare when it has nine letters or more and common when it has eight or fewer, the nine-letter rule; names never count; the null telling's register also exempts every word its fabula's items use, since it must say them), per hundred | < 2 | < 5 | < 10 | < 20 | ≥ 20 |
+| `register` | the share of distinct words outside FEED's common band (FEED's bands 4 and up are common; a word with no band is rare when it has nine letters or more and common when it has eight or fewer, the nine-letter rule; names never count; the null short's register also exempts every word its fabula's items use, since it must say them), per hundred | < 2 | < 5 | < 10 | < 20 | ≥ 20 |
 | `sentence-length` | mean words per sentence | ≤ 10 | ≤ 15 | ≤ 20 | ≤ 27 | > 27 |
 | `paragraph-rhythm` | the spread of sentences per paragraph: standard deviation over mean, per hundred; needs three paragraphs, else 1 with confidence 30 | < 15 | < 30 | < 50 | < 75 | ≥ 75 |
 | `analytical-depth` | the fabula's reason links (`supports`, `depends-on`, `resolves`) per claim, per hundred | < 10 | < 30 | < 60 | < 100 | ≥ 100 |
@@ -1430,9 +1450,9 @@ departure from the null, with its evidence. It is derived from any text the pers
 sharpens over a corpus: a corpus's morph is the scale-wise median of its texts' morphs, and each scale's confidence
 rises with the number of texts. A person may **pin** a scale by hand; the pin wins, and the scale is listed as pinned.
 
-`analytical-depth` is carried from the fabula rather than measured on the telling: a text's depth is its fabula's. A
-telling may say fewer of the fabula's reasons than the fabula holds, never more, so the fabula's depth is a ceiling. The
-null tells the claims without the reasons that link them, and so sits at 1. In a `read`, the morph's value is the ask,
+`analytical-depth` is carried from the fabula rather than measured on the text or the short: a text's depth is its fabula's.
+An entailment may say fewer of the fabula's reasons than the fabula holds, never more, so the fabula's depth is a ceiling. The
+null says the claims without the reasons that link them, and so sits at 1. In a `read`, the morph's value is the ask,
 up to that ceiling.
 
 An **isomorph** is a holomorph the owner chose to share: the same shape, marked shared, released from the holograph by a
@@ -1461,7 +1481,7 @@ program letter-home
   gives s: short
 
   let f = derive t
-  give tell f as told with plain-letter
+  give entail f as told with plain-letter
 end
 ```
 
@@ -1473,9 +1493,9 @@ As an item, a morph is `M:morph/<slug>` in a `thym/1` volume (section 17.3). It 
 
 ## 14. Readings
 
-<!-- atem: someone else's fabula told in your morph: local, labelled, never the source -->
+<!-- atem: a short of someone else's fabula in your morph: local, labelled, never the source -->
 
-A **reading** is `read f with m in c`: a telling of a fabula in the reader's morph (their holomorph, or an isomorph they
+A **reading** is `read f with m in c`: an entailment of a fabula in the reader's morph (their holomorph, or an isomorph they
 chose), shaped by the reader's occasional context and made on the reader's machine. Its contract is `morph`'s with two
 more checks. It is **labelled**: `read_through: <morph name>` in the file's front matter, and the reading footer at its
 end. And it **never touches the source** (`never-source`): its path is never an input's path, and no input file changes.
@@ -1576,7 +1596,7 @@ implementation's; that they exist is the rule, and each refusal is whole: nothin
 
 ### 15.4 The laws of a package
 
-The author's text is the package's telling as told: `unpack` gives it back byte for byte, and what is checked is that
+The author's text is the package's text as the author told it: `unpack` gives it back byte for byte, and what is checked is that
 every span of the fabula resolves into it and that the fabula covers it. Every file's digest is in the catalog
 (`digests`). The catalog names the program and the trace that made the package. Nothing is in `graph.cosm` without a
 release recorded in the holograph (`released`). A package never names its author unless the author put the name in the
@@ -1593,14 +1613,14 @@ text.
 The **surrounding context** is the volume a text sits in: its volume's catalog in the home file system (Canon's `canon.cosm`), the project's catalog, or a
 site's served catalog when a website serves packages. It is read, never written. `context of story` gives the catalog
 excerpt around the text: its neighbours, the volume's name and scope, and the terms the volume defines. A program may
-use it to link terms, to choose a morph the volume prefers, or to tell a text in the light of its neighbours.
+use it to link terms, to choose a morph the volume prefers, or to make a text's short in the light of its neighbours.
 
 ### 16.2 Occasional context
 
 The **occasional context** is just-in-time: why this text, for whom, in what medium, at what moment, under what
 constraints. It is a `thym/1` item of kind `context` with the fields `purpose`, `audience`, `medium`, `moment`, `hurry`
 (a bool), `words` (a budget), `minutes` (a reading time), `language`, and any field a program names. The author's
-occasion shapes the telling (a note for a friend, a brief for a board); the interpreter's shapes the reading (on a
+occasion shapes the entailment (a note for a friend, a brief for a board); the interpreter's shapes the reading (on a
 phone, in a hurry: the atem, expanded to three hundred words). A context may be declared in a program file and thrown
 away:
 
@@ -1617,7 +1637,7 @@ end
 
 program read-my-way
   why: a package is read on the reader's terms: in a hurry, the short way in;
-       otherwise a telling in the reader's own morph, for this occasion.
+       otherwise an entailment in the reader's own morph, for this occasion.
 
   takes p: package, mine: morph, now: context
   gives r: short
@@ -1626,7 +1646,7 @@ program read-my-way
   if now.medium is "phone" and now.hurry then
     give expand (atem f) with f to 300 words     -- the short way in
   else
-    give read f with mine in now                 -- a telling in my morph, labelled a reading
+    give read f with mine in now                 -- an entailment in my morph, labelled a reading
   end
 end
 ```
@@ -1724,10 +1744,10 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 | `asks` | `true` when the move needs the model; absent or `false` otherwise |
 | `contract` | the list of check names (section 7.3) |
 | `scaffold` | the name of the rules-mode stand-in, when one exists |
-| `code` | the reference implementation, informative: `enough.thym.moves.emf:tell` |
+| `code` | the reference implementation, informative: `enough.thym.moves.emf:entail` |
 | `says` | one line, in FEED words, for the viewer and the readvisor |
 | `since` | `1`: the move exists for `thym 1` programs only (section 4.9) |
-| `extends` | `true`: the entry adds `as` kinds to a move another manifest declares, and nothing else (its `modifiers` are `{as: <kinds>}`); a call of one of its kinds gives the entry's `gives`, keeps its `contract` and runs its `code`. Ascribe's `project … as isograph` is one (section 6.2) |
+| `extends` | `true`: the entry adds `as` kinds to a move another manifest declares, and nothing else (its `modifiers` are `{as: <kinds>}`); a call of one of its kinds gives the entry's `gives`, keeps its `contract` and runs its `code`. Ascribe's `project … as isograph` and `project … as allograph` are one, an entry whose `as` lists both, written as one string, `isograph | allograph`, since a manifest gives a modifier's alternatives as a single string and refuses a YAML list for one (section 6.2) |
 | `thym-1` | a mapping of the keys a `thym 1` program sees in addition to, or in place of, the entry's own: `takes`, `gives`, `modifiers`, `contract`, `scaffold`, and the three below; a `thym 0` program sees the entry without it |
 | `gives-when` | a list of `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}`: the type a call gives when its `as` word, or its first operand's type, is one of these |
 | `contract-when` | the same shape, with `contract: [...]`: the call's contract when its `as` word or first operand's type matches; else `contract` |
@@ -1750,8 +1770,18 @@ owner may write their own. A release carries the digests of the program and the 
 is a specification of its own, Comprise OES (https://comprise.cosmoes.org/); Thym defines none of it, and a Thym
 implementation reads what Comprise produces. A person's dial is the same move over a holograph, `project h as
 isograph`, to the schema of Ascribe's isograph (Ascribe (https://ascribe.cosmoes.org/), its section 14.1), whose rules
-are then the contract. Each MiniCOSM declares the kinds it projects: `isotype` and `paratype` are Comprise OES's, and
-`isograph` is Ascribe's.
+are then the contract. `project h as allograph` makes the other projection a holder runs: the allograph, which keeps
+only the holder's experience and domain expertise and is the one thing of a holograph a registry lists (Ascribe, its
+sections 14.6 and 14.7). Each MiniCOSM declares the kinds it projects: `isotype` and `paratype` are Comprise OES's, and
+`isograph` and `allograph` are Ascribe's. Listing an allograph is the implementation's act after the run; no move sends
+anything to a registry. Ascribe's cryptograph and isomorph are made by the implementation, and moves for them are
+reserved for a later edition; it makes match tokens no more, so no move is reserved for them.
+
+A projection is an entailment made by rule: a holotype entails its isotype and its paratype, and a holograph its
+isograph and its allograph (MacroCOSM OES, its section 18.1). What it makes holds by construction, since the schema's rules are its
+contract and no model is asked. `entail` (section 6.3) makes an entailment by a model under contract, and what it makes
+holds only because its checks hold it. The two kinds stay on the two sides of the line section 1 draws: `project`
+transcodes, and `entail` transcognizes.
 
 The example program, deterministic end to end:
 
@@ -1800,12 +1830,12 @@ their count, the route and the first one's statement and line ("3 steps ask a mo
 = derive story` (line 11); agent-free is on"). A cloud model is a model too: agent-free refuses a plan on the cloud
 route exactly as it refuses one on the local route, at plan time, before any broker is asked. A plan with no
 model-backed node runs. With `--rules`, each model-backed move that declares a `scaffold` runs it instead: `derive`
-gives the rules twin, `atem` the labelled scaffold, `tell` and `null` the ordered outline, and `measure` the seven
+gives the rules twin, `atem` the labelled scaffold, `entail` and `null` the ordered outline, and `measure` the seven
 statistics scales with the three judgement scales pending; in `thym 1`, `derive … as code` gives its file's outline
-marked pending, `tell` at a catem's depth the uses and interfaces in told order, `question` the bank's questions only,
+marked pending, `entail` at a catem's depth the uses and interfaces in told order, `question` the bank's questions only,
 and `settle` its rules part, leaving the answers that must be read again answered and unsettled, for a run with a model.
-A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `tell … as code`) still refuses,
-at plan time: "1 step asks a model and has no scaffold: give code: tell f as code (line 12); --rules runs no model"
+A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `entail … as code`) still refuses,
+at plan time: "1 step asks a model and has no scaffold: give code: entail f as code (line 12); --rules runs no model"
 (with agent-free on, in the words above, which then add that the steps have no scaffold).
 `survey`, `history`, `record` and the editing moves other than `reword` ask nothing, and run. The trace says `engine:
 rules` for each scaffold, and every output is marked `state: pending`, as a fabula's rules mode marks a twin. The viewer
@@ -1815,7 +1845,7 @@ offers only plans that can run.
 
 ## 20. Folders and code
 
-<!-- atem: a folder of code decompiled to a fabulac, and told back -->
+<!-- atem: a folder of code decompiled to a fabulac, and the cshort and catems it entails -->
 
 `thym 1` reads a folder of code as a value, decompiles it into a fabulac, and compiles a fabulac back into a cshort and
 its catems. The fabulac, the cshort and the catem are MacroCOSM OES's (its section 18.4.7); this section says how a
@@ -1929,7 +1959,7 @@ digest, is reserved for a later edition.
 
 ### 20.4 A folder as an output
 
-A move may give a folder (`tell f as code`, section 20.7). A program that `gives code: folder` lands it as
+A move may give a folder (`entail f as code`, section 20.7). A program that `gives code: folder` lands it as
 `outputs/code/`, a directory holding exactly the folder's files, written into the run's stage and renamed into place
 with every other output in one step: all or none (section 12.1). The trace's output row is `{name: code, sha256: <tree
 digest>, path: outputs/code/}`. Where the host copies it next follows the kind of the value: a cshort lands beside its
@@ -1942,8 +1972,8 @@ so its `made` lives in the trace's record and in whatever file the move writes i
 A fabula's flavour is said with `as`, the modifier every program already has: `derive t as prose` gives a fabulan,
 `derive t as verse` a fabulap, and `derive t as code` the fabulac's reading of one file. With no `as`, a text derives as
 it always has, to a fabulan: `derive t` and `derive t as prose` are the same call. A fabula from `derive <folder>` or
-`survey` is a fabulac. `tell f as told` of a fabulan or a fabulap keeps its contract; `as code` and a catem's depths are
-refused of either (check `flavour`): "f is a fabulap, a poem's fabula; a catem is told from a fabulac".
+`survey` is a fabulac. `entail f as told` of a fabulan or a fabulap keeps its contract; `as code` and a catem's depths are
+refused of either (check `flavour`): "f is a fabulap, a poem's fabula; only a fabulac entails a catem".
 
 ```thym
 thym 1
@@ -2087,7 +2117,7 @@ section 18.4.7).
 
 ### 20.7 Compiling a fabulac
 
-**`tell f as code`** gives a folder, the **cshort**: source code rebuilt from the fabulac, file by file, one model
+**`entail f as code`** gives a folder, the **cshort**: source code rebuilt from the fabulac, file by file, one model
 request per file it rebuilds: every `C:file` in a programming language that is not a test, and the README (MacroCOSM
 OES, its section 18.4.7). Each request carries the file's items: its components, its interfaces with their parameters,
 the behaviours and cases about them (and the cases of an interface whose behaviours name this file's module or a private
@@ -2099,9 +2129,9 @@ with digests (the packaging file rules wrote among them, or why none was written
 contract is checked without executing anything: `parses`, `interfaces-present`, `files-present`, `footer` (`CSHORT.md`'s
 first line is the footer, naming the fabulac's file, the language, the UTC day of the run and the model; its last line
 is the licence line, equal to `source.licence`) and `provenance`. A failed check asks again only for the files it names,
-within the node's attempts. `tell … as code` has no scaffold, so `--rules` refuses it at plan time.
+within the node's attempts. `entail … as code` has no scaffold, so `--rules` refuses it at plan time.
 
-**`tell f as line`, `as overview` and `as manual`** give a short, the **catem** at that depth. `line` is the atem's
+**`entail f as line`, `as overview` and `as manual`** give a short, the **catem** at that depth. `line` is the atem's
 line, the same as `atem f`'s; `overview` names every use; `manual` names every use and every interface a person
 reaches (the command-line entry points and the public interface), with what they do. The contract is `coverage`
 (every sentence traces to behaviours, uses or events), `no-invention`, `uses-told`, `footer` (the catem's footer names
@@ -2112,16 +2142,16 @@ words. The host saves a catem as `<name>.catem-<YYYY-MM-DD-HHMM>.md` beside the 
 thym 1
 
 program compile-python
-  why: a fabulac told back into Python, file by file, with the manual of everything a person can do
+  why: a fabulac compiled back into Python, file by file, with the manual of everything a person can do
        with the program.
-  must: nothing told is run, imported or installed.
+  must: nothing it entails is run, imported or installed.
   decided 2026-11-05: a cshort is read in enough and never run there; the rebuild test runs outside.
 
   takes f: fabula
   gives code: folder, manual: short
 
-  give code: tell f as code                        -- one file at a time; it parses, and every interface is there
-  give manual: tell f as manual                    -- the catem at its deepest
+  give code: entail f as code                      -- one file at a time; it parses, and every interface is there
+  give manual: entail f as manual                  -- the catem at its deepest
 end
 ```
 

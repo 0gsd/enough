@@ -1088,6 +1088,14 @@ def _blocks(kind: str) -> list[str]:
     return re.findall(rf"^```{kind}\n(.*?)^```", SPEC.read_text(encoding="utf-8"), re.S | re.M)
 
 
+def _spec_isograph_json() -> str:
+    """The text's isograph example: of its JSON blocks (from 0.7 also the allograph and a signed statement), the one
+    that says it is an isograph."""
+    js = [b for b in _blocks("json") if '"isograph":' in b]
+    assert len(js) == 1, f"{len(js)} isograph examples in the text"
+    return js[0]
+
+
 def _spec_holograph(tmp_path: Path) -> Path:
     cosm, = _blocks("cosm")
     root = tmp_path / "spec-self"
@@ -1103,7 +1111,7 @@ def test_the_texts_cosm_example_lints_clean(tmp_path):
 
 
 def test_the_texts_json_isograph_is_what_the_projection_gives(tmp_path):
-    js, = _blocks("json")
+    js = _spec_isograph_json()
     doc = json.loads(js)
     assert A.isograph_problems(doc) == [] and doc["run"] == TRACE["run"]
     assert A.canonical_json(doc).decode() == js.strip() == SPEC_ISOGRAPH
@@ -1308,7 +1316,7 @@ def test_project_as_isograph_runs_on_the_sample_to_the_texts_example(tmp_path):
     assert t.landed, t.refusal
     got = (t.dir / "outputs" / "isograph.json").read_text(encoding="utf-8")
     # the text's example, byte for byte, but for what only this run can know: its program's digest and its run's id
-    js, = _blocks("json")
+    js = _spec_isograph_json()
     want = json.loads(js)
     want["program"]["sha256"] = hashlib.sha256(prog.read_bytes()).hexdigest()
     want["run"] = t.dir.name

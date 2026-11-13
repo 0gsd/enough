@@ -591,7 +591,7 @@ def test_the_three_minicosm_specifications_enumerate(built):
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
     for slug, counts in (("thym", {"section": 111, "term": 20, "example": 1, "decision": 47}),
-                         ("ascribe", {"section": 45, "term": 15, "example": 1, "decision": 22}),
+                         ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 22}),   # 0.7: the Allograph Registry (14.6-14.14, 16.3)
                          ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 29})):
         vol = built["vols"][(slug, "en")]
         assert vol.refused is None and vol.id == f"doc/{slug}"

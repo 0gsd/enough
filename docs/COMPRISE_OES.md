@@ -1445,6 +1445,12 @@ optional:  program, trace, bonds, policies, and the optional keys of items (belo
 - **Opt-indexed.** Nothing is listed on the Index as its subject unless the subject released it and chose to list it. An
   outside chart (11.4) is listed under Outside View, and never as the subject. Comprise Connect charges fees for what it
   does, and its terms page states them; a promoted entry on the Index is always labelled as promoted.
+- **Beside the Index, the Allograph Registry.** Comprise Connect also serves Ascribe's Allograph Registry, where people
+  and agents list what they can do for others, with the Index's accounts, passkeys and rate limits (Ascribe, its
+  section 14.7, https://ascribe.cosmoes.org/). A company listed on the Index may own an agent listed there and may
+  attest work a person or an agent did for it, by a statement signed with the key that signs its current isotype
+  (Ascribe, its sections 14.9 and 14.10). The registry names the company by its Index handle, and holds nothing of its
+  Holotype.
 
 **What a release may also carry.** Each of these is optional and the version stays `/0`, so a stored isotype stays
 valid and an older one reads as it always did. Default-deny still holds: anything not named here is refused, never filtered. A text is
@@ -1456,18 +1462,20 @@ digest's digits count nothing.
 | `program` | `{name, sha256}`: the preset or program that made it, and the sha256 of its `.thym` bytes | every release through the app |
 | `trace` | `{sha256}`: the sha256 of the cleaned trace, which stays on the machine | every release through the app |
 | `shape.markets` | a list of names, as above, or one word: `few` (1 to 2 regions), `several` (3 to 9), `many` (10 or more, or a region named exactly `worldwide` or `global`, in any case) | a list from *minimal*, a word from *fuller* and *house* |
-| `offers[].told`, `seeks[].told`, `open_to[].told` | one line built from the item's summary and the names of its public children, by a rule and never by a model, and only when it says more than `summary` | *fuller*, *house* |
+| `offers[].entailed`, `seeks[].entailed`, `open_to[].entailed` | one line built from the item's summary and the names of its public children, by a rule and never by a model, and only when it says more than `summary`: an entailment of the item, made by rule. `told` is its earlier spelling: a reader accepts it for good, and a writer writes `entailed` | *fuller*, *house* |
 | `offers[].tiers` | at most 10 of `{name, price}`, `price` being `free`, `paid` or `on-request`, from the offer's public pricebook | *house* |
 | `seeks[].horizon`, `open_to[].horizon` | `this year`, `next year` or `later`, relative to the epoch, or a few words of the company's with no digit | *house* |
 | `bonds` | `{kinds, from, to}`: public relationships with both ends concerns of this Holotype, by name, and never an outside counterparty | *house* |
 | `policies` | `{name, summary}`: public policies | *house* |
 
-**The dial: a release is a program's projection.** `project` calls the rules in the table above, then narrows to what a Thym program
+**The dial: a release is a program's projection.** A projection is an entailment made by rule: the Holotype entails its
+isotype, and what is projected holds by construction (MacroCOSM OES, its section 18.1). `project` calls the rules in the table above, then narrows to what a Thym program
 emitted and withheld, so a program only chooses: it can keep more back, and it can't add a row, word one or ask a model. Three presets ship
-with Comprise: *minimal*, which reproduces those rules byte for byte; *fuller*, with `told` and a word for `shape.markets`; and *house*,
+with Comprise: *minimal*, which reproduces those rules byte for byte; *fuller*, with `entailed` and a word for `shape.markets`; and *house*,
 which adds the rest of the table. A subject with first-party standing may write its own program, and a program that breaks a rule is refused,
 with the line. A first release states a market word, and after that it moves only after 90 days past its boundary. The moves are declared
-in a sidecar, `comprise.moves.cosm`, and never in the manifest; the language a program is written in is Thym
+in a sidecar, `comprise.moves.cosm`, and never in the manifest. The move that writes `entailed` is `entailment`; its
+earlier name, `telling`, is read for good as the same move, and a program written now says `entailment`. The language a program is written in is Thym
 (https://thym.cosmoes.org/), the transcognition language that connects OESes.
 
 Further isotype fields a subject may open one at a time, each opt-in and marked verified or stated, are reserved for a
@@ -1593,6 +1601,8 @@ problems, as narrative), are reserved for a later edition.
    name.
 7. Never read the local database's people into anything but counts, outside E's own pages.
 8. Read through another system's tool (an MCP source) and never write through it.
+9. Read `told` on an isotype's or a paratype's `offers[]`, `seeks[]` and `open_to[]` as `entailed`, and the move
+   `telling` as `entailment` (11.3); write only the new spellings.
 
 ### 13.2 A writer must
 

@@ -1286,7 +1286,7 @@ describes a subject who keeps it private:
 | MiniCOSM | The private volume | Its public projection | How the projection is made |
 |---|---|---|---|
 | `comprise` | the Holotype | the isotype | by a fixed schema, each field derived by one rule (Comprise OES, its section on the private/public split) |
-| `ascribe` | the holograph | the isograph | by a Thym program the holder runs over the holograph (Ascribe, https://ascribe.cosmoes.org/, on projections) |
+| `ascribe` | the holograph | the isograph, which the holder shares in private; the allograph, which the holder lists in the Allograph Registry | by a Thym program the holder runs over the holograph (Ascribe, https://ascribe.cosmoes.org/, on projections) |
 
 A MiniCOSM with a split declares its public projection in its manifest (Comprise's and Ascribe's
 `public-projection`), and the rules of the projection are its own.
@@ -1348,11 +1348,12 @@ declare it (sections 13.4 and 18.6).
 its catalog id `emf/<slug>` and its URIs `oes:emf/…` (sections 5.2, 6.2 and 11.3). A writer never writes it, and a
 reader never rewrites it: a twin keeps it until its text is decompiled again (section 18.4). Where a manifest, a
 program or a trace names the check `emf-checks`, it names the fabula's checks, `fabula-checks`, by their old name.
+Where a program or a trace names the move `tell`, it names `entail` by its earlier spelling (Thym, its section 6.3).
 
 <!-- term: decompile -->
 **The model.** To **decompile** is to take an input apart into its fabula: everything that can be found in it or
-derived from it, enumerated item by item. To compile is to tell a fabula again, in an order, as a short. The plainest
-thing that can be said of either is an atem. These are three densities of one meaning: the fabula is the material, a
+derived from it, enumerated item by item. To compile is to make a short of a fabula, its items said again in an
+order. The plainest thing that can be said of either is an atem. These are three densities of one meaning: the fabula is the material, a
 short is one arrangement of it, and an atem is a reduction, with a hermeneutic shape of its own (section 18.3.5). For
 code each density has a form of its own:
 
@@ -1360,13 +1361,24 @@ code each density has a form of its own:
 |---|---|---|
 | the input | a text: an essay, a story, a poem, a song | a folder of source |
 | fabula | a `fabulan` (narrative and non-fiction prose) or a `fabulap` (poetry, metered verse, song lyrics) | a `fabulac`: the program's specification, item by item |
-| short | a short: the fabula told again in markdown, in an order (section 18.4.4) | a `cshort`: source code rebuilt from the fabulac, to be read and never run |
+| short | a short: an entailment of the fabula in markdown, its items in an order (section 18.4.4) | a `cshort`: source code rebuilt from the fabulac, to be read and never run |
 | atem | the atem: a line, with its focus, push and pull | the atem, as for any fabula; and a `catem`, a text saying everything a user can do with the program, at the depth `line`, `overview` or `manual` |
 
 The flavour is a property of the fabula, named in its catalog; one format, `fabula/1`, holds all three (section 18.4).
 A running program is outside the model: nothing in the core runs a cshort, imports it or installs it.
 
-**The work is done by Thym's moves.** `derive` decompiles and `tell` compiles; a fabula of code is built in stages,
+<!-- term: entailment -->
+An **entailment** is the step that expands meaning by reducing data, and it is also what that step makes. The whole
+entails what is made from it: an input entails its fabula, a fabula a short, and a short an atem; a codebase or an
+application entails its fabulac, and a fabulac a cshort or a catem; a Holotype entails its isotype and its paratype, and a
+holograph its isograph and its allograph. What is made says nothing its whole does not hold. It says it at a smaller size, or in another order or
+voice. An entailment made by rule, a projection (section 16), holds by construction. An entailment made by a model holds
+only because the contract's checks hold it: `no-invention` (it names nothing its whole lacks), `stance-kept` (it says
+no claim more strongly than its whole does) and `coverage` (each of its sentences traces to items of its whole), as
+Thym (https://thym.cosmoes.org/), its section 7.3, states them. Decompiling and compiling are both entailments; the
+move `entail` makes one by a model, and `project` makes one by rule.
+
+**The work is done by Thym's moves.** `derive` decompiles and `entail` compiles; a fabula of code is built in stages,
 each one atomic run, and a job may resume between them (section 18.4.7); the dialectic's moves `question`, `record` and
 `settle` ask a person and fold the answers in (section 18.6). The moves are declared in the manifests (section 13.4)
 and specified in Thym (https://thym.cosmoes.org/), its sections 6.3 and 20. DocOES's byte-exact compile is a different
@@ -1605,8 +1617,8 @@ Push is the author's side and pull is the reader's. They agree when a text is ho
 difference is the most useful thing an atem shows.
 
 **Three densities of one meaning: fabula · short (SHORT) · atem.** A text's fabula holds its meaning item by item
-(section 18.4); a SHORT tells it again as prose, in an order (section 18.4.4); an atem says it in one line. The fabula
-is the material and a short is one arrangement of it. The atem is neither: it is a reduction, with a hermeneutic shape
+(section 18.4); a SHORT, which the fabula entails, says it again as prose, in an order (section 18.4.4); an atem says
+it in one line. The fabula is the material and a short is one arrangement of it. The atem is neither: it is a reduction, with a hermeneutic shape
 of its own in push and pull. A fabula of code has the same four-part atem, and its catem says at a chosen depth what a
 user can do with the program (sections 18.1 and 18.4.7).
 
@@ -1718,19 +1730,20 @@ A **fabula** enumerates all the inspiration, meaning, intent, construction, prod
 in an input or derived from it: what the work came from; the words it leans on, the particular things and people it
 names and the ideas it uses; what it sets out to do, for whom, and what it chose; how it is built; who made it, with
 what, and how it changed; what it claims, how it can be read, and what happens in it, in order; and its atems. A fabula
-is not a summary. It is the input taken apart into items that can be checked, drawn, compared and compiled back into a
-telling. A text is what a person reads; its fabula is what the text holds, enumerated. Section 18.4.4 says where the
+is not a summary. It is the input taken apart into items that can be checked, drawn, compared and compiled into the shorts
+it entails. A text is what a person reads; its fabula is what the text holds, enumerated. Section 18.4.4 says where the
 word comes from.
 
-**Decompile, compile, atem.** The fabula sits between an input and its tellings:
+**Decompile, compile, atem.** The fabula sits in the middle of a chain of entailments (section 18.1): its input
+entails it, and it entails its shorts and its atem:
 
 - **decompiling** an input makes its fabula;
-- **compiling** a fabula makes a short, a telling of it (section 18.4.4), and for code a cshort, source rebuilt from it
-  (section 18.4.7);
+- **compiling** a fabula makes a short, an entailment of it (section 18.4.4), and for code a cshort, source rebuilt
+  from it (section 18.4.7);
 - an **atem** says it most plainly (section 18.3.5), and for code a catem says at depth everything a user can do
   (section 18.4.7).
 
-In a Thym program the two acts are the moves `derive` and `tell` (Thym (https://thym.cosmoes.org/), its section 6; for
+In a Thym program the two acts are the moves `derive` and `entail` (Thym (https://thym.cosmoes.org/), its section 6; for
 a folder of code, its section 20).
 
 **Three flavours.** One format serves three kinds of input. A fabula's flavour says which, in the catalog's `flavour`
@@ -1830,7 +1843,7 @@ appends its runs. The single keys repeat the last entry that derived the fabula,
 
 | List | Entry | Notes |
 |---|---|---|
-| `shorts`, a prose or verse short | `{path, at, by, mode, order}`, and `route` when a model told it | `order` is `told` or `weight`; the path is `<text-stem>.short-<YYYY-MM-DD-HHMM>.md` (section 18.4.4) |
+| `shorts`, a prose or verse short | `{path, at, by, mode, order}`, and `route` when a model wrote it | `order` is `told` or `weight`; the path is `<text-stem>.short-<YYYY-MM-DD-HHMM>.md` (section 18.4.4) |
 | `shorts`, a cshort | `{path, at, by, mode, order: code, route, language, files}` | `path` is the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/`, with its `/`, taking `-2`, `-3` on a collision; `language` is the cshort's own; `files`, how many files it holds besides `CSHORT.md` (section 18.4.7) |
 | `catems` | `{path, at, by, mode, route, depth}` | `depth` is `line`, `overview` or `manual`; the path is `<name>.catem-<YYYY-MM-DD-HHMM>.md`, taking `-2`, `-3` on a collision as shorts do (section 18.4.7) |
 
@@ -2084,47 +2097,47 @@ A scaffold is a starting point a person can see through, never a guess dressed a
 that imports, copies, lists or reconciles files ever decompiles an input, and nothing ever fetches an input that is not
 already on the person's disk.
 
-**Compiled back, it is told again.** Compiling a fabula writes a short beside its input, a cshort or a catem beside its
+**Compiled, it entails a short.** Compiling a fabula writes a short beside its input, a cshort or a catem beside its
 folder, and never touches the input (sections 18.4.4 and 18.4.7).
 
 #### 18.4.4 Shorts
 
 <!-- term: short -->
-A **short** is a telling of a text that is compiled from the text's fabula. Its name is an acronym, **SHORT**,
+A **short** of a text is an entailment of the text's fabula, compiled from it. Its name is an acronym, **SHORT**,
 *syuzhetic-hermeneutic open readable text*. It is *syuzhetic*: an arrangement, the fabula's items put in an order. It is
-*hermeneutic*: as it tells each thing it says how the thing is known, every claim's stance in plain words. It is
+*hermeneutic*: as it sets out each thing it says how the thing is known, every claim's stance in plain words. It is
 *open*: it is plain markdown that anyone can read without enough, it is yours to edit, it is honest about its gaps, and
 it is open to the reader's own reading. It is *readable text*: prose, not a database. The name covers only what is
 compiled from a fabulan or a fabulap.
 
-**One fabula, many tellings.** A text's twin is its fabula (section 18.4): the order-free material a telling is made
-from. Every claim is there with its stance, every event with its own before and after, every term grounded, and each
-item's `span` says where in the telling it was found.
+**One fabula, many entailments.** A text's twin is its fabula (section 18.4): the order-free material every short is
+made from. Every claim is there with its stance, every event with its own before and after, every term grounded, and
+each item's `span` says where in the author's text it was found.
 
 <!-- term: syuzhet -->
-A *syuzhet* is a telling of a fabula, an arrangement of its material. The author's text is a syuzhet of the same fabula,
-the first one, and it is the author's: it is never called a short. A short is a syuzhet compiled from the fabula, and a
-text can have many. The atem sits outside the pair. It is the breath of the text, a reduction with its own hermeneutic
+A *syuzhet* is an arrangement of a fabula's material, its items in an order. The author's text is a syuzhet of the
+same fabula, the first one, and it is the author's: it is never called a short, and it entails the fabula rather than
+the other way round. A short is a syuzhet the fabula entails, compiled from it, and a text can have many. The atem sits outside the pair. It is the breath of the text, a reduction with its own hermeneutic
 shape (push and pull), neither material nor arrangement.
 
-**Two orders.** A short tells the fabula's items in one of two orders:
+**Two orders.** A short sets out the fabula's items in one of two orders:
 
 - **as told** — every item where its span puts it, in the author's order: `told` in the files;
 - **by weight** — the claims that matter most first, then the events, then the terms: `weight` in the files.
 
-| Order | In words | How it tells |
+| Order | In words | How it orders |
 |---|---|---|
 | `told` | as the author told it | every item with a span, in the order of its span: by first line, then last line, and within one line the words, the names, the ideas, the claims, then the events. Under the text's own headings when the text can be read (a span given as quotes is then placed on its line). Items that no span places come last, under "Also in the fabula" |
 | `weight` | by weight | the claims in order of salience, grouped by the concepts they lean on; then the events, in before/after order; then the terms |
 
 Both open with the atem line, and both say each claim's stance in plain words ("the author holds that", "it is assumed
-that", "reportedly"). Pinned passage atems are not told: like the file's atem, they stand outside the telling. With no
-order given, a compile tells `told` when the fabula names a source text that can be read, and `weight` for a standalone
+that", "reportedly"). Pinned passage atems are not set out: like the file's atem, they stand outside the short. With no
+order given, a compile uses `told` when the fabula names a source text that can be read, and `weight` for a standalone
 fabula. Without a model a short is the ordered outline itself, said in the items' own sentences; with one, a model
 writes the outline as prose and is told which order it is in. A third order, the events first in the order they
 happened, is reserved for a later edition.
 
-A short of a fabulap (section 18.4.6) is told stanza by stanza: how the poem is built, then each stanza's lines with
+A short of a fabulap (section 18.4.6) goes stanza by stanza: how the poem is built, then each stanza's lines with
 their stresses and rhymes (their words only where the fabulap holds them), its devices and its readings, each reading
 said as whose it is. Told by weight, it ends with how the poem can be read.
 
@@ -2146,20 +2159,20 @@ Without a model the line ends "by rules, without a model". A short of a standalo
 rain.fabulan.cosm, a standalone fabula, told by weight, compiled on …". A footer written by an earlier edition, which
 names the fabula by the name it had then, reads the same.
 
-**The fabula records its tellings.** Each compile appends one entry to the fabula's `shorts:` list, `{path, at, by,
+**The fabula records its entailments.** Each compile appends one entry to the fabula's `shorts:` list, `{path, at, by,
 mode, order}`: the short's file name beside the twin; when, as a timestamp in UTC; the model's id, or `rules`; `model`
-or `rules`; `told` or `weight`; and `route`, `local` or `cloud`, when a model told it. The list is made just above
+or `rules`; `told` or `weight`; and `route`, `local` or `cloud`, when a model wrote it. The list is made just above
 `nodes:` the first time. Nothing else in the fabula changes: not its items, not its `source:` (a fresh twin stays
 fresh), not a byte of the rest.
 
-**Code is told as a cshort.** A fabulac's short is a cshort, source code rebuilt from the fabulac (section 18.4.7). It
-is recorded in the same `shorts:` list, with `order: code`, but it is a folder of source and not a telling in prose:
-the acronym SHORT names the prose and verse telling, and a cshort keeps only the word.
+**A fabulac entails a cshort.** A fabulac's short is a cshort, source code rebuilt from the fabulac (section 18.4.7). It
+is recorded in the same `shorts:` list, with `order: code`, but it is a folder of source and not prose:
+the acronym SHORT names the entailment in prose and verse, and a cshort keeps only the word.
 
 **Where the words come from.** *Fabula* and *syuzhet* are the Russian Formalists' pair: the story as it happened, and
 the story as it is told. Their work on how a telling makes the familiar strange began with Viktor Shklovsky's *Art as
 Technique* (1917), and Boris Tomashevsky's *Thematics* (1925) set the two terms out. MacroCOSM borrows the pair for
-meaning rather than plot: the fabula is the material, and a short is one telling of it.
+meaning rather than plot: the fabula is the material, and a short is one entailment of it.
 
 #### 18.4.5 Examples
 
@@ -2814,7 +2827,7 @@ the day of the run (in UTC) and the model: "*a cshort of days.fabulac.cosm, in P
 Then come a table of the files written, each with the `C:file` it came from (`rules` for the packaging file) and its
 sha256, what was not rebuilt, why no packaging file was written when none was, and, last, the source's licence line,
 `Licence of the source: <source.licence>` (with none recorded, `Licence of the source: not recorded (<the open
-question>)`). A compile is recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may be told in another
+question>)`). A compile is recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may entail a cshort in another
 language than its source's; the entry's `language` names the cshort's own.
 
 A compile passes these checks, all without executing anything:
@@ -3256,7 +3269,7 @@ does not run them lists them as not run (section 12.3).
 ### 18.5 doc: documents (DocOES)
 
 <!-- atem: one document taken apart into items and compiled back, byte for byte -->
-**What it enumerates.** One document, taken apart and told again.
+**What it enumerates.** One document, taken apart and given back.
 
 <!-- term: DocOES -->
 **DocOES**, *Documentation OES*, takes a markdown document apart into items:
@@ -3285,7 +3298,7 @@ volume, change its document. The reference enumeration is enough's.
 | `name` | the document's title |
 | `document` | the markdown this telling was enumerated from: `{path, sha256, version}` |
 | `telling` | `{lang, voice}`: the language, one of `en`, `de`, `es`, `fr`, `ja` and `zh`; and the voice the document is written in, when it has one (the Help Center's is `rosa`) |
-| `tellings` | the languages the document is told in |
+| `tellings` | the languages the document is written in |
 | `chapters` | the synced documents inside the volume, one `{id, path, source, commit, sha256, prefix, version}` each |
 | `built` | `{at, by, digest, manifests}`: when, by which enough, the digest of everything the volume was built from, and each manifest's `{name, version, sha256}` |
 | `nodes` | the items |
@@ -3385,11 +3398,11 @@ chapter, is written `<inventory>@<version>:<kind>:<id>`, as in `comprise@1:secti
 check `xref-unresolved` resolves it through the inventory instead.
 
 <!-- term: telling -->
-A *telling* is one arrangement of a fabula in words: the author's text is one and a short another, and each language a
-document is told in is a telling, a volume of its own. All the tellings of a document share one set of ids: the fabula
-has no language, and a section's name and body are its telling's. A translated telling takes its ids from the
-author's, its sections by number and its terms by their place in the section; where a place cannot be matched, the
-item is told from the author's telling and says so, `fallback: en`.
+A *telling* is one language a document is written in, a volume of its own. All the tellings of a document share one
+set of ids: the fabula has no language, and a section's name and body are its telling's. A translated telling takes
+its ids from the author's, its sections by number and its terms by their place in the section; where a place cannot be
+matched, the item is taken from the author's telling and says so, `fallback: en`. The word names this alone: what a
+fabula is compiled into is an entailment (section 18.1).
 
 **Voice.** The catalog's `telling` names the voice a document is written in. The Help Center's is `{lang: en, voice:
 rosa}`, so a viewer can say who wrote it and a readvisor can quote it as hers.
@@ -3950,7 +3963,7 @@ folder snapshot's catalog adds the keys `path`, `tree`, `commit`, `origin`, `fil
 | `move` | P Programs | a move a program defines, with its parameters |
 | `step` | P Programs | one statement of a program, verbatim, with the moves it calls |
 | `contract` | P Programs | the checks a step's move must pass |
-| `morph` | M Morphs | ten scales of a telling's departure from the null morph, with evidence |
+| `morph` | M Morphs | ten scales of a text's or a short's departure from the null morph, with evidence |
 | `context` | C Contexts | an occasion: purpose, audience, medium, moment, hurry, words |
 | `plan` | R Runs | what a program will do, before it does it |
 | `node` | R Runs | one call or check of a plan, and the nodes it runs after |
@@ -4082,8 +4095,8 @@ sources:
 the whole self, private, kept by its subject, as a Holotype is a company's. It holds what the person is drawn to,
 believes, worries about, has lived through, wants to know, thinks, feels, can do, understands and longs for, each item
 anchored to the thing it is about. There is no kind and no field for a name, an email address, a phone number, a postal
-address, a birth date, a government id or an employer's legal name; people in a person's life appear by role or by a
-pseudonym the catalog declares. The full specification is Ascribe (https://ascribe.cosmoes.org/); this section says how
+address, a birth date, a government id or an employer's legal name; people in a person's life appear by what they are
+to the holder or by a pseudonym the catalog declares. The full specification is Ascribe (https://ascribe.cosmoes.org/); this section says how
 it sits in MacroCOSM.
 
 **Its declaration.** `oes: ascribe/1`. There is no legacy form, and a catalog without the key is refused.
@@ -4126,8 +4139,8 @@ checks (an anchored form, a declared relation, the shape of a `when`, the range 
 personal data, and what a private marker would drop) are enough's (its `ascribe lint` command runs them over a
 holograph's folder), and a generic reader runs none of them. The personal-data check warns in a holograph and refuses a projection while it finds anything. The
 opening questions its manifest's `dialectic:` block holds are a bank of the core's dialectic, and a holograph's
-sessions and questions are items of module D (section 18.6). Ascribe's application module, isographs and index belong
-to Ascribe's own specification.
+sessions and questions are items of module D (section 18.6). Ascribe's projections, the isograph and the allograph, and the
+Allograph Registry where a holder lists an allograph belong to Ascribe's own specification.
 
 **An example.** A holograph small enough to be one file: two forms, a declared relation and two nodes.
 

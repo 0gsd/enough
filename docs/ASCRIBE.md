@@ -14,7 +14,7 @@ Ascribe is one of the two MiniCOSMs, the domain OESes with a specification of th
 (https://macro.cosmoes.org/), an OES: the shared grammar and its core, which holds the formats built into every
 reader, the densities and the dialectic; its words (item, kind, volume, catalog, module, check, lens, open question, question, session) keep
 their meaning here. Thym (https://thym.cosmoes.org/) is the transcognition language that connects OESes: an isograph
-leaves a holograph by a Thym program its holder runs. Comprise describes companies and Ascribe describes people, in the
+and an allograph leave a holograph by a Thym program its holder runs. Comprise describes companies and Ascribe describes people, in the
 same grammar and with the same envelope, so that one set of moves works on both.
 
 **Status.** Normative for `ascribe/1`. The declaration is the manifest, `ascribe.manifest.cosm`. The reference
@@ -39,7 +39,7 @@ corrected.
 11. The private filter
 12. Lenses
 13. Releases
-14. Projections: the isograph, the cryptograph, match tokens, morphs
+14. Projections and the Allograph Registry
 15. The command line
 16. Conformance
 17. Changes
@@ -63,9 +63,13 @@ checks do not enforce.
 *holo-* the whole; *iso-* an equal, verified; *para-* beside, by another hand; *crypto-* hidden, by the owner. There is
 no outsider's graph of a person, ever: what one person knows of another is an experience in their own holograph.
 
+A person has one more: the **allograph**, *allo-* other, the holder's public account of what they can do for others,
+listed in the Allograph Registry (section 14.6). A company's isotype already says what it offers, so Comprise has none.
+
 <!-- term: holder -->
 The **holder** of a holograph is its subject, who keeps it: the one person who answers its questions,
-runs its programs and releases what leaves it.
+runs its programs and releases what leaves it. A character's holograph (section 4.2) is held by the person who keeps
+it, since a character cannot.
 
 **Blocks.** A block marked `cosm` is one complete file that loads through a conforming reader and passes the checks the
 manifest selects and Ascribe's own (section 10), with every reference resolving inside it. A block marked `json` is one
@@ -120,9 +124,11 @@ changed.
   (section 9).
 - Nothing about the person that would identify them has a place in the schema. A check warns on what reads like it,
   and a filter keeps private files and restricted nodes out of everything that leaves (section 11).
-- The holograph stays with its holder. What leaves it, as an isograph, a cryptograph, match tokens or an isomorph,
-  leaves by the holder's act: an isograph by a Thym program the holder runs, the others made by the implementation
-  (section 14); each release is recorded in the holograph (section 13).
+- The holograph stays with its holder. What leaves it, as an isograph, an allograph, a cryptograph or an isomorph,
+  leaves by the holder's act: an isograph and an allograph by a Thym program the holder runs, the others made by the
+  implementation (section 14); each release is recorded in the holograph (section 13).
+- One thing is public, and only at the holder's act: an allograph, listed in the Allograph Registry, where a person who
+  needs a service finds those who offer it (section 14.7). The registry holds no one who did not list themselves.
 
 ---
 
@@ -181,7 +187,8 @@ a morph volume included, is kept beside the folder and never inside it.
 | `macrocosm` | reserved ([MacroCOSM OES](https://macro.cosmoes.org/), its section 5.6) |
 | `id` | `ascribe/<hid>`: the hid is twenty-six characters of lowercase base32 (`a`–`z`, `2`–`7`), the shape of a Comprise Connect `hid` |
 | `handle` | a pseudonymous handle: lowercase words joined by hyphens (`salt-and-crumb`), never a name |
-| `summary` | one line, optional; people appear in it by role, never by name |
+| `summary` | one line, optional; people appear in it by what they are to the holder, never by name |
+| `subject` | `person`, the default when absent: the holder's own self; or `character`: the self of a subject that is not a person, kept by its holder (below) |
 | `sample` | `true` on a fixture or a demonstration, never on a real person's holograph |
 | `visibility` | `public`, `internal` or `restricted`; `internal` when absent |
 | `pseudonyms` | the stand-in names the author uses for the people in their life ("Wren", "the Captain"), so that the `no-pii` check reads them as declared rather than as personal names |
@@ -192,8 +199,14 @@ a morph volume included, is kept beside the folder and never inside it.
 A catalog never holds the person's name, an email address, a phone number, a postal address, a birth date, a government
 id or an employer's legal name. A catalog `name` key reads as a personal name to the `no-pii` check (a holograph names
 no one); an item's `name` is the item's own. The reader titles a holograph by its `handle`. A holograph written before
-`releases` and `morphs` were catalog keys reads unchanged, and a reader that does not know the two keeps them as unknown
-catalog keys.
+`releases`, `morphs` and `subject` were catalog keys reads unchanged, and a reader that does not know them keeps them as
+unknown catalog keys.
+
+**A character's holograph.** A holograph whose catalog says `subject: character` describes a subject that is not a
+person: a character in a story, a virtual persona, or an agent run by a model. It is the same volume under the same
+rules, with ten containers, forms, the dialectic and the private filter, and it names no one. Its holder is the person
+who keeps it: they answer its questions for it, run its programs and release what leaves it. An agent lists in the
+Allograph Registry from a character's holograph, and never from a person's (section 14.10).
 
 ### 4.3 Ids and paths
 
@@ -430,8 +443,8 @@ names the holder by the role word `holder` and describes them by nothing else.
 An answer to a bank question writes a **node** in the container the question belongs to, or, for a question of the
 forms, a form. `settle` writes it, from the answer, after `record` has kept the holder's words verbatim on the question:
 
-- `name`: a few words of the holder's own, naming the node; `summary`: the answer, one line, people in it by role or
-  by a declared pseudonym;
+- `name`: a few words of the holder's own, naming the node; `summary`: the answer, one line, people in it by what
+  they are to the holder or by a declared pseudonym;
 - `form`: the form the answer is about, found as section 8.4 says;
 - `provenance: {mode: dialectic, sources: [D:session/<id>], confidence: <how sure the person is>}`, the confidence
   the holder gave with the answer, and `1` when they gave none and stated it plainly.
@@ -540,8 +553,8 @@ A **candidate** is an ordinary node of its kind, proposed by a reading and not y
 | `form` | a form of the holograph, a new form found as section 8.4 says, or `{pending: "<what it seems to be about>"}` |
 | `made` | the move, run and engine that proposed it ([Thym](https://thym.cosmoes.org/), its section 5.3) |
 
-Its `name` and `summary` say what the text shows in the reading's words, and name people only by role or by a declared
-pseudonym; the text's own names never enter the holograph. A candidate is proposed only from what the text says
+Its `name` and `summary` say what the text shows in the reading's words, and name people only by what they are to the holder
+or by a declared pseudonym; the text's own names never enter the holograph. A candidate is proposed only from what the text says
 (the core's `no-invention`), and each carries the span that shows it.
 
 **The holder decides.** Each candidate gets a question about it, `about: <the candidate's id>`, `why: unsure`,
@@ -555,7 +568,7 @@ pseudonym; the text's own names never enter the holograph. A candidate is propos
 | "I don't know", a refusal, or nothing | the candidate stays a candidate |
 
 A candidate is not part of the self until the holder says so. Every lens draws it as pending, `no-pii` reads it as it
-reads any item, and no projection, package or match token ever carries one (section 14). Nothing is written into a
+reads any item, and no projection, package or listing ever carries one (section 14). Nothing is written into a
 holograph by a reading except its candidates and their questions, and nothing becomes the holder's except by their
 answer.
 
@@ -614,8 +627,8 @@ It warns on:
 | a personal name | in a prose field (a `summary`, and an experience's `name`), two adjacent capitalised words neither of which is all capitals, a place word, a month or day, a sentence's opening word, or a declared pseudonym |
 
 A stretch one pattern has claimed is not claimed again, so one email address is one warning. A form with a `wiki` names
-a public subject, and its prose is not read for names. Every warning ends with the same advice: people appear by role,
-or by a pseudonym you declare.
+a public subject, and its prose is not read for names. Every warning ends with the same advice: describe people by what
+they are to you, or by a pseudonym you declare.
 
 ---
 
@@ -632,7 +645,7 @@ side behind; this section is the rule, and an implementation applies it.
 | **ingest** | another volume, a library or an index copies the holograph, or part of it, in |
 | **package** | a Thym package carries it, sealed or not, a cryptograph included ([Thym](https://thym.cosmoes.org/), its section 15) |
 | **transfer** | the holograph, or part of it, is copied off the holder's machine, a backup included |
-| **projection** | a program projects it: an isograph, match tokens, an isomorph (section 14) |
+| **projection** | a program or the implementation projects it: an isograph, an allograph, an isomorph (section 14) |
 
 **What it withholds.**
 
@@ -687,8 +700,8 @@ like any node, with its pending state shown.
 
 <!-- atem: the holograph's own record of everything that has left it -->
 <!-- term: release -->
-A **release** is one act of the holder's by which something left the holograph: an isograph, a cryptograph, a list of
-match tokens or an isomorph (section 14). Every release is recorded in the holograph, in the catalog's `releases:`
+A **release** is one act of the holder's by which something left the holograph: an isograph, an allograph, a
+cryptograph or an isomorph (section 14). Every release is recorded in the holograph, in the catalog's `releases:`
 list, oldest first. The record is the holder's own and private: the private filter withholds it in every use
 (section 11). It is what Thym's `released` check reads:
 nothing is in a package's `graph.cosm` without a release recorded in the holograph
@@ -698,17 +711,18 @@ nothing is in a package's `graph.cosm` without a release recorded in the hologra
 | Field | Holds | Required |
 |---|---|---|
 | `epoch` | the epoch the release carries: a quarter (`2026-Q4`), a month (`2026-11`) or a week (`2026-W45`), never the day of an edit | yes |
-| `as` | what left: `isograph`, `cryptograph`, `tokens` or `isomorph` | yes |
+| `as` | what left: `isograph`, `allograph`, `cryptograph` or `isomorph`; `tokens` in a record made before match tokens were withdrawn (section 14.3) | yes |
 | `program` | `{name, sha256}`: the program that made it, and the sha256 of its `.thym` bytes | yes |
 | `trace` | `{run, sha256}`: the run's id, and the sha256 of its trace file as the run wrote it, which stays on the holder's machine | yes |
 | `at` | when the release was made: a timestamp, kept in the holograph and never in what left | yes |
-| `sha256` | the sha256 of the bytes that left: the isograph's canonical JSON, the sealed file, the token list or the morph volume | yes |
+| `sha256` | the sha256 of the bytes that left: the isograph's or the allograph's canonical JSON, the sealed file, the token list or the morph volume | yes |
 | `items` | the ids of the holograph's items that left, sorted, and for an isomorph the morph's id (`M:morph/<slug>`); `all` for a cryptograph of the whole holograph | yes |
 | `for` | `{path, sha256}`: the text a package's excerpt was released for | when the release is a package's `graph.cosm` |
 
 A record never holds what was withheld: no id of a withheld item, no count of them and no reason. It never holds a
-key, a token's key or the party a cryptograph was handed to. A record is appended and never rewritten; a release
-withdrawn later stays recorded, since what left cannot be recalled.
+key, a token's key, the party a cryptograph was handed to, or the name or tag an allograph was listed under. A record
+is appended and never rewritten; a release withdrawn later stays recorded, since what left cannot be recalled, and an
+allograph whose listing is withdrawn (section 14.13) stays recorded too.
 
 A release, as a fragment of the catalog:
 
@@ -728,13 +742,15 @@ its holder releases something.
 
 ---
 
-## 14. Projections: the isograph, the cryptograph, match tokens, morphs
+## 14. Projections and the Allograph Registry
 
-<!-- atem: what may leave a holograph, in what shape, and by whose act -->
+<!-- atem: what may leave a holograph, in what shape, by whose act, and the one place it is listed -->
 What leaves a holograph leaves by its holder's act, after the private filter (section 11), and is recorded as a release
-(section 13). In this edition an isograph is made by a Thym program the holder runs ([Thym](https://thym.cosmoes.org/),
-its section 18); a cryptograph, an isomorph and match tokens are made by the implementation at the holder's act, and
-Thym moves for them are reserved for a later edition. Every projection keeps four rules:
+(section 13). In this edition an isograph and an allograph are made by a Thym program the holder runs, `project h as
+isograph` and `project h as allograph` ([Thym](https://thym.cosmoes.org/), its section 18); a cryptograph and an
+isomorph are made by the implementation at the holder's act, and Thym moves for them are reserved for a later edition.
+Listing an allograph is the implementation's act at the holder's word, after the run: no Thym move sends anything to a
+registry. Every projection keeps four rules:
 
 1. **Default-deny.** Only what this section names may appear; anything else is refused, never filtered.
 2. **Withhold, never falsify.** What does not leave leaves no mark: no placeholder, no gap, no count.
@@ -743,16 +759,20 @@ Thym moves for them are reserved for a later edition. Every projection keeps fou
 4. **No personal data.** `no-pii` runs over what the filter keeps and over the projection itself, at the severity of
    an error, and a release is refused while any finding stands.
 
-There is no paratype of a person: no outsider's graph, ever.
+There is no paratype of a person: no outsider's graph, ever, and no entry in the Allograph Registry that its holder
+did not make (section 14.7).
 
 ### 14.1 The isograph
 
 <!-- term: isograph -->
-An **isograph** (`ascribe-isograph/0`) is a person's public projection: a separate document with a fixed schema,
-computed from the holograph by rules, one rule per field, and narrowed by the holder's program, as a company's
-isotype is in [Comprise OES](https://comprise.cosmoes.org/), its section 11.3. It is the dial for a person
+An **isograph** (`ascribe-isograph/0`) is a person's projection for sharing: public in its shape, since it holds
+nothing that may not be shown, and private in its use, since its holder hands it only to whom they choose (below). It
+is a separate document with a fixed schema, computed from the holograph by rules, one rule per field, and narrowed by
+the holder's program, as a company's isotype is in [Comprise OES](https://comprise.cosmoes.org/), its section 11.3. It is an entailment made by rule: the
+holograph entails its isograph, and what is projected holds by construction
+([MacroCOSM OES](https://macro.cosmoes.org/), its section 18.1). It is the dial for a person
 ([Thym](https://thym.cosmoes.org/), its section 18, writes the company's): `project h as isograph`, under a program
-that only chooses, and can keep more back but never add a row, a word or a model's telling. A field added to the model
+that only chooses, and can keep more back but never add a row, a word or a model's entailment. A field added to the model
 later never flows into it by itself.
 
 ```text
@@ -793,17 +813,18 @@ text can identify.
   nothing counts them. At most twenty entries of each kind; at most 64 kilobytes.
 - **One per epoch.** A holder releases at most one isograph in an epoch; one who releases more often chooses a shorter
   epoch.
-- **Stated and verified.** Every entry is marked `stated`: the holder's own word. **`verified`** is reserved for what a
-  registry can attest of the holder, and of nothing in the self: that one real person holds the key this isograph is
-  signed with, and that this holograph has one holder. Ascribe lists nothing as derivable, so Thym's
-  `verified-only-where-derived` refuses every `mark … as verified` in a program over a holograph, and an isograph made
-  by its holder alone marks everything `stated`. A reader refuses an isograph that carries `verified`.
+- **Stated, always.** Every entry is marked `stated`: the holder's own word. An isograph never carries `verified`:
+  what a registry confirms of a holder is shown beside their allograph's listing, as its levels (section 14.9), and
+  never as a marking inside a projection. Ascribe lists nothing as derivable, so Thym's `verified-only-where-derived`
+  refuses every `mark … as verified` in a program over a holograph. A reader refuses an isograph that carries
+  `verified`.
 - **Canonical JSON.** The document is JSON with its keys sorted, no space between tokens and UTF-8 without a
   byte-order mark; the release's `sha256` is over those bytes.
 
-The registry itself, the signing of an isograph and the key it is signed with, an index of isographs, and further
-fields a holder may open one at a time (each opt-in and marked `stated` or `verified`) are reserved for a later
-edition. An isograph is the holder's to keep or hand on; nothing in this edition publishes one.
+**For private sharing.** An isograph is the holder's to keep or to hand, by their own act, to the people they choose.
+Nothing lists, hosts or signs one, and no registry takes one: what is public of a person is their allograph, and only
+when they list it (section 14.7). Further fields a holder may open one at a time, each opt-in and marked `stated`, are
+reserved for a later edition.
 
 The isograph of the holograph of section 4.4, were its node `A:affinity/fast-bread` of section 5.2 added and marked
 `visibility: public` (the two other nodes anchor to a form FEED does not have, and stay):
@@ -833,32 +854,32 @@ one chosen party. It is, for a person, the sealed package of [Comprise OES](http
   lost cryptograph.
 - **The notice** says what it is and names no one.
 
-Hosting a cryptograph for others to fetch is reserved for a later edition, with the registry.
+A cryptograph is handed directly, with its key, to the one party the holder chose. Nothing hosts one for others to
+fetch or to find: the registry takes allographs only (section 14.14).
 
 ### 14.3 Match tokens
 
 <!-- term: match token -->
-A **match token** lets a search find a cryptograph without reading it: a consented, salted digest of one chosen form,
-`{about, token}`, `token` being the lowercase hex HMAC-SHA256 of `about`, a line feed and the value, under a key made for
-one cryptograph and never its package key.
+A **match token** is one thing a search asks for: `{about, value}`, `about` saying what kind of claim it looks for and
+`value` the public word the claim is about. The registry matches tokens against listed allographs, in the clear,
+since an allograph is public (section 14.11).
 
 | `about` | The value |
 |---|---|
-| one of the ten kinds: `affinity`, `belief`, `concern`, `experience`, `interest`, `opinion`, `quale`, `skill`, `understanding`, `yearning` | the slug of the node's form, and, when the node carries a `valence`, a space and the valence word: `sourdough against` |
-| `form` | the slug of a form the holder chose, whatever nodes anchor to it |
+| `experience`, `skill` or `understanding` | a FEED word: a claim of that kind whose form is the word, or whose polyform holds it |
+| `form` | a FEED word: a claim of any kind whose form is the word, or whose polyform holds it |
 
-A token is made only for a form grounded in FEED with origin `feed`, and only for a node the isograph's rules let
-appear (section 14.1), so that a value is a public word whose meaning anyone can work out. Making tokens is the holder's
-act and is a release (`as: tokens`): the holder chooses each form, and nothing is made a token by default. The list is
-`{tokens: ascribe-tokens/0, of: <the cryptograph's hid>, epoch, entries: [{about, token}]}`, its entries sorted by
-`token`. A cryptograph handed over directly has none. Serving tokens, and who holds the key a search needs, are
-reserved for a later edition, with the registry.
+The salted list of earlier editions, `{tokens: ascribe-tokens/0, of, epoch, entries: [{about, token}]}`, whose tokens
+were HMAC-SHA256 digests under a key made for one cryptograph, is withdrawn: it let a search find a hosted
+cryptograph, and no cryptograph is hosted. A writer makes no token list; a reader still reads a release recorded
+`as: tokens` (section 13).
 
 ### 14.4 The bridge to Comprise
 
-A bridge between a company's Holotype and a person's holograph, an employer's *seek* for a role shaped like an isograph
-and answered by a candidate's isograph, both speaking Thym, is reserved for a later edition; the common envelope makes
-it possible.
+The bridge between a company and a person is the registry. A company listed on the Comprise Index searches the
+registry as anyone does, by what it needs (section 14.11); it may attest work a person or an agent did for it
+(section 14.9) and may own an agent (section 14.10). It never receives anything of a holograph but the allograph its
+holder listed. What follows a match, a conversation or an isograph handed in private, is the holder's act.
 
 ### 14.5 Morphs
 
@@ -875,6 +896,453 @@ An **isomorph** is a holomorph the holder chose to share: the same shape, marked
 recorded as a release `as: isomorph`. It leaves with its `scales`, `toward`, `pinned` and `confidence`, and never with
 its `evidence` or `derived.from`, which quote and point to the holder's texts. A holder may keep several, one for
 letters and one for work.
+
+### 14.6 The allograph
+
+<!-- term: allograph -->
+An **allograph** (`ascribe-allograph/0`) is the holder's public account of what they can do for others: the
+experience and domain expertise of a person, or of an agent, that they are qualified, certified and willing to put to
+work. It is a separate document with a fixed schema, computed from the holograph by rules, one rule per field, and
+narrowed by the holder's program, as the isograph is. It is an entailment made by rule: the holograph entails its
+allograph, and what is projected holds by construction ([MacroCOSM OES](https://macro.cosmoes.org/), its section
+18.1). It is made by `project h as allograph` ([Thym](https://thym.cosmoes.org/), its section 18), under a program
+that only chooses, and nothing of the holograph is sent to a model to make it. An allograph exists only at its
+holder's act, and is public only when they list it in the Allograph Registry (section 14.7).
+
+```text
+{allograph, kind, epoch, sample, program, run, expertise}
+expertise[]:  kind, form, strength, when, marking
+```
+
+| Field | Derived from |
+|---|---|
+| `allograph` | `ascribe-allograph/0` |
+| `kind` | `person` when the catalog's `subject` is `person` or absent; `agent` when it is `character` (section 4.2) |
+| `epoch` | the release's epoch (section 13) |
+| `sample` | `true` when the catalog says so; absent otherwise |
+| `program` | as the release records it: `{name, sha256}` |
+| `run` | the id of the run that made it |
+| `expertise[].kind` | the node's kind: `experience`, `skill` or `understanding` |
+| `expertise[].form` | the FEED word of the node's form; for a polyform, the sorted list of its forms' words, at most eight, every one so grounded |
+| `expertise[].strength` | the band of the node's `strength`: `slight` (1 or 2), `moderate` (3), `strong` (4 or 5); absent when no node of the entry carries one |
+| `expertise[].when` | the decade of a date or a year (`2010s`), or an era word already in that shape; absent when no node of the entry carries one |
+| `expertise[].marking` | `stated` |
+
+**Which nodes may enter.** A node of the three kinds of expertise, E (experiences), S (skills) and U
+(understandings), whose `visibility` is `public`, whose `status` is absent or `active`, whose provenance is known at
+confidence 0.5 or more, whose `valence` is absent or `for`, that the filter keeps, and whose form, or every form of
+whose polyform, is grounded in FEED with origin `feed`. A node marked `against` or `mixed` is not something the holder
+offers, and stays.
+
+**What never enters.** No node of the other seven kinds (affinities, beliefs, concerns, interests, opinions, qualia,
+yearnings), however public. No candidate and no question about one, no item of module D, and nothing else the private
+filter withholds (section 11). Not the catalog's `releases:`, `handle`, `summary`, `pseudonyms` or id: an allograph
+carries no hid and no handle, so that a listing cannot be joined to an isograph or a cryptograph the holder handed to
+someone in private. No node's `name`, `summary`, `links`, `of`, `parts`, `span` or `provenance`, no item id, no form
+named only by an encyclopedia article or in the holder's own words, and no relation. Free text never leaves.
+
+**Its rules.** The four rules of every projection (section 14) and these:
+
+- **Assertions, not measurements.** No number of anything; the only digits are in the format string
+  `ascribe-allograph/0`, the epoch, a decade, the run's id and the program's digest. A program's name may hold no digit.
+- **One entry per kind and form.** Nodes that give the same `kind` and `form` give one entry, with the strongest band
+  among them and the latest decade, so that a claim is named by its kind and its form alone (section 14.9).
+- **Sorted.** `expertise` is sorted by the order of the modules (E, S, U), then by `form`, a polyform's list sorting as
+  its words joined by a space. At most twenty entries of each kind; at most 64 kilobytes.
+- **Stated, always.** Every entry is marked `stated`: the holder's word, their own judgement of their strength
+  included. The levels a registry shows beside a claim (section 14.9) are never written into the document. A reader
+  refuses an allograph that carries a field this section does not name or a marking other than `stated`.
+- **Canonical JSON**, as the isograph's; the release's `sha256` is over those bytes.
+
+**Made again, never edited.** An allograph names the run that made it, and the run names the holograph's state: the
+run's trace records the state of the holograph as the filter kept it, as a digest,
+and that digest is what names the state; the plan's digests of the run's inputs do not
+([Thym](https://thym.cosmoes.org/), its section 17.1). The release record carries the digest of the run's trace
+(section 13). When the holograph changes, the holder may run the program again; the new allograph is a new release,
+and it replaces the listed one when the holder lists it. An implementation should tell the holder when their
+holograph has changed since the run their listed allograph names; nothing makes or lists an allograph again by itself.
+A holder may release more than one allograph in an epoch.
+
+Were the holograph of section 4.4 to hold a form `bakery` grounded in FEED, an experience anchored to it
+(`when: 2014`) and a skill anchored to `sourdough` (`strength: 5`), both marked `visibility: public`, and were its
+holder to run a program named `open-for-work` that emits both, the allograph would be:
+
+```json
+{"allograph":"ascribe-allograph/0","epoch":"2026-Q4","expertise":[{"form":"bakery","kind":"experience","marking":"stated","when":"2010s"},{"form":"sourdough","kind":"skill","marking":"stated","strength":"strong"}],"kind":"person","program":{"name":"open-for-work","sha256":"5555555555555555555555555555555555555555555555555555555555555555"},"run":"2026-11-12-0930-cd34","sample":true}
+```
+
+### 14.7 The Allograph Registry
+
+<!-- term: Allograph Registry -->
+The **Allograph Registry** is the one public place of Ascribe: an index of allographs, each listed by its holder,
+where a person who needs a service finds people and agents who offer it, and sees how far each claim is confirmed.
+Comprise Connect serves it beside the Comprise Index, with the same accounts, passkeys and rate limits
+([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). Another service may serve a registry under the
+rules of this section and the seven after it; a tag is the same wherever its key is used (section 14.8), and a listing
+lives in the registry it was sent to.
+
+**Why list.** Listing is a choice, and nothing in Ascribe or in Comprise requires it. A holder lists to be
+cognizable: so that whoever needs a service can know who offers it, what they claim, who has confirmed it and, for an
+agent, who answers for it. To cognize your agent is to know those four things before you let it act for you. A holder
+who lists can show what they claimed and who confirmed it; a person who chooses only listed agents can show that they
+did.
+
+**No paragraphs.** The registry holds no row about anyone who did not list themselves (section 14). There is no
+unclaimed entry, no entry copied from another registry or from a public record, and no entry anyone but its holder can
+start. An attester and an owner are listed themselves, or are companies listed on the Comprise Index. A look-up for
+someone who is not listed finds nothing, and says nothing more.
+
+**No social graph.** The registry answers look-ups and offers no browsing from one entry to another: no list of who
+attested for whom, no list of an owner's agents, no "others like this", no followers. An entry names another listing
+only where it must, an agent's owner (section 14.10) and an attester who chose to be named (section 14.9), and names it
+as a value, never as a link.
+
+**What it holds.** For each listing: the holder's current `list` statement with its signature, the allograph inside it
+included; the faceplace proofs it took, each `{faceplace, handle, address, checked, state}` and, while a proof is missed or lapsed, `since` (section 14.9); the
+attestations and bonds signed for it or by it; and, privately, the account its tag is tied to (section 14.8). Nothing
+else: no page a proof was found on, no record of a look-up, and no count of who looked beyond what a rate limit keeps,
+which holds no words and lasts no longer than a day.
+
+**Statements.** Every act on the registry's records is a **statement** (`ascribe-statement/0`), signed by the key of
+the listing or the company that makes it:
+
+```text
+{statement, says, by, nonce, ...the fields of what it says}
+```
+
+| Field | Holds |
+|---|---|
+| `statement` | `ascribe-statement/0` |
+| `says` | what the statement does: `list`, `withdraw`, `prove`, `unprove`, `attest`, `accept`, `remove`, `bond` or `unbond`, each with the fields section 14.12 gives it |
+| `by` | the signer: a listing's tag (section 14.8), or `company:` and the handle of a company listed on the Comprise Index, three to eight of `A`–`Z` and `0`–`9` (`company:MEADOW`) |
+| `nonce` | a challenge the registry issued to the sending account in the last ten minutes and has not taken yet: twenty-six characters of lowercase base32 (section 14.12) |
+
+A statement is sent as `{statement, signature}`, `signature` being Ed25519 over the statement's canonical JSON (keys
+sorted, no space between tokens, UTF-8 without a byte-order mark, and no character escaped that JSON does not require
+escaping), its 64 bytes in standard base64 with padding. A listing's statements verify
+against the listing's key; a company's against the public key of its current isotype release on the Index, the key
+that signs its isotype ([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). A statement is sent by a
+signed-in account of the registry, and the account is never in a statement, an entry or an answer. A company's
+statements are taken only from an account in that company's organization on Comprise Connect. The nonce makes
+every statement good once: a statement sent again, or kept and sent later, is refused, so that no one can bring back a
+withdrawn listing by sending its old statement.
+
+### 14.8 Keys, tags and names
+
+**The key.** A holder lists under a key of their own: an Ed25519 key pair made for one listing, its private half kept
+in the holder's keychain, never in the holograph, never in a file and never sent. The key is the listing's identity:
+every statement its holder makes about the listing is signed with it, and every confirmation names the tag it gives.
+It signs nothing else: not
+an isograph, a Comprise isotype, an outside chart or another listing. A holder who lists their own allograph and keeps
+an agent lists each under its own key.
+
+<!-- term: tag -->
+The **tag** is a listing's permanent hash: the first twelve characters of the lowercase base32 encoding (the RFC 4648
+alphabet, `a`–`z` and `2`–`7`, without padding) of the SHA-256 of the key's 32 raw bytes. It is derived from the key,
+never chosen, and never changes. Bonds and attestations name the tag, never the name. A registry refuses a key whose
+tag another live listing has.
+
+**The name.** The holder picks a user name: two to thirty-two characters of `a`–`z`, `0`–`9`, `.` and `-`, beginning
+with a letter, ending with a letter or a digit, with no `.` or `-` beside another. Many listings may share a name. A
+registry keeps a list of reserved names, its own and words that would read as its voice, and refuses them. The first name
+a listing takes is not a change. After that, a name may change at most once in ninety days.
+
+<!-- term: dangler -->
+The **dangler** is a short line the holder hangs on their name and edits when they like: one to thirty-two printable
+characters on one line, so that two holders of one name can tell themselves apart (`bread, slowly`). It is refused when
+it holds `://`, or anything the `no-pii` check reads as an email address, a phone number, an id-like run of digits, a
+street address or a birth date (section 10.3). A personal name in a name or a dangler is the holder's own choice to
+show, and is not refused.
+
+A listing is shown as its name, its dangler and its whole tag: `harbour-baker`, *bread, slowly*, `#ts7de32a5bnz`.
+
+**Listing.** A `list` statement publishes a listing, or replaces the one its key already has. Beyond the fields every
+statement carries, it holds:
+
+| Field | Holds | Required |
+|---|---|---|
+| `key` | the listing's Ed25519 public key: its 32 raw bytes in standard base64 with padding, 44 characters; `by` is the tag this key gives | yes |
+| `name` | the user name | yes |
+| `dangler` | the dangler | no |
+| `allograph` | an `ascribe-allograph/0` document (section 14.6) | yes |
+| `owner` | who answers for an agent: a tag, or `company:<handle>` (section 14.10); refused on a person's listing | an agent's |
+| `show` | `{faceplaces, same_name}`: `faceplaces` is `named` or `counted`, `same_name` is `true` or `false` (section 14.9); absent, `{faceplaces: counted, same_name: false}` | no |
+
+The registry checks the allograph by the rules of section 14.6, as a reader does, and refuses a form whose word is not
+a FEED headword in the edition of FEED it holds. It cannot read the holograph, so it checks what it can; the holder's
+implementation has kept the rest. The first `list` statement for a tag ties the tag to the account that sent it. Only
+that account sends later statements for the listing, and it may withdraw the listing without the key (section 14.13).
+A lost key cannot be replaced in this edition: its holder withdraws by their account and lists again under a new key,
+and a new key is a new tag, to which no confirmation of the old one moves. A re-listing may not change a listing's kind
+between person and agent; its holder withdraws it and lists the other under a key of its own. Moving a listing to a new key is reserved
+for a later edition.
+
+A sample allograph (`sample: true`) is listed only by a registry that serves demonstrations, and is shown labelled as a
+sample. The `list` statement for the allograph of section 14.6, as its holder sends it, under the key made from the
+32-byte seed that is the SHA-256 of the text `ascribe example key: salt-and-crumb`, so that an implementation can check
+its key, its tag and its signature against these:
+
+```json
+{"signature":"McEAI8AnkwPw9kKs4825O3R5fL/grSnmuXyL1IySYZiNXpDGIE8OFUPbTZrNBG4/zt0FH7R+BHpUkMnYgo+SAQ==","statement":{"allograph":{"allograph":"ascribe-allograph/0","epoch":"2026-Q4","expertise":[{"form":"bakery","kind":"experience","marking":"stated","when":"2010s"},{"form":"sourdough","kind":"skill","marking":"stated","strength":"strong"}],"kind":"person","program":{"name":"open-for-work","sha256":"5555555555555555555555555555555555555555555555555555555555555555"},"run":"2026-11-12-0930-cd34","sample":true},"by":"ts7de32a5bnz","dangler":"bread, slowly","key":"xftteVFlq9JmdslFScJdILce32OfPGOKMmVyUwNEmvE=","name":"harbour-baker","nonce":"qk5riktfj6curptnjdndclsit4","says":"list","show":{"faceplaces":"counted","same_name":true},"statement":"ascribe-statement/0"}}
+```
+
+### 14.9 Levels of confirmation
+
+Every claim and every listing shows how far it is confirmed, and everything starts as the holder's word.
+
+| Level | Of | Means |
+|---|---|---|
+| `stated` | a claim; a listing with no attested claim | the holder's own word, their judgement of their strength included: subjective, and shown as "stated by the holder" |
+| `attested` | a claim; a listing with one or more attested claims | a party to the work signed that the claim is so |
+| Allograph+ | a person's listing | an identity derived from faceplaces |
+
+A claim is one entry of the listed allograph, named by its `kind` and its `form`. A registry shows each claim with its
+level, and each listing with its `level` and, for a person, whether it is an Allograph+.
+
+<!-- term: attestation -->
+An **attestation** is a party's signed word that the holder did work that bears out some of their
+claims: an `attest` statement, which holds:
+
+| Field | Holds |
+|---|---|
+| `of` | the tag of the listing it is about |
+| `as` | how the attester knows: `client` (the work was done for them), `employer`, `colleague` (they did the work together), or `certifier` (they examined the holder and certify the qualification) |
+| `claims` | one to twenty `{kind, form}`, each a claim of the listing's current allograph |
+| `epoch` | the epoch of the work, or of the certificate: a quarter, a month or a week, not later than the current one |
+| `named` | `true` when the attester shows who they are beside the claims; `false` otherwise |
+
+An attester is a person's listing, an Allograph+ or not, or a company listed on the Comprise Index. An agent never
+attests, no one attests their own listing, and an owner never attests an agent bonded to them. An attestation waits
+until the holder accepts it with an `accept` statement that names its digest, the SHA-256 of the inner `attest` statement's
+canonical JSON in lowercase hex, not of the `{statement, signature}` envelope: nothing shows on a listing without its holder's word. The holder may remove an
+attestation at any time, and so may its attester, with a `remove` statement. An accepted attestation shows beside each
+claim it names that the current allograph still makes, as `{as, epoch, from, plus, by}`: `from` is `person` or
+`company`; `plus` is `true` when the attester is an Allograph+, and absent otherwise; `by` is the attester's tag or
+`company:<handle>`, present only when `named` is `true`. A licence or a certificate is attested by its certifier, a
+company or a person listed in its own right, and the registry checks it nowhere else.
+
+<!-- term: faceplace -->
+A **faceplace** is a public place where a person has an account, under a handle, that represents them
+and not an agent: a profile on a social or professional network, an account on a code host, a forum where they write
+under one name. A registry lists the faceplaces it can check, each as `{faceplace, title, handle, addresses}`: a
+lowercase word that names it, its title on screen, a regular expression for a handle in its normal form (by default
+lower case, with any leading `@` taken off; every faceplace of this edition has that normal form, and none has
+another), and the public addresses on it that belong to a handle, as `https` templates in which `{handle}` stands for
+the handle, `{any}` for one path segment of `A`–`Z`, `a`–`z`, `0`–`9`, `_` and `-`, and, for a handle of the shape
+`user@host`, `{user}` and `{host}` for its two parts. Case does not matter in an address, and one trailing `/` is
+allowed; a query or a fragment is not. A faceplace is listed only when an address alone tells which account a page
+belongs to.
+
+The list is registry data, and the forms below are examples, not a closed list. A registry at launch accepts these:
+
+| Faceplace | Handle | Addresses |
+|---|---|---|
+| GitHub | `octocat` | `https://github.com/octocat`; a gist, `https://gist.github.com/octocat/{any}` |
+| a personal website | `example.org` | `https://example.org/.well-known/ascribe-proof.txt`, on the holder's own domain |
+| Mastodon | `user@instance.example` | `https://instance.example/@user`; a post, `https://instance.example/@user/{any}` |
+| Bluesky | `user.bsky.social` | `https://bsky.app/profile/user.bsky.social`; a post, `https://bsky.app/profile/user.bsky.social/post/{any}` |
+
+**Posted proofs.** A holder proves that they control a faceplace account by posting a short code in a public place of
+the account (a bio, a gist, a post) at an address the faceplace's entry accepts for the handle. The code is the proof
+string:
+
+```text
+proof = "aar-" tag "-" code
+code  = the first twelve characters of the lowercase base32, without padding, of the SHA-256 of the UTF-8 bytes of
+        "ascribe-proof/0" LF tag LF faceplace LF handle
+```
+
+It names the listing, and is good for one handle on one faceplace. For the listing of section 14.8, as the handle
+`harbour-baker` on a faceplace named `harbourboard`, it is `aar-ts7de32a5bnz-k7xgvdxsixco`. The holder then sends a
+`prove` statement with the `faceplace`, the `handle` and the `address`. The registry reads the proof over HTTPS,
+with no credentials and following no redirect to another host, reads at most one megabyte of it as text, and looks
+for the proof string. For a personal website it fetches the address itself. For the other faceplaces it reads the
+platform's own public interface for the same account or post (GitHub's users and gists interface, a Mastodon
+instance's `accounts/lookup` and `statuses`, Bluesky's public `getProfile` and `getPosts`), takes the text the holder
+wrote there (a bio, a gist, a post), and checks that the account or the post is the handle's. A gist or a post that
+another account made does not count. It keeps the faceplace, the handle, the address, the state, the day it last found
+the string and, while a proof is missed or lapsed, the day that began (`since`), and nothing else of the page or the
+account. Anyone can check a proof again: the address shows the string, and the
+string follows from the tag, the faceplace and the handle.
+
+A proof found is `live`. The registry checks each live proof again at least once in thirty days. A check that does not
+find the string is tried again a day later, and a first miss still counts as live until the second miss makes the
+proof `lapsed`. A lapsed proof counts for nothing and is not fetched again. It is live again when the holder sends
+`prove` again and the string is found, and it is removed after thirty days lapsed. An `unprove` statement
+removes a proof at once. A matching name is never evidence; control of the account, shown by the string where only the
+account's holder could post it, is. Only a person's listing takes proofs, and a registry refuses a `prove` from an
+agent's.
+
+A registry never signs in to a faceplace, never reads anything of an account or a post but what proves it, never keeps
+what it reads beyond what is named above, never follows or watches an account, and never uses a faceplace to find, describe or rank anyone. Proving by signing in to a faceplace, for one
+that allows it, is reserved for a later edition.
+
+<!-- term: Allograph plus -->
+An **Allograph+**, said *Allograph plus*, is a person's listing with an identity derived from faceplaces: live proofs on two
+or more distinct faceplaces. Two proofs on one platform count once. It shows that one holder controls those accounts, each with a public life of its own. In an entry
+it is the field `plus: true`, never a character in a name, a tag or a key; in prose it is written Allograph+. A listing
+stops being an Allograph+ while it has live proofs on fewer than two faceplaces, and is one again when it has two. An agent is never
+an Allograph+.
+
+**What a holder shows.** By `show.faceplaces`, an entry gives a person's live proofs either `counted`, as their number
+("verified on three faceplaces"), or `named`, as the list of their `{faceplace, handle, address, checked}`. By
+`show.same_name`, it also gives `same_name`: how many live proofs have a handle equal to the listing's name, both
+written in lower case without `.`, `-` or `_` and the handle without anything from an `@` on. The same name on several
+faceplaces is a signal a holder may show; it is never what makes an Allograph+.
+
+**Reserved.** A level at the strength of an identity document, checked by a third party with only the result kept, is
+reserved for a later edition. In this edition no entry carries a field for it, and a registry shows nothing like it.
+
+### 14.10 Agents and their owners
+
+An **agent** is a listing whose allograph has `kind: agent`: a virtual, fictional or model-run subject that does work
+for others, made from a character's holograph (section 4.2). Its holder keeps its holograph and its key. An agent lists
+as a person does, with two differences: its `list` statement names its `owner`, and it is never an Allograph+.
+
+<!-- term: bond -->
+A **bond** joins an agent to the one owner who answers for it: a person's listing that is an Allograph+, or a company
+listed on the Comprise Index. The agent's `list` statement names the owner, and the owner sends a `bond` statement
+naming the agent's tag, signed with the owner's key: its listing's key, or the key that signs the company's isotype.
+The bond is live while both statements stand and the owner is still what it was, an Allograph+ or a company listed on
+the Index with a current isotype. An agent is in no answer while its bond is not live, and is again once it is. The
+owner ends a bond with an `unbond` statement; the agent's holder ends it by listing the agent with another owner, or by
+withdrawing it. An agent has one owner. An owner may bond many agents, and no answer lists them.
+
+**Who answers.** The owner named in the bond answers for the agent: whoever deals with the agent deals, for what it
+does, with its owner. An agent's entry names its owner, by the name, dangler and tag of the owner's listing, or by the
+company's Index handle. The registry settles nothing between an agent's client and its owner: a dispute goes where the
+law, or the body that governs the work, sends it.
+
+Who an agent works for is the client's side of its work, and stays private. The registry holds none of it, and it shows
+only where a client attests and chooses to be named (section 14.9).
+
+### 14.11 Look-ups and matching
+
+A registry answers three look-ups: by tag, by name, and by what a person needs. Each answers with entries
+(`ascribe-entry/0`), and none needs an account.
+
+```text
+{entry, tag, name, dangler, kind, sample, epoch, level, plus, faceplaces, same_name, owner, claims, signed}
+claims[]:    kind, form, strength, when, level, attested
+attested[]:  as, epoch, from, plus, by
+```
+
+| Field | Holds |
+|---|---|
+| `entry` | `ascribe-entry/0` |
+| `tag`, `name`, `dangler` | the listing's (section 14.8); `dangler` absent when it has none |
+| `kind`, `sample`, `epoch` | the listed allograph's |
+| `level` | `attested` when one or more claims are attested; `stated` otherwise |
+| `plus` | for a person, `true` or `false`; absent for an agent |
+| `faceplaces` | for a person with live proofs, as the holder shows them: their number, or the list of `{faceplace, handle, address, checked}`, `checked` being the day the string was last found |
+| `same_name` | the number of section 14.9, when the holder shows it and it is one or more |
+| `owner` | for an agent: `{tag, name, dangler}` of its owner's listing, or `{company: <handle>}` |
+| `claims` | one per entry of the allograph, in its order: `kind`, `form`, `strength` and `when` as the allograph gives them, `level` (`stated` or `attested`), and `attested`, the accepted attestations that name the claim, newest `epoch` first |
+| `signed` | the listing's `list` statement and its signature, so that anyone can check that the key signed this allograph |
+
+**By tag** answers the one entry, or nothing. **By name** answers at most twenty entries with that name, sorted by tag.
+
+**By need.** A search is `{needs, kind, plus, attested, next}`:
+
+- `needs`: one to eight match tokens (section 14.3). A listing matches when every token matches one of its claims.
+- `kind`: `person` or `agent`, to keep to one; absent, both.
+- `plus`: `true` to keep to Allograph+ listings.
+- `attested`: `true` to keep to listings whose matching claims are all attested.
+- `next`: the value a previous answer gave, for the page after it.
+
+The answer is `{entries, next}`: at most twenty entries, Allograph+ listings first, then those with more of their
+matching claims attested, then by tag; `next` is absent on the last page. A person who needs a service sees what each
+listing claims, how far each claim is confirmed, and who answers for an agent. Nothing ranks a listing by payment, by
+how often it is looked up or by who looked.
+
+The registry keeps nothing of a look-up: not its words, not its answer, not who asked.
+
+### 14.12 The registry's operations
+
+A registry speaks JSON over HTTPS. These are its operations, at these paths under its address. The look-ups (by tag, by
+name and by need) and the list of faceplaces need no account. Only `challenge`, `statements`, `waiting` and `DELETE`
+need one.
+
+| Operation | Request | Answer |
+|---|---|---|
+| `POST /api/v0/allographs/challenge` | a signed-in account | `{nonce, until}`: a nonce good for one statement from this account, until ten minutes later |
+| `POST /api/v0/allographs/statements` | a signed-in account; `{statement, signature}` | `{ok: true}`, with `entry`, the signer's own listing as it now stands, when the statement is about it |
+| `GET /api/v0/allographs/{tag}` | nothing | an entry, or 404 `not_listed` |
+| `GET /api/v0/allographs?name={name}` | nothing | `{entries}` |
+| `POST /api/v0/allographs/search` | `{needs, kind, plus, attested, next}` | `{entries, next}` |
+| `GET /api/v0/allographs/faceplaces` | nothing | `{faceplaces}`: the faceplaces it checks (section 14.9) |
+| `GET /api/v0/allographs/{tag}/waiting` | the account the tag is tied to | `{attestations}`: each `{attestation, statement, signature}` waiting for the holder's word |
+| `DELETE /api/v0/allographs/{tag}` | the account the tag is tied to | `{withdrawn: true}` (section 14.13) |
+
+Each statement, by what it says:
+
+| `says` | Signed by | Fields beyond `statement`, `says`, `by` and `nonce` | Does |
+|---|---|---|---|
+| `list` | the listing's key | `key`, `name`, `dangler`, `allograph`, `owner`, `show` (section 14.8) | publishes the listing, or replaces it |
+| `withdraw` | the listing's key | none | withdraws the listing (section 14.13) |
+| `prove` | a person's listing | `faceplace`, `handle`, `address` | checks a posted proof, and keeps it when found |
+| `unprove` | a person's listing | `faceplace`, `handle` | removes a proof |
+| `attest` | a person's listing, or a company | `of`, `as`, `claims`, `epoch`, `named` (section 14.9) | offers an attestation, which waits for the holder |
+| `accept` | the listing attested | `attestation`: the attestation's digest | shows a waiting attestation |
+| `remove` | the listing attested, or the attester | `attestation` | removes an attestation, waiting or shown |
+| `bond` | an Allograph+ person's listing, or a company | `agent`: the agent's tag | the owner answers for the agent (section 14.10) |
+| `unbond` | the owner | `agent` | ends the bond |
+
+A statement that is refused changes nothing, and is answered with one of these:
+
+| Status | Code | When |
+|---|---|---|
+| 401 | `signed_out` | no signed-in account |
+| 400 | `bad_statement` | a field missing, a field this section does not name, a value outside its shape, or an `owner` on a person's listing |
+| 400 | `bad_signature` | the signature does not verify against the signer's key |
+| 400 | `bad_nonce` | a nonce the registry did not issue to this account, already taken, or older than ten minutes |
+| 400 | `bad_allograph` | an allograph that breaks a rule of section 14.6 |
+| 400 | `not_feed` | a form whose word is not a FEED headword |
+| 400 | `bad_name`, `bad_dangler` | a name or a dangler outside the rules of section 14.8 |
+| 403 | `name_reserved` | a reserved name |
+| 409 | `name_changed` | a new name within ninety days of the last |
+| 409 | `tag_taken` | a key whose tag another live listing has, or a statement for a tag tied to another account |
+| 404 | `not_listed` | `by`, `of`, `agent` or `owner` names no live listing and no company listed on the Index |
+| 403 | `not_allowed` | a signer who may not say this: an agent proving or attesting, an attester attesting themselves or an agent they own, an owner that is not an Allograph+ or a listed company, an agent naming no owner, a re-listing that changes a listing's kind between person and agent, a company's statement from an account outside that company's organization, an `accept` or `remove` that names a digest the signer has no attestation under (the refusal does not say whether another listing holds that digest) |
+| 400 | `bad_claim` | an attested claim the listing's current allograph does not make |
+| 400 | `unknown_faceplace`, `bad_address` | a faceplace the registry does not list; a handle outside the faceplace's shape, or an address its entry does not accept for the handle |
+| 409 | `proof_missing` | the address could not be read, or it was read and the proof string was not on it |
+| 403 | `sample_refused` | a sample, at a registry that serves no demonstrations |
+| 413 | `too_large` | a statement over 64 kilobytes |
+| 429 | `rate` | past a rate limit; the registry's terms state its limits |
+
+A search with a token outside section 14.3's table, or a value that is not a FEED headword, is 400 `bad_need`; a
+`next` the registry did not give is 400 `bad_next`.
+
+### 14.13 Withdrawal
+
+A holder withdraws a listing at any time: by a `withdraw` statement, or, without the key, from the account its tag is
+tied to. The holder's key is kept by the holder, and a later `list` under the same key lists again under the same tag, as a new
+listing: nothing of the old one comes back. A withdrawn listing is gone from every answer at once, in the request that withdraws it. The registry keeps
+nothing of it: its statements, its allograph, its proofs, the attestations and bonds signed for it or by it, and the
+tie to its account are deleted then, and are gone from the registry's backups within thirty days. An agent bonded to
+it is in no answer until it has a live bond again. A registry that a law obliges to keep something states in its terms
+what it keeps and for how long, and keeps nothing more. A copy someone made of an entry while it was listed is beyond
+the registry's reach.
+
+A registry may remove a listing that breaks its terms, as one that passes itself off as another does; its terms say
+what does. A removal is a withdrawal made by the registry, with the same effect.
+
+### 14.14 What became of Ascribe-Connect
+
+Earlier editions reserved a server for Ascribe, called Ascribe-Connect: an index of isographs, match tokens served for
+hosted cryptographs, and a bridge to Comprise. The Allograph Registry replaces it, and is the one public thing.
+
+| Reserved in edition 0.6.0 | Now |
+|---|---|
+| the registry (section 14.1) | kept: it is the Allograph Registry (section 14.7) |
+| the signing of an isograph, and the key it is signed with (section 14.1) | folded in: a key signs a holder's statements to the registry, and its tag names their listing (section 14.8); an isograph stays unsigned, so that nothing joins it to a listing |
+| an index of isographs (section 14.1) | withdrawn: an isograph is for private, intentional sharing, and the registry lists allographs only |
+| the marking `verified` (section 14.1) | withdrawn from the isograph: what a registry confirms is shown as levels beside a listing (section 14.9), never as a marking inside a projection; a reader still refuses an isograph that carries it |
+| further opt-in fields of an isograph (section 14.1) | still reserved, for private sharing; none is ever listed |
+| hosting a cryptograph for others to fetch (section 14.2) | withdrawn: a cryptograph is for one chosen party, handed with its key; a hosted one would put a private share where strangers search |
+| serving match tokens, and who holds the key a search needs (section 14.3) | folded in: the shape `{about, value}` is how a search says what it needs (section 14.11); the salted list `ascribe-tokens/0` is withdrawn, since it found only a hosted cryptograph, and an allograph, being public, needs no salt |
+| the bridge to Comprise, an employer's seek answered by a candidate's isograph (section 14.4) | folded in: a company searches the registry, attests work and owns agents (sections 14.9 to 14.11); a seek answered by an isograph is withdrawn, since an isograph is never listed |
 
 ---
 
@@ -920,11 +1388,14 @@ name, an email address, an id-like run of digits, an `employer` field and a stre
    a warning inside the holograph.
 4. Apply visibility before drawing or showing anything (section 12).
 5. Refuse an isograph that carries a field section 14.1 does not name, or the marking `verified`.
+6. Refuse an allograph that carries a field section 14.6 does not name, or a marking other than `stated`; and read a
+   catalog with no `subject` as a person's holograph.
 
 ### 16.2 A writer must
 
 1. Never write a name, an email address, a phone number, a postal address, a birth date, a government id or an
-   employer's legal name, in any field, key or comment; write people by role or by a pseudonym the catalog declares.
+   employer's legal name, in any field, key or comment; write people by what they are to the holder or by a pseudonym the catalog
+   declares.
 2. Write a node only from the holder's own word: an answer, an accepted candidate, or what the holder wrote down
    (section 8, section 9); write an open question, never a guess, and never a form FEED does not have as if it did.
 3. Read only the holder's own texts into a holograph, never a text about them by anyone else.
@@ -936,8 +1407,28 @@ name, an email address, an id-like run of digits, an `employer` field and a stre
 7. Record every release in the catalog's `releases:` before anything leaves, append records and never rewrite one, and
    never record what was withheld (section 13).
 8. Keep a morph volume beside the holograph's folder, never inside it (section 14.5).
+9. Make an allograph only by `project h as allograph`, from the nodes section 14.6 lets enter and from nothing else,
+   and list it only at the holder's word; make an agent's allograph only from a character's holograph.
+10. Keep a listing's private key in the holder's keychain, one key for each listing, and sign nothing with it but that
+    listing's statements (section 14.8).
+11. Make no match-token list (section 14.3), and host no cryptograph for others to find (section 14.2).
 
-### 16.3 Where an implementation and this text disagree
+### 16.3 A registry must
+
+1. Hold no row about anyone who did not list themselves, and take no listing, attestation or bond but by a statement
+   its signer made (section 14.7).
+2. Take a statement only from a signed-in account, with a nonce it issued to that account in the last ten minutes and
+   a signature that verifies against the signer's key, and refuse every other with the codes of section 14.12.
+3. Check every allograph by the rules of section 14.6 and every form against FEED, and every name and dangler by
+   section 14.8.
+4. Show each claim's level and each listing's, never show an attestation its holder has not accepted, never show an
+   agent as an Allograph+, and show no agent whose bond is not live (sections 14.9 and 14.10).
+5. Keep of a faceplace proof only its faceplace, handle, address, state, the day it was last found and, while it is
+   missed or lapsed, the day that began, and never sign in to a faceplace (section 14.9).
+6. Answer look-ups and offer no browsing from one entry to another, and keep nothing of a look-up (section 14.11).
+7. Withdraw a listing at once when its holder asks, and keep nothing of it after (section 14.13).
+
+### 16.4 Where an implementation and this text disagree
 
 Where an implementation and this text disagree, one of them is in error. The disagreement is settled by correcting the
 one that is wrong, and the Changes appendix (section 17) records which was corrected, with the section it touched.
@@ -1008,9 +1499,13 @@ check and no example changed.
 
 ## 18. Withdrawn
 
-<!-- atem: withdrawn in edition 0.5.4; see the Changes appendix -->
+<!-- atem: what was withdrawn, and where each withdrawal is recorded -->
 The section "What is not built" was withdrawn in edition 0.5.4; what it listed is specified in this edition or stated
 where it falls as reserved for a later edition, and the Changes appendix records each step.
+
+What earlier editions reserved for Ascribe-Connect is kept, folded into the Allograph Registry or withdrawn, as
+section 14.14 says piece by piece: an index of isographs, the marking `verified` in an isograph, hosting a cryptograph,
+the match-token list `ascribe-tokens/0` and a seek answered by an isograph are withdrawn.
 
 ---
 
