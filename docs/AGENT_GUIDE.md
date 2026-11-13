@@ -311,7 +311,14 @@ bash tests/bootstrap_linux_harness.sh   # ~5s, 66 assertions (-v to watch)
   `orchestrator.json` and `~/enough/.llama-server/server.pid` have no env
   hook), and picks a free port for `--llm-url` so it can never adopt or
   kill the developer's real llama-server on 8080. Copy its `build_env()`
-  when you need a scratch server of your own.
+  when you need a scratch server of your own. Since 0.7 the seams it and
+  `tests/conftest.py` export are one list, [enough/seams.py](../enough/seams.py)
+  (path seams under the scratch root, fixed ones on a dead loopback port,
+  behaviour seams cleared); `tests/test_seams.py` fails when a module under
+  `enough/` reads an `ENOUGH_*` variable the list does not name, so a new
+  variable arrives with its seam. conftest's `session_floor` points `$HOME`
+  and every seam at a session scratch folder before any fixture of any scope
+  runs; the per-test seams sit on top of it.
 - **[tests/bootstrap_linux_harness.sh](../tests/bootstrap_linux_harness.sh)**
   runs the *real* bootstrap.sh with `uname`, `curl`, `git`, `uv`, `brew`,
   `ldconfig` and the checksum tools shimmed — seven scenarios covering the

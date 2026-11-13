@@ -17,10 +17,9 @@ nothing-is-installed path all survive contact with this machine.
 Isolation, in two layers, because half of enough's state predates the env
 hooks:
 
-1. every ``ENOUGH_*`` seam (weights dir, live model state, registry,
-   download URL base, canon root, infoworld
-   root, wikisink config, ui config, llama-server override, FEED dictionary
-   root, DocOES docs root) is pointed inside the scratch dir; and
+1. every ``ENOUGH_*`` seam named in ``enough/seams.py`` (the list
+   ``tests/conftest.py`` reads too) is pointed inside the scratch dir, held
+   at a dead loopback address, or cleared; and
 2. ``$HOME`` is pointed there too, which is what actually isolates
    ``~/enough/config/broker.json``, ``openrouter.json``,
    ``orchestrator.json`` and ``~/enough/.llama-server/server.pid`` — none
@@ -57,6 +56,13 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+# The one list of seams, shared with tests/conftest.py (loaded from this
+# checkout whichever way the script runs: directly, or by path from
+# scripts/uicheck/server.py).
+from enough import seams  # noqa: E402
 
 # Bounds. Generous enough for a cold GitHub-hosted runner, tight enough
 # that a hang fails the job instead of burning the six-hour ceiling.
@@ -128,61 +134,27 @@ def build_env(scratch: Path) -> dict[str, str]:
     home = scratch / "home"
     (home / "enough" / "config").mkdir(parents=True, exist_ok=True)
     (home / "enough" / "bin").mkdir(parents=True, exist_ok=True)
-    weights = scratch / "weights"
-    weights.mkdir(exist_ok=True)
+    (scratch / "weights").mkdir(exist_ok=True)
 
-    # The registry is read-only, but copy it anyway: "every ENOUGH_* points
-    # into the scratch dir" is a rule worth being able to state without
-    # exceptions, and a copy also proves the hook itself works.
-    registry = scratch / "models.json"
-    shutil.copyfile(REPO_ROOT / "defaults" / "models.json", registry)
-
-    env = dict(os.environ)
+    # Every seam in enough/seams.py, the list tests/conftest.py reads too:
+    # each path seam under the scratch dir (the registry a copy of
+    # defaults/models.json, so "every ENOUGH_* points into the scratch dir"
+    # holds without exceptions), the download and cosmoes.org bases on a
+    # dead loopback port (nothing may reach huggingface.co or cosmoes.org
+    # from a smoke run), the specifications' launch check off, and every
+    # behaviour seam the developer may have exported cleared (the desktop
+    # shell's checkout, uv and llama URL among them, which would redirect
+    # which checkout and which uv the run uses).
+    env = seams.scratch_env(scratch, os.environ)
     env.update({
         "HOME": str(home),
-        # Model layer.
-        "ENOUGH_WEIGHTS_DIR": str(weights),
-        "ENOUGH_LIVE_STATE": str(scratch / "live-models.json"),
-        "ENOUGH_MODELS_REGISTRY": str(registry),
-        # Nothing may reach huggingface.co from a smoke run. Port 1 is
-        # never listening; a download attempt fails instantly and loudly
-        # instead of quietly pulling gigabytes.
-        "ENOUGH_MODELS_URL_BASE": "http://127.0.0.1:1/weights",
+        # The boot's own choices, made after the clearing, on purpose.
         # A dead rung-1 override: exercises the documented fall-through
         # (warn, then try ~/enough/bin, then PATH) on every run.
         "ENOUGH_LLAMA_SERVER": str(scratch / "no-such-llama-server"),
-        # Stores.
-        "ENOUGH_CANON_ROOT": str(scratch / "canon"),
-        "ENOUGH_INFOWORLD_ROOT": str(scratch / "no-infoworld"),
-        "ENOUGH_WIKISINK_CONFIG": str(scratch / "wikisink.json"),
-        "ENOUGH_UI_CONFIG": str(scratch / "ui.json"),
-        "ENOUGH_EXTRAS_STATE": str(scratch / "extras.json"),
-        # The user-global readvisors dir (P7). Without this seam an
-        # `install_readvisor` at global scope writes into the developer's
-        # real ~/enough/readvisors/ and is then symlinked into every
-        # project they open afterwards.
-        "ENOUGH_READVISORS_ROOT": str(scratch / "readvisors"),
-        # FEED (0.4.1): feed.sqlite and the precious user-dictionary.sqlite.
-        # The source stays the checkout's reflib/dict (the shipping path), so
+        # FEED's source is the checkout's reflib/dict (the shipping path), so
         # the boot really starts a background build — into the scratch dir.
-        "ENOUGH_DICT_ROOT": str(scratch / "dict"),
-        # DocOES (0.4.4): the built doc volumes (the spec, the Help Center in
-        # six tellings), ~/enough/docoes/ by default. Disposable, rebuilt on
-        # digest — into the scratch dir.
-        "ENOUGH_DOCS_ROOT": str(scratch / "docoes"),
-        # Thym (0.5.0): plans, traces, recorded candidates and landed outputs, ~/enough/thym/ by default.
-        "ENOUGH_THYM_ROOT": str(scratch / "thym"),
-        # The specifications synced from cosmoes.org (0.5.4): the client's folder, ~/enough/specs/ by default;
-        # the launch check is off (no scratch boot may reach cosmoes.org) and the client's base is a dead
-        # loopback port, so a rig that turns the check back on must also point ENOUGH_COSMOES_BASE at its own
-        # stand-in.
-        "ENOUGH_SPECS_ROOT": str(scratch / "specs"),
-        "ENOUGH_SPECS_SYNC": "0",
-        "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
-        # The home screen's project registry. $HOME already points here, so
-        # this is belt and braces — but the rule is "every ENOUGH_* seam", and
-        # the handoff file and desktop.json are derived from this one's dir.
-        "ENOUGH_PROJECTS_STATE": str(scratch / "config" / "projects.json"),
+        "ENOUGH_DICT_SOURCE": str(REPO_ROOT / "reflib" / "dict"),
         # Desktop capability gate — so the shutdown route exists and its
         # token check is exercised. Not an isolation hook; see AGENT_GUIDE.
         "ENOUGH_DESKTOP": "1",
@@ -190,13 +162,6 @@ def build_env(scratch: Path) -> dict[str, str]:
         # Unbuffered child output, so a crash log isn't lost in a pipe.
         "PYTHONUNBUFFERED": "1",
     })
-    # The shell-side desktop vars, if the developer happens to have them
-    # exported, would redirect which checkout and which uv the run uses.
-    env.pop("ENOUGH_DESKTOP_CODE", None)
-    env.pop("ENOUGH_DESKTOP_UV", None)
-    env.pop("ENOUGH_DESKTOP_LLM_URL", None)
-    # A developer's own dictionary source would change what the boot builds.
-    env.pop("ENOUGH_DICT_SOURCE", None)
     return env
 
 

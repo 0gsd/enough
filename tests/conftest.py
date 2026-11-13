@@ -19,7 +19,6 @@ from __future__ import annotations
 import base64
 import os
 import re
-import shutil
 import subprocess
 import zipfile
 from pathlib import Path
@@ -48,63 +47,29 @@ _FTR_XML = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             f'<w:ftr xmlns:w="{_W}"><w:p><w:r><w:t>{FIXTURE_FOOTER}</w:t>'
             f'</w:r></w:p></w:ftr>')
 
-# Every `ENOUGH_*` seam that names a path into the developer's real state,
-# mapped to its home under tmp_path. Mirrors `scripts/smoke_boot.py`'s
-# `build_env()` — keep the two in step; that script is the other half of the
-# same rule, for the subprocess servers the pre-commit suite boots.
-_STATE_SEAMS = {
-    "ENOUGH_WEIGHTS_DIR": "weights",
-    "ENOUGH_LIVE_STATE": "live-models.json",
-    "ENOUGH_CANON_ROOT": "canon",
-    "ENOUGH_INFOWORLD_ROOT": "no-infoworld",
-    "ENOUGH_WIKISINK_CONFIG": "wikisink.json",
-    "ENOUGH_UI_CONFIG": "ui.json",
-    "ENOUGH_EXTRAS_STATE": "extras.json",
-    "ENOUGH_PROJECTS_STATE": "config/projects.json",
-    # The user-global readvisors dir (P7): a test that installs one at
-    # global scope would otherwise file it in the developer's real
-    # ~/enough/readvisors/ and symlink it into every project they open.
-    "ENOUGH_READVISORS_ROOT": "readvisors",
-    # FEED (0.4.1): the built dictionary + the user's own entries. And its
-    # source dir, pointed at nothing: every app a test boots would otherwise
-    # start a 380 MB background build from reflib/dict. Dictionary tests
-    # write a small fixture source and point the seam at it themselves.
-    "ENOUGH_DICT_ROOT": "dict",
-    "ENOUGH_DICT_SOURCE": "no-dict-source",
-    # DocOES (0.4.4): the built doc volumes. Every test that builds one lands
-    # here; the real ~/enough/docoes/ is never touched by the suite.
-    "ENOUGH_DOCS_ROOT": "docoes",
-    # Thym (0.5.0): runs (plans, traces, candidates, outputs). No test may land a run in ~/enough/thym/.
-    "ENOUGH_THYM_ROOT": "thym",
-    # The specifications synced from cosmoes.org (0.5.4): the client's folder. A test that wants a synced copy
-    # writes one here; none may be read from the developer's real ~/enough/specs/.
-    "ENOUGH_SPECS_ROOT": "specs",
-}
+# Every `ENOUGH_*` seam, from the one list `scripts/smoke_boot.py`'s
+# `build_env()` reads too (that script is the other half of the same rule, for
+# the subprocess servers the pre-commit suite boots): the path seams, each
+# under tmp_path (the registry a copy of defaults/models.json, so a test that
+# rewrites it cannot corrupt the checkout); the fixed ones (no test may reach
+# huggingface.co or cosmoes.org, and the specifications' launch check is off;
+# tests of the check or of a download set them for themselves); and the
+# behaviour seams, which must be *absent*, not redirected — a developer who
+# happens to export one would otherwise get a different run than CI, and the
+# tests that need one (the desktop-shutdown gate, the llama-server lookup
+# ladder) set it themselves. `tests/test_seams.py` keeps the list whole.
+from enough import seams as _seams  # noqa: E402
 
-# Seams that must hold a fixed value, not a path: the launch check (0.5.4) is off for every test, and the client's
-# base is a loopback port nothing listens on, so a test that forgot the switch fails instantly instead of asking
-# cosmoes.org. Tests of the check set both for themselves (a stand-in server, or an injected opener).
-_FIXED_SEAMS = {
-    "ENOUGH_SPECS_SYNC": "0",
-    "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
-}
-
-# Seams that must be *absent*, not redirected. Each of these changes
-# behaviour rather than location — a developer who happens to export one in
-# their shell would otherwise get a different test run than CI, and tests
-# that need them (the desktop-shutdown gate, the llama-server lookup ladder)
-# set them for themselves.
-_BEHAVIOUR_SEAMS = (
-    "ENOUGH_LLAMA_SERVER", "ENOUGH_DESKTOP", "ENOUGH_DESKTOP_TOKEN",
-    "ENOUGH_DESKTOP_CODE", "ENOUGH_DESKTOP_UV", "ENOUGH_DESKTOP_LLM_URL",
-    "ENOUGH_VULKAN_ICD_DIRS", "ENOUGH_TOOLTIP_RE", "ENOUGH_REPO_URL",
-)
+_STATE_SEAMS = _seams.PATH_SEAMS
+_FIXED_SEAMS = _seams.FIXED_SEAMS
+_BEHAVIOUR_SEAMS = _seams.BEHAVIOUR_SEAMS
 
 
 # The environment as the *process* found it, captured at import time —
-# before any fixture has run. `_still_pristine()` below is the difference
-# between "the developer exported this" (isolate it) and "another fixture
-# moved it on purpose" (leave it alone); see the docstring.
+# before any fixture has run — and then moved onto the session floor's values
+# by `session_floor` below. `_still_pristine()` is the difference between "the
+# developer exported this, or the floor set it" (isolate it per test) and
+# "another fixture moved it on purpose" (leave it alone); see the docstring.
 _GIT_LOCATION = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY",
                  "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX")
 
@@ -113,6 +78,55 @@ _ENV_AT_START = dict(os.environ)
 
 def _still_pristine(var: str) -> bool:
     return os.environ.get(var) == _ENV_AT_START.get(var)
+
+
+def _redirect_home_bound_paths(mp: pytest.MonkeyPatch, home: Path) -> None:
+    """Three paths are bound to `Path.home()` when their modules import, which happens at collection, before any
+    fixture moves `$HOME`: without these the broker's, the cloud slot's and the orchestrator's config files are the
+    developer's real ones (wave 2 of 0.5.0: `~/enough/config/broker.json` was found rewritten during a round of
+    test runs)."""
+    from enough import broker as _broker, cloud as _cloud, server as _server
+    config = home / "enough" / "config"
+    mp.setattr(_broker, "CONFIG_PATH", config / "broker.json")
+    mp.setattr(_cloud, "CONFIG_PATH", config / "openrouter.json")
+    mp.setattr(_server, "ORCHESTRATOR_CONFIG", config / "orchestrator.json")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def session_floor(tmp_path_factory: pytest.TempPathFactory):
+    """The floor under every fixture: `$HOME` and every seam pointed at one session scratch folder.
+
+    `isolated_state` below is function-scoped, so a module- or session-scoped fixture is made before it and saw the
+    real `$HOME` and whatever the developer had exported (test_docoes' module fixture read the real ~/enough/specs
+    the day 0.6.0 went live). This one is session-scoped and autouse in the root conftest, so pytest makes it before
+    any other fixture of any scope, and nothing a wider fixture reads or writes can be the developer's.
+
+    It then makes its own values the baseline `_still_pristine()` compares against, so the per-test redirection
+    still happens under it, and a wider fixture that moves a seam on purpose (test_convert_docling's real weights
+    dir) is still left alone. Values read at import time, during collection, are before any fixture and are not
+    its business: test_convert_docling reads the real weights dir that way, deliberately."""
+    floor = tmp_path_factory.mktemp("session-floor")
+    mp = pytest.MonkeyPatch()
+    moved = {"HOME": str(floor / "home")}
+    moved.update(_seams.scratch_values(floor / "state"))
+    _seams.fill_registry(floor / "state")
+    before = {var: _ENV_AT_START.get(var) for var in (*moved, *_BEHAVIOUR_SEAMS)}
+    for var, value in moved.items():
+        mp.setenv(var, value)
+        _ENV_AT_START[var] = value
+    for var in _BEHAVIOUR_SEAMS:
+        mp.delenv(var, raising=False)
+        _ENV_AT_START.pop(var, None)
+    _redirect_home_bound_paths(mp, floor / "home")
+    try:
+        yield floor
+    finally:
+        mp.undo()
+        for var, value in before.items():
+            if value is None:
+                _ENV_AT_START.pop(var, None)
+            else:
+                _ENV_AT_START[var] = value
 
 
 @pytest.fixture(autouse=True)
@@ -149,38 +163,15 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """
     if _still_pristine("HOME"):
         monkeypatch.setenv("HOME", str(tmp_path / "home"))
-        # Three paths are bound to `Path.home()` when their modules import, which happens at collection, before
-        # this fixture moves `$HOME`: without these the broker's, the cloud slot's and the orchestrator's config
-        # files are the developer's real ones in every test that does not patch them itself (wave 2 of 0.5.0:
-        # `~/enough/config/broker.json` was found rewritten during a round of test runs).
-        from enough import broker as _broker, cloud as _cloud, server as _server
-        home = tmp_path / "home" / "enough" / "config"
-        monkeypatch.setattr(_broker, "CONFIG_PATH", home / "broker.json")
-        monkeypatch.setattr(_cloud, "CONFIG_PATH", home / "openrouter.json")
-        monkeypatch.setattr(_server, "ORCHESTRATOR_CONFIG", home / "orchestrator.json")
+        # The paths bound to `Path.home()` at import, moved with it, in every test that does not patch them itself.
+        _redirect_home_bound_paths(monkeypatch, tmp_path / "home")
 
     state = tmp_path / "state"
-    for var, rel in _STATE_SEAMS.items():
-        if _still_pristine(var):
-            monkeypatch.setenv(var, str(state / rel))
-    for var, value in _FIXED_SEAMS.items():
+    for var, value in _seams.scratch_values(state).items():
         if _still_pristine(var):
             monkeypatch.setenv(var, value)
-
-    # A read-only file, but "every ENOUGH_* points inside tmp_path" is a rule
-    # worth being able to state without exceptions — and a copy also means a
-    # test that rewrites the registry cannot corrupt the checkout.
-    if _still_pristine("ENOUGH_MODELS_REGISTRY"):
-        registry = state / "models.json"
-        registry.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(REPO / "defaults" / "models.json", registry)
-        monkeypatch.setenv("ENOUGH_MODELS_REGISTRY", str(registry))
-
-    # Nothing in the suite may reach huggingface.co. Port 1 is never
-    # listening, so a stray download fails instantly and loudly instead of
-    # quietly pulling gigabytes.
-    if _still_pristine("ENOUGH_MODELS_URL_BASE"):
-        monkeypatch.setenv("ENOUGH_MODELS_URL_BASE", "http://127.0.0.1:1/weights")
+            if var == "ENOUGH_MODELS_REGISTRY":
+                _seams.fill_registry(state)
 
     for var in _BEHAVIOUR_SEAMS:
         if _still_pristine(var):
