@@ -93,3 +93,34 @@ jobs:
       # bash-3.2 clean, so both jobs run it.
       - name: bootstrap.sh install harness
         run: bash tests/bootstrap_linux_harness.sh
+
+  # The floor. pyproject says `requires-python >= 3.11`, and enough/thym/ is
+  # copied text-exact into Comprise, which runs it on 3.11, while the job
+  # above pins 3.12. This one runs the pytest suite on 3.11 and nothing else:
+  # the shell syntax, the boot smoke and the installer harness do not depend
+  # on the interpreter's version, and the suite already imports and runs
+  # every module (tests/test_python_floor.py also asks 3.11 to read every
+  # file, where one is installed: here it is). Ubuntu only: the floor is a
+  # question about the language, not the platform.
+  floor:
+    name: pytest on the floor (python 3.11)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      UV_PYTHON: "3.11"
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: uv sync
+        run: uv sync --frozen
+
+      - name: pytest
+        run: uv run pytest -q
