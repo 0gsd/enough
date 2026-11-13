@@ -23,8 +23,11 @@ from enough.thym import plan as pl
 REPO = Path(__file__).resolve().parents[1]
 TEXT = REPO / "docs" / "THYM.md"
 SHIPPED = REPO / "defaults" / "thym"
-#: The programs the round ships (design 5); defaults/thym/ also holds the three thym 0 programs of 0.5.0.
-ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "settle", "tighten")
+#: The programs the round ships (design 5), and 0.7's verse files: decompile-verse, the fabulap's five programs (Thym
+#: 20.9), and decompile-verse-quick, the one-call fabulap it replaced as the full build (20.5); defaults/thym/ also
+#: holds the three thym 0 programs of 0.5.0.
+ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "decompile-verse-quick", "settle",
+         "tighten")
 
 
 def scratch_decls() -> dc.Declarations:
@@ -43,13 +46,14 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
     list), whether it asks, its scaffold; the three rows that choose by the call are held to their `-when` rules."""
     d = dc.load()
     rows = _table_rows()
-    assert len(rows) == 20
+    assert len(rows) == 22                                 # scan and construe since 0.7 (THYM 20.9)
     for name, _sig, asks, contract, scaffold in rows:
         v = d[name].view(1)
         assert v is not None, name
         assert v.asks is asks.startswith("yes"), name
         if "·" not in contract and "as above" not in contract:
-            assert list(v.contract) == re.findall(r"`([a-z-]+)`", contract), name
+            # the contract is the list before any ", with …" (construe's row says which checks it reads for verse)
+            assert list(v.contract) == re.findall(r"`([a-z-]+)`", contract.split(", with ")[0]), name
         if "·" not in scaffold:
             want = re.findall(r"`([a-z-]+)`", scaffold)
             assert ([v.scaffold] if v.scaffold else []) == want, name
@@ -120,6 +124,7 @@ def test_folder_outline_compiles_as_the_text_now_writes_it():
 def test_the_draft_holds_the_blocks_this_round_names():
     names = sorted(_first_name(b) for _, b in DRAFT_BLOCKS)
     assert names == sorted(["plain-enough", "aims-in-brief", "folder-outline", "python-files", "decompile-verse",
+                            "scan-the-poem",
                             "its-own-file", "compile-python", "shorter", "drop-the-todos", "decompile-prose",
                             "settle-the-answers"]), names
 

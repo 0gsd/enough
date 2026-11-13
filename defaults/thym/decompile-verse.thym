@@ -1,15 +1,70 @@
 thym 1
 
-program decompile-verse
-  why: a poem decompiled into its fabula, line by line, with its metre and its rhymes, and a
-       question for its author wherever a reading is a guess.
+-- The fabulap of a poem or a lyric, built in five runs. A host runs the programs of this file in the
+-- order they are written, as one job: each lands the fabulap so far beside the poem, and a job that
+-- stops takes up again after the last one that landed.
+
+program scan-the-poem
+  why: a poem's stanzas, lines, stresses and metre are read by rule from its words and FEED's
+       pronunciations, before any model reads a line.
   must: nothing is fetched; the poem is the person's own copy.
 
   takes poem: text
   gives f: fabula
 
-  let found = derive poem as verse
+  give scan poem                                   -- stanzas, lines, stresses, metre, pauses
+end
+
+program hear-the-poem
+  why: what the poem does with rhyme, sound and repetition, and the form they make, is heard by rule.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let rhymed = scan poem as rhyme with f           -- end and inner rhymes, the scheme
+  let sounded = scan poem as sound with rhymed     -- alliteration, assonance, consonance
+  let heard = scan poem as recurrence with sounded -- refrains, openings, repetitions, the hook
+  give scan poem as form with heard                -- the form it keeps, and where it departs
+end
+
+program read-the-poem
+  why: a model reads what the poem says, stanza by stanza, against what the rules found.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let found = derive poem as verse with f          -- terms, names, ideas, claims, events, atems
   assert found covers poem else "a line of the poem is in no item"
-  let asked = question found
-  give gather asked with found
+  give found
+end
+
+program read-closely
+  why: figure, image, allusion, voice, turn, meaning and what is left open, each read by a model
+       under contract; every reading stays the model's own until the author says otherwise.
+  decided 2026-11-12: what only the author knows is asked, never guessed; a reading is an opinion
+       until the dialectic settles it.
+
+  takes poem: text, f: fabula
+  gives g: fabula
+
+  let a = construe poem as figure with f           -- metaphor, simile, symbol, irony …
+  let b = construe poem as image with a            -- the images, and the senses they reach
+  let c = construe poem as allusion with b         -- echoes, traditions, occasions
+  let d = construe poem as voice with c            -- who speaks, to whom, in what tone
+  let e = construe poem as turn with d             -- where the poem changes direction
+  let m = construe poem as meaning with e          -- readings, side by side
+  give construe poem as ambiguity with m           -- what the poem leaves open
+end
+
+program raise-the-questions
+  why: what only the poet knows is asked of the poet, or of an expert in the poet's work, and the
+       questions land with the fabulap.
+  decided 2026-11-12: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
 end

@@ -1,6 +1,8 @@
 """The dialectic in a program (THYM 22; MacroCOSM OES 18.6): the moves `question`, `record` and `settle`, their checks
 `addressed`, `no-duplicate` and `only-the-asked`, the scaffolds `bank` and `direct`, the prompts, and the three
-shipped programs `decompile-prose`, `decompile-verse` and `settle` (`settle-the-answers`).
+shipped programs `decompile-prose`, `decompile-verse-quick` (the program `decompile-verse`, the one-call fabulap of
+Thym 20.5; `decompile-verse.thym` is the five-program full build of 20.9, tests/test_verse_moves.py) and `settle`
+(`settle-the-answers`).
 
 The moves reach the dialectic's core only through `ctx.engines["dialectic"]`. The engine is `enough.dialectic.thym_engine()`,
 which the host registers: three functions that take and give plain data, so that a run records them and a replay
@@ -502,7 +504,7 @@ def test_a_folder_volume_is_questioned_but_never_written(tmp_path):
 
 def test_the_shipped_programs_are_the_texts():
     blocks = _text_blocks()
-    for name in ("decompile-prose", "decompile-verse", "settle"):
+    for name in ("decompile-prose", "decompile-verse", "decompile-verse-quick", "settle"):
         assert (SHIPPED / f"{name}.thym").read_text(encoding="utf-8") in blocks, name
     assert (SUITE / "programs" / "settle-the-answers.thym").read_bytes() == (SHIPPED / "settle.thym").read_bytes()
 
@@ -538,7 +540,7 @@ def run(tmp_path: Path, name: str, inputs: dict, *, cp=None, rules: bool = False
     return t
 
 
-@pytest.mark.parametrize("name,kind", [("decompile-prose", "essay"), ("decompile-verse", "poem")])
+@pytest.mark.parametrize("name,kind", [("decompile-prose", "essay"), ("decompile-verse-quick", "poem")])
 def test_the_decompile_programs_compile_and_plan(tmp_path, name, kind):
     pl, _p = plan(tmp_path, name, {kind: ("text", FAB / "guides" / "close.md")})
     nodes = [n for n in pl["nodes"] if n.get("type") == "node"]
@@ -629,7 +631,7 @@ def test_decompile_prose_lands_questions_with_the_fabula_then_settle_closes_one(
 
 
 @pytest.mark.parametrize("name,kind,src", [("decompile-prose", "essay", FAB / "guides" / "close.md"),
-                                           ("decompile-verse", "poem", FAB / "poems" / "the-sick-rose.txt")])
+                                           ("decompile-verse-quick", "poem", FAB / "poems" / "the-sick-rose.txt")])
 def test_the_decompile_programs_run_under_rules(tmp_path, name, kind, src):
     work = tmp_path / "work"
     work.mkdir()
@@ -644,7 +646,7 @@ def test_the_decompile_programs_run_under_rules(tmp_path, name, kind, src):
     assert [n for n in got["nodes"] if str(n.get("id", "")).startswith("D:question/")]
     # VERSE FLIP (flipped): `derive … as verse` reaches the engine's verse reading, so a poem lands as a fabulap and
     # is asked the fabulap bank
-    want = {"decompile-prose": "fabulan", "decompile-verse": "fabulap"}[name]
+    want = {"decompile-prose": "fabulan", "decompile-verse-quick": "fabulap"}[name]
     assert got.get("flavour", "fabulan") == want
     banked = {q["raised"]["from"].split("/")[0] for q in got["nodes"]
               if str(q.get("id", "")).startswith("D:question/") and q["raised"]["by"] == "bank"}
@@ -730,7 +732,7 @@ def test_a_verse_run_records_what_its_rules_read_and_replays_with_no_dictionary(
     work = tmp_path / "work"
     work.mkdir()
     shutil.copy(FAB / "poems" / "the-sick-rose.txt", work / "the-sick-rose.txt")
-    pl, p = plan(work, "decompile-verse", {"poem": ("text", work / "the-sick-rose.txt")})
+    pl, p = plan(work, "decompile-verse-quick", {"poem": ("text", work / "the-sick-rose.txt")})
     eng = {**engines(), "pron": H.pron_fields(pron)}
     t = RUN.run(pl, inputs_root=work, root=tmp_path / "root", program=p, rules=True, engines=eng, now=NOW)
     assert isinstance(t, T.Trace) and t.landed, t
