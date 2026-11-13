@@ -134,6 +134,9 @@ def test_every_contract_check_is_defined_in_the_spec():
     for name, (owner, mv) in ((mv["name"], (o, mv)) for o, mv in ext):
         entries.append((name, owner, mv))
     old = {"emf-checks"}                     # fabula-checks' old name, which a thym 0 view keeps (7.3)
+    from enough.thym.contracts import AHEAD   # an owner's ruling ahead of the text's table (`quotes-held`, 0.7)
+    assert not set(AHEAD) & defined, "a check the text now defines: take it out of contracts.AHEAD"
+    old |= set(AHEAD)
     for name, owner, mv in entries:
         views = [mv, mv.get("thym-1") or {}]
         rules = [r for v in views for k in ("contract-when",) for r in (v.get(k) or [])]
