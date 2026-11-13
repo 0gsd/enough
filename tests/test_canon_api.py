@@ -75,8 +75,8 @@ def _store_volume(client: TestClient, name: str) -> Path:
 def test_every_route_answers_under_canon_and_the_old_prefix_is_gone(client: TestClient):
     box = _store_volume(client, "docs")
     (box / "a.md").write_text("a", encoding="utf-8")
-    for sub, params in (("tree", {}), ("mirror", {"box": "docs"}),
-                        ("ingest-status", {"box": "docs"})):
+    for sub, params in (("tree", {}), ("mirror", {"volume": "docs"}),
+                        ("ingest-status", {"volume": "docs"})):
         new = client.get(f"/api/canon/{sub}", params=params)
         assert new.status_code == 200, (sub, new.text)
         assert client.get(f"/api/cacheawl/{sub}", params=params).status_code in (404, 405), sub
@@ -151,7 +151,7 @@ def test_the_old_box_and_cacheboxes_keys_still_answer_for_one_release(client: Te
     assert any(v["name"] == "old" for v in client.get("/api/canon/tree").json()["cacheboxes"])
     r = client.post("/api/canon/transfer", json={
         "op": "copy", "src": {"root": "project", "path": "hello.md"}, "dst": {"root": "canon", "path": "x.md"}})
-    assert r.status_code == 400
+    assert r.status_code == 400 and r.json()["detail"] == "a canon endpoint needs a volume: its name."
 
 
 def test_transfer_with_canon_root(client: TestClient, project: Path):
@@ -166,7 +166,7 @@ def test_transfer_with_canon_root(client: TestClient, project: Path):
         "dst": {"root": "project", "path": "copy.md"}})
     assert r.status_code == 200, r.text
     assert client.post("/api/canon/transfer", json={       # the legacy word, removed in 0.6
-        "op": "copy", "src": {"root": "cachebox", "box": "box", "path": "hello.md"},
+        "op": "copy", "src": {"root": "cachebox", "volume": "box", "path": "hello.md"},
         "dst": {"root": "project", "path": "copy2.md"}}).status_code == 400
     assert (project / "copy.md").read_text(encoding="utf-8") == "hi from the project"
     assert "hello.md" in (box / canon.CATALOG_NAME).read_text(encoding="utf-8")

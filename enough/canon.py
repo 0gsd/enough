@@ -1740,7 +1740,7 @@ def _resolve_endpoint(project_dir: Path, kind: str, box: str | None,
         base = project_dir
     elif kind in VOLUME_KINDS:
         if not box:
-            raise CanonError("a canon endpoint needs a <box> (the volume's name).")
+            raise CanonError("a canon endpoint needs a volume: its name.")
         base = _require_volume(box)
     else:
         raise CanonError(

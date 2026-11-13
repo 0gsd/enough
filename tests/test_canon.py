@@ -583,8 +583,8 @@ def test_canon_tools_are_gated_and_named(store: Path, tmp_path: Path, monkeypatc
     assert res.ok and (store / "notes" / canon.CATALOG_NAME).is_file()
     res = tools.run_canon_list(project, _wc("canon_list", volume="notes"))
     assert res.ok and "volume 'notes'" in res.body
-    res = tools.run_canon_list(project, _wc("canon_list", box="notes"))   # the old tag
-    assert res.ok
+    res = tools.run_canon_list(project, _wc("canon_list", box="notes"))   # the old tag, removed in 0.7
+    assert res.ok and "volume 'notes'" not in res.body                    # read as no tag: the volume list
     broker.save_config({**broker.load_config(), "canon_enabled": False})
     res = tools.run_canon_list(project, _wc("canon_list"))
     assert not res.ok and "canon tools are disabled" in res.body

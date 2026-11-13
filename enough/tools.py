@@ -1529,8 +1529,7 @@ def run_wikisink(project_dir: Path, call: ToolCall) -> ToolResult:
 # source). All gated by the `canon_enabled` broker toggle. The module
 # (canon.py) owns the store; these runners are thin adapters. url ingests
 # additionally honor the fetch_url toggles by construction (they route
-# through fetch_gated). A volume is named by `<volume>`; the pre-0.4.3 tag
-# `<box>` is read too.
+# through fetch_gated). A volume is named by `<volume>`.
 # ---------------------------------------------------------------------------
 
 def _canon_denied(name: str, key: str = "") -> ToolResult:
@@ -1538,7 +1537,7 @@ def _canon_denied(name: str, key: str = "") -> ToolResult:
 
 
 def _volume_arg(call: ToolCall) -> str:
-    return (call.extra.get("volume") or call.extra.get("box") or "").strip()
+    return (call.extra.get("volume") or "").strip()
 
 
 def run_canon_list(project_dir: Path, call: ToolCall) -> ToolResult:

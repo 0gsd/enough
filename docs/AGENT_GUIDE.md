@@ -1379,7 +1379,7 @@ project need no switch, and a write into the store rides on the existing
 | `read_wiki_article` | `tools.run_read_wiki_article` → `wikisink/agent.py` | same; full text cached under `rness/io/input/`, preview returned |
 | `wiki_status` | `tools.run_wiki_status` → `wikisink/agent.py` | `wikisink_enabled` toggle (works without an archive — that's the point) |
 | `wikisink` | `tools.run_wikisink` → `wikisink/agent.py` | `wikisink_enabled` toggle; network calls additionally gated by `wikisink_live_updates` |
-| `canon_list` | `tools.run_canon_list` → `canon.py` | `canon_enabled` toggle; no arg = list volumes, `<volume>` = its contents tree (reconciles first). Renamed from `cachebox_list` in 0.4.3 with no alias; the old `<box>` tag is still read |
+| `canon_list` | `tools.run_canon_list` → `canon.py` | `canon_enabled` toggle; no arg = list volumes, `<volume>` = its contents tree (reconciles first). Renamed from `cachebox_list` in 0.4.3 with no alias; the old `<box>` tag was removed in 0.7 |
 | `canon_create` | `tools.run_canon_create` → `canon.py` | `canon_enabled` toggle; creates an empty volume (name-validated) + its `canon.cosm` catalog |
 | `canon_ingest` | `tools.run_canon_ingest` → `canon.py` | `canon_enabled` toggle; `path`/`url`/`wikisink` source to a depth. URL ingests also honor the `fetch_url_*` toggles; a Holotype's people, database and outside-the-model folders are skipped; runs in the background, volume registered `ingesting` up front |
 | `cosm_read` | `canon_tools.run_cosm_read` | none (it reads); `<path>` a `.cosm` file, a volume folder or a text with a fabula twin (any of its names), project-relative or `canon:`; `<item>` optional (id, key, item/field/module path). The text tree capped to 80 lines / 8 000 chars, or one item as YAML |
@@ -3148,7 +3148,7 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   public,wiki}` into three same-named volumes, move-only and idempotent; its
   source root honors `ENOUGH_INFOWORLD_ROOT`.
 - **Tools and the toggle.** `canon_list` / `canon_create` / `canon_ingest`
-  (`tools.run_canon_*`, inner tag `<volume>`, the old `<box>` still read),
+  (`tools.run_canon_*`, inner tag `<volume>`; the old `<box>` was removed in 0.7),
   renamed outright with no `cachebox_*` aliases (the docs ↔ dispatch drift
   tests would flag one), documented in the "## canon" section of
   `prompt.TOOL_INSTRUCTIONS`. Broker toggle `canon_enabled` ("canon tools",
