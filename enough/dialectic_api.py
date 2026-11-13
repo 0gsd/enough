@@ -53,7 +53,8 @@ CARD_FIELDS = ("hint", "options", "options-open", "many", "range")
 ANSWERED = ("answered", "unknown", "declined")
 #: The closed questions a listing carries (the newest; `closed_total` says how many there are).
 CLOSED_SHOWN = 50
-#: The server-sent event a recorded sitting or a landed settle sends (beside the jobs' `canon`).
+#: The server-sent event a recorded sitting, a landed settle, a raised bank or a question asked again sends (beside
+#: the jobs' `canon`).
 EVENT = "dialectic"
 
 
@@ -746,7 +747,9 @@ def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | No
 
 def notify(emit: Callable[[str, dict], None] | None, path: str, session: Any, what: str) -> None:
     """The `dialectic` event (beside the jobs' `canon`, on the same stream): `{path, session, what: recorded |
-    settled}`, so a card open in another tab reads the volume again. Never fails what it reports."""
+    settled | raised | asked-again}` (the last two since 0.7, with `session` null: a bank raised that landed
+    questions, a question put back to open), so a card open in another tab reads the volume again. Never fails what
+    it reports."""
     if emit is None:
         return
     try:
@@ -837,6 +840,8 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
                 return raise_bank(project_dir, str(body.get("path") or ""), dry=True)
             out = held(t, lambda: raise_bank(project_dir, str(body.get("path") or "")))
             catalog_after(t.rel)
+            if out.get("count"):
+                said(out.get("path") or t.rel, None, "raised")
             return out
         return await run(go)
 
@@ -849,7 +854,9 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
 
         def go() -> dict:
             t = target(project_dir, str(body.get("path") or ""))
-            return held(t, lambda: ask_again(project_dir, str(body.get("path") or ""), q))
+            out = held(t, lambda: ask_again(project_dir, str(body.get("path") or ""), q))
+            said(out.get("path") or t.rel, None, "asked-again")
+            return out
         return await run(go)
 
     @router.post("/api/dialectic/settle")

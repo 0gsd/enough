@@ -132,6 +132,8 @@ def run_dialectic(project_dir: Path, call: Any) -> Any:
             return _result("dialectic", raw, True, _job_line(got))
         if do == "raise":
             out = D.raise_bank(project_dir, raw)
+            if out.get("count"):
+                D.notify(_conf.get("emit"), out.get("path") or raw, None, "raised")
             return _result("dialectic", raw, True, f"raised {out['count']} question{'s' if out['count'] != 1 else ''} "
                                                    f"in {out['path']}; call dialectic again to see the first.")
         if do not in ("", "ask", "record", "answer"):

@@ -5163,7 +5163,9 @@ each card's `candidate` says where a reading saw a candidate (`text`,
 /api/dialectic/raise` with `dry: true` counts what it would raise (`count`,
 `by` bank entry or rule) and writes nothing. A recorded sitting and a landed
 settle send the `dialectic` event (`{path, session, what: recorded |
-settled}`) on the app's event stream. (S3; `POST /api/dialectic/answers`'
+settled}`) on the app's event stream; since 0.7 so do a raise that landed
+questions (`what: raised`, from the route or the tool) and a question asked
+again (`what: asked-again`), each with `session: null`. (S3; `POST /api/dialectic/answers`'
 `recorded` now says `answered`, `unknown` or `declined` for an address too.)
 
 **The tool** `dialectic` puts **one or two questions at a time** (`SHOWN`

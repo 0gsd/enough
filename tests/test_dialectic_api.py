@@ -398,6 +398,7 @@ def test_a_dry_raise_counts_and_lands_nothing(client: TestClient, project: Path)
 def test_a_recorded_sitting_and_a_landed_settle_send_the_dialectic_event(client: TestClient, project: Path):
     seen = _events(client)
     client.post("/api/dialectic/raise", json={"path": "notes.md"})
+    assert seen("dialectic") == [{"path": "notes.md.cosm", "session": None, "what": "raised"}]
     q = next(c["id"] for c in client.get("/api/dialectic/questions", params={"path": "notes.md"}).json()["open"]
              if c["form"] == "question")
     out = client.post("/api/dialectic/answers", json={"path": "notes.md", "answers": [
@@ -412,6 +413,7 @@ def test_a_recorded_sitting_and_a_landed_settle_send_the_dialectic_event(client:
     assert seen("dialectic") == [{"path": "notes.md.cosm", "session": None, "what": "settled"}]
     # a holograph's settle, at once by rules
     client.post("/api/dialectic/raise", json={"path": "self"})
+    assert seen("dialectic") == [{"path": "self", "session": None, "what": "raised"}]
     hq = next(c["id"] for c in client.get("/api/dialectic/questions", params={"path": "self"}).json()["open"])
     rec = client.post("/api/dialectic/answers", json={"path": "self", "answers": [
         {"question": hq, "says": "baking bread on a Sunday morning"}]}).json()
@@ -428,6 +430,12 @@ def test_a_recorded_sitting_and_a_landed_settle_send_the_dialectic_event(client:
     assert r.ok, r.body
     got = seen("dialectic")
     assert len(got) == 1 and got[0]["what"] == "recorded" and got[0]["path"] == "notes.md.cosm" and got[0]["session"]
+    # a question asked again (0.7): the same shape, no session
+    assert client.post("/api/dialectic/ask-again", json={"path": "notes.md", "question": q}).status_code == 200
+    assert seen("dialectic") == [{"path": "notes.md.cosm", "session": None, "what": "asked-again"}]
+    # one refused sends nothing
+    assert client.post("/api/dialectic/ask-again", json={"path": "notes.md", "question": "no-such"}).status_code == 404
+    assert seen("dialectic", timeout=0.3) == []
     assert D.notify(None, "x", None, "recorded") is None                   # no app: nothing sent, nothing fails
 
 
