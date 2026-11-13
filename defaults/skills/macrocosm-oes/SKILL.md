@@ -33,8 +33,10 @@ the two **MiniCOSMs**. Any volume may carry module D, the **dialectic**.
 To **decompile** is to take an input apart into its **fabula**: everything
 found in it or derived from it — I inspiration, L terms (grounded in FEED),
 E entities, K concepts, N intent, C construction, R production, P claims
-(and readings or cases), T events, X atems. To **compile** is to tell a
-fabula back as a **short** (markdown). Its **flavour**: `fabulan` (prose),
+(and readings or cases), T events, X atems. To **compile** is to make a
+**short** of a fabula (markdown). Both are **entailments**: the whole
+entails what is made from it (a text its fabula, a fabula a short, a short
+its atem). One fabula, many entailments. Its **flavour**: `fabulan` (prose),
 `fabulap` (verse), `fabulac` (code: its short is a **cshort**, source
 rebuilt; its deep atem a **catem**). A text's **twin** sits beside it:
 `notes.md.fabulan.cosm`. An old twin `notes.md.cosm` that says `oes: emf/1`
@@ -117,7 +119,7 @@ files, 6,000 lines): `tool/` → `tool.fabulac.cosm`. Only when asked:
   `cancel` stops it; `build` again resumes it.
 - `<do>compile</do>` with `<what>` `code` (a cshort and the manual catem) or
   a catem's depth: `line`, `overview`, `manual`.
-- Nothing read or told is ever run: a cshort is text to read.
+- Nothing read or entailed is ever run: a cshort is text to read.
 
 ## Thym programs
 
@@ -126,7 +128,9 @@ is checked and planned before anything runs, and every run leaves a trace
 that replays. Its first line is `thym 0` or `thym 1`; `thym 1` adds folders,
 several outputs, editing moves, loops that collect (`keep`), contract blocks
 a move `keeps`, recursion under a `depth:`, and the dialectic's `question`,
-`record`, `settle`.
+`record`, `settle`. The move that makes a short of a fabula is `entail`
+(`entail f as told`); a program that still says `tell`, its earlier
+spelling, runs the same, but write `entail`.
 
 - `thym_check`: "ok" and the plan's line (with which model, how many
   calls), or the refusal with its line. Use it first.

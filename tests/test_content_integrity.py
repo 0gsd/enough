@@ -91,7 +91,7 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # `canon` (0.4.3) replaced cacheawl/cachebox, which no value uses now.
     # `MacroCOSM` and `atem` (0.4.3) are the Canon round's own names, which
     # the translation contract keeps as-is (with cosm and EMF). `short`
-    # (0.4.3, SHORT, plan §15) is the product word for a telling compiled
+    # (0.4.3, SHORT, plan §15) is the product word for an entailment compiled
     # from an EMF twin, kept as-is in every language (docs/I18N.md).
     # `fabula` (0.4.4, DocOES) is the third of the docs viewer's three
     # densities beside atem and short, kept as-is like them; `MiniCOSMs`

@@ -5039,7 +5039,7 @@ SCENARIOS: dict[str, Scenario] = {
     "twin-flip": scenario_twin_flip,
     "atem-selection": scenario_atem_selection,
     "atem-pin": scenario_atem_pin,
-    # --- 0.4.3 SHORT: a telling compiled from the twin ---
+    # --- 0.4.3 SHORT: an entailment compiled from the twin ---
     "compile-short": scenario_compile_short,
     # --- 0.4.4: agent-free mode ---
     "agentfree-toggle": scenario_agentfree_toggle,

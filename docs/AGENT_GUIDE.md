@@ -51,14 +51,15 @@ and whose spec ships as [docs/MACROCOSM_OES.md](MACROCOSM_OES.md). MacroCOSM
 has a **core** — five built-in formats (`cosm`, `canon`, `fabula`, `doc`,
 `thym`) and the dialectic — and two **MiniCOSMs**, Comprise and Ascribe. Any
 text can be **decompiled** — on request, never automatically — into its
-**fabula** (a twin beside it, `close.md.fabulan.cosm`, prose or verse), told
-back as a **short**, and reduced to an **atem**; in the 0.6 round a small
+**fabula** (a twin beside it, `close.md.fabulan.cosm`, prose or verse),
+compiled back into a **short** (an entailment of the fabula), and reduced to
+an **atem**; in the 0.6 round a small
 folder of Python is decompiled into a **fabulac** and compiled back into a
 **cshort** and its **catems** (see "Canon", "MacroCOSM", "The fabula" and
 "Building a fabulac"). Any volume may carry the **dialectic**'s questions,
 which a person answers and a second step settles (see "The dialectic").
 **Thym** (0.5.0; `thym 1` in the 0.6 round) is the transcognition language
-that connects the OESes: a `.thym` program composes moves (derive, tell,
+that connects the OESes: a `.thym` program composes moves (derive, entail,
 measure, package, project, edit, survey, question…), is compiled into a
 plan a person can read, and runs with model-backed moves behind contracts,
 on a model route chosen per run, leaving a trace that replays; a text
@@ -156,7 +157,7 @@ Every Python module in `enough/`:
 | [enough/dialectic.py](../enough/dialectic.py) | ~2770 | The dialectic's deterministic core (0.6): module D on any volume — reading questions and sessions, raising them from a bank and from a volume's pending and unsure items, recording answers (into an answers volume beside the volume, or into it), settling, staleness and carrying over a re-derive; a volume written back byte for byte outside the change. No model, no network, no server, no Thym import; `python -m enough.dialectic list\|raise\|answer\|settle`. See "The dialectic" | `open_twin()` / `Twin`, `ledger_of()` / `Ledger`, `questions()` / `open_questions()` / `banks_for()`, `raise_questions()`, `record()` / `check_value()`, `answers_path()` / `is_answers_of()`, `mark_stale()` / `carry_over()`, `DialecticError` / `AnswerRefused` |
 | [enough/dialectic_api.py](../enough/dialectic_api.py) | ~845 | HTTP translation for the dialectic (0.6): `build_router(...)` → `/api/dialectic/questions\|check\|answers\|raise\|ask-again\|settle`, `POST /api/ascribe/isograph` and `POST /api/ascribe/allograph` (one runner, `_projection`); one family of routes for every volume, dispatching on its format (a fabula, any `.cosm` volume, a holograph by Ascribe's rules); a settle is a CanonJob of kind `dialectic`. Also the plain functions the `dialectic` tool calls | `build_router()`, `listing()`, `record()`, `raise_bank()`, `ledger()`, `DialecticRouteError` |
 | [enough/fabulac_job.py](../enough/fabulac_job.py) | ~1090 | A folder of Python decompiled into its fabulac as one resumable job of five Thym runs, and a fabulac compiled into a cshort and its catems (0.6); `build_router(...)` → `/api/fabula/build\|resume\|cancel\|compile\|compiled\|cshort\|cshort/file\|catem`. State is read from disk only. See "Building a fabulac" | `build_router()`, `build_state()`, `target_of()`, `BuildError`, `STAGES`, `STAGE_WORDS`, `PROGRAM_FILE`, `COMPILE_FILE` |
-| [enough/fabulac_prompts.py](../enough/fabulac_prompts.py) | ~245 | The prompts of the fabulac's model-backed steps (`read`: a file against the outline; `fold`: the whole; `code` and `readme`: a cshort's files; `catem`), each system prompt under 2,000 characters. `thym_host` finds its `PROMPTS` by name (`thym_host.PROMPT_MODULES`) and puts them before its own builders for `derive` and `tell`. A host module, never vendored | `PROMPTS`, `BUILDERS`, `STEPS`, `messages()`, `step()` |
+| [enough/fabulac_prompts.py](../enough/fabulac_prompts.py) | ~245 | The prompts of the fabulac's model-backed steps (`read`: a file against the outline; `fold`: the whole; `code` and `readme`: a cshort's files; `catem`), each system prompt under 2,000 characters. `thym_host` finds its `PROMPTS` by name (`thym_host.PROMPT_MODULES`) and puts them before its own builders for `derive` and `entail`. A host module, never vendored | `PROMPTS`, `BUILDERS`, `STEPS`, `messages()`, `step()` |
 | [enough/repo_engine.py](../enough/repo_engine.py) | ~1045 | The fabulac's two engines (0.6), reached from Thym moves as `ctx.engines["repo"]` and `ctx.engines["syntax"]`: `repo` (`history`, `tree`, `files`, `text`: a clone's log and tags through one fixed `git log` / `git for-each-ref` command line that touches no index, work tree or network) and `syntax` (`outline`, `parse`, `manifest`: Python read by `ast` on its text, project files by `tomllib` / `configparser`; nothing imported, `setup.py` never run). Every answer is plain data, recorded for replay. A host module, never vendored | `engines()`, `REPO`, `SYNTAX`, `run_git()`, `language()` |
 | [enough/fabula_tools.py](../enough/fabula_tools.py) | ~260 | The readvisor's `dialectic` and `fabulac` tools (0.6), behind the `macrocosm-oes` skill; a build, a compile or a settle started from a tool is a job like the page's, handed to the event loop (`configure(start=…)`) and run after the turn. See "Tools" | `TOOL_NAMES`, `register()`, `configure()`, `run_dialectic()`, `run_fabulac()`, `SHOWN` |
 | [enough/retired_names.py](../enough/retired_names.py) | ~35 | The one table of the names 0.6 retired that still answer (three route paths, the tool `emf_derive`, the body word `what: emf`). **Goes in 0.7**: delete it, the loop in `server.create_app` that reads `ROUTES` and the lookup in `tools.execute` that reads `TOOLS` | `ROUTES`, `TOOLS`, `WORDS`, `tool()` |
@@ -3661,12 +3662,16 @@ three densities and its uicheck screens and scenarios.
 **Decompile and compile.** An input — an essay, a poem, a folder of Python —
 is **decompiled** into its **fabula**: everything found in it or derived from
 it, enumerated as one `fabula/1` volume (a built-in of MacroCOSM's core). A
-fabula is **compiled** back into a **short**, a telling, and said most
-plainly as an **atem**. Three densities of one meaning: fabula · short ·
+fabula is **compiled** back into a **short**, an entailment of it, and said
+most plainly as an **atem**. Each step is an **entailment** (MacroCOSM OES
+18.1): the whole entails what is made from it — an input its fabula, a fabula
+a short, a short its atem, a fabulac a cshort or a catem; a projection is an
+entailment made by rule. Three densities of one meaning: fabula · short ·
 atem. For code the fabula is the spec (a **fabulac**), the short is source (a
 **cshort**) and the atem's deep form is a **catem** (see "Building a
-fabulac"). In Thym the moves stay `derive` and `tell`; DocOES's byte-exact
-`enumerate` / `compile` keep their names. A **twin** is the everyday word for
+fabulac"). In Thym the moves are `derive` and `entail` (`tell`,
+`entail`'s earlier spelling, reads as `entail` for good: see "Thym"); DocOES's
+byte-exact `enumerate` / `compile` keep their names. A **twin** is the everyday word for
 a text's fabula file kept beside it. Spec: MacroCOSM OES §18.4 (18.4.1 the
 catalog, 18.4.2 the modules, 18.4.3 the conventions, 18.4.4 shorts, 18.4.5
 examples, 18.4.6 verse, 18.4.7 code, 18.4.8 the checks) and §18.3.5
@@ -3904,11 +3909,11 @@ dictionary.
 
 ### Shorts
 
-**The model (SHORT, plan §15).** One fabula, many tellings. The fabula is the
-text's order-free material (every item with a `span` saying where in the
-telling it was found); a **short** — *syuzhetic-hermeneutic open readable
-text* — is a telling enough compiles from it: an arrangement (syuzhetic) that
-says how each thing is known as it tells it (hermeneutic), plain markdown
+**The model (SHORT, plan §15).** One fabula, many entailments. The fabula is
+the text's order-free material (every item with a `span` saying where in the
+text it was found); a **short** — *syuzhetic-hermeneutic open readable
+text* — is an entailment enough compiles from it: an arrangement (syuzhetic) that
+says how each thing is known as it goes (hermeneutic), plain markdown
 that is yours, honest about its gaps and open to the reader's own reading
 (open), as prose (readable text). The author's text is also a syuzhet of that
 fabula but is never called a short; the atem sits outside the pair (the
@@ -4347,12 +4352,21 @@ meaning between densities and projections. Its own volumes (`thym/1`) are a
 built-in of MacroCOSM's core, specified in Thym's own text; Thym is not a
 MiniCOSM. A program (`<name>.thym`, its first line the version line `thym 0`
 or `thym 1`) composes **moves** that the formats declare in their `moves:`
-blocks — the fabula's `derive`, `tell`, `atem`, `expand` and (`thym 1`)
+blocks — the fabula's `derive`, `entail`, `atem`, `expand` and (`thym 1`)
 `survey`, `history`; DocOES's `enumerate`, `compile`; Thym's own `cut`,
 `count`, `words`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, the
 accessors, and (`thym 1`) the editing moves and the dialectic's three;
 Comprise's `project`, `band`, `mark`, `withhold` (in the sidecar); Ascribe's
-`propose` (`thym 1`). The compiler parses, resolves, types, checks the
+`propose` (`thym 1`). **`entail`, once `tell`** (0.7, THYM 6.3): the move
+that makes a short of a fabula was `tell`; `tell` is its earlier spelling,
+read for good under `thym 0` and `thym 1` and never written.
+`types.EARLIER_SPELLINGS` is the one table: the parser reads a `tell` call
+as `entail` (so a step's `move` and `calls`, the contract and the plan's
+nodes say `entail`, while the step's `text`, `name` and `body` keep the
+program's words and `compile` gives the file back byte for byte); the
+checker keeps `tell` reserved; `run.spelled_now` reads a plan, `trace.load`
+a trace and the replay coprocessor a recorded candidate that says `tell` as
+`entail`, so a run recorded before 0.7 replays. The compiler parses, resolves, types, checks the
 static contracts, estimates, enumerates the program into `thym/1` items and
 plans it; the runtime checks the plan against the machine, runs
 deterministic moves in code and sends model-backed ones (`asks: true`) to a
@@ -4446,8 +4460,8 @@ move as `thym 1` sees it (`declarations.views(decls, version)`); a
   are texts; a filter over a folder is a folder), `line` (a numbered line of
   a text or short; fits where a string is taken) and `change` (an edit made
   against a line). A fabula's flavour is a property of the value, not a new
-  type: `tell f as code` of a fabula known to be a fabulap is refused
-  `flavour` at compile.
+  type: `entail f as code` of a fabula known to be a fabulap is refused
+  `flavour` at compile ("only a fabulac entails code").
 - **Several outputs** (`gives code: folder, size: number`) and labelled gives
   (`give code: …`); every output given once on every path (`no-give` names
   the output a path misses); a folder output lands as a folder.
@@ -4492,7 +4506,7 @@ with their signatures):
 | family | moves | declared in |
 |---|---|---|
 | editing (THYM 21) | `lines`, `replace`, `drop`, `insert` (`before` or `after`, exactly one, refused at compile otherwise), `edit` (every change applied at once; `only-the-changed`), `reword` (asks), `join`, `say`; helpers `folders`, `gather` (merges readings into a fabula: `nothing-lost`, `ids-unique`); `count` and `words` grown | `thym.manifest.cosm` (`enough/thym/moves/edit.py`) |
-| code (THYM 20) | `survey` and `history` (rules), `derive t as code with f`, `derive repo with f` (the fold), `tell f as code` (a cshort), `tell f as line \| overview \| manual` (a catem) | `fabula.manifest.cosm` (`moves/code.py`); see "Building a fabulac" |
+| code (THYM 20) | `survey` and `history` (rules), `derive t as code with f`, `derive repo with f` (the fold), `entail f as code` (a cshort), `entail f as line \| overview \| manual` (a catem) | `fabula.manifest.cosm` (`moves/code.py`); see "Building a fabulac" |
 | prose and verse | `derive … as prose \| verse` chooses the flavour | `fabula.manifest.cosm` (`moves/emf.py`) |
 | the dialectic (THYM 22) | `question` (asks; a bank and the rules by scaffold), `record` (code), `settle` (asks only where an item must be read again; scaffold `direct`) | `thym.manifest.cosm` (`moves/dialectic.py`); see "The dialectic" |
 | Ascribe | `propose` (asks: a reading's candidates for a holograph), and `project h as isograph \| allograph` (one extension) | `ascribe.manifest.cosm` (`moves/ascribe.py`); see "Ascribe's module" |
@@ -4533,8 +4547,8 @@ after as of project").
 morph, context → short; asks), `open-house` (Holotype → isotype;
 deterministic), byte for byte the suite's `programs/` (`tests/test_thym_host.py`)
 — and six `thym 1` files of the 0.6 round: `decompile-python` (five
-programs, the stages of a fabulac build), `compile-python` (a fabulac told as
-code and as its manual), `decompile-prose`, `decompile-verse`, `settle` and
+programs, the stages of a fabulac build), `compile-python` (a fabulac compiled
+back into code and its manual), `decompile-prose`, `decompile-verse`, `settle` and
 `tighten`. **Each of the six is a ```` ```thym ```` block of `docs/THYM.md`
 byte for byte** (`tests/test_thym_shipped.py`): a change to one is a change
 to the text, made on cosmoes-site first and synced back, never here alone.
@@ -4949,7 +4963,7 @@ parsers as written), `syntax.parse`, `syntax.manifest` (`pyproject.toml` by
 `tomllib`, `setup.cfg` by `configparser` with interpolation off,
 `requirements*.txt` by line).
 
-**Nothing read or told is ever run** (THYM 20.8). No file of the folder is
+**Nothing read or entailed is ever run** (THYM 20.8). No file of the folder is
 executed, imported or installed; `setup.py` is read as text, never run. Git
 is reached by **one** fixed command line (`repo_engine.run_git`): a fixed
 absolute binary (no PATH lookup), `shell=False`, standard input closed, a 20 s
@@ -4962,12 +4976,12 @@ as bytes and decoded for the viewer, never imported, compiled or run, and a
 link inside a cshort is not followed.
 
 **Compiling** (`POST /api/fabula/compile` on a fabulac, or the tool's
-`compile`). `what: code` (the default) runs `compile-python.thym`: `tell f
+`compile`). `what: code` (the default) runs `compile-python.thym`: `entail f
 as code` writes the cshort file by file (asks once per file; contract
 `parses`, `interfaces-present`, `files-present`, `footer`, `provenance` —
 `parses` reads the syntax engine's outline of each rebuilt file, nothing
 compiled) and the `manual` catem. `what: line | overview | manual` runs
-`tell f as <depth>` alone. Without a model a cshort is refused ("a cshort
+`entail f as <depth>` alone. Without a model a cshort is refused ("a cshort
 needs a model, and none is answering (…)"), and a catem is its scaffold
 (`uses-outline`, state pending, recorded `mode: rules, by: rules`). The
 cshort lands as the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/` (the rebuilt
@@ -7364,7 +7378,7 @@ A list of things that will confuse you if you don't see them coming:
   catalogs, reconcile, import, copy and every write that is not a decompile
   (an atem, a pin, a short's record) leave its name and declaration as they
   are. Every name rule lives in `enough/fabula_names.py`; add none elsewhere.
-- **Nothing read or told is ever run.** A folder a fabulac is built from is
+- **Nothing read or entailed is ever run.** A folder a fabulac is built from is
   read by its syntax and its git log only (`repo_engine`: one fixed git
   command line, no shell, no hooks, no network); a cshort is text, shown and
   never imported, compiled, installed or run. Keep it so: no route, tool or
