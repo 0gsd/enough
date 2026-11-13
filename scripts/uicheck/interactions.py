@@ -2926,7 +2926,7 @@ def scenario_docs_specs(d: Driver) -> list[str]:
         .replace("{edition}", r"\d+\.\d+\.\d+") + "$"
     specs = (("macrocosm-oes", "ui-cosmspec-btn", "macrocosm", r"^MacroCOSM OES" + edition,
               "t('modes.docs.spec.icon', 'MacroCOSM specification')"),
-             ("thym", "ui-thym-btn", "cosm", r"^Thym" + edition, "t('modes.docs.thym.icon', 'Thym specification')"),
+             ("thym", "ui-thym-btn", "thym", r"^Thym" + edition, "t('modes.docs.thym.icon', 'Thym specification')"),
              ("ascribe", "ui-ascribe-btn", "readvisor-rename", r"^Ascribe" + edition,
               "t('modes.docs.ascribe.icon', 'Ascribe specification')"),
              ("comprise-oes", "ui-comprise-btn", "cosm", r"^Comprise OES" + edition,
