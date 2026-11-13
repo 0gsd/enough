@@ -336,7 +336,7 @@ path: notes.md → notes.md.fabulan.cosm
 文本页头里、转换小标签旁边的那一小组按钮，告诉你这段文本有没有 <strong>fabula</strong>，也就是它的孪生文件：一个写在它旁边的 <code>.cosm</code> 文件（<code>notes.md</code> → <code>notes.md.fabulan.cosm</code>），把文本拆开——它倚重的词语、它提到的人和事物、它提出的主张以及这些主张从何得知、它讲述的事件。有孪生文件时徽标带颜色，没有时是空心的；孪生文件写成之后文本若有改动，徽标上会多一个小点。不会自动反编译——只在你要求时才做。
 
 ### how
-<strong>孪生</strong> 把阅读器翻到孪生文件，大小不变，替换文本：cosm 查看器的卡片，加上返回用的 <strong>回到文本</strong>、把孪生文件写成一个 <em>short</em> 的 <strong>编译一个 short</strong>（文本旁边一份新的 markdown 讲述，<code>notes.short-2026-10-23-1042.md</code>，按作者讲述的顺序或按分量，由小小的 ▾ 选择；孪生文件会记住从它讲出的每一个 short）、画成图的 <strong>透镜</strong>，以及查看文件本身的 <strong>以原始文本打开</strong>。还没有孪生文件时，这个按钮会先反编译，完成后再翻过去。<strong>atem</strong> 按钮把整段文本浓缩成一句（见 atem 卡片）。<strong>反编译</strong> 生成孪生文件，<strong>更新孪生文件</strong> 重新生成；两者都会先打开一张小卡片：散文还是韵文（enough 会建议一种，由你决定），以及模型在哪里运行；孪生文件已经是最新的时候，卡片会告诉你。处理过程显示成一条可以取消的通知。有模型运行时要花些时间，这期间你发出的聊天消息会排队等候；没有模型时你会得到一个标明的脚手架——只有词语和名称，还没有主张——而在无智能体下，标签写的是<em>无智能体</em>。
+<strong>孪生</strong> 把阅读器翻到孪生文件，大小不变，替换文本：cosm 查看器的卡片，加上返回用的 <strong>回到文本</strong>、把孪生文件写成一个 <em>short</em> 的 <strong>编译一个 short</strong>（文本旁边一份新的 markdown，孪生文件所蕴含的内容，<code>notes.short-2026-10-23-1042.md</code>，按作者讲述的顺序或按分量，由小小的 ▾ 选择；孪生文件会记住它蕴含过的每一个 short）、画成图的 <strong>透镜</strong>，以及查看文件本身的 <strong>以原始文本打开</strong>。还没有孪生文件时，这个按钮会先反编译，完成后再翻过去。<strong>atem</strong> 按钮把整段文本浓缩成一句（见 atem 卡片）。<strong>反编译</strong> 生成孪生文件，<strong>更新孪生文件</strong> 重新生成；两者都会先打开一张小卡片：散文还是韵文（enough 会建议一种，由你决定），以及模型在哪里运行；孪生文件已经是最新的时候，卡片会告诉你。处理过程显示成一条可以取消的通知。有模型运行时要花些时间，这期间你发出的聊天消息会排队等候；没有模型时你会得到一个标明的脚手架——只有词语和名称，还没有主张——而在无智能体下，标签写的是<em>无智能体</em>。
 
 ### ideas
 - 把很长的一章反编译一次，然后把孪生文件里的主张当成清单来读，看这一章到底论证了什么。
@@ -351,7 +351,7 @@ path: notes.md → notes.md.fabulan.cosm · tool/ → tool.fabulac.cosm
 反编译之前出现的那张卡片，也是一个文件夹的 <strong>fabulac</strong> 卡片。在文本上，它问两件事：把它当作<strong>散文</strong>（<code>fabulan</code>）还是<strong>韵文</strong>（<code>fabulap</code>）来读——enough 会根据文本的样子建议一种，由你决定——以及模型在哪里运行。它列出文本每种已有的孪生文件，说明哪个是最新的；如果某个孪生文件还是旧名字（<code>notes.md.cosm</code>），它会告诉你再次反编译会写出新名字并移除旧文件。在一个 python 文件夹上，它显示这个文件夹的 fabulac（<code>tool.fabulac.cosm</code>）的构建，分五个阶段：勘查和历史按规则进行，然后是阅读、折叠和提问，这三步需要模型。
 
 ### how
-在文本上点<strong>反编译</strong>或<strong>更新孪生文件</strong>会打开它；在文件夹的 option 点击菜单里点<strong>构建它的 fabulac…</strong>，或在 cosm 查看器里对一个 fabulac 点<strong>构建与编译…</strong>，会在文件夹上打开它。<strong>模型在哪里运行</strong>默认是<em>本机</em>，也就是这台机器运行的模型，除非你为这一次任务选择云端；只有云端开放时才会提供这个选项。云端构建可以为每个阶段的模型调用设一个上限。构建会显示当前阶段、已读的文件和已发出的调用；<strong>取消</strong>会保留每个已完成的阶段，只要文件夹没有变化，<strong>接着做</strong>就从停下的地方继续。没有模型时，构建会留下<em>轮廓</em>（勘查和历史），并说明还在等什么。<strong>编译</strong>把 fabulac <strong>编译为代码</strong>（一个 <em>cshort</em>），或讲成深度为 line、overview 或 manual 的 <em>catem</em>；它产出的东西列在下面，每项都有<strong>打开</strong>。
+在文本上点<strong>反编译</strong>或<strong>更新孪生文件</strong>会打开它；在文件夹的 option 点击菜单里点<strong>构建它的 fabulac…</strong>，或在 cosm 查看器里对一个 fabulac 点<strong>构建与编译…</strong>，会在文件夹上打开它。<strong>模型在哪里运行</strong>默认是<em>本机</em>，也就是这台机器运行的模型，除非你为这一次任务选择云端；只有云端开放时才会提供这个选项。云端构建可以为每个阶段的模型调用设一个上限。构建会显示当前阶段、已读的文件和已发出的调用；<strong>取消</strong>会保留每个已完成的阶段，只要文件夹没有变化，<strong>接着做</strong>就从停下的地方继续。没有模型时，构建会留下<em>轮廓</em>（勘查和历史），并说明还在等什么。<strong>编译</strong>把 fabulac <strong>编译为代码</strong>（一个 <em>cshort</em>），或编译为深度为 line、overview 或 manual 的 <em>catem</em>，都是 fabulac 所蕴含的；它产出的东西列在下面，每项都有<strong>打开</strong>。
 
 ### ideas
 - 先给一个小工具构建一次 fabulac，在读它的代码之前，先读深度为 overview 的 catem。
@@ -605,10 +605,10 @@ name: 包
 path: *.package.cosm · *.thym/
 
 ### what
-<strong>包</strong>是一份带着描述它的东西出门的文本：完全照原样的文本，它的 fabula（它的孪生文件），作者的 morph（如果有的话）——也就是这份文本在十个尺度上偏离同一个 fabula 最朴素的讲述的方式——以及它的上下文。它有并排的两种形式：一个随身带走的文件 <code>notes.package.cosm</code>，和一个可以一个文件一个文件打开的文件夹 <code>notes.thym/</code>。它的目录列出每个文件和它的校验值，写明做出它的程序和那次运行，而且除非文本自己写了，绝不写出作者的名字。
+<strong>包</strong>是一份带着描述它的东西出门的文本：完全照原样的文本，它的 fabula（它的孪生文件），作者的 morph（如果有的话）——也就是这份文本在十个尺度上偏离同一个 fabula 最朴素的蕴含的方式——以及它的上下文。它有并排的两种形式：一个随身带走的文件 <code>notes.package.cosm</code>，和一个可以一个文件一个文件打开的文件夹 <code>notes.thym/</code>。它的目录列出每个文件和它的校验值，写明做出它的程序和那次运行，而且除非文本自己写了，绝不写出作者的名字。
 
 ### how
-打开任一种形式，cosm 查看器都会显示这个包的卡片：它装着什么（在文件夹形式里，每个文件都是链接）、由什么在什么时候做出来、<strong>打开文本</strong>，以及<strong>透过…来读</strong>——它用你选的 morph 把文本重新讲一遍：包自己的那个，让你按作者的方式读；你自己的某一个；或者零 morph。包里的文本从不被碰。enough 附带的程序之一 <code>publish-story</code>，会在你运行它的任何文本旁边放下一个包。<strong>打包…</strong>在 fabula 是最新的文本上，按规则做出一个包，不问模型，也可以顺便把它密封，钥匙只给你看一次，哪里都不留；<strong>拆包…</strong>在任一种形式的包上，先核对每一个校验值，再把文本和它的孪生文件写回旁边，包是密封的就向你要钥匙。
+打开任一种形式，cosm 查看器都会显示这个包的卡片：它装着什么（在文件夹形式里，每个文件都是链接）、由什么在什么时候做出来、<strong>打开文本</strong>，以及<strong>透过…来读</strong>——它用你选的 morph 把文本重新说一遍：包自己的那个，让你按作者的方式读；你自己的某一个；或者零 morph。包里的文本从不被碰。enough 附带的程序之一 <code>publish-story</code>，会在你运行它的任何文本旁边放下一个包。<strong>打包…</strong>在 fabula 是最新的文本上，按规则做出一个包，不问模型，也可以顺便把它密封，钥匙只给你看一次，哪里都不留；<strong>拆包…</strong>在任一种形式的包上，先核对每一个校验值，再把文本和它的孪生文件写回旁边，包是密封的就向你要钥匙。
 
 ### ideas
 - 发那一个单文件就够了：读者按自己的方式读它所需的一切都在里面。
@@ -621,16 +621,16 @@ name: 读本
 path: *.read-*-YYYY-MM-DD-HHMM.md
 
 ### what
-<strong>读本</strong>是透过一个 morph 重新讲一遍的别人的文本——你的 morph、作者的，或者零 morph——在你自己的机器上，作为文本旁边的一个新文件。它标明了两次：开头的 <code>read_through:</code>，以及结尾的一行页脚：<em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>。只要这份读本开着，阅读器页头下的横带就一直显示这个标注，哪一面、哪种大小都一样，而且关不掉：读本绝不冒充原文。
+<strong>读本</strong>是透过一个 morph 重新说一遍的别人的文本，也就是它的 fabula 的一种蕴含——你的 morph、作者的，或者零 morph——在你自己的机器上，作为文本旁边的一个新文件。它标明了两次：开头的 <code>read_through:</code>，以及结尾的一行页脚：<em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>。只要这份读本开着，阅读器页头下的横带就一直显示这个标注，哪一面、哪种大小都一样，而且关不掉：读本绝不冒充原文。
 
 ### how
-在一个包上，或者在一份有 fabula 的文本上，用<strong>透过…来读</strong>要一份；选一个 morph，读本写好就会打开，名字像 <code>notes.read-plain-letter-2026-11-01-1042.md</code>（那一分钟已经有一份时，加 <code>-2</code>、<code>-3</code>）。读本需要模型——<code>read</code> 没有只靠规则的替代——所以无智能体下，卡片会这么说，什么也不读。给读本再做读本会被拒绝：读本读的是 fabula，而读本本身是一种讲述。
+在一个包上，或者在一份有 fabula 的文本上，用<strong>透过…来读</strong>要一份；选一个 morph，读本写好就会打开，名字像 <code>notes.read-plain-letter-2026-11-01-1042.md</code>（那一分钟已经有一份时，加 <code>-2</code>、<code>-3</code>）。读本需要模型——<code>read</code> 没有只靠规则的替代——所以无智能体下，卡片会这么说，什么也不读。给读本再做读本会被拒绝：读本读的是 fabula，而读本本身是一个 fabula 的蕴含。
 
 ### ideas
 - 透过零 morph 读一份密密麻麻的报告，就能确切看到它主张了什么，一句一个主张。
 - 透过你自己的 morph 读一封信，听听换作你会怎么说，然后再回去读原信。
 - 把读本都留着：每一份都写着它的 morph 和日期，你可以把同一份文本的几份读本并排摆着看。
-- 帮助中心的第 12.6 节讲读本和它的标注；第 13.4 节讲它们所透过的那些 morph。
+- 帮助中心的第 12.6 节讲读本和它的标注；第 13.4 节讲它们透过哪些 morph 说出来。
 
 ## thym-editor
 name: 正在写的程序

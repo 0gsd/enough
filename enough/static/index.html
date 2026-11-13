@@ -7537,7 +7537,7 @@
     }
 
     /* SHORT (plan §15): "compile a short" and its caret are one split
-       button; the caret opens a tiny menu of the two telling orders, the
+       button; the caret opens a tiny menu of a short's two orders, the
        default marked. The menu hangs under the button, over the cards. */
     .emf-face .emf-short {
       position: relative;
@@ -18255,15 +18255,15 @@
               title="open the file itself as plain text in read/edit" data-i18n-title="cosm.raw.title"
               data-i18n="cosm.raw.label">open raw</button>
             <!-- SHORT (0.4.3, plan §15): compile the twin into a short, a new
-                 markdown telling beside the text, in the order the tiny
+                 markdown entailment beside the text, in the order the tiny
                  menu chooses (the default marked); emfShortMenu(). -->
             <span class="emf-short" data-ef="short">
               <button type="button" class="cosm-tool-btn emf-short-go" data-ef="compile"
-                title="write a short: a new markdown telling of the text, compiled from its twin and written beside it; the text is never touched"
+                title="write a short: a new markdown entailment of the text's twin, compiled from it and written beside the text; the text is never touched"
                 data-i18n-title="emf.face.short.title" data-i18n="emf.face.short">compile a short</button
               ><button type="button" class="cosm-tool-btn emf-short-more" data-ef="short-menu"
                 aria-haspopup="menu" aria-expanded="false"
-                title="choose the order the short tells it in" data-i18n-title="emf.face.short.menu.title"
+                title="choose the order the short follows" data-i18n-title="emf.face.short.menu.title"
                 aria-label="the order of the short" data-i18n-aria="emf.face.short.menu.aria">&#9662;</button>
               <span class="emf-short-menu" role="menu" hidden>
                 <button type="button" class="emf-short-item" role="menuitem" data-ef="short-told"
@@ -18404,15 +18404,15 @@
               title="open the file itself as plain text in read/edit" data-i18n-title="cosm.raw.title"
               data-i18n="cosm.raw.label">open raw</button>
             <!-- SHORT (0.4.3, plan §15): compile the twin into a short, a new
-                 markdown telling beside the text, in the order the tiny
+                 markdown entailment beside the text, in the order the tiny
                  menu chooses (the default marked); emfShortMenu(). -->
             <span class="emf-short" data-ef="short">
               <button type="button" class="cosm-tool-btn emf-short-go" data-ef="compile"
-                title="write a short: a new markdown telling of the text, compiled from its twin and written beside it; the text is never touched"
+                title="write a short: a new markdown entailment of the text's twin, compiled from it and written beside the text; the text is never touched"
                 data-i18n-title="emf.face.short.title" data-i18n="emf.face.short">compile a short</button
               ><button type="button" class="cosm-tool-btn emf-short-more" data-ef="short-menu"
                 aria-haspopup="menu" aria-expanded="false"
-                title="choose the order the short tells it in" data-i18n-title="emf.face.short.menu.title"
+                title="choose the order the short follows" data-i18n-title="emf.face.short.menu.title"
                 aria-label="the order of the short" data-i18n-aria="emf.face.short.menu.aria">&#9662;</button>
               <span class="emf-short-menu" role="menu" hidden>
                 <button type="button" class="emf-short-item" role="menuitem" data-ef="short-told"
@@ -31916,7 +31916,7 @@
         const tag = document.createElement('span');
         tag.className = 'cn-tag cn-tag-short';
         tag.textContent = t('cn.tag.short', 'short');
-        tile.title = t('cn.tag.short.title', '{name} — a short of {text}: a telling compiled from its fabula')
+        tile.title = t('cn.tag.short.title', '{name} — a short of {text}: an entailment of its fabula')
           .replace('{name}', () => d.name).replace('{text}', () => d.short_of);
         tile.appendChild(tag);
       }
@@ -33949,7 +33949,7 @@
     }
 
     // "compile a short" (plan §15): the twin back out as a SHORT, a new
-    // datestamped markdown telling beside it (`notes.short-…md`; the text is
+    // datestamped markdown entailment beside it (`notes.short-…md`; the text is
     // never touched, the twin records it in its shorts: list); the toast
     // offers to open it. `order` is told | weight; none = the server's
     // default (told when the twin's text is there to follow).
@@ -34273,7 +34273,7 @@
       el: null,            // the face on screen
       waiting: null,       // a decompile this face is waiting for: its job id, or 'pending'
       waitSnap: null,
-      shortDefault: 'told', // the order "compile a short" tells in when none is chosen (marked in its menu)
+      shortDefault: 'told', // the order "compile a short" follows when none is chosen (marked in its menu)
       error: null,
       body: () => EMF_FACE.el && EMF_FACE.el.querySelector('[data-ef="body"]'),
       rail: () => EMF_FACE.el && EMF_FACE.el.querySelector('[data-ef="rail"]'),
@@ -34367,7 +34367,7 @@
       q('raw').hidden = !(data && d.twin);
       q('short').hidden = !(data && !data.refused);
       emfShortMenu(false);
-      // The order a plain click tells in, marked in the menu: the author's
+      // The order a plain click compiles in, marked in the menu: the author's
       // when the twin names its text (it is open here), else by weight.
       const told = !!(data && data.catalog && data.catalog.source && typeof data.catalog.source === 'object');
       EMF_FACE.shortDefault = told ? 'told' : 'weight';
@@ -34440,7 +34440,7 @@
       emfFaceRender();     // done: "reading…" until canonAfterWrite has fetched the twin
     }
 
-    // The short's tiny menu: the two telling orders, the default marked.
+    // The short's tiny menu: its two orders, the default marked.
     // Opens under the caret; closes on a choice, a click elsewhere, Esc
     // (which then goes no further: it must not close the reader too) or
     // when the face redraws. Up/Down move between the two items.
@@ -35354,7 +35354,7 @@
         + '<span class="dict-sc">' + cosmEsc(label) + '</span>';
       if (opts.title) h += '<span class="thym-scales-name">' + cosmEsc(String(it.name || slug)) + '</span>';
       if (isNull) {
-        h += '<span class="thym-tag thym-null">' + cosmEsc(t('thym.scales.null', 'the null morph: every scale at 1, the plainest telling'))
+        h += '<span class="thym-tag thym-null">' + cosmEsc(t('thym.scales.null', 'the null morph: every scale at 1, the plainest entailment'))
           + '</span>';
       }
       if (d.declared === true) h += '<span class="thym-tag">' + cosmEsc(t('thym.scales.declared', 'declared by hand')) + '</span>';
@@ -35455,7 +35455,7 @@
           + cosmEsc(t('thym.pkg.openText', 'open the text')) + '</button>';
       }
       h += '<button type="button" class="thym-btn" data-tact="read" data-path="' + cosmEsc(self) + '" title="'
-        + cosmEsc(t('thym.readThrough.title', 'tell this text again through a morph: a new file beside it, labelled; the text is never replaced'))
+        + cosmEsc(t('thym.readThrough.title', 'say this text again through a morph: a new file beside it, labelled; the text is never replaced'))
         + '">' + cosmEsc(t('thym.readThrough', 'read through…')) + '</button>'
         + '<button type="button" class="thym-btn" data-tact="unpack" data-path="' + cosmEsc(self) + '" title="'
         + cosmEsc(t('thym.unpack.title', 'check this package, then write its text and twin back beside it'))
@@ -35874,7 +35874,7 @@
     // ---- the run and read card (#thym-modal) ----
     const THYM_PICK = {
       open: false, face: 'run',
-      input: null,          // the text a run reads first, or what a reading tells
+      input: null,          // the text a run reads first, or the fabula a reading entails
       program: null,        // the program chosen (a rel, a canon: path or a shipped name)
       programName: '',
       fixed: false,         // opened from a program: the text is what is chosen
@@ -36004,7 +36004,7 @@
         if (/\.morph\.cosm$/i.test(p)) add(p, canonBase(p).replace(/\.morph\.cosm$/i, ''), p);
       }
       add('null', t('thym.morph.null', 'the null morph'),
-        t('thym.morph.null.note', 'the plainest telling that conforms: every scale at 1, the reference every morph departs from'));
+        t('thym.morph.null.note', 'the plainest entailment that conforms: every scale at 1, the reference every morph departs from'));
       return out;
     }
 
@@ -36328,7 +36328,7 @@
     }
     function thymReadPhase(s) {
       if (s.state === 'queued' || s.phase === 'waiting') return t('canon.phase.waiting', 'waiting for the model');
-      return s.message || t('thym.read.reading', 'telling the fabula through the morph…');
+      return s.message || t('thym.read.reading', 'reading the fabula through the morph…');
     }
 
     async function thymGo() {
@@ -37482,8 +37482,9 @@
     }
 
     // The refusals the compiler gave, each `{line, check, message}`. The
-    // compiler stops at the first, so there is one at a time; the strip
-    // steps through however many a reply holds.
+    // checker reports every fault that stands on its own, so a reply may
+    // hold several (a parse error still stops at the first, so it comes
+    // alone); the strip steps through however many a reply holds.
     function thymEdRefusals() {
       const res = THYM_ED.res;
       if (!res || res.ok || res.unavailable) return [];
@@ -38680,8 +38681,8 @@
       if (!d) { fabSet(body, '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>'); return; }
       let h = '';
       if (FABV.kind === 'catem') {
-        h += '<p class="fabv-note">' + cosmEsc(d.depth ? t('fab.view.depth', 'a catem at depth {depth}: what a user can do with the program, told from its fabulac')
-          .replace('{depth}', () => String(d.depth)) : t('fab.view.catemNote', 'a catem: what a user can do with the program, told from its fabulac')) + '</p>';
+        h += '<p class="fabv-note">' + cosmEsc(d.depth ? t('fab.view.depth', 'a catem at depth {depth}: what a user can do with the program, entailed by its fabulac')
+          .replace('{depth}', () => String(d.depth)) : t('fab.view.catemNote', 'a catem: what a user can do with the program, entailed by its fabulac')) + '</p>';
         h += '<div class="fabv-pane"><div class="fabv-md">' + renderMarkdown(String(d.text || ''), null).html + '</div></div>';
         fabSet(body, h);
         return;
@@ -42025,7 +42026,7 @@
         const tag = document.createElement('span');
         tag.className = 'tree-short-tag';
         tag.textContent = t('cn.tag.short', 'short');
-        tag.title = t('cn.tag.short.title', '{name} — a short of {text}: a telling compiled from its fabula')
+        tag.title = t('cn.tag.short.title', '{name} — a short of {text}: an entailment of its fabula')
           .replace('{name}', () => name).replace('{text}', () => text);
         row.appendChild(tag);
       });
