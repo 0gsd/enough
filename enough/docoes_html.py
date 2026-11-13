@@ -116,11 +116,14 @@ _LIST = _NUM + "(?:" + _JOIN + _NUM + ")*"
 _WB_BEFORE = r"(?<![A-Za-z0-9_])"
 _WB_AFTER = r"(?![A-Za-z0-9_])"
 # "its section N" (0.5.4) is another document's section — "Thym (https://thym.cosmoes.org/), its section 15" — and is
-# never linked to the citing document's own; the core's `_SEC_REF` skips the same form.
-_NOT_ITS = r"(?<![Ii]ts )"
+# never linked to the citing document's own; the core's `_SEC_REF` skips the same form. Since 0.7 in all six
+# languages, from the core's one list of words (`docoes.OTHER_DOC_WORDS`: "ihrem Abschnitt 4", "sa section 4",
+# "su sección 4", "仕様書のセクション 4", "它的第 4 节").
+_NOT_ITS = D.not_after_other_doc("en", "de", "fr", "es")
 XREF_RE = re.compile(
-    r"(?:" + _NOT_ITS + _WB_BEFORE + r"(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\s+|セクション\s*)(" + _LIST + ")"
-    r"|第\s*(" + _NUM + r")\s*节"
+    r"(?:" + _NOT_ITS + _WB_BEFORE + r"(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\s+|"
+    + D.not_after_other_doc("ja") + r"セクション\s*)(" + _LIST + ")"
+    r"|" + D.not_after_other_doc("zh") + r"第\s*(" + _NUM + r")\s*节"
     r"|(README\s+)?§§?\s*(" + _LIST + ")"
     r"|" + _WB_BEFORE + r"([A-Z])\.(" + _NUM + ")" + _WB_AFTER, re.I)
 _NUM_RE = re.compile(_NUM)

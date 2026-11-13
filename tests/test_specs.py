@@ -367,7 +367,7 @@ def test_its_section_never_links_to_the_citing_document():
     assert hits == ["section 2", "sections 3 to 4"]
     html = (REPO / "enough" / "static" / "index.html").read_text(encoding="utf-8")
     block = html[html.index("const DOCS_XREF_RE"):html.index("const DOCS", html.index("const DOCS_XREF_RE") + 10)]
-    assert "(?<![Ii]ts\\\\s)" in block
+    assert "(?<![Ii]ts\\\\s)" in block or "its|" in block       # 0.7: the six languages' list (test_docoes_reading)
 
 
 def _headings(text: str) -> set[str]:

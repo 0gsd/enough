@@ -640,12 +640,42 @@ def _mask_code(text: str) -> str:
 _NUM = r"\d+(?:\.\d+)*"
 # と joins two numbers in Japanese ("セクション 12.4 と 12.5"), as the page's and the export's joins do.
 _JOIN = r"(?:\s*(?:,|、|と|and|or|und|oder|et|ou|y|o|to|bis|à|a|–|—|-|〜|～|から)\s*)"
+# "its section N" (0.5.4) cites another document's section — "Thym (https://thym.cosmoes.org/), its section 15" —
+# and never names the citing document's own. Since 0.7 in every telling: the language's word for "its" right before
+# the section word (docs/I18N.md), and in Japanese and Chinese, which mostly leave "its" out, "the specification's".
+# The core here, the exporter's `XREF_RE` (docoes_html.py) and the viewer's `DOCS_XREF_RE` (index.html) skip the
+# same words.
+OTHER_DOC_WORDS: dict[str, tuple[str, ...]] = {
+    "en": ("its",),
+    "de": tuple(f"{w}{e}" for w in ("ihr", "sein") for e in ("", "e", "em", "en", "er", "es")) + ("dessen", "deren"),
+    "fr": ("sa", "ses", "leur", "leurs"),
+    "es": ("su", "sus"),
+    "ja": ("その", "仕様の", "仕様書の"),
+    "zh": ("它的", "其", "规范", "规范的"),
+}
+
+
+def not_after_other_doc(*langs: str) -> str:
+    """Negative lookbehinds, one per word of `langs` in OTHER_DOC_WORDS (fixed width, as Python's `re` needs them):
+    a Latin word as a whole word, in any case, then one space; a Japanese or Chinese word glued on or one space
+    before."""
+    out = []
+    for lang in langs:
+        for w in OTHER_DOC_WORDS[lang]:
+            if lang in ("ja", "zh"):
+                out += [f"(?<!{w})", f"(?<!{w}\\s)"]
+            else:
+                out.append(f"(?<!(?i:\\b{w})\\s)")
+    return "".join(out)
+
+
 # The word-boundary lookbehind guards the Latin words only: Japanese runs unspaced, and a particle before セクション
 # ("ヘルプセンターのセクション 13.4") is a word character.
 _SEC_REF = re.compile(
-    rf"(?P<its>\bits\s+)?(?:(?<![\w-])(?:[Ss]ections?|[Ss]ecci[oó]n(?:es)?|Abschnitt(?:en|e)?)|セクション)\s*"
+    rf"(?:{not_after_other_doc('en', 'de', 'fr', 'es')}(?<![\w-])"
+    rf"(?:[Ss]ections?|[Ss]ecci[oó]n(?:es)?|Abschnitt(?:en|e)?)|{not_after_other_doc('ja')}セクション)\s*"
     rf"(?P<list>{_NUM}(?:{_JOIN}(?:§\s*)?{_NUM})*)")
-_ZH_REF = re.compile(rf"第\s*({_NUM})\s*节")
+_ZH_REF = re.compile(rf"{not_after_other_doc('zh')}第\s*({_NUM})\s*节")
 _SIGN_REF = re.compile(rf"(?P<readme>README\s+)?§\s*(?P<list>{_NUM}(?:\s*(?:,|–|—|-|to|and)\s*§?\s*{_NUM})*)")
 _P_REF = re.compile(r"(?<![\w.:/-])P\.(\d+(?:\.\d+)*)(?![\w-]|\.\w)")
 _RANGE = {"to", "bis", "à", "a", "–", "—", "-", "〜", "～", "から"}
@@ -682,9 +712,7 @@ def _refs_in(masked: str, doc_xref: dict, *, own_p: bool) -> _Refs:
     inventory (the spec's convention); without it § names this document's own sections. `own_p`: P.N names this
     document's own chapter P (inside Comprise's spec)."""
     out = _Refs()
-    for m in _SEC_REF.finditer(masked):
-        if m.group("its"):
-            continue                                    # "its section 10": another document's section
+    for m in _SEC_REF.finditer(masked):                 # "its section 10" is another document's: not matched
         out.sections += _numbers(m.group("list"))
     for m in _ZH_REF.finditer(masked):
         out.sections.append(m.group(1))
@@ -764,7 +792,11 @@ _BULLET_TERM = re.compile(rf"^\*\*(?P<t>[^*]+?)\*\*\s*(?P<sep>{_SEP})\s*(?P<rest
 _SENTENCE_TERM = re.compile(
     r"^(?:(?:A|An|The) )?\*\*(?P<t>[^*]+?)\*\*(?P<paren> \([^)]*\))?,? "
     r"(?P<verb>is|are|means|stands for|turns|holds|names) (?P<rest>.*)$")
-_LOOSE_LEAD = re.compile(r"^(?:\S+\s)?\*\*(?P<t>[^*]+?)\*\*")
+# A paragraph's lead: one optional plain word (an article: "A", "Der", "La") and the first bold run. The word holds no
+# bold of its own (0.7): a bold label glued to a bold button, "**Leerlo.** **abrir el fabulac** …", leads with the
+# label — which ends in a stop, so the paragraph defines nothing, as its English ("**Reading it.** **open the
+# fabulac** …") doesn't — never with the button as if the label were the word before it.
+_LOOSE_LEAD = re.compile(r"^(?:(?:(?!\*\*)\S)+\s)?\*\*(?P<t>[^*]+?)\*\*")
 
 
 def _term_name(bold: str) -> str:
@@ -876,8 +908,8 @@ def _term_meaning(cls: str, cand: dict, lang: str) -> tuple[str, str]:
             pred_first = (_sentences(pred_plain, lang) or [pred_plain])[0]
             atem = _atem_cut(pred_first if verb in ("is", "are", "means") else f"{verb} {pred_first}", lang)
         else:
-            # The lead is one optional word and the first bold run: lazy, or unspaced CJK runs on to the second bold.
-            atem = _atem_of(_plain(re.sub(r"^\S*?\s*\*\*[^*]+\*\*", "", cand["full"])), lang) or \
+            # What follows the lead the candidate was read from (one optional plain word and the first bold run).
+            atem = _atem_of(_plain(_LOOSE_LEAD.sub("", cand["full"], count=1)), lang) or \
                 _atem_cut(summary, lang)
         return summary, atem
     rest = _plain(cand.get("rest", ""))
