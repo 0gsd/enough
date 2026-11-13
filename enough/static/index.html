@@ -52373,6 +52373,7 @@
       tall: false,
       sel: null,               // the selected word
       token: 0,                // latest render wins
+      jump: 0,                 // latest jump wins (dictJumpTo)
       pollT: 0,
       saveT: 0,
       slipT: 0,
@@ -53282,15 +53283,21 @@
 
     // Open the page at `word` in the current view: its offset from the
     // server, a few entries of lead so it is not jammed against the top,
-    // and the heading of its group when that is close by.
+    // and the heading of its group when that is close by. Each jump takes a
+    // token and supersedes the last: two quick jumps (a link, then another
+    // before the first position came back) end on the second word, never on
+    // whichever answer arrived last.
     async function dictJumpTo(word, opts = {}) {
       if (!word) return;
+      const jump = ++DICT.jump;
+      const live = () => jump === DICT.jump;
       const st = dictStore();
       let p;
       try {
         await dictGroups(st);
         p = await dictGet('/api/dict/position?' + dictViewParams(st.view, { word }));
-      } catch (err) { dictShowError(err); return; }
+      } catch (err) { if (live()) dictShowError(err); return; }
+      if (!live()) return;
       if (!p.found && p.headword && (DICT.view.q || Object.values(DICT.view.filters).some((x) => x !== ''))) {
         // In the dictionary, but not in this search or filter: say so.
         if (DICT.view.q) {
@@ -53312,13 +53319,16 @@
       if (opts.quiet) start = p.offset;   // back where the reader left off: that page, as it was
       else if (g && p.offset - g.offset <= Math.max(lead, Math.floor(DICT.avg / 2))) start = g.offset;
       await dictShow(start, { flash: opts.quiet ? null : p.headword, anim: opts.anim || null });
+      if (!live()) return;
       // The lead came from the running page estimate; when the page held
       // fewer entries than that (one tall column), the word fell off the
       // end: open again with a lead this page can carry.
       if (DICT.start === start && p.offset >= start + DICT.fit) {
         const s2 = Math.max(0, p.offset - Math.floor((DICT.fit - 1) / 3));
         await dictShow(s2, { flash: opts.quiet ? null : p.headword });
+        if (!live()) return;
         if (DICT.start === s2 && p.offset >= s2 + DICT.fit) await dictShow(p.offset, { flash: opts.quiet ? null : p.headword });
+        if (!live()) return;
       }
       if (!opts.quiet) dictSelect(p.headword);
       if (p.matched_form) {

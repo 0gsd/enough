@@ -2382,6 +2382,20 @@ def scenario_dict_search_jump(d: Driver) -> list[str]:
              " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"gloaming\"]')}))()") or {}
     if r.get("q") or r.get("sel") != "gloaming" or not r.get("on"):
         fails.append(f"Return on an exact word did not turn to its page: {r}")
+    # Two quick jumps: the first word's position is held back, so its answer
+    # arrives last. The second jump superseded it, so the page ends there.
+    r = d.js_await("(async () => { const f0 = window.fetch;"
+                   " window.fetch = (u, ...a) => (String(u).includes('/api/dict/position')"
+                   " && String(u).includes('word=zymurgy'))"
+                   " ? new Promise((res) => setTimeout(res, 700)).then(() => f0(u, ...a)) : f0(u, ...a);"
+                   " try { await Promise.all([dictJumpTo('zymurgy'), dictJumpTo('lantern')]); }"
+                   " finally { window.fetch = f0; }"
+                   " await new Promise((r) => setTimeout(r, 300));"
+                   " return {sel: DICT.sel,"
+                   " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')}; })()",
+                   timeout=20) or {}
+    if r.get("sel") != "lantern" or not r.get("on"):
+        fails.append(f"a slow first jump overtook the jump after it: {r}")
     _reset(d)
     return fails
 
