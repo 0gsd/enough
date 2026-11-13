@@ -5089,6 +5089,31 @@ never run). Lane note `docs/fabula-landed-U1a.md` 4 and 5.
   no run/terminal/download control; Esc closes only the viewer, focus back in
   the card). Seeded by `_seed_fabula` in `works/`.
 
+### A poem in steps (0.7, V2c)
+
+`enough/fabulap_job.py` is `fabulac_job`'s pattern for a poem: the five programs of
+`defaults/thym/decompile-verse.thym` (`scan-the-poem`, `hear-the-poem`, `read-the-poem`, `read-closely`,
+`raise-the-questions`), run in order as one CanonJob of kind `fabulap`, keyed by the poem (the same claim key as a
+one-call decompile, so the two never run together). Each lands `<poem>.fabulap.cosm` whole; the state is read from
+the twin alone, each program naming itself in `derived.runs` (`scan`, `construe` and `derive … with f` write their
+own entries; the host adds the questions' and the route). A poem whose digest differs from `source.sha256` is scanned
+again; a twin decompiled in one call (no program of the five in its runs) is rebuilt in steps only with `restart`.
+With no model, agent-free, or `mode: rules`, the job stops after scan and hear and refuses `read-the-poem` in
+`thym_api.asks_refusal`'s words. Routes `POST /api/fabula/verse/build|resume|cancel`, `GET /api/fabula/verse/build`
+(`{state, job}`; `state.card` = `card_of`: the `C:form` with each rule held / not held / open and its departures,
+the metre, devices with `cue` and `senses`, a lyric's parts and hook, counts). The `fabulap` tool (build, status,
+cancel) is in `fabula_tools`.
+
+- **The page** — the fabula card's verse face (`#fab-verse`, `FAB.verse`, `fabVerse*`): three steps (scan, hear by
+  rule; read closely = the three asking programs, with construe's seven axes and the card's model line, or
+  agent-free's plain refusal), its own build / take up again / start again / cancel, and what was found. Snapshots
+  are followed as `want: 'fabulap'`. A dialectic card whose bank entry `sets` a field on the item an answer writes
+  (the fabulap's `turn`, `sung`) says so (`card.writes` from `dialectic_api.card`).
+- **moves.js** — `scan` and `construe` are in the fallback `DECLS`; `scan` is in `NOT_HERE` (FEED's pronunciations
+  are the server's); `construe` asks, so `planCheck` refuses `read-closely` as any asking step.
+- **uicheck** — scenario `fabulap-steps` on `works/lantern-song.txt` (agent-free scan and hear; what is drawn; the
+  twin; agent-free off offering read closely).
+
 ---
 
 ## The dialectic (module D, 0.6)
