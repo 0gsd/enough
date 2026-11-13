@@ -6,7 +6,9 @@ as allograph`, the release recorded, the document written beside the holograph a
 Nothing is sent then. Everything here that sends is the holder's own act, one click each, through
 `enough/allograph_registry.py`:
 
-- **Connect** (`/api/connect/status|sign-in|poll|sign-out`): the device flow; the token in the keychain.
+- **Connect** (`/api/connect/status|sign-in|poll|sign-out`): the device flow, at Connect's address
+  (`ENOUGH_CONNECT_URL`); the token in the keychain. Everything else goes to the registry's address
+  (`ENOUGH_ALLOGRAPH_URL`, allograph.net), with the same token.
 - **The subject** (`POST /api/ascribe/subject`): `person` (the default) or `character`, which makes an agent's
   allograph.
 - **The listing** (`/api/allograph/...`): `listing` (what this machine knows, the tag, and whether the holograph has
@@ -99,7 +101,8 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
         def go() -> dict:
             url = R.connect_url()
             sess = R.session(url)
-            return {"url": url, "signed_in": sess is not None, "account": sess.account if sess else None}
+            return {"url": url, "registry": R.registry_url(), "signed_in": sess is not None,
+                    "account": sess.account if sess else None}
         return await run(go)
 
     @router.post("/api/connect/sign-in")
@@ -145,12 +148,14 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
 
     @router.get("/api/allograph/listing")
     async def allograph_listing(path: str = "") -> dict:
-        """What this machine knows of the holograph's listing (`listing_status`), with `signed_in` and the registry's
-        address. Asks the registry nothing."""
+        """What this machine knows of the holograph's listing (`listing_status`), with `signed_in`, Connect's address
+        (`connect`) and the registry's (`registry_url`; `registry` is where this listing was sent, when it was). Asks
+        the registry nothing."""
         def go() -> dict:
             t = holograph(path)
             out = R.listing_status(t.path)
-            out.update(path=t.rel, signed_in=R.session() is not None, connect=R.connect_url())
+            out.update(path=t.rel, signed_in=R.session() is not None, connect=R.connect_url(),
+                       registry_url=R.registry_url())
             return out
         return await run(go)
 
@@ -187,7 +192,7 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
                                    dangler=str(dangler) if dangler not in (None, "") else None,
                                    owner=str(body["owner"]) if body.get("owner") else None,
                                    show=show if isinstance(show, dict) else None)
-            rec = {"registry": sess.url, "tag": key.tag, "name": str(body.get("name")),
+            rec = {"registry": sess.registry, "tag": key.tag, "name": str(body.get("name")),
                    "dangler": str(dangler) if dangler not in (None, "") else None, "kind": doc.get("kind"),
                    "allograph": rel, "run": doc.get("run"), "sha256": hashlib.sha256(data).hexdigest(),
                    "holograph": R.run_state(str(doc.get("run")))}
@@ -236,7 +241,7 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
             key = key_of(t)
             fp = str(body.get("faceplace") or "")
             handle = R.normal_handle(body.get("handle"))
-            entry = next((f for f in R.faceplaces(R.connect_url()) if isinstance(f, dict)
+            entry = next((f for f in R.faceplaces(R.registry_url()) if isinstance(f, dict)
                           and f.get("faceplace") == fp), None)
             if entry is None:
                 raise R.RegistryError(R.PLAIN["unknown_faceplace"], 400, "unknown_faceplace")
@@ -337,7 +342,7 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
 
         def go() -> dict:
             needs = body.get("needs")
-            return R.search(R.connect_url(), needs if isinstance(needs, list) else [],
+            return R.search(R.registry_url(), needs if isinstance(needs, list) else [],
                             kind=body.get("kind") or None,
                             plus=True if body.get("plus") is True else None,
                             attested=True if body.get("attested") is True else None,
@@ -349,7 +354,7 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
         """`?tag=` → `{entry}` (null when nothing is listed under it), `?name=` → `{entries}`; each entry's `signed`
         checked here (`verified`)."""
         def go() -> dict:
-            base = R.connect_url()
+            base = R.registry_url()
             if tag:
                 e = R.entry(base, tag)
                 if isinstance(e, dict):
@@ -361,7 +366,7 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
 
     @router.get("/api/allograph/faceplaces")
     async def allograph_faceplaces() -> dict:
-        return await run(lambda: {"faceplaces": R.faceplaces(R.connect_url())})
+        return await run(lambda: {"faceplaces": R.faceplaces(R.registry_url())})
 
     return router
 

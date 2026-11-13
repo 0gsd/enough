@@ -18,15 +18,17 @@ bytes; **a proof string** is `aar-<tag>-<code>`, the code the first twelve of th
 canonical JSON (keys sorted, no space, UTF-8, nothing escaped that JSON does not require), the 64 bytes of the
 signature in standard base64 with padding. The text's own example (14.8, 14.9) is `tests/test_allograph_registry.py`.
 
-**Connect** (14.7, 14.12). The registry is served by Comprise Connect, and takes a statement only from a signed-in
-account. enough signs in as Comprise's app does: Connect's device flow (after RFC 8628). `start_sign_in` asks Connect
+**Connect** (14.7, 14.12). The registry is served by Comprise Connect, its listings at allograph.net, and takes a
+statement only from an account signed in to Connect. enough signs in as Comprise's app does: Connect's device flow (after RFC 8628). `start_sign_in` asks Connect
 for a code and gives the person the code and the address to approve it at (they sign in to Connect in their browser,
 with a passkey); `poll_sign_in` asks until they have, then keeps the bearer token in the keychain (service
 `enough/connect/<host>`, user `token`, the value `{token, account, expires, url, at}` in JSON), never in a file;
-`sign_out` revokes it at Connect and forgets it here. The device code lives in this process's memory only. The
-address is `ENOUGH_CONNECT_URL`, else https://compriseconnect.com; plain http only for this machine, since a bearer
-token never crosses a network in the clear. Every operation that needs an account takes a `Session` (`session()`
-reads the keychain's), so a caller passes the one it has and a test passes its own.
+`sign_out` revokes it at Connect and forgets it here. The device code lives in this process's memory only. Two
+addresses: Connect's, for the sign-in and the sign-out alone, is `ENOUGH_CONNECT_URL`, else https://compriseconnect.com;
+the registry's, for every operation of 14.12 (statements, nonces, look-ups, faceplaces), is `ENOUGH_ALLOGRAPH_URL`,
+else https://allograph.net, where the same token works. Plain http only for this machine, since a bearer token never
+crosses a network in the clear. Every operation that needs an account takes a `Session` (`session()` reads the
+keychain's; its `registry` is the registry's address), so a caller passes the one it has and a test passes its own.
 
 **The network** sits behind one function, `TRANSPORT(method, url, body, token) -> (status, answer)`, which tests
 replace; nothing else here opens a connection. A refusal comes back as `RegistryError`, with the registry's status,
@@ -54,7 +56,7 @@ import re
 import secrets
 import threading
 import urllib.parse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
@@ -66,6 +68,8 @@ from . import ascribe as A
 
 DEFAULT_URL = "https://compriseconnect.com"
 URL_ENV = "ENOUGH_CONNECT_URL"
+REGISTRY_URL = "https://allograph.net"
+REGISTRY_URL_ENV = "ENOUGH_ALLOGRAPH_URL"
 KEYCHAIN_ENV = "ENOUGH_KEYCHAIN"
 API = "/api/v0/allographs"
 DEVICE_API = "/api/v0/device"
@@ -138,6 +142,7 @@ PLAIN = {
     "bad_need": "A search need is outside the shape, or names a word that is not a FEED headword.",
     "bad_next": "That page of answers is not one the registry gave.",
     "unreachable": "Connect could not be reached.",
+    "unreachable_registry": "The Allograph Registry could not be reached.",
 }
 
 
@@ -526,21 +531,27 @@ def listing_key(hid: str, *, create: bool = False) -> ListingKey | None:
 # Connect: the address, the session, the device flow
 # ---------------------------------------------------------------------------
 
-def normalize_url(url: Any) -> str:
+def normalize_url(url: Any, what: str = "Connect", like: str = DEFAULT_URL) -> str:
     """`https://host[:port][/path]` without a trailing slash; plain http only for this machine."""
     s = str(url or "").strip().rstrip("/")
     u = urllib.parse.urlsplit(s)
     if u.scheme not in ("https", "http") or not u.hostname or u.query or u.fragment:
-        raise RegistryError(f"{s or '(empty)'} is not an address of Connect: give https://<host>, like {DEFAULT_URL}")
+        raise RegistryError(f"{s or '(empty)'} is not an address of {what}: give https://<host>, like {like}")
     if u.scheme == "http" and u.hostname not in LOCAL_HOSTS:
-        raise RegistryError("Connect is reached over https; plain http only for this machine, since a bearer token "
+        raise RegistryError(f"{what} is reached over https; plain http only for this machine, since a bearer token "
                             "never crosses a network in the clear")
     return s
 
 
 def connect_url() -> str:
-    """The Connect enough talks to: `ENOUGH_CONNECT_URL`, else https://compriseconnect.com."""
+    """The Connect enough signs in to and out of: `ENOUGH_CONNECT_URL`, else https://compriseconnect.com."""
     return normalize_url(os.environ.get(URL_ENV) or DEFAULT_URL)
+
+
+def registry_url() -> str:
+    """The Allograph Registry's address, for every operation of 14.12: `ENOUGH_ALLOGRAPH_URL`, else
+    https://allograph.net. Connect serves it there; the sign-in stays at `connect_url()`."""
+    return normalize_url(os.environ.get(REGISTRY_URL_ENV) or REGISTRY_URL, "the Allograph Registry", REGISTRY_URL)
 
 
 def _host(url: str) -> str:
@@ -550,13 +561,15 @@ def _host(url: str) -> str:
 
 @dataclass(frozen=True)
 class Session:
-    """A signed-in Connect account, as the registry's operations take it: the address and the bearer token."""
+    """A signed-in Connect account, as the registry's operations take it: Connect's address (where the token was
+    given, and is revoked), the bearer token, and the registry's address (where it is used)."""
     url: str
     token: str
     account: Any = None
+    registry: str = field(default_factory=registry_url)
 
     def __repr__(self) -> str:                  # never the token
-        return f"Session(url={self.url!r})"
+        return f"Session(url={self.url!r}, registry={self.registry!r})"
 
 
 _SESSIONS: dict[str, dict | None] = {}        # url -> the keychain's document, read once per process
@@ -677,7 +690,8 @@ def _http(method: str, url: str, body: Any, token: str | None) -> tuple[int, Any
     try:
         r = httpx.request(method, url, content=data, headers=headers, timeout=TIMEOUT, follow_redirects=False)
     except httpx.HTTPError as e:
-        raise RegistryError(f"{PLAIN['unreachable']} ({type(e).__name__})", None, "unreachable") from None
+        said = PLAIN["unreachable"] if url.startswith(connect_url() + "/") else PLAIN["unreachable_registry"]
+        raise RegistryError(f"{said} ({type(e).__name__})", None, "unreachable") from None
     try:
         answer = r.json() if r.content else None
     except ValueError:
@@ -691,7 +705,8 @@ TRANSPORT: Callable[[str, str, Any, str | None], tuple[int, Any]] = _http
 
 
 def request(method: str, base: str, path: str, body: Any = None, sess: Session | None = None) -> Any:
-    """One operation: the answer on a 2xx, a `RegistryError` in plain words otherwise."""
+    """One operation at `base` (the registry's address, or Connect's for the device flow): the answer on a 2xx, a
+    `RegistryError` in plain words otherwise."""
     status, got = TRANSPORT(method, normalize_url(base) + path, body, sess.token if sess else None)
     if 200 <= status < 300:
         return got
@@ -705,7 +720,7 @@ def request(method: str, base: str, path: str, body: Any = None, sess: Session |
 
 def challenge(sess: Session) -> str:
     """A nonce good for one statement from this account, for ten minutes (`POST /api/v0/allographs/challenge`)."""
-    got = request("POST", need_session(sess).url, f"{API}/challenge", {}, sess)
+    got = request("POST", need_session(sess).registry, f"{API}/challenge", {}, sess)
     nonce = got.get("nonce") if isinstance(got, dict) else None
     if not NONCE_RE.match(str(nonce or "")):
         raise RegistryError("the registry gave no challenge")
@@ -715,7 +730,7 @@ def challenge(sess: Session) -> str:
 def send(sess: Session, signed: dict) -> dict:
     """`POST /api/v0/allographs/statements`: `{ok: true}`, with `entry` when the statement is about the signer's own
     listing."""
-    return request("POST", need_session(sess).url, f"{API}/statements", signed, sess)
+    return request("POST", need_session(sess).registry, f"{API}/statements", signed, sess)
 
 
 def say(sess: Session, signer: ListingKey, says: str, /, **fields: Any) -> dict:
@@ -741,7 +756,7 @@ def withdraw_by_account(sess: Session, tag: str) -> dict:
     """Withdraw a listing without its key, from the account its tag is tied to (`DELETE`, 14.13)."""
     if not TAG_RE.match(str(tag)):
         raise RegistryError(f"{tag!r} is not a tag")
-    return request("DELETE", need_session(sess).url, f"{API}/{tag}", None, sess)
+    return request("DELETE", need_session(sess).registry, f"{API}/{tag}", None, sess)
 
 
 def prove(sess: Session, key: ListingKey, faceplace: str, handle: str, address: str) -> dict:
@@ -779,7 +794,7 @@ def waiting(sess: Session, tag: str) -> list:
     """The attestations waiting for the holder's word: each `{attestation, statement, signature}`."""
     if not TAG_RE.match(str(tag)):
         raise RegistryError(f"{tag!r} is not a tag")
-    got = request("GET", need_session(sess).url, f"{API}/{tag}/waiting", None, sess)
+    got = request("GET", need_session(sess).registry, f"{API}/{tag}/waiting", None, sess)
     return list((got or {}).get("attestations") or []) if isinstance(got, dict) else []
 
 

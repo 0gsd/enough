@@ -19,7 +19,7 @@ from enough import allograph_registry as R
 from enough import ascribe as A
 from enough import models, skeleton
 from enough.server import create_app
-from tests.test_allograph_registry import URL, FakeRegistry
+from tests.test_allograph_registry import REGISTRY, URL, FakeRegistry
 from tests.test_ascribe_module import OPEN_FOR_WORK, SAMPLE, _for_work, node, write_nodes
 
 
@@ -42,6 +42,7 @@ def fake(monkeypatch: pytest.MonkeyPatch) -> FakeRegistry:
     reg = FakeRegistry()
     monkeypatch.setattr(R, "TRANSPORT", reg)
     monkeypatch.setenv("ENOUGH_CONNECT_URL", URL)
+    monkeypatch.setenv("ENOUGH_ALLOGRAPH_URL", REGISTRY)
     return reg
 
 
@@ -68,7 +69,7 @@ def make(client: TestClient) -> dict:
 
 def test_connect_sign_in_and_out(client, fake):
     st = client.get("/api/connect/status").json()
-    assert st == {"url": URL, "signed_in": False, "account": None}
+    assert st == {"url": URL, "registry": REGISTRY, "signed_in": False, "account": None}
     sign_in(client, fake)
     st = client.get("/api/connect/status").json()
     assert st["signed_in"] is True and st["account"] == {"uid": "u1"} and "token" not in json.dumps(st)

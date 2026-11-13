@@ -139,9 +139,11 @@ def build_env(scratch: Path) -> dict[str, str]:
     # Every seam in enough/seams.py, the list tests/conftest.py reads too:
     # each path seam under the scratch dir (the registry a copy of
     # defaults/models.json, so "every ENOUGH_* points into the scratch dir"
-    # holds without exceptions), the download and cosmoes.org bases on a
-    # dead loopback port (nothing may reach huggingface.co or cosmoes.org
-    # from a smoke run), the specifications' launch check off, and every
+    # holds without exceptions), the download and cosmoes.org bases and
+    # the addresses of Connect and of the Allograph Registry
+    # (ENOUGH_CONNECT_URL, ENOUGH_ALLOGRAPH_URL) on a dead loopback port
+    # (nothing may reach huggingface.co, cosmoes.org, compriseconnect.com or
+    # allograph.net from a smoke run), the specifications' launch check off, and every
     # behaviour seam the developer may have exported cleared (the desktop
     # shell's checkout, uv and llama URL among them, which would redirect
     # which checkout and which uv the run uses).

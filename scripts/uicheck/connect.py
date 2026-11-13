@@ -3,8 +3,9 @@ device flow, on a loopback port, so the allograph panel can be drawn and driven 
 
 It is `FakeRegistry` from tests/test_allograph_registry.py (the registry the client's tests are held to: nonces per
 account, signatures verified against each listing's key, proofs, attestations waiting and accepted, bonds), wrapped in
-a small HTTP server on a thread; the scratch project server is pointed at it with `ENOUGH_CONNECT_URL` (http is allowed
-for a loopback address only, `allograph_registry.normalize_url`). Two things are added for the screens:
+a small HTTP server on a thread; the scratch project server is pointed at it with both `ENOUGH_CONNECT_URL` and
+`ENOUGH_ALLOGRAPH_URL`, as Connect and the registry's own address are one service (http is allowed for a loopback
+address only, `allograph_registry.normalize_url`). Two things are added for the screens:
 
 - the device flow approves itself at the second poll, so a sign-in shows its code once and then completes;
 - one listing is there from the start, the text's own example (`harbour-baker`, *bread, slowly*, `#ts7de32a5bnz`),
@@ -36,7 +37,8 @@ def _tests():
 
 
 class StandInConnect:
-    """`start()` serves on 127.0.0.1:<port>; `url` is what `ENOUGH_CONNECT_URL` takes; `stop()` ends it."""
+    """`start()` serves on 127.0.0.1:<port>; `url` is what `ENOUGH_CONNECT_URL` and `ENOUGH_ALLOGRAPH_URL` take;
+    `stop()` ends it."""
 
     def __init__(self) -> None:
         self.port = 0
@@ -52,7 +54,7 @@ class StandInConnect:
         self._srv = ThreadingHTTPServer(("127.0.0.1", 0), self._handler())
         self.port = self._srv.server_address[1]
         self.url = f"http://127.0.0.1:{self.port}"
-        mod.URL = self.url                       # FakeRegistry checks every request is for its own address
+        mod.URL = mod.REGISTRY = self.url        # FakeRegistry checks every request is for its own address
         self.fake = mod.FakeRegistry()
         # The text's example listing, as its holder sent it (section 14.8): already listed here.
         self._example_key = R.key_from_seed(mod.SEED)

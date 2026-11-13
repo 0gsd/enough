@@ -29,7 +29,8 @@ SPEC_LIST = ('{"signature":"McEAI8AnkwPw9kKs4825O3R5fL/grSnmuXyL1IySYZiNXpDGIE8O
              '"key":"xftteVFlq9JmdslFScJdILce32OfPGOKMmVyUwNEmvE=","name":"harbour-baker",'
              '"nonce":"qk5riktfj6curptnjdndclsit4","says":"list","show":{"faceplaces":"counted","same_name":true},'
              '"statement":"ascribe-statement/0"}}')
-URL = "https://connect.test"
+URL = "https://connect.test"            # Connect: the device flow's sign-in and sign-out (ENOUGH_CONNECT_URL)
+REGISTRY = "https://registry.test"      # the registry's own address, allograph.net in life (ENOUGH_ALLOGRAPH_URL)
 
 
 # ---------------------------------------------------------------------------
@@ -196,7 +197,8 @@ def test_a_scratch_server_keeps_its_keychain_in_memory(monkeypatch):
 class FakeRegistry:
     """Plays Connect's registry (14.12) closely enough for the client: nonces per account, signatures verified
     against the listing's key, a listing per tag, proofs, attestations waiting and accepted, bonds, and the device
-    flow. `calls` keeps every request as (method, path, body, token)."""
+    flow. `calls` keeps every request as (method, path, body, token). The device flow is asked of Connect's address
+    (`URL`) and everything else of the registry's (`REGISTRY`); the two may be one, as at the uicheck stand-in."""
 
     TOKEN = "cct_test-token"
 
@@ -212,8 +214,11 @@ class FakeRegistry:
                             "addresses": ["https://harbourboard.test/{handle}"]}]
 
     def __call__(self, method: str, url: str, body, token):
-        assert url.startswith(URL), url
-        path = url[len(URL):]
+        if url.startswith(URL + "/api/v0/device/"):
+            path = url[len(URL):]
+        else:
+            assert url.startswith(REGISTRY + "/api/v0/allographs"), url
+            path = url[len(REGISTRY):]
         self.calls.append((method, path, copy.deepcopy(body), token))
         if path == "/api/v0/device/code":
             return 200, {"device_code": "dev-1", "user_code": "ABCD-EFGH", "verification_uri": URL + "/device",
@@ -318,13 +323,34 @@ def fake(monkeypatch) -> FakeRegistry:
     reg = FakeRegistry()
     monkeypatch.setattr(R, "TRANSPORT", reg)
     monkeypatch.setenv("ENOUGH_CONNECT_URL", URL)
+    monkeypatch.setenv("ENOUGH_ALLOGRAPH_URL", REGISTRY)
     return reg
 
 
 def test_the_conftest_seams_point_nowhere():
     import os
     assert os.environ["ENOUGH_CONNECT_URL"] == "http://127.0.0.1:1" and R.connect_url() == "http://127.0.0.1:1"
+    assert os.environ["ENOUGH_ALLOGRAPH_URL"] == "http://127.0.0.1:1" and R.registry_url() == "http://127.0.0.1:1"
     assert os.environ["ENOUGH_KEYCHAIN"] == "memory"
+
+
+def test_two_addresses_connect_s_for_the_sign_in_and_the_registry_s_for_the_rest(fake, monkeypatch):
+    sess = _signed_in(fake)
+    assert sess.url == URL and sess.registry == REGISTRY and fake.TOKEN not in repr(sess)
+    R.list_allograph(sess, R.key_from_seed(SEED), name="harbour-baker", allograph=json.loads(SPEC_ALLOGRAPH))
+    R.search(R.registry_url(), [{"about": "skill", "value": "sourdough"}])
+    R.sign_out()
+    paths = [c[1] for c in fake.calls]
+    assert paths[:2] == ["/api/v0/device/code", "/api/v0/device/token"] and paths[-1] == "/api/v0/device/revoke"
+    assert "/api/v0/allographs/challenge" in paths and "/api/v0/allographs/statements" in paths
+    # the defaults, with neither variable set: Connect for the sign-in, allograph.net for the registry
+    monkeypatch.delenv("ENOUGH_CONNECT_URL")
+    monkeypatch.delenv("ENOUGH_ALLOGRAPH_URL")
+    assert R.connect_url() == "https://compriseconnect.com" and R.registry_url() == "https://allograph.net"
+    assert R.Session("https://compriseconnect.com", "t").registry == "https://allograph.net"
+    monkeypatch.setenv("ENOUGH_ALLOGRAPH_URL", "http://allograph.example")
+    with pytest.raises(R.RegistryError, match="the Allograph Registry is reached over https"):
+        R.registry_url()
 
 
 @pytest.mark.parametrize("url, ok", [("https://compriseconnect.com", True), ("http://localhost:8095", True),
@@ -379,10 +405,10 @@ def test_every_operation_against_the_stand_in_registry(fake):
     assert got["ok"] and got["entry"]["tag"] == me.tag
     sent = next(c[2] for c in fake.calls if c[1] == "/api/v0/allographs/statements")
     assert R.verify(sent) and sent["statement"]["allograph"] == allo
-    assert R.entry(URL, me.tag)["name"] == "harbour-baker" and R.entry(URL, "b" * 12) is None
-    assert [e["tag"] for e in R.by_name(URL, "harbour-baker")] == [me.tag]
-    assert [e["tag"] for e in R.search(URL, [{"about": "skill", "value": "sourdough"}])["entries"]] == [me.tag]
-    assert R.search(URL, [{"about": "experience", "value": "sourdough"}])["entries"] == []
+    assert R.entry(REGISTRY, me.tag)["name"] == "harbour-baker" and R.entry(REGISTRY, "b" * 12) is None
+    assert [e["tag"] for e in R.by_name(REGISTRY, "harbour-baker")] == [me.tag]
+    assert [e["tag"] for e in R.search(REGISTRY, [{"about": "skill", "value": "sourdough"}])["entries"]] == [me.tag]
+    assert R.search(REGISTRY, [{"about": "experience", "value": "sourdough"}])["entries"] == []
     # proofs
     with pytest.raises(R.RegistryError) as e:
         R.prove(sess, me, "harbourboard", "harbour-baker", "https://harbourboard.test/someone")
@@ -415,7 +441,7 @@ def test_every_operation_against_the_stand_in_registry(fake):
     assert fake.bonds == set()
     # withdrawn, by the key and by the account
     R.withdraw(sess, me)
-    assert R.entry(URL, me.tag) is None
+    assert R.entry(REGISTRY, me.tag) is None
     R.withdraw_by_account(sess, client.tag)
     assert fake.listings == {}
     # every statement went with the account's token and a fresh nonce, used once
@@ -464,7 +490,7 @@ def test_the_listing_status_says_when_the_holograph_has_changed_since_the_listed
     assert st["listed"] is False and st["tag"] is None and st["kind"] == "person" and st["changed"] is False
     hid = R.hid_of(holo)
     key = R.listing_key(hid, create=True)
-    R.record_listing(hid, {"registry": URL, "tag": key.tag, "name": "harbour-baker", "dangler": None,
+    R.record_listing(hid, {"registry": REGISTRY, "tag": key.tag, "name": "harbour-baker", "dangler": None,
                            "kind": "person", "allograph": "self.allograph-x.json", "run": ALLO_TRACE["run"],
                            "sha256": "0" * 64, "holograph": A.holograph_state(holo)})
     st = R.listing_status(holo)

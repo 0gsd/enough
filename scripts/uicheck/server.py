@@ -31,7 +31,7 @@ Since 0.7 it holds a holograph that offers work (`talks/work-self/`, Ascribe
 14.6's example) and the holder's program that makes its allograph, and the
 project server talks to a stand-in Connect on a loopback port
 (`connect.StandInConnect`, the client tests' `FakeRegistry` behind HTTP),
-named by `ENOUGH_CONNECT_URL`: the allograph panel's sign-in, listing and
+named by `ENOUGH_CONNECT_URL` and `ENOUGH_ALLOGRAPH_URL`: the allograph panel's sign-in, listing and
 look-ups reach nothing but that.
 """
 
@@ -734,6 +734,7 @@ class ScratchWorld:
             self.connect = StandInConnect()
             self.connect.start()
             self.project_server.extra_env["ENOUGH_CONNECT_URL"] = self.connect.url
+            self.project_server.extra_env["ENOUGH_ALLOGRAPH_URL"] = self.connect.url
             self.project_server.start()
             self._pin_blank_launch()
             self._register(second)
