@@ -27,6 +27,12 @@ hand-made reading, and a small deterministic program a run can land without
 a model; and, for the package and unpack cards (U2), the measured morph
 beside the notes and a sealed copy of the package in a folder of its own,
 sealed at seed time, whose key lives only in this process.
+Since 0.7 it holds a holograph that offers work (`talks/work-self/`, Ascribe
+14.6's example) and the holder's program that makes its allograph, and the
+project server talks to a stand-in Connect on a loopback port
+(`connect.StandInConnect`, the client tests' `FakeRegistry` behind HTTP),
+named by `ENOUGH_CONNECT_URL`: the allograph panel's sign-in, listing and
+look-ups reach nothing but that.
 """
 
 from __future__ import annotations
@@ -58,6 +64,10 @@ _spec.loader.exec_module(smoke_boot)
 
 build_env = smoke_boot.build_env
 free_port = smoke_boot.free_port
+
+if str(REPO) not in sys.path:                    # tests.* (the stand-in Connect, the allograph fixture) import by name
+    sys.path.insert(0, str(REPO))
+from .connect import StandInConnect  # noqa: E402
 
 BOOT_TIMEOUT_S = 90.0
 
@@ -406,6 +416,9 @@ DIALECTIC_KINDS = """  - id: D:question/tone
     state: open
 """
 DIALECTIC_LANGS = ("en", "de", "fr", "es", "ja", "zh")
+# 0.7 (P4): the holograph whose allograph the panel makes and lists (`talks/work-self/`), and its holder's program.
+ALLOGRAPH_HOLO = "work-self"
+ALLOGRAPH_PROGRAM = "open-for-work.thym"
 OPEN_SELF = """thym 1
 
 program open-self
@@ -517,6 +530,13 @@ def _seed_dialectic(talks: Path) -> None:
                 aff.write_text(src, encoding="utf-8")
         _a.raise_bank(holo, at=at)
     (talks / "open-self.thym").write_text(OPEN_SELF, encoding="utf-8")
+    # 0.7 (P4): a holograph that offers work, Ascribe 14.6's example (a form `bakery` grounded in FEED, an experience
+    # of it and a skill, both public), and the holder's program that makes its allograph.
+    from tests.test_ascribe_module import OPEN_FOR_WORK, _for_work
+    work = talks / ALLOGRAPH_HOLO
+    shutil.copytree(ASCRIBE_FIXTURES / "sample-self", work, dirs_exist_ok=True)
+    _for_work(work)
+    (talks / ALLOGRAPH_PROGRAM).write_text(OPEN_FOR_WORK, encoding="utf-8")
 
 
 def _seed_fabula(works: Path) -> None:
@@ -621,6 +641,8 @@ class ScratchServer:
     def __init__(self, scratch: Path, *, home: bool = False) -> None:
         self.scratch = scratch
         self.home_mode = home
+        # Seams set after build_env(): only ever an address inside this run (the stand-in Connect's).
+        self.extra_env: dict[str, str] = {}
         self.port = free_port()
         self.base = f"http://127.0.0.1:{self.port}"
         self.project = scratch / "project"
@@ -629,6 +651,7 @@ class ScratchServer:
 
     def start(self) -> None:
         env = build_env(self.scratch)
+        env.update(self.extra_env)
         cmd = [sys.executable, "-m", "enough", "--port", str(self.port),
                "--llm-url", f"http://127.0.0.1:{free_port()}", "--no-browser"]
         cmd += ["--home"] if self.home_mode else ["--dir", str(self.project)]
@@ -698,6 +721,7 @@ class ScratchWorld:
         self.scratch = scratch
         self.project_server = ScratchServer(scratch)
         self.home_server = ScratchServer(scratch, home=True)
+        self.connect: StandInConnect | None = None
 
     def __enter__(self) -> ScratchWorld:
         seed_project(self.project_server.project)
@@ -706,6 +730,10 @@ class ScratchWorld:
         second.mkdir(parents=True, exist_ok=True)
         (second / "readme.md").write_text("# Second\n", encoding="utf-8")
         try:
+            # 0.7 (P4): the Allograph Registry the project server talks to, on a loopback port of this run.
+            self.connect = StandInConnect()
+            self.connect.start()
+            self.project_server.extra_env["ENOUGH_CONNECT_URL"] = self.connect.url
             self.project_server.start()
             self._pin_blank_launch()
             self._register(second)
@@ -752,6 +780,9 @@ class ScratchWorld:
     def __exit__(self, *_exc: object) -> None:
         self.home_server.stop()
         self.project_server.stop()
+        if self.connect is not None:
+            self.connect.stop()
+            self.connect = None
 
 
 def cleanup(scratch: Path) -> None:

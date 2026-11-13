@@ -42,7 +42,7 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
-                      THYM_LIST, THYM_HARVEST, THYM_SAME)
+                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -4986,6 +4986,151 @@ def scenario_thym_same_name(d: Driver) -> list[str]:
     return fails
 
 
+def scenario_thym_run_here(d: Driver) -> list[str]:
+    """0.7 (P3): Thym's runtime in the page. run with… on a text, count-words: "run here" is offered beside run →
+    it runs in the page: the readings panel shows one step, the output's value, and says nothing was written
+    (the project's files are the same before and after) → "show the trace" opens the page run's trace in the cosm
+    viewer, one record card → a plan that asks a model (publish-story) offers no "run here" and says why in the
+    runtime's words (agent-free's, word for word with the server's)."""
+    fails: list[str] = []
+    _reset(d)
+    files = "(async () => (await (await fetch('/api/files')).text()).length)()"
+    d.js_await("(async () => { localStorage.removeItem('enough.thym.inputs'); await thymRunOpen({input: %s});"
+               " return true; })()" % json.dumps(HARVEST))
+    radio = '#thym-list input[value="%s"]' % THYM_RULES_PROGRAM
+    if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(radio)):
+        _reset(d)
+        return [f"the run card did not list {THYM_RULES_PROGRAM}"]
+    d.click(radio)
+    if not _wait_js(d, "!document.getElementById('thym-here').hidden && !document.getElementById('thym-here').disabled", 15000):
+        fails.append("run here is not offered for a program that asks no model: "
+                     + str(d.js("({plan: (document.getElementById('thym-plan') || {}).innerText, here: THYM_PICK.here})")))
+        _reset(d)
+        return fails
+    before = d.js_await(files)
+    d.click("#thym-here")
+    if not _wait_js(d, "!!document.querySelector('#thym-status ol.thym-readings li') && !!document.querySelector('#thym-status [data-there=\"trace\"]')", 20000):
+        fails.append("the page run showed no readings: " + str(d.js("(document.getElementById('thym-status') || {}).innerText")))
+        _reset(d)
+        return fails
+    got = d.js("(() => ({rows: document.querySelectorAll('#thym-status ol.thym-readings > li').length,"
+               " fails: document.querySelectorAll('#thym-status ol.thym-readings > li.fail').length,"
+               " val: (document.querySelector('#thym-status pre.thym-here-val') || {}).textContent || '',"
+               " ok: THYM_PICK.hererun && THYM_PICK.hererun.out && THYM_PICK.hererun.out.outcome,"
+               " words: THYM_PICK.hererun && THYM_PICK.hererun.out && THYM_PICK.hererun.out.outputs.n.text}))()") or {}
+    if got.get("rows") != 1 or got.get("fails") or got.get("ok") != "landed":
+        fails.append(f"a one-step program should read one green step that landed: {got}")
+    if not str(got.get("val") or "").strip().isdigit() or got.get("val") != got.get("words"):
+        fails.append(f"the output's value is not shown as the runtime made it: {got}")
+    if d.js_await(files) != before:
+        fails.append("the page run changed the project's files: nothing should be written")
+    d.click("#thym-status [data-there='trace']")
+    if not _wait_js(d, "document.getElementById('cosm-mode').classList.contains('open') && /^inline:thym-page\\//.test(String(COSM.path))"
+                       " && document.querySelectorAll('#cosm-body [data-kind=\"R/record\"] .cosm-card').length === 1", 15000):
+        fails.append("the page run's trace did not open in the cosm viewer with its one record: "
+                     + str(d.js("({path: COSM.path, body: (document.getElementById('cosm-body') || {}).innerText})")))
+    _reset(d)
+    d.js_await("(async () => { await thymRunOpen({input: %s}); return true; })()" % json.dumps(EMF_TEXT))
+    asks = '#thym-list input[value="%s"]' % THYM_PROGRAM
+    if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(asks)):
+        fails.append(f"the run card did not list {THYM_PROGRAM}")
+    else:
+        d.click(asks)
+        if not _wait_js(d, "!!document.getElementById('thym-here-note')", 15000):
+            fails.append("a plan that asks a model does not say why it cannot run in the page: "
+                         + str(d.js("(document.getElementById('thym-plan') || {}).innerText")))
+        else:
+            note = d.js("document.getElementById('thym-here-note').textContent") or ""
+            if "ask a model" not in note or "agent-free is on" not in note:
+                fails.append(f"the refusal is not the runtime's agent-free words: {note!r}")
+            if not d.js("document.getElementById('thym-here').hidden"):
+                fails.append("run here is offered for a plan that asks a model")
+    _reset(d)
+    return fails
+
+
+def scenario_allograph_panel(d: Driver) -> list[str]:
+    """0.7 (P4): the allograph and its listing, against the stand-in Connect (scripts/uicheck/connect.py). The cosm
+    viewer on a holograph offers the allograph… beside the isograph… → make it by the holder's program: nothing
+    sent, the file written, the rows previewed as stated by you → sign in to Connect (a code shown large, approved
+    by the stand-in at its second poll) → list it under a user name and a dangler: the listing shows name, dangler
+    and #tag → an attestation the stand-in sends waits for the holder's word, and is accepted → withdraw, after a
+    confirm → sign out. The tree marks the holograph's folder and the allograph file."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await("(async () => { await enterCosmMode(%s); return true; })()" % json.dumps(ALLO_HOLO))
+    if not _wait_js(d, "!document.getElementById('cosm-allo-btn').hidden"
+                       " && document.querySelector('#cosm-mode .cosm-mode-icon').dataset.icon === 'holograph'", 15000):
+        fails.append("the cosm viewer on a holograph does not offer the allograph… with the holograph's mark")
+        _reset(d)
+        return fails
+    d.click("#cosm-allo-btn")
+    prog = 'input[name="allo-prog"][value="%s"]' % ALLO_PROGRAM
+    if not _wait_js(d, "!!document.querySelector(%s) && document.getElementById('dlg-mast-icon').dataset.icon === 'allograph'"
+                       % json.dumps(prog), 15000):
+        fails.append("the allograph card did not list the holder's program: "
+                     + str(d.js("(document.getElementById('dlg-main') || {}).innerText")))
+        _reset(d)
+        return fails
+    d.click(prog)
+    d.click("[data-dlg='allo-make']")
+    if not _wait_js(d, "!!document.querySelector('#allo-make table.allo-table tbody tr') && !!(DLG.allo.made && DLG.allo.made.allograph)", 30000):
+        fails.append("making the allograph showed no preview: " + str(d.js("(document.getElementById('allo-make') || {}).innerText")))
+        _reset(d)
+        return fails
+    made = d.js("DLG.allo.made.allograph") or ""
+    if not re.match(r"^talks/work-self\.allograph-\d{4}-\d{2}-\d{2}-\d{4}-[0-9a-z]{4}\.json$", made):
+        fails.append(f"the allograph is not written beside the holograph, named for its run: {made!r}")
+    if not _wait_js(d, "!!document.querySelector('#tree li.file[data-path=' + JSON.stringify(%s) + '] img.tree-kind-icon[data-icon=\"allograph\"]')"
+                       " && !!document.querySelector('#tree li.dir[data-path=%s] > .dir-row > img.tree-kind-icon[data-icon=\"holograph\"]')"
+                       % (json.dumps(made), json.dumps(ALLO_HOLO)), 15000):
+        fails.append("the tree does not mark the allograph file and the holograph's folder")
+    if not d.js("DLG.allo.connect && DLG.allo.connect.signed_in"):
+        d.click("[data-dlg='allo-signin']")
+        if not _wait_js(d, "/^[A-Z]{4}-[A-Z]{4}$/.test((document.getElementById('allo-code') || {}).textContent || '')", 15000):
+            fails.append("sign in did not show the code: " + str(d.js("(document.getElementById('allo-connect') || {}).innerText")))
+        if not _wait_js(d, "DLG.allo.connect && DLG.allo.connect.signed_in && !!document.querySelector(\"[data-dlg='allo-signout']\")", 30000):
+            fails.append("the sign-in never completed: " + str(d.js("(document.getElementById('allo-connect') || {}).innerText")))
+            _reset(d)
+            return fails
+    d.focus("#allo-name")
+    d.type_text("harbour-baker")
+    d.focus("#allo-dangler")
+    d.type_text("crumb and crust")
+    d.click("[data-dlg='allo-list']")
+    if not _wait_js(d, "!!(DLG.allo.listing && DLG.allo.listing.listed && DLG.allo.listing.tag)", 20000):
+        fails.append("listing it did not list it: " + str(d.js("(document.getElementById('allo-listing') || {}).innerText")))
+        _reset(d)
+        return fails
+    shown = d.js("document.querySelector('#allo-listing .allo-listed').textContent") or ""
+    tag = d.js("DLG.allo.listing.tag") or ""
+    if "harbour-baker" not in shown or "crumb and crust" not in shown or "#" + tag not in shown:
+        fails.append(f"the listing is not shown as its name, dangler and #tag: {shown!r}")
+    # The stand-in's own listing attests the first claim; it waits for the holder's word.
+    d.js_await("(async () => { const s = await (await fetch('/api/connect/status')).json();"
+               " await fetch(s.url + '/__attest', {method: 'POST', mode: 'no-cors', body: JSON.stringify({of: %s})});"
+               " return true; })()" % json.dumps(tag))
+    d.click("[data-dlg='allo-waiting']")
+    if not _wait_js(d, "document.querySelectorAll('#allo-waiting [data-dlg=\"allo-accept\"]').length === 1", 15000):
+        fails.append("the waiting attestation is not shown: " + str(d.js("(document.getElementById('allo-waiting') || {}).innerText")))
+    else:
+        d.click("#allo-waiting [data-dlg='allo-accept']")
+        if not _wait_js(d, "Array.isArray(DLG.allo.waiting) && !DLG.allo.waiting.length && !!DLG.allo.done.waiting", 15000):
+            fails.append("accepting it did not leave nothing waiting: " + str(d.js("(document.getElementById('allo-waiting') || {}).innerText")))
+    d.click("[data-dlg='allo-withdraw']")
+    if not _wait_js(d, "!!document.querySelector('#allo-listing [role=\"alertdialog\"]')"):
+        fails.append("withdraw… did not ask first")
+    else:
+        d.click("[data-dlg='allo-withdraw-yes']")
+        if not _wait_js(d, "DLG.allo.listing && DLG.allo.listing.listed === false", 15000):
+            fails.append("the listing was not withdrawn: " + str(d.js("(document.getElementById('allo-listing') || {}).innerText")))
+    d.click("[data-dlg='allo-signout']")
+    if not _wait_js(d, "DLG.allo.connect && DLG.allo.connect.signed_in === false", 15000):
+        fails.append("sign out did not sign out")
+    _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -5077,4 +5222,7 @@ SCENARIOS: dict[str, Scenario] = {
     "thym-run-folder-outputs": scenario_thym_run_folder_outputs,
     "thym-shipped-copy": scenario_thym_shipped_copy,
     "thym-settle-from-dialectic": scenario_thym_settle_from_dialectic,
+    # --- 0.7: Thym's runtime in the page (P3), the allograph and its registry (P4) ---
+    "thym-run-here": scenario_thym_run_here,
+    "allograph-panel": scenario_allograph_panel,
 }

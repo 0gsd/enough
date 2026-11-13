@@ -112,6 +112,9 @@ DLG_SELF = "talks/self"
 DLG_SELF_PII = "talks/self-pii"
 DLG_ANSWER = "talks/answer-{lang}/close.md.fabulan.cosm"
 DLG_SELF_ASK = "talks/self-ask-{lang}"
+# 0.7 (P4): the holograph that offers work, its holder's program for the allograph (server.ALLOGRAPH_*).
+ALLO_HOLO = "talks/work-self"
+ALLO_PROGRAM = "talks/open-for-work.thym"
 
 Step = tuple[str, str]
 
