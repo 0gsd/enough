@@ -102,7 +102,9 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # `cshort` and `catem` (0.6, pins P0: a fabulac's short and its atem at a
     # depth) are product words like short and atem, lowercase in every language.
     "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem", "short",
-    "fabula", "MiniCOSMs", "Thym", "Ascribe", "Comprise OES", "cshort", "catem",
+    # `Connect` (0.7, P4: Comprise Connect, where the Allograph Registry is) is a product name like OpenRouter;
+    # `faceplace` (0.7, P4) is Ascribe's own word, kept as-is in every language like holograph and isograph.
+    "fabula", "MiniCOSMs", "Thym", "Ascribe", "Comprise OES", "cshort", "catem", "Connect", "faceplace",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",

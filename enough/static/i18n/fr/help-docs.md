@@ -405,6 +405,21 @@ ouvrez-la avec <strong>questions</strong> dans la visionneuse cosm, sur le holog
 - dites <strong>en partie</strong> à un candidat presque juste, puis dites-le à votre façon.
 - la section 13.8 du centre d’aide présente les règles d’Ascribe, les candidats et l’isograph.
 
+## allograph
+name: l’allograph
+path: self/ → self.allograph-<run>.json
+
+### what
+un <strong>allograph</strong> (Ascribe) est votre compte rendu public de ce que vous pouvez faire pour les autres, fait à partir de votre holograph selon les règles : chaque expérience, compétence et compréhension que vous avez rendue publique, par le mot FEED de sa forme, un palier de sa force et la décennie du quand, chacune <em>déclarée par vous</em>. rien d’autre du holograph n’y entre, et aucun nom. il est fait ici et n’est envoyé nulle part tant que vous ne l’<strong>inscrivez</strong> pas à l’Allograph Registry, que sert Comprise Connect.
+
+### how
+choisissez un programme à vous dont l’unique entrée est le holograph et qui finit par <code>give project h as allograph</code>, puis <strong>faire l’allograph</strong>. pour l’inscrire, <strong>se connecter…</strong> à Connect (un code que vous approuvez dans votre navigateur), donnez un nom d’utilisateur et, si vous voulez, un dangler, puis <strong>l’inscrire</strong>. l’inscription d’une personne peut recevoir des preuves de faceplace, accepter des attestations et répondre d’agents ; <strong>chercher quelqu’un</strong> ne demande aucun compte.
+
+### ideas
+- refaites-le quand votre holograph change : la carte dit quand celui qui est inscrit n’est plus à jour.
+- des preuves actives sur deux faceplaces font de votre inscription un Allograph+.
+- la section 13.9 du centre d’aide présente l’allograph et le registre.
+
 ## atem-card
 name: carte atem
 path: (the atem of a text or a passage)

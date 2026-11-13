@@ -404,6 +404,21 @@ open it with <strong>questions</strong> in the cosm viewer on the holograph; the
 - say <strong>partly</strong> to a candidate that is nearly right, then say it your way.
 - section 13.8 of the help center has Ascribe's rules, candidates and the isograph.
 
+## allograph
+name: the allograph
+path: self/ → self.allograph-<run>.json
+
+### what
+an <strong>allograph</strong> (Ascribe) is your public account of what you can do for others, made from your holograph by rules: each experience, skill and understanding you made public, by the FEED word of its form, a band of its strength and the decade of when, every one <em>stated by you</em>. nothing else of the holograph enters it, and no name. it is made here and sent nowhere until you <strong>list</strong> it in the Allograph Registry, which Comprise Connect serves.
+
+### how
+pick a program of yours whose only input is the holograph and which ends <code>give project h as allograph</code>, then <strong>make the allograph</strong>. to list it, <strong>sign in…</strong> to Connect (a code you approve in your browser), give a user name and, if you like, a dangler, and <strong>list it</strong>. a person's listing can take faceplace proofs, accept attestations and answer for agents; <strong>look people up</strong> needs no account.
+
+### ideas
+- make it again when your holograph changes: the card says when the listed one is out of date.
+- live proofs on two faceplaces make your listing an Allograph+.
+- section 13.9 of the help center has the allograph and the registry.
+
 ## atem-card
 name: atem card
 path: (the atem of a text or a passage)

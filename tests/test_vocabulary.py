@@ -149,6 +149,20 @@ ALLOWLIST: tuple[tuple[str, str], ...] = (
     (r"自由智能体|无智能体|^智能体$", "zh: the slider's two states and word (§13)"),
     (r"フリーエージェント|エージェントフリー|^エージェント$", "ja: the slider's two states and word (§13)"),
 
+    # --- Ascribe's agent (0.7, P4): a listing whose allograph is an agent's, made from a character's holograph and
+    #     answered for by an owner (Ascribe 4.2, 14.10). Never the assistant. Exempt on a line about the allograph
+    #     or the holograph, and in the allograph card's few short labels, in each language.
+    (r"^.*(?:allograph|holograph).*$", "Ascribe's agent, on a line about the allograph or the holograph (14.10)"),
+    (r"\bagents you answer for\b|\bthe agent’s tag\b|\bpeople (?:and|or) agents\b|^agents$",
+     "the allograph card's labels for Ascribe's agents (14.10)"),
+    (r"\bles agents dont vous répondez\b|\bl’étiquette de l’agent\b|\bpersonnes (?:et|ou) agents\b|^les agents$",
+     "fr: the allograph card's labels (14.10)"),
+    (r"\bagentes por los que respondes\b|\bla etiqueta del agente\b|\bpersonas (?:y|o) agentes\b|^agentes$",
+     "es: the allograph card's labels (14.10)"),
+    (r"\bAgenten, für die du einstehst\b|\bdas Tag des Agenten\b|\bMenschen (?:und|oder) Agenten\b|^Agenten$",
+     "de: the allograph card's labels (14.10)"),
+    (r"あなたが責任を持つエージェント|エージェントのタグ|人(?:と|か)エージェント", "ja: the allograph card's labels (14.10)"),
+
     # --- katakana collisions: the ja legacy word ロール is a substring of
     #     ordinary vocabulary. Nothing here is the readvisor sense.
     (r"スクロール", "ja: スクロール = scroll / scrollback"),

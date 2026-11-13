@@ -404,6 +404,21 @@ path: self/ → self/D/questions.cosm
 - 对差不多对的候选回答<strong>部分是</strong>，然后用你的话重说一遍。
 - 帮助中心的第 13.8 节讲 Ascribe 的规则、候选和 isograph。
 
+## allograph
+name: allograph
+path: self/ → self.allograph-<run>.json
+
+### what
+<strong>allograph</strong>（Ascribe）是你公开说明自己能为别人做什么，由你的 holograph 按规则生成：你设为公开的每项经验、技能和理解，以它的形式在 FEED 中的词、强度的档位和时间所在的年代表示，每一项都<em>由你自述</em>。holograph 里别的东西都不进去，名字也不进。它在这里生成，在你把它<strong>登记</strong>到由 Comprise Connect 提供的 Allograph Registry 之前，不会发送到任何地方。
+
+### how
+选一个你自己的程序，它唯一的输入是 holograph，并以 <code>give project h as allograph</code> 结尾，然后<strong>生成 allograph</strong>。要登记它，先<strong>登录…</strong> Connect（一个你在浏览器里批准的代码），填一个用户名，愿意的话再加一个 dangler，然后<strong>登记</strong>。一个人的登记可以接受 faceplace 证明、接受证言，并为代理负责；<strong>查人</strong>不需要账户。
+
+### ideas
+- holograph 变了就重新生成：登记的那份过时了，卡片会告诉你。
+- 在两个 faceplace 上有有效证明，你的登记就成为 Allograph+。
+- 帮助中心第 13.9 节讲 allograph 和登记处。
+
 ## atem-card
 name: atem 卡片
 path: (the atem of a text or a passage)

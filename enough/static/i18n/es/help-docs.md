@@ -405,6 +405,21 @@ un <strong>holograph</strong> (Ascribe) describe a una persona sin nombre, y se 
 - di <strong>en parte</strong> a un candidato que casi acierta, y luego dilo a tu manera.
 - la sección 13.8 del centro de ayuda tiene las reglas de Ascribe, los candidatos y el isograph.
 
+## allograph
+name: el allograph
+path: self/ → self.allograph-<run>.json
+
+### what
+un <strong>allograph</strong> (Ascribe) es tu relación pública de lo que puedes hacer por los demás, hecha a partir de tu holograph por reglas: cada experiencia, habilidad y comprensión que hiciste pública, por la palabra FEED de su forma, una franja de su fuerza y la década del cuándo, cada una <em>declarada por ti</em>. nada más del holograph entra en él, y ningún nombre. se hace aquí y no se envía a ninguna parte hasta que lo <strong>inscribes</strong> en el Allograph Registry, que sirve Comprise Connect.
+
+### how
+elige un programa tuyo cuya única entrada sea el holograph y que termine en <code>give project h as allograph</code>, luego <strong>hacer el allograph</strong>. para inscribirlo, <strong>iniciar sesión…</strong> en Connect (un código que apruebas en tu navegador), da un nombre de usuario y, si quieres, un dangler, e <strong>inscríbelo</strong>. la inscripción de una persona puede recibir pruebas de faceplace, aceptar atestaciones y responder por agentes; <strong>buscar a alguien</strong> no necesita cuenta.
+
+### ideas
+- hazlo de nuevo cuando cambie tu holograph: la tarjeta dice cuándo el inscrito está desfasado.
+- pruebas activas en dos faceplaces hacen de tu inscripción un Allograph+.
+- la sección 13.9 del centro de ayuda trata del allograph y del registro.
+
 ## atem-card
 name: tarjeta del atem
 path: (the atem of a text or a passage)

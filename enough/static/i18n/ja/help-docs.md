@@ -404,6 +404,21 @@ holograph を開いた cosm ビューアの<strong>質問</strong>で開きま�
 - ほぼ合っている候補には<strong>一部そう</strong>と答え、あなたの言葉で言い直しましょう。
 - ヘルプセンターのセクション 13.8 に、Ascribe の規則、候補、そして isograph があります。
 
+## allograph
+name: allograph
+path: self/ → self.allograph-<run>.json
+
+### what
+<strong>allograph</strong>（Ascribe）は、あなたが人のためにできることを公に示すもので、holograph から規則によって作ります：公開にした経験・技能・理解のそれぞれを、形の FEED の語、強さの段階、いつの年代で表し、すべて <em>あなたの申告</em> とします。holograph のほかのものは何も入らず、名前も入りません。ここで作られ、Comprise Connect が運営する Allograph Registry に <strong>掲載</strong> するまで、どこにも送られません。
+
+### how
+入力が holograph だけで <code>give project h as allograph</code> で終わるあなたのプログラムを選び、<strong>allograph を作る</strong>。掲載するには、Connect に <strong>サインイン…</strong>（ブラウザで承認するコード）し、ユーザー名と、よければ dangler を入れて <strong>掲載する</strong>。人の掲載は faceplace の証明を受け、証言を受け入れ、エージェントに責任を持てます。<strong>人を調べる</strong> にはアカウントは要りません。
+
+### ideas
+- holograph が変わったら作り直しましょう：掲載したものが古くなるとカードが伝えます。
+- 二つの faceplace で有効な証明があれば、掲載は Allograph+ になります。
+- ヘルプセンターのセクション 13.9 に allograph と登録簿のことがあります。
+
 ## atem-card
 name: atem カード
 path: (the atem of a text or a passage)

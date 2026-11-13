@@ -8554,6 +8554,8 @@
     :is(#thym-modal, #thym-pack-modal, #fabula-modal, #dialectic-modal, #thym-ref-modal) .thym-list {
       display: flex;
       flex-direction: column;
+      /* a scrolling child of the card's flex column: never squeezed to nothing by a long plan below it */
+      flex-shrink: 0;
       gap: 4px;
       max-height: calc(34vh / var(--uiz, 1));
       overflow-y: auto;
@@ -9516,6 +9518,128 @@
       flex: 0 1 8em;
     }
 
+    /* 0.7 (P4): the allograph face of the card, and its listing. */
+    #dialectic-modal .allo-sec {
+      margin: 0 0 6px;
+    }
+    #dialectic-modal .allo-connect.want {
+      outline: 2px solid var(--accent-tool, var(--accent));
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    #dialectic-modal .allo-code {
+      margin: 6px 0;
+      font-family: var(--font-mono);
+      font-size: 26px;
+      letter-spacing: 0.12em;
+      user-select: all;
+    }
+    #dialectic-modal .allo-field {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1 1 12em;
+      min-width: 0;
+      margin: 6px 0 0;
+      font-size: 12px;
+    }
+    #dialectic-modal .allo-field > span {
+      color: var(--fg-muted);
+      font-size: 11.5px;
+    }
+    #dialectic-modal .allo-choice {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin: 3px 12px 3px 0;
+      font-size: 12.5px;
+    }
+    #dialectic-modal table.allo-table {
+      width: 100%;
+      margin: 4px 0;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    #dialectic-modal table.allo-table th {
+      color: var(--fg-muted);
+      font-weight: normal;
+      font-size: 11px;
+      text-align: left;
+    }
+    #dialectic-modal table.allo-table :is(th, td) {
+      padding: 2px 8px 2px 0;
+      border-bottom: 1px solid var(--border);
+      overflow-wrap: anywhere;
+    }
+    #dialectic-modal :is(ul.allo-claims, ul.allo-waiting) {
+      margin: 4px 0;
+      padding-left: 1.2em;
+      font-size: 12px;
+    }
+    #dialectic-modal :is(ul.allo-claims, ul.allo-waiting) li {
+      margin: 3px 0;
+      overflow-wrap: anywhere;
+    }
+    #dialectic-modal .allo-entry {
+      margin: 6px 0;
+      padding: 2px 8px;
+      border-left: 2px solid var(--border);
+    }
+    #dialectic-modal .allo-listed {
+      margin: 4px 0;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    #dialectic-modal input.allo-proof {
+      font-family: var(--font-mono);
+    }
+    #dialectic-modal fieldset.allo-fs {
+      display: flex;
+      flex-direction: column;
+      margin: 6px 0;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+    #dialectic-modal fieldset.allo-fs legend {
+      color: var(--fg-muted);
+      font-size: 11.5px;
+    }
+    #dialectic-modal details.allo-again > summary {
+      cursor: pointer;
+      font-size: 12.5px;
+    }
+    #dialectic-modal .allo-link {
+      font-size: 12.5px;
+      color: var(--accent-tool, var(--accent));
+      overflow-wrap: anywhere;
+    }
+    #dialectic-modal .allo-sec button.primary {
+      border-color: var(--accent-tool, var(--accent));
+      box-shadow: inset 0 0 0 1px var(--accent-tool, var(--accent));
+    }
+    #cosm-mode #cosm-allo-btn:not([hidden]) {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    #cosm-mode .cosm-tool-btn img.cosm-tool-icon {
+      width: 13px;
+      height: 13px;
+      margin-right: 4px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    #tree img.tree-kind-icon {
+      flex: 0 0 auto;
+      align-self: flex-start;          /* beside a long name's first line, not its middle */
+      width: 13px;
+      height: 13px;
+      margin: 0.3em 3px 0 0;
+      vertical-align: -2px;
+      object-fit: contain;
+    }
+
     #dialectic-modal .dlg-row .thym-meta {
       margin: 4px 0 0;
     }
@@ -9619,7 +9743,8 @@
 
     #dialectic-modal .dlg-alts button,
     #dialectic-modal .fab-row button,
-    #dialectic-modal ul.dlg-rows button {
+    #dialectic-modal ul.dlg-rows button,
+    #dialectic-modal .allo-sec button {
       font: inherit;
       font-size: 12px;
       min-height: 24px;
@@ -9645,7 +9770,8 @@
       margin-top: 8px;
     }
 
-    #dialectic-modal .fab-row button:disabled {
+    #dialectic-modal .fab-row button:disabled,
+    #dialectic-modal .allo-sec button:disabled {
       opacity: 0.55;
       cursor: default;
     }
@@ -18738,6 +18864,10 @@
           <button type="button" class="cosm-tool-btn" id="cosm-iso-btn" hidden onclick="dlgIsoOpen(COSM.path)"
             title="make this holograph’s isograph, by a program of yours"
             data-i18n-title="dlg.iso.title" data-i18n="dlg.iso.label">the isograph…</button>
+          <button type="button" class="cosm-tool-btn" id="cosm-allo-btn" hidden onclick="dlgAlloOpen(COSM.path)"
+            title="what you can do for others, made from this holograph by a program of yours, and its listing in the Allograph Registry"
+            data-i18n-title="allo.cosm.title"><img class="svg-icon cosm-tool-icon" data-icon="allograph" alt="" draggable="false"><span
+            data-i18n="allo.cosm.label">the allograph…</span></button>
           <button type="button" class="cosm-tool-btn" id="cosm-rail-btn" aria-controls="cosm-rail"
             aria-expanded="true" onclick="cosmRailToggle()"
             title="show or hide the outline" data-i18n-title="cosm.rail.title"
@@ -20311,7 +20441,7 @@
     <div class="modal-backdrop" onclick="dlgClose()"></div>
     <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
       <div class="modal-head">
-        <img class="svg-icon thym-mast-icon" data-icon="cosm" alt="" draggable="false">
+        <img class="svg-icon thym-mast-icon" id="dlg-mast-icon" data-icon="cosm" alt="" draggable="false">
         <h3 id="dlg-title"></h3>
         <span class="thym-source" id="dlg-source"></span>
         <span class="mode-help-anchor" data-help="dialectic-card"></span>
@@ -32882,6 +33012,8 @@
       cosmEl('cosm-fab-btn').hidden = true;
       cosmEl('cosm-dlg-btn').hidden = true;
       cosmEl('cosm-iso-btn').hidden = true;
+      cosmEl('cosm-allo-btn').hidden = true;
+      setIcon(document.querySelector('#cosm-mode .cosm-mode-icon'), 'cosm');
       cosmEl('cosm-rail').innerHTML = '';
       cosmRailApply();
       const body = cosmEl('cosm-body');
@@ -32930,6 +33062,8 @@
       const title = cosmEl('cosm-title');
       title.textContent = data.title || title.textContent;
       title.title = COSM.path;
+      // 0.7 (P4): a holograph wears its own mark beside its title.
+      setIcon(document.querySelector('#cosm-mode .cosm-mode-icon'), !refused && data.minicosm === 'ascribe' ? 'holograph' : 'cosm');
       const decl = cosmEl('cosm-decl');
       decl.hidden = refused || !data.minicosm;
       decl.textContent = data.minicosm ? data.minicosm + '/' + data.major : '';
@@ -35273,6 +35407,10 @@
           + (landed ? '✓' : '✗') + '</span>' + cosmEsc(landed ? t('thym.trace.landed', 'landed') : (outcome
             ? t('thym.trace.refused', 'refused: nothing landed') : t('thym.trace.unknown', 'no outcome recorded')))
           + '</span>' + (bits.length ? ' · ' + cosmEsc(bits.join(' · ')) : '') + '</p>';
+        // 0.7 (P3): a run made in the page landed in memory only.
+        if (/^inline:thym-page\//.test(String(COSM.path || ''))) {
+          h += '<p class="thym-meta">' + cosmEsc(t('thym.here.nothing', 'ran in the page; nothing was written')) + '</p>';
+        }
         const rels = thymLanded(THYM.outputs.get(run));
         if (rels.length) {
           h += '<p class="thym-meta">' + cosmEsc(t('thym.trace.outputs', 'landed beside the text:')) + ' '
@@ -36199,8 +36337,8 @@
       }
       if (!pl || pl.loading) { el.innerHTML = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('thym.pick.planning', 'planning…')) + '</p>'; return; }
       if (pl.error) { el.innerHTML = '<p class="' + (pl.missing ? 'thym-unavail' : 'thym-refusal') + '">' + cosmEsc(pl.error) + '</p>'; return; }
-      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: P.where || thymProgramWhere(P.program) })
-        + thymHereNoteHTML();
+      el.innerHTML = thymPlanReadHTML(pl, { source: P.source, program: P.program, where: P.where || thymProgramWhere(P.program),
+        after: thymHereNoteHTML() });
     }
 
     // 0.6 (U1c): a plan a person can read before it runs (THYM.md 11, 12,
@@ -36208,7 +36346,7 @@
     // as written; each step at its line with what it keeps, a loop said as
     // known or known only at run time, a recursion's depth, the calls counted
     // only as it runs; every input (a folder's snapshot); what lands where.
-    function thymPlanReadHTML(pl, { source = null, program = null, where = null } = {}) {
+    function thymPlanReadHTML(pl, { source = null, program = null, where = null, after = '' } = {}) {
       let h = '';
       if (pl.atem) h += '<p class="thym-atem-line">' + cosmEsc(String(pl.atem)) + '</p>';
       // 0.6: which model, how many calls at most, before anything runs.
@@ -36226,6 +36364,7 @@
         h += '<p class="thym-fits">' + cosmEsc(pl.mode === 'rules' ? t('thym.pick.fitsRules', 'it can run: by rules, no model asked')
           : t('thym.pick.fitsModel', 'it fits this machine: the model answers the steps that ask')) + '</p>';
       }
+      h += after;
       const plan = cosmIsMap(pl.plan) ? pl.plan : null;
       const nodes = plan && Array.isArray(plan.nodes) ? plan.nodes.filter((n) => cosmIsMap(n) && n.type === 'node') : [];
       const models = cosmIsMap(pl.models) ? pl.models : (plan && cosmIsMap(plan.models) ? plan.models : null);
@@ -36589,7 +36728,7 @@
       const st = thymEl('thym-status');
       const first = st && st.querySelector('[data-there], button');
       if (first) first.focus({ preventScroll: true });
-      if (st) st.scrollIntoView({ block: 'nearest' });
+      if (st) st.scrollIntoView({ block: 'start' });
     }
 
     // The readings panel: the run's line, its refusal as the plan words one,
@@ -36639,9 +36778,13 @@
       const outs = cosmIsMap(out.outputs) ? Object.entries(out.outputs) : [];
       if (outs.length) {
         const files = cosmIsMap(out.files) ? Object.keys(out.files) : [];
+        // Where the run would land each one: the plan's own `writes`, as the plan shows them.
+        const writes = P.plan && Array.isArray(P.plan.writes) ? P.plan.writes.filter(cosmIsMap) : [];
         h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('thym.here.outputs', 'what it would write')) + '</div>';
         for (const [name, o] of outs) {
           const path = String((o && o.path) || '');
+          const w = writes.find((x) => x.name === name);
+          const at = w && w.rel ? String(w.rel) : path;
           let val;
           if (o && typeof o.text === 'string') {
             const txt = o.text.length > 4000 ? o.text.slice(0, 4000) + '\n…' : o.text;
@@ -36652,7 +36795,7 @@
             val = '<p class="thym-plan-sub">' + cosmEsc(t('thym.out.files', 'a folder of {n} files').replace('{n}', String(n))) + '</p>';
           }
           h += '<details class="thym-here-out" open><summary><code>' + cosmEsc(name) + '</code> <span class="thym-meta-i">'
-            + cosmEsc(String((o && o.type) || '')) + '</span>' + (path ? ' <span class="thym-plan-path">' + cosmEsc(path) + '</span>' : '')
+            + cosmEsc(String((o && o.type) || '')) + '</span>' + (at ? ' → <span class="thym-plan-path">' + cosmEsc(at) + '</span>' : '')
             + '</summary>' + val + '</details>';
         }
       }
@@ -39239,7 +39382,9 @@
     function dlgPaint() {
       if (!DLG.open) return;
       if (DLG.face === 'iso') { dlgIsoPaint(); return; }
+      if (DLG.face === 'allo') { dlgAlloPaint(); return; }
       dlgEl('dlg-title').textContent = t('dlg.title', 'the questions');
+      setIcon(dlgEl('dlg-mast-icon'), dlgHolo() ? 'holograph' : 'cosm');
       const src = dlgEl('dlg-source');
       src.textContent = canonBase(String(DLG.vol || DLG.path || '').replace(/\/$/, ''));
       src.title = DLG.vol || DLG.path || '';
@@ -39846,6 +39991,7 @@
 
     // ---- the card's controls ----
     dlgEl('dlg-body').addEventListener('input', (e) => {
+      if (DLG.face === 'allo') { dlgAlloOnInput(e); return; }
       if (DLG.face === 'iso') return;
       if (fabRouteOnEvent(e, 'dlg', () => {})) return;
       const box = e.target.closest('.dlg-q');
@@ -39861,6 +40007,7 @@
       dlgFoot();
     });
     dlgEl('dlg-body').addEventListener('change', (e) => {
+      if (DLG.face === 'allo') { dlgAlloOnInput(e); return; }
       if (DLG.face === 'iso') {
         if (e.target.name === 'dlg-prog') { DLG.iso.chosen = e.target.value; DLG.iso.error = null; dlgIsoPaint(); }
         return;
@@ -39871,6 +40018,7 @@
       const b = e.target.closest('button[data-dlg]');
       if (!b || b.disabled) return;
       const act = b.dataset.dlg;
+      if (act.startsWith('allo-')) { void dlgAlloAct(act, b); return; }
       if (act === 'dont_know' || act === 'declined' || act === 'skip') {
         const i = Number(b.dataset.dlgI);
         const d = dlgRead(i);
@@ -39955,6 +40103,7 @@
       if (!DLG.open) return;
       const I = DLG.iso;
       dlgEl('dlg-title').textContent = t('dlg.iso.head', 'the isograph');
+      setIcon(dlgEl('dlg-mast-icon'), 'holograph');
       const src = dlgEl('dlg-source');
       src.textContent = canonBase(String(DLG.vol || DLG.path || '').replace(/\/$/, ''));
       src.title = DLG.vol || '';
@@ -40010,7 +40159,774 @@
       }
     }
 
-    // ---- the cosm viewer's toolbar: questions (n), isograph… ----
+
+    // ---- 0.7 (P4, tracker allograph-registry): the holograph's allograph,
+    // and its listing in the Allograph Registry (Ascribe 4.2, 14.6 to 14.13) ----
+    // The card's third face, modelled on the isograph's: the subject (a
+    // person, or a character whose allograph is an agent's); the allograph
+    // made by the holder's program (POST /api/ascribe/allograph: nothing is
+    // sent); Connect's sign-in (a device flow: a code approved in the
+    // browser); the listing and what this machine keeps of it; a person's
+    // faceplace proofs, the attestations waiting for their word, their own
+    // attestations of others and the agents they answer for; and the look-ups,
+    // which need no account. Everything that sends is one click of the
+    // holder's. Nothing personal is shown beyond what the routes answer, and
+    // the Connect account itself never is.
+    function dlgAlloFresh() {
+      return {
+        listing: null, connect: null, signin: null, programs: null, chosen: null, busy: null, made: null,
+        errs: {}, want: false, entry: null, faceplaces: null, proof: null, proofs: [], waiting: null,
+        confirm: false, done: {},
+        form: { name: '', dangler: '', faceplaces: 'counted', same_name: false, owner: '', allograph: '' },
+        pf: { faceplace: '', handle: '', address: '' },
+        at: { of: '', entry: null, claims: [], as: 'client', epoch: dlgAlloEpochNow(), named: false },
+        agent: '',
+        search: { needs: [{ about: 'skill', value: '' }], kind: '', plus: false, attested: false, result: null, next: null },
+      };
+    }
+    DLG.allo = null;
+
+    function dlgAlloEpochNow() {
+      const d = new Date();
+      return d.getFullYear() + '-Q' + (Math.floor(d.getMonth() / 3) + 1);
+    }
+
+    async function dlgAlloOpen(path) {
+      if (IS_HOME || !path) return;
+      DLG.seq++;
+      Object.assign(DLG, { face: 'allo', path: String(path), vol: String(path), data: null, error: null, mainKey: null });
+      DLG.allo = dlgAlloFresh();
+      dlgModal(true);
+      dlgAlloPaint();
+      const seq = DLG.seq;
+      const [q, p] = await Promise.all([canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)), canonJSON('/api/thym/programs')]);
+      if (seq !== DLG.seq) return;
+      if (q.ok && q.data) { DLG.data = q.data; DLG.vol = q.data.path; }
+      const A = DLG.allo;
+      if (!p.ok || !p.data) A.errs.make = dlgAlloErr(p);
+      else {
+        // The holder's own programs, as for the isograph: in the project, taking one volume, asking no model.
+        A.programs = (p.data.programs || []).filter((x) => x && x.where === 'project' && !x.problem && Array.isArray(x.takes)
+          && x.takes.length === 1 && x.takes[0].type === 'volume' && !x.asks);
+        if (A.programs.length === 1) A.chosen = A.programs[0].rel;
+      }
+      await Promise.all([dlgAlloListing(seq), dlgAlloConnect(seq)]);
+      if (seq !== DLG.seq) return;
+      dlgAlloPaint();
+      const first = dlgEl('dlg-main').querySelector('input:checked, input, button:not([disabled])');
+      if (first) first.focus({ preventScroll: true });
+    }
+    window.dlgAlloOpen = dlgAlloOpen;
+
+    // A refusal in words: 401 asks for the sign-in strip, 502 says Connect is out of reach, anything else is the
+    // route's own detail, shown beside the control that asked.
+    function dlgAlloErr(r) {
+      if (r && r.status === 401) {
+        if (DLG.allo) DLG.allo.want = true;
+        if (DLG.allo && DLG.allo.connect) DLG.allo.connect.signed_in = false;
+        return t('allo.err.signIn', 'sign in to Connect first: the registry takes a statement only from a signed-in account');
+      }
+      if (r && r.status === 502) return t('allo.err.unreachable', 'Connect could not be reached');
+      return String((r && r.error) || t('canon.job.failed', 'that did not work'));
+    }
+
+    async function dlgAlloListing(seq = DLG.seq) {
+      const A = DLG.allo;
+      const r = await canonJSON('/api/allograph/listing?path=' + encodeURIComponent(DLG.vol || DLG.path));
+      if (seq !== DLG.seq || A !== DLG.allo) return;
+      A.listing = r.ok && r.data ? r.data : { error: dlgAlloErr(r) };
+      if (r.ok && r.data && r.data.listed && r.data.tag) {
+        const [e, w] = await Promise.all([dlgAlloEntryLoad(r.data.tag), A.connect && A.connect.signed_in ? dlgAlloWaitingLoad() : null]);
+        if (seq !== DLG.seq || A !== DLG.allo) return;
+        A.entry = e;
+        if (w) A.waiting = w;
+      } else {
+        A.entry = null;
+        A.waiting = null;
+      }
+    }
+
+    async function dlgAlloEntryLoad(tag) {
+      const r = await canonJSON('/api/allograph/entry?tag=' + encodeURIComponent(tag));
+      if (!r.ok || !r.data) return { error: dlgAlloErr(r) };
+      return r.data.entry ? r.data.entry : { none: true };
+    }
+
+    async function dlgAlloWaitingLoad() {
+      const r = await canonJSON('/api/allograph/waiting?path=' + encodeURIComponent(DLG.vol || DLG.path));
+      return r.ok && r.data ? (Array.isArray(r.data.attestations) ? r.data.attestations : []) : { error: dlgAlloErr(r) };
+    }
+
+    async function dlgAlloConnect(seq = DLG.seq) {
+      const A = DLG.allo;
+      const r = await canonJSON('/api/connect/status');
+      if (seq !== DLG.seq || A !== DLG.allo) return;
+      // The account is never shown: only whether this machine is signed in, and to which Connect.
+      A.connect = r.ok && r.data ? { url: r.data.url, signed_in: !!r.data.signed_in } : { error: dlgAlloErr(r) };
+      if (A.connect.signed_in) A.want = false;
+    }
+
+    function dlgAlloHost(url) {
+      try { return new URL(String(url)).host; } catch (_e) { return String(url || ''); }
+    }
+
+    function dlgAlloSubject() {
+      const L = DLG.allo && DLG.allo.listing;
+      return L && L.kind === 'agent' ? 'character' : 'person';
+    }
+
+    // The allograph files beside the holograph, newest first (the tree's rows; the one just made first of all).
+    function dlgAlloFiles() {
+      const A = DLG.allo;
+      const holo = String(DLG.vol || DLG.path || '').replace(/\/$/, '');
+      const out = Array.from(document.querySelectorAll('#tree li.file[data-path]')).map((li) => li.dataset.path)
+        .filter((p) => p.startsWith(holo + '.allograph-') && /\.json$/i.test(p)).sort().reverse();
+      const made = A && A.made && A.made.allograph;
+      if (made) return [made].concat(out.filter((p) => p !== made));
+      return out;
+    }
+
+    function dlgAlloSec(id, head, body) {
+      return '<section class="allo-sec" id="allo-' + id + '"><div class="thym-sec-h dict-sc" id="allo-' + id + '-h">' + cosmEsc(head) + '</div>' + body + '</section>';
+    }
+    function dlgAlloErrHTML(key) {
+      const e = DLG.allo && DLG.allo.errs[key];
+      return e ? '<p class="thym-refusal" role="alert">' + cosmEsc(e) + '</p>' : '';
+    }
+    function dlgAlloDoneHTML(key) {
+      const d = DLG.allo && DLG.allo.done[key];
+      return d ? '<p class="thym-fits" role="status">' + cosmEsc(d) + '</p>' : '';
+    }
+    function dlgAlloBtn(act, label, { disabled = false, primary = false, extra = '' } = {}) {
+      return '<button type="button" data-dlg="' + act + '"' + (primary ? ' class="primary"' : '') + (disabled ? ' disabled' : '') + extra + '>' + cosmEsc(label) + '</button>';
+    }
+    function dlgAlloWait(words) {
+      return '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(words) + '</p>';
+    }
+
+    function dlgAlloPaint() {
+      if (!DLG.open || !DLG.allo) return;
+      const A = DLG.allo;
+      dlgEl('dlg-title').textContent = t('allo.head', 'the allograph');
+      setIcon(dlgEl('dlg-mast-icon'), 'allograph');
+      const src = dlgEl('dlg-source');
+      src.textContent = canonBase(String(DLG.vol || DLG.path || '').replace(/\/$/, ''));
+      src.title = DLG.vol || '';
+      dlgSet('dlg-rules', '<div class="dlg-holo"><p>' + cosmEsc(t('allo.what', 'an allograph is your public account of what you can do for others: each experience, skill and understanding you made public, by the FEED word of its form, a band of its strength and the decade of when, every one stated by you. it is made by rules, here, by a program of yours, and it is public only if you list it.'))
+        + ' <span class="mode-help-anchor" data-help="allograph"></span></p></div>');
+      dlgSet('dlg-progress', '');
+      const person = dlgAlloSubject() === 'person';
+      const L = A.listing;
+      const listed = !!(L && L.listed);
+      const signed = !!(A.connect && A.connect.signed_in);
+      let h = dlgAlloSubjectHTML() + dlgAlloMakeHTML() + dlgAlloConnectHTML() + dlgAlloListingHTML();
+      if (listed && person) h += dlgAlloProofHTML();
+      if (listed && signed) h += dlgAlloWaitingHTML();
+      if (listed && signed && person) h += dlgAlloAttestHTML() + dlgAlloAgentsHTML();
+      h += dlgAlloSearchHTML();
+      DLG.mainKey = null;
+      dlgSet('dlg-main', h);
+      ['dlg-sitting', 'dlg-settle', 'dlg-before'].forEach((id) => dlgSet(id, ''));
+      dlgStatus('');
+      dlgEl('dlg-send').hidden = true;
+      applyHelpBubbles();
+    }
+
+    // 1. Whose self the holograph is: a person, or a character (an agent's allograph, which names an owner).
+    function dlgAlloSubjectHTML() {
+      const A = DLG.allo;
+      const s = dlgAlloSubject();
+      const opt = (v, label) => '<label class="allo-choice"><input type="radio" name="allo-subject" value="' + v + '"'
+        + (s === v ? ' checked' : '') + (A.busy === 'subject' || !A.listing || A.listing.error ? ' disabled' : '') + '> ' + cosmEsc(label) + '</label>';
+      return dlgAlloSec('subject', t('allo.subject.head', 'whose self it is'),
+        '<div class="dlg-row" role="radiogroup" aria-labelledby="allo-subject-h">' + opt('person', t('allo.subject.person', 'a person: you'))
+        + opt('character', t('allo.subject.character', 'a character')) + '</div>'
+        + '<p class="thym-note">' + cosmEsc(t('allo.subject.note', 'a character’s holograph makes an agent’s allograph, and an agent’s listing must name the owner who answers for it.')) + '</p>'
+        + dlgAlloErrHTML('subject'));
+    }
+
+    // 2. Make it, by a program of the holder's; preview what it says; nothing is sent.
+    function dlgAlloMakeHTML() {
+      const A = DLG.allo;
+      let h = '<div class="dlg-holo allo-never"><p><strong>' + cosmEsc(t('allo.never.head', 'what never enters it:')) + '</strong> '
+        + cosmEsc(t('allo.never', 'the other seven kinds of node (affinities, beliefs, concerns, interests, opinions, qualia, yearnings); a node marked against or mixed; anything not public; anything pending, a candidate or a question; a form not grounded in FEED; and no name, summary, id or words of yours.')) + '</p></div>';
+      h += '<div class="thym-sec-h dict-sc" id="allo-prog-h">' + cosmEsc(t('dlg.iso.prog', 'by which program')) + '</div>';
+      if (A.programs == null && !A.errs.make) h += dlgAlloWait(t('cosm.loading', 'reading…'));
+      else if (A.programs && !A.programs.length) {
+        h += '<p class="thym-note">' + cosmEsc(t('allo.make.none', 'no program of yours takes the holograph alone: write a .thym in the project whose one input is a volume and whose output is project h as allograph')) + '</p>';
+      } else if (A.programs) {
+        h += '<div class="thym-list" role="radiogroup" aria-labelledby="allo-prog-h">' + A.programs.map((p) => '<label class="thym-opt"><input type="radio" name="allo-prog" value="'
+          + cosmEsc(p.rel) + '"' + (A.chosen === p.rel ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">' + cosmEsc(String(p.name || p.rel))
+          + '</span><span class="thym-where">' + cosmEsc(p.rel) + '</span></span>' + (p.why ? '<span class="thym-opt-meta">' + cosmEsc(String(p.why)) + '</span>' : '') + '</label>').join('') + '</div>';
+        h += '<div class="fab-row">' + dlgAlloBtn('allo-make', t('allo.make.go', 'make the allograph'), { disabled: !A.chosen || !!A.busy }) + '</div>';
+      }
+      if (A.busy === 'make') h += dlgAlloWait(t('dlg.iso.busy', 'running the program by rules…'));
+      h += dlgAlloErrHTML('make');
+      if (A.made) h += dlgAlloPreviewHTML(A.made);
+      return dlgAlloSec('make', t('allo.make.head', 'make it'), h);
+    }
+
+    function dlgAlloPreviewHTML(m) {
+      const doc = cosmIsMap(m.document) ? m.document : {};
+      const rows = Array.isArray(doc.expertise) ? doc.expertise.filter(cosmIsMap) : [];
+      let h = '<p class="thym-fits">' + cosmEsc(t('allo.made.sent', 'nothing was sent. written: {file}').replace('{file}', () => String(m.allograph || ''))) + '</p>'
+        + '<p class="thym-note">' + cosmEsc(t('allo.made.release', 'the release was recorded in the holograph first: epoch {epoch}, run {run}')
+          .replace('{epoch}', () => String(doc.epoch || '')).replace('{run}', () => String(m.run || doc.run || ''))) + '</p>';
+      h += '<p class="thym-meta">' + cosmEsc(t('allo.made.kind', 'an allograph of a {kind}, epoch {epoch}').replace('{kind}', () => String(doc.kind || '?'))
+        .replace('{epoch}', () => String(doc.epoch || '?'))) + (doc.sample ? ' · ' + cosmEsc(t('allo.sample', 'a sample')) : '') + '</p>';
+      if (!rows.length) {
+        h += '<p class="thym-note">' + cosmEsc(t('allo.made.empty', 'it offers nothing yet: no public experience, skill or understanding of yours has a form grounded in FEED.')) + '</p>';
+        return h;
+      }
+      h += '<table class="allo-table"><thead><tr><th>' + cosmEsc(t('allo.col.kind', 'kind')) + '</th><th>' + cosmEsc(t('allo.col.form', 'form'))
+        + '</th><th>' + cosmEsc(t('allo.col.band', 'band')) + '</th><th>' + cosmEsc(t('allo.col.when', 'decade')) + '</th><th>'
+        + cosmEsc(t('allo.col.marking', 'marking')) + '</th></tr></thead><tbody>'
+        + rows.map((r) => '<tr><td>' + cosmEsc(String(r.kind || '')) + '</td><td><code>' + cosmEsc(Array.isArray(r.form) ? r.form.join(' ') : String(r.form || '')) + '</code></td><td>'
+          + cosmEsc(String(r.strength || '—')) + '</td><td>' + cosmEsc(String(r.when || '—')) + '</td><td>'
+          + cosmEsc(r.marking === 'stated' ? t('allo.stated', 'stated by you') : String(r.marking || '')) + '</td></tr>').join('')
+        + '</tbody></table>';
+      return h;
+    }
+
+    // 3. Connect: signed in or not, and the device flow's code.
+    function dlgAlloConnectHTML() {
+      const A = DLG.allo;
+      const C = A.connect;
+      let h = '';
+      if (!C) h = dlgAlloWait(t('cosm.loading', 'reading…'));
+      else if (C.error) h = '<p class="thym-refusal">' + cosmEsc(C.error) + '</p>';
+      else if (C.signed_in) {
+        h = '<div class="dlg-row"><span class="fab-say">' + cosmEsc(t('allo.connect.in', 'signed in to Connect at {host}').replace('{host}', () => dlgAlloHost(C.url))) + '</span>'
+          + dlgAlloBtn('allo-signout', t('allo.connect.out', 'sign out'), { disabled: !!A.busy }) + '</div>';
+      } else if (A.signin && A.signin.user_code) {
+        const S = A.signin;
+        const url = String(S.verification_uri_complete || S.verification_uri || '');
+        h = '<p class="thym-note">' + cosmEsc(t('allo.connect.code', 'approve this code in your browser, with your passkey:')) + '</p>'
+          + '<p class="allo-code" id="allo-code">' + cosmEsc(String(S.user_code)) + '</p>'
+          + '<div class="dlg-row">' + (/^https?:\/\//.test(url) ? '<a class="allo-link" href="' + cosmEsc(url) + '" target="_blank" rel="noopener">'
+            + cosmEsc(t('allo.connect.open', 'open {url}').replace('{url}', () => String(S.verification_uri || url))) + '</a>' : '')
+          + dlgAlloBtn('allo-signin-cancel', t('atem.card.cancel', 'cancel')) + '</div>'
+          + dlgAlloWait(t('allo.connect.waiting', 'waiting for you to approve it…'));
+      } else {
+        h = '<div class="dlg-row"><span class="fab-say">' + cosmEsc(t('allo.connect.outNow', 'not signed in to Connect at {host}: listing, proofs and attestations need an account; looking people up does not.')
+          .replace('{host}', () => dlgAlloHost(C.url))) + '</span>'
+          + dlgAlloBtn('allo-signin', t('allo.connect.in.go', 'sign in…'), { disabled: !!A.busy, primary: !!A.want }) + '</div>';
+      }
+      return '<section class="allo-sec allo-connect' + (A.want && !(C && C.signed_in) ? ' want' : '') + '" id="allo-connect"><div class="thym-sec-h dict-sc">'
+        + cosmEsc(t('allo.connect.head', 'Connect')) + '</div>' + h + dlgAlloErrHTML('connect') + '</section>';
+    }
+
+    // 4. The listing: list it, or what is listed, whether the holograph changed since, and withdrawing it.
+    function dlgAlloListingHTML() {
+      const A = DLG.allo;
+      const L = A.listing;
+      let h = '';
+      if (!L) h = dlgAlloWait(t('cosm.loading', 'reading…'));
+      else if (L.error) h = '<p class="thym-refusal">' + cosmEsc(L.error) + '</p>';
+      else if (L.listed) {
+        h = '<p class="allo-listed"><code>' + cosmEsc(String(L.name || '')) + '</code>' + (L.dangler ? ' <em>' + cosmEsc(String(L.dangler)) + '</em>' : '')
+          + ' <code>#' + cosmEsc(String(L.tag || '')) + '</code></p>'
+          + '<p class="thym-meta">' + cosmEsc(t('allo.listed.where', 'listed at {host}, from {file}').replace('{host}', () => dlgAlloHost(L.registry))
+            .replace('{file}', () => String(L.allograph || ''))) + '</p>';
+        if (L.changed === true) h += '<p class="thym-refusal">' + cosmEsc(t('allo.changed', 'your holograph has changed since the allograph you listed was made; make it again and list it to replace it')) + '</p>';
+        else if (L.changed === null) h += '<p class="thym-note">' + cosmEsc(t('allo.changed.unknown', 'can’t tell whether your holograph has changed since; that run isn’t on this machine')) + '</p>';
+        if (A.entry) h += dlgAlloEntryHTML(A.entry, { own: true });
+        h += dlgAlloFormHTML(true);
+        if (A.confirm) {
+          h += '<div class="dlg-holo" role="alertdialog" aria-labelledby="allo-withdraw-q"><p id="allo-withdraw-q">' + cosmEsc(t('allo.withdraw.q', 'withdraw this listing? it is gone from every answer at once, with its proofs, attestations and bonds; listing again later starts afresh under the same tag.')) + '</p>'
+            + '<div class="fab-row">' + dlgAlloBtn('allo-withdraw-yes', t('allo.withdraw.yes', 'yes, withdraw it'), { disabled: !!A.busy })
+            + dlgAlloBtn('allo-withdraw-no', t('allo.withdraw.no', 'keep it listed')) + '</div></div>';
+        } else {
+          h += '<div class="fab-row">' + dlgAlloBtn('allo-withdraw', t('allo.withdraw', 'withdraw…'), { disabled: !!A.busy }) + '</div>';
+        }
+      } else {
+        h = '<p class="thym-note">' + cosmEsc(t('allo.unlisted', 'not listed: no one can find it until you list it.')) + '</p>' + dlgAlloFormHTML(false);
+      }
+      if (A.busy === 'list' || A.busy === 'withdraw') h += dlgAlloWait(t('allo.sending', 'sending it to the registry…'));
+      return dlgAlloSec('listing', t('allo.listing.head', 'the listing'), h + dlgAlloErrHTML('listing') + dlgAlloDoneHTML('listing'));
+    }
+
+    // The form that lists (or lists again, replacing what is listed).
+    function dlgAlloFormHTML(again) {
+      const A = DLG.allo;
+      const F = A.form;
+      const L = A.listing || {};
+      if (again && !F.name && L.name) { F.name = String(L.name); F.dangler = String(L.dangler || ''); }
+      const files = dlgAlloFiles();
+      if (!F.allograph || !files.includes(F.allograph)) F.allograph = files[0] || '';
+      if (!files.length) return '<p class="thym-note">' + cosmEsc(t('allo.list.noFile', 'make the allograph first: the listing carries the file its run wrote.')) + '</p>';
+      const agent = dlgAlloSubject() === 'character';
+      let h = again ? '<details class="allo-again"><summary>' + cosmEsc(t('allo.list.again', 'list a newer allograph, or change the name…')) + '</summary>' : '';
+      h += '<label class="allo-field"><span>' + cosmEsc(t('allo.list.name', 'user name')) + '</span><input class="dlg-in" id="allo-name" data-allo="form.name" value="'
+        + cosmEsc(F.name) + '" maxlength="32" autocomplete="off" spellcheck="false" aria-describedby="allo-name-hint"></label>'
+        + '<p class="thym-meta" id="allo-name-hint">' + cosmEsc(t('allo.list.name.hint', '2 to 32 of a–z, 0–9, . and -, beginning with a letter; many listings may share a name')) + '</p>'
+        + '<label class="allo-field"><span>' + cosmEsc(t('allo.list.dangler', 'dangler (optional)')) + '</span><input class="dlg-in" id="allo-dangler" data-allo="form.dangler" value="'
+        + cosmEsc(F.dangler) + '" maxlength="32" autocomplete="off" aria-describedby="allo-dangler-hint"></label>'
+        + '<p class="thym-meta" id="allo-dangler-hint">' + cosmEsc(t('allo.list.dangler.hint', 'one short line on your name, so two of one name can tell themselves apart: no address, nothing personal')) + '</p>';
+      if (!agent) {
+        h += '<div class="dlg-row" role="radiogroup" aria-label="' + cosmEsc(t('allo.list.show', 'your faceplaces, as the listing shows them')) + '"><span class="fab-say">'
+          + cosmEsc(t('allo.list.show', 'your faceplaces, as the listing shows them')) + '</span>'
+          + ['counted', 'named'].map((v) => '<label class="allo-choice"><input type="radio" name="allo-show" value="' + v + '"' + (F.faceplaces === v ? ' checked' : '') + '> '
+            + cosmEsc(v === 'counted' ? t('allo.list.counted', 'counted') : t('allo.list.named', 'named')) + '</label>').join('') + '</div>'
+          + '<label class="allo-choice"><input type="checkbox" id="allo-same" data-allo="form.same_name"' + (F.same_name ? ' checked' : '') + '> '
+          + cosmEsc(t('allo.list.same', 'show how many of your faceplace handles match the name')) + '</label>';
+      } else {
+        h += '<label class="allo-field"><span>' + cosmEsc(t('allo.list.owner', 'owner')) + '</span><input class="dlg-in" id="allo-owner" data-allo="form.owner" value="'
+          + cosmEsc(F.owner) + '" autocomplete="off" spellcheck="false" placeholder="ts7de32a5bnz · company:MEADOW"></label>'
+          + '<p class="thym-meta">' + cosmEsc(t('allo.list.owner.hint', 'who answers for the agent: an Allograph+ listing’s tag, or company: and a company’s handle on the Comprise Index')) + '</p>';
+      }
+      h += '<label class="allo-field"><span>' + cosmEsc(t('allo.list.file', 'the allograph to list')) + '</span><select class="dlg-in" id="allo-file" data-allo="form.allograph">'
+        + files.map((f) => '<option value="' + cosmEsc(f) + '"' + (f === F.allograph ? ' selected' : '') + '>' + cosmEsc(canonBase(f)) + '</option>').join('') + '</select></label>';
+      h += '<div class="fab-row">' + dlgAlloBtn('allo-list', again ? t('allo.list.replace', 'list it, replacing what is listed') : t('allo.list.go', 'list it'),
+        { disabled: !!A.busy, primary: !again }) + '</div>';
+      return h + (again ? '</details>' : '');
+    }
+
+    // An entry as the registry shows it (Ascribe 14.11): name, dangler, tag, its levels, its claims.
+    function dlgAlloEntryHTML(e, { own = false } = {}) {
+      if (!cosmIsMap(e)) return '';
+      if (e.error) return '<p class="thym-refusal">' + cosmEsc(e.error) + '</p>';
+      if (e.none) return '<p class="thym-note">' + cosmEsc(t('allo.entry.none', 'the registry lists nothing under that tag')) + '</p>';
+      const bits = [String(e.kind || '')];
+      bits.push(e.level === 'attested' ? t('allo.level.attested', 'attested') : t('allo.level.stated', 'stated'));
+      if (e.plus === true) bits.push('Allograph+');
+      if (typeof e.faceplaces === 'number') bits.push(t('allo.entry.fpCount', 'verified on {n} faceplaces').replace('{n}', String(e.faceplaces)));
+      if (e.same_name) bits.push(t('allo.entry.same', '{n} faceplace handles match the name').replace('{n}', String(e.same_name)));
+      if (e.sample) bits.push(t('allo.sample', 'a sample'));
+      if (e.verified === false) bits.push(t('allo.entry.unverified', 'its signature does not check'));
+      let h = '<div class="allo-entry">';
+      if (!own) {
+        h += '<p class="allo-listed"><code>' + cosmEsc(String(e.name || '')) + '</code>' + (e.dangler ? ' <em>' + cosmEsc(String(e.dangler)) + '</em>' : '')
+          + ' <code>#' + cosmEsc(String(e.tag || '')) + '</code></p>';
+      } else {
+        h += '<p class="thym-meta">' + cosmEsc(t('allo.entry.own', 'as the registry shows it now:')) + '</p>';
+      }
+      h += '<p class="thym-meta">' + cosmEsc(bits.filter(Boolean).join(' · ')) + '</p>';
+      if (cosmIsMap(e.owner)) {
+        const o = e.owner;
+        h += '<p class="thym-meta">' + cosmEsc(t('allo.entry.owner', 'answered for by {who}').replace('{who}', () => o.company ? 'company:' + o.company
+          : [o.name, o.dangler, o.tag ? '#' + o.tag : ''].filter(Boolean).join(' '))) + '</p>';
+      }
+      if (Array.isArray(e.faceplaces) && e.faceplaces.length) {
+        h += '<ul class="allo-claims">' + e.faceplaces.filter(cosmIsMap).map((f) => '<li><code>' + cosmEsc(String(f.faceplace || '')) + '</code> '
+          + cosmEsc(String(f.handle || '')) + (f.checked ? ' <span class="thym-meta-i">' + cosmEsc(t('allo.entry.checked', 'checked {day}').replace('{day}', () => String(f.checked))) + '</span>' : '') + '</li>').join('') + '</ul>';
+      }
+      const claims = Array.isArray(e.claims) ? e.claims.filter(cosmIsMap) : [];
+      if (claims.length) {
+        h += '<ul class="allo-claims">' + claims.map((c) => {
+          const att = Array.isArray(c.attested) ? c.attested.filter(cosmIsMap) : [];
+          return '<li>' + cosmEsc(String(c.kind || '')) + ' <code>' + cosmEsc(Array.isArray(c.form) ? c.form.join(' ') : String(c.form || '')) + '</code>'
+            + ' <span class="thym-meta-i">' + cosmEsc([c.strength, c.when, c.level === 'attested' ? t('allo.level.attested', 'attested') : t('allo.level.stated', 'stated')].filter(Boolean).join(' · ')) + '</span>'
+            + (att.length ? '<span class="thym-plan-sub">' + cosmEsc(att.map((a) => [a.as, a.epoch, a.from, a.plus ? 'Allograph+' : '', a.by].filter(Boolean).join(' ')).join('; ')) + '</span>' : '')
+            + '</li>';
+        }).join('') + '</ul>';
+      }
+      return h + '</div>';
+    }
+
+    // 5. A person's faceplace proofs: the string to post, the address it is at, the registry asked to read it.
+    function dlgAlloProofHTML() {
+      const A = DLG.allo;
+      const P = A.pf;
+      let h = '<p class="thym-note">' + cosmEsc(t('allo.proof.what', 'prove that you hold an account somewhere public by posting a short code there; live proofs on two or more faceplaces make your listing an Allograph+.')) + '</p>';
+      if (A.faceplaces == null) h += dlgAlloBtn('allo-fp-load', t('allo.proof.load', 'the faceplaces the registry checks…'), { disabled: !!A.busy });
+      else if (A.faceplaces.error) h += '<p class="thym-refusal">' + cosmEsc(A.faceplaces.error) + '</p>';
+      else {
+        const fps = A.faceplaces.list;
+        if (!P.faceplace && fps.length) P.faceplace = String(fps[0].faceplace || '');
+        h += '<div class="dlg-row"><label class="allo-field"><span>' + cosmEsc(t('allo.proof.faceplace', 'faceplace')) + '</span><select class="dlg-in" id="allo-fp" data-allo="pf.faceplace">'
+          + fps.map((f) => '<option value="' + cosmEsc(String(f.faceplace || '')) + '"' + (f.faceplace === P.faceplace ? ' selected' : '') + '>'
+            + cosmEsc(String(f.title || f.faceplace || '')) + '</option>').join('') + '</select></label>'
+          + '<label class="allo-field"><span>' + cosmEsc(t('allo.proof.handle', 'your handle there')) + '</span><input class="dlg-in" id="allo-handle" data-allo="pf.handle" value="'
+          + cosmEsc(P.handle) + '" autocomplete="off" spellcheck="false"></label></div>'
+          + '<div class="fab-row">' + dlgAlloBtn('allo-proof', t('allo.proof.go', 'make the proof string'), { disabled: !P.faceplace || !P.handle.trim() || !!A.busy }) + '</div>';
+      }
+      const R = A.proof;
+      if (R) {
+        const addrs = Array.isArray(R.addresses) ? R.addresses.map(String) : [];
+        if (!P.address) P.address = addrs.find((a) => !/\{[a-z]+\}/.test(a)) || '';
+        h += '<p class="thym-note">' + cosmEsc(t('allo.proof.post', 'post this exactly in a public place of the account: its bio, a post, a gist.')) + '</p>'
+          + '<div class="dlg-row"><input class="dlg-in allo-proof" id="allo-proof" readonly value="' + cosmEsc(String(R.proof || '')) + '" aria-label="'
+          + cosmEsc(t('allo.proof.string', 'the proof string')) + '">' + dlgAlloBtn('allo-copy', t('allo.proof.copy', 'copy')) + '</div>';
+        if (addrs.length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('allo.proof.where', 'it may be at any of these addresses:'))
+            + (addrs.some((a) => a.includes('{any}')) ? ' ' + cosmEsc(t('allo.proof.any', '{any} is a part you fill in, such as a post’s id.')) : '') + '</p>'
+            + '<ul class="allo-claims">' + addrs.map((a) => '<li><code>' + cosmEsc(a) + '</code></li>').join('') + '</ul>';
+        }
+        h += '<label class="allo-field"><span>' + cosmEsc(t('allo.proof.address', 'the address where you posted it')) + '</span><input class="dlg-in" id="allo-address" data-allo="pf.address" value="'
+          + cosmEsc(P.address) + '" autocomplete="off" spellcheck="false" inputmode="url"></label>'
+          + '<div class="fab-row">' + dlgAlloBtn('allo-prove', t('allo.proof.check', 'ask the registry to read it'), { disabled: !P.address.trim() || !!A.busy, primary: true })
+          + dlgAlloBtn('allo-unprove', t('allo.proof.remove', 'remove this proof'), { disabled: !!A.busy }) + '</div>';
+      }
+      if (A.busy === 'proof') h += dlgAlloWait(t('allo.sending', 'sending it to the registry…'));
+      return dlgAlloSec('proofs', t('allo.proof.head', 'faceplace proofs'), h + dlgAlloErrHTML('proof') + dlgAlloDoneHTML('proof'));
+    }
+
+    // 6. Attestations waiting for the holder's word.
+    function dlgAlloWaitingHTML() {
+      const A = DLG.allo;
+      const W = A.waiting;
+      let h = '';
+      if (W == null) h = dlgAlloBtn('allo-waiting', t('allo.waiting.load', 'see what waits for your word…'), { disabled: !!A.busy });
+      else if (W.error) h = '<p class="thym-refusal">' + cosmEsc(W.error) + '</p>';
+      else if (!W.length) h = '<p class="thym-note">' + cosmEsc(t('allo.waiting.none', 'no attestation waits for your word')) + '</p>';
+      else {
+        h = '<p class="thym-note">' + cosmEsc(t('allo.waiting.what', 'nothing shows on your listing until you accept it; you may remove one at any time.')) + '</p><ul class="allo-waiting">'
+          + W.filter(cosmIsMap).map((w) => {
+            const s = cosmIsMap(w.statement) ? w.statement : {};
+            const claims = Array.isArray(s.claims) ? s.claims.filter(cosmIsMap).map((c) => String(c.kind || '') + ' ' + String(c.form || '')).join(', ') : '';
+            const d = String(w.attestation || '');
+            return '<li><span><code>' + cosmEsc(String(s.as || '?')) + '</code> ' + cosmEsc(String(s.epoch || '?')) + ' · ' + cosmEsc(claims) + '</span>'
+              + '<span class="thym-plan-sub">' + cosmEsc(s.named ? t('allo.waiting.by', 'by {by}, who shows who they are').replace('{by}', () => String(s.by || '?'))
+                : t('allo.waiting.anon', 'by a listing that does not show who it is')) + '</span>'
+              + '<span class="fab-row">' + dlgAlloBtn('allo-accept', t('allo.waiting.accept', 'accept'), { disabled: !!A.busy, extra: ' data-allo-d="' + cosmEsc(d) + '"' })
+              + dlgAlloBtn('allo-remove', t('allo.waiting.remove', 'remove'), { disabled: !!A.busy, extra: ' data-allo-d="' + cosmEsc(d) + '"' }) + '</span></li>';
+          }).join('') + '</ul>';
+      }
+      return dlgAlloSec('waiting', t('allo.waiting.head', 'waiting for your word'), h + dlgAlloErrHTML('waiting') + dlgAlloDoneHTML('waiting'));
+    }
+
+    // 7. Attest someone's claims (a person's listing only).
+    function dlgAlloAttestHTML() {
+      const A = DLG.allo;
+      const X = A.at;
+      let h = '<p class="thym-note">' + cosmEsc(t('allo.attest.what', 'say that someone did work that bears out some of their claims: for you, with you, as your employee, or as a qualification you examined. it waits until they accept it.')) + '</p>'
+        + '<div class="dlg-row"><label class="allo-field"><span>' + cosmEsc(t('allo.attest.of', 'their tag')) + '</span><input class="dlg-in" id="allo-of" data-allo="at.of" value="'
+        + cosmEsc(X.of) + '" maxlength="13" autocomplete="off" spellcheck="false"></label>'
+        + dlgAlloBtn('allo-of-look', t('allo.attest.look', 'look it up'), { disabled: !X.of.trim() || !!A.busy }) + '</div>';
+      const e = X.entry;
+      if (e) {
+        h += dlgAlloEntryHTML(e);
+        const claims = !e.error && !e.none && Array.isArray(e.claims) ? e.claims.filter(cosmIsMap) : [];
+        if (claims.length) {
+          h += '<fieldset class="allo-fs"><legend>' + cosmEsc(t('allo.attest.claims', 'the claims you attest')) + '</legend>'
+            + claims.map((c, i) => {
+              const k = String(c.kind || '') + ' ' + (Array.isArray(c.form) ? c.form.join(' ') : String(c.form || ''));
+              return '<label class="allo-choice"><input type="checkbox" data-allo-claim="' + i + '"' + (X.claims.includes(i) ? ' checked' : '') + '> ' + cosmEsc(k) + '</label>';
+            }).join('') + '</fieldset>'
+            + '<div class="dlg-row"><label class="allo-field"><span>' + cosmEsc(t('allo.attest.as', 'how you know')) + '</span><select class="dlg-in" id="allo-as" data-allo="at.as">'
+            + [['client', t('allo.as.client', 'client: the work was done for you')], ['employer', t('allo.as.employer', 'employer')],
+              ['colleague', t('allo.as.colleague', 'colleague: you did the work together')], ['certifier', t('allo.as.certifier', 'certifier: you examined them')]]
+              .map(([v, l]) => '<option value="' + v + '"' + (X.as === v ? ' selected' : '') + '>' + cosmEsc(l) + '</option>').join('') + '</select></label>'
+            + '<label class="allo-field"><span>' + cosmEsc(t('allo.attest.epoch', 'when (a quarter, a month or a week)')) + '</span><input class="dlg-in dlg-num" id="allo-epoch" data-allo="at.epoch" value="'
+            + cosmEsc(X.epoch) + '" autocomplete="off" spellcheck="false"></label></div>'
+            + '<label class="allo-choice"><input type="checkbox" id="allo-named" data-allo="at.named"' + (X.named ? ' checked' : '') + '> '
+            + cosmEsc(t('allo.attest.named', 'show who I am beside the claims')) + '</label>'
+            + '<div class="fab-row">' + dlgAlloBtn('allo-attest', t('allo.attest.go', 'attest'), { disabled: !X.claims.length || !X.epoch.trim() || !!A.busy }) + '</div>';
+        }
+      }
+      return dlgAlloSec('attest', t('allo.attest.head', 'attest someone'), h + dlgAlloErrHTML('attest') + dlgAlloDoneHTML('attest'));
+    }
+
+    // 8. Agents this person answers for (the registry takes a bond only from an Allograph+).
+    function dlgAlloAgentsHTML() {
+      const A = DLG.allo;
+      const h = '<p class="thym-note">' + cosmEsc(t('allo.agents.what', 'answer for an agent: whoever deals with it deals with you, for what it does. the registry takes a bond only from an Allograph+.')) + '</p>'
+        + '<div class="dlg-row"><label class="allo-field"><span>' + cosmEsc(t('allo.agents.tag', 'the agent’s tag')) + '</span><input class="dlg-in" id="allo-agent" data-allo="agent" value="'
+        + cosmEsc(A.agent) + '" maxlength="13" autocomplete="off" spellcheck="false"></label>'
+        + dlgAlloBtn('allo-bond', t('allo.agents.bond', 'answer for it'), { disabled: !A.agent.trim() || !!A.busy })
+        + dlgAlloBtn('allo-unbond', t('allo.agents.unbond', 'stop answering for it'), { disabled: !A.agent.trim() || !!A.busy }) + '</div>';
+      return dlgAlloSec('agents', t('allo.agents.head', 'agents you answer for'), h + dlgAlloErrHTML('agents') + dlgAlloDoneHTML('agents'));
+    }
+
+    // 9. Look-ups: by what someone needs; no account needed.
+    function dlgAlloSearchHTML() {
+      const A = DLG.allo;
+      const S = A.search;
+      const about = [['experience', t('allo.about.experience', 'experience')], ['skill', t('allo.about.skill', 'skill')],
+        ['understanding', t('allo.about.understanding', 'understanding')], ['form', t('allo.about.form', 'any kind')]];
+      let h = '<p class="thym-note">' + cosmEsc(t('allo.search.what', 'find who offers what someone needs, by FEED words: every need must match one of a listing’s claims. no account is needed, and the registry keeps nothing of a look-up.')) + '</p>';
+      h += S.needs.map((n, i) => '<div class="dlg-row"><select class="dlg-in dlg-num" data-allo-need-about="' + i + '" aria-label="' + cosmEsc(t('allo.search.about', 'what kind of claim')) + '">'
+        + about.map(([v, l]) => '<option value="' + v + '"' + (n.about === v ? ' selected' : '') + '>' + cosmEsc(l) + '</option>').join('') + '</select>'
+        + '<input class="dlg-in" id="allo-need-' + i + '" data-allo-need-value="' + i + '" value="' + cosmEsc(n.value) + '" autocomplete="off" spellcheck="false" aria-label="'
+        + cosmEsc(t('allo.search.word', 'a FEED word')) + '" placeholder="' + cosmEsc(t('allo.search.word', 'a FEED word')) + '">'
+        + (S.needs.length > 1 ? dlgAlloBtn('allo-need-rm', '×', { extra: ' data-allo-i="' + i + '" aria-label="' + cosmEsc(t('allo.search.rm', 'remove this need')) + '"' }) : '')
+        + '</div>').join('');
+      h += '<div class="dlg-row">' + (S.needs.length < 8 ? dlgAlloBtn('allo-need-add', t('allo.search.add', 'another need')) : '')
+        + '<select class="dlg-in dlg-num" id="allo-kind" data-allo="search.kind" aria-label="' + cosmEsc(t('allo.search.kind', 'people or agents')) + '">'
+        + [['', t('allo.search.both', 'people and agents')], ['person', t('allo.search.people', 'people')], ['agent', t('allo.search.agents', 'agents')]]
+          .map(([v, l]) => '<option value="' + v + '"' + (S.kind === v ? ' selected' : '') + '>' + cosmEsc(l) + '</option>').join('') + '</select>'
+        + '<label class="allo-choice"><input type="checkbox" id="allo-plus" data-allo="search.plus"' + (S.plus ? ' checked' : '') + '> ' + cosmEsc(t('allo.search.plus', 'Allograph+ only')) + '</label>'
+        + '<label class="allo-choice"><input type="checkbox" id="allo-attested" data-allo="search.attested"' + (S.attested ? ' checked' : '') + '> ' + cosmEsc(t('allo.search.attested', 'attested claims only')) + '</label></div>'
+        + '<div class="fab-row">' + dlgAlloBtn('allo-search', t('allo.search.go', 'look them up'), { disabled: !S.needs.some((n) => n.value.trim()) || A.busy === 'search' }) + '</div>';
+      if (A.busy === 'search') h += dlgAlloWait(t('allo.search.busy', 'asking the registry…'));
+      if (S.result) {
+        h += S.result.length ? S.result.map((e) => dlgAlloEntryHTML(e)).join('')
+          : '<p class="thym-note">' + cosmEsc(t('allo.search.none', 'no listing answers that')) + '</p>';
+        if (S.next) h += '<div class="fab-row">' + dlgAlloBtn('allo-search-more', t('allo.search.more', 'more'), { disabled: A.busy === 'search' }) + '</div>';
+      }
+      return dlgAlloSec('search', t('allo.search.head', 'look people up'), h + dlgAlloErrHTML('search'));
+    }
+
+    // Every field keeps its value in the face's state as it is typed; nothing repaints while typing.
+    function dlgAlloOnInput(e) {
+      const A = DLG.allo;
+      if (!A) return false;
+      const el = e.target;
+      const key = el.dataset && el.dataset.allo;
+      if (key) {
+        const [a, b] = key.split('.');
+        const v = el.type === 'checkbox' ? !!el.checked : String(el.value);
+        if (b) A[a][b] = v; else A[a] = v;
+        if (e.type === 'change' && (key === 'pf.faceplace')) { A.proof = null; A.pf.address = ''; dlgAlloPaint(); }
+        // A text field's own change (as focus leaves it) repaints nothing: the next field keeps its focus.
+        else if (e.type === 'input' || (el.tagName === 'INPUT' && el.type !== 'checkbox')) dlgAlloEnable();
+        else dlgAlloPaint();
+        return true;
+      }
+      if (el.name === 'allo-prog') { A.chosen = el.value; A.errs.make = null; dlgAlloPaint(); return true; }
+      if (el.name === 'allo-show') { A.form.faceplaces = el.value; return true; }
+      if (el.name === 'allo-subject' && e.type === 'change') { void dlgAlloSubjectSet(el.value); return true; }
+      if (el.dataset && el.dataset.alloClaim != null) {
+        const i = Number(el.dataset.alloClaim);
+        A.at.claims = el.checked ? A.at.claims.concat([i]) : A.at.claims.filter((x) => x !== i);
+        dlgAlloEnable();
+        return true;
+      }
+      if (el.dataset && el.dataset.alloNeedAbout != null) { A.search.needs[Number(el.dataset.alloNeedAbout)].about = el.value; return true; }
+      if (el.dataset && el.dataset.alloNeedValue != null) { A.search.needs[Number(el.dataset.alloNeedValue)].value = el.value; dlgAlloEnable(); return true; }
+      return false;
+    }
+    // The buttons that wait on a typed value, enabled as it is typed (no repaint, so the caret stays).
+    function dlgAlloEnable() {
+      const A = DLG.allo;
+      const set = (act, ok) => { const b = dlgEl('dlg-main').querySelector('button[data-dlg="' + act + '"]'); if (b) b.disabled = !ok || !!A.busy; };
+      set('allo-proof', !!A.pf.faceplace && !!A.pf.handle.trim());
+      set('allo-prove', !!A.pf.address.trim());
+      set('allo-of-look', !!A.at.of.trim());
+      set('allo-attest', A.at.claims.length > 0 && !!A.at.epoch.trim());
+      set('allo-bond', !!A.agent.trim());
+      set('allo-unbond', !!A.agent.trim());
+      const sb = dlgEl('dlg-main').querySelector('button[data-dlg="allo-search"]');
+      if (sb) sb.disabled = !A.search.needs.some((n) => n.value.trim()) || A.busy === 'search';
+    }
+
+    // One step that asks a route: busy while it runs, its refusal or its word beside its control after.
+    async function dlgAlloStep(key, busy, fn) {
+      const A = DLG.allo;
+      const seq = DLG.seq;
+      A.busy = busy;
+      A.errs[key] = null;
+      A.done[key] = null;
+      dlgAlloPaint();
+      let r;
+      try { r = await fn(); } catch (err) { r = { ok: false, error: String((err && err.message) || err) }; }
+      if (seq !== DLG.seq || A !== DLG.allo) return null;
+      A.busy = null;
+      if (r && r.ok === false) A.errs[key] = dlgAlloErr(r);
+      return r;
+    }
+
+    async function dlgAlloSubjectSet(subject) {
+      const A = DLG.allo;
+      if (subject === dlgAlloSubject()) return;
+      const r = await dlgAlloStep('subject', 'subject', () => canonPost('/api/ascribe/subject', { path: DLG.vol, subject }));
+      if (!r) return;
+      // An allograph made under the other subject is a different kind's: it is made again before it lists.
+      if (r.ok) { Object.assign(A, { made: null, errs: {}, done: {}, confirm: false }); await dlgAlloListing(); }
+      dlgAlloPaint();
+    }
+
+    async function dlgAlloPollSoon(seq, secs) {
+      const A = DLG.allo;
+      DLG.timers.set('allo-poll', setTimeout(async () => {
+        DLG.timers.delete('allo-poll');
+        if (seq !== DLG.seq || A !== DLG.allo || !A.signin) return;
+        const r = await canonPost('/api/connect/poll', {});
+        if (seq !== DLG.seq || A !== DLG.allo || !A.signin) return;
+        if (r.ok && r.data && r.data.state === 'signed_in') {
+          A.signin = null;
+          A.want = false;
+          await dlgAlloConnect(seq);
+          await dlgAlloListing(seq);
+          if (seq !== DLG.seq) return;
+          dlgAlloPaint();
+          return;
+        }
+        if (r.ok && r.data && r.data.state === 'pending') { void dlgAlloPollSoon(seq, Number(r.data.interval) || secs); return; }
+        A.signin = null;
+        A.errs.connect = dlgAlloErr(r);
+        dlgAlloPaint();
+      }, Math.max(1, Number(secs) || 5) * 1000));
+    }
+
+    async function dlgAlloAct(act, b) {
+      const A = DLG.allo;
+      if (!A || (A.busy && act !== 'allo-signin-cancel')) return;
+      const path = DLG.vol || DLG.path;
+      const seq = DLG.seq;
+      if (act === 'allo-make') {
+        const r = await dlgAlloStep('make', 'make', () => canonPost('/api/ascribe/allograph', { path, program: A.chosen }));
+        if (!r) return;
+        if (r.ok && r.data) {
+          A.made = r.data;
+          A.form.allograph = r.data.allograph || '';
+          if (!IS_HOME) htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+          await dlgAlloListing(seq);
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-signin') {
+        const r = await dlgAlloStep('connect', 'signin', () => canonPost('/api/connect/sign-in', {}));
+        if (!r) return;
+        if (r.ok && r.data && r.data.user_code) {
+          // The page to approve it opens from its link, as the app's other outside links do (target _blank): a
+          // window.open here could take the app's own window away from it.
+          A.signin = r.data;
+          void dlgAlloPollSoon(seq, r.data.interval);
+        }
+        dlgAlloPaint();
+        const code = dlgEl('allo-code');
+        if (code) code.scrollIntoView({ block: 'nearest' });
+        return;
+      }
+      if (act === 'allo-signin-cancel') {
+        A.signin = null;
+        const tm = DLG.timers.get('allo-poll');
+        if (tm) { clearTimeout(tm); DLG.timers.delete('allo-poll'); }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-signout') {
+        const r = await dlgAlloStep('connect', 'signout', () => canonPost('/api/connect/sign-out', {}));
+        if (!r) return;
+        await dlgAlloConnect(seq);
+        A.waiting = null;
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-list') {
+        const F = A.form;
+        const body = { path, allograph: F.allograph, name: F.name.trim(), dangler: F.dangler.trim() || null };
+        if (dlgAlloSubject() === 'character') body.owner = F.owner.trim() || null;
+        else body.show = { faceplaces: F.faceplaces, same_name: !!F.same_name };
+        const r = await dlgAlloStep('listing', 'list', () => canonPost('/api/allograph/list', body));
+        if (!r) return;
+        if (r.ok && r.data) {
+          A.listing = Object.assign({}, A.listing || {}, r.data.listing || {});
+          A.entry = cosmIsMap(r.data.entry) ? r.data.entry : await dlgAlloEntryLoad(A.listing.tag);
+          A.done.listing = t('allo.list.done', 'listed: anyone can now find it by its name, its tag or what it offers');
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-withdraw') { A.confirm = true; dlgAlloPaint(); const y = dlgEl('dlg-main').querySelector('[data-dlg="allo-withdraw-no"]'); if (y) y.focus(); return; }
+      if (act === 'allo-withdraw-no') { A.confirm = false; dlgAlloPaint(); return; }
+      if (act === 'allo-withdraw-yes') {
+        A.confirm = false;
+        const r = await dlgAlloStep('listing', 'withdraw', () => canonPost('/api/allograph/withdraw', { path }));
+        if (!r) return;
+        if (r.ok) {
+          await dlgAlloListing(seq);
+          Object.assign(A, { entry: null, waiting: null, proof: null });
+          A.done.listing = t('allo.withdraw.done', 'withdrawn: it is gone from every answer');
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-fp-load') {
+        const r = await dlgAlloStep('proof', 'fp', () => canonJSON('/api/allograph/faceplaces'));
+        if (!r) return;
+        if (r.ok && r.data) A.faceplaces = { list: (r.data.faceplaces || []).filter(cosmIsMap) };
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-proof') {
+        const r = await dlgAlloStep('proof', 'proof', () => canonPost('/api/allograph/proof', { path, faceplace: A.pf.faceplace, handle: A.pf.handle.trim() }));
+        if (!r) return;
+        if (r.ok && r.data) { A.proof = r.data; A.pf.address = ''; }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-copy') {
+        const v = A.proof && A.proof.proof;
+        if (v) {
+          try { await navigator.clipboard.writeText(String(v)); A.done.proof = t('allo.proof.copied', 'copied'); } catch (_e) {
+            const inp = dlgEl('allo-proof'); if (inp) { inp.focus(); inp.select(); }
+          }
+          dlgAlloPaint();
+        }
+        return;
+      }
+      if (act === 'allo-prove' || act === 'allo-unprove') {
+        const body = { path, faceplace: A.pf.faceplace, handle: (A.proof && A.proof.handle) || A.pf.handle.trim() };
+        if (act === 'allo-prove') body.address = A.pf.address.trim();
+        const r = await dlgAlloStep('proof', 'proof', () => canonPost('/api/allograph/' + (act === 'allo-prove' ? 'prove' : 'unprove'), body));
+        if (!r) return;
+        if (r.ok) {
+          A.done.proof = act === 'allo-prove' ? t('allo.proof.found', 'the registry found it: the proof is live') : t('allo.proof.removed', 'the proof is removed');
+          if (act === 'allo-unprove') A.proof = null;
+          A.entry = await dlgAlloEntryLoad(A.listing && A.listing.tag);
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-waiting') {
+        A.waiting = await dlgAlloWaitingLoad();
+        if (A.waiting && A.waiting.error) { A.errs.waiting = A.waiting.error; A.waiting = null; }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-accept' || act === 'allo-remove') {
+        const d = b && b.dataset.alloD;
+        const r = await dlgAlloStep('waiting', 'waiting', () => canonPost('/api/allograph/' + (act === 'allo-accept' ? 'accept' : 'remove'), { path, attestation: d }));
+        if (!r) return;
+        if (r.ok) {
+          A.done.waiting = act === 'allo-accept' ? t('allo.waiting.accepted', 'accepted: it shows beside the claims it names') : t('allo.waiting.removed', 'removed');
+          A.waiting = await dlgAlloWaitingLoad();
+          A.entry = await dlgAlloEntryLoad(A.listing && A.listing.tag);
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-of-look') {
+        const tag = A.at.of.trim().replace(/^#/, '');
+        const r = await dlgAlloStep('attest', 'look', () => canonJSON('/api/allograph/entry?tag=' + encodeURIComponent(tag)));
+        if (!r) return;
+        if (r.ok && r.data) { A.at.entry = r.data.entry ? r.data.entry : { none: true }; A.at.claims = []; }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-attest') {
+        const e = A.at.entry;
+        const claims = (Array.isArray(e && e.claims) ? e.claims : []).filter((_c, i) => A.at.claims.includes(i)).map((c) => ({ kind: c.kind, form: c.form }));
+        const body = { path, of: String(e.tag || A.at.of.trim().replace(/^#/, '')), as: A.at.as, claims, epoch: A.at.epoch.trim(), named: !!A.at.named };
+        const r = await dlgAlloStep('attest', 'attest', () => canonPost('/api/allograph/attest', body));
+        if (!r) return;
+        if (r.ok) { A.done.attest = t('allo.attest.done', 'sent: it waits until they accept it'); A.at.claims = []; }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-bond' || act === 'allo-unbond') {
+        const r = await dlgAlloStep('agents', 'agents', () => canonPost('/api/allograph/' + (act === 'allo-bond' ? 'bond' : 'unbond'), { path, agent: A.agent.trim().replace(/^#/, '') }));
+        if (!r) return;
+        if (r.ok) A.done.agents = act === 'allo-bond' ? t('allo.agents.bonded', 'you answer for it now') : t('allo.agents.unbonded', 'you no longer answer for it');
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-need-add') { A.search.needs.push({ about: 'skill', value: '' }); dlgAlloPaint(); const i = dlgEl('allo-need-' + (A.search.needs.length - 1)); if (i) i.focus(); return; }
+      if (act === 'allo-need-rm') { A.search.needs.splice(Number(b.dataset.alloI), 1); dlgAlloPaint(); return; }
+      if (act === 'allo-search' || act === 'allo-search-more') {
+        const S = A.search;
+        const more = act === 'allo-search-more';
+        const body = { needs: S.needs.filter((n) => n.value.trim()).map((n) => ({ about: n.about, value: n.value.trim().toLowerCase() })) };
+        if (S.kind) body.kind = S.kind;
+        if (S.plus) body.plus = true;
+        if (S.attested) body.attested = true;
+        if (more && S.next) body.next = S.next;
+        const r = await dlgAlloStep('search', 'search', () => canonPost('/api/allograph/search', body));
+        if (!r) return;
+        if (r.ok && r.data) {
+          const got = Array.isArray(r.data.entries) ? r.data.entries.filter(cosmIsMap) : [];
+          S.result = more && S.result ? S.result.concat(got) : got;
+          S.next = r.data.next || null;
+        }
+        dlgAlloPaint();
+      }
+    }
+
+    // ---- the cosm viewer's toolbar: questions (n), isograph…, allograph… ----
     let DLG_COSM_SEQ = 0;
     function dlgCosmPaint(data) {
       const btn = cosmEl('cosm-dlg-btn'), iso = cosmEl('cosm-iso-btn'), n = cosmEl('cosm-dlg-n');
@@ -40018,6 +40934,7 @@
       const ok = !!data && !data.refused && !IS_HOME && path && !/^(canon:|thym-run:)/.test(path) && !COSM_INLINE.has(path);
       btn.hidden = true;
       iso.hidden = !(ok && data.minicosm === 'ascribe');
+      cosmEl('cosm-allo-btn').hidden = iso.hidden;
       if (!ok) return;
       const seq = ++DLG_COSM_SEQ;
       void canonJSON('/api/dialectic/questions?path=' + encodeURIComponent(path)).then((r) => {
@@ -40114,7 +41031,34 @@
       void dlgLoad(seq).then(() => { if (seq === DLG.seq && DLG.open) { DLG.dry = null; dlgPaint(); } });
     }
 
+    // 0.7 (P4): a holograph's folder and an allograph beside it wear their marks in the tree.
+    function dlgDecorateTree() {
+      const tree = document.getElementById('tree');
+      if (!tree || IS_HOME) return;
+      const mark = (row, name, title) => {
+        if (!row || row.querySelector(':scope > img.tree-kind-icon')) return;
+        const img = document.createElement('img');
+        img.className = 'svg-icon tree-kind-icon';
+        img.alt = '';
+        img.draggable = false;
+        img.title = title;
+        setIcon(img, name);
+        row.insertBefore(img, row.querySelector(':scope > .dir-name, :scope > a'));
+      };
+      tree.querySelectorAll('li.dir').forEach((li) => {
+        if (li.querySelector(':scope > ul > li.file[data-name="holograph.cosm"]')) {
+          mark(li.querySelector(':scope > .dir-row'), 'holograph', t('allo.tree.holograph', 'a holograph: a self described with no name'));
+        }
+      });
+      tree.querySelectorAll('li.file[data-path*=".allograph-"]').forEach((li) => {
+        if (/\.allograph-[^/]*\.json$/i.test(li.dataset.path || '')) {
+          mark(li.querySelector(':scope > .file-row'), 'allograph', t('allo.tree.allograph', 'an allograph, made from the holograph beside it'));
+        }
+      });
+    }
+
     window.__dlgReady = true;
+    dlgDecorateTree();
 
 
     // ---------- Phase 2: selection toolbar ----------
@@ -43363,11 +44307,13 @@
       if (e.target && e.target.id === 'tree') {
         decorateConvertRows(); decorateShortRows();
         if (window.__thymReady) thymDecorateTree();
+        if (window.__dlgReady) dlgDecorateTree();
       }
     });
     document.body.addEventListener('htmx:afterSettle', () => {
       decorateConvertRows(); decorateShortRows();
       if (window.__thymReady) thymDecorateTree();
+      if (window.__dlgReady) dlgDecorateTree();
     });
     convertFormats().then(() => { decorateConvertRows(); convertExtrasPaint(); });
     decorateConvertRows();
