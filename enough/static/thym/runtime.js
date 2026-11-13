@@ -765,7 +765,16 @@
     const parts = typeof x === 'string' ? [x] : Array.isArray(x) ? x.map(String) : [String(x)];
     return parts.flatMap((p) => p.split('|')).map((a) => pyStrip(a)).filter(Boolean);
   };
-  function newRunId(now) {
+  // How a trace writes the folder the inputs were read against (Python's trace.portable_inputs_root, 0.7): relative to the
+// run's root when it lies under it ('.' for the root itself), else '.'. Never the absolute folder of the machine.
+function portableInputsRoot(inputsRoot, runRoot) {
+  if (!inputsRoot || !runRoot) return '.';
+  const a = String(inputsRoot).replace(/\/+$/, ''), r = String(runRoot).replace(/\/+$/, '');
+  if (a === r) return '.';
+  return a.startsWith(r + '/') ? a.slice(r.length + 1) : '.';
+}
+
+function newRunId(now) {
     const t = now || new Date();
     const p = (n) => String(n).padStart(2, '0');
     const hex = Math.floor(Math.random() * 0x10000).toString(16).padStart(4, '0');
@@ -783,6 +792,7 @@
       this.madeRun = o.madeRun || null;
       this.now = o.now ? new Date(o.now) : null;
       this.inputsRoot = o.inputsRoot || null;
+      this.runRoot = o.runRoot || null;
       this.agentFree = true;
       this.rules = false;
       this.route = o.route || null;
@@ -916,7 +926,7 @@
       const prog = isDict(this.plan.program) ? this.plan.program : {};
       this.trace = new Trace({ runId: rid, program: { name: prog.name || this.info.name, sha256: prog.sha256 === undefined ? null : prog.sha256 },
         planSha256: sha256(planBytes), environment: env, started: this.started, nodes: this.nodes.slice(),
-        inputs: this.traceInputs(), extra: { inputs_root: this.inputsRoot, rules: false, replay_of: null,
+        inputs: this.traceInputs(), extra: { inputs_root: portableInputsRoot(this.inputsRoot, this.runRoot), rules: false, replay_of: null,
           made_run: this.madeRun !== rid ? this.madeRun : null, engines: null } });
       for (const [k, v] of this.inputs) this.env.set(k, v);
       this.outputNames = this.outputNamesOf();
