@@ -1,5 +1,14 @@
 {
-  "_doc": "Visible-content bounding boxes for enough/static/icons/*.svg, measured 2026-07-16 via Chrome getBBox on the uniform 72x72 re-exports. Every source now has viewBox='0 0 72 72'; build_icons.py keeps that viewBox when the art fits inside it and auto-fits a square viewBox (centered on this bbox) only when the art overflows the artboard. If an icon source changes, re-measure and update its entry. The twenty-one originals that replaced the 0.3.5\u20130.4.4 placeholders (the composure, readvisor, cosm, macrocosm, atem, short and fabula icons) were measured the same way on 2026-11-02.",
+  "_doc": "Visible-content bounding boxes for enough/static/icons/*.svg, measured 2026-07-16 via Chrome getBBox on the uniform 72x72 re-exports. Every source now has viewBox='0 0 72 72'; build_icons.py keeps that viewBox when the art fits inside it and auto-fits a square viewBox (centered on this bbox) only when the art overflows the artboard. If an icon source changes, re-measure and update its entry. The twenty-one originals that replaced the 0.3.5\u20130.4.4 placeholders (the composure, readvisor, cosm, macrocosm, atem, short and fabula icons) were measured the same way on 2026-11-02. thym, thymop, allograph and holograph were measured the same way on 2026-11-12.",
+  "allograph.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 56.6,
+      "w": 57.5,
+      "x": 7.1,
+      "y": 7.6
+    }
+  },
   "atem.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
@@ -297,6 +306,15 @@
       "y": 10.69
     }
   },
+  "holograph.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 9
+    }
+  },
   "hxc.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
@@ -511,6 +529,24 @@
       "w": 52,
       "x": 10,
       "y": 9.1
+    }
+  },
+  "thym.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 59,
+      "w": 52.3,
+      "x": 10,
+      "y": 6.4
+    }
+  },
+  "thymop.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 59.2,
+      "w": 52.6,
+      "x": 9.7,
+      "y": 6.4
     }
   },
   "twin-off.svg": {
