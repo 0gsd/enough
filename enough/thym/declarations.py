@@ -457,3 +457,31 @@ def names(registry: mc.Registry | None = None, *, version: int | None = None) ->
     program of that grammar version sees (THYM 4.9)."""
     found = load(registry)
     return frozenset(found if version is None else found.view(version))
+
+
+def use_manifests(dirs: list[Path]) -> list[str]:
+    """Know the moves the manifests in these folders declare, alongside the bundled ones, for the rest of the process
+    (`--manifests` on the command line). Returns the reasons it refuses, one line each, and changes nothing when there
+    are any: a folder that is not one, a manifest that cannot be read, a manifest named as a bundled one, or a move
+    named as a bundled move. A bundled name always wins, never silently: it is refused."""
+    dirs = [Path(d).expanduser() for d in dirs]
+    refusals = [f"--manifests {d}: not a folder" for d in dirs if not d.is_dir()]
+    if refusals:
+        return refusals
+    bundled_reg = mc.Registry()
+    extra_reg = mc.Registry(dirs)
+    refusals += [f"--manifests: {p}" for p in extra_reg.problems]
+    for name, m in extra_reg.manifests.items():
+        if name in bundled_reg.manifests:
+            refusals.append(f"--manifests: the manifest {name} ({m.path}) has the name of a bundled one; the bundled "
+                            "manifest wins, so this one is refused")
+    bundled = _load(bundled_reg)
+    for name, d in _load(extra_reg).items():
+        if name in bundled:
+            refusals.append(f"--manifests: the move {name} ({d.source or d.owner}) has the name of a move "
+                            f"{bundled[name].owner} declares; a bundled move is never overridden, so rename it")
+    if refusals:
+        return refusals
+    mc.use_extra_manifest_dirs(dirs)
+    _default.cache_clear()
+    return []

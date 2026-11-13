@@ -181,3 +181,68 @@ def test_the_vendored_file_names_no_app_path():
     added = [ln for ln in diff.splitlines() if ln.startswith("+") and not ln.startswith("+++")]
     for ln in added:
         assert "ENOUGH_" not in ln and "~/enough" not in ln and "defaults/cosm" not in ln, ln
+
+
+# --- --manifests DIR: an application's own moves, known alongside the bundled ones ---------------------------------
+
+SHOUT = "thym 0\n\nprogram loud\n  why: a text, shouted.\n\n  takes story: text\n  gives n: text\n\n  give shoutout story\nend\n"
+
+
+@pytest.fixture
+def clean_manifests():
+    from enough import macrocosm as mc
+    from enough.thym import declarations
+    yield
+    mc.use_extra_manifest_dirs(())
+    declarations._default.cache_clear()
+
+
+def app_folder(tmp_path: Path, name: str = "shoutout", code: str | None = None) -> Path:
+    d = tmp_path / "app-manifests"
+    d.mkdir(exist_ok=True)
+    extra = f", code: {code}" if code else ""
+    (d / "shouty.moves.cosm").write_text(
+        f"moves-of: shouty/1\nmoves:\n  - {{name: {name}, takes: [text], gives: text{extra}, says: a text, shouted}}\n",
+        encoding="utf-8")
+    return d
+
+
+def test_without_manifests_an_outside_move_is_unknown(tmp_path: Path, capsys, clean_manifests):
+    prog = write(tmp_path, "loud.thym", SHOUT)
+    assert cli.main(["check", str(prog)]) == 2
+    assert "shoutout" in lines(capsys)[-1]
+
+
+def test_manifests_make_an_outside_move_known_to_check_plan_and_enumerate(tmp_path: Path, capsys, clean_manifests):
+    prog = write(tmp_path, "loud.thym", SHOUT)
+    folder = app_folder(tmp_path)
+    assert cli.main(["check", str(prog), "--manifests", str(folder)]) == 0
+    assert lines(capsys) == ["ok"]
+    assert cli.main(["plan", str(prog), str(INPUTS / "notes.md"), "--manifests", str(folder)]) == 0
+    assert "loud" in lines(capsys)[0]
+    assert cli.main(["enumerate", str(prog), "--manifests", str(folder)]) == 0
+    assert (tmp_path / "loud.thym.cosm").is_file()
+
+
+def test_run_refuses_an_outside_move_whose_code_is_not_installed(tmp_path: Path, capsys, clean_manifests):
+    prog = write(tmp_path, "loud.thym", SHOUT)
+    folder = app_folder(tmp_path, code="not_an_installed_app.moves:shoutout")
+    assert cli.main(["run", str(prog), str(INPUTS / "notes.md"), "--manifests", str(folder)]) == 2
+    out = " ".join(lines(capsys))
+    assert "shoutout" in out and "not_an_installed_app.moves:shoutout" in out and "installed" in out
+
+
+def test_a_move_named_as_a_bundled_move_is_refused_and_nothing_changes(tmp_path: Path, capsys, clean_manifests):
+    prog = write(tmp_path, "count.thym", COUNT)
+    folder = app_folder(tmp_path, name="words")
+    assert cli.main(["check", str(prog), "--manifests", str(folder)]) == 2
+    out = lines(capsys)
+    assert "the move words" in out[0] and "never overridden" in out[0]
+    from enough import macrocosm as mc
+    assert mc._EXTRA_MANIFEST_DIRS == ()
+
+
+def test_a_manifests_folder_that_is_not_one_is_refused(tmp_path: Path, capsys, clean_manifests):
+    prog = write(tmp_path, "count.thym", COUNT)
+    assert cli.main(["check", str(prog), "--manifests", str(tmp_path / "nope")]) == 2
+    assert "not a folder" in lines(capsys)[0]

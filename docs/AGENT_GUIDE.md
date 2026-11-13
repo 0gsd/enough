@@ -4377,7 +4377,12 @@ twin, in `HOME_PATHS`, English only; a `static/i18n/<lang>/THYM.md` would win).
 **The CLI.** `python -m enough.thym check|plan|run|trace|enumerate|compile|conform`
 (`run <program> <inputs…> [--rules]`, `run --replay <run-id>`, `conform
 [<suite>]`; since 0.6 `plan` and `run` take `--model local|cloud|cloud:<id>`
-and `--calls N`). **Always with `ENOUGH_THYM_ROOT` (better: every seam of
+and `--calls N`; since 0.7 `check`, `plan`, `run`, `enumerate` and `compile` take
+`--manifests DIR`, repeatable: the `*.manifest.cosm` and `*.moves.cosm` files there declare
+an outside application's moves, known beside the bundled ones. A name a bundled move
+already has is refused, never overridden; a move whose `code:` is not importable is known
+to `check`, `plan` and `enumerate`, and `run` refuses it, saying its implementation must be
+installed). **Always with `ENOUGH_THYM_ROOT` (better: every seam of
 `scripts/smoke_boot.build_env()`) pointed at a scratch dir**; `conform` writes
 into a temp root and reads only, the others write runs under the root.
 `plan` prints one line, `cli.plan_atem`'s: "publish-story: 7 nodes, 3 ask a

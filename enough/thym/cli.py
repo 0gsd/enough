@@ -12,6 +12,12 @@
     python -m enough.thym compile   <name.thym.cosm>                   the file again, byte for byte
     python -m enough.thym conform   [<suite folder>]                   run the conformance suite
 
+`check`, `plan`, `run`, `enumerate` and `compile` take `--manifests DIR`, once per folder: the
+`*.manifest.cosm` and `*.moves.cosm` files there declare moves an application built outside enough has, known
+alongside the bundled ones. A move named as a bundled move is refused. A declared move whose `code: module:function`
+is not importable here (the folder is never put on the import path) is known to `check`, `plan` and `enumerate`;
+`run` refuses it, saying the application's implementation must be installed.
+
 Every command reads `--root`, else `ENOUGH_THYM_ROOT`, else `~/enough/thym/`, for where runs live, and writes nowhere
 else unless it is given the path. A refusal is printed as one line and exits 2; a conformance failure or a replay
 that differs exits 1. The compiler's parts (`check`, `plan`, `enumerate`, `compile`) and enough's host (the model
@@ -69,6 +75,28 @@ def _compiler(*names: str) -> list[Any] | None:
         _err(f"the compiler is not here: enough.thym.{', enough.thym.'.join(names)} must import")
         return None
     return mods
+
+
+_NO_IMPL = re.compile(r"the move ([A-Za-z_][A-Za-z0-9_-]*) has no implementation here")
+
+
+def _extra_moves() -> dict[str, str]:
+    """`{move: code}` for the moves `--manifests` added that point at code."""
+    if not mc._EXTRA_MANIFEST_DIRS:
+        return {}
+    from enough.thym import declarations
+    own = declarations._load(mc.Registry(list(mc._EXTRA_MANIFEST_DIRS)))
+    return {n: d.code for n, d in own.items() if getattr(d, "code", None)}
+
+
+def _needs_install(text: str) -> str:
+    """A refusal's text, with a move from `--manifests` that has no implementation told plainly."""
+    m = _NO_IMPL.search(text)
+    extra = _extra_moves() if m else {}
+    if m and m.group(1) in extra:
+        text += (f" (it is declared by a folder given to --manifests and points at {extra[m.group(1)]}, which is not "
+                 "importable here: `run` needs the application's implementation installed)")
+    return text
 
 
 def _root(args: argparse.Namespace) -> Path:
@@ -341,7 +369,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
     if plan is None:
         return 1
     if isinstance(plan, Refusal):
-        _say(str(plan))
+        _say(_needs_install(str(plan)))
         return 2
     _say(_plan_atem(plan))
     line = models_line(plan)
@@ -436,7 +464,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         if plan is None:
             return 1
         if isinstance(plan, Refusal):
-            _say(str(plan))
+            _say(_needs_install(str(plan)))
             return 2
         program = src
         inputs_root = Path(args.inputs_root) if args.inputs_root else Path.cwd()
@@ -451,12 +479,12 @@ def cmd_run(args: argparse.Namespace) -> int:
     t = R.run(plan, inputs_root=inputs_root, root=root, rules=args.rules, program=program,
               destination=Path(args.destination) if args.destination else None, **kw)
     if isinstance(t, Refusal):
-        _say(str(_in_file(t, src)))
+        _say(_needs_install(str(_in_file(t, src))))
         return 2
     assert isinstance(t, Trace)
     _say(t.atem())
     if not t.landed:
-        _say(str(_in_file(t.refusal, src)))
+        _say(_needs_install(str(_in_file(t.refusal, src))))
         _say(f"trace: {t.path}")
         return 2
     for line in _output_lines(t):
@@ -529,8 +557,13 @@ def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="python -m enough.thym",
                                  description="Thym, the MacroCOSM language: check, plan, run, trace and conform "
                                              "(docs/THYM.md 11.3).")
+    manifests = argparse.ArgumentParser(add_help=False)
+    manifests.add_argument("--manifests", metavar="DIR", action="append",
+                           help="a folder of an application's own *.manifest.cosm and *.moves.cosm files, whose moves "
+                                "are known alongside the bundled ones (repeatable); a move named as a bundled move is "
+                                "refused, and `run` needs the code a declared move names to be installed")
     sub = ap.add_subparsers(dest="command", required=True, metavar="command")
-    p = sub.add_parser("check", parents=[common], help="compile only; prints the refusal or ok")
+    p = sub.add_parser("check", parents=[common, manifests], help="compile only; prints the refusal or ok")
     p.add_argument("program")
     p.set_defaults(fn=cmd_check)
     routes = argparse.ArgumentParser(add_help=False)
@@ -541,12 +574,12 @@ def build_parser() -> argparse.ArgumentParser:
                         help="a ceiling on the run's model requests (a cloud plan whose count is open needs one)")
     inputs_help = ("name=path, one per input the program takes (a folder's path too), and once per member for a list "
                    "(xs=a.md xs=b.md); a bare path for a program of one")
-    p = sub.add_parser("plan", parents=[common, routes], help="compile and plan; prints the plan's atem and cost")
+    p = sub.add_parser("plan", parents=[common, manifests, routes], help="compile and plan; prints the plan's atem and cost")
     p.add_argument("program")
     p.add_argument("inputs", nargs="*", help=inputs_help)
     p.add_argument("--out", help="also write the plan volume here")
     p.set_defaults(fn=cmd_plan)
-    p = sub.add_parser("run", parents=[common, routes], help="run a program, a plan, or replay a recorded run")
+    p = sub.add_parser("run", parents=[common, manifests, routes], help="run a program, a plan, or replay a recorded run")
     p.add_argument("program", nargs="?", help="a .thym program, or a .plan.cosm plan")
     p.add_argument("inputs", nargs="*", help=inputs_help)
     p.add_argument("--rules", action="store_true", help="run the declared scaffolds instead of the model")
@@ -559,10 +592,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("trace", parents=[common], help="show a trace")
     p.add_argument("run_id")
     p.set_defaults(fn=cmd_trace)
-    p = sub.add_parser("enumerate", parents=[common], help="write <name>.thym.cosm beside the program")
+    p = sub.add_parser("enumerate", parents=[common, manifests], help="write <name>.thym.cosm beside the program")
     p.add_argument("program")
     p.set_defaults(fn=cmd_enumerate)
-    p = sub.add_parser("compile", parents=[common], help="a program volume compiled back to its file")
+    p = sub.add_parser("compile", parents=[common, manifests], help="a program volume compiled back to its file")
     p.add_argument("volume")
     p.set_defaults(fn=cmd_compile)
     p = sub.add_parser("conform", parents=[common], help="run the conformance suite")
@@ -573,4 +606,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if getattr(args, "manifests", None):
+        from enough.thym import declarations
+        refused = declarations.use_manifests([Path(d) for d in args.manifests])
+        if refused:
+            for line in refused:
+                _say(line)
+            return 2
     return int(args.fn(args))

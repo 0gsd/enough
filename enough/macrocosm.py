@@ -843,10 +843,25 @@ def _scalar_text(v: Any) -> str:
     return str(v).strip() if v is not None else ""
 
 
+#: Folders of an application's own manifests, read after the bundled ones (set by `use_extra_manifest_dirs`).
+_EXTRA_MANIFEST_DIRS: tuple[Path, ...] = ()
+
+
 @functools.lru_cache(maxsize=1)
 def default_registry() -> Registry:
-    """The bundled manifests, loaded once per process."""
+    """The bundled manifests, loaded once per process; with `use_extra_manifest_dirs`, the bundled ones first and
+    then the extra folders', so a bundled name always wins."""
+    if _EXTRA_MANIFEST_DIRS:
+        return Registry([DEFAULT_MANIFEST_DIR, *_EXTRA_MANIFEST_DIRS])
     return Registry()
+
+
+def use_extra_manifest_dirs(dirs: list[Path] | tuple[Path, ...]) -> None:
+    """Make `default_registry()` read these folders after the bundled manifests, for the rest of the process (the
+    Thym command line's `--manifests`). Callers that cache what the registry gave must clear their caches."""
+    global _EXTRA_MANIFEST_DIRS
+    _EXTRA_MANIFEST_DIRS = tuple(Path(d) for d in dirs)
+    default_registry.cache_clear()
 
 
 # ---------------------------------------------------------------------------
