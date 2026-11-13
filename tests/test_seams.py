@@ -107,10 +107,23 @@ def test_the_smoke_boot_reads_the_same_list(tmp_path: Path, monkeypatch: pytest.
     assert not (set(seams.BEHAVIOUR_SEAMS) - chosen) & set(env)
 
 
-# A seam another session-scoped fixture moves on purpose, which the floor and the per-test seams leave alone (conftest's
-# `_still_pristine`): tests/test_convert_docling.py pins ENOUGH_WEIGHTS_DIR at the real weights for the whole session,
-# because the docling models are the one thing those tests cannot fabricate. In a full run it is pinned here too.
-PINNED_FOR_THE_SESSION = {"ENOUGH_WEIGHTS_DIR"}
+# Another session-scoped fixture may move a seam on purpose, and the floor and the per-test seams then leave it alone
+# (conftest's `_still_pristine`): tests/test_convert_docling.py pins ENOUGH_WEIGHTS_DIR at the real weights for the
+# whole session, because the docling models are the one thing those tests cannot fabricate, and points
+# ENOUGH_EXTRAS_STATE at its own scratch. So in a full run a seam holds either the floor's value or such a fixture's.
+# What may never happen is a seam on the real ~/enough, except the weights, read only, by that one deliberate pin.
+READ_REAL_ON_PURPOSE = {"ENOUGH_WEIGHTS_DIR"}
+
+
+def _floor_or_moved_on_purpose(var: str, value: str | None, mine: Path) -> None:
+    real_enough = Path(pwd.getpwuid(os.getuid()).pw_dir) / "enough"
+    path = Path(value or "")
+    if var in READ_REAL_ON_PURPOSE:
+        return
+    assert not path.is_relative_to(real_enough), var
+    if not path.is_relative_to(mine):
+        # moved by another session fixture: it must still be scratch, never anywhere under the real home
+        assert not path.is_relative_to(Path(pwd.getpwuid(os.getuid()).pw_dir)) or "pytest-of-" in str(path), var
 
 
 # ---------------------------------------------------------------------------
@@ -129,9 +142,7 @@ def test_a_module_fixture_never_sees_the_real_home(seen_by_a_module_fixture, ses
     assert Path(seen["HOME"]) != real_home
     assert Path(seen["HOME"]).is_relative_to(session_floor)
     for var in seams.PATH_SEAMS:
-        if var in PINNED_FOR_THE_SESSION:
-            continue
-        assert Path(seen[var]).is_relative_to(session_floor), var
+        _floor_or_moved_on_purpose(var, seen[var], session_floor)
     for var, value in seams.FIXED_SEAMS.items():
         assert seen[var] == value
     for var in seams.BEHAVIOUR_SEAMS:
@@ -141,8 +152,6 @@ def test_a_module_fixture_never_sees_the_real_home(seen_by_a_module_fixture, ses
 def test_a_test_still_gets_its_own_seams_under_the_floor(tmp_path: Path, session_floor: Path):
     assert Path(os.environ["HOME"]).is_relative_to(tmp_path)
     for var in seams.PATH_SEAMS:
-        if var in PINNED_FOR_THE_SESSION:
-            continue
-        assert Path(os.environ[var]).is_relative_to(tmp_path), var
+        _floor_or_moved_on_purpose(var, os.environ.get(var), tmp_path)
     from enough import broker
     assert broker.CONFIG_PATH.is_relative_to(tmp_path)
