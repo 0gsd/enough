@@ -9,7 +9,7 @@
 #
 # Written in the COSM YAML subset: no anchors, no aliases, no tags, one document.
 #
-# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+# Copyright © 2026 Graham Smith. CC BY 4.0, with a patent promise under OWFa 1.0. See defaults/cosm/NOTICE.md.
 
 moves-of: comprise/1
 

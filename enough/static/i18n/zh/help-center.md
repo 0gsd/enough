@@ -1765,4 +1765,4 @@ girraph-merirmaid 技能（第 20.3 节）带着这两种文件的写作纪律�
 
 ---
 
-*enough © 2026 Graham Smith，以 Apache License 2.0 发布。词典自己的文字——FEED 的词、释义，以及其余的一切——同样是 © 2026 Graham Smith，但它不在那个许可证之下：它随 enough 一起打包，供在 enough 里使用，目前保留一切权利。MacroCOSM OES——规范、随 enough 一起发的各方言的清单，以及这个家族的名字——同样是 © 2026 Graham Smith，它也一样：不在那个许可证之下，随 enough 一起打包，供在 enough 里使用，目前保留一切权利。经由 wikisink 读到的维基百科内容为 CC BY-SA。这份文档：同样归你改。*
+*enough © 2026 Graham Smith，以 Apache License 2.0 发布。词典自己的文字——FEED 的词、释义，以及其余的一切——同样是 © 2026 Graham Smith，但它不在那个许可证之下：它随 enough 一起打包，供在 enough 里使用，目前保留一切权利。MacroCOSM OES——各份规范，以及随 enough 一起发的各格式的清单——同样是 © 2026 Graham Smith，以 CC BY 4.0 发布，并附有依照 Open Web Foundation Final Specification Agreement 1.0（OWFa 1.0）作出的专利承诺；这个家族的名字目前由作者本人持有，打算日后交给一个不是公司的机构。详情见 `defaults/cosm/NOTICE.md`。经由 wikisink 读到的维基百科内容为 CC BY-SA。这份文档：同样归你改。*

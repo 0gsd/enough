@@ -59,7 +59,7 @@ def test_the_manifest_carries_the_header_and_the_notice():
     text = MANIFEST.read_text(encoding="utf-8")
     head = text.split("\nmanifest:", 1)[0]
     assert head.startswith("# ") and all(line.startswith("#") or not line for line in head.splitlines())
-    assert "# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md." in head
+    assert "# Copyright © 2026 Graham Smith. CC BY 4.0, with a patent promise under OWFa 1.0. See defaults/cosm/NOTICE.md." in head
     assert text.count("\nmanifest: minicosm/0\n") == 1
     assert "the canonical edition" in text.split("\nspec:", 1)[1].splitlines()[0]
     assert "later round" not in text and "0.5.0" not in text                   # no round language (0.5.4)

@@ -22,9 +22,10 @@ with this summary.
 ## First-party material under separate terms
 
 Two parts of this repository are first-party, by enough's author, but are
-**not** released under the Apache License 2.0 with the rest of enough. Both
-are bundled for use within enough only; all rights are reserved until a
-licence is published beside them.
+**not** released under the Apache License 2.0 with the rest of enough: the
+dictionary, bundled for use within enough only with all rights reserved until
+a licence is published beside it, and the OES specifications with their
+manifests, published under CC BY 4.0 with a patent promise under OWFa 1.0.
 
 ### FEED, the first-party enough english dictionary
 
@@ -38,15 +39,19 @@ launch. Copyright © 2026 Graham Smith; see
 The four OES specifications bundled as `docs/MACROCOSM_OES.md`, `docs/THYM.md`,
 `docs/ASCRIBE.md` and `docs/COMPRISE_OES.md` are the canonical editions
 published at [cosmoes.org](https://cosmoes.org/) (their editions in
-`docs/specs.json`), copyright © 2026 Graham Smith, all rights reserved. They are
-bundled for use inside enough — the docs viewer and the `/api/*-spec` routes —
+`docs/specs.json`), copyright © 2026 Graham Smith, published under the Creative
+Commons Attribution 4.0 International licence (CC BY 4.0) with a patent promise
+under the Open Web Foundation Final Specification Agreement 1.0 (OWFa 1.0) made
+by their author. enough shows them — the docs viewer and the `/api/*-spec` routes —
 and refreshed from cosmoes.org by `scripts/sync_specs.py` at release time and
 by enough itself at run time (`enough/specs.py`, with the client cosmoes-site
 publishes, `enough/cosmoes_client.py`, Apache 2.0). The MiniCOSM manifests under
 `defaults/cosm/` describe the `.cosm` family of formats that enough opens,
 checks and draws, under the same terms; see
 [defaults/cosm/NOTICE.md](defaults/cosm/NOTICE.md), which also covers the names
-MacroCOSM, MiniCOSM, MicroCOSM, Canon, EMF and atem. The reader,
+MacroCOSM, MiniCOSM, MicroCOSM, Canon, fabula (EMF, its earlier name) and atem:
+licensed by neither, held by the author for now, with the intent to move them
+later to a body that is not a company. The reader,
 `enough/macrocosm.py`, is ordinary enough code under Apache 2.0.
 
 ---

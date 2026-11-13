@@ -196,7 +196,7 @@ def test_our_manifests_carry_the_header_and_the_notice(name):
     text = (MANIFESTS / f"{name}.manifest.cosm").read_text(encoding="utf-8")
     head = text.split("\nmanifest:", 1)[0]
     assert head.startswith("# ") and all(line.startswith("#") or not line for line in head.splitlines())
-    assert "# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md." in head
+    assert "# Copyright © 2026 Graham Smith. CC BY 4.0, with a patent promise under OWFa 1.0. See defaults/cosm/NOTICE.md." in head
     assert text.count("\nmanifest: minicosm/0\n") == 1
 
 

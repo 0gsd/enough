@@ -8090,9 +8090,11 @@ Thym, Ascribe and Comprise OES ([docs/MACROCOSM_OES.md](MACROCOSM_OES.md),
 — the canonical editions published at cosmoes.org, bundled by
 `scripts/sync_specs.py` and refreshed from there at run time), the MiniCOSM manifests in
 `defaults/cosm/manifests/` and the names MacroCOSM, MiniCOSM, MicroCOSM,
-Canon, EMF and atem are © 2026 Graham Smith, all rights reserved — bundled
-for use within enough only (enough reads the manifests and shows the spec in
-its docs viewer), a licence for the specification still to be decided.
+Canon, fabula (EMF before) and atem are © 2026 Graham Smith: the
+specifications and the manifests are published under CC BY 4.0 with a patent
+promise under OWFa 1.0 in the author's name (enough reads the manifests and
+shows the specs in its docs viewer); the names are licensed by neither, held
+by the author for now, to move later to a body that is not a company.
 [defaults/cosm/NOTICE.md](../defaults/cosm/NOTICE.md) is authoritative, and
 `tests/fixtures/cosm/NOTICE.md` covers the synced Comprise samples. **The
 reader, `enough/macrocosm.py`, is part of enough and Apache 2.0** with the

@@ -1763,4 +1763,4 @@ enough をいちばん速くあなたのものにする道：
 
 ---
 
-*enough は © 2026 Graham Smith、Apache License 2.0 のもとで公開されています。辞書そのものの文章 — FEED の語、定義、そのほかのすべて — も © 2026 Graham Smith ですが、そのライセンスのもとにはありません：enough の中で使うために同梱されたもので、いまのところ、すべての権利は留保されています。MacroCOSM OES — 仕様書、enough に同梱される方言のマニフェスト、そしてこの一族の名前 — も © 2026 Graham Smith で、同じことが言えます：そのライセンスのもとにはなく、enough の中で使うために同梱されたもので、いまのところ、すべての権利は留保されています。wikisink 経由で届く Wikipedia のコンテンツは CC BY-SA です。このドキュメントも：あなたが編集してよいものです。*
+*enough は © 2026 Graham Smith、Apache License 2.0 のもとで公開されています。辞書そのものの文章 — FEED の語、定義、そのほかのすべて — も © 2026 Graham Smith ですが、そのライセンスのもとにはありません：enough の中で使うために同梱されたもので、いまのところ、すべての権利は留保されています。MacroCOSM OES — 仕様書と、enough に同梱される各フォーマットのマニフェスト — も © 2026 Graham Smith で、CC BY 4.0 のもとで公開され、Open Web Foundation Final Specification Agreement 1.0（OWFa 1.0）による特許の約束が付いています。この一族の名前は、いまのところ作者が持っていて、いずれ企業ではない団体に引き継ぐつもりです。詳しくは `defaults/cosm/NOTICE.md` にあります。wikisink 経由で届く Wikipedia のコンテンツは CC BY-SA です。このドキュメントも：あなたが編集してよいものです。*
