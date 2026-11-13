@@ -129,6 +129,11 @@ COGNATES: dict[str, frozenset[str]] = {
         "prose",            # "la prose" — a text's flavour, fabulan (fab.fl.prose, 0.6)
         "questions",        # "des questions" — the cosm viewer's dialectic button (dlg.cosm.label, 0.6)
         "code",             # "le code" — a fabula's flavour, fabulac (thym.fl.code, 0.6 U1c)
+        # 0.7 (V2c): the fabulap card's axes and figures, the French terms of prosody spelled as the English
+        "allusion",         # "une allusion" — construe's axis (fab.verse.axis.allusion)
+        "assonance",        # "une assonance" — a sound device (fab.verse.fig.assonance)
+        "consonance",       # "une consonance" — likewise (fab.verse.fig.consonance)
+        "refrain",          # "un refrain" — a recurrence (fab.verse.fig.refrain)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"

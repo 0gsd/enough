@@ -288,6 +288,14 @@ def test_the_build_route_scans_and_hears_without_a_model_and_says_what_waits(cli
     # the questions: the bank, raised by rule, through the dialectic's own route
     q = client.post("/api/dialectic/raise", json={"path": "lantern-song.txt.fabulap.cosm", "dry": True})
     assert q.status_code == 200 and q.json()["count"] > 0, q.text
+    assert client.post("/api/dialectic/raise", json={"path": "lantern-song.txt.fabulap.cosm"}).status_code == 200
+    cards = {c["id"]: c for c in client.get("/api/dialectic/questions",
+                                            params={"path": "lantern-song.txt.fabulap.cosm"}).json()["open"]}
+    # the hook and the form are yes-no; turn and sung write a device of their figure; music, editor, performed text
+    assert cards["D:question/hook-hook"]["kind"] == "yes-no" and cards["D:question/form-shape"]["kind"] == "yes-no"
+    assert cards["D:question/turn"]["writes"] == {"kind": "C:device", "sets": {"figure": "turn"}}
+    assert cards["D:question/sung"]["writes"] == {"kind": "C:device", "sets": {"figure": "sung stress"}}
+    assert all(cards[f"D:question/{k}"]["kind"] == "text" for k in ("music", "editor", "performed"))
 
 
 def test_the_build_routes_refusals(client: TestClient):

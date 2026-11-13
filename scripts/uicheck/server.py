@@ -313,7 +313,10 @@ I hold the warm cup's ring
 and let the day.
 """
 FABULA_LETTER = "letter.md"
-FABULA_RUNS = ("survey-the-repo", "read-the-history", "read-every-file", "fold-the-whole", "raise-the-questions")
+# 0.7 (V2c): a lyric with labelled parts and a hook, for the fabulap card's build in steps (a copy of the verse
+# fixture; no twin, so the card offers its first build).
+FABULA_LYRIC = "lantern-song.txt"
+FABULA_RUNS =("survey-the-repo", "read-the-history", "read-every-file", "fold-the-whole", "raise-the-questions")
 
 # The dialectic in the page (0.6, U1b), seeded by _seed_dialectic() into
 # `talks/`, each in a folder of its own so a scenario that writes a sitting or
@@ -562,6 +565,7 @@ def _seed_fabula(works: Path) -> None:
     shutil.copyfile(FABULA_FIXTURES / FABULA_CATEM, works / FABULA_CATEM)
     shutil.copytree(THYM_FIXTURES / "inputs" / FABULA_TINY, works / FABULA_TINY, dirs_exist_ok=True)
     (works / FABULA_POEM).write_text(FIXTURE_POEM, encoding="utf-8")
+    shutil.copyfile(FABULA_FIXTURES / "verse" / FABULA_LYRIC, works / FABULA_LYRIC)
     # A letter with its twin under the new name, and the old-named twin still
     # beside it (the orchard notes' twin, declared fabula/1 under the new name).
     shutil.copyfile(COSM_FIXTURES / "emf" / "notes.md", works / FABULA_LETTER)

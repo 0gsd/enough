@@ -253,6 +253,17 @@ def card(led: Any, entry: dict, *, waiting_in: str | None = None) -> dict:
         last = answers[-1]
         out["last"] = {k: _macrocosm.jsonable(last.get(k)) for k in ("at", "says", "value", "declined") if k in last}
     out["candidate"] = candidate_of(led.item(where.item_id) if where.item_id else None)
+    # 0.7: an answer about a module or a kind writes a new item; the card says which (the fabulap's `turn` and
+    # `sung` write a `C:device` of their figure, by the bank entry's `writes` and `sets`, MacroCOSM 18.6.6).
+    if q is not None and where.form in ("module", "kind"):
+        frm = (q.get("raised") or {}).get("from") if isinstance(q.get("raised"), dict) else None
+        try:
+            mod, kind = dl._new_item_kind(led, where, frm)
+            sets = dl._entry_sets(led, frm)
+        except Exception:  # noqa: BLE001 - a card is drawn whatever the bank says
+            mod, kind, sets = None, None, {}
+        if mod and kind:
+            out["writes"] = {"kind": f"{mod}:{kind}", "sets": _macrocosm.jsonable(sets) if sets else None}
     if waiting_in:
         out["waiting_in"] = waiting_in
     return out

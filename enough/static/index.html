@@ -9377,6 +9377,150 @@
       overflow-wrap: anywhere;
     }
 
+    /* 0.7 (V2c): the fabulap card, a poem decompiled in steps — scan,
+       hear, read closely — and what they found: the form and its rules,
+       each device's cue and senses, a lyric's parts and its hook. */
+    #fabula-modal #fab-verse:not(:empty) {
+      margin: 10px 0 4px;
+    }
+
+    #fabula-modal ol.fv-steps li {
+      padding: 4px 0;
+    }
+
+    #fabula-modal .fv-why,
+    #fabula-modal .fv-line {
+      flex: 1 0 100%;
+      padding-left: calc(1.2em + 8px);
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fv-line {
+      color: var(--fg);
+    }
+
+    #fabula-modal ul.fv-axes,
+    #fabula-modal ul.fv-chips {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 3px 0 0;
+      padding: 0;
+    }
+
+    #fabula-modal ul.fv-axes {
+      flex: 1 0 100%;
+      padding-left: calc(1.2em + 8px);
+    }
+
+    #fabula-modal ul.fv-axes li,
+    #fabula-modal ul.fv-chips li,
+    #fabula-modal .fv-held {
+      display: inline-block;
+      padding: 0 7px;
+      font-size: 11px;
+      line-height: 18px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      white-space: nowrap;
+    }
+
+    #fabula-modal ul.fv-axes li.landed {
+      border-color: var(--accent-agent);
+    }
+
+    #fabula-modal .fv-held.held {
+      color: var(--accent-agent);
+      border-color: var(--accent-agent);
+    }
+
+    #fabula-modal .fv-held.not-held {
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fv-held.open {
+      color: var(--accent-tool);
+      border-style: dashed;
+      border-color: var(--accent-tool);
+    }
+
+    #fabula-modal .fv-box {
+      margin: 6px 0;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fv-box-h {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 8px;
+    }
+
+    #fabula-modal .fv-name {
+      font-weight: 600;
+    }
+
+    #fabula-modal .fv-scheme {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    #fabula-modal ul.fv-list {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    #fabula-modal ul.fv-list li {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 8px;
+    }
+
+    /* a rule and its mark, a departure and its line: the words wrap beside the mark, not under it */
+    #fabula-modal ul.fv-rules li,
+    #fabula-modal ul.fv-deps li {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      column-gap: 8px;
+    }
+
+    #fabula-modal ul.fv-rules .fv-held {
+      justify-self: start;
+    }
+
+    #fabula-modal .fv-sub {
+      margin: 6px 0 0;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fv-cue {
+      font-style: italic;
+    }
+
+    #fabula-modal .fv-meta {
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal details.fv-devices summary {
+      cursor: pointer;
+      font-size: 12px;
+    }
+
     /* 0.6 (U1b): the dialectic card (#dialectic-modal): the questions in
        hand, each with an input fit to its kind and its live check, the
        three other answers, the sitting, settling and what waits, what was
@@ -20393,6 +20537,7 @@
       </div>
       <div class="modal-body thym-body" id="fab-body">
         <div id="fab-main"></div>
+        <div id="fab-verse"></div>
         <div id="fab-route-box"></div>
         <div id="fab-compile"></div>
         <div id="fab-dialectic"></div>
@@ -34223,6 +34368,8 @@
       if ((e.kind === 'thym' || e.kind === 'read') && window.__thymReady) thymJobOnSnap(e, snap);
       // 0.6: a fabulac's build, or its compile, that the fabula card follows.
       if (e.want === 'fabulac' && window.__fabReady) fabJobOnSnap(e, snap);
+      // 0.7 (V2c): a poem's build in steps that the fabula card follows.
+      if (e.want === 'fabulap' && window.__fabReady) fabVerseOnSnap(e, snap);
       // 0.6 (U1b): a settle the dialectic card follows.
       if (e.want === 'dialectic' && window.__dlgReady) dlgJobOnSnap(e, snap);
       if (end) {
@@ -34244,8 +34391,11 @@
       // 0.6 (U1b): answers settled into a volume.
       if (snap && snap.kind === 'dialectic') { if (window.__dlgReady) dlgAfterWrite(snap); return; }
       const wrote = snap.kind === 'emf' || snap.kind === 'pin' || snap.kind === 'compile' || snap.kind === 'fabulac'
-        || (snap.kind === 'atem' && res.written);
+        || snap.kind === 'fabulap' || (snap.kind === 'atem' && res.written);
       if (!wrote) return;
+      // 0.7 (V2c): a poem's fabulap, built in steps: an open viewer of it catches up too.
+      if (snap.kind === 'fabulap' && res.fabulap && COSM.path && canonSame(COSM.path, res.fabulap)
+        && cosmEl('cosm-mode').classList.contains('open')) cosmLoad(COSM.path);
       // 0.6: a fabulac built or compiled: the tree, Canon and an open viewer.
       if (window.__fabReady && fabIsFabulacSnap(snap)) { fabAfterWrite(snap); return; }
       const text = res.text_path || snap.path;
@@ -34301,7 +34451,8 @@
       const thym = (e.kind === 'thym' || e.kind === 'read') && window.__thymReady;
       // 0.6: a fabulac's build or compile (fabIsFabulacSnap), told from its progress.
       const fab = window.__fabReady && fabIsFabulacSnap(snap, e);
-      const icon = e.kind === 'emf' || e.kind === 'compile' || e.kind === 'thym' || e.kind === 'fabulac' || e.kind === 'dialectic' ? 'cosm'
+      const icon = e.kind === 'emf' || e.kind === 'compile' || e.kind === 'thym' || e.kind === 'fabulac' || e.kind === 'dialectic'
+        || e.kind === 'fabulap' ? 'cosm'
         : (e.kind === 'read' ? 'short' : 'atem');
       const dismiss = { label: t('canon.job.dismiss', 'dismiss'), run: () => convertToastClose(id) };
       // 0.5.0: the run / read card shows its own progress while it is open.
@@ -34309,6 +34460,28 @@
       // 0.6: so does the fabula card.
       if (fab && fabCardShowing(e.id)) { convertToastClose(id); return; }
       if (fab && CANON_TERMINAL.has(snap.state)) { fabToastEnd(e, snap, id, icon, dismiss); return; }
+      // 0.7 (V2c): a poem's build in steps, told from its progress; its end in the job's own words.
+      if (e.kind === 'fabulap' && window.__fabReady) {
+        if (fabCardShowing(e.id)) { convertToastClose(id); return; }
+        if (!CANON_TERMINAL.has(snap.state)) {
+          convertToast(id, { state: 'running', icon, square: true, title: e.label, message: fabVerseProgressText(snap),
+            progress: snap.chunks > 0 ? Math.round(100 * Math.max(0, snap.chunk || 0) / snap.chunks) : null,
+            actions: [{ label: t('canon.job.cancel', 'cancel'), run: () => { void canonCancel(e.id); } }] });
+          return;
+        }
+        const res = snap.result || {};
+        if (snap.state === 'done') {
+          const message = res.message || t('fab.verse.built', 'the fabulap is built');
+          const actions = res.fabulap ? [{ label: t('canon.job.open', 'open'), run: () => { convertToastClose(id); void enterCosmMode(res.fabulap); } }, dismiss] : [dismiss];
+          convertToast(id, { state: 'done', icon, square: true, title: e.label, message, actions, ttl: 15000 });
+          if (res.fabulap && window.__dlgReady) dlgToastOffer(id, res.fabulap, { state: 'done', icon, square: true, title: e.label, message, actions });
+          return;
+        }
+        convertToast(id, { state: 'failed', icon, square: true, title: e.label,
+          message: snap.message || snap.error || (snap.state === 'cancelled' ? t('canon.job.cancelled', 'cancelled — nothing was written')
+            : t('canon.job.failed', 'that did not work')), ttl: 15000, actions: [dismiss] });
+        return;
+      }
       // 0.6 (U1b): and so does the dialectic card, while it shows its settle.
       if (e.kind === 'dialectic' && window.__dlgReady && dlgCardShowing(e.id)) { convertToastClose(id); return; }
       if (!CANON_TERMINAL.has(snap.state)) {
@@ -34416,6 +34589,7 @@
       const name = canonBase(busy.path || '');
       const what = busy.kind === 'emf' ? t('canon.busy.emf', 'decompiling {name}').replace('{name}', () => name)
         : busy.kind === 'fabulac' ? t('fab.busy.build', 'building the fabulac of {name}').replace('{name}', () => name)
+        : busy.kind === 'fabulap' ? t('fab.verse.busy', 'decompiling {name} in steps').replace('{name}', () => name)
         : busy.kind === 'dialectic' ? t('dlg.busy', 'settling the answers into {name}').replace('{name}', () => name)
         : (busy.kind === 'compile' ? t('canon.busy.compile', 'compiling {name}').replace('{name}', () => name)
           : (busy.kind === 'thym' ? t('thym.busy.run', 'running a program on {name}').replace('{name}', () => name)
@@ -38527,15 +38701,18 @@
       target: null, build: null, compiled: null, what: 'code',
       job: null, snap: null, result: null, cjob: null, csnap: null, cresult: null,
       busy: false, error: null, cerror: null,
+      // 0.7 (V2c): a poem decompiled in steps (GET /api/fabula/verse/build)
+      verse: null, vjob: null, vsnap: null, vresult: null, verror: null,
     };
 
     function fabCardReset(face) {
       FAB.seq++;
       Object.assign(FAB, { face, path: null, state: null, flip: false, twin: null, suggested: null, flavour: null,
         target: null, build: null, compiled: null, what: 'code', job: null, snap: null, result: null, cjob: null,
-        csnap: null, cresult: null, busy: false, error: null, cerror: null });
+        csnap: null, cresult: null, busy: false, error: null, cerror: null,
+        verse: null, vjob: null, vsnap: null, vresult: null, verror: null });
       fabRouteReset('fab');
-      ['fab-main', 'fab-route-box', 'fab-compile', 'fab-dialectic', 'fab-status'].forEach((id) => {
+      ['fab-main', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
       });
@@ -38556,7 +38733,7 @@
       m.setAttribute('aria-hidden', 'true');
       FAB.open = false;
       // A build or a compile still running carries on in a toast.
-      [FAB.job, FAB.cjob].forEach((id) => {
+      [FAB.job, FAB.cjob, FAB.vjob].forEach((id) => {
         const e = id && id !== 'pending' ? CANON.jobs.get(id) : null;
         if (e && !e.terminal) { e.want = 'toast'; canonToast(e, e.snap || { state: 'running', kind: e.kind }); }
       });
@@ -38564,7 +38741,7 @@
     }
     window.fabCardClose = fabCardClose;
 
-    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id)); }
+    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id)); }
 
     // "decompile" on a text: the card's text face.
     async function fabDecompileOpen(path, state, opts = {}) {
@@ -38587,6 +38764,9 @@
       if (seq !== FAB.seq) return null;
       // The default: the flavour of the twin it has (derived last), else the suggestion.
       FAB.flavour = (tw.ok && tw.data && tw.data.flavour) || FAB.suggested || 'fabulan';
+      // 0.7 (V2c): a poem's build in steps, where it stands
+      if (FAB.flavour === 'fabulap') await fabVerseLoad(seq);
+      if (seq !== FAB.seq) return null;
       fabCardPaint();
       const r = fabEl('fab-main').querySelector('input[name="fab-fl"]:checked');
       if (r) r.focus({ preventScroll: true });
@@ -38689,6 +38869,8 @@
         fabSet(main, h);
         fabSet(fabEl('fab-route-box'), fabRouteHTML('fab'));
       }
+      // 0.7 (V2c): verse is decompiled in steps too: the fabulap card
+      fabSet(fabEl('fab-verse'), FAB.twin && FAB.flavour === 'fabulap' ? fabVerseHTML() : '');
       fabSet(fabEl('fab-compile'), '');
       // 0.6 (U1b): the twin of the chosen flavour, when it has one: its questions.
       if (window.__dlgReady) {
@@ -38701,7 +38883,7 @@
       const twins = FAB.twin && cosmIsMap(FAB.twin.twins) ? FAB.twin.twins : {};
       go.hidden = false;
       go.textContent = cosmIsMap(twins[FAB.flavour]) ? t('canon.confirm.refresh.ok', 'decompile again') : t('menu.decompile', 'decompile');
-      go.disabled = !FAB.twin || FAB.busy;
+      go.disabled = !FAB.twin || FAB.busy || fabVerseRunning();
       fabEl('fab-cancel-job').hidden = true;
       fabEl('fab-open').hidden = true;
       fabEl('fab-restart').hidden = true;
@@ -38986,10 +39168,323 @@
       if (fab && COSM.path && canonSame(COSM.path, fab) && cosmEl('cosm-mode').classList.contains('open')) cosmLoad(COSM.path);
     }
 
+    // -- the fabulap card: a poem decompiled in steps (0.7, V2c) --
+    // The five programs of decompile-verse.thym, run by the server as one
+    // job (enough/fabulap_job.py; POST /api/fabula/verse/build | resume |
+    // cancel, GET /api/fabula/verse/build), shown as the three steps a
+    // person sees: scan and hear by rule (they run agent-free), read
+    // closely by a model (what the poem says, the seven axes, the
+    // questions). Beneath them, what the steps found (the state's `card`):
+    // the C:form with each rule held, not held or open and its
+    // departures; each device's cue and senses; a lyric's parts and its
+    // hook. The questions go through the dialectic, as every volume's do.
+    const FV_STEPS = ['scan', 'hear', 'read-closely'];
+    const FV_AXES = ['figure', 'image', 'allusion', 'voice', 'turn', 'meaning', 'ambiguity'];
+
+    function fabVerseRunning() {
+      return !!(FAB.vjob && (FAB.vjob === 'pending' || (FAB.vsnap && !CANON_TERMINAL.has(FAB.vsnap.state))));
+    }
+
+    async function fabVerseLoad(seq = FAB.seq) {
+      if (!FAB.path) return;
+      const r = await canonJSON('/api/fabula/verse/build?path=' + encodeURIComponent(FAB.path));
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FAB.verse = { error: r.error || t('canon.job.failed', 'that did not work') }; return; }
+      FAB.verse = r.data.state || null;
+      const job = r.data.job;
+      if (job && job.id && !CANON_TERMINAL.has(job.state) && !FAB.vjob) {
+        // A build already running (the agent's tool, another tab's): follow it here.
+        FAB.vjob = job.id;
+        FAB.vsnap = job;
+        const e = CANON.jobs.get(job.id);
+        if (e) e.want = 'fabulap';
+        else canonTrack(job, { want: 'fabulap', label: canonBase(FAB.path), writes: true });
+      }
+    }
+
+    function fabVerseStepWord(step) {
+      return step === 'scan' ? t('fab.verse.scan', 'scan') : (step === 'hear' ? t('fab.verse.hear', 'hear')
+        : t('fab.verse.close', 'read closely'));
+    }
+    function fabVerseStageWord(program) {
+      const words = {
+        'scan-the-poem': t('fab.verse.scan', 'scan'), 'hear-the-poem': t('fab.verse.hear', 'hear'),
+        'read-the-poem': t('fab.verse.stage.read', 'what the poem says'),
+        'read-closely': t('fab.verse.stage.axes', 'the seven axes'),
+        'raise-the-questions': t('fab.verse.stage.questions', 'the questions'),
+      };
+      return words[program] || String(program || '');
+    }
+    function fabVerseAxis(a) {
+      const words = {
+        figure: t('fab.verse.axis.figure', 'figure'), image: t('fab.verse.axis.image', 'image'),
+        allusion: t('fab.verse.axis.allusion', 'allusion'), voice: t('fab.verse.axis.voice', 'voice'),
+        turn: t('fab.verse.axis.turn', 'turn'), meaning: t('fab.verse.axis.meaning', 'meaning'),
+        ambiguity: t('fab.verse.axis.ambiguity', 'ambiguity'),
+      };
+      return words[a] || a;
+    }
+    // A device's figure in the reader's language where the rules wrote it; a model's own figure as it wrote it.
+    function fabVerseFigure(f) {
+      const words = {
+        caesura: t('fab.verse.fig.caesura', 'caesura'), alliteration: t('fab.verse.fig.alliteration', 'alliteration'),
+        assonance: t('fab.verse.fig.assonance', 'assonance'), consonance: t('fab.verse.fig.consonance', 'consonance'),
+        refrain: t('fab.verse.fig.refrain', 'refrain'), anaphora: t('fab.verse.fig.anaphora', 'anaphora'),
+        epistrophe: t('fab.verse.fig.epistrophe', 'epistrophe'), repetition: t('fab.verse.fig.repetition', 'repetition'),
+        hook: t('fab.verse.fig.hook', 'hook'), turn: t('fab.verse.axis.turn', 'turn'), image: t('fab.verse.axis.image', 'image'),
+        'sung stress': t('fab.verse.fig.sung', 'sung stress'),
+      };
+      return words[String(f || '')] || String(f || '');
+    }
+    function fabVerseSense(s) {
+      const words = {
+        sight: t('fab.verse.sense.sight', 'sight'), hearing: t('fab.verse.sense.hearing', 'hearing'),
+        touch: t('fab.verse.sense.touch', 'touch'), taste: t('fab.verse.sense.taste', 'taste'),
+        smell: t('fab.verse.sense.smell', 'smell'), movement: t('fab.verse.sense.movement', 'movement'),
+      };
+      return words[s] || s;
+    }
+    // The poem's lines a device names (`C:line/3` …), in words.
+    function fabVerseWhere(ids) {
+      const nums = (Array.isArray(ids) ? ids : []).map((x) => /^C:line\/(\d+)$/.exec(String(x))).filter(Boolean).map((m) => m[1]);
+      if (!nums.length) return '';
+      return nums.length === 1 ? t('fab.verse.atOne', 'line {line}').replace('{line}', () => nums[0])
+        : t('fab.verse.at', 'lines {lines}').replace('{lines}', () => nums.join(', '));
+    }
+    function fabVerseIntended(v) {
+      const said = v === true ? t('dlg.yes', 'yes') : (v === false ? t('dlg.no', 'no')
+        : (v === 'open' ? t('fab.verse.open', 'open') : t('fab.verse.unsaid', 'the author has not said')));
+      return t('fab.verse.intended', 'intended') + ': ' + said;
+    }
+
+    // "step 3 of 5: what the poem says · 2 model calls · here"
+    function fabVerseProgressText(snap) {
+      const s = snap || {};
+      if (s.state === 'queued' || s.phase === 'waiting') return t('canon.phase.waiting', 'waiting for the model');
+      if (s.state === 'cancelling') return t('canon.phase.cancelling', 'cancelling…');
+      const p = cosmIsMap(s.progress) ? s.progress : null;
+      if (!p || !p.program) return s.message || t('canon.phase.starting', 'starting…');
+      const bits = [t('fab.verse.progress', 'step {n} of {of}: {stage}').replace('{n}', String(p.n || '?'))
+        .replace('{of}', String(p.of || 5)).replace('{stage}', () => fabVerseStageWord(p.program))];
+      if (p.calls || p.at_most) {
+        bits.push(p.at_most ? t('fab.progress.calls', '{k} model calls, at most {n}').replace('{k}', String(p.calls || 0)).replace('{n}', String(p.at_most))
+          : t('fab.progress.callsOpen', '{k} model calls').replace('{k}', String(p.calls || 0)));
+      }
+      if (p.route) bits.push(p.route === 'cloud' ? t('fab.made.cloud', 'on the cloud') : t('fab.made.here', 'here'));
+      return bits.join(' · ');
+    }
+
+    // What the build's state says, in a line.
+    function fabVerseSays(v) {
+      if (v.exists && !v.built) return t('fab.verse.oneCall', 'its twin was decompiled in one call: building it in steps replaces it');
+      if (!v.exists) return t('fab.verse.none', 'no fabulap yet: building it writes {name} beside the poem')
+        .replace('{name}', () => canonBase(String(v.poem || FAB.path || '')) + '.fabulap.cosm');
+      if (v.moved) return t('fab.verse.moved', 'the poem has changed since it was scanned: a build starts again from the scan');
+      if (v.complete) return t('fab.verse.complete', 'built: every step landed');
+      if (v.landed === 2) return t('fab.verse.outline', 'an outline: scan and hear landed by rule; reading closely waits for a model');
+      return t('fab.state.partway', '{n} of 5 stages landed; the build can take up again from {next}')
+        .replace('{n}', String(v.landed || 0)).replace('{next}', () => fabVerseStageWord(v.next));
+    }
+
+    function fabVerseResumable(v) { return !!(v && !v.error && v.built && v.landed > 0 && !v.complete && !v.moved); }
+
+    function fabVerseHTML() {
+      const v = FAB.verse;
+      let h = '<div class="thym-sec-h dict-sc" id="fv-h">' + cosmEsc(t('fab.verse.head', 'in steps')) + '</div>';
+      if (!v) return h + '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      if (v.error) return h + '<p class="thym-refusal">' + cosmEsc(v.error) + '</p>';
+      const running = fabVerseRunning();
+      const p = running && FAB.vsnap && cosmIsMap(FAB.vsnap.progress) ? FAB.vsnap.progress : null;
+      h += '<p class="thym-note">' + cosmEsc(t('fab.verse.note', 'a poem’s fabulap, built in three steps; each lands beside the poem as it finishes, and a build that stops takes up again where it stopped')) + '</p>';
+      const steps = Array.isArray(v.steps) ? v.steps : FV_STEPS.map((s) => ({ step: s, landed: 0, of: s === 'read-closely' ? 3 : 1 }));
+      const stages = Array.isArray(v.stages) ? v.stages : [];
+      h += '<ol class="fab-stages fv-steps" aria-labelledby="fv-h">' + steps.map((st, i) => {
+        const done = !v.moved && st.landed >= st.of && st.of > 0;
+        const now = !!(p && p.step === st.step);
+        const cls = done ? 'landed' : (now ? 'running' : '');
+        const mark = done ? '✓' : (now ? '▸' : '·');
+        let meta;
+        if (done) {
+          const mine = stages.filter((s) => s.step === st.step && s.model);
+          meta = t('fab.stage.landed', 'landed') + ' · ' + (mine.length ? String(mine[mine.length - 1].model)
+            + (mine[mine.length - 1].route === 'cloud' ? ' · ' + t('fab.made.cloud', 'on the cloud') : ' · ' + t('fab.made.here', 'here'))
+            : t('fab.stage.byRules', 'by rules'));
+        } else if (now) {
+          meta = t('fab.stage.running', 'running');
+        } else if (st.step === 'read-closely') {
+          meta = (st.landed && !v.moved ? t('fab.verse.partway', '{k} of {n} landed').replace('{k}', String(st.landed)).replace('{n}', String(st.of)) + ' · ' : '')
+            + t('fab.verse.asks', 'asks a model');
+        } else {
+          meta = t('fab.stage.waits', 'waits') + ' · ' + t('fab.verse.free', 'by rules; runs agent-free');
+        }
+        const why = st.step === 'scan' ? t('fab.verse.scan.why', 'stanzas, lines, stresses and metre, read by rule from FEED’s pronunciations')
+          : (st.step === 'hear' ? t('fab.verse.hear.why', 'rhyme, sound, recurrence and the form they make, by rule')
+            : t('fab.verse.close.why', 'what the poem says, then the seven axes, each a model call, then the questions only the poet can answer'));
+        let li = '<li class="' + cls + '" data-fv-step="' + st.step + '"><span class="fab-mark" aria-hidden="true">' + mark + '</span>'
+          + '<span class="fab-stage-name">' + cosmEsc((i + 1) + '. ' + fabVerseStepWord(st.step)) + '</span>'
+          + '<span class="fab-stage-meta">' + cosmEsc(meta) + '</span>'
+          + '<span class="fv-why">' + cosmEsc(why) + '</span>';
+        if (st.step === 'read-closely') {
+          const axesDone = stages.some((s) => s.name === 'read-closely' && s.landed) && !v.moved;
+          li += '<ul class="fv-axes" aria-label="' + cosmEsc(t('fab.verse.axes', 'the seven axes')) + '">'
+            + FV_AXES.map((a) => '<li' + (axesDone ? ' class="landed"' : '') + '>' + cosmEsc(fabVerseAxis(a)) + '</li>').join('') + '</ul>';
+          // Where its model runs: the card's model line, said here too; agent-free refuses it plainly.
+          li += AGENT_FREE
+            ? '<span class="fv-line fv-refused">' + cosmEsc(t('fab.verse.agentFree', 'agent-free is on: reading closely asks a model, so it is refused; scan and hear run by rule')) + '</span>'
+            : '<span class="fv-line fv-where">' + cosmEsc(t('fab.verse.where', 'where the model runs: {where}')
+              .replace('{where}', () => fabRouteWords(fabCloudOpen() && fabRouteState('fab').route === 'cloud' ? 'cloud' : 'local'))) + '</span>';
+        }
+        return li + '</li>';
+      }).join('') + '</ol>';
+      h += '<p class="fab-say">' + cosmEsc(fabVerseSays(v)) + '</p>';
+      if (running) {
+        h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fabVerseProgressText(FAB.vsnap || { state: 'queued' })) + '</span></p>';
+      } else if (FAB.vresult) {
+        const res = FAB.vresult;
+        const ref = cosmIsMap(res.refusal) ? res.refusal : null;
+        if (res.message) h += '<p class="' + (ref ? 'thym-note' : 'thym-fits') + ' fv-result">' + cosmEsc(String(res.message)) + '</p>';
+      }
+      if (FAB.verror) h += '<p class="thym-refusal">' + cosmEsc(FAB.verror) + '</p>';
+      // The controls: build, take up again, start again, cancel.
+      const resumable = fabVerseResumable(v);
+      const goWord = resumable ? t('fab.resume', 'take up again')
+        : (v.complete ? t('fab.verse.again', 'build in steps again') : (AGENT_FREE ? t('fab.verse.goFree', 'scan and hear') : t('fab.verse.go', 'decompile in steps')));
+      h += '<div class="fab-row fv-row"><button type="button" data-fab="verse-build" id="fv-go"' + (running || FAB.busy || !v.poem_exists ? ' disabled' : '') + '>'
+        + cosmEsc(goWord) + '</button>';
+      if ((resumable || (v.exists && v.built && !v.complete && v.moved)) && !running) {
+        h += '<button type="button" data-fab="verse-restart" id="fv-restart">' + cosmEsc(t('fab.verse.restart', 'start again from the scan')) + '</button>';
+      }
+      if (running && FAB.vjob !== 'pending') {
+        h += '<button type="button" data-fab="verse-cancel" id="fv-cancel">' + cosmEsc(t('atem.card.cancel', 'cancel')) + '</button>';
+      }
+      h += '</div>';
+      if (v.card && !running) h += fabVerseFoundHTML(v.card);
+      return h;
+    }
+
+    // What the steps found: the form, the metre, a lyric's parts and hook, the devices.
+    function fabVerseFoundHTML(c) {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.verse.found', 'what it found')) + '</div>';
+      const f = cosmIsMap(c.form) ? c.form : null;
+      if (f) {
+        h += '<div class="fv-box fv-form"><div class="fv-box-h"><span class="thym-where">' + cosmEsc(t('fab.verse.formHead', 'its form')) + ' · C:form</span>'
+          + '<span class="fv-name">' + cosmEsc(String(f.name || f.form || '')) + '</span>'
+          + (f.scheme ? '<span class="fv-scheme">' + cosmEsc(t('fab.verse.scheme', 'scheme {scheme}').replace('{scheme}', () => String(f.scheme))) + '</span>' : '')
+          + '</div>';
+        const rules = Array.isArray(f.rules) ? f.rules : [];
+        if (rules.length) {
+          const word = { held: t('fab.verse.held', 'held'), 'not held': t('fab.verse.notHeld', 'not held'), open: t('fab.verse.open', 'open') };
+          h += '<ul class="fv-list fv-rules" aria-label="' + cosmEsc(t('fab.verse.rules', 'its rules')) + '">' + rules.map((r) => {
+            const k = r.held === 'held' ? 'held' : (r.held === 'not held' ? 'not-held' : 'open');
+            return '<li><span class="fv-held ' + k + '">' + cosmEsc(word[r.held] || word.open) + '</span><span>' + cosmEsc(String(r.rule || '')) + '</span></li>';
+          }).join('') + '</ul>';
+        }
+        const deps = Array.isArray(f.departures) ? f.departures : [];
+        if (deps.length) {
+          h += '<p class="fv-sub">' + cosmEsc(t('fab.verse.departures', 'where it departs')) + '</p><ul class="fv-list fv-deps">'
+            + deps.map((d) => '<li><span class="fv-meta">' + cosmEsc(fabVerseWhere([d.at]) || String(d.at || '')) + '</span><span>'
+              + cosmEsc(String(d.what || '')) + '</span></li>').join('') + '</ul>';
+        }
+        h += '<p class="fv-sub">' + cosmEsc(fabVerseIntended(f.intended)) + '</p></div>';
+      }
+      const bits = [];
+      if (cosmIsMap(c.metre) && c.metre.name) bits.push(t('fab.verse.metre', 'metre: {name}').replace('{name}', () => String(c.metre.name)));
+      if (c.lines) bits.push(t('fab.verse.lines', '{n} lines').replace('{n}', String(c.lines)));
+      if (c.unscanned) bits.push(t('fab.verse.unscanned', '{n} FEED could not scan').replace('{n}', String(c.unscanned)));
+      if (c.readings) bits.push(t('fab.verse.readings', '{n} readings').replace('{n}', String(c.readings)));
+      if (c.voices) bits.push(t('fab.verse.voices', '{n} voices').replace('{n}', String(c.voices)));
+      if (bits.length) h += '<p class="thym-meta fv-counts">' + cosmEsc(bits.join(' · ')) + '</p>';
+      const parts = Array.isArray(c.parts) ? c.parts : [];
+      if (c.lyric && parts.length) {
+        h += '<div class="fv-box fv-parts"><div class="fv-box-h"><span class="thym-where">' + cosmEsc(t('fab.verse.parts', 'a lyric’s parts')) + '</span></div>'
+          + '<ul class="fv-list">' + parts.map((p) => '<li><span class="fv-name">' + cosmEsc(String(p.name || p.heading || '')) + '</span>'
+            + (p.again ? '<span class="fv-meta">' + cosmEsc(t('fab.verse.sungAgain', 'sung again')) + '</span>' : '') + '</li>').join('') + '</ul></div>';
+      }
+      const hook = cosmIsMap(c.hook) ? c.hook : null;
+      if (hook) {
+        const where = fabVerseWhere(hook.where);
+        h += '<div class="fv-box fv-hook"><div class="fv-box-h"><span class="thym-where">' + cosmEsc(t('fab.verse.hook', 'its hook')) + '</span>'
+          + '<span class="fv-cue">“' + cosmEsc(String(hook.cue || hook.name || '')) + '”</span>'
+          + (where ? '<span class="fv-meta">' + cosmEsc(where) + '</span>' : '') + '</div>'
+          + '<p class="fv-sub">' + cosmEsc(t('fab.verse.hookWhy', 'by rule, the words said most often; whether they are the hook is asked')) + ' · '
+          + cosmEsc(fabVerseIntended(hook.intended)) + '</p></div>';
+      }
+      const devs = (Array.isArray(c.devices) ? c.devices : []).filter((d) => d && d.figure !== 'hook');
+      if (devs.length) {
+        h += '<details class="fv-box fv-devices"' + (devs.length <= 6 ? ' open' : '') + '><summary>'
+          + cosmEsc(t('fab.verse.devices', 'devices ({n})').replace('{n}', String(devs.length))) + ' · C:device</summary><ul class="fv-list">'
+          + devs.map((d) => {
+            let li = '<li><span class="fv-name">' + cosmEsc(fabVerseFigure(d.figure)) + '</span>';
+            if (d.cue) li += '<span class="fv-meta">' + cosmEsc(t('fab.verse.cue', 'cue')) + '</span><span class="fv-cue">“' + cosmEsc(String(d.cue)) + '”</span>';
+            const where = fabVerseWhere(d.where);
+            if (where) li += '<span class="fv-meta">' + cosmEsc(where) + '</span>';
+            const senses = Array.isArray(d.senses) ? d.senses : [];
+            if (senses.length) {
+              li += '<span class="fv-meta">' + cosmEsc(t('fab.verse.senses', 'senses')) + '</span><ul class="fv-chips">'
+                + senses.map((s) => '<li>' + cosmEsc(fabVerseSense(s)) + '</li>').join('') + '</ul>';
+            }
+            if (d.intended === true || d.intended === false) li += '<span class="fv-meta">' + cosmEsc(fabVerseIntended(d.intended)) + '</span>';
+            return li + '</li>';
+          }).join('') + '</ul></details>';
+      }
+      return h;
+    }
+
+    async function fabVerseGo(kind) {
+      const v = FAB.verse;
+      if (!v || v.error || !FAB.path) return;
+      const body = fabRouteBody('fab', { path: FAB.path });
+      if (kind === 'restart' || (kind === 'build' && (v.complete || (v.exists && !v.built)))) body.restart = true;
+      const url = kind === 'resume' ? '/api/fabula/verse/resume' : '/api/fabula/verse/build';
+      const seq = FAB.seq;
+      Object.assign(FAB, { vjob: 'pending', vsnap: null, vresult: null, verror: null });
+      fabCardPaint();
+      const r = await canonPost(url, body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { FAB.vjob = null; FAB.verror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FAB.vjob = r.data.job.id;
+      FAB.vsnap = r.data.job;
+      canonTrack(r.data.job, { want: 'fabulap', label: canonBase(FAB.path), writes: true });
+      fabCardPaint();
+    }
+
+    async function fabVerseCancel() {
+      if (!FAB.path) return;
+      const r = await canonPost('/api/fabula/verse/cancel', { path: FAB.path });
+      if (r.ok && r.data) canonOnSnap(r.data);
+      else if (!r.ok && FAB.open) { FAB.verror = r.error; fabCardPaint(); }
+    }
+
+    // Every snapshot of a poem's build the card follows (canonApply, want 'fabulap').
+    function fabVerseOnSnap(e, snap) {
+      if (!FAB.open || FAB.vjob !== e.id) return;
+      FAB.vsnap = snap;
+      if (CANON_TERMINAL.has(snap.state)) {
+        const words = snap.state === 'done' ? null : (snap.message || snap.error || t('canon.job.failed', 'that did not work'));
+        Object.assign(FAB, { vjob: null, vresult: snap.state === 'done' ? (snap.result || {}) : null, verror: words });
+        const seq = FAB.seq;
+        void (async () => {
+          // where it stands now, and its twin (the questions line reads it)
+          const [, tw] = await Promise.all([fabVerseLoad(seq), canonJSON('/api/fabula/twin?path=' + encodeURIComponent(FAB.path))]);
+          if (seq !== FAB.seq) return;
+          if (tw && tw.ok && tw.data) FAB.twin = tw.data;
+          fabCardPaint();
+        })();
+      }
+      fabCardPaint();
+    }
+    window.fabVerseOnSnap = fabVerseOnSnap;
+    window.fabVerseProgressText = fabVerseProgressText;
+
     // -- the card's controls --
     fabEl('fab-body').addEventListener('change', (e) => {
       if (fabRouteOnEvent(e, 'fab', () => fabCardPaint())) return;
-      if (e.target.name === 'fab-fl') { FAB.flavour = e.target.value === 'fabulap' ? 'fabulap' : 'fabulan'; fabCardPaint(); return; }
+      if (e.target.name === 'fab-fl') {
+        FAB.flavour = e.target.value === 'fabulap' ? 'fabulap' : 'fabulan';
+        fabCardPaint();
+        if (FAB.flavour === 'fabulap' && !FAB.verse) { const seq = FAB.seq; void fabVerseLoad(seq).then(() => { if (seq === FAB.seq) fabCardPaint(); }); }
+        return;
+      }
       if (e.target.name === 'fab-what') { FAB.what = e.target.value; fabCardPaint(); }
     });
     fabEl('fab-body').addEventListener('input', (e) => { fabRouteOnEvent(e, 'fab', () => {}); });
@@ -38998,6 +39493,9 @@
       if (!b) return;
       if (b.dataset.fab === 'compile') void fabCompileGo();
       else if (b.dataset.fab === 'view') void fabViewOpen(b.dataset.fabPath);
+      else if (b.dataset.fab === 'verse-build') void fabVerseGo(fabVerseResumable(FAB.verse) ? 'resume' : 'build');
+      else if (b.dataset.fab === 'verse-restart') void fabVerseGo('restart');
+      else if (b.dataset.fab === 'verse-cancel') void fabVerseCancel();
     });
     fabEl('fab-go').addEventListener('click', () => {
       if (FAB.face === 'text') { void fabDecompileGo(); return; }
@@ -39533,6 +40031,13 @@
         + ' · ' + cosmEsc(t('dlg.to', 'for {who}').replace('{who}', () => dlgWho(c.to)))
         + (about ? ' · ' + cosmEsc(t('dlg.about', 'about')) + ' ' + about : '') + '</p>';
       h += '<p class="dlg-hint" id="dlg-hint-' + i + '"' + (c.hint ? '' : ' hidden') + '>' + cosmEsc(String(c.hint || '')) + '</p>';
+      // 0.7 (V2c): an answer about a module writes a new item; where the bank gives that item a field the answer
+      // cannot (a fabulap's turn and sung: a C:device of their figure), the card says what is written.
+      if (cosmIsMap(c.writes) && c.writes.kind && cosmIsMap(c.writes.sets)) {
+        const sets = Object.entries(c.writes.sets).map(([k, v]) => k + ': ' + String(v)).join(', ');
+        h += '<p class="thym-meta dlg-writes">' + cosmEsc(t('dlg.writes', 'an answer is written as a new {kind}').replace('{kind}', () => String(c.writes.kind))
+          + (sets ? ' (' + sets + ')' : '')) + '</p>';
+      }
       h += dlgInputHTML(c, d, i, desc, off);
       h += '<p class="dlg-check" id="dlg-chk-' + i + '" aria-live="polite"></p>';
       const alt = (m, label) => '<button type="button" class="dlg-alt" id="dlg-alt-' + m + '-' + i + '" data-dlg="' + m + '" data-dlg-i="' + i

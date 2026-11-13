@@ -39,7 +39,7 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       GIRRAPH, HARVEST, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS,
                       THYM_BAND_READY, THYM_MORPH, THYM_READING, THYM_READING_FOOTER,
                       THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY,
-                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL,
+                      FAB_CSHORT, FAB_LYRIC, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
                       THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM)
@@ -3729,6 +3729,94 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
     return fails
 
 
+_FV_STATE = """(() => { const v = document.getElementById('fab-verse');
+  const li = (s) => v.querySelector('li[data-fv-step="' + s + '"]');
+  return {
+    steps: v.querySelectorAll('ol.fv-steps > li').length,
+    landed: v.querySelectorAll('ol.fv-steps > li.landed').length,
+    axes: v.querySelectorAll('ul.fv-axes li').length,
+    refused: !!(li('read-closely') && li('read-closely').querySelector('.fv-refused')),
+    where: (li('read-closely') && (li('read-closely').querySelector('.fv-where') || {}).textContent) || '',
+    go: (document.getElementById('fv-go') || {}).textContent || '',
+    goOff: !!(document.getElementById('fv-go') || {}).disabled,
+    result: (v.querySelector('.fv-result') || {}).textContent || '',
+    form: (v.querySelector('.fv-form .fv-name') || {}).textContent || '',
+    rules: v.querySelectorAll('.fv-form ul.fv-rules li').length,
+    parts: v.querySelectorAll('.fv-parts ul.fv-list li').length,
+    again: !!v.querySelector('.fv-parts .fv-meta'),
+    hook: (v.querySelector('.fv-hook .fv-cue') || {}).textContent || '',
+    cues: v.querySelectorAll('.fv-devices .fv-cue').length,
+    questions: !!document.getElementById('fab-dlg-open'),
+    vresult: !!FAB.vresult, verror: FAB.verror,
+  }; })()"""
+
+
+def scenario_fabulap_steps(d: Driver) -> list[str]:
+    """0.7 (V2c): a lyric with no twin, agent-free on: the card's verse face
+    shows the three steps (scan, hear, read closely with its seven axes) and
+    read closely refuses plainly → "scan and hear" lands the two rules steps
+    and says, in the job's words, what waits → what they found is drawn: the
+    C:form with its rules, the lyric's parts (the chorus sung again), its hook,
+    the devices' cues → the twin is a fabulap with a C:form → its questions
+    are offered → agent-free off: read closely shows where the model runs,
+    and the build offers to take up again."""
+    fails: list[str] = []
+    _reset(d)
+    try:
+        d.js_await("(async () => { await agentFreeSet(true); return true; })()")
+        if not _wait_js(d, "agentFreeOn() && !AF_BUSY", 15000):
+            fails.append("agent-free did not come on")
+            return fails
+        d.js_await(f"(async () => {{ await fabDecompileOpen('{FAB_LYRIC}', 'absent'); return true; }})()")
+        _ready(d, _FAB_OK + " && FAB.verse !== null")
+        st = d.js(_FV_STATE) or {}
+        if st.get("steps") != 3 or st.get("axes") != 7:
+            fails.append(f"the verse face should show three steps and read closely's seven axes: {st}")
+        if not st.get("refused"):
+            fails.append(f"agent-free: read closely should be refused plainly: {st}")
+        if st.get("goOff"):
+            fails.append(f"the build in steps is not offered: {st}")
+        d.click("#fv-go")
+        if not _wait_js(d, "FAB.vresult !== null || FAB.verror !== null", 90000):
+            fails.append("the build in steps did not finish")
+            return fails
+        _wait_js(d, "document.querySelectorAll('#fab-verse ol.fv-steps > li.landed').length >= 2"
+                    " && !!document.querySelector('#fab-verse .fv-form')", 8000)
+        st = d.js(_FV_STATE) or {}
+        if st.get("verror"):
+            fails.append(f"the build failed: {st.get('verror')}")
+        if st.get("landed") != 2:
+            fails.append(f"agent-free should land scan and hear only: {st}")
+        if "agent-free is on" not in (st.get("result") or "") or "waits" not in (st.get("result") or ""):
+            fails.append(f"the card does not say what waits, and why, in the job's words: {st}")
+        if not st.get("form") or st.get("parts") != 5 or not st.get("again"):
+            fails.append(f"the form and the lyric's parts (the chorus sung again) are not drawn: {st}")
+        if st.get("hook") != "“Carry the light”" or not st.get("cues"):
+            fails.append(f"the hook and the devices' cues are not drawn: {st}")
+        if not st.get("questions"):
+            fails.append(f"the fabulap's questions are not offered: {st}")
+        twin = _raw(d, FAB_LYRIC + ".fabulap.cosm") or ""
+        if "flavour: fabulap" not in twin or "C:form/" not in twin or "completeness: outline" not in twin:
+            fails.append(f"the twin did not land as a fabulap outline with its C:form: {twin[:160]!r}")
+        d.js("fabCardClose()")
+        d.js_await("(async () => { await agentFreeSet(false); return true; })()")
+        _wait_js(d, "!agentFreeOn() && !AF_BUSY", 15000)
+        d.js_await(f"(async () => {{ await fabDecompileOpen('{FAB_LYRIC}', 'fresh'); return true; }})()")
+        _ready(d, _FAB_OK + " && FAB.verse !== null && FAB.verse.landed === 2")
+        st = d.js(_FV_STATE) or {}
+        if st.get("refused") or not st.get("where"):
+            fails.append(f"agent-free off: read closely should say where the model runs: {st}")
+        if st.get("landed") != 2 or st.get("goOff"):
+            fails.append(f"agent-free off: the outline stands and taking up again is offered: {st}")
+    finally:
+        d.js_await("(async () => { try { await agentFreeSet(false); } catch (e) {}"
+                   " if (agentFreeOn()) await fetch('/api/ui-config', {method: 'POST',"
+                   " headers: {'Content-Type': 'application/json'},"
+                   " body: JSON.stringify({agent_free: false})}); return true; })()")
+        _reset(d)
+    return fails
+
+
 def scenario_cshort_read(d: Driver) -> list[str]:
     """A built fabulac's card lists what it made → "open" on the cshort
     opens the viewer: the line that says enough never runs it, its files;
@@ -5210,6 +5298,8 @@ SCENARIOS: dict[str, Scenario] = {
     "fabula-decompile-card": scenario_fabula_decompile_card,
     "fabulac-build-outline": scenario_fabulac_build_outline,
     "cshort-read": scenario_cshort_read,
+    # --- 0.7: the fabulap card, a poem decompiled in steps (V2c) ---
+    "fabulap-steps": scenario_fabulap_steps,
     # --- 0.6: the fabula round (U1b): the dialectic card ---
     "dialectic-answer-kinds": scenario_dialectic_answer_kinds,
     "dialectic-holograph-no-cloud": scenario_dialectic_holograph_no_cloud,

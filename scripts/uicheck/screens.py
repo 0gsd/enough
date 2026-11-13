@@ -99,6 +99,7 @@ FAB_CATEM = "works/tally.catem-2026-11-05-1415.md"
 FAB_TINY = "works/tiny-tool"
 FAB_POEM = "works/rain.md"
 FAB_LETTER = "works/letter.md"
+FAB_LYRIC = "works/lantern-song.txt"            # 0.7 (V2c): a lyric for the fabulap card's build in steps
 # The dialectic (0.6, U1b), seeded by server._seed_dialectic() in talks/: the
 # morning-close guide's fabulan with one open question of every kind, the same
 # with a sitting written and not settled, the same with no questions at all,
