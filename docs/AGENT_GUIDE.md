@@ -5234,11 +5234,11 @@ by it. State `DLG` (separate from `FAB` and the editor's).
   checkbox); the refusal beside the field in `.dlg-check` (`aria-live=polite`,
   the field `aria-invalid`); a value written differently is said back
   ("written as: true").
-- **Drafts and the sitting.** Drafts live in `DLG.drafts` per volume until
+- **Drafts and the session.** Drafts live in `DLG.drafts` per volume until
   recorded: closing the card, following an item link or another sitting
   landing loses nothing (words typed for a question answered elsewhere are
   said and kept). "keep these, and the next" holds the pair; "send the
-  sitting (N)" (`dlgSend`) posts `{path, answers, through: "person"}` (never
+  session (N)" (`dlgSend`) posts `{path, answers, through: "person"}` (never
   `who`); the reply is shown per question in the server's words; a refused
   answer comes back first with what was typed; a 422 puts every answer back.
 - **The re-read.** `dlgOnEvent` on the `dialectic` SSE event (S3): an open
@@ -5251,7 +5251,7 @@ by it. State `DLG` (separate from `FAB` and the editor's).
   a fabula's settle carries the model line (`fabRouteHTML('dlg', {ceiling:
   'cloud'})`) and is followed as a CanonJob (`want: 'dialectic'`); any other
   volume and a holograph are "settled at once, by rules" and send `{path}`
-  only. After: the job's `message`, "waiting" (`waiting_in` → "in the sitting
+  only. After: the job's `message`, "waiting" (`waiting_in` → "in the session
   X, not settled yet", else "waits for a model to read <item> again"),
   `counters` and a holograph's `follow_ups` put next. On a fabula with
   sittings, "run with {file}…" per sitting opens Thym's run card on

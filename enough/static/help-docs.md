@@ -379,15 +379,15 @@ name: the questions
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
 
 ### what
-what a volume asks of a person: what its source could not say, each a <strong>question</strong> about one place in it, of one kind (words, a choice, yes or no, a number, a date, an item, the lines that show it), put to someone: the author, an expert, the makers, anyone who knows. the card shows one or two at a time, checks an answer as you type, and keeps what you say in a <strong>sitting</strong> you send whole. a twin's sitting is written beside it as an answers file; the volume itself changes only when the answers are <strong>settled</strong>.
+what a volume asks of a person: what its source could not say, each a <strong>question</strong> about one place in it, of one kind (words, a choice, yes or no, a number, a date, an item, the lines that show it), put to someone: the author, an expert, the makers, anyone who knows. the card shows one or two at a time, checks an answer as you type, and keeps what you say in a <strong>session</strong> you send whole. a twin's session is written beside it as an answers file; the volume itself changes only when the answers are <strong>settled</strong>.
 
 ### how
-<strong>questions</strong> in the cosm viewer's toolbar opens it, with how many are open; so do the fabula card and the toast of a decompile or a build that landed questions. answer, or say <strong>I don't know</strong> (an answer too: the place stays open, in your words), <strong>I'd rather not say</strong> (kept as a fact) or <strong>skip for now</strong>. <strong>keep these, and the next</strong> moves on; <strong>send the sitting</strong> records them all and says, question by question, what was recorded, skipped or refused, a refused answer coming back with what you typed. <strong>settle the answers</strong> folds them in, with the model here unless you choose the cloud for that one job; what waits for a model to read its item again is listed, and a question a check raised against an answer is put next. <strong>ask again</strong> reopens a settled or declined question; a volume with none can <strong>raise the questions</strong>, by rules.
+<strong>questions</strong> in the cosm viewer's toolbar opens it, with how many are open; so do the fabula card and the toast of a decompile or a build that landed questions. answer, or say <strong>I don't know</strong> (an answer too: the place stays open, in your words), <strong>I'd rather not say</strong> (kept as a fact) or <strong>skip for now</strong>. <strong>keep these, and the next</strong> moves on; <strong>send the session</strong> records them all and says, question by question, what was recorded, skipped or refused, a refused answer coming back with what you typed. <strong>settle the answers</strong> folds them in, with the model here unless you choose the cloud for that one job; what waits for a model to read its item again is listed, and a question a check raised against an answer is put next. <strong>ask again</strong> reopens a settled or declined question; a volume with none can <strong>raise the questions</strong>, by rules.
 
 ### ideas
 - "I don't know, but the support lead would" is a good answer: the field stays open in those words, for the next person to be asked.
-- answer two, send, settle: a short sitting is still a sitting.
-- section 13.7 of the help center has the whole of it: a question's parts, sittings, settling and asking again.
+- answer two, send, settle: a short session is still a session.
+- section 13.7 of the help center has the whole of it: a question's parts, sessions, settling and asking again.
 
 ## holograph
 name: a holograph's questions

@@ -39054,7 +39054,7 @@
       if (!dlgQuestionItems()) h += dlgRaiseHTML();
       if (!shown.length) {
         if (dlgQuestionItems() || (DLG.data.open || []).length === 0) {
-          h += '<p class="dlg-none">' + cosmEsc(dlgHeld().length ? t('dlg.none.held', 'every open question is in this sitting: send it')
+          h += '<p class="dlg-none">' + cosmEsc(dlgHeld().length ? t('dlg.none.held', 'every open question is in this session: send it')
             : t('dlg.none', 'no question is open')) + '</p>';
         }
       } else {
@@ -39147,7 +39147,7 @@
         + alt('skip', t('dlg.skip', 'skip for now')) + '</div>';
       if (d.mode === 'dont_know') h += '<p class="thym-meta">' + cosmEsc(t('dlg.dontKnow.note', 'an answer too: the place stays open, in your own words if you wrote any above')) + '</p>';
       else if (d.mode === 'declined') h += '<p class="thym-meta">' + cosmEsc(t('dlg.declined.note', 'a refusal is kept as a fact, and no one asks again unless someone opens the question again')) + '</p>';
-      else if (d.mode === 'skip') h += '<p class="thym-meta">' + cosmEsc(t('dlg.skip.note', 'it stays open; the sitting notes that it was skipped')) + '</p>';
+      else if (d.mode === 'skip') h += '<p class="thym-meta">' + cosmEsc(t('dlg.skip.note', 'it stays open; the session notes that it was skipped')) + '</p>';
       return h + '</div>';
     }
 
@@ -39308,15 +39308,15 @@
       const held = dlgHeld();
       let h = '';
       if (held.length) {
-        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sitting.head', 'this sitting: {n}').replace('{n}', String(held.length))) + '</div>'
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sitting.head', 'this session: {n}').replace('{n}', String(held.length))) + '</div>'
           + '<ul class="dlg-rows">' + held.map((d) => '<li><span class="dlg-row-asks">' + cosmEsc(String(d.card.asks || '')) + '</span>'
             + '<span class="dlg-row-what">' + cosmEsc(dlgStateWords(d)) + '</span>'
             + '<button type="button" data-dlg="unhold" data-dlg-key="' + cosmEsc(dlgKey(d.card)) + '">' + cosmEsc(t('dlg.change', 'change')) + '</button></li>').join('')
-          + '</ul><p class="thym-meta">' + cosmEsc(t('dlg.sitting.note', 'nothing is written until you send the sitting; the volume itself is not touched until the answers are settled')) + '</p>';
+          + '</ul><p class="thym-meta">' + cosmEsc(t('dlg.sitting.note', 'nothing is written until you send the session; the volume itself is not touched until the answers are settled')) + '</p>';
       }
       const s = DLG.sent;
       if (s) {
-        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sent.head', 'the sitting you sent')) + '</div>';
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.sent.head', 'the session you sent')) + '</div>';
         if (s.error) h += '<p class="thym-refusal">' + cosmEsc(s.error) + '</p>';
         if (s.written) h += '<p class="thym-fits">' + cosmEsc(t('dlg.sent.where', 'recorded in {file}').replace('{file}', () => canonBase(String(s.written).replace(/\/$/, '')))) + '</p>';
         if (s.rows && s.rows.length) {
@@ -39332,7 +39332,7 @@
       if (!DLG.open || DLG.face !== 'q' || !DLG.data) { send.hidden = true; return; }
       const n = dlgHeld().length + dlgShown().filter((c) => { const d = dlgDraft(c); return !!d.mode || dlgValueOf(d) != null; }).length;
       send.hidden = false;
-      send.textContent = t('dlg.send', 'send the sitting ({n})').replace('{n}', String(n));
+      send.textContent = t('dlg.send', 'send the session ({n})').replace('{n}', String(n));
       send.disabled = !n || DLG.sending;
     }
 
@@ -39416,7 +39416,7 @@
       if (can || running || DLG.result || DLG.jerror) {
         h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.settle.head', 'settle')) + '</div>';
         if (!atOnce && sittings.length) {
-          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.why', 'settling folds the answers into the volume, one run for each sitting; a model reads an item again only where an answer needs it')) + '</p>'
+          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.why', 'settling folds the answers into the volume, one run for each session; a model reads an item again only where an answer needs it')) + '</p>'
             + '<ul class="dlg-files">' + sittings.map((s) => '<li>' + cosmEsc(canonBase(String(s.path || ''))) + '</li>').join('') + '</ul>';
         } else if (atOnce && can) {
           h += '<p class="thym-note">' + cosmEsc(d.holograph
@@ -39431,7 +39431,7 @@
         // 0.6 (U1c): the same second run as a Thym program, its two inputs
         // given (the fabula, a sitting's answers), to read its plan first.
         if (!atOnce && sittings.length && !running && window.__thymReady && d.path) {
-          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.thym', 'or run the program settle-the-answers on one sitting, its plan read first:')) + '</p>'
+          h += '<p class="thym-note">' + cosmEsc(t('dlg.settle.thym', 'or run the program settle-the-answers on one session, its plan read first:')) + '</p>'
             + '<ul class="dlg-files">' + sittings.map((s) => '<li><button type="button" class="thym-btn" data-dlg="thym-settle" data-dlg-path="'
               + cosmEsc(String(s.path || '')) + '">' + cosmEsc(t('dlg.settle.thymGo', 'run with {file}…').replace('{file}', () => canonBase(String(s.path || ''))))
               + '</button></li>').join('') + '</ul>';
@@ -39452,7 +39452,7 @@
         h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('dlg.waiting.head', 'waiting')) + '</div><ul class="dlg-rows">'
           + waiting.map((c) => {
             const last = c.last || {};
-            const where = c.waiting_in ? t('dlg.waiting.in', 'in the sitting {file}, not settled yet').replace('{file}', () => String(c.waiting_in))
+            const where = c.waiting_in ? t('dlg.waiting.in', 'in the session {file}, not settled yet').replace('{file}', () => String(c.waiting_in))
               : t('dlg.waiting.model', 'waits for a model to read {item} again').replace('{item}', () => String((c.item && (c.item.name || c.item.id)) || c.about || ''));
             const said = last.declined ? t('dlg.s.declined', 'rather not say') : (last.says != null ? String(last.says) : '');
             return '<li><span class="dlg-row-asks">' + cosmEsc(String(c.asks || '')) + '</span><span class="dlg-row-what">'
@@ -39532,7 +39532,7 @@
           const last = answers.length ? answers[answers.length - 1] : {};
           const said = last.declined ? '' : (last.says != null ? '“' + String(last.says) + '” · ' : '');
           const note = DLG.again && DLG.again.id === q.id ? '<span class="dlg-row-what ' + (DLG.again.error ? 'bad' : '') + '">' + cosmEsc(DLG.again.error || t('dlg.again.done', 'asked again: it is open')) + '</span>'
-            : (q.waiting_in ? '<span class="dlg-row-what">' + cosmEsc(t('dlg.waiting.in', 'in the sitting {file}, not settled yet').replace('{file}', () => String(q.waiting_in))) + '</span>' : '');
+            : (q.waiting_in ? '<span class="dlg-row-what">' + cosmEsc(t('dlg.waiting.in', 'in the session {file}, not settled yet').replace('{file}', () => String(q.waiting_in))) + '</span>' : '');
           return '<li><span class="dlg-row-asks">' + cosmEsc(String(q.asks || q.id)) + '</span><span class="dlg-row-what">' + cosmEsc(said + (words[q.state] || q.state)
             + (q.settled ? ' · ' + t('dlg.st.settled', 'settled') : '')) + '</span>' + note
             + '<button type="button" data-dlg="again" data-dlg-key="' + cosmEsc(q.id) + '">' + cosmEsc(t('dlg.again', 'ask again')) + '</button></li>';
