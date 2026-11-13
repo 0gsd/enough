@@ -33678,16 +33678,17 @@
     // Canon in the reader: EMF twins and atems (0.4.3, checkpoint B)
     // ================================================================
     // The Canon chip in the three reader headers says whether the text on
-    // screen has an EMF twin (`notes.md` ↔ `notes.md.cosm`, owner decision 4)
+    // screen has a fabula twin (`notes.md` ↔ `notes.md.cosm`, owner decision 4)
     // and offers three things: its atem (the card, #atem-modal), the twin
-    // itself (the EMF face, in place of the text, at the reader's size) and a
-    // decompile / refresh. Nothing here runs unless a person asked (plan §0:
-    // no auto-derivation). The routes are P3's (docs/canon-landed-P3.md):
-    // POST /api/canon/derive, /atem, /compile answer `{job}`, a snapshot that
-    // is followed on the SSE `canon` event and by polling, and shown as a
-    // toast with cancel; /atem/pin writes at once; GET /api/canon/emf gives a
-    // text's twin as a /api/cosm payload with its state (fresh | stale; 404 =
-    // none yet). Every path is project-relative or `canon:<volume>/<rel>`.
+    // itself (the fabula face, in place of the text, at the reader's size) and
+    // a decompile / refresh. Nothing here runs unless a person asked (plan §0:
+    // no auto-derivation). The routes: POST /api/fabula/derive and
+    // /api/fabula/compile, and POST /api/canon/atem, answer `{job}`, a snapshot
+    // that is followed on the SSE `canon` event and by polling, and shown as a
+    // toast with cancel; /api/canon/atem/pin writes at once; GET
+    // /api/fabula/twin gives a text's twin as a /api/cosm payload with its
+    // state (fresh | stale; 404 = none yet). Every path is project-relative or
+    // `canon:<volume>/<rel>`.
     const CANON_TEXT_RE = /\.(md|markdown|mdown|mkd|txt|text)$/i;
     const CANON_CHIP_IDS = ['canon-chip-mini', 'canon-chip-review', 'canon-chip-edit'];
     const CANON_TERMINAL = new Set(['done', 'failed', 'cancelled']);
@@ -33790,7 +33791,7 @@
     async function canonRefreshDoc(seq = CANON.seq) {
       const doc = CANON.doc;
       if (!doc) return null;
-      // 0.6: GET /api/fabula/twin (was /api/canon/emf, which goes in 0.7).
+      // GET /api/fabula/twin: the text's twin and its state.
       const r = await canonJSON('/api/fabula/twin?path=' + encodeURIComponent(doc.path));
       if (seq !== CANON.seq || CANON.doc !== doc) return null;
       if (r.ok && r.data) {
@@ -33898,7 +33899,7 @@
       return canonDecompile(path, Object.assign({}, opts, { force: state === 'fresh' }));
     }
 
-    // 0.6: POST /api/fabula/derive (was /api/canon/derive) with the card's
+    // POST /api/fabula/derive with the card's
     // `flavour` and `route` (always said: local unless the person chose the
     // cloud for this job). `quiet`: a refusal comes back as {error} for the
     // card to show in the server's words, instead of a toast.
@@ -33956,7 +33957,7 @@
     // never touched, the twin records it in its shorts: list); the toast
     // offers to open it. `order` is told | weight; none = the server's
     // default (told when the twin's text is there to follow).
-    // 0.6: POST /api/fabula/compile (was /api/canon/compile), with the route
+    // POST /api/fabula/compile, with the route
     // the face's menu chose for this one compile (local unless the cloud was).
     async function canonCompile(twin, order, route = 'local') {
       const body = { path: twin, route: route === 'cloud' ? 'cloud' : 'local' };
