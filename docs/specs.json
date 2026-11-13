@@ -1,6 +1,6 @@
 {
   "source": "cosmoes-site",
-  "commit": "da7b531",
+  "commit": "7aaeedb",
   "dirty": false,
   "synced": "2026-11-12",
   "client": {
@@ -51,7 +51,7 @@
       "revised": "2026-11-06",
       "path": "docs/ASCRIBE.md",
       "source": "specs/ascribe.md",
-      "sha256": "8c3ba216753989b90203a610fdbba441af8d4bf52307b18e48f37f25f82ca66a"
+      "sha256": "19ebac4cc6810db4e070c880c4cf3cbe96a202ac93f93bf06771aa0477eb101b"
     },
     {
       "slug": "comprise-oes",

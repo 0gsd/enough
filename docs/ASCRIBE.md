@@ -978,7 +978,9 @@ holder to run a program named `open-for-work` that emits both, the allograph wou
 The **Allograph Registry** is the one public place of Ascribe: an index of allographs, each listed by its holder,
 where a person who needs a service finds people and agents who offer it, and sees how far each claim is confirmed.
 Comprise Connect serves it beside the Comprise Index, with the same accounts, passkeys and rate limits
-([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). Another service may serve a registry under the
+([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). Its listings are served at `https://allograph.net`,
+where its operations (section 14.12) are answered; an account still signs in at Comprise Connect, and the app's token it
+gets there is good at both. Another service may serve a registry under the
 rules of this section and the seven after it; a tag is the same wherever its key is used (section 14.8), and a listing
 lives in the registry it was sent to.
 
