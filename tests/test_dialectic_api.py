@@ -278,6 +278,33 @@ def test_an_isograph_is_made_by_the_holders_program_and_its_release_recorded_fir
     assert client.post("/api/ascribe/isograph", json={"path": "spec-self", "program": "nope"}).status_code == 404
 
 
+def test_an_allograph_is_made_by_the_holders_program_and_sent_nowhere(client: TestClient, project: Path):
+    """`project h as allograph` through the route (Ascribe 14.6): the release recorded first, the allograph written
+    beside the holograph under its run, the holograph's state given; a second in one epoch is allowed."""
+    import shutil
+    from enough import ascribe as A
+    from tests.test_ascribe_module import OPEN_FOR_WORK, SAMPLE, _for_work
+    root = project / "work-self"
+    shutil.copytree(SAMPLE, root)
+    _for_work(root)
+    (project / "open-for-work.thym").write_text(OPEN_FOR_WORK, encoding="utf-8")
+    r = client.post("/api/ascribe/allograph", json={"path": "work-self", "program": "open-for-work.thym"})
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out["allograph"] == f"work-self.allograph-{out['run']}.json" and (project / out["allograph"]).is_file()
+    assert out["document"]["expertise"] == [{"form": "sourdough", "kind": "skill", "marking": "stated",
+                                             "strength": "strong"}]
+    assert out["holograph"] == A.holograph_state(root)
+    rel, = A.releases(root)
+    assert rel["as"] == "allograph" and rel["trace"]["run"] == out["run"]
+    assert rel["sha256"] == __import__("hashlib").sha256((project / out["allograph"]).read_bytes()).hexdigest()
+    again = client.post("/api/ascribe/allograph", json={"path": "work-self", "program": "open-for-work.thym"})
+    assert again.status_code == 200, again.text                     # more than one allograph in an epoch
+    assert [r["as"] for r in A.releases(root)] == ["allograph", "allograph"]
+    r = client.post("/api/ascribe/allograph", json={"path": "work-self", "program": "open-self.thym"})
+    assert r.status_code == 404
+
+
 # ---------------------------------------------------------------------------
 # Lane S3: the state recorded, a candidate's source, closed questions, a dry raise, the event, the refusal's words
 # ---------------------------------------------------------------------------

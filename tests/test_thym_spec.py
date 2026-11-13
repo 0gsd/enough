@@ -99,11 +99,12 @@ def _declared_moves(*, extensions: list | None = None) -> dict[str, tuple[str, d
 
 
 def test_a_kind_another_owner_adds_extends_a_move_it_does_not_declare():
-    """Ascribe adds `isograph` to Comprise's `project` (THYM 6.2, 6.3, 18): an extension names a move another owner
-    declares, adds only `as` kinds, for `thym 1`, and the code that runs them."""
+    """Ascribe adds `isograph` and `allograph` to Comprise's `project` (THYM 6.2, 6.3, 18), in one entry: an
+    extension names a move another owner declares, adds only `as` kinds, for `thym 1`, and the code that runs them."""
     ext: list = []
     moves = _declared_moves(extensions=ext)
-    assert [(o, mv["name"], mv["modifiers"]) for o, mv in ext] == [("ascribe", "project", {"as": "isograph"})]
+    assert [(o, mv["name"], mv["modifiers"]) for o, mv in ext] == [("ascribe", "project",
+                                                                  {"as": "isograph | allograph"})]
     for owner, mv in ext:
         assert moves[mv["name"]][0] != owner and mv.get("since") == 1 and mv.get("code") and mv.get("says")
 

@@ -1,10 +1,11 @@
 """Ascribe's moves for Thym (Ascribe, https://ascribe.cosmoes.org/, sections 9 and 14; THYM 6.2, 6.3, 18): `propose`,
-declared in Ascribe's own manifest for `thym 1`, and `isograph`, the body of `project h as isograph`.
+declared in Ascribe's own manifest for `thym 1`, and `project`, the body of `project h as isograph` and `project h as
+allograph`.
 
 **The engine.** These moves never read or write a holograph themselves: they reach Ascribe's module only through
 `ctx.engines["ascribe"]`, which the host supplies (this folder is vendored into a product that brings its own), and
 every engine call is recorded and replayed with the run, so every argument and every answer is plain data (paths,
-text, lists, strings, whole numbers). The engine answers exactly these three functions:
+text, lists, strings, whole numbers). The engine answers these functions:
 
 - `thym_forms(holograph) -> {text, whole}`: what a reading may see of the holograph after its private filter (its
   forms and polyforms, by id, name and FEED word, and its pseudonyms), as YAML text; `whole` is true when a marker
@@ -17,6 +18,10 @@ text, lists, strings, whole numbers). The engine answers exactly these three fun
 - `thym_isograph(holograph, *, epoch, program, trace, keep=None) -> {json, items}`: the holograph's isograph
   (`ascribe-isograph/0`) after the filter, as canonical JSON text, and the ids of the items in it. It records no
   release: the host records it when the run lands, before anything leaves.
+- `thym_allograph(holograph, *, epoch, program, trace, keep=None) -> {json, items, holograph}`: the holograph's
+  allograph (`ascribe-allograph/0`) the same way, and the holograph's state as the run took it; no release either.
+- `thym_isograph_problems(text)`, `thym_allograph_problems(text) -> [words]`: why a reader would refuse the
+  projection, for the checks of `project` of each kind.
 
 A `holograph` argument is `{path}`, the holograph's folder. With no such engine, or one that lacks a function, the
 move refuses in plain words.
@@ -29,9 +34,12 @@ answer from which nothing could be kept is a failed reading, asked again. The li
 sentence-to-item map `no-invention` reads: each candidate's summary and the fabula's items it was read from.
 Nothing it proposes is the holder's until they answer yes.
 
-**isograph** is what `project h as isograph` does for a holograph: the program's emitted nodes (default-deny: an
-item neither emitted nor withheld is left out), less what it withheld, projected by the engine. The move `project`
-is declared once, by Comprise's sidecar, for its own two kinds, and nothing yet dispatches `as isograph` here.
+**project** is what `project h as isograph` and `project h as allograph` do for a holograph (Ascribe's one entry
+that `extends` Comprise's `project`, THYM 17.6): the program's emitted nodes (default-deny: an item neither emitted
+nor withheld is left out), less what it withheld, projected by the engine as the kind the call names. The engine's
+`thym_allograph` answers as `thym_isograph` does, with `holograph` beside: the holograph's state after the filter,
+which the host keeps with the listing so that it can say when the holograph has changed since (Ascribe 14.6). No move
+sends anything to a registry.
 
 The standard library, PyYAML and the MacroCOSM reader.
 """
@@ -47,11 +55,15 @@ from enough.thym.trace import write_atomic
 from enough.thym.values import Value, is_withheld, plain
 
 ENGINE = "ascribe"
-FUNCTIONS = ("thym_forms", "thym_propose", "thym_isograph")
+FUNCTIONS = ("thym_forms", "thym_propose", "thym_isograph", "thym_allograph")
 HOLOGRAPH_OES = "ascribe/1"
 _DOES = {"thym_forms": "read a holograph's forms", "thym_propose": "turn a reading into candidates",
          "thym_isograph": "project a holograph as an isograph",
-         "thym_isograph_problems": "read an isograph as a reader would"}
+         "thym_isograph_problems": "read an isograph as a reader would",
+         "thym_allograph": "project a holograph as an allograph",
+         "thym_allograph_problems": "read an allograph as a reader would"}
+#: The kinds Ascribe adds to `project` (THYM 6.2), each its engine function and the file it stages.
+KINDS = {"isograph": ("thym_isograph", "isograph.json"), "allograph": ("thym_allograph", "allograph.json")}
 
 
 def _engine(ctx: Any, move: str, fn: str) -> Any:
@@ -196,11 +208,12 @@ def _emitted_ids(ctx: Any) -> list[str]:
     return out
 
 
-def isograph(ctx: Any, h: Value, **mods: Any) -> Value:
-    """`project h as isograph` for a holograph: the nodes the program emitted and did not withhold, projected by the
-    rules of `ascribe-isograph/0`; the epoch the run falls in, by quarter; the program's name and digest; the run's
-    id. Written into the run's stage as `isograph.json`, its canonical form, so that it lands with the run or
-    not at all."""
+def _projection(ctx: Any, h: Value, kind: str) -> Value:
+    """`project h as <kind>` for a holograph, an isograph or an allograph: the nodes the program emitted and did not
+    withhold, projected by the rules of the kind's schema; the epoch the run falls in, by quarter; the program's name
+    and digest; the run's id. Written into the run's stage as `<kind>.json`, its canonical form, so that it lands with
+    the run or not at all."""
+    fn, staged = KINDS[kind]
     hol = _holograph(h, "project")
     try:
         prog = (ctx.trace().mapping() or {}).get("program") or {}
@@ -208,18 +221,40 @@ def isograph(ctx: Any, h: Value, **mods: Any) -> Value:
         prog = {}
     now, run = getattr(ctx, "now", None), getattr(ctx, "run", None)
     if now is None or not prog.get("name") or not prog.get("sha256") or not run:
-        raise MoveError("an isograph names its epoch, its program and its run, and this run gives none of them")
+        raise MoveError(f"an {kind} names its epoch, its program and its run, and this run gives none of them")
     epoch = f"{now.year}-Q{(now.month - 1) // 3 + 1}"
-    # the isograph names the run by its id; the trace's digest goes into the release record, once the run has landed
-    res = _engine(ctx, "project", "thym_isograph")(hol, epoch=epoch,
-                                                   program={"name": prog["name"], "sha256": prog["sha256"]},
-                                                   trace={"run": str(run)}, keep=_emitted_ids(ctx))
+    # the projection names the run by its id; the trace's digest goes into the release record, once the run has landed
+    res = _engine(ctx, "project", fn)(hol, epoch=epoch, program={"name": prog["name"], "sha256": prog["sha256"]},
+                                      trace={"run": str(run)}, keep=_emitted_ids(ctx))
     doc = mc.yaml_load(res["json"])
     stage = getattr(ctx, "stage", None)
     if stage is not None:
-        write_atomic(stage / "isograph.json", res["json"].encode("utf-8"))
-    # the ids that left ride in the value's origin, for the release the host records once the run has landed
-    return Value("volume", doc, origin={"items": list(res.get("items") or [])})
+        write_atomic(stage / staged, res["json"].encode("utf-8"))
+    # the ids that left ride in the value's origin, for the release the host records once the run has landed; an
+    # allograph's also carries the holograph's state as the run took it (Ascribe 14.6: made again, never edited)
+    origin: dict = {"items": list(res.get("items") or [])}
+    if res.get("holograph"):
+        origin["holograph"] = str(res["holograph"])
+    return Value("volume", doc, origin=origin)
+
+
+def isograph(ctx: Any, h: Value, **mods: Any) -> Value:
+    """`project h as isograph` for a holograph (Ascribe 14.1)."""
+    return _projection(ctx, h, "isograph")
+
+
+def allograph(ctx: Any, h: Value, **mods: Any) -> Value:
+    """`project h as allograph` for a holograph (Ascribe 14.6): only E, S and U, offered, public and known; no hid, no
+    handle. Nothing is sent anywhere: listing is the implementation's act after the run, at the holder's word."""
+    return _projection(ctx, h, "allograph")
+
+
+def project(ctx: Any, h: Value, **mods: Any) -> Value:
+    """The code of Ascribe's one `extends` entry of `project` (THYM 17.6): the call's `as` word chooses the kind."""
+    kind = mods.get("as")
+    if kind not in KINDS:
+        raise MoveError(f"Ascribe projects a holograph as an isograph or an allograph, not as {kind!r}")
+    return _projection(ctx, h, kind)
 
 
 # ---------------------------------------------------------------------------
@@ -260,4 +295,35 @@ def _isograph_epoch(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any
     return _verdict([p for p in _isograph_problems(output, ctx) if p.startswith("epoch ") or p == "no epoch"])
 
 
-__all__ = ["FUNCTIONS", "PROMPTS", "isograph", "propose", "propose_messages"]
+# `project … as allograph`, held to `ascribe-allograph/0` (Ascribe 14.6) under the same check names.
+
+def _allograph_problems(output: Value, ctx: Any) -> list[str]:
+    import json
+    data = output.mapping()
+    if not isinstance(data, dict):
+        return ["the projection is not an ascribe-allograph/0 document"]
+    text = json.dumps(plain(data), sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return list(_engine(ctx, "project", "thym_allograph_problems")(text))
+
+
+@check("default-deny", kind="allograph")
+def _allograph_default_deny(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """The allograph holds only the fields ascribe-allograph/0 names, each in its shape, one entry per kind and form,
+    in order, every entry `stated`."""
+    return _verdict([p for p in _allograph_problems(output, ctx) if "holds a number" not in p
+                     and not p.startswith("epoch ")])
+
+
+@check("no-counts", kind="allograph")
+def _allograph_no_counts(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Assertions, not measurements: no number of anything (Ascribe 14.6)."""
+    return _verdict([p for p in _allograph_problems(output, ctx) if "holds a number" in p])
+
+
+@check("epoch", kind="allograph")
+def _allograph_epoch(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """The allograph names its epoch: a quarter, a month or a week."""
+    return _verdict([p for p in _allograph_problems(output, ctx) if p.startswith("epoch ") or p == "no epoch"])
+
+
+__all__ = ["FUNCTIONS", "KINDS", "PROMPTS", "allograph", "isograph", "project", "propose", "propose_messages"]

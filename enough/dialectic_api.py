@@ -674,13 +674,18 @@ def settle_fabula(project_dir: Path, t: Target, *, mode: str, why: str = "", rou
 # A holograph's isograph: the holder's program, run through Thym (`project h as isograph`), then the release
 # ---------------------------------------------------------------------------
 
-def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | None = None) -> dict:
-    """`POST /api/ascribe/isograph`: the holder's program (its one input a volume, its output `project h as
-    isograph`) run on the holograph by rules (THYM 6.3; Ascribe 14.1: an isograph is computed by rules), the release
-    recorded in the holograph's `releases:` (Ascribe 13: before anything leaves; `trace: {run, sha256}` of the run's
-    trace), then the isograph written beside the holograph as `<holograph>.isograph-<epoch>.json`. Returns `{path,
-    isograph, release, run, trace}`. Refused in words: not a holograph, no such program, a program that asks a model
-    or takes anything but the holograph, a run that does not land (its refusal), a second isograph in one epoch."""
+#: What each projection of a holograph is called on the page and where it lands beside the holograph.
+PROJECTIONS = {"isograph": "an isograph is a holograph's projection for private sharing",
+               "allograph": "an allograph is a holograph's public account of what its holder can do for others"}
+
+
+def _projection(project_dir: Path, rel: str, program: str, kind: str, *, now: dt.datetime | None = None) -> dict:
+    """The holder's program (its one input a volume, its output `project h as <kind>`) run on the holograph by rules
+    (THYM 6.3; Ascribe 14.1 and 14.6: a projection is computed by rules), the release recorded in the holograph's
+    `releases:` (Ascribe 13: before anything leaves; `trace: {run, sha256}` of the run's trace), then the projection
+    written beside the holograph. Refused in words: not a holograph, no such program, a program that asks a model or
+    takes anything but the holograph, a run that does not land (its refusal), a program whose output is not this kind,
+    and for an isograph a second one in one epoch."""
     import hashlib
     from .thym import plan as _plan
     from .thym import run as _run
@@ -688,11 +693,11 @@ def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | No
     a = _ascribe()
     t = target(project_dir, rel)
     if not t.holograph:
-        raise DialecticRouteError(f"{t.rel} is not a holograph; an isograph is a holograph's public projection")
+        raise DialecticRouteError(f"{t.rel} is not a holograph; {PROJECTIONS[kind]}")
     prog = _host.find_program(str(program or "").strip(), project_dir) if str(program or "").strip() else None
     if prog is None:
         raise DialecticRouteError(f"no program {program!r}: name the holder's program, a .thym file whose output is "
-                                  "project h as isograph", 404)
+                                  f"project h as {kind}", 404)
     checked = _thym_api._checked(prog)
     if isinstance(checked, Refusal):
         raise DialecticRouteError(f"{prog.name} does not compile: {checked.message}"
@@ -701,14 +706,14 @@ def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | No
     takes = list(block.takes) if block is not None else []
     if len(takes) != 1 or takes[0].type != "volume":
         raise DialecticRouteError(f"{prog.name} takes {', '.join(f'{p.name}: {p.type}' for p in takes) or 'nothing'};"
-                                  " an isograph's program takes the holograph alone, as a volume")
+                                  f" an {kind}'s program takes the holograph alone, as a volume")
     rows = [{"name": takes[0].name, "type": "volume", "path": str(t.path), "sha256": digest_path(t.path)}]
     plan = _plan.plan(checked, rows, inputs_root=project_dir)
     if isinstance(plan, Refusal):
         raise DialecticRouteError(f"{prog.name} does not plan: {plan.message}")
     said = _host.asks_said(plan, route="local", program=prog)
     if said is not None:
-        raise DialecticRouteError(f"{said[0]}; an isograph is computed by rules, and no model reads a holograph for "
+        raise DialecticRouteError(f"{said[0]}; an {kind} is computed by rules, and no model reads a holograph for "
                                   "it", 409)
     kw = _thym_api.runtime(project_dir, mode="rules", why="", scaffolds=False, complete=None, n_ctx=None)
     tr = _run.run(plan, inputs_root=project_dir, program=prog, **({"now": now} if now is not None else {}), **kw)
@@ -716,29 +721,51 @@ def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | No
         raise DialecticRouteError(tr.message, 409)
     if not tr.landed:
         r = tr.refusal
-        raise DialecticRouteError(f"the isograph was not made ({r.check}): {r.message}" if r else
-                                  "the isograph was not made", 409)
-    staged = tr.dir / "outputs" / "isograph.json"
+        raise DialecticRouteError(f"the {kind} was not made ({r.check}): {r.message}" if r else
+                                  f"the {kind} was not made", 409)
+    staged = tr.dir / "outputs" / f"{kind}.json"
     if not staged.is_file():
-        raise DialecticRouteError(f"{prog.name} landed no isograph: its output is not project h as isograph", 409)
+        raise DialecticRouteError(f"{prog.name} landed no {kind}: its output is not project h as {kind}", 409)
     data = staged.read_bytes()
     doc = json.loads(data)
     value = next((v for v in tr.values.values() if isinstance(getattr(v, "origin", None), dict)
                   and "items" in v.origin), None)
     items = sorted(value.origin["items"]) if value is not None else []
+    # An allograph's run names the holograph's state as it took it, after the filter (Ascribe 14.6): the engine's
+    # answer, recorded with the run, so that the page can say when the holograph has changed since.
+    state = str(value.origin.get("holograph") or "") if value is not None else ""
     trace_sha = hashlib.sha256(tr.path.read_bytes()).hexdigest()
     try:
-        record = a.release_record(epoch=doc["epoch"], as_="isograph", program=doc["program"],
+        record = a.release_record(epoch=doc["epoch"], as_=kind, program=doc["program"],
                                   trace={"run": tr.run_id, "sha256": trace_sha},
                                   sha256=hashlib.sha256(data).hexdigest(), items=items, at=now)
         a.append_release(t.path, record)
     except a.AscribeError as e:
         raise DialecticRouteError(str(e), 409) from None
-    dst = t.path.parent / f"{t.path.name}.isograph-{doc['epoch']}.json"
+    # an isograph is one per epoch, so its epoch names it; an allograph may be made again in an epoch, so its run does
+    dst = t.path.parent / f"{t.path.name}.{kind}-{doc['epoch'] if kind == 'isograph' else tr.run_id}.json"
     dl = _dl()
     dl.write_atomic(dst, data.decode("utf-8"))
-    return {"path": t.rel, "isograph": _rel(project_dir, dst), "release": _macrocosm.jsonable(record),
-            "run": tr.run_id, "trace": str(tr.path)}
+    out = {"path": t.rel, kind: _rel(project_dir, dst), "release": _macrocosm.jsonable(record),
+           "run": tr.run_id, "trace": str(tr.path)}
+    if kind == "allograph":
+        out.update(document=doc, holograph=state)
+    return out
+
+
+def isograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | None = None) -> dict:
+    """`POST /api/ascribe/isograph`: the holder's program run on the holograph, `project h as isograph`, the release
+    recorded, the isograph written beside the holograph as `<holograph>.isograph-<epoch>.json`. Returns `{path,
+    isograph, release, run, trace}`."""
+    return _projection(project_dir, rel, program, "isograph", now=now)
+
+
+def allograph(project_dir: Path, rel: str, program: str, *, now: dt.datetime | None = None) -> dict:
+    """`POST /api/ascribe/allograph`: the holder's program run on the holograph, `project h as allograph` (Ascribe
+    14.6), the release recorded `as: allograph`, the allograph written beside the holograph as
+    `<holograph>.allograph-<run>.json`. Nothing is sent anywhere: this is the preview the holder lists, or does not.
+    Returns `{path, allograph, document, release, run, trace, holograph}`, `holograph` the state its run took."""
+    return _projection(project_dir, rel, program, "allograph", now=now)
 
 
 # ---------------------------------------------------------------------------
@@ -950,10 +977,24 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             return out
         return await run(go)
 
+    @router.post("/api/ascribe/allograph")
+    async def ascribe_allograph(request: Request) -> dict:
+        """A holograph's allograph, by the holder's program: `{path, program}` → `{path, allograph, document,
+        release, run, trace, holograph}` (synchronous: a rules run). The preview: nothing is sent anywhere."""
+        body = await body_of(request)
+
+        def go() -> dict:
+            t = target(project_dir, str(body.get("path") or ""))
+            out = held(t, lambda: allograph(project_dir, str(body.get("path") or ""),
+                                            str(body.get("program") or "")))
+            catalog_after(t.rel)
+            return out
+        return await run(go)
+
     router.start_settle = start_settle          # type: ignore[attr-defined]  (the agent's tool settles through it)
     return router
 
 
-__all__ = ["DialecticRouteError", "Target", "ask_again", "build_router", "candidate_of", "card", "check",
-           "closed_questions", "isograph", "ledger", "listing", "notify", "raise_bank", "record", "settle_fabula",
-           "settle_rules", "sittings", "target", "unsettled"]
+__all__ = ["DialecticRouteError", "PROJECTIONS", "Target", "allograph", "ask_again", "build_router", "candidate_of",
+           "card", "check", "closed_questions", "isograph", "ledger", "listing", "notify", "raise_bank", "record",
+           "settle_fabula", "settle_rules", "sittings", "target", "unsettled"]

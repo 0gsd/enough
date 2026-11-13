@@ -30,8 +30,12 @@ an answer into a node anchored to a form; nothing that reads as personal data is
 own texts** (section 9): `candidates` and `land_candidates` (the engine side of Thym's move `propose`). **The
 private filter** (section 11): `private_filter`, a pure function of the folder. **Releases** (section 13):
 `releases`, `append_release`, `released`. **Projections** (section 14): `project_isograph` (`ascribe-isograph/0`),
-`isograph_problems` (the reader's refusal), `cryptograph`, `make_tokens` (`ascribe-tokens/0`), `isomorph`.
-`thym_engine()` is what Thym's moves reach as `ctx.engines["ascribe"]`.
+`isograph_problems` (the reader's refusal), `project_allograph` (`ascribe-allograph/0`, section 14.6) and
+`allograph_problems`, `holograph_state` (the digest an allograph's run records), `cryptograph`, `isomorph`. A writer
+makes no match-token list (`ascribe-tokens/0` is withdrawn, sections 14.3 and 14.14); a release recorded `as: tokens`
+still reads. **The subject** (section 4.2): `subject_of`, `set_subject` (`person`, the default, or `character`).
+`thym_engine()` is what Thym's moves reach as `ctx.engines["ascribe"]`. Listing an allograph in the Allograph
+Registry is `enough/allograph_registry.py`'s, at the holder's word, after the run.
 
 Only the dialectic's writers, `land_candidates` and the release writers write, and only into the holograph folder
 they are given (atomically, every byte outside the change kept). `lint_holograph` reads only the folder.
@@ -48,11 +52,9 @@ import argparse
 import copy
 import datetime as _dt
 import hashlib
-import hmac
 import json
 import os
 import re
-import secrets
 import tempfile
 from collections import Counter
 from dataclasses import dataclass, field
@@ -98,8 +100,11 @@ MODULE_FILES = {"A": "affinities", "B": "beliefs", "C": "concerns", "E": "experi
 BANK = "ascribe"                                   # the bank the older `dialectic.questions` shape is read as
 HOLDER = "holder"
 
-# Releases (section 13).
-RELEASE_AS = ("isograph", "cryptograph", "tokens", "isomorph")
+# Releases (section 13). A writer records one of RELEASE_AS; a reader also reads `tokens`, a record made before
+# match-token lists were withdrawn (sections 14.3 and 14.14).
+RELEASE_AS = ("isograph", "allograph", "cryptograph", "isomorph")
+RELEASE_AS_WITHDRAWN = ("tokens",)
+RELEASE_AS_READ = RELEASE_AS + RELEASE_AS_WITHDRAWN
 RELEASE_REQUIRED = ("epoch", "as", "program", "trace", "at", "sha256", "items")
 RELEASE_FIELDS = RELEASE_REQUIRED + ("for",)
 EPOCH_RE = re.compile(r"^[0-9]{4}-(?:Q[1-4]|0[1-9]|1[0-2]|W(?:0[1-9]|[1-4][0-9]|5[0-3]))$")
@@ -115,7 +120,15 @@ ISOGRAPH_KEYS = ("isograph", "hid", "handle", "epoch", "sample", "program", "run
 #: A run's id as a Thym runtime writes it (`2026-11-05-2046-2166`): its minute, then four hex digits.
 RUN_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{4}-[0-9a-f]{4}$")
 ISOGRAPH_SELF_KEYS = ("kind", "form", "valence", "strength", "when", "marking")
-TOKENS = "ascribe-tokens/0"
+# The allograph (section 14.6): the holder's public account of what they can do for others; no hid, no handle.
+ALLOGRAPH = "ascribe-allograph/0"
+ALLOGRAPH_KEYS = ("allograph", "kind", "epoch", "sample", "program", "run", "expertise")
+ALLOGRAPH_EXPERTISE_KEYS = ("kind", "form", "strength", "when", "marking")
+EXPERTISE = ("E", "S", "U")                        # experiences, skills, understandings: the three kinds that enter
+OFFERED_VALENCE = (None, "for")                    # a node marked against or mixed is not something the holder offers
+# The catalog's `subject` (section 4.2) and the allograph's `kind` it gives.
+SUBJECTS = ("person", "character")
+SUBJECT_KIND = {"person": "person", "character": "agent"}
 STATED = "stated"
 BANDS = {1: "slight", 2: "slight", 3: "moderate", 4: "strong", 5: "strong"}
 PER_KIND = 20
@@ -554,6 +567,11 @@ class _Own:
         if p is not None and not (isinstance(p, list) and all(isinstance(x, str) and x.strip() for x in p)):
             self.add("catalog-key", None, "pseudonyms is a list of the stand-in names the author uses", "pseudonyms",
                      file=f)
+        s = cat.get("subject")
+        if s is not None and not mc.is_pending(s) and s not in SUBJECTS:
+            self.add("catalog-key", None, f"subject {_quote(str(s))} is person (the holder's own self, the default) "
+                                          "or character (a subject that is not a person, kept by its holder)",
+                     "subject", file=f)
 
     # no-pii
     def no_pii(self) -> None:
@@ -696,7 +714,8 @@ def _timestamp_ok(v: Any) -> bool:
 
 def release_problems(entry: Any) -> list[tuple[str, str]]:
     """(field, message) for each way a `releases:` entry falls short of section 13 (`release-shape`): a required
-    field missing; `epoch` not a quarter, a month or a week; `as` not one of isograph, cryptograph, tokens, isomorph;
+    field missing; `epoch` not a quarter, a month or a week; `as` not one of isograph, allograph, cryptograph,
+    isomorph (or tokens, read in a record made before match-token lists were withdrawn);
     `program` not `{name, sha256}`; `trace` not `{run, sha256}`; `at` not a timestamp; `sha256` not a digest;
     `items` not a sorted list of ids (an isomorph's `M:morph/<slug>` among them), or `all` for a cryptograph; `for`
     not `{path, sha256}`; and any field section 13 does not name (a record never holds what was withheld, a key or a
@@ -714,7 +733,7 @@ def release_problems(entry: Any) -> list[tuple[str, str]]:
     if "epoch" in entry and not (isinstance(entry["epoch"], str) and EPOCH_RE.match(entry["epoch"])):
         out.append(("epoch", f"epoch {_quote(str(entry['epoch']))} is a quarter (2026-Q4), a month (2026-11) or a "
                              "week (2026-W45), never the day of an edit"))
-    if "as" in entry and entry["as"] not in RELEASE_AS:
+    if "as" in entry and entry["as"] not in RELEASE_AS_READ:
         out.append(("as", f"as {_quote(str(entry['as']))} is one of {', '.join(RELEASE_AS)}"))
     prog = entry.get("program")
     if "program" in entry and not (isinstance(prog, dict) and set(prog) == {"name", "sha256"}
@@ -926,6 +945,7 @@ class Holograph:
         self._ids0 = {d.get("id") for d in self.led.items if isinstance(d, dict)}
         self._origin0 = list(self.led.origin)
         self._files0 = {f for _part, f in self._origin0}
+        self.drop_keys: set[str] = set()       # catalog keys `save` removes (a write keeps every other key it finds)
 
     @property
     def pseudonyms(self) -> list[str]:
@@ -963,6 +983,8 @@ class Holograph:
                 for k, v in self.led.catalog.items():
                     if k != "nodes":
                         new[k] = v
+                for k in self.drop_keys:
+                    new.pop(k, None)
                 if nodes or "nodes" in new:
                     new["nodes"] = nodes
             else:
@@ -1708,7 +1730,9 @@ def releases(folder: Any) -> list[dict]:
 
 def release_record(*, epoch: str, as_: str, program: dict, trace: dict, sha256: str, items: Any,
                    at: Any = None, for_: dict | None = None) -> dict:
-    """A release as section 13 writes it (refused in plain words when it is not in its shape)."""
+    """A release as section 13 writes it (refused in plain words when it is not in its shape, or when it records
+    what a writer no longer makes: a match-token list)."""
+    _refuse_withdrawn(as_)
     rec: dict = {"epoch": epoch, "as": as_, "program": {"name": program.get("name"), "sha256": program.get("sha256")},
                  "trace": {"run": trace.get("run"), "sha256": trace.get("sha256")}, "at": dl.now(at),
                  "sha256": sha256, "items": items if items == "all" else sorted(dict.fromkeys(items))}
@@ -1720,6 +1744,12 @@ def release_record(*, epoch: str, as_: str, program: dict, trace: dict, sha256: 
     return rec
 
 
+def _refuse_withdrawn(as_: Any) -> None:
+    if as_ in RELEASE_AS_WITHDRAWN:
+        raise AscribeError("a match-token list is withdrawn (sections 14.3 and 14.14): a writer makes none, and a "
+                           "release as tokens is only read, in a record made before")
+
+
 def append_release(folder: Any, record: dict) -> dict:
     """A release appended to the catalog's `releases:` (never rewriting one), before anything leaves. Refused when
     the record is not in its shape, or when it is a second isograph in one epoch (a holder who releases more often
@@ -1727,6 +1757,7 @@ def append_release(folder: Any, record: dict) -> dict:
     probs = release_problems(record)
     if probs:
         raise AscribeError("the release is not in its shape: " + "; ".join(f"{f}: {m}" if f else m for f, m in probs))
+    _refuse_withdrawn(record.get("as"))
     h = Holograph(folder)
     rel = h.led.catalog.get("releases", [])
     if not isinstance(rel, list):
@@ -1760,7 +1791,7 @@ def sha256_hex(data: bytes) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Projections (section 14): the isograph, match tokens, the cryptograph, the isomorph
+# Projections (section 14): the isograph, the allograph, the cryptograph, the isomorph
 # ---------------------------------------------------------------------------
 
 def canonical_json(doc: Any) -> bytes:
@@ -1792,11 +1823,14 @@ class _Eligible:
     data: dict
 
 
-def _eligible(vol: mc.Volume) -> list[_Eligible]:
+def _eligible(vol: mc.Volume, letters: Iterable[str] = CONTAINERS,
+              valences: tuple | None = None) -> list[_Eligible]:
     """The nodes the isograph's rules let appear (section 14.1), in module order: of the ten kinds, `visibility:
     public`, `status` absent or active, provenance known at confidence 0.5 or more, and anchored to a form grounded
     in FEED with origin feed, or to a polyform of at most eight forms every one so grounded. `vol` is what the filter
-    kept, so whatever it withheld is not here."""
+    kept, so whatever it withheld is not here. The allograph's (section 14.6) are the same rules over `letters` E, S
+    and U alone, with `valences` (absent or `for`) the only ones a node may carry."""
+    letters = tuple(letters)
     forms = {it.id: it for it in vol.items.values() if it.module == FORM_MODULE}
 
     def grounded(fid: Any) -> str | None:
@@ -1809,11 +1843,15 @@ def _eligible(vol: mc.Volume) -> list[_Eligible]:
 
     out = []
     for letter in CONTAINERS:
+        if letter not in letters:
+            continue
         for it in vol.items.values():
             if it.module != letter or it.kind != KINDS[letter]:
                 continue
             d = it.data
             if d.get("visibility") != "public" or d.get("status") not in (None, "active"):
+                continue
+            if valences is not None and d.get("valence") not in valences:
                 continue
             prov = d.get("provenance")
             conf = prov.get("confidence") if isinstance(prov, dict) else None
@@ -2044,62 +2082,228 @@ def project_isograph(folder: Any, *, epoch: str, program: dict, trace: dict, kee
     return data, record
 
 
-def token_key() -> bytes:
-    """A key made for one cryptograph's match tokens, never its package key; the holder keeps it, nothing records it."""
-    return secrets.token_bytes(32)
+# ---------------------------------------------------------------------------
+# The allograph (section 14.6): the holder's public account of what they can do for others
+# ---------------------------------------------------------------------------
+
+def holograph_state(folder: Any) -> str:
+    """The digest of the holograph as a run takes it, after the private filter (section 14.6, "made again, never
+    edited"): the sha256 of one line per file the filter keeps for a projection, in path order, each `<the sha256 of
+    what it says as it leaves>  <path>` and a line feed (`_content`). What the filter withholds (a marker's files, a
+    restricted item, module D, the catalog's `releases:`) never moves it, so recording a release changes nothing.
+    `project h as allograph` gives it beside the allograph, and the run records it with the engine's answer (a Thym
+    plan's own input digest of a volume is its catalog file's, THYM 17.1). Refused when a marker beside the catalog
+    withholds the whole holograph."""
+    filt = _filtered_for_projection(folder)
+    lines = "".join(f"{sha256_hex(_content(rel, raw))}  {rel}\n" for rel, raw in sorted(filt.files.items()))
+    return sha256_hex(lines.encode("utf-8"))
 
 
-def match_token(key: bytes, about: str, value: str) -> str:
-    """One match token: the lowercase hex HMAC-SHA256 of `about`, a line feed and the value (section 14.3)."""
-    return hmac.new(key, f"{about}\n{value}".encode("utf-8"), hashlib.sha256).hexdigest()
+def _content(rel: str, raw: bytes) -> bytes:
+    """What a kept file says, for the holograph's state: a `.cosm` file's parsed content as canonical JSON (so that a
+    file the filter wrote out again without what it withheld, a comment, or the layout of its YAML moves nothing),
+    any other file's bytes."""
+    if not rel.endswith(".cosm"):
+        return raw
+    try:
+        data = mc.yaml_load(raw.decode("utf-8-sig"))
+    except Exception:  # noqa: BLE001 - the filter keeps no file that does not parse; its bytes if one does
+        return raw
+    return json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str).encode("utf-8")
 
 
-def make_tokens(folder: Any, chosen: Iterable[dict], *, of: str, epoch: str, program: dict, trace: dict,
-                key: bytes | None = None, at: Any = None) -> tuple[bytes, bytes, dict]:
-    """The holder's consented match tokens (`ascribe-tokens/0`, section 14.3) for the forms they choose, and the
-    release (`as: tokens`) recorded before the list is given. `chosen` is `[{about, form}]`: `about` one of the ten
-    kinds (a token per node of that kind anchored to the form, its value the form's slug and, when the node carries
-    a valence, a space and the valence word) or `form` (the form's slug); `form` a form's slug or id. A token is made
-    only for a form grounded in FEED with origin feed and a node the isograph's rules let appear; nothing is a token
-    by default. `of` is the cryptograph's hid. Returns (the list's canonical JSON, the key, the release); serving
-    tokens is reserved for a later edition."""
-    if not (isinstance(of, str) and HID_RE.match(of)):
-        raise AscribeError("tokens name the cryptograph they are of, by its 26-character hid")
+def subject_of(folder: Any) -> str:
+    """The catalog's `subject` (section 4.2): `person` when it is absent, or `character`. A value outside those two
+    is read as what it says, for the caller to refuse."""
+    vol = folder if isinstance(folder, mc.Volume) else mc.load_volume(_root_of(folder))
+    s = vol.catalog.get("subject")
+    return "person" if s is None else str(s)
+
+
+def set_subject(folder: Any, subject: str) -> str:
+    """Write the catalog's `subject`: `person` (written as its absence, the default) or `character`. Every other byte
+    of the catalog is kept. Returns the subject as it now reads."""
+    if subject not in SUBJECTS:
+        raise AscribeError(f"subject is person or character, not {subject!r}")
+    h = Holograph(folder)
+    if subject == "person":
+        h.led.catalog.pop("subject", None)
+        h.drop_keys.add("subject")
+    else:
+        h.led.catalog["subject"] = subject
+    h.save()
+    return subject
+
+
+def _check_run(epoch: Any, program: Any, trace: Any, what: str) -> None:
     if not (isinstance(epoch, str) and EPOCH_RE.match(epoch)):
-        raise AscribeError(f"epoch {epoch!r} is a quarter, a month or a week")
-    key = key or token_key()
+        raise AscribeError(f"epoch {epoch!r} is a quarter (2026-Q4), a month (2026-11) or a week (2026-W45)")
+    if not (isinstance(program, dict) and isinstance(program.get("name"), str) and _sha_ok(program.get("sha256"))):
+        raise AscribeError(f"an {what} names the program that made it: {{name, sha256}}")
+    if not (isinstance(trace, dict) and isinstance(trace.get("run"), str) and RUN_ID_RE.match(trace["run"])):
+        raise AscribeError(f"an {what} names the run that made it by its id (2026-11-05-2046-2166)")
+
+
+_BAND_ORDER = ("slight", "moderate", "strong")
+
+
+def _form_key(f: Any) -> str:
+    return " ".join(f) if isinstance(f, list) else str(f)
+
+
+def allograph_doc(folder: Any, *, epoch: str, program: dict, trace: dict,
+                  keep: Iterable[str] | None = None) -> tuple[dict, list[str]]:
+    """The allograph of a holograph (`ascribe-allograph/0`, section 14.6) and the ids of the items that leave in it,
+    computed by rules after the private filter: only nodes of E, S and U that are public, active, known at 0.5 or
+    more, marked `for` or carrying no valence, and anchored to FEED; one entry per kind and form, with the strongest
+    band and the latest decade among its nodes; sorted by module (E, S, U) then form; at most twenty of each kind;
+    `kind` `person`, or `agent` when the catalog's `subject` is `character`. No hid, no handle, no free text. `keep` is
+    the program's choice of nodes (it may keep more back, never add one). Refused while no-pii finds anything the
+    filter keeps. Writes nothing."""
+    _check_run(epoch, program, trace, "allograph")
     filt = _filtered_for_projection(folder)
     with _Materialized(filt) as vol:
+        if vol.refused is not None or vol.manifest is None or vol.minicosm != "ascribe":
+            raise AscribeError(f"the holograph was refused: {vol.refused}")
         _refuse_pii(vol)
-        rows = _eligible(vol)
-    entries: dict[str, dict] = {}
+        cat = vol.catalog
+        chosen = None if keep is None else set(keep)
+        rows = [e for e in _eligible(vol, EXPERTISE, OFFERED_VALENCE) if chosen is None or e.id in chosen]
+    subject = cat.get("subject", "person")
+    if subject not in SUBJECTS:
+        raise AscribeError(f"the catalog's subject is {subject!r}; it is person or character (section 4.2)")
+    merged: dict[tuple, dict] = {}
+    for e in rows:
+        kind = KINDS[e.letter]
+        key = (EXPERTISE.index(e.letter), _form_key(e.form))
+        m = merged.setdefault(key, {"kind": kind, "form": e.form, "strength": None, "when": None, "ids": set()})
+        m["ids"].add(e.id)
+        m["ids"].update(e.form_ids)
+        s = e.data.get("strength")
+        if strength_ok(s) and (m["strength"] is None or s > m["strength"]):
+            m["strength"] = s
+        dec = _decade(e.data.get("when"))
+        if dec and (m["when"] is None or int(dec[:-1]) > int(m["when"][:-1])):
+            m["when"] = dec
+    entries: list[dict] = []
     items: set = set()
-    for c in chosen:
-        about = c.get("about") if isinstance(c, dict) else None
-        form = str(c.get("form") or "") if isinstance(c, dict) else ""
-        fid = form if form.startswith(f"{FORM_MODULE}:form/") else f"{FORM_MODULE}:form/{form}"
-        slug = fid.split("/", 1)[1]
-        if about not in KINDS.values() and about != "form":
-            raise AscribeError(f"a token is about one of the ten kinds or a form, not {about!r}")
-        hits = [e for e in rows if e.form_ids == [fid] and (about == "form" or KINDS[e.letter] == about)]
-        if not hits:
-            raise AscribeError(f"no token for {about} {slug}: a token is made only for a form grounded in FEED and a "
-                               "node an isograph may show")
-        for e in hits:
-            value = slug if about == "form" else (slug + (f" {e.data['valence']}" if e.data.get("valence")
-                                                          in ("for", "against", "mixed") else ""))
-            tok = match_token(key, about, value)
-            entries[tok] = {"about": about, "token": tok}
-            items.add(e.id)
-            items.add(fid)
-    if not entries:
-        raise AscribeError("the holder chose no form: nothing is made a token by default")
-    doc = {"tokens": TOKENS, "of": of, "epoch": epoch, "entries": [entries[t] for t in sorted(entries)]}
+    per_kind: Counter = Counter()
+    for key in sorted(merged):
+        m = merged[key]
+        if per_kind[m["kind"]] >= PER_KIND:
+            continue
+        per_kind[m["kind"]] += 1
+        x: dict = {"kind": m["kind"], "form": m["form"]}
+        if m["strength"] is not None:
+            x["strength"] = BANDS[m["strength"]]
+        if m["when"] is not None:
+            x["when"] = m["when"]
+        x["marking"] = STATED
+        entries.append(x)
+        items.update(m["ids"])
+    doc: dict = {"allograph": ALLOGRAPH, "kind": SUBJECT_KIND[subject], "epoch": epoch,
+                 "program": {"name": program["name"], "sha256": str(program["sha256"])},
+                 "run": trace["run"], "expertise": entries}
+    if cat.get("sample") is True:
+        doc["sample"] = True
+    if len(canonical_json(doc)) > MAX_ISOGRAPH_BYTES:
+        raise AscribeError("the allograph would be larger than 64 kilobytes; keep more back")
+    return doc, sorted(items)
+
+
+def allograph_problems(doc: Any) -> list[str]:
+    """Why a reader refuses an allograph (sections 14.6 and 16.1.6), in plain words; [] when it reads it: a field
+    section 14.6 does not name, at the top or in an entry; a marking other than `stated`; a field out of its shape;
+    two entries of one kind and form, or entries out of their order; more than twenty of a kind; a number anywhere."""
+    if not isinstance(doc, dict):
+        return ["an allograph is one JSON object"]
+    out = []
+    extra = [k for k in doc if k not in ALLOGRAPH_KEYS]
+    if extra:
+        out.append(f"fields ascribe-allograph/0 does not name: {', '.join(map(str, extra))}")
+    for k in ("allograph", "kind", "epoch", "program", "run", "expertise"):
+        if k not in doc:
+            out.append(f"no {k}")
+    if doc.get("allograph") != ALLOGRAPH:
+        out.append(f"allograph is {ALLOGRAPH}")
+    if "kind" in doc and doc["kind"] not in SUBJECT_KIND.values():
+        out.append("kind is person or agent")
+    if "epoch" in doc and not (isinstance(doc["epoch"], str) and EPOCH_RE.match(doc["epoch"])):
+        out.append("epoch is a quarter, a month or a week")
+    if "sample" in doc and doc["sample"] is not True:
+        out.append("sample is true, or absent")
+    p = doc.get("program")
+    if "program" in doc and not (isinstance(p, dict) and set(p) == {"name", "sha256"} and isinstance(p.get("name"), str)
+                                 and p["name"].strip() and _sha_ok(p.get("sha256"))):
+        out.append("program is {name, sha256}")
+    if "run" in doc and not (isinstance(doc["run"], str) and RUN_ID_RE.match(doc["run"])):
+        out.append("run is the id of the run that made it")
+    rows = doc.get("expertise")
+    if "expertise" in doc and not isinstance(rows, list):
+        out.append("expertise is a list")
+        rows = []
+    kinds = {KINDS[L]: i for i, L in enumerate(EXPERTISE)}
+    keys: list[tuple] = []
+    per_kind: Counter = Counter()
+    for i, x in enumerate(rows or []):
+        if not isinstance(x, dict):
+            out.append(f"expertise[{i}] is an object")
+            continue
+        bad = [k for k in x if k not in ALLOGRAPH_EXPERTISE_KEYS]
+        if bad:
+            out.append(f"expertise[{i}]: fields ascribe-allograph/0 does not name: {', '.join(map(str, bad))}")
+        if x.get("marking") != STATED:
+            out.append(f"expertise[{i}]: marking is stated, always: the levels a registry shows are never written "
+                       "into an allograph")
+        if x.get("kind") not in kinds:
+            out.append(f"expertise[{i}]: kind is experience, skill or understanding")
+        f = x.get("form")
+        if not (isinstance(f, str) and f.strip()) and not (isinstance(f, list) and 0 < len(f) <= MAX_POLYFORM_WORDS
+                                                          and all(isinstance(w, str) and w for w in f)
+                                                          and f == sorted(f)):
+            out.append(f"expertise[{i}]: form is a FEED word, or the sorted words of a polyform's forms (at most "
+                       "eight)")
+        if "strength" in x and x["strength"] not in _BAND_ORDER:
+            out.append(f"expertise[{i}]: strength leaves only as its band")
+        if "when" in x and not (isinstance(x["when"], str) and DECADE_RE.match(x["when"])):
+            out.append(f"expertise[{i}]: when leaves only as its decade")
+        if x.get("kind") in kinds and (isinstance(f, str) or isinstance(f, list)):
+            keys.append((kinds[x["kind"]], _form_key(f)))
+            per_kind[x["kind"]] += 1
+    if len(set(keys)) != len(keys):
+        out.append("expertise gives one entry per kind and form")
+    elif keys != sorted(keys):
+        out.append("expertise is sorted by module (E, S, U), then by form")
+    for k, n in per_kind.items():
+        if n > PER_KIND:
+            out.append(f"at most twenty entries of each kind, and {k} has more")
+    for path, v in _leaves(doc):
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            out.append(f"{path} holds a number; an allograph says no number of anything")
+    return out
+
+
+def project_allograph(folder: Any, *, epoch: str, program: dict, trace: dict, keep: Iterable[str] | None = None,
+                      at: Any = None) -> tuple[bytes, dict]:
+    """`project h as allograph`, its engine side (section 14.6): the filter first, no-pii an error over what it keeps
+    and over the allograph itself, the allograph by rules, refused if a reader would refuse it, and the release
+    (`as: allograph`, its sha256 over the canonical bytes) recorded in the holograph before the bytes are given. A
+    holder may release more than one allograph in an epoch. `trace` is `{run, sha256}`. Returns (the canonical JSON
+    bytes, the release). Nothing is sent anywhere: listing is the holder's later act."""
+    doc, items = allograph_doc(folder, epoch=epoch, program=program, trace=trace, keep=keep)
+    probs = allograph_problems(doc)
+    if probs:
+        raise AscribeError("the allograph would not read: " + "; ".join(probs))
     data = canonical_json(doc)
-    record = release_record(epoch=epoch, as_="tokens", program=program, trace=trace, sha256=sha256_hex(data),
-                            items=sorted(items), at=at)
+    _refuse_pii_doc(doc, "the allograph")
+    if not items:
+        raise AscribeError("no node of this holograph may enter an allograph (an experience, a skill or an "
+                           "understanding, public, known at 0.5 or more, offered, anchored to a FEED word): nothing "
+                           "to release")
+    record = release_record(epoch=epoch, as_="allograph", program=program, trace=trace, sha256=sha256_hex(data),
+                            items=items, at=at)
     append_release(folder, record)
-    return data, key, record
+    return data, record
 
 
 def _known_only(files: dict) -> dict:
@@ -2284,12 +2488,35 @@ def thym_isograph_problems(isograph_json: str) -> list[str]:
     return isograph_problems(doc)
 
 
-THYM_FUNCTIONS = ("thym_forms", "thym_propose", "thym_isograph", "thym_isograph_problems")
+def thym_allograph(holograph: dict, *, epoch: str, program: dict, trace: dict, keep: list | None = None) -> dict:
+    """The allograph of a holograph, for the `as allograph` arm of `project`: `{json: <canonical JSON text>, items:
+    [...], holograph: <holograph_state>}`. Writes nothing: the host records the release when the run lands."""
+    doc, items = allograph_doc(holograph["path"], epoch=epoch, program=program, trace=trace, keep=keep)
+    probs = allograph_problems(doc)
+    if probs:
+        raise AscribeError("the allograph would not read: " + "; ".join(probs))
+    data = canonical_json(doc)
+    _refuse_pii_doc(doc, "the allograph")
+    return {"json": data.decode("utf-8"), "items": items, "holograph": holograph_state(holograph["path"])}
+
+
+def thym_allograph_problems(allograph_json: str) -> list[str]:
+    """Why a reader would refuse this allograph (`allograph_problems`), for the checks of `project … as allograph`."""
+    try:
+        doc = json.loads(allograph_json)
+    except ValueError:
+        return ["an allograph is one JSON object"]
+    return allograph_problems(doc)
+
+
+THYM_FUNCTIONS = ("thym_forms", "thym_propose", "thym_isograph", "thym_isograph_problems", "thym_allograph",
+                  "thym_allograph_problems")
 
 
 def thym_engine() -> Any:
-    """The `ascribe` engine Thym's moves reach (`ctx.engines["ascribe"]`): `thym_forms`, `thym_propose` and
-    `thym_isograph`, every argument and answer plain data (paths, text, lists, strings)."""
+    """The `ascribe` engine Thym's moves reach (`ctx.engines["ascribe"]`): `thym_forms`, `thym_propose`,
+    `thym_isograph` and `thym_allograph` (with their readers' refusals), every argument and answer plain data
+    (paths, text, lists, strings)."""
     from types import SimpleNamespace
     return SimpleNamespace(**{n: globals()[n] for n in THYM_FUNCTIONS})
 

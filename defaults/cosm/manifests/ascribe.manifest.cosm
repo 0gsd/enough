@@ -63,12 +63,14 @@ volume:
   private-marker: .ascribe-private  # see filter: below
 
 catalog:
-  keys: [oes, macrocosm, id, handle, summary, sample, visibility, pseudonyms, releases, morphs, nodes]
+  keys: [oes, macrocosm, id, handle, summary, subject, sample, visibility, pseudonyms, releases, morphs, nodes]
   id: ascribe/<hid>               # ascribe/aej6l5qrka6c6btarfiy2f7vnj
   hid: '[a-z2-7]{26}'             # 26 characters of lowercase base32, as Connect's hid; checked by enough/ascribe.py
   handle: 'a pseudonymous handle: lowercase words joined by hyphens (salt-and-crumb); never a name'
   summary: one line, optional; people appear in it by role, never by name
-  sample: [true, false]           # true on a fixture or a demonstration, never on a real person's holograph
+  subject: [person, character]    # person when absent: the holder's own self; character: the self of a subject that is not a person (a character, a persona, an agent run by a model), kept by its holder; an agent lists only from a character's holograph
+  subject-absent: person
+  sample: [true, false]          # true on a fixture or a demonstration, never on a real person's holograph
   visibility: [public, internal, restricted]
   visibility-absent: internal
   pseudonyms: 'the stand-in names the author uses for the people in their life ("Wren", "the Captain"), so the
@@ -77,7 +79,8 @@ catalog:
              as, program: {name, sha256}, trace: {run, sha256}, at, sha256, items} and, for a package''s graph.cosm,
              for: {path, sha256}; never what was withheld, a key, or the party a cryptograph was handed to (check
              release-shape)'
-  release-as: [isograph, cryptograph, tokens, isomorph]
+  release-as: [isograph, allograph, cryptograph, isomorph]
+  release-as-withdrawn: [tokens]  # read in a record made before match-token lists were withdrawn; a writer makes none
   morphs: 'optional: the file names of the holder''s morph volumes, each a bare name ending .morph.cosm, kept beside
            the holograph''s folder and never inside it'
   never: [the person's name, an email address, a phone number, a postal address, a birth date, a government id,
@@ -374,11 +377,13 @@ filter:
 
 # What may leave, by a Thym program the holder runs, after the filter, recorded as a release (Ascribe, sections 13
 # and 14): default-deny; withhold, never falsify; nothing of the dialectic and nothing pending; no personal data, no-pii
-# an error here. There is no paratype of a person.
+# an error here. There is no paratype of a person. The isograph is for private sharing, handed by the holder to whom
+# they choose; the allograph is the one thing of a holograph a registry lists, and only when its holder lists it.
 public-projection:
-  status: 'the isograph, built (enough/ascribe.py project_isograph); the registry, signing, an index of isographs and
-           further opt-in fields are reserved for a later edition'
-  isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (Thym, https://thym.cosmoes.org/)
+  status: 'the isograph and the allograph, built (enough/ascribe.py project_isograph, project_allograph); the
+           Allograph Registry''s client, keys and statements, built (enough/allograph_registry.py); further opt-in
+           fields of an isograph are reserved for a later edition, for private sharing'
+  isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (Thym, https://thym.cosmoes.org/), for private sharing; nothing lists, hosts or signs one
   schema: ascribe-isograph/0
   fields: [isograph, hid, handle, epoch, sample, program, run, self]
   self-fields: [kind, form, valence, strength, when, marking]
@@ -393,21 +398,35 @@ public-projection:
   sorted: [module, form, valence, strength, when]
   per-epoch: 1
   canonical: JSON, keys sorted, no space between tokens, UTF-8 without a byte-order mark
+  allograph: 'an allograph is a Thym projection of the holograph, made by project h as allograph: the holder''s public
+              account of what they can do for others, listed in the Allograph Registry only at the holder''s word'
+  allograph-schema: ascribe-allograph/0
+  allograph-fields: [allograph, kind, epoch, sample, program, run, expertise]
+  expertise-fields: [kind, form, strength, when, marking]
+  allograph-kind: {person: person, character: agent}    # the catalog's subject gives the allograph's kind
+  may-enter: 'a node of E, S or U (an experience, a skill, an understanding) whose visibility is public, whose status is
+              absent or active, whose provenance is known at confidence 0.5 or more, whose valence is absent or for,
+              that the filter keeps, and whose form, or every form of whose polyform (at most eight), is grounded in
+              FEED with origin feed; never the other seven kinds, the handle, the hid, a name, a summary or any free text'
+  allograph-entries: one per kind and form, with the strongest band and the latest decade among its nodes
+  allograph-sorted: [module, form]
+  allograph-per-epoch: any       # a holder may release more than one allograph in an epoch; made again, never edited
   cryptograph: 'a Thym package in its encrypted form of the filtered holograph (one holograph row per kept file, D left
-                out) or of a projection (projection.json, program.thym, trace.cosm); a random hid; the key shown once'
-  tokens: 'ascribe-tokens/0: {tokens, of, epoch, entries: [{about, token}]}, token the lowercase hex HMAC-SHA256 of
-           about, a line feed and the value, under a key made for one cryptograph; made only for forms the holder
-           chooses; serving them is reserved for a later edition'
+                out) or of a projection (projection.json, program.thym, trace.cosm); a random hid; the key shown once;
+                handed with its key to one chosen party, never hosted'
+  tokens: 'withdrawn: the salted list ascribe-tokens/0 is made no more (a writer makes none; a release as tokens still
+           reads); a search says what it needs as match tokens {about, value} (Ascribe, sections 14.3 and 14.11)'
   outsiders: no outsider's graph of a person exists
 
 extension:
-  status: 'the isograph, the cryptograph, match tokens and isomorphs are specified (Ascribe, section 14); the bridge to
-           Comprise is reserved for a later edition'
-  note: an isograph is a Thym projection of the holograph; no outsider's graph of a person exists
+  status: 'the isograph, the allograph, the cryptograph and isomorphs are specified (Ascribe, section 14); the
+           Allograph Registry replaces Ascribe-Connect and is the bridge to Comprise (sections 14.7 to 14.14)'
+  note: an isograph and an allograph are each a Thym projection of the holograph; no outsider's graph of a person exists
 
 # The moves Ascribe declares for Thym (Thym, https://thym.cosmoes.org/, sections 6.2, 6.3 and 17.6), for thym 1 only:
-# propose, and the kind it adds to project (isograph; isotype and paratype stay Comprise OES's). propose
-# asks the model; nothing it proposes is the holder's until they answer yes; a program lands it with gather.
+# propose, and the kinds it adds to project (isograph and allograph, in one entry; isotype and paratype stay Comprise
+# OES's). propose asks the model; nothing it proposes is the holder's until they answer yes; a program lands it with
+# gather. No move sends anything to a registry: listing an allograph is the implementation's act after the run.
 moves:
   - name: propose
     takes: [fabula]
@@ -422,8 +441,8 @@ moves:
     extends: true
     takes: [volume]
     gives: volume
-    modifiers: {as: isograph}
+    modifiers: {as: 'isograph | allograph'}
     contract: [default-deny, no-counts, no-mark, epoch, provenance]
-    code: enough.thym.moves.ascribe:isograph
-    says: a holograph projected as an isograph, from what the program emitted and withheld
+    code: enough.thym.moves.ascribe:project
+    says: a holograph projected as an isograph or an allograph, from what the program emitted and withheld
     since: 1

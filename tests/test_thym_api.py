@@ -600,11 +600,12 @@ def test_moves_lists_every_move_of_a_version_as_the_tool_does(client: TestClient
     ctx = next(m for m in body["moves"] if m["name"] == "context")
     assert ctx["takes"] == [] and ctx["of"] and "of" not in ctx["modifiers"]
     project_move = next(m for m in body["moves"] if m["name"] == "project")
-    assert {"owner": "ascribe", "as": ["isograph"]} in project_move["extended"]      # a second format's kinds
-    assert "isograph" in project_move["modifiers"]["as"]
+    assert {"owner": "ascribe", "as": ["isograph", "allograph"]} in project_move["extended"]   # a second format's kinds
+    assert {"isograph", "allograph"} <= set(project_move["modifiers"]["as"])
     zero = client.get("/api/thym/moves", params={"version": 0}).json()
     zero_project = next(m for m in zero["moves"] if m["name"] == "project")
-    assert "isograph" not in zero_project["modifiers"].get("as", []) and zero_project["extended"] == []
+    assert not {"isograph", "allograph"} & set(zero_project["modifiers"].get("as", []))
+    assert zero_project["extended"] == []
     assert len(zero["moves"]) < len(body["moves"])
     assert all(m["versions"] == [1] for m in body["moves"] if m["name"] not in {z["name"] for z in zero["moves"]})
     assert client.get("/api/thym/moves").json() == body                       # 1 by default

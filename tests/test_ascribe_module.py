@@ -5,7 +5,7 @@ The reader's one report (section 10, `release-shape`, `form-anchored` never on D
 section 8 (an answer in each container and in F, form discovery and FEED grounding, the four follow-ups, "I don't
 know", a refusal, a skip, an answer with a name refused); the private filter (section 11: each thing it withholds,
 each thing it never drops, a pure function); releases and `release-shape` (section 13); `propose` with a scripted
-coprocessor (section 9); the isograph, match tokens, the cryptograph and the isomorph (section 14); the manifest; the
+coprocessor (section 9); the isograph, the allograph, the cryptograph and the isomorph (section 14); the manifest; the
 specification's own `cosm`, `json` and `yaml` blocks, read from the bundled copy of the text (docs/ASCRIBE.md, which
 scripts/sync_specs.py keeps byte for byte cosmoes-site's specs/ascribe.md; skipped, with the reason, when it is
 absent).
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import datetime as dt
 import hashlib
-import hmac
+
 import json
 import re
 import shutil
@@ -803,29 +803,187 @@ def test_the_isograph_arm_reaches_only_its_engine(holo):
 
 
 # ---------------------------------------------------------------------------
+# E2b. project … as allograph (section 14.6), and the catalog's subject (section 4.2)
+# ---------------------------------------------------------------------------
+
+ALLO_PROG = {"name": "open-for-work", "sha256": "5" * 64}
+ALLO_TRACE = {"run": "2026-11-12-0930-cd34", "sha256": "6" * 64}
+# The text's example (ASCRIBE 14.6), byte for byte.
+SPEC_ALLOGRAPH = ('{"allograph":"ascribe-allograph/0","epoch":"2026-Q4","expertise":[{"form":"bakery",'
+                  '"kind":"experience","marking":"stated","when":"2010s"},{"form":"sourdough","kind":"skill",'
+                  '"marking":"stated","strength":"strong"}],"kind":"person","program":{"name":"open-for-work",'
+                  '"sha256":"' + "5" * 64 + '"},"run":"2026-11-12-0930-cd34","sample":true}')
+BAKERY = {"id": "F:form/bakery", "type": "form", "name": "bakery", "summary": "Where bread is made and sold.",
+          "feed": {"word": "bakery", "pos": "noun", "origin": "feed"},
+          "provenance": {"mode": "manual", "sources": ["self"], "confidence": 1}}
+
+
+def _for_work(root: Path) -> None:
+    """Section 14.6's example: a form `bakery` grounded in FEED, an experience anchored to it (`when: 2014`) and a
+    skill anchored to `sourdough` (`strength: 5`), both public."""
+    write_nodes(root, "F/work.cosm", BAKERY)
+    write_nodes(root, "E/work.cosm", node("E:experience/years-at-the-bakery", form="F:form/bakery", when=2014,
+                                          visibility="public"))
+    write_nodes(root, "S/work.cosm", node("S:skill/sourdough-loaves", strength=5, visibility="public"))
+
+
+def allo(root: Path, **kw) -> tuple[dict, list]:
+    return A.allograph_doc(root, epoch="2026-Q4", program=ALLO_PROG, trace=ALLO_TRACE, **kw)
+
+
+def test_the_allograph_of_the_texts_example(holo):
+    _for_work(holo)
+    data, rec = A.project_allograph(holo, epoch="2026-Q4", program=ALLO_PROG, trace=ALLO_TRACE, at=NOW)
+    assert data.decode("utf-8") == SPEC_ALLOGRAPH
+    assert rec["as"] == "allograph" and rec["sha256"] == hashlib.sha256(data).hexdigest()
+    assert rec["items"] == ["E:experience/years-at-the-bakery", "F:form/bakery", "F:form/sourdough",
+                            "S:skill/sourdough-loaves"]
+    assert A.releases(holo) == [rec] and A.lint_holograph(holo).errors == []
+    assert A.allograph_problems(json.loads(SPEC_ALLOGRAPH)) == []
+    # no hid, no handle, no free text: a listing cannot be joined to an isograph handed in private
+    text = data.decode()
+    assert "aej6l5qrka6c6btarfiy2f7vnj" not in text and "salt-and-crumb" not in text and "a test node" not in text
+    # a holder may release more than one allograph in an epoch
+    A.project_allograph(holo, epoch="2026-Q4", program=ALLO_PROG, trace=ALLO_TRACE, at=NOW)
+    assert [r["as"] for r in A.releases(holo)] == ["allograph", "allograph"]
+
+
+@pytest.mark.parametrize("nid, extra", [
+    ("A:affinity/loaves", {}),                                   # the seven other kinds never enter, however public
+    ("B:belief/loaves", {}), ("C:concern/loaves", {}), ("I:interest/loaves", {}), ("O:opinion/loaves", {}),
+    ("Q:quale/loaves", {}), ("Y:yearning/loaves", {}),
+    ("S:skill/loaves", {"valence": "against"}),                  # not something the holder offers
+    ("S:skill/loaves", {"valence": "mixed"}),
+    ("S:skill/loaves", {"visibility": "internal"}),
+    ("S:skill/loaves", {"visibility": "restricted"}),
+    ("S:skill/loaves", {"status": "retired"}),
+    ("S:skill/loaves", {"provenance": {"mode": "manual", "sources": ["self"], "confidence": 0.4}}),
+    ("S:skill/loaves", {"provenance": {"mode": "derived", "sources": ["x.md#sha256:" + "a" * 64], "confidence": 0.9,
+                                       "state": "pending"}}),
+    ("S:skill/loaves", {"form": "F:form/celestial-navigation"}),  # an encyclopedia article is not a FEED word
+])
+def test_what_never_enters_an_allograph(holo, nid, extra):
+    n = {**node(nid, visibility="public"), **extra}
+    write_nodes(holo, f"{nid[0]}/more.cosm", n)
+    doc, ids = allo(holo)
+    assert doc["expertise"] == [] and ids == []
+    assert set(doc) == {"allograph", "kind", "epoch", "sample", "program", "run", "expertise"}
+
+
+def test_one_entry_per_kind_and_form_with_the_strongest_band_and_the_latest_decade(holo):
+    write_nodes(holo, "S/more.cosm",
+                node("S:skill/old-loaves", strength=2, when=1998, visibility="public", valence="for"),
+                node("S:skill/new-loaves", strength=4, when="2014-06-03", visibility="public"),
+                node("S:skill/plain-loaves", visibility="public"))
+    write_nodes(holo, "U/more.cosm", node("U:understanding/rising", visibility="public", when="childhood"))
+    doc, ids = allo(holo)
+    assert doc["expertise"] == [{"kind": "skill", "form": "sourdough", "strength": "strong", "when": "2010s",
+                                 "marking": "stated"},
+                                {"kind": "understanding", "form": "sourdough", "marking": "stated"}]
+    assert ids == ["F:form/sourdough", "S:skill/new-loaves", "S:skill/old-loaves", "S:skill/plain-loaves",
+                   "U:understanding/rising"]
+    assert A.allograph_problems(doc) == []
+
+
+def test_at_most_twenty_entries_of_each_kind(holo):
+    forms = [{**BAKERY, "id": f"F:form/w{i:02d}", "name": f"w{i:02d}", "feed": {"word": f"w{i:02d}", "origin": "feed"},
+              "provenance": {"mode": "manual", "sources": ["self"], "confidence": 1}} for i in range(22)]
+    write_nodes(holo, "F/many.cosm", *forms)
+    write_nodes(holo, "S/many.cosm", *[node(f"S:skill/s{i:02d}", form=f"F:form/w{i:02d}", visibility="public")
+                                       for i in range(22)])
+    doc, ids = allo(holo)
+    assert [x["form"] for x in doc["expertise"]] == [f"w{i:02d}" for i in range(20)]
+    assert "S:skill/s20" not in ids and A.allograph_problems(doc) == []
+
+
+def test_a_characters_holograph_gives_an_agents_allograph(holo):
+    _for_work(holo)
+    assert A.subject_of(holo) == "person" and allo(holo)[0]["kind"] == "person"     # absent: a person's
+    before = (holo / "holograph.cosm").read_text(encoding="utf-8")
+    assert A.set_subject(holo, "character") == "character"
+    after = (holo / "holograph.cosm").read_text(encoding="utf-8")
+    assert "subject: character" in after and after.replace("subject: character\n", "") == before
+    assert A.subject_of(holo) == "character" and allo(holo)[0]["kind"] == "agent"
+    assert A.lint_holograph(holo).problems() == []
+    A.set_subject(holo, "person")
+    assert (holo / "holograph.cosm").read_text(encoding="utf-8") == before            # person is written as absent
+    with pytest.raises(A.AscribeError, match="person or character"):
+        A.set_subject(holo, "robot")
+    cat = mc.yaml_load(before)
+    cat["subject"] = "robot"
+    (holo / "holograph.cosm").write_text(mc.dump(cat), encoding="utf-8")
+    assert any(p.check == "catalog-key" and "subject" in str(p) for p in A.lint_holograph(holo).errors)
+    with pytest.raises(A.AscribeError, match="person or character"):
+        allo(holo)
+
+
+def test_no_pii_refuses_an_allograph(holo):
+    _for_work(holo)
+    (holo / "E" / "work.cosm").write_text("# ring me on 020 7946 0958\n"
+                                          + (holo / "E" / "work.cosm").read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(A.AscribeError, match="no-pii"):
+        A.project_allograph(holo, epoch="2026-Q4", program=ALLO_PROG, trace=ALLO_TRACE)
+    assert A.releases(holo) == []
+
+
+@pytest.mark.parametrize("change, said", [
+    ({"hid": "aej6l5qrka6c6btarfiy2f7vnj"}, "does not name: hid"),
+    ({"handle": "salt-and-crumb"}, "does not name: handle"),
+    ({"kind": "robot"}, "person or agent"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "attested"}]}, "marking is stated"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "verified"}]}, "marking is stated"),
+    ({"expertise": [{"kind": "affinity", "form": "sourdough", "marking": "stated"}]}, "experience, skill or"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "stated", "valence": "for"}]},
+     "does not name: valence"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "stated", "strength": 5}]}, "band"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "stated", "when": "2014"}]}, "decade"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "stated"}] * 2}, "one entry per kind"),
+    ({"expertise": [{"kind": "skill", "form": "sourdough", "marking": "stated"},
+                    {"kind": "experience", "form": "bakery", "marking": "stated"}]}, "sorted"),
+    ({"expertise": [{"kind": "skill", "form": f"w{i:02d}", "marking": "stated"} for i in range(21)]},
+     "at most twenty"),
+    ({"sample": False}, "sample is true"),
+])
+def test_a_reader_refuses_an_allograph_out_of_its_schema(change, said):
+    doc = {**json.loads(SPEC_ALLOGRAPH), **change}
+    assert any(said in p for p in A.allograph_problems(doc)), A.allograph_problems(doc)
+
+
+def test_the_holographs_state_moves_with_what_the_filter_keeps_and_nothing_else(holo):
+    _for_work(holo)
+    s0 = A.holograph_state(holo)
+    assert re.fullmatch(r"[0-9a-f]{64}", s0) and A.holograph_state(holo) == s0
+    A.project_allograph(holo, epoch="2026-Q4", program=ALLO_PROG, trace=ALLO_TRACE, at=NOW)
+    assert A.holograph_state(holo) == s0                        # a release is withheld: recording one changes nothing
+    A.raise_bank(holo, at=NOW)
+    assert A.holograph_state(holo) == s0                        # module D never leaves, so never moves it
+    write_nodes(holo, "A/hidden/more.cosm", node("A:affinity/secret"))
+    (holo / "A" / "hidden" / A.PRIVATE_MARKER).write_text("", encoding="utf-8")
+    assert A.holograph_state(holo) == s0                        # behind a marker
+    write_nodes(holo, "S/more.cosm", node("S:skill/new-one", visibility="public"))
+    assert A.holograph_state(holo) != s0                        # the self changed
+
+
+# ---------------------------------------------------------------------------
 # E3. Match tokens, the cryptograph, the isomorph (sections 14.2, 14.3, 14.5)
 # ---------------------------------------------------------------------------
 
-def test_match_tokens_for_the_forms_the_holder_chooses(holo):
-    _public(holo, ids=("A:affinity/fast-bread", "A:affinity/sourdough-baking"))
-    key = b"k" * 32
-    data, got_key, rec = A.make_tokens(holo, [{"about": "affinity", "form": "sourdough"},
-                                              {"about": "form", "form": "F:form/sourdough"}],
-                                       of="b" * 26, epoch="2026-Q4", program=PROG, trace=TRACE, key=key, at=NOW)
-    doc = json.loads(data)
-    assert got_key == key and set(doc) == {"tokens", "of", "epoch", "entries"} and doc["tokens"] == "ascribe-tokens/0"
-    want = {hmac.new(key, f"affinity\n{v}".encode(), hashlib.sha256).hexdigest()
-            for v in ("sourdough for", "sourdough against")}
-    want.add(hmac.new(key, b"form\nsourdough", hashlib.sha256).hexdigest())
-    assert {e["token"] for e in doc["entries"]} == want
-    assert [e["token"] for e in doc["entries"]] == sorted(e["token"] for e in doc["entries"])
-    assert rec["as"] == "tokens" and rec["sha256"] == hashlib.sha256(data).hexdigest()
-    assert key.hex() not in (holo / "holograph.cosm").read_text() and "kkkk" not in (holo / "holograph.cosm").read_text()
-    with pytest.raises(A.AscribeError, match="grounded in FEED"):
-        A.make_tokens(holo, [{"about": "form", "form": "celestial-navigation"}], of="b" * 26, epoch="2026-Q4",
-                      program=PROG, trace=TRACE)
-    with pytest.raises(A.AscribeError, match="chose no form"):
-        A.make_tokens(holo, [], of="b" * 26, epoch="2026-Q4", program=PROG, trace=TRACE)
+def test_match_token_lists_are_withdrawn_and_an_old_record_of_one_still_reads(holo):
+    """Sections 14.3 and 14.14: a writer makes no `ascribe-tokens/0` list, and a release recorded `as: tokens` before
+    the withdrawal reads as it did."""
+    assert not hasattr(A, "make_tokens") and not hasattr(A, "match_token") and "tokens" not in A.RELEASE_AS
+    with pytest.raises(A.AscribeError, match="withdrawn"):
+        A.release_record(epoch="2026-Q4", as_="tokens", program=PROG, trace=TRACE, sha256="9" * 64,
+                         items=["F:form/sourdough"])
+    old = dict(GOOD, **{"as": "tokens"})
+    assert A.release_problems(old) == []
+    with pytest.raises(A.AscribeError, match="withdrawn"):
+        A.append_release(holo, old)
+    cat = mc.yaml_load((holo / "holograph.cosm").read_text(encoding="utf-8"))
+    cat["releases"] = [old]                                         # as a 0.6 holograph may already hold it
+    (holo / "holograph.cosm").write_text(mc.dump(cat), encoding="utf-8")
+    assert A.releases(holo)[0]["as"] == "tokens" and A.lint_holograph(holo).errors == []
+    assert A.released(holo, sha256=GOOD["sha256"])["as"] == "tokens"
 
 
 def test_a_cryptograph_of_the_whole_holograph_opens_with_its_key_and_carries_only_what_the_filter_keeps(holo):
@@ -899,6 +1057,10 @@ def test_the_manifest_as_the_text_now_has_it():
     pp = m.data["public-projection"]
     assert pp["schema"] == A.ISOGRAPH and pp["fields"] == list(A.ISOGRAPH_KEYS)
     assert pp["self-fields"] == list(A.ISOGRAPH_SELF_KEYS) and pp["derivable"] == []
+    assert pp["allograph-schema"] == A.ALLOGRAPH and pp["allograph-fields"] == list(A.ALLOGRAPH_KEYS)
+    assert pp["expertise-fields"] == list(A.ALLOGRAPH_EXPERTISE_KEYS) and pp["allograph-kind"] == A.SUBJECT_KIND
+    assert pp["tokens"].startswith("withdrawn") and cat["release-as-withdrawn"] == list(A.RELEASE_AS_WITHDRAWN)
+    assert "subject" in cat["keys"] and cat["subject"] == list(A.SUBJECTS) and cat["subject-absent"] == "person"
     text = (REPO / "defaults/cosm/manifests/ascribe.manifest.cosm").read_text(encoding="utf-8")
     assert "not built" not in text and "the process that asks them is reserved" not in text
     assert "filter that applies it is reserved" not in text and "release-shape" in m._block("checks")["own"]
@@ -1053,7 +1215,7 @@ def _open_self(tmp_path: Path, v: str):
                                               "sha256": digest_path(root)}])
 
 
-def test_ascribe_adds_isograph_to_project_for_thym_1_only():
+def test_ascribe_adds_isograph_and_allograph_to_project_for_thym_1_only():
     from enough.thym import declarations as dc
     decls = dc.load()
     assert decls.problems == []
@@ -1061,11 +1223,78 @@ def test_ascribe_adds_isograph_to_project_for_thym_1_only():
     assert p.owner == "comprise" and p.view(0).modifiers["as"] == ("isotype", "paratype")
     assert p.view(0).contract_when == () and p.view(0).code_when == ()
     one = p.view(1)
-    assert one.modifiers["as"] == ("isotype", "paratype", "isograph")
+    assert one.modifiers["as"] == ("isotype", "paratype", "isograph", "allograph")
     assert dc.chosen(one, as_word="isotype")["contract"] == p.contract          # Comprise's kinds: Comprise's contract
-    assert dc.chosen(one, as_word="isograph")["contract"] == ("default-deny", "no-counts", "no-mark", "epoch",
-                                                              "provenance")
-    assert one.code_when == ((("isograph",), "enough.thym.moves.ascribe:isograph", "ascribe"),)
+    for kind in ("isograph", "allograph"):
+        assert dc.chosen(one, as_word=kind)["contract"] == ("default-deny", "no-counts", "no-mark", "epoch",
+                                                            "provenance")
+    # one entry whose `as` lists both (THYM 17.6)
+    assert one.code_when == ((("isograph", "allograph"), "enough.thym.moves.ascribe:project", "ascribe"),)
+
+
+OPEN_FOR_WORK = """thym 1
+
+program open-for-work
+  why: what a person can do for others, as they say it, and nothing more.
+  takes h: volume
+  gives a: volume
+
+  for each s in h where kind is skill
+    emit s
+  end
+  give project h as allograph
+end
+"""
+
+
+def test_project_as_allograph_runs_through_thym_and_names_the_holographs_state(holo, tmp_path):
+    from enough import thym
+    from enough import thym_host as H
+    from enough.thym import Refusal
+    from enough.thym import run as RUN
+    from enough.thym.values import digest_path
+    _for_work(holo)
+    prog = tmp_path / "open-for-work.thym"
+    prog.write_text(OPEN_FOR_WORK, encoding="utf-8")
+    state = A.holograph_state(holo)
+    pl = thym.plan_file(prog, [{"name": "h", "type": "volume", "path": str(holo), "sha256": digest_path(holo)}])
+    assert not isinstance(pl, Refusal), pl
+    t = RUN.run(pl, inputs_root=tmp_path, root=tmp_path / "runs", program=prog, engines=H.engines(feed=None),
+                now=dt.datetime(2026, 11, 12, 9, 30, tzinfo=dt.timezone.utc))
+    assert not isinstance(t, Refusal), t
+    assert t.landed, t.refusal
+    got = json.loads((t.dir / "outputs" / "allograph.json").read_text(encoding="utf-8"))
+    # the program emitted only the skills: the experience is kept back, never added
+    assert got["expertise"] == [{"form": "sourdough", "kind": "skill", "marking": "stated", "strength": "strong"}]
+    assert got["kind"] == "person" and got["run"] == t.dir.name and got["epoch"] == "2026-Q4"
+    assert got["program"]["sha256"] == hashlib.sha256(prog.read_bytes()).hexdigest()
+    value = next(v for v in t.values.values() if isinstance(getattr(v, "origin", None), dict)
+                 and "items" in v.origin)
+    # the run names the holograph's state as it took it, after the filter: the engine's answer, recorded with the run
+    assert value.origin["holograph"] == state and "E:experience/years-at-the-bakery" not in value.origin["items"]
+    assert any(state in p.read_text(encoding="utf-8") for p in t.dir.rglob("*") if p.is_file()
+               and p.suffix in (".cosm", ".json", ".yaml"))
+    assert A.releases(holo) == []                                # nothing written into the holograph by the run
+
+
+def test_an_allograph_is_held_to_its_own_schema(holo):
+    from enough.thym import checks as C
+    from enough.thym.moves import ascribe as _M  # noqa: F401 - registers the allograph kind's checks
+    from enough.thym.values import Value
+
+    class Ctx:
+        engines = {"ascribe": A.thym_engine()}
+    doc = json.loads(SPEC_ALLOGRAPH)
+    allo_call = {"modifiers": {"as": "allograph"}}
+    assert C.verdict("default-deny", Value("volume", doc), {}, allo_call, None, Ctx()) == (True, "")
+    ok, why = C.verdict("default-deny", Value("volume", {**doc, "handle": "salt-and-crumb"}), {}, allo_call, None,
+                        Ctx())
+    assert not ok and "does not name: handle" in why
+    ok, why = C.verdict("no-counts", Value("volume", {**doc, "expertise": [dict(doc["expertise"][1], strength=5)]}),
+                        {}, allo_call, None, Ctx())
+    assert not ok and "holds a number" in why
+    ok, why = C.verdict("epoch", Value("volume", {**doc, "epoch": "2026-11-12"}), {}, allo_call, None, Ctx())
+    assert not ok and "epoch" in why
 
 
 def test_project_as_isograph_runs_on_the_sample_to_the_texts_example(tmp_path):
