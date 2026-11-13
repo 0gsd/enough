@@ -677,3 +677,12 @@ def test_real_dictionary_build_and_timings(tmp_path: Path, monkeypatch: pytest.M
     print("\nFEED real-data timings (ms):", json.dumps(timings, indent=1))
     slow = {k: v for k, v in timings.items() if k.startswith(("entries", "index")) and v > 300}
     assert not slow, slow
+
+
+def test_the_word_key_takes_a_contraction_a_leading_apostrophe_and_one_space():
+    assert D.WORD_RE.match("don't") and D.WORD_RE.match("'tis") and D.WORD_RE.match("terza rima")
+    assert not D.WORD_RE.match("two  words") and not D.WORD_RE.match("co-invest") and not D.WORD_RE.match("don’t")
+    assert D.normalize("’Tis") == ["'tis", "tis"]
+    assert D.normalize("  Don’t, ") == ["don't"]
+    assert D.normalize("Terza   Rima") == ["terza rima"]
+    assert D.normalize("“Hello”") == ["hello"]

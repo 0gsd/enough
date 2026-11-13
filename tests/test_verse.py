@@ -238,3 +238,48 @@ def test_readings_are_told_as_whose_they_are():
         {"id": "E:thing/worm", "type": "thing", "name": "worm", "summary": "A worm."}]}
     md, _ = CD.compile_short(doc, order="weight", now=NOW)
     assert "## How it can be read" in md and "One reading, the model's own guess: The worm is a canker." in md
+
+
+# ---------------------------------------------------------------------------
+# Contractions and two-word headwords (the lexicon's rule 4, 2026-11-12)
+# ---------------------------------------------------------------------------
+
+def test_words_keep_a_contraction_and_a_leading_apostrophe_and_fold_curly_ones():
+    assert V.words("’Tis o’er, and I’m here; don't") == ["'tis", "o'er", "and", "i'm", "here", "don't"]
+    assert V.words("She said ‘hello’ twice") == ["she", "said", "hello", "twice"]   # ‘ opens a quotation
+    assert V.words("theirs’ ʼtwas") == ["theirs", "'twas"]
+    assert V.norm_line("'Tis the season") == V.norm_line("Tis the season") == "tis the season"
+
+
+def test_a_two_word_headword_scans_as_one_and_a_contraction_by_its_own_key():
+    feed = {"'tis": {"ipa": "/tɪz/"}, "the": {"ipa": "/ðə/"}, "terza rima": {"ipa": "/ˌtɛrtsə ˈrimə/"},
+            "in": {"ipa": "/ɪn/"}, "we'll": {"ipa": "/wil/"}, "well": {"ipa": "/wɛl/"}, "sing": {"ipa": "/sɪŋ/"}}
+    poem = V.read_poem("'Tis in terza rima\nWe'll sing\n")
+    first, second = V.scan(poem, lambda ws: {w: feed.get(w) for w in ws})
+    assert first.missing == [] and first.syllables == 6 and first.end == "terza rima"
+    assert second.missing == [] and second.syllables == 2
+
+
+def test_feed_pronunciations_tries_the_key_then_without_a_leading_apostrophe_then_without_any(monkeypatch):
+    """Any word but a contraction (V2's rule): the key, then without a leading apostrophe, then without any."""
+    from enough import dictionary as D
+
+    asked = []
+
+    class Con:
+        def execute(self, sql, args):
+            class R:
+                def fetchone(self):
+                    return None
+            return R()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(D, "_connect", lambda: (Con(), False))
+    monkeypatch.setattr(D, "_row", lambda con, has_user, w: (asked.append(w), (None, None))[1])
+    assert V.feed_pronunciations(["'gainst"]) == {"'gainst": None}
+    assert asked == ["'gainst", "gainst"]
+    asked.clear()
+    assert V.feed_pronunciations(["we'll", "'twas"]) == {"we'll": None, "'twas": None}
+    assert asked == ["'twas", "we'll"]   # a contraction only through its own key: we'll never falls back to well

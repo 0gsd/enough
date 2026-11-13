@@ -71,7 +71,11 @@ REQUIRED = ("definition", "pos", "pronunciation")
 REPORTED = ("pronunciation", "pos", "definition", "usage_note", "domain", "etymology", "examples", "synonyms",
             "related", "antonyms", "hyphenation", "frequency_rank", "first_use", "forms")
 
-WORD_RE = re.compile(r"^[a-z]+$")
+# The word key (the lexicon's rule 4, owner 2026-11-12, for 0.7): lowercase a-z, the straight apostrophe U+0027 the only
+# one stored (don't, i'm; a leading one kept: 'tis), and one U+0020 space between the words of a multi-word headword
+# (terza rima). Curly apostrophes and the modifier letter fold to the straight one on write and on lookup.
+WORD_RE = re.compile(r"^'?[a-z]+(?:'[a-z]+)*(?: '?[a-z]+(?:'[a-z]+)*)*$")
+_APOSTROPHES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u02bc": "'"})
 
 SORT_KEYS = ("alpha", "length", "domain", "era", "pos", "frequency", "syllables", "added", "origin")
 _SORT_EXPR = {
@@ -529,12 +533,16 @@ _PUNCT = string.punctuation + string.whitespace + "“”‘’«»‹›—–�
 
 
 def normalize(raw: str) -> list[str]:
-    """Lookup candidates for a typed or clicked word, best first: lowercased, diacritics folded, surrounding
-    punctuation stripped, a possessive 's (or s') dropped."""
-    s = _fold(raw or "").replace("’", "'").replace("‘", "'").lower().strip(_PUNCT)
+    """Lookup candidates for a typed or clicked word, best first: lowercased, diacritics folded, every apostrophe the
+    straight one, inner spaces one space, surrounding punctuation stripped (a leading apostrophe before a letter is
+    tried first with it, 'tis, then without), a possessive 's (or s') dropped."""
+    s = " ".join(_fold(raw or "").translate(_APOSTROPHES).lower().split())
+    kept = s.strip(_PUNCT.replace("'", "")).rstrip("'")  # every edge but a leading apostrophe ('tis)
+    s = s.strip(_PUNCT)
     if not s:
         return []
-    out = [s]
+    out = ["'" + s] if kept.startswith("'") and kept.lstrip("'")[:1].isalpha() else []
+    out.append(s)
     if s.endswith("'s") and len(s) > 2:
         out.append(s[:-2].strip(_PUNCT))
     return [c for i, c in enumerate(out) if c and c not in out[:i]]
@@ -1069,7 +1077,7 @@ def _prepare(fields: dict, editable: set[str]) -> tuple[dict, list[str]]:
 
 def _derive(word: str, row: dict) -> None:
     row["word"] = word
-    row["letter"] = word[0]
+    row["letter"] = next((c for c in word if "a" <= c <= "z"), word[:1])  # 'tis files under t, as FEED's does
     row["length"] = len(word)
     row["is_headword"] = 1
     pos = row.get("pos") or ""
@@ -1133,7 +1141,7 @@ def user_add(fields: dict) -> dict:
     fields = dict(fields or {})
     word = _clean_word(fields.get("word"))
     if not WORD_RE.match(word):
-        return _fail(word, "a word is lowercase letters a-z only")
+        return _fail(word, "a word is lowercase letters a-z, with a straight apostrophe in a contraction or one space between words")
     feed = _feed_row(word)
     if feed is not None and feed.get("is_headword") == 1:
         return _fail(word, f"feed already has {word!r}; update it instead to keep your own version")
@@ -1161,7 +1169,7 @@ def user_update(word: str, fields: dict) -> dict:
     """Change a user entry, or make a user version of a feed entry (the user row then wins everywhere)."""
     word = _clean_word(word)
     if not WORD_RE.match(word):
-        return _fail(word, "a word is lowercase letters a-z only")
+        return _fail(word, "a word is lowercase letters a-z, with a straight apostrophe in a contraction or one space between words")
     with _write_lock:
         con = _user_connect()
         try:

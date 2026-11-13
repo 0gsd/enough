@@ -254,17 +254,21 @@ def decap(text: str, poem: Poem | None = None) -> str:
 # Words and FEED's pronunciations
 # ---------------------------------------------------------------------------
 
-_WORD = re.compile(r"[A-Za-zÀ-ɏ]+(?:['’][A-Za-zÀ-ɏ]+)*")
+# A leading apostrophe before a letter stays with the word ('tis, 'twas: FEED's key keeps it, the lexicon's rule 4);
+# the left single quote (U+2018) opens a quotation and is never one.
+_WORD = re.compile(r"(?<![A-Za-zÀ-ɏ'’ʼ])['’ʼ]?[A-Za-zÀ-ɏ]+(?:['’ʼ][A-Za-zÀ-ɏ]+)*")
 
 
 def words(line: str) -> list[str]:
-    """A line's words, lowercased, in order; a hyphenated word is its parts; a curly apostrophe is a straight one."""
-    return [w.lower().replace("’", "'") for w in _WORD.findall(line.replace("-", " ").replace("—", " "))]
+    """A line's words, lowercased, in order; a hyphenated word is its parts; a curly apostrophe or the modifier letter
+    is a straight one; a leading apostrophe before a letter is kept ('tis)."""
+    return [w.lower().replace("’", "'").replace("ʼ", "'")
+            for w in _WORD.findall(line.replace("-", " ").replace("—", " "))]
 
 
 def norm_line(line: str) -> str:
-    """A line folded for comparing (refrains): lowercased, its words only."""
-    return " ".join(words(line))
+    """A line folded for comparing (refrains): lowercased, its words only, a leading apostrophe dropped."""
+    return " ".join(w.lstrip("'") for w in words(line))
 
 
 def said_words(line: str) -> list[str]:
@@ -300,7 +304,9 @@ def feed_pronunciations(ws: Iterable[str]) -> dict[str, dict | None]:
         return out
     try:
         for w in want:
-            for cand in dict.fromkeys([w] if _CONTRACTION.match(w) else [w, w.replace("'", "")]):
+            # the key as written ('tis, don't, terza rima); a contraction only so (we'll never falls back to well);
+            # any other word then without a leading apostrophe, then without any
+            for cand in dict.fromkeys([w] if _CONTRACTION.match(w) else [w, w.lstrip("'"), w.replace("'", "")]):
                 row, _origin = D._row(con, has_user, cand)
                 if row is not None:
                     e = dict(row)
@@ -458,9 +464,15 @@ class LineScan:
         return len(self.stresses) if self.stresses is not None else None
 
 
+def _pairs(ws: list[str]) -> list[str]:
+    """A line's adjacent word pairs, for FEED's two-word headwords (terza rima)."""
+    return [f"{a} {b}" for a, b in zip(ws, ws[1:])]
+
+
 def scan(poem: Poem, pron: PronFn) -> list[LineScan]:
     """Every line scanned against FEED (`pron` is `feed_pronunciations`' shape)."""
-    all_words = sorted({w for vl in poem.lines for w in words(vl.text)})
+    all_words = sorted({w for vl in poem.lines for w in words(vl.text)}
+                       | {p for vl in poem.lines for p in _pairs(words(vl.text))})
     try:
         found = pron(all_words) or {}
     except Exception:  # noqa: BLE001 - no FEED is a question per line, never a failure
@@ -472,7 +484,21 @@ def scan(poem: Poem, pron: PronFn) -> list[LineScan]:
         missing: list[str] = []
         entries: list = []
         prons: list = []
-        for w in ws:
+        end = ws[-1] if ws else None
+        i = 0
+        while i < len(ws):
+            pair = f"{ws[i]} {ws[i + 1]}" if i + 1 < len(ws) else None   # a two-word headword (terza rima)
+            e2 = found.get(pair) if pair else None
+            p2 = parse_ipa(e2.get("ipa")) if isinstance(e2, dict) else None
+            if p2 is not None:   # scanned as one: its entry and sound on the first word, None on the second
+                stresses += word_stress(pair, p2)
+                entries += [e2, None]
+                prons += [p2, None]
+                end = pair if i + 2 == len(ws) else end
+                i += 2
+                continue
+            w = ws[i]
+            i += 1
             e = found.get(w)
             p = parse_ipa(e.get("ipa")) if isinstance(e, dict) else None
             entries.append(e if isinstance(e, dict) else None)
@@ -481,7 +507,6 @@ def scan(poem: Poem, pron: PronFn) -> list[LineScan]:
                 missing.append(w)
                 continue
             stresses += word_stress(w, p)
-        end = ws[-1] if ws else None
         e_end = found.get(end) if end else None
         p_end = parse_ipa(e_end.get("ipa")) if isinstance(e_end, dict) else None
         covered = (len(ws) - len(missing)) / len(ws) if ws else 0.0

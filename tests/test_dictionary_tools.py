@@ -174,7 +174,8 @@ def test_write_failures_name_what_is_missing(project: Path, built: Path):
                      '<pronunciation>/zɔrk/</pronunciation><definition>A thing.</definition>'
                      '<colour>red</colour></tool>')
     assert not r.ok and "unknown column 'colour'" in r.body and "columns you can write" in r.body
-    r = run(project, '<tool name="dict_add_entry"><word>two words</word></tool>')
+    # one space between words is a key now (terza rima: the lexicon's rule 4, 2026-11-12); a hyphen never is
+    r = run(project, '<tool name="dict_add_entry"><word>two-words</word></tool>')
     assert not r.ok and "a-z" in r.body
     r = run(project, '<tool name="dict_update_entry"><word>nowhere</word><pos>noun</pos></tool>')
     assert not r.ok and "add it instead" in r.body
