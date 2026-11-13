@@ -1687,7 +1687,7 @@ def scenario_topbar_no_collisions(d: Driver) -> list[str]:
 
 
 def scenario_composure_autofit(d: Driver) -> list[str]:
-    """A board ends up fitted and centred after any viewport size change —
+    """A plane ends up fitted and centred after any viewport size change —
     but not while a drag owns the view, and not while it is covered."""
     fails: list[str] = []
     _reset(d)
@@ -1705,13 +1705,13 @@ def scenario_composure_autofit(d: Driver) -> list[str]:
     d.click("#toggle-sidebar")
     _sleep(d, 700)
     if not centred(d.js(off)):
-        fails.append(f"hiding the sidebar did not refit the board: {d.js(off)}")
+        fails.append(f"hiding the sidebar did not refit the plane: {d.js(off)}")
     d.js(pan)
     d.js("COMP.drag = {kind: 'pan'}")
     d.click("#toggle-sidebar")
     _sleep(d, 600)
     if centred(d.js(off)):
-        fails.append("the board was refitted in the middle of a drag")
+        fails.append("the plane was refitted in the middle of a drag")
     d.js("COMP.drag = null")
     _sleep(d, 600)
     if not centred(d.js(off)):

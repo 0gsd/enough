@@ -244,7 +244,9 @@ def test_the_fabulac_tool_starts_and_follows_a_build_through_the_app(client: Tes
 
 def test_the_retired_tool_name_and_routes_are_gone(client: TestClient, project: Path):
     from enough import retired_names
-    assert not retired_names.TOOLS and not retired_names.ROUTES and not retired_names.WORDS
+    assert "emf_derive" not in retired_names.TOOLS and "what" not in retired_names.WORDS
+    assert not any(old.startswith("/api/canon/") and old.rsplit("/", 1)[1] in ("emf", "derive", "compile")
+               for _m, old, _n in retired_names.ROUTES)
     assert "emf_derive" not in T._DISPATCH and "fabula_derive" in T._DISPATCH
     r = run(project, tool("emf_derive", path="notes.md"))
     assert not r.ok and "unknown tool" in r.body

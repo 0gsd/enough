@@ -26,7 +26,7 @@ from enough.composure import ComposureError
 def build(**kw) -> C.Composure:
     comp = C.Composure(title=kw.pop("title", "Test"),
                        form=kw.pop("form", "blank"),
-                       kind=kw.pop("kind", "board"))
+                       kind=kw.pop("kind", "plane"))
     comp.created = comp.modified = "2026-09-17T00:00:00Z"
     return comp
 
@@ -344,9 +344,9 @@ def test_snap_scale_stays_on_the_ladder():
 
 @pytest.fixture()
 def comp_path(tmp_path: Path) -> Path:
-    path = tmp_path / "rness" / "io" / "composure" / "board.comp"
+    path = tmp_path / "rness" / "io" / "composure" / "plane.comp"
     path.parent.mkdir(parents=True, exist_ok=True)
-    C.save(path, C.new_composure("blank", "Board"))
+    C.save(path, C.new_composure("blank", "Plane"))
     return path
 
 
@@ -529,13 +529,33 @@ def test_stroke_validation(comp_path: Path):
             {"color": "puce", "points": [[0, 0], [1, 1]]}]})
 
 
+def test_a_retired_board_kind_reads_and_saves_as_plane(tmp_path: Path, comp_path: Path):
+    """`board` was the plane's name until 0.7: an old file and an old op still say it for one release
+    (`retired_names.WORDS["kind"]`); both arrive as `plane`, and the file is written back as `plane`."""
+    old = C.dumps(build(kind="plane")).replace(
+        '<meta name="composure:kind" content="plane">', '<meta name="composure:kind" content="board">')
+    assert 'content="board"' in old
+    path = tmp_path / "old.comp"
+    path.write_text(old, encoding="utf-8")
+    comp = C.load(path)
+    assert comp.kind == "plane"
+    C.save(path, comp)
+    text = path.read_text(encoding="utf-8")
+    assert 'content="plane"' in text and 'content="board"' not in text
+
+    ops(comp_path, {"op": "set_meta", "kind": "board"})
+    assert C.load(comp_path).kind == "plane"
+    with pytest.raises(ComposureError, match="kinds: page, plane"):
+        ops(comp_path, {"op": "set_meta", "kind": "desk"})
+
+
 def test_set_meta_and_arrange(comp_path: Path):
     ids = [ops(comp_path, {"op": "add_module", "type": "text"}).changed[0]
            for _ in range(4)]
-    ops(comp_path, {"op": "set_meta", "title": "Renamed", "kind": "board",
+    ops(comp_path, {"op": "set_meta", "title": "Renamed", "kind": "plane",
                     "view": {"x": 5, "y": 6, "zoom": 2}})
     comp = C.load(comp_path)
-    assert comp.title == "Renamed" and comp.kind == "board"
+    assert comp.title == "Renamed" and comp.kind == "plane"
     assert comp.view == {"x": 5, "y": 6, "zoom": 2}
     ops(comp_path, {"op": "arrange", "ids": ids, "mode": "column",
                     "x": 0, "y": 0})
@@ -598,16 +618,16 @@ def test_new_path_never_collides(tmp_path: Path):
 
 
 def test_save_as_form_and_project_override(tmp_path: Path):
-    comp = C.new_composure("cards", "My Board")
-    dest = C.save_as_form(tmp_path, comp, "My Board!")
-    assert dest.name == "my-board.comp"
+    comp = C.new_composure("cards", "My Plane")
+    dest = C.save_as_form(tmp_path, comp, "My Plane!")
+    assert dest.name == "my-plane.comp"
     names = {f["name"]: f for f in C.list_forms(tmp_path)}
-    assert names["my-board"]["origin"] == "project"
+    assert names["my-plane"]["origin"] == "project"
     # A project form shadows a shipped one of the same name.
     C.save_as_form(tmp_path, comp, "blank")
     assert {f["name"]: f for f in C.list_forms(tmp_path)}["blank"]["origin"] \
         == "project"
-    assert C.new_composure("my-board", "x", tmp_path).form == "my-board"
+    assert C.new_composure("my-plane", "x", tmp_path).form == "my-plane"
 
 
 def test_list_composures_hides_dotfiles_and_sorts_newest_first(tmp_path: Path):
@@ -635,20 +655,20 @@ def test_save_is_atomic_and_leaves_no_temp_file(tmp_path: Path):
 # ---------------------------------------------------------------------------
 
 def test_comments_crud(tmp_path: Path):
-    path = tmp_path / "board.comp"
-    C.save(path, C.new_composure("blank", "Board"))
+    path = tmp_path / "plane.comp"
+    C.save(path, C.new_composure("blank", "Plane"))
     side = C.comments_path(path)
-    assert side.name == ".board.comp.comments.json"
+    assert side.name == ".plane.comp.comments.json"
     assert not side.exists()
 
     entry = C.add_comment(path, "first thought",
                           {"type": "quote", "module": "m1", "page": 1,
-                           "quote": "hello"}, "board.comp")
+                           "quote": "hello"}, "plane.comp")
     assert entry["state"] == "anchored" and entry["id"].startswith("c_")
     assert side.is_file()
     C.add_reply(path, entry["id"], "a reply")
     C.update_comment(path, entry["id"], resolved=True, state="orphaned")
-    doc = C.load_comments(path, "board.comp")
+    doc = C.load_comments(path, "plane.comp")
     assert len(doc["comments"][0]["replies"]) == 1
     assert doc["comments"][0]["resolved"] is True
     assert doc["comments"][0]["state"] == "orphaned"
@@ -707,8 +727,8 @@ def test_outline_is_compact_and_quotes_module_ids(comp_path: Path):
     mid = ops(comp_path, {"op": "add_module", "type": "text",
                           "title": "Act one",
                           "markdown": "The hero wants something."}).changed[0]
-    text = C.outline(C.load(comp_path), "board.comp")
-    assert "composure: Board" in text and "path: board.comp" in text
+    text = C.outline(C.load(comp_path), "plane.comp")
+    assert "composure: Plane" in text and "path: plane.comp" in text
     assert mid in text and "Act one" in text
     assert "The hero wants something." in text
     assert len(text.splitlines()) == 6          # 3 header, blank, 2 modules

@@ -460,8 +460,8 @@ el lienzo que siempre está ahí, detrás de todo lo demás — la capa base de 
 la barra de herramientas recorre la parte de arriba: el título (para renombrarlo, escribe y haz clic fuera), el interruptor lectura/edición, las herramientas, deshacer/rehacer, el grupo de zoom, la búsqueda, el panel de comentarios y el menú de composures. desplaza el lienzo con dos dedos, con espacio+arrastrar o con el botón central; amplía con pellizco, ⌘+rueda, ⌘+ / ⌘− / ⌘0, o con «encajar». no hay botón de guardar — todo se va escribiendo sobre la marcha, y una composure que abres y nunca tocas no llega a escribir ningún archivo. aléjate lo suficiente y cada módulo se pliega hasta quedarse en su <em>cara</em>: su título, tan grande como quepa, con el cuerpo simulado, de modo que sesenta tarjetas se leen como sesenta títulos.
 
 ### ideas
-- ten un tablero por proyecto, como el mapa que miras antes de ponerte a escribir.
-- un módulo <code>.comp</code> que apunta a otro <code>.comp</code> convierte un tablero en un desglose: al hacer clic, el lienzo cambia bajo tus pies.
+- ten un plano por proyecto, como el mapa que miras antes de ponerte a escribir.
+- un módulo <code>.comp</code> que apunta a otro <code>.comp</code> convierte un plano en un desglose: al hacer clic, el lienzo cambia bajo tus pies.
 - selecciona un pasaje dentro de un módulo y viajará con tu siguiente mensaje a tu readvisor, en un bloque de código y con su etiqueta.
 
 ## composure-modules
@@ -477,7 +477,7 @@ el botón de añadir módulo abre una lista corta con los seis tipos. con un mó
 ### ideas
 - ponle un título a un módulo y conservará su nombre cuando te alejes más allá del tamaño de lectura.
 - las muestras <code>tinta</code> y <code>transparente</code> son para dar estructura — una tarjeta oscura para una fila de encabezado, una transparente para una etiqueta que no es una tarjeta en absoluto.
-- apunta un módulo al archivo que no dejas de reabrir; el tablero se vuelve un escritorio con los papeles adecuados ya encima.
+- apunta un módulo al archivo que no dejas de reabrir; el plano se vuelve un escritorio con los papeles adecuados ya encima.
 
 ## composure-tools
 name: herramientas
@@ -492,7 +492,7 @@ con el lápiz, simplemente dibuja — la línea se suaviza y se simplifica al so
 ### ideas
 - rodea con un círculo las tres tarjetas que van juntas antes de decidir cómo se llama el grupo.
 - traza flechas con mayús+arrastrar entre módulos para mostrar qué va después de qué, y luego mueve los módulos; la flecha se queda donde la dibujaste, que suele ser la respuesta honesta.
-- dibuja en rojo sobre un tablero que estás revisando y borra las marcas a medida que las vas resolviendo.
+- dibuja en rojo sobre un plano que estás revisando y borra las marcas a medida que las vas resolviendo.
 
 ## journal
 name: diario

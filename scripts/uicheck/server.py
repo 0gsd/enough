@@ -721,7 +721,7 @@ class ScratchWorld:
         Since 0.4.2 a project opens on its own composure (`auto`): the only
         one with anything in it, else the last one used. Here that would be
         whatever the previous screen or scenario left behind — a council, a
-        cards board — so a reload would land the next recipe on someone
+        cards plane — so a reload would land the next recipe on someone
         else's document. `new` is the user-facing "a new blank page" choice,
         set through the same endpoint the project window uses."""
         req = urllib.request.Request(

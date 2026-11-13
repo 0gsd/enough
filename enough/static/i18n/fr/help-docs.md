@@ -460,8 +460,8 @@ le canevas qui est toujours là, derrière tout le reste — la couche de base d
 la barre d'outils court en haut : le titre (pour le renommer, tapez dedans puis cliquez ailleurs), le sélecteur lecture/édition, les outils, annuler/rétablir, le groupe de zoom, la recherche, le panneau des commentaires et le menu des composures. faites glisser à deux doigts, avec la barre d'espace enfoncée ou avec le bouton du milieu ; zoomez par pincement, ⌘-molette, ⌘+ / ⌘− / ⌘0, ou « ajuster ». il n'y a pas de bouton enregistrer — tout s'écrit au fil de l'eau, et une composure que vous ouvrez sans jamais y toucher n'écrit aucun fichier. dézoomez assez loin et chaque module se replie sur sa <em>face</em> : son titre, aussi grand que la boîte le permet, le corps en faux-texte — soixante cartes se lisent alors comme soixante titres.
 
 ### ideas
-- gardez un tableau par projet : la carte que vous regardez avant de vous mettre à écrire.
-- un module <code>.comp</code> qui pointe vers un autre <code>.comp</code> transforme un tableau en descente par paliers : un clic échange le canevas sous vos pieds.
+- gardez un plan par projet : la carte que vous regardez avant de vous mettre à écrire.
+- un module <code>.comp</code> qui pointe vers un autre <code>.comp</code> transforme un plan en descente par paliers : un clic échange le canevas sous vos pieds.
 - sélectionnez un passage dans un module et il part avec votre prochain message à votre readvisor, encadré et étiqueté.
 
 ## composure-modules
@@ -477,7 +477,7 @@ le bouton d'ajout de module ouvre une courte liste des six types. quand un modul
 ### ideas
 - donnez un titre à un module et il garde son nom quand vous dézoomez au-delà de la taille de lecture.
 - les pastilles <code>encre</code> et <code>transparent</code> servent à la structure — une carte sombre pour une ligne de titre, une transparente pour une étiquette qui n'est pas une carte du tout.
-- pointez un module vers un fichier que vous rouvrez sans arrêt ; le tableau devient un bureau avec les bons papiers déjà posés dessus.
+- pointez un module vers un fichier que vous rouvrez sans arrêt ; le plan devient un bureau avec les bons papiers déjà posés dessus.
 
 ## composure-tools
 name: outils
@@ -492,7 +492,7 @@ avec le crayon, dessinez, tout simplement — le trait est lissé et simplifié 
 ### ideas
 - entourez les trois cartes qui vont ensemble avant de décider comment s'appelle le groupe.
 - tracez des flèches en maj+glisser entre les modules pour montrer ce qui suit quoi, puis déplacez les modules ; la flèche reste là où vous l'avez tracée, ce qui est en général la réponse honnête.
-- dessinez en rouge sur un tableau que vous relisez, et effacez les marques une fois que vous vous en êtes occupé.
+- dessinez en rouge sur un plan que vous relisez, et effacez les marques une fois que vous vous en êtes occupé.
 
 ## journal
 name: journal

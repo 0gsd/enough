@@ -243,8 +243,8 @@ def build_router(
 
     def _doc_head(target: Path, lines: int = 40) -> str:
         """Title + the first ~40 rendered lines of a project document. A
-        `.comp` previews as its own outline, which is what makes a board of
-        boards navigable."""
+        `.comp` previews as its own outline, which is what makes a plane of
+        planes navigable."""
         if target.suffix == comp_core.SUFFIX:
             try:
                 return comp_core.outline(comp_core.load(target), _rel(target))

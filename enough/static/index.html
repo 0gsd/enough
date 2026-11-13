@@ -1681,12 +1681,12 @@
       cursor: default;
     }
 
-    /* A board is a desk you spread things out on, so it gets a register
+    /* A plane is a desk you spread things out on, so it gets a register
        grid at the model's own 24-unit spacing — it makes "these two cards
        are aligned" visible without any snapping. A page composure is a
        sheet of paper on a plain surface; a grid behind it would compete
        with the thing you are reading. */
-    .comp-viewport.comp-board {
+    .comp-viewport.comp-plane {
       background-image: radial-gradient(
         circle at 1px 1px,
         color-mix(in oklab, var(--fg-faint) 55%, transparent) 1px,
@@ -1697,7 +1697,7 @@
 
     /* Grid dots below ~5 screen px apart turn into a flat wash of noise —
        hide them rather than let the desk shimmer while you zoom out. */
-    .comp-viewport.comp-board.comp-nogrid {
+    .comp-viewport.comp-plane.comp-nogrid {
       background-image: none;
     }
 
@@ -45508,7 +45508,7 @@
     // The view a composure OPENS at, as against the one the fit button
     // gives you when you ask for it.
     //
-    // A `board` is fitted to what is on it — but never MAGNIFIED: fit-all
+    // A `plane` is fitted to what is on it — but never MAGNIFIED: fit-all
     // solves for "the content fills the stage", and on a nearly-empty desk
     // that means zooming in, which is the opposite of what someone opening
     // a document wants. So the open path caps userZoom at 1.
@@ -45527,7 +45527,7 @@
     // a council is a column of statements on a sheet, not a desk — so the
     // fix is here rather than in defaults/composure-forms/council.comp.
     function compOpenFit(eased) {
-      if (COMP.kind === 'board') compFitAll(!!eased, 1);
+      if (COMP.kind === 'plane') compFitAll(!!eased, 1);
       else compApplyView(!!eased);
     }
     window.compOpenFit = compOpenFit;
@@ -45572,9 +45572,9 @@
     // reading instead of sliding out from under it.
     function compPanelChanged() {
       if (!COMP.ready) return;
-      // A board is refitted after the change instead (compAutoFit); an
+      // A plane is refitted after the change instead (compAutoFit); an
       // anchored ease first would only be a second motion before it.
-      if (COMP.kind === 'board') { compAutoFitSoon(); return; }
+      if (COMP.kind === 'plane') { compAutoFitSoon(); return; }
       const f0 = COMP.lastFactor || 1;
       const z0 = compClampZ(COMP.userZoom * f0);
       const anchor = compAnchorStagePoint();
@@ -45595,7 +45595,7 @@
     // 180ms grid transition ends in exactly ONE fit rather than a fit per
     // frame.
     //
-    // What a fit is depends on the kind. A `board` gets compFitAll, the
+    // What a fit is depends on the kind. A `plane` gets compFitAll, the
     // button's own action. A `page` gets compApplyView: its page-fit clamp
     // already IS fit-and-centre for a sheet (width fitted, centred, reading
     // position kept), and fit-all on a page is the bug the compOpenFit
@@ -45639,7 +45639,7 @@
       }
       _compFitTries = 0;
       _compFitPending = false;
-      if (COMP.kind === 'board') compFitAll(true);
+      if (COMP.kind === 'plane') compFitAll(true);
       else compApplyView(true);
     }
 
@@ -46143,7 +46143,7 @@
 
     // What a module says when it is too small to read: its title, else its
     // first heading, else the first line of the page. An EMPTY module says
-    // nothing — falling back to the type name turned a board of blank
+    // nothing — falling back to the type name turned a plane of blank
     // cards into a wall of the word "text", which is worse than blank.
     function compFaceText(m, page) {
       if (m.title) return m.title;
@@ -46281,7 +46281,7 @@
     // The strokes' own bounding box, NOT the canvas's. An ink layer sized to
     // everything-plus-slack is a multi-thousand-pixel element that the
     // compositor has to keep around even when there is not one stroke on
-    // it — enough, at board zooms, to take the renderer down. `overflow:
+    // it — enough, at plane zooms, to take the renderer down. `overflow:
     // visible` means a modest pad is all the slack a stroke needs.
     function compInkBounds() {
       const strokes = (COMP.model && COMP.model.strokes) || [];
@@ -46981,7 +46981,7 @@
       // `model` whenever the rev moved underneath it, which would then be
       // pasted over the document now on the stage. The token says whose
       // reply this is. (Found by the suite: a screen that opened `cards`
-      // sometimes measured the previous screen's board.)
+      // sometimes measured the previous screen's plane.)
       const doc = COMP.docSeq;
       try {
         const r = await fetch('/api/composure/ops', {
@@ -47447,7 +47447,7 @@
       compLoadComments();
       // …and the council chrome, from the meta that came with the model.
       // The form behaviour runs a beat later and fills in the live state;
-      // this is what stops a council flashing up as an ordinary board.
+      // this is what stops a council flashing up as an ordinary plane.
       compCouncilRender();
     }
 
@@ -49875,7 +49875,7 @@
       const path = f.href || '';
       if (!path) return;
       // Another composure: the base layer swaps to it, with everything on
-      // this one flushed first — a drill-down board is still one stage.
+      // this one flushed first — a drill-down plane is still one stage.
       if (path.toLowerCase().endsWith('.comp')) {
         await compFlush();
         await compOpenPath(path, { peek: true });
@@ -50688,7 +50688,7 @@
     const COMP_CHARGE_MAX = 200;
     const COMP_SAY_WORDS = 350;      // the framing's own ceiling
     const COMP_FOLLOW_MS = 5000;     // how long a hand-pan owns the view
-    const COMP_STATEMENT_W = 816;    // fullport width: minutes, not a board
+    const COMP_STATEMENT_W = 816;    // fullport width: minutes, not a plane
 
     function compCouncilMeta() {
       const st = COMP_COUNCIL.state;

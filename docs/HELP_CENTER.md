@@ -251,13 +251,13 @@ What's around it:
 
 Three things move the view on their own, and all three are trying to help.
 
-**The fit, whenever the room changes.** On a board — any composure that isn't shaped like a page — a change in the space the canvas has to work with ends exactly where **fit** would put you: everything in view, centred. Hide the sidebar, open or close the readvisor panel, give it the whole window and take it back, open the comments, resize the window, step the ui scale: a moment after the change settles, so does the board. It waits for you, too. It never takes the view while you're dragging, pinching or scrolling, and while a mode is stacked over the composure it holds off until you come back down to it. Zooming by hand still works as it always did; it lasts until the next time the room changes.
+**The fit, whenever the room changes.** On a plane — any composure that isn't shaped like a page — a change in the space the canvas has to work with ends exactly where **fit** would put you: everything in view, centred. Hide the sidebar, open or close the readvisor panel, give it the whole window and take it back, open the comments, resize the window, step the ui scale: a moment after the change settles, so does the plane. It waits for you, too. It never takes the view while you're dragging, pinching or scrolling, and while a mode is stacked over the composure it holds off until you come back down to it. Zooming by hand still works as it always did; it lasts until the next time the room changes.
 
 **The panel steps.** On a page, hiding a side panel doesn't only make the canvas wider, it makes it *bigger*: text on a page reads at about 12 point with both the sidebar and the readvisor panel open, about 14 with one of them hidden, and about 16 with both. The change animates over a fifth of a second, anchored on your caret if you're typing and on the middle of the view if you're not, so you don't lose your place.
 
 **The page fit.** A composure shaped like a page — blank, journal, council — is centred and held at whatever zoom makes its full width fit, with a comfortable margin, until the first time you zoom by hand. A wider window shows more desk around the sheet rather than a bigger sheet. Only the width is fitted: a page is taller than most windows, so the bottom of one is always a pan away. When the room changes, a page keeps that arrangement — the width refitted, the sheet re-centred, your reading position where it was — rather than being shrunk to show the whole of a long sheet at once.
 
-**Faces.** Zoom far enough out and each module folds down to its **face**: its title, set as large as the box allows, with the body greeked. So sixty cards read as sixty titles instead of sixty grey rectangles, and a board you built at reading size is still a board at a glance. Give a module a title and you decide what that face says. Ink, meanwhile, thins more slowly than everything else shrinks, so a zoomed-out sketch still reads as a sketch.
+**Faces.** Zoom far enough out and each module folds down to its **face**: its title, set as large as the box allows, with the body greeked. So sixty cards read as sixty titles instead of sixty grey rectangles, and a plane you built at reading size is still a plane at a glance. Give a module a title and you decide what that face says. Ink, meanwhile, thins more slowly than everything else shrinks, so a zoomed-out sketch still reads as a sketch.
 
 ### 4.2 The four tools
 
@@ -274,7 +274,7 @@ Ink lies on the desk, *under* the modules, so a note can cross three cards and a
 
 A **text** module is writing, with as many pages inside it as you want. The other five point at something, show you a live preview of it while you're reading, and open the real thing when you click:
 
-- **a file in this project** — its first lines, and a click opens it exactly as clicking it in the tree would (converted documents and all). Point one at a `.comp` and the click swaps the canvas underneath you, which is what turns a board into a drill-down.
+- **a file in this project** — its first lines, and a click opens it exactly as clicking it in the tree would (converted documents and all). Point one at a `.comp` and the click swaps the canvas underneath you, which is what turns a plane into a drill-down.
 - **a wikisink article** — the lead paragraphs, and a click opens the wikisink reader there (section 11). On a machine with no archive yet the card says so, keeps the article name, and fills itself in once one is installed.
 - **a link to the web** — the title and the host. A click opens it in your browser, like every other external link in the app.
 - **a cached web page** — the page's text as of the last fetch, with the date and a **refresh** button. Refreshing goes through the broker exactly like any other web read, so your fetch toggles, allowlists and Tor routing all apply — and if the broker refuses, the card shows you its refusal in the broker's own words, so you know which switch to go and look at.
@@ -300,8 +300,8 @@ Select several modules and the inspector says how many and offers what still mak
 A **form** is a composure template. Five ship:
 
 - **blank** — one page-shaped sheet, opening in the edit face with the caret already blinking in it.
-- **cards** — a board of text cards in a grid, opening zoomed out to fit.
-- **scaffold** — a board laid out as columns of beats, with a band across the top for the premise and a row along the bottom for the endings. It is what the `scaffold` skill (section 20.8) fills when it turns a pile of notes into a structure.
+- **cards** — a plane of text cards in a grid, opening zoomed out to fit.
+- **scaffold** — a plane laid out as columns of beats, with a band across the top for the premise and a row along the bottom for the endings. It is what the `scaffold` skill (section 20.8) fills when it turns a pile of notes into a structure.
 - **journal** — a dated record. One module, one entry per page. Opening a journal lands you on *today's* page with the caret in it, and that page exists only in memory until you type something, so opening the journal and thinking better of it leaves nothing behind. The entry saves itself as you go; leave without filing it and the journal reopens on that same unfinished draft. **file this entry** stamps it with the date and makes it permanently read-only — enough will refuse to change it afterwards and the caret won't go into it — and moves you on to a fresh page. Flipping back through filed entries is safe: turning a page you didn't write in saves nothing at all. You can still comment on filed text, which is rather the point of filing it.
 - **council** — a room of readvisors thinking about one thing in turn. That's section 19.
 
@@ -331,11 +331,11 @@ The mode-stack indicators in the top bar (section 15) end in a permanent square 
 
 Click it while you have modes stacked and every one of them hides, showing you the canvas underneath with all their state exactly as it was — your scroll position, your unsaved edits, your descent into a nested girraph. Click it again, or click any other indicator, and they come straight back. Esc while peeking restores the stack first and pops it second.
 
-It is for the moment when the thing you need to check is on the board and you don't want to dismantle three modes to see it.
+It is for the moment when the thing you need to check is on the plane and you don't want to dismantle three modes to see it.
 
 ### 4.9 What your readvisors can do to a composure
 
-They can read one, make one from a form, add and restyle and rearrange modules, write a page, save a composure as a form, and — with the `scaffold` skill (section 20.8) — turn a whole outline into a laid-out board in a single move. All of it is gated by the **composure tools** toggle in the broker (section 9); your own canvas is never gated, the same way your own wikisink and Canon browsing never is.
+They can read one, make one from a form, add and restyle and rearrange modules, write a page, save a composure as a form, and — with the `scaffold` skill (section 20.8) — turn a whole outline into a laid-out plane in a single move. All of it is gated by the **composure tools** toggle in the broker (section 9); your own canvas is never gated, the same way your own wikisink and Canon browsing never is.
 
 What they cannot do is write a `.comp` as a file. Both of the ordinary file-writing doors refuse the extension outright, so every change a readvisor makes goes through the same small set of operations you use, one at a time, through the same door, on the record. It means a model that gets confused cannot corrupt a document — the worst it can do is add a card you didn't want, and ⌘Z is right there.
 
@@ -1542,7 +1542,7 @@ New from the **council** form and you get a setup card with four fields for the 
 - **input** — the thing being decided. One question, as sharp as you can make it.
 - **parameters** — how you want it run. "Two rounds, then decide."
 - **constraints** — what's off the table. "Do not rewrite the prose."
-- **desired output** — one of three: **a decided answer**, written on the canvas at the end; **a document**, written to a path you name; or **a new composure**, a whole board of cards built out of what the council decided. Choose composure and a second control appears beside it for the layout — *scaffold*, where each group of cards is a column, or *cards*, where each group is a row. What each one actually does at the end is 19.3.
+- **desired output** — one of three: **a decided answer**, written on the canvas at the end; **a document**, written to a path you name; or **a new composure**, a whole plane of cards built out of what the council decided. Choose composure and a second control appears beside it for the layout — *scaffold*, where each group of cards is a column, or *cards*, where each group is a row. What each one actually does at the end is 19.3.
 
 Then the room. The checklist starts with your chief readvisor, every readvisor you have switched on in this project, and **you**; untick anyone you don't want. Up to twelve, and no two participants may share a name, because a statement is attributed by name and two Nadias is not a council, it's a mix-up. **max rounds** defaults to 3 and can be anything from 1 to 20.
 
@@ -1577,7 +1577,7 @@ What happens next depends on the **desired output** you chose at setup:
 
 - **an answer** — nothing further. That final card is the output, and it's on the canvas where the council is.
 - **a document** — the conclusion is written as a markdown file at a path in your project that you name. It goes through the same door as every other file write, with the same allowlists and the same undo, and it will not overwrite an existing file until you've seen the confirmation and said yes. Then a link-in module is added under the conclusion pointing at it, so the document is one click from the council that produced it.
-- **a composure** — the conclusion comes back as an outline, and enough builds it into a new composure beside this one, at `rness/io/composure/<council>-output-<date>.comp`, in the layout you picked at setup. Each group is a column or a row, each card is one piece of what the council decided, and what it *didn't* settle can come through as an open question — a card titled `[gap: who owns the migration?]`, tinted so you can find them all at a glance. A link-in module goes under the conclusion pointing at the new file, so the board is one click from the council that produced it. It never overwrites an existing file: a second one gets `-2`.
+- **a composure** — the conclusion comes back as an outline, and enough builds it into a new composure beside this one, at `rness/io/composure/<council>-output-<date>.comp`, in the layout you picked at setup. Each group is a column or a row, each card is one piece of what the council decided, and what it *didn't* settle can come through as an open question — a card titled `[gap: who owns the migration?]`, tinted so you can find them all at a glance. A link-in module goes under the conclusion pointing at the new file, so the plane is one click from the council that produced it. It never overwrites an existing file: a second one gets `-2`.
 
 That last one asks a model to write headings in an exact shape, and not every model does it first time. If the outline doesn't parse, enough asks once more with the grammar spelled out. If the second try doesn't parse either, you get the conclusion as an ordinary answer card instead, with one line saying that's what happened, and no file is written. The council's decision is never thrown away because the headings came out wrong — and it's never retried a third time, because a council that has already decided shouldn't spend two more turns on formatting.
 
@@ -1669,7 +1669,7 @@ Turns a pile of thinking into a structure you can look at.
 
 Give it a brain dump — pasted in the panel, a file in the project, or a composure that already exists — and it reads for shape rather than for sentences. It knows story shapes (arcs, beats, continuity threads, denouements, endings) and argument shapes (claim, grounds, warrant, counter-case, close) and plan shapes (goal, phases, dependencies, risks, done-when). It asks at most two clarifying questions, often none, and then hands the result to enough, which lays it out as a composure: one card per beat or section or phase, grouped into columns or rows, on the canvas in front of you (section 4.5).
 
-The rule that makes it worth having: **it never invents material to fill a hole.** Where the structure needs something you haven't written, it writes a `[gap: …]` card instead — tinted orange, keeping the question — so the shape shows you what you still owe it. A story where you know the ending and not the turn gets a gap card saying exactly that, and it is usually the most useful card on the board.
+The rule that makes it worth having: **it never invents material to fill a hole.** Where the structure needs something you haven't written, it writes a `[gap: …]` card instead — tinted orange, keeping the question — so the shape shows you what you still owe it. A story where you know the ending and not the turn gets a gap card saying exactly that, and it is usually the most useful card on the plane.
 
 It doesn't write the piece. It writes the structure, and every card on it is yours to edit the moment it lands.
 

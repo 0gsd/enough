@@ -23,7 +23,7 @@ from enough import broker
 from enough import composure as C
 from enough.server import create_app
 
-REL = "rness/io/composure/board.comp"
+REL = "rness/io/composure/plane.comp"
 
 
 @pytest.fixture()
@@ -56,8 +56,8 @@ def seed(client: TestClient, form: str = "blank", rel: str = REL) -> dict:
     canvas does: `/new` describes it, the first op batch writes it."""
     r = client.post("/api/composure/ops", json={
         "path": rel, "base_rev": 0, "create": True, "form": form,
-        "title": "Board",
-        "ops": [{"op": "set_meta", "title": "Board"}],
+        "title": "Plane",
+        "ops": [{"op": "set_meta", "title": "Plane"}],
     })
     assert r.status_code == 200, r.text
     return r.json()
@@ -104,6 +104,18 @@ def test_ops_creates_then_reads_back(client: TestClient, project: Path):
     mod = next(m for m in doc["model"]["modules"] if m["bg"] == "yellow")
     assert mod["pages"][0]["rich"].startswith("<h1>Act one</h1>")
     assert mod["pages"][0]["first_line"] == "Act one"
+
+
+def test_ops_still_take_the_retired_board_kind(client: TestClient, project: Path):
+    """The API takes `kind: board` for one release and answers, and writes, `plane`."""
+    created = seed(client)
+    r = client.post("/api/composure/ops", json={
+        "path": REL, "base_rev": created["rev"], "want_model": True,
+        "ops": [{"op": "set_meta", "kind": "board"}]})
+    assert r.status_code == 200, r.text
+    assert r.json()["model"]["kind"] == "plane"
+    assert client.get("/api/composure", params={"path": REL}).json()["model"]["kind"] == "plane"
+    assert 'content="plane"' in (project / REL).read_text(encoding="utf-8")
 
 
 def test_ops_without_create_404s_rather_than_writing(client: TestClient):
@@ -224,15 +236,15 @@ def test_rename_can_keep_the_filename(client: TestClient, project: Path):
 def test_save_as_form_then_use_it(client: TestClient, project: Path):
     seed(client, form="cards")
     r = client.post("/api/composure/save-as-form",
-                    json={"path": REL, "name": "My Board"})
+                    json={"path": REL, "name": "My Plane"})
     assert r.status_code == 200, r.text
-    assert r.json()["form"] == "my-board"
+    assert r.json()["form"] == "my-plane"
     names = {f["name"]: f for f in r.json()["forms"]}
-    assert names["my-board"]["origin"] == "project"
-    assert (project / "rness" / "composure-forms" / "my-board.comp").is_file()
+    assert names["my-plane"]["origin"] == "project"
+    assert (project / "rness" / "composure-forms" / "my-plane.comp").is_file()
     made = client.post("/api/composure/new",
-                       json={"form": "my-board", "title": "From my form"})
-    assert made.json()["form"] == "my-board"
+                       json={"form": "my-plane", "title": "From my form"})
+    assert made.json()["form"] == "my-plane"
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +274,7 @@ def test_link_preview_of_another_composure_is_its_outline(client: TestClient):
                               "href": other}]}).json()["changed"][0]
     body = client.get("/api/composure/link-preview",
                       params={"path": REL, "module": mid}).json()
-    assert body["ok"] and "composure: Board" in body["body"]
+    assert body["ok"] and "composure: Plane" in body["body"]
 
 
 def test_link_preview_reports_a_missing_target_calmly(client: TestClient):
@@ -429,7 +441,7 @@ def test_post_api_file_refuses_comp_and_its_sidecar(client: TestClient):
     r = client.post("/api/file", data={"path": REL, "content": "<html>x"})
     assert r.status_code == 403 and "module-by-module" in r.json()["detail"]
     r = client.post("/api/file", data={
-        "path": "rness/io/composure/.board.comp.comments.json",
+        "path": "rness/io/composure/.plane.comp.comments.json",
         "content": "[]"})
     assert r.status_code == 403 and "backend-owned" in r.json()["detail"]
 
@@ -439,8 +451,8 @@ def test_the_tree_marks_comp_files_and_hides_the_sidecar(client: TestClient):
     client.post("/api/composure/comments",
                 json={"path": REL, "body": "x", "anchor": {"module": "m1"}})
     html = client.get("/api/files").text
-    assert "board.comp" in html
-    assert ".board.comp.comments.json" not in html
+    assert "plane.comp" in html
+    assert ".plane.comp.comments.json" not in html
 
 
 def write_something(client: TestClient, rel: str = REL) -> None:
@@ -586,8 +598,8 @@ def test_the_sse_event_fires_on_every_batch(project: Path):
         project_dir=project, resolve_path=resolve, emit=emit))
     with TestClient(app) as c:
         created = c.post("/api/composure/ops", json={
-            "path": REL, "create": True, "form": "blank", "title": "Board",
-            "ops": [{"op": "set_meta", "title": "Board"}]}).json()
+            "path": REL, "create": True, "form": "blank", "title": "Plane",
+            "ops": [{"op": "set_meta", "title": "Plane"}]}).json()
         second = c.post("/api/composure/ops", json={
             "path": REL, "base_rev": created["rev"], "source": "readvisor",
             "ops": [{"op": "add_module", "type": "text"}]}).json()

@@ -459,8 +459,8 @@ the canvas that is always there behind everything else — the base layer of the
 the toolbar runs along the top: the title (rename by typing and clicking away), the read/edit switch, the tools, undo/redo, the zoom group, search, the comments panel and the composures menu. pan with two fingers, space-drag or the middle button; zoom with pinch, ⌘-scroll, ⌘+ / ⌘− / ⌘0, or "fit". there is no save button — everything is written as you go, and a composure you open and never touch writes no file at all. zoom far enough out and each module folds down to its <em>face</em>: its title, as large as fits, with the body greeked, so sixty cards read as sixty titles.
 
 ### ideas
-- keep one board per project as the map you look at before you start writing.
-- a <code>.comp</code> module that points at another <code>.comp</code> turns a board into a drill-down: clicking it swaps the canvas underneath you.
+- keep one plane per project as the map you look at before you start writing.
+- a <code>.comp</code> module that points at another <code>.comp</code> turns a plane into a drill-down: clicking it swaps the canvas underneath you.
 - select a passage inside a module and it rides along with your next message to your readvisor, fenced and labelled.
 
 ## composure-modules
@@ -476,7 +476,7 @@ the add-module button opens a short list of the six types. with a module selecte
 ### ideas
 - give a module a title and it keeps its name when you zoom out past reading size.
 - the <code>ink</code> and <code>clear</code> swatches are for structure — a dark card for a heading row, a clear one for a label that is not a card at all.
-- point a module at a file you keep re-opening; the board becomes a desk with the right papers already on it.
+- point a module at a file you keep re-opening; the plane becomes a desk with the right papers already on it.
 
 ## composure-tools
 name: tools
@@ -491,7 +491,7 @@ with the pencil, just draw — the line is smoothed and simplified when you let 
 ### ideas
 - circle the three cards that belong together before you decide what the group is called.
 - shift-drag arrows between modules to show what follows what, then move the modules; the arrow stays where you drew it, which is usually the honest answer.
-- draw in red over a board you are reviewing and erase the marks when you have dealt with them.
+- draw in red over a plane you are reviewing and erase the marks when you have dealt with them.
 
 ## journal
 name: journal

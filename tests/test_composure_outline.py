@@ -82,7 +82,7 @@ def test_worked_example_a_lands_as_the_skill_describes_it(story: str):
     assert gaps[0].title == "[gap: why does she not sell?]"
 
     comp = C.from_outline("The Keeper's Stipend", "scaffold", story)
-    assert comp.kind == "board"
+    assert comp.kind == "plane"
     assert len(comp.modules) == 15 + 6     # a header card per group
     heads = [m for m in comp.modules if m.bg == "gray"]
     assert [m.title for m in heads] == [g.name for g in doc.groups]
@@ -201,7 +201,7 @@ def test_the_title_argument_wins_over_the_hash_line():
 def test_cards_form_makes_a_row_per_group():
     comp = C.from_outline("Set", "cards",
                           "# Set\n\n## A\n\n- one\n- two\n\n## B\n\n- three\n")
-    assert comp.kind == "board"
+    assert comp.kind == "plane"
     heads = [m for m in comp.modules if m.bg == "gray"]
     assert [m.title for m in heads] == ["A", "B"]
     assert [m.x for m in heads] == [0.0, 0.0]        # a column of headers

@@ -20,7 +20,7 @@ from enough import composure as C
 from enough import tools
 from enough.tools import ToolCall
 
-REL = "rness/io/composure/board.comp"
+REL = "rness/io/composure/plane.comp"
 
 
 @pytest.fixture()
@@ -51,7 +51,7 @@ def run(project: Path, tool: str, **kw):
     return tools.execute(project, call(tool, **kw))
 
 
-def seed(project: Path, form: str = "cards", title: str = "Board") -> str:
+def seed(project: Path, form: str = "cards", title: str = "Plane") -> str:
     result = run(project, "new_composure", form=form, title=title)
     assert result.ok, result.body
     return result.key
@@ -98,7 +98,7 @@ def test_read_composure_returns_the_outline(project: Path):
     rel = seed(project)
     out = run(project, "read_composure", path=rel)
     assert out.ok
-    assert out.body.startswith("composure: Board")
+    assert out.body.startswith("composure: Plane")
     assert "form: cards" in out.body
     assert "16 module(s)" in out.body
     assert out.body.count("\n") < 30          # compact, by construction

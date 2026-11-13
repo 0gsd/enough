@@ -1813,7 +1813,7 @@ exactly that. It **never** contains `<script>`, event-handler attributes,
 <meta name="generator" content="enough 0.3.0">
 <meta name="composure:version" content="1">
 <meta name="composure:form" content="cards">
-<meta name="composure:kind" content="board">       <!-- page | board -->
+<meta name="composure:kind" content="plane">       <!-- page | plane -->
 <meta name="composure:rev" content="12">
 <meta name="composure:created" content="2026-09-17T14:03:00Z">
 <meta name="composure:modified" content="2026-09-17T15:10:00Z">
@@ -1964,7 +1964,7 @@ covers `base_rev` — then refresh everything).
 
 ```jsonc
 // event: composure
-{"path": "rness/io/composure/board.comp", "rev": 12,
+{"path": "rness/io/composure/plane.comp", "rev": 12,
  "changed": ["m4f2a91c", "ink"],        // "ink" = the stroke layer moved
  "source": "ui" | "readvisor" | "council" | "enough",
  "created": false}
@@ -2009,7 +2009,7 @@ and go.
 docked / full / closed, the comments panel, a window resize, a ui-scale step
 — re-applies the view at once (so a page's width clamp tracks the 180 ms
 grid transition frame by frame) and re-arms a `COMP_AUTOFIT_SETTLE_MS`
-(160 ms) timer, so a transition ends in exactly **one** fit. A `board` gets
+(160 ms) timer, so a transition ends in exactly **one** fit. A `plane` gets
 `compFitAll(true)`, the fit button's own action; a `page` gets
 `compApplyView(true)`, because its page-fit clamp already *is*
 fit-and-centre for a sheet, and fit-all on a page is the bug the
@@ -2020,7 +2020,7 @@ mode covers the canvas or it is only peeked at (`_compFitPending`, paid by
 `compAutoFitFlush()` from `_modeRender` when the stack empties), or while a
 drag, a pinch, a wheel burst (250 ms) or an eased move is under way —
 those defer it, up to 25 tries, then leave it pending. So a hand zoom on a
-board lasts until the next size change: that is the rule, not a bug.
+plane lasts until the next size change: that is the rule, not a bug.
 
 **Saving is ops, not a save button.** `compQueue(op, key)` coalesces by key
 (`geo:<id>`, `bg:<id>`, `z:<id>`, `scale:<id>`, `cur:<id>`,
@@ -2215,7 +2215,7 @@ Every statement lands through `composure.apply_ops(..., source="council")`.
 One batch, two ops, one rev, one SSE:
 
 1. `add_module` — `type: text`, `w: 816` (fullport width, so a council reads
-   as minutes rather than a board), `h` from `composure.estimate_height`,
+   as minutes rather than a plane), `h` from `composure.estimate_height`,
    `bg` = the speaker's tint, `title` = `"<name> · turn <n>"`, plus
    `speaker` / `speaker_kind` / `turn`. **Setting `speaker` is what makes
    the module `locked`.**

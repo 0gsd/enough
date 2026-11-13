@@ -459,8 +459,8 @@ die Leinwand, die immer hinter allem anderen liegt — die Grundschicht des Fens
 die Werkzeugleiste läuft oben entlang: der Titel (umbenennen durch Hineintippen und Wegklicken), der Lese-/Bearbeiten-Schalter, die Werkzeuge, Rückgängig/Wiederherstellen, die Zoom-Gruppe, die Suche, das Kommentarpanel und das Composures-Menü. schieben mit zwei Fingern, mit gedrückter Leertaste oder der mittleren Maustaste; zoomen mit Pinch, ⌘-Scrollen, ⌘+ / ⌘− / ⌘0 oder „einpassen“. es gibt keinen Speichern-Button — alles wird geschrieben, während du arbeitest, und eine Composure, die du öffnest und nie anfasst, legt überhaupt keine Datei an. zoom weit genug heraus, und jedes Modul klappt auf seine <em>Schauseite</em> zusammen: sein Titel, so groß wie er passt, der Rumpf als Blindtext — sechzig Karten lesen sich dann als sechzig Titel.
 
 ### ideas
-- halt eine Tafel je Projekt als die Karte, auf die du schaust, bevor du zu schreiben anfängst.
-- ein <code>.comp</code>-Modul, das auf eine andere <code>.comp</code> zeigt, macht aus einer Tafel einen Einstieg in die Tiefe: ein Klick tauscht die Leinwand unter dir aus.
+- halt eine Ebene je Projekt als die Karte, auf die du schaust, bevor du zu schreiben anfängst.
+- ein <code>.comp</code>-Modul, das auf eine andere <code>.comp</code> zeigt, macht aus einer Ebene einen Einstieg in die Tiefe: ein Klick tauscht die Leinwand unter dir aus.
 - markier eine Passage in einem Modul, und sie reitet mit deiner nächsten Nachricht an deinen Readvisor mit, eingerahmt und beschriftet.
 
 ## composure-modules
@@ -476,7 +476,7 @@ der Modul-hinzufügen-Button öffnet eine kurze Liste der sechs Arten. ist im Be
 ### ideas
 - gib einem Modul einen Titel, und es behält seinen Namen, wenn du unter die Lesegröße hinauszoomst.
 - die Farben <code>Tinte</code> und <code>klar</code> sind für Struktur — eine dunkle Karte für eine Überschriftenreihe, eine klare für eine Beschriftung, die gar keine Karte sein soll.
-- lass ein Modul auf eine Datei zeigen, die du immer wieder öffnest; die Tafel wird zum Schreibtisch, auf dem die richtigen Papiere schon liegen.
+- lass ein Modul auf eine Datei zeigen, die du immer wieder öffnest; die Ebene wird zum Schreibtisch, auf dem die richtigen Papiere schon liegen.
 
 ## composure-tools
 name: Werkzeuge
@@ -491,7 +491,7 @@ mit dem Stift zeichnest du einfach drauflos — die Linie wird geglättet und ve
 ### ideas
 - kringel die drei Karten ein, die zusammengehören, bevor du entscheidest, wie die Gruppe heißt.
 - zieh mit Umschalt Pfeile zwischen die Module, um zu zeigen, was worauf folgt, und verschieb die Module dann; der Pfeil bleibt, wo du ihn gezogen hast, was meistens die ehrlichere Antwort ist.
-- zeichne rot über eine Tafel, die du durchsiehst, und radier die Marken weg, wenn du sie erledigt hast.
+- zeichne rot über eine Ebene, die du durchsiehst, und radier die Marken weg, wenn du sie erledigt hast.
 
 ## journal
 name: Journal

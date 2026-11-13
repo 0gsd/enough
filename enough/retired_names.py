@@ -10,6 +10,10 @@ needs only a line:
 - `WORDS`: `{field: {old word: new word}}`; a handler that reads the field maps the old word to the new one.
 
 Removed in 0.7: the 0.6 fabula renames (`/api/canon/emf`, `/derive`, `/compile`; the tool `emf_derive`; `what: emf`).
+
+Added in 0.7, to go in 0.8: the composure kind `board`, now `plane` (a `.comp` that says `composure:kind board` is read
+as `plane` and saved back as `plane`; a `set_meta` op may still say `board`), so that "board" is free for Thymop's
+governing body.
 """
 from __future__ import annotations
 
@@ -20,7 +24,9 @@ ROUTES: tuple[tuple[str, str, str], ...] = ()
 TOOLS: dict[str, str] = {}
 
 #: `{field: {old word: new word}}`: old words a request's fields may still say.
-WORDS: dict[str, dict[str, str]] = {}
+WORDS: dict[str, dict[str, str]] = {
+    "kind": {"board": "plane"},      # composure:kind, in a .comp and in a set_meta op (0.7)
+}
 
 
 def tool(name: str) -> str:

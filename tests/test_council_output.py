@@ -517,7 +517,7 @@ def test_the_brief_module_is_rewritten_when_the_setup_changes(
     text = C.rich_to_md(C.load(project / REL).modules[0].pages[0].rich)
     assert "Should chapter nine go?" in text
     assert "chapter four" not in text
-    assert "board of cards in the cards layout" in text
+    assert "plane of cards in the cards layout" in text
 
 
 def test_brief_markdown_skips_the_fields_that_are_empty():

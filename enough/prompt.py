@@ -494,7 +494,7 @@ status `ingesting` and marked `complete` (or `failed`) at the end.
 COMPOSURE_TOOL_INSTRUCTIONS = """\
 ## Composures
 
-A **composure** is a canvas document in a `.comp` file: an unbounded plane of
+A **composure** is a canvas document in a `.comp` file: an unbounded surface of
 **modules** (boxes) and ink. A module is a text card, a full page, or a link
 to a project file, a wiki article or a web page, and holds one or more
 **pages**. A **form** is a template — `blank`, `cards`, `scaffold`, `journal`,
@@ -503,7 +503,7 @@ you work: a composure is shared ground with them and, in a council, with
 the other readvisors — never a file you own.
 
 Reach for one when the material has a shape rather than a sequence: a chapter
-map, a board of options, a five-act scaffold. For linear prose, markdown is
+map, a plane of options, a five-act scaffold. For linear prose, markdown is
 still the right tool.
 
 Every composure tool has this shape:
@@ -873,7 +873,7 @@ COMPOSURE_LEAN_INSTRUCTIONS = """\
 ## Composures *(guide: composures)*
 
 A composure is a canvas document in a `.comp` file: modules (text cards,
-pages, links to project files, wiki articles or web pages) on a plane the
+pages, links to project files, wiki articles or web pages) on a surface the
 user is looking at while you work — shared ground, never a file you own,
 for material with a shape rather than a sequence. Every tool takes the
 `.comp` `<path>`:

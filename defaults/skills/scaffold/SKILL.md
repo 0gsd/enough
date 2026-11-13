@@ -92,7 +92,7 @@ matter. Bold, italics and links inside a card body are fine.
 |---|---|---|
 | `scaffold` | Groups become **columns**, left to right. Each column gets a header card and its cards stacked below. | The thing has an order: acts, sections, phases, chapters. This is the default. |
 | `cards` | Groups become **rows** of a grid. | The thing is a set, not a sequence: characters, options, sources, open questions. |
-| `blank` | One full-page module holding the whole outline as rich text. | The user wants a document, not a board. Rare from this skill. |
+| `blank` | One full-page module holding the whole outline as rich text. | The user wants a document, not a plane. Rare from this skill. |
 
 Two names get special treatment in the `scaffold` form, so use them when they
 fit:

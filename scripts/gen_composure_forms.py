@@ -106,7 +106,7 @@ def form_cards() -> C.Composure:
                 bg="yellow" if n in _TINTED else "paper",
                 markdown=text,
             ))
-    return _comp("Cards", "cards", "board", modules)
+    return _comp("Cards", "cards", "plane", modules)
 
 
 # ---------------------------------------------------------------------------
@@ -183,7 +183,7 @@ def form_scaffold() -> C.Composure:
                                       "Last impression")[i],
                                markdown=md))
         next_id += 1
-    return _comp("Scaffold", "scaffold", "board", modules)
+    return _comp("Scaffold", "scaffold", "plane", modules)
 
 
 # ---------------------------------------------------------------------------

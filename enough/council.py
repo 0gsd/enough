@@ -131,7 +131,7 @@ READVISOR_TINTS: tuple[str, ...] = ("yellow", "green", "pink", "lilac", "orange"
 CONCLUSION_TINT = "ink"
 
 #: Statement modules are fullport-wide, so a council reads as a page of
-#: minutes rather than a board of cards.
+#: minutes rather than a plane of cards.
 STATEMENT_W = comp_core.FULLPORT[0]
 COLUMN_GUTTER = 48.0
 
@@ -284,11 +284,11 @@ _CONCLUSION_SHAPE = {
         "title. Nothing but the document — no covering note."
     ),
     "composure": (
-        "- The output is a **composure**: a board of cards enough will lay "
+        "- The output is a **composure**: a plane of cards enough will lay "
         "out from an outline. Write the outline and nothing else — no "
         "covering note, no code fence, no explanation before or after it.\n"
         "- The grammar is exactly four rules:\n"
-        "  - one `# ` line, the title of the board;\n"
+        "  - one `# ` line, the title of the plane;\n"
         "  - each `## ` line is a group (a column in the scaffold form, a "
         "row in the cards form);\n"
         "  - each `### ` line is a card, and its heading is the card's "
@@ -303,7 +303,7 @@ _CONCLUSION_SHAPE = {
         "them for what the council did not settle instead of leaving it "
         "out.\n"
         "- Two to six groups, two to eight cards in each, a body of a "
-        "sentence or three per card. The whole board is what the council "
+        "sentence or three per card. The whole plane is what the council "
         "decided, arranged so it can be read at a glance."
     ),
 }
@@ -316,7 +316,7 @@ That did not parse as an outline, so nothing was made. Write it again, as \
 the outline and nothing else — no preamble, no code fence, no closing note. \
 This is the whole grammar:
 
-# The title of the board
+# The title of the plane
 
 ## The first group
 
@@ -710,7 +710,7 @@ def output_sentence(meta: dict[str, Any]) -> str:
     return {
         "answer": "a decided answer, written on the canvas at the end",
         "document": f"a document, written to {out.get('path') or '(a path)'}",
-        "composure": (f"a new composure — a board of cards in the {form} "
+        "composure": (f"a new composure — a plane of cards in the {form} "
                       f"layout, written beside this council"),
     }.get(kind, "a decided answer")
 
