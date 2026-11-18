@@ -121,7 +121,11 @@ def test_every_shipped_form_loads_sanitizes_clean_and_round_trips():
 
 def test_shipped_form_shapes():
     assert len(C.new_composure("cards").modules) == 16
-    assert len(C.new_composure("scaffold").modules) == 29
+    # Since 0.8 the scaffold form is one page frame and the scaffold block
+    # (the 0.7 plane of 29 prompt cards is tests/fixtures/composure/).
+    scaffold = C.new_composure("scaffold")
+    assert [m.type for m in scaffold.modules] == [C.FRAME]
+    assert C.scaffold_view(scaffold)["frames"] == [scaffold.modules[0].id]
     blank = C.new_composure("blank")
     assert blank.kind == "page"
     assert (blank.modules[0].w, blank.modules[0].h) == C.FULLPORT
@@ -708,7 +712,8 @@ def test_model_shape_is_the_frontend_contract(comp_path: Path):
                     "strokes": [{"points": [[0, 0], [1, 1]]}]})
     m = C.model(C.load(comp_path))
     assert set(m) == {"version", "title", "form", "kind", "rev", "created",
-                      "modified", "view", "council", "bounds", "modules",
+                      "modified", "view", "council", "scaffold", "bounds",
+                      "modules",
                       "strokes", "meta", "warnings", "caps"}
     mod = next(x for x in m["modules"] if x["id"] == mid)
     assert set(mod) == {"id", "type", "known_type", "x", "y", "w", "h", "z",

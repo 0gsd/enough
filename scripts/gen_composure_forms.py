@@ -19,12 +19,12 @@ Geometry, in world units (1 unit = 1 CSS px at zoom 1):
 - `blank`    — one fullport (816×1056) text module, one empty page.
 - `cards`    — a 4×4 grid of 360×240 text cards, 48-unit gutters, three
                pre-tinted yellow so the swatches are discoverable.
-- `scaffold` — a premise card across the top, five act columns (header card,
-               three beat cards, one continuity card each), and an
-               endings/denouement row underneath. Every card carries prompt
-               text saying what belongs there — deliberately generic, because
-               a scaffold is for any text that needs a visualized structure,
-               not only for fiction.
+- `scaffold` — since 0.8 a scaffold: one page-shaped frame (816×1056) and
+               a `composure:scaffold` block (`thing: page`, the frame
+               first in order), nothing written on it. Until 0.7 it was a
+               plane of prompt cards (premise, five act columns, endings);
+               a composure made from that form keeps its cards, and
+               `from_outline` still lays outlines out as such a plane.
 - `journal`  — one fullport module, `kind=page`. The format guarantees at
                least one page per module, so "no pages yet" is expressed as a
                single empty page; the UI stamps and files it.
@@ -113,77 +113,19 @@ def form_cards() -> C.Composure:
 # scaffold
 # ---------------------------------------------------------------------------
 
-PREMISE_MD = (
-    "**Premise.** In a sentence or two: what is this piece, and what is "
-    "different by the end of it?\n\n"
-    "A scaffold suits anything that needs a visible structure — a story, an "
-    "argument, a proposal, a course, a report. The five columns are five "
-    "movements; rename them to whatever your material actually does."
-)
-
-ACT_TITLES = ("Act one", "Act two", "Act three", "Act four", "Act five")
-ACT_MD = (
-    "**{name}.** What this movement is *for*: the job it does that no other "
-    "part of the piece can do. One line. If you cannot write it, the "
-    "movement is not earning its place yet."
-)
-BEAT_MD = (
-    "**Beat {i}.** One step. What happens here, what it costs, and what it "
-    "makes possible next."
-)
-CONTINUITY_MD = (
-    "**Continuity.** What has to stay true across this movement — facts, "
-    "names, numbers, promises already made to the reader. Check this card "
-    "before you revise the beats above it."
-)
-ENDING_MD = (
-    ("**Climax.** Where the pressure built above is finally released. "
-     "Name the moment, not the feeling."),
-    ("**Denouement.** What settles afterwards: consequences, loose ends, the "
-     "new normal."),
-    ("**Last impression.** The final paragraph, slide or line — and what you "
-     "want the reader left holding."),
-)
-
-ACT_HEADER_H = 120.0
-BEAT_H = 160.0
-CONTINUITY_H = 140.0
-PREMISE_H = 180.0
-
-
 def form_scaffold() -> C.Composure:
-    modules: list[C.Module] = []
-    total_w = 5 * CARD_W + 4 * GUT
-    modules.append(_module("m1", "text", 0, 0, total_w, PREMISE_H,
-                           bg="lilac", title="Premise", markdown=PREMISE_MD))
-    top = PREMISE_H + GUT
-    next_id = 2
-    for col, name in enumerate(ACT_TITLES):
-        x = col * COL
-        y = top
-        modules.append(_module(f"m{next_id}", "text", x, y, CARD_W,
-                               ACT_HEADER_H, bg="blue", title=name,
-                               markdown=ACT_MD.format(name=name)))
-        next_id += 1
-        y += ACT_HEADER_H + GUT
-        for i in range(1, 4):
-            modules.append(_module(f"m{next_id}", "text", x, y, CARD_W, BEAT_H,
-                                   markdown=BEAT_MD.format(i=i)))
-            next_id += 1
-            y += BEAT_H + GUT
-        modules.append(_module(f"m{next_id}", "text", x, y, CARD_W,
-                               CONTINUITY_H, bg="gray", title="Continuity",
-                               markdown=CONTINUITY_MD))
-        next_id += 1
-    bottom = top + ACT_HEADER_H + GUT + 3 * (BEAT_H + GUT) + CONTINUITY_H + GUT
-    for i, md in enumerate(ENDING_MD):
-        modules.append(_module(f"m{next_id}", "text", i * COL, bottom,
-                               CARD_W, BEAT_H, bg="orange",
-                               title=("Climax", "Denouement",
-                                      "Last impression")[i],
-                               markdown=md))
-        next_id += 1
-    return _comp("Scaffold", "scaffold", "plane", modules)
+    """A scaffold (0.8): one page-shaped frame and the `composure:scaffold`
+    block, nothing written on it. Boxes come from the person ("+
+    scaffold-box") or the readvisor's plectrum tool. `from_outline` lays an
+    outline over this form by removing the frame and clearing the block, so
+    the outline tool and the council's output stay plain planes of cards."""
+    w, h = C.FULLPORT
+    frame = _module("m1", C.FRAME, 0, 0, w, h, z=0)
+    frame.shape = "page"
+    comp = _comp("Scaffold", "scaffold", "plane", [frame])
+    comp.scaffold = C.new_scaffold_meta("page")
+    comp.scaffold["frames"] = ["m1"]
+    return comp
 
 
 # ---------------------------------------------------------------------------

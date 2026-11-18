@@ -95,9 +95,32 @@ EVENT = "composure"
 
 #: Module types. `doc` links a project file (any type — routed to the right
 #: mode on open, including another `.comp`, which is how planes drill down).
+#: `scaffold-box` (a plecholder in prose and help) and `frame` (one page or
+#: one slide of a scaffold) arrived in 0.8; an older enough keeps both as
+#: unknown types and draws them as text cards, so a scaffold's words still
+#: read there.
 MODULE_TYPES: tuple[str, ...] = (
     "text", "doc", "wiki", "weblink", "webframe", "image",
+    "scaffold-box", "frame",
 )
+
+#: The plecholder's type on disk. The person's text is the module's page 1.
+BOX = "scaffold-box"
+#: One page or one slide of a scaffold. It holds no text of its own; boxes
+#: belong to it by `data-frame`, and the order of frames lives in the
+#: `composure:scaffold` meta, never in geometry.
+FRAME = "frame"
+
+#: What a scaffold makes (`composure:scaffold` → `thing`).
+SCAFFOLD_THINGS: tuple[str, ...] = ("page", "deck", "document")
+#: A box holds words or stands for a picture the person supplies.
+BOX_KINDS: tuple[str, ...] = ("text", "graphic")
+#: A box's state. `written` is the person's own mark; `empty` and `over` are
+#: what the page computes from the text and the target; `locked` belongs to
+#: the scaffold's lock (a later lane enforces it).
+BOX_STATES: tuple[str, ...] = ("empty", "written", "over", "locked")
+#: Who last set a box's plec. Derived from the op's source, never sent.
+PLEC_BY: tuple[str, ...] = ("readvisor", "person")
 
 #: Named background swatches. NEVER a raw color — the frontend maps these
 #: to theme-aware values, so a composure written in the light theme is not
@@ -137,11 +160,21 @@ BASE_SIZE: dict[str, tuple[float, float]] = {
     "weblink": (320.0, 120.0),
     "webframe": (480.0, 600.0),
     "image": (360.0, 240.0),
+    "scaffold-box": (360.0, 160.0),
+    "frame": (816.0, 1056.0),
 }
 
 #: A fullport module: US Letter at 96 dpi, with 72 units of inner padding.
 FULLPORT = (816.0, 1056.0)
 FULLPORT_PAD = 72.0
+
+#: A slide-shaped frame: 16:9 at 1280 wide, beside the page's US Letter.
+SLIDE = (1280.0, 720.0)
+#: A frame's shape → its size. A page frame may grow taller (a long page is
+#: one frame); a slide keeps its shape.
+FRAME_SHAPES: dict[str, tuple[float, float]] = {"page": FULLPORT, "slide": SLIDE}
+#: Inner margin a box is placed at inside its frame.
+FRAME_PAD = 48.0
 
 #: The scale ladder (`data-scale`): 0.5 – 6, step ×1.125.
 SCALE_MIN = 0.5
@@ -894,6 +927,18 @@ class Module:
     speaker: str = ""
     speaker_kind: str = ""
     turn: str = ""
+    # Scaffold (0.8). `frame` is the frame module a box belongs to; `shape`
+    # is a frame's `page|slide` or a graphic box's proportion (`16:9`);
+    # `kind` is a box's `text|graphic`; `plec` the bracketed brief and
+    # `plec_by` who last set it; `target` a length with its unit (`140c`,
+    # `300w`); `state` one of `BOX_STATES`.
+    frame: str = ""
+    kind: str = ""
+    shape: str = ""
+    plec: str = ""
+    plec_by: str = ""
+    target: str = ""
+    state: str = ""
     pages: list[Page] = field(default_factory=list)
     extra: dict[str, str] = field(default_factory=dict)
 
@@ -924,6 +969,10 @@ class Composure:
     modified: str = ""
     view: dict[str, float] = field(default_factory=lambda: {"x": 0.0, "y": 0.0, "zoom": 1.0})
     council: dict[str, Any] | None = None
+    #: The `composure:scaffold` meta block (0.8): `{"v", "thing", "frames",
+    #: "locked", "version", "parent"}`. Its presence is what makes a
+    #: composure a scaffold; an old `form=scaffold` file has none.
+    scaffold: dict[str, Any] | None = None
     lang: str = "en"
     generator: str = ""
     modules: list[Module] = field(default_factory=list)
@@ -966,7 +1015,16 @@ _KNOWN_MODULE_ATTRS = {
     "data-bg", "data-scale", "data-title", "data-cur", "data-href",
     "data-url", "data-article", "data-install", "data-refresh", "data-cache",
     "data-speaker", "data-speaker-kind", "data-turn",
+    "data-frame", "data-kind", "data-shape", "data-plec", "data-plec-by",
+    "data-target", "data-state",
 }
+
+#: The scaffold fields in the order `dumps` writes them (attribute, field).
+_SCAFFOLD_ATTRS: tuple[tuple[str, str], ...] = (
+    ("data-frame", "frame"), ("data-kind", "kind"), ("data-shape", "shape"),
+    ("data-plec", "plec"), ("data-plec-by", "plec_by"),
+    ("data-target", "target"), ("data-state", "state"),
+)
 _KNOWN_PAGE_ATTRS = {"data-n", "data-date", "data-filed"}
 
 
@@ -1103,6 +1161,16 @@ class _CompParser(HTMLParser):
         elif key == "council":
             c.council = _json_or_none(content) if isinstance(
                 _json_or_none(content), dict) else None
+        elif key == "scaffold":
+            # Kept verbatim, as the council's block is; `scaffold_view`
+            # cleans it for readers and the ops rewrite it whole.
+            value = _json_or_none(content)
+            if isinstance(value, dict):
+                c.scaffold = value
+            else:
+                c.warnings.append(
+                    "the composure:scaffold block is not a json object — "
+                    "dropped; this composure opens as a plain plane.")
         else:
             if len(c.meta_extra) < MAX_EXTRA_ATTRS:
                 c.meta_extra[key] = _clean_text(content, MAX_ATTR_CHARS)
@@ -1129,6 +1197,9 @@ class _CompParser(HTMLParser):
         m.speaker = _clean_text(attrd.get("data-speaker"), 64)
         m.speaker_kind = _clean_text(attrd.get("data-speaker-kind"), 32)
         m.turn = _clean_text(attrd.get("data-turn"), 16)
+        for attr, name in _SCAFFOLD_ATTRS:
+            limit = MAX_ATTR_CHARS if name == "plec" else 16
+            setattr(m, name, _clean_text(attrd.get(attr), limit))
         m.extra = _extra_attrs(attrd, _KNOWN_MODULE_ATTRS)
         self._module = m
 
@@ -1378,6 +1449,21 @@ border-radius:4px}
 .comp-page span[data-hl=pink]{background:var(--sw-pink)}\
 """
 
+#: Appended to `_STYLE` only in a file that holds a frame or a plecholder,
+#: so every composure without one keeps the bytes it had before 0.8. A
+#: plecholder shows its plec in brackets above the person's text, with a
+#: dashed border; a frame is the page or slide the boxes sit on.
+_STYLE_SCAFFOLD = """\
+.comp-module[data-type=frame]{background:var(--sw-paper);
+border:1px solid var(--comp-line);border-radius:2px;
+box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.comp-module[data-type=scaffold-box]{border:1.5px dashed var(--comp-line);
+background:transparent}
+.comp-module[data-type=scaffold-box][data-plec]::before{
+content:"[" attr(data-plec) "]";display:block;font-style:italic;
+margin-bottom:.4em;opacity:.7}\
+"""
+
 
 def _attr(name: str, value: str) -> str:
     return f' {name}="{_html.escape(value, quote=True)}"'
@@ -1434,9 +1520,14 @@ def dumps(comp: Composure) -> str:
     ]
     if comp.council is not None:
         out.append(_meta_json("council", comp.council))
+    if comp.scaffold is not None:
+        out.append(_meta_json("scaffold", comp.scaffold))
     for key in sorted(comp.meta_extra):
         out.append(_meta_line(key, comp.meta_extra[key]))
-    out.append(f"<style>\n{_STYLE}\n</style>")
+    style = _STYLE
+    if any(m.type in (BOX, FRAME) for m in comp.modules):
+        style = f"{_STYLE}\n{_STYLE_SCAFFOLD}"
+    out.append(f"<style>\n{style}\n</style>")
     out.append("</head>")
     out.append("<body>")
     out.append('<main class="comp-canvas">')
@@ -1470,6 +1561,7 @@ def dumps(comp: Composure) -> str:
             ("data-refresh", m.refresh), ("data-cache", m.cache),
             ("data-speaker", m.speaker), ("data-speaker-kind", m.speaker_kind),
             ("data-turn", m.turn),
+            *((attr, getattr(m, fname)) for attr, fname in _SCAFFOLD_ATTRS),
         ):
             if value:
                 attrs.append(_attr(name, value))
@@ -1554,6 +1646,13 @@ def module_model(m: Module) -> dict[str, Any]:
             "install": m.install or None,
             "refresh": m.refresh or None,
             "cache": m.cache or None,
+            "frame": m.frame or None,
+            "kind": m.kind or None,
+            "shape": m.shape or None,
+            "plec": m.plec or None,
+            "plec_by": m.plec_by or None,
+            "target": m.target or None,
+            "state": m.state or None,
         },
         "speaker": m.speaker or None,
         "speaker_kind": m.speaker_kind or None,
@@ -1581,6 +1680,7 @@ def model(comp: Composure) -> dict[str, Any]:
         "modified": comp.modified,
         "view": _clean_view(comp.view),
         "council": comp.council,
+        "scaffold": scaffold_view(comp),
         "bounds": {k: round(v, 2) for k, v in comp.bounds().items()},
         "modules": [module_model(m) for m in comp.modules],
         "strokes": [
@@ -1755,6 +1855,8 @@ OP_NAMES: tuple[str, ...] = (
     "set_page", "add_page", "remove_page", "file_page",
     "add_strokes", "remove_strokes", "replace_strokes",
     "set_meta", "set_council", "arrange",
+    "make_scaffold", "set_scaffold", "add_frame", "reorder_frames",
+    "move_to_frame",
 )
 
 #: Ops that write a module's text. Refused on a filed journal page and on an
@@ -1810,6 +1912,30 @@ def _check_writable(comp: Composure, m: Module, page: Page | None,
             f"council engine owns its text. You can move it, restyle it and "
             f"comment on it, but not rewrite it."
         )
+    if m.type == FRAME and op_name in _CONTENT_OPS:
+        raise ComposureError(
+            f"module {m.id} is a frame — it holds no text of its own. Put a "
+            f"scaffold-box on it (add_module type scaffold-box, frame "
+            f"{m.id}) and write there.")
+    if m.type == BOX and source == "readvisor":
+        if op_name in _CONTENT_OPS:
+            raise ComposureError(
+                f"module {m.id} is a plecholder (scaffold-box): its text is "
+                f"the person's own words, and the readvisor never writes "
+                f"them. You may change its plec, target, kind, shape, frame "
+                f"and place with update_module; the text is left to the "
+                f"person.")
+        if op_name == "remove_module" and _has_text(m):
+            raise ComposureError(
+                f"module {m.id} is a plecholder (scaffold-box) the person has "
+                f"already written in — removing it would delete their words, "
+                f"so the readvisor may not. Ask the person to remove it, or "
+                f"leave it and change its plec.")
+
+
+def _has_text(m: Module) -> bool:
+    """Whether any page of `m` carries words (markup alone does not count)."""
+    return any(rich_to_md(p.rich).strip() for p in m.pages)
 
 
 def _claim_module_id(comp: Composure, raw: object) -> str:
@@ -1859,14 +1985,38 @@ def _apply_one(comp: Composure, op: dict[str, Any], source: str) -> list[str]:
             f"unknown op {name!r}. known ops: {', '.join(OP_NAMES)}.")
 
     if name == "add_module":
-        return [_op_add_module(comp, op)]
+        return _op_add_module(comp, op, source)
     if name == "update_module":
-        return [_op_update_module(comp, op, source)]
+        return _op_update_module(comp, op, source)
     if name == "remove_module":
         m = _module_for(comp, op, "id", "remove_module")
         _check_writable(comp, m, None, source, name)
+        if m.type == FRAME:
+            held = [b.id for b in comp.modules if b.type == BOX and b.frame == m.id]
+            if held:
+                raise ComposureError(
+                    f"frame {m.id} still holds {len(held)} scaffold-box(es) "
+                    f"({', '.join(held)}) — move them to another frame "
+                    f"(move_to_frame) or remove them first.")
+            order = [f for f in frame_order(comp) if f != m.id]
+            comp.modules = [x for x in comp.modules if x.id != m.id]
+            if comp.scaffold is not None:
+                _store_frame_order(comp, order)
+            return [m.id]
         comp.modules = [x for x in comp.modules if x.id != m.id]
         return [m.id]
+    if name == "make_scaffold":
+        return _op_make_scaffold(comp, op, source)
+    if name == "set_scaffold":
+        _op_set_scaffold(comp, op, source)
+        return []
+    if name == "add_frame":
+        return _op_add_frame(comp, op)
+    if name == "reorder_frames":
+        _op_reorder_frames(comp, op)
+        return []
+    if name == "move_to_frame":
+        return _op_move_to_frame(comp, op)
     if name in ("set_page", "add_page", "remove_page", "file_page"):
         return [_op_page(comp, op, name, source)]
     if name in ("add_strokes", "remove_strokes", "replace_strokes"):
@@ -1883,31 +2033,56 @@ def _apply_one(comp: Composure, op: dict[str, Any], source: str) -> list[str]:
     raise ComposureError(f"unknown op {name!r}.")  # pragma: no cover
 
 
-def _op_add_module(comp: Composure, op: dict[str, Any]) -> str:
+def _check_module_cap(comp: Composure) -> None:
+    """Frames and plecholders are modules like any other: they count
+    toward `MAX_MODULES`."""
     if len(comp.modules) >= MAX_MODULES:
         raise ComposureError(
-            f"this composure already holds {MAX_MODULES} modules, the cap. "
-            f"Start a second composure and link to it with a `doc` module.")
+            f"this composure already holds {MAX_MODULES} modules, the cap "
+            f"(frames and scaffold-boxes count too). Start a second "
+            f"composure and link to it with a `doc` module.")
+
+
+def _op_add_module(comp: Composure, op: dict[str, Any],
+                   source: str = "ui") -> list[str]:
+    _check_module_cap(comp)
     mtype = str(_need(op, "type", "add_module")).strip().lower()
     if mtype not in MODULE_TYPES:
         raise ComposureError(
             f"unknown module type {mtype!r}. types: {', '.join(MODULE_TYPES)}.")
+    if mtype == FRAME:
+        raise ComposureError(
+            "a frame is added with the add_frame op, which also puts it in "
+            "the scaffold's order of frames.")
     m = Module(id=_claim_module_id(comp, op.get("id")), type=mtype)
     m.scale = snap_scale(op["scale"]) if "scale" in op else default_scale(comp)
+    frame: Module | None = None
+    if mtype == BOX:
+        m.kind, m.state = "text", "empty"
+        frame = _box_frame(comp, op)
+        if frame is not None:
+            m.frame = frame.id
     if op.get("fullport"):
         m.w, m.h = FULLPORT
+    elif frame is not None:
+        m.w = round(max(1.0, _num(op.get("w"), frame.w - 2 * FRAME_PAD)), 2)
+        m.h = round(max(1.0, _num(op.get("h"), BASE_SIZE[BOX][1] * m.scale)), 2)
     else:
         dw, dh = default_size(comp, mtype, m.scale)
         m.w = round(max(1.0, _num(op.get("w"), dw)), 2)
         m.h = round(max(1.0, _num(op.get("h"), dh)), 2)
+    touched: list[str] = [m.id]
     if "x" in op or "y" in op:
         m.x = round(_num(op.get("x")), 2)
         m.y = round(_num(op.get("y")), 2)
+    elif frame is not None:
+        m.x, m.y = _place_in_frame(comp, frame, m)
+        touched += _grow_page_frame(frame, m)
     else:
         near = op.get("near")
         m.x, m.y = place_module(comp, m.w, m.h, str(near) if near else None)
     m.z = int(_num(op.get("z"), (max((x.z for x in comp.modules), default=0) + 1)))
-    _set_common_fields(comp, m, op, creating=True)
+    _set_common_fields(comp, m, op, creating=True, source=source)
     pages = op.get("pages")
     if isinstance(pages, list) and pages:
         if len(pages) > MAX_PAGES_PER_MODULE:
@@ -1919,13 +2094,18 @@ def _op_add_module(comp: Composure, op: dict[str, Any]) -> str:
         ]
     else:
         m.pages = [Page(n=1, rich=_rich_from(op, "add_module"))]
+    if m.type == BOX and source == "readvisor" and _has_text(m):
+        raise ComposureError(
+            "a scaffold-box's text is the person's own words, and the "
+            "readvisor never writes them — add the box with its plec, target "
+            "and kind and leave 'markdown', 'rich' and 'pages' out.")
     m.cur = 1
     comp.modules.append(m)
-    return m.id
+    return touched
 
 
 def _set_common_fields(comp: Composure, m: Module, op: dict[str, Any],
-                       *, creating: bool) -> None:
+                       *, creating: bool, source: str = "ui") -> None:
     """Apply the fields `add_module` and `update_module` share. Only keys
     actually present are touched, so a partial update is a patch."""
     if "bg" in op:
@@ -1952,12 +2132,101 @@ def _set_common_fields(comp: Composure, m: Module, op: dict[str, Any],
             setattr(m, key, _clean_text(op[key]))
     if m.type == "webframe" and not m.refresh:
         m.refresh = "manual"
+    _set_scaffold_fields(comp, m, op, source)
     _validate_module_fields(m)
+
+
+#: The op keys a frame or a plecholder takes (besides geometry and title).
+_SCAFFOLD_KEYS: tuple[str, ...] = ("frame", "kind", "shape", "plec", "target",
+                                   "state")
+_TARGET_RE = re.compile(r"^(0|[1-9][0-9]{0,5})[cw]$")
+_GRAPHIC_SHAPE_RE = re.compile(r"^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}$")
+_GRAPHIC_SHAPES: tuple[str, ...] = ("portrait", "landscape", "square")
+
+
+def _set_scaffold_fields(comp: Composure, m: Module, op: dict[str, Any],
+                         source: str) -> None:
+    """The plecholder's and the frame's own fields. Who set the plec is
+    derived from the op's source (`ui` is the person, anyone else the
+    readvisor), so `plec_by` is never sent; `state` is the person's mark."""
+    if "plec_by" in op:
+        raise ComposureError(
+            "plec_by is not sent — it records who last set the plec, and "
+            "enough derives it from who sent the op.")
+    present = [k for k in _SCAFFOLD_KEYS if k in op]
+    if not present:
+        return
+    if m.type not in (BOX, FRAME):
+        raise ComposureError(
+            f"{', '.join(present)} belong(s) to a scaffold-box or a frame, and "
+            f"module {m.id} is a {m.type} module.")
+    if m.type == FRAME:
+        extra = [k for k in present if k != "shape"]
+        if extra:
+            raise ComposureError(
+                f"a frame takes a shape ({' or '.join(FRAME_SHAPES)}), a title "
+                f"and a place — not {', '.join(extra)}; those belong to its "
+                f"scaffold-boxes.")
+        shape = _clean_text(op["shape"], 16).lower()
+        if shape not in FRAME_SHAPES:
+            raise ComposureError(
+                f"unknown frame shape {shape!r}. shapes: "
+                f"{', '.join(FRAME_SHAPES)}.")
+        m.shape = shape
+        return
+    if "frame" in op:
+        fid = _clean_text(op["frame"], 16).lower()
+        if fid:
+            f = comp.module(fid)
+            if f is None or f.type != FRAME:
+                frames = ", ".join(frame_order(comp)) or "(none)"
+                raise ComposureError(
+                    f"no frame {fid!r} on this composure. frames: {frames}.")
+        m.frame = fid
+    if "kind" in op:
+        kind = _clean_text(op["kind"], 16).lower()
+        if kind not in BOX_KINDS:
+            raise ComposureError(
+                f"unknown box kind {kind!r}. kinds: {', '.join(BOX_KINDS)}.")
+        m.kind = kind
+    if "shape" in op:
+        m.shape = _clean_text(op["shape"], 16).lower()
+    if "plec" in op:
+        m.plec = _clean_text(op["plec"], MAX_ATTR_CHARS)
+        m.plec_by = ("person" if source == "ui" else "readvisor") if m.plec else ""
+    if "target" in op:
+        target = _clean_text(op["target"], 16).lower().replace(" ", "")
+        if target and not _TARGET_RE.match(target):
+            raise ComposureError(
+                f"a target is a whole number with its unit: 'c' for "
+                f"characters or 'w' for words, like 140c or 300w (got "
+                f"{target!r}). Send '' for no target.")
+        m.target = target
+    if "state" in op:
+        if source == "readvisor":
+            raise ComposureError(
+                f"a scaffold-box's state is the person's mark (written means "
+                f"they say it is done) — the readvisor does not set it on "
+                f"{m.id}.")
+        state = _clean_text(op["state"], 16).lower()
+        if state not in BOX_STATES:
+            raise ComposureError(
+                f"unknown box state {state!r}. states: {', '.join(BOX_STATES)}.")
+        m.state = state
 
 
 def _validate_module_fields(m: Module) -> None:
     """Per-type requirements, checked at the op door so a half-configured
     module never reaches disk."""
+    if m.type == BOX and m.shape:
+        if m.kind != "graphic":
+            raise ComposureError(
+                f"module {m.id} is a text box, and only a graphic box has a "
+                f"shape — send kind: graphic, or shape: ''.")
+        if not (_GRAPHIC_SHAPE_RE.match(m.shape) or m.shape in _GRAPHIC_SHAPES):
+            raise ComposureError(
+                f"a graphic box's shape is a proportion like 16:9 or 1:1, or "
+                f"one of {', '.join(_GRAPHIC_SHAPES)} (got {m.shape!r}).")
     if m.type in ("doc", "image") and m.href:
         if _href_ok(m.href) is None or m.href.lower().startswith(("http://", "https://", "mailto:")):
             raise ComposureError(
@@ -1970,7 +2239,8 @@ def _validate_module_fields(m: Module) -> None:
                 f"a {m.type} module's url must be http(s) (got {m.url!r}).")
 
 
-def _op_update_module(comp: Composure, op: dict[str, Any], source: str = "ui") -> str:
+def _op_update_module(comp: Composure, op: dict[str, Any],
+                      source: str = "ui") -> list[str]:
     m = _module_for(comp, op, "id", "update_module")
     # The speaker fields ARE the lock (`Module.locked` is `bool(speaker)`), so
     # only the council engine may set or clear them on an existing module.
@@ -1991,6 +2261,22 @@ def _op_update_module(comp: Composure, op: dict[str, Any], source: str = "ui") -
         if mtype not in MODULE_TYPES:
             raise ComposureError(
                 f"unknown module type {mtype!r}. types: {', '.join(MODULE_TYPES)}.")
+        if mtype != m.type and FRAME in (mtype, m.type):
+            raise ComposureError(
+                "a frame is made with add_frame and removed with "
+                "remove_module; no module becomes a frame, and a frame "
+                "becomes nothing else.")
+        if mtype != m.type and BOX in (mtype, m.type) and source == "readvisor":
+            raise ComposureError(
+                f"the readvisor may not turn module {m.id} into or out of a "
+                f"scaffold-box: a box's text is the person's own words, so "
+                f"only the person changes what is theirs.")
+        if mtype != m.type and m.type == BOX:
+            # Back to a plain module: its words stay, its plec goes.
+            for _attr_name, fname in _SCAFFOLD_ATTRS:
+                setattr(m, fname, "")
+        elif mtype != m.type and mtype == BOX:
+            m.kind, m.state = "text", "empty"
         m.type = mtype
     for key in ("x", "y", "w", "h"):
         if key in op:
@@ -2000,12 +2286,14 @@ def _op_update_module(comp: Composure, op: dict[str, Any], source: str = "ui") -
         m.z = int(_num(op["z"], m.z))
     if "cur" in op:
         m.cur = int(_clamp(_num(op["cur"], m.cur), 1, len(m.pages)))
-    _set_common_fields(comp, m, op, creating=False)
-    return m.id
+    _set_common_fields(comp, m, op, creating=False, source=source)
+    return [m.id]
 
 
 def _op_page(comp: Composure, op: dict[str, Any], name: str, source: str) -> str:
     m = _module_for(comp, op, "module", name)
+    if m.type == FRAME:
+        _check_writable(comp, m, None, source, "set_page")
     if name == "add_page":
         if len(m.pages) >= MAX_PAGES_PER_MODULE:
             raise ComposureError(
@@ -2197,6 +2485,313 @@ def _op_arrange(comp: Composure, op: dict[str, Any]) -> list[str]:
         m.x = round(origin_x + (i % cols) * (col_w + gutter), 2)
         m.y = round(origin_y + (i // cols) * (row_h + gutter), 2)
     return [m.id for m in mods]
+
+
+# ---------------------------------------------------------------------------
+# Scaffold (0.8): frames in order, plecholders, the `composure:scaffold` meta
+#
+# A scaffold is a plane of frames (a page or a slide each) holding
+# scaffold-boxes. The `.comp` stays flat: a box names its frame in
+# `data-frame`, and the order of frames lives in the meta block, which is
+# written the way the council's is (`_meta_json`, sorted keys). Nothing here
+# converts a composure on open: an old `form=scaffold` file (the council
+# writes that form too) has no meta and stays what it was until the person
+# asks for `make_scaffold`.
+# ---------------------------------------------------------------------------
+
+SCAFFOLD_META_V = 1
+
+
+def new_scaffold_meta(thing: str = "page") -> dict[str, Any]:
+    """The meta block of a fresh scaffold: no frames yet, unlocked, version
+    1, no parent."""
+    return {"v": SCAFFOLD_META_V, "thing": _thing(thing), "frames": [],
+            "locked": None, "version": 1, "parent": None}
+
+
+def is_scaffold(comp: Composure) -> bool:
+    return comp.scaffold is not None
+
+
+def _thing(raw: object) -> str:
+    thing = _clean_text(raw, 16).lower()
+    if thing not in SCAFFOLD_THINGS:
+        raise ComposureError(
+            f"unknown scaffold thing {thing!r}. things: "
+            f"{', '.join(SCAFFOLD_THINGS)}.")
+    return thing
+
+
+def frame_order(comp: Composure) -> list[str]:
+    """The frames in reading order: the meta's list first (ids that are not
+    frames on this composure dropped), then any frame it does not name, top
+    to bottom and left to right. Pure; the file is never rewritten to agree
+    until an op writes the order."""
+    frames = [m for m in comp.modules if m.type == FRAME]
+    ids = {m.id for m in frames}
+    order: list[str] = []
+    raw = (comp.scaffold or {}).get("frames")
+    if isinstance(raw, list):
+        for item in raw:
+            fid = str(item).strip().lower()
+            if fid in ids and fid not in order:
+                order.append(fid)
+    rest = sorted((m for m in frames if m.id not in order),
+                  key=lambda m: (m.y, m.x, m.id))
+    return order + [m.id for m in rest]
+
+
+def _store_frame_order(comp: Composure, order: list[str]) -> None:
+    meta = dict(comp.scaffold or new_scaffold_meta())
+    meta["frames"] = list(order)
+    comp.scaffold = meta
+
+
+def scaffold_view(comp: Composure) -> dict[str, Any] | None:
+    """The scaffold as the page and the tools read it, or None for a
+    composure that is not one: the meta's fields cleaned, the frames in
+    order, each frame's boxes in reading order, and the boxes no frame
+    holds (`loose`)."""
+    s = comp.scaffold
+    if s is None:
+        return None
+    thing = s.get("thing") if s.get("thing") in SCAFFOLD_THINGS else "page"
+    locked = s.get("locked") if isinstance(s.get("locked"), dict) else None
+    parent = s.get("parent") if isinstance(s.get("parent"), str) and s.get("parent") else None
+    order = frame_order(comp)
+    boxes: dict[str, list[str]] = {fid: [] for fid in order}
+    loose: list[str] = []
+    for m in sorted((m for m in comp.modules if m.type == BOX),
+                    key=lambda m: (m.y, m.x, m.id)):
+        (boxes[m.frame] if m.frame in boxes else loose).append(m.id)
+    return {
+        "v": int(_num(s.get("v"), SCAFFOLD_META_V)),
+        "thing": thing,
+        "frames": order,
+        "boxes": boxes,
+        "loose": loose,
+        "locked": locked,
+        "version": max(1, int(_num(s.get("version"), 1))),
+        "parent": parent,
+    }
+
+
+def _need_scaffold(comp: Composure, op_name: str) -> None:
+    if comp.scaffold is None:
+        raise ComposureError(
+            f"{op_name}: this composure is not a scaffold. The person makes "
+            f"it one with make_scaffold (\"make this a scaffold\"), or a new "
+            f"one starts from the scaffold form.")
+
+
+def _box_frame(comp: Composure, op: dict[str, Any]) -> Module | None:
+    """The frame a new box goes on: the one the op names, else the last
+    frame in order, else none (a plane that has no frames)."""
+    if "frame" in op:
+        fid = _clean_text(op["frame"], 16).lower()
+        if not fid:
+            return None
+        f = comp.module(fid)
+        if f is None or f.type != FRAME:
+            frames = ", ".join(frame_order(comp)) or "(none)"
+            raise ComposureError(
+                f"no frame {fid!r} on this composure. frames: {frames}.")
+        return f
+    order = frame_order(comp)
+    return comp.module(order[-1]) if order else None
+
+
+def _place_in_frame(comp: Composure, frame: Module,
+                    box: Module) -> tuple[float, float]:
+    """Below the frame's lowest box, at the frame's inner margin."""
+    held = [b for b in comp.modules
+            if b.type == BOX and b.frame == frame.id and b.id != box.id]
+    x = frame.x + FRAME_PAD
+    y = frame.y + FRAME_PAD
+    if held:
+        y = max(y, max(b.y + b.h for b in held) + GRID)
+    return (round(x, 2), round(y, 2))
+
+
+def _grow_page_frame(frame: Module, box: Module) -> list[str]:
+    """A page frame grows taller to hold a box placed below its edge (a
+    long page is one frame); a slide keeps its size. Returns the frame's
+    id when it changed."""
+    if frame.shape == "slide":
+        return []
+    need = round(box.y + box.h + FRAME_PAD - frame.y, 2)
+    if need > frame.h:
+        frame.h = need
+        return [frame.id]
+    return []
+
+
+def _op_make_scaffold(comp: Composure, op: dict[str, Any],
+                      source: str) -> list[str]:
+    """"Make this a scaffold": the person's click, never an open. Every
+    plain text card (not a council statement, no filed page) becomes a
+    scaffold-box whose text is the person's, on one frame drawn around
+    them; other modules stay as they are."""
+    if source != "ui":
+        raise ComposureError(
+            "make_scaffold is the person's choice, made on the page: it turns "
+            "text cards into scaffold-boxes whose text is theirs from then "
+            "on, so no other source may send it.")
+    if comp.scaffold is not None:
+        raise ComposureError("this composure is already a scaffold.")
+    _check_module_cap(comp)
+    thing = _thing(op.get("thing") or "page")
+    shape = "slide" if thing == "deck" else "page"
+    convert = [m for m in comp.modules
+               if m.type == "text" and not m.locked
+               and not any(p.filed for p in m.pages)]
+    w, h = FRAME_SHAPES[shape]
+    fid = _claim_module_id(comp, op.get("frame_id"))
+    if convert:
+        x = min(m.x for m in convert) - FRAME_PAD
+        y = min(m.y for m in convert) - FRAME_PAD
+        w = max(w, max(m.x + m.w for m in convert) - x + FRAME_PAD)
+        h = max(h, max(m.y + m.h for m in convert) - y + FRAME_PAD)
+    else:
+        x, y = place_module(comp, w, h)
+    frame = Module(id=fid, type=FRAME, x=round(x, 2), y=round(y, 2),
+                   w=round(w, 2), h=round(h, 2),
+                   z=min((m.z for m in comp.modules), default=1) - 1,
+                   bg="paper", scale=1.0, shape=shape, pages=[Page(n=1)])
+    for m in convert:
+        m.type, m.frame, m.kind, m.state = BOX, fid, "text", "empty"
+        m.plec = m.plec_by = m.target = m.shape = ""
+    comp.modules.insert(0, frame)
+    comp.kind = "plane"
+    comp.scaffold = new_scaffold_meta(thing)
+    comp.scaffold["frames"] = [fid]
+    return [fid] + [m.id for m in convert]
+
+
+def _op_set_scaffold(comp: Composure, op: dict[str, Any], source: str) -> None:
+    """Patch the meta block (`thing`, `locked`, `version`, `parent`), or
+    clear it with `scaffold: null` once no frame or box is left (which is
+    how `outline_ops` lays an outline over the scaffold form and gets
+    today's plain plane). The lock, the version and the parent are the
+    person's (`ui`) or enough's own; this lane stores them and enforces
+    nothing else yet."""
+    if "scaffold" in op:
+        if op["scaffold"] is not None:
+            raise ComposureError(
+                "set_scaffold takes 'scaffold': null to clear the block, or "
+                "the fields thing, locked, version and parent to change it.")
+        held = [m.id for m in comp.modules if m.type in (BOX, FRAME)]
+        if held:
+            raise ComposureError(
+                f"the scaffold still holds frames or scaffold-boxes "
+                f"({', '.join(held)}) — it stays a scaffold while it does.")
+        comp.scaffold = None
+        return
+    _need_scaffold(comp, "set_scaffold")
+    meta = dict(comp.scaffold or {})
+    meta.setdefault("v", SCAFFOLD_META_V)
+    if "thing" in op:
+        meta["thing"] = _thing(op["thing"])
+    person_keys = [k for k in ("locked", "version", "parent") if k in op]
+    if person_keys and source not in ("ui", "enough"):
+        raise ComposureError(
+            f"the scaffold's {', '.join(person_keys)} belong(s) to the person "
+            f"— a lock is theirs to close and open.")
+    if "locked" in op:
+        value = op["locked"]
+        if value in (None, False):
+            meta["locked"] = None
+        elif value is True:
+            meta["locked"] = {"at": _now_iso(), "by": source}
+        elif isinstance(value, dict):
+            meta["locked"] = {"at": _clean_text(value.get("at"), 40) or _now_iso(),
+                              "by": _clean_text(value.get("by"), 16) or source}
+        else:
+            raise ComposureError(
+                "set_scaffold 'locked' is true, false, null or "
+                "{\"at\": …, \"by\": …}.")
+    if "version" in op:
+        version = int(_num(op["version"], 0))
+        if version < 1:
+            raise ComposureError("a scaffold's version is a whole number from 1.")
+        meta["version"] = version
+    if "parent" in op:
+        meta["parent"] = _clean_text(op["parent"], 512) or None
+    comp.scaffold = meta
+
+
+def _op_add_frame(comp: Composure, op: dict[str, Any]) -> list[str]:
+    """A page or a slide, put at `at` in the order (1-based; the end by
+    default) and, without `x`/`y`, below the last frame (a page or a
+    document) or to its right (a deck)."""
+    _need_scaffold(comp, "add_frame")
+    _check_module_cap(comp)
+    view = scaffold_view(comp) or {}
+    default_shape = "slide" if view.get("thing") == "deck" else "page"
+    shape = _clean_text(op.get("shape") or default_shape, 16).lower()
+    if shape not in FRAME_SHAPES:
+        raise ComposureError(
+            f"unknown frame shape {shape!r}. shapes: {', '.join(FRAME_SHAPES)}.")
+    w, h = FRAME_SHAPES[shape]
+    order = frame_order(comp)
+    if "x" in op or "y" in op:
+        x, y = _num(op.get("x")), _num(op.get("y"))
+    elif order:
+        last = comp.module(order[-1])
+        assert last is not None
+        if view.get("thing") == "deck":
+            x, y = last.x + last.w + GUTTER, last.y
+        else:
+            x, y = last.x, last.y + last.h + GUTTER
+    else:
+        x, y = place_module(comp, w, h)
+    frame = Module(id=_claim_module_id(comp, op.get("id")), type=FRAME,
+                   x=round(x, 2), y=round(y, 2), w=w, h=h,
+                   z=min((m.z for m in comp.modules), default=1) - 1,
+                   bg="paper", scale=1.0, shape=shape, pages=[Page(n=1)])
+    _set_common_fields(comp, frame, {k: op[k] for k in ("bg", "title") if k in op},
+                       creating=True)
+    at = int(_clamp(_num(op.get("at"), len(order) + 1), 1, len(order) + 1))
+    order.insert(at - 1, frame.id)
+    comp.modules.append(frame)
+    _store_frame_order(comp, order)
+    return [frame.id]
+
+
+def _op_reorder_frames(comp: Composure, op: dict[str, Any]) -> None:
+    _need_scaffold(comp, "reorder_frames")
+    raw = op.get("order")
+    current = frame_order(comp)
+    if not isinstance(raw, list):
+        raise ComposureError("reorder_frames needs an 'order' list of frame ids.")
+    order = [str(x).strip().lower() for x in raw]
+    if len(set(order)) != len(order) or sorted(order) != sorted(current):
+        raise ComposureError(
+            f"reorder_frames needs every frame exactly once. The frames now, "
+            f"in order: {', '.join(current) or '(none)'}.")
+    _store_frame_order(comp, order)
+
+
+def _op_move_to_frame(comp: Composure, op: dict[str, Any]) -> list[str]:
+    """Put a box on a frame: at `x`/`y` when given, else below the frame's
+    lowest box. The box keeps its size and its text."""
+    box = _module_for(comp, op, "id", "move_to_frame")
+    if box.type != BOX:
+        raise ComposureError(
+            f"move_to_frame moves a scaffold-box, and module {box.id} is a "
+            f"{box.type} module.")
+    frame = _module_for(comp, op, "frame", "move_to_frame")
+    if frame.type != FRAME:
+        raise ComposureError(
+            f"module {frame.id} is not a frame. frames: "
+            f"{', '.join(frame_order(comp)) or '(none)'}.")
+    box.frame = frame.id
+    if "x" in op or "y" in op:
+        box.x = round(_num(op.get("x"), box.x), 2)
+        box.y = round(_num(op.get("y"), box.y), 2)
+        return [box.id]
+    box.x, box.y = _place_in_frame(comp, frame, box)
+    return [box.id] + _grow_page_frame(frame, box)
 
 
 # ---------------------------------------------------------------------------
@@ -2474,6 +3069,13 @@ def has_content(comp: Composure) -> bool:
     if comp.strokes:
         return True
     for m in comp.modules:
+        if m.type == FRAME:
+            # A frame is the paper, not something written on it.
+            continue
+        if m.type == BOX:
+            if m.plec.strip() or _has_text(m):
+                return True
+            continue
         if m.type != "text" or m.title.strip():
             return True
         if any(rich_to_md(p.rich).strip() for p in m.pages):
@@ -2685,6 +3287,13 @@ def outline(comp: Composure, path_rel: str = "") -> str:
     if comp.council:
         status = comp.council.get("status") if isinstance(comp.council, dict) else None
         head.append(f"council: status {status or 'unknown'}")
+    view = scaffold_view(comp)
+    if view is not None:
+        head.append(
+            f"scaffold: a {view['thing']} · frames in order: "
+            f"{', '.join(view['frames']) or '(none)'}"
+            f"{' · locked' if view['locked'] else ''} · a box's text is the "
+            f"person's (read it, never write it)")
     lines = [*head, ""]
     if not comp.modules:
         lines.append("(no modules yet — comp_add_module puts the first one down)")
@@ -2704,6 +3313,21 @@ def outline(comp: Composure, path_rel: str = "") -> str:
         filed = [p for p in m.pages if p.filed]
         if filed:
             bits.append(f"[{len(filed)} filed]")
+        if m.type == FRAME:
+            bits.append(f"{m.shape or 'page'}")
+        if m.type == BOX:
+            box = [f"on {m.frame}" if m.frame else "on no frame",
+                   m.kind or "text"]
+            if m.shape:
+                box.append(m.shape)
+            if m.target:
+                box.append(f"target {m.target}")
+            if m.state:
+                box.append(m.state)
+            bits.append(" · ".join(box))
+            if m.plec:
+                plec = m.plec if len(m.plec) <= 80 else m.plec[:79] + "…"
+                bits.append(f"[{plec}]")
         snippet = first_line(m.pages[0].rich, 80) if m.pages else ""
         if snippet:
             bits.append(f"— {snippet}")
@@ -2944,6 +3568,11 @@ def outline_ops(doc: OutlineDoc, form: str = "scaffold",
     ops: list[dict[str, Any]] = [
         {"op": "remove_module", "id": mid} for mid in (clear_ids or [])
     ]
+    # Since 0.8 the scaffold form is a scaffold (one frame and a
+    # `composure:scaffold` block). An outline laid over it is today's plain
+    # plane of text cards, so the block goes with the form's frame — which
+    # keeps the outline tool and the council's output exactly as they were.
+    ops.append({"op": "set_scaffold", "scaffold": None})
     if doc.title:
         ops.append({"op": "set_meta", "title": doc.title})
 

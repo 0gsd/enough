@@ -615,7 +615,8 @@ def test_model_is_json_serializable_end_to_end(client: TestClient):
     seed(client, form="scaffold")
     doc = client.get("/api/composure", params={"path": REL}).json()
     json.dumps(doc)
-    assert len(doc["model"]["modules"]) == 29
+    assert [m["type"] for m in doc["model"]["modules"]] == ["frame"]
+    assert doc["model"]["scaffold"]["thing"] == "page"
     assert doc["model"]["caps"]["page_chars"] == C.MAX_PAGE_CHARS
 
 
