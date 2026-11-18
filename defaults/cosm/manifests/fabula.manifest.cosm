@@ -56,13 +56,25 @@ volume:
   single-file: true                                   # identified by its declaration, never by its file name
 
 catalog:
-  keys: [oes, macrocosm, flavour, id, name, source, derived, atem, shorts, catems, nodes]
+  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, atem, shorts, catems,
+         nodes]
+  purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
+                                                       # checks and gates of transconception (MacroCOSM OES 18.4.9),
+                                                       # written after flavour; enough/transconception.py runs them
+  written-for-fields: [assumes]                        # written-for: {assumes: [text]}: what a reader is taken to know
+  written-for-default: {assumes: ['how to read a program''s commands, files and messages', 'plain English']}
+  ruled-by-form: 'R:maker/<slug> whose capacity is transconceiver, or none: nobody could rule, and the fabulac is kept
+                  unruled and says so'
+  cases-form: '<folder>.cases.json beside the fabulac: the outside cases as data, the recorder''s and runner''s shape;
+               the fabulac keeps P:case items for the cases a person wrote or ruled'
   id: fabula/<slug>
   id-old: [emf/<slug>]                                 # an emf/1 twin's id, read as it is
   flavour: [fabulan, fabulap, fabulac]
   flavour-absent: fabulan                              # every emf/1 file
   source-fields: [path, sha256, size, mtime_ns]                    # a text; absent for a standalone fabula
-  source-folder-fields: [path, kind, language, files, bytes, skipped, tree, commit, origin, licence]   # a folder (fabulac)
+  source-folder-fields: [path, kind, language, files, bytes, skipped, tree, commit, origin, licence, obtained, swhid]   # a folder (fabulac)
+  source-obtained: [public, permitted, own]                        # how the source came to the reader
+  source-swhid: '{dir: swh:1:dir:<hex>, rev: swh:1:rev:<hex>}: the folder''s and the revision''s identifiers, by rule'
   source-kind: [text, folder]                                      # absent: text
   tree: 'sha256 over the read set: for each file read, sorted by the UTF-8 bytes of its relative path, the bytes of
          <relative path> NUL <lowercase hex sha256 of its bytes> LF (MacroCOSM OES 18.4.1; Thym 20.1 uses the same digest)'
@@ -75,7 +87,12 @@ catalog:
                                                                    # run included; the single keys describe the last
                                                                    # run that derived the fabula from its source
   atem-fields: [line, focus, push, pull]
-  shorts-fields: [path, at, by, mode, order, route, language, files]
+  shorts-fields: [path, at, by, mode, order, route, language, files, entailed, target, layout, evidence]
+  shorts-entailed: [apart, beside]                                 # a cshort entailed from the fabulac alone (apart)
+                                                                   # or with the source at hand (beside)
+  shorts-target: a ref to N:target/<language>
+  shorts-layout: 'the layout short it was entailed with: <folder>.layout-<language>-<YYYY-MM-DD-HHMM>.md'
+  shorts-evidence-fields: [level, steps, against, inputs, where, at, by]   # steps: {kept, agree}; where: {file, digest}
   shorts-path: '<text-stem>.short-<YYYY-MM-DD-HHMM>.md; a cshort: <folder>.cshort-<YYYY-MM-DD-HHMM>/'
   shorts-modes: [model, rules]
   shorts-orders: [told, weight, code]                              # code: a cshort, compiled file by file
@@ -166,7 +183,10 @@ closed-lists:
   surface: [function, method, class, command, format, stream]
   scope: [standard, run-time, test, build, optional]
   set-in: [environment, file, option, constant]
-  capacity: [author, maintainer, contributor, editor, translator, publisher, performer, composer]
+  capacity: [author, maintainer, contributor, editor, translator, publisher, performer, composer, transconceiver]
+  ruling.is: [kept, alike, free, kept-wrong, changed]                     # ruling is a list, one entry per target
+  ruling.relied-on: [documented, tested, used, seen]                      # (made-for; none: any target)
+  relied-on: [documented, tested, used, seen]
   nature: [feature, fix, refactor, removal, docs, tests, build, revision]
 
 references:
@@ -218,12 +238,17 @@ modules:
                  required: [id, type, name, summary, provenance, stance]}
       use: {refs: [for, via], checked: [stance, steps, gets], flavours: [fabulac],
             required: [id, type, name, summary, provenance, stance]}
-      requirement: {refs: [met-by, checked-by], checked: [stance, force], flavours: [fabulac],
-                    required: [id, type, name, summary, provenance, stance, force]}
+      requirement: {refs: [met-by, checked-by], checked: [stance, force, of], flavours: [fabulac],
+                    required: [id, type, name, summary, provenance, stance, force],
+                    closed: {of: [behaviour, quality, making]}}
       decision: {refs: [by, changed-in], checked: [stance, chose, over, because], flavours: [fabulan, fabulap, fabulac],
                  required: [id, type, name, summary, provenance, stance, chose]}
       exclusion: {refs: [], checked: [stance, horizon, because], flavours: [fabulan, fabulap, fabulac],
                   required: [id, type, name, summary, provenance, stance]}
+      target: {refs: [provides.for], checked: [language, version, weighed, provides, spike, verdict, conditions, at, by, stance],
+               flavours: [fabulac], required: [id, type, name, summary, provenance, stance, language],
+               closed: {weighed.score: [0, 1, 2, 3], provides.by: [built-in, library, binding, written, cannot, dropped],
+                        verdict: [feasible, feasible-with, not]}}
   C:
     name: Construction
     subtitle: How the work is built
@@ -246,21 +271,27 @@ modules:
              required: [id, type, name, summary, provenance, stance, path]}
       component: {refs: [files, of, exposes, uses], checked: [does, stance], flavours: [fabulac],
                   required: [id, type, name, summary, provenance, stance]}
-      interface: {refs: [defined-in], checked: [surface, signature, takes, gives, raises, exported, stance], flavours: [fabulac],
-                  required: [id, type, name, summary, provenance, stance, surface]}
-      structure: {refs: [defined-in], checked: [shape, fields, invariants, stance], flavours: [fabulac],
-                  required: [id, type, name, summary, provenance, stance]}
-      behaviour: {refs: [of], checked: [when, does, edges, errors, intended, stance], flavours: [fabulac],
-                  required: [id, type, name, summary, provenance, stance, does]}
-      dependency: {refs: [used-by], checked: [package, version, scope, needed-for, licence, stance], flavours: [fabulac],
-                   required: [id, type, name, summary, provenance, stance, scope]}
-      setting: {refs: [read-by], checked: [key, set-in, default, means, stance], flavours: [fabulac],
-                required: [id, type, name, summary, provenance, stance, set-in]}
+      interface: {refs: [defined-in, ruling.made-for, ruling.by], checked: [surface, signature, takes, gives, raises, exported,
+                  plain, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
+                  closed: {plain.takes.*: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing],
+                           plain.gives: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing]}}
+      structure: {refs: [defined-in, ruling.made-for, ruling.by], checked: [shape, fields, invariants, ruling, stance],
+                  flavours: [fabulac], required: [id, type, name, summary, provenance, stance]}
+      behaviour: {refs: [of, ruling.made-for, ruling.by], checked: [when, does, edges, errors, intended, ruling, stance],
+                  flavours: [fabulac], required: [id, type, name, summary, provenance, stance, does]}
+      dependency: {refs: [used-by], checked: [package, version, scope, needed-for, licence, address, resolved, digest, stance],
+                   flavours: [fabulac], required: [id, type, name, summary, provenance, stance, scope]}
+      setting: {refs: [read-by, ruling.made-for, ruling.by], checked: [key, set-in, default, means, ruling, stance],
+                flavours: [fabulac], required: [id, type, name, summary, provenance, stance, set-in]}
+      reliance: {refs: [of, used-by, shown-by, ruling.made-for, ruling.by], checked: [on, of, gives, example, shown-by, used-by,
+                 entry, stated, contradicted-by, ruling, stance], flavours: [fabulac],
+                 required: [id, type, name, summary, provenance, stance, 'on', gives],
+                 closed: {'on': [language, runtime, platform, dependency]}}
   R:
     name: Production
     subtitle: Who made the work, with what, and how it changed
     kinds:
-      maker: {refs: [who], checked: [capacity, stance], flavours: [fabulan, fabulap, fabulac],
+      maker: {refs: [who], checked: [capacity, statements, stance], flavours: [fabulan, fabulap, fabulac],
               required: [id, type, name, summary, provenance, stance]}
       change: {refs: [by, touches, release, phase], checked: [at, nature, because, commit, stance], flavours: [fabulan, fabulap, fabulac],
                required: [id, type, name, summary, provenance, stance]}
@@ -270,8 +301,9 @@ modules:
                 required: [id, type, name, summary, provenance, stance]}
       means: {refs: [], checked: [what, used-for, version, stance], flavours: [fabulan, fabulap, fabulac],
               required: [id, type, name, summary, provenance, stance]}
-      licence: {refs: [], checked: [identifier, file, holder, year, first-line, stance], flavours: [fabulan, fabulap, fabulac],
-                required: [id, type, name, summary, provenance, stance]}
+      licence: {refs: [], checked: [identifier, file, holder, year, first-line, lane, notice, leave, stance],
+                flavours: [fabulan, fabulap, fabulac], required: [id, type, name, summary, provenance, stance],
+                closed: {lane: [open, bound, closed]}}
   P:
     name: Propositions
     subtitle: What the work claims, how it can be read, and what it must do
@@ -279,8 +311,13 @@ modules:
       claim: {refs: [roles.*], checked: [stance, salience, span], flavours: [fabulan, fabulap, fabulac]}
       reading: {refs: [of, grounds.of], checked: [whose, grounds, intended, stance, span], flavours: [fabulan, fabulap],
                 required: [id, type, name, summary, provenance, stance, of, whose]}
-      case: {refs: [of], checked: [given, expect, stance, span], flavours: [fabulac],
-             required: [id, type, name, summary, provenance, stance, of, given, expect]}
+      case: {refs: [of, made-for, ruling.made-for, ruling.by], checked: [given, expect, stands, from, allowing, ruling, stance,
+             span], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, of, given, expect],
+             closed: {stands: [outside, inside], from: [test, document, recorded, ruled],
+                      allowing: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order]}}
+      assumption: {refs: [relied-by], checked: [about, checked, if-false, relied-by, carries, stance], flavours: [fabulac],
+                   required: [id, type, name, summary, provenance, stance, about],
+                   closed: {checked: ['yes', 'no'], carries: [must, need-not]}}
   T:
     name: Transitions
     subtitle: What happens, in order
@@ -298,10 +335,38 @@ checks:
   envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, provenance, status, visibility,
              ref-grammar, ref-unresolved, closed-list, pending-shape, catalog-key, flavour, flavour-kind]
   own: [code-span, licence-recorded, question-about, question-shape, session-declared, reading-whose,
-        interface-signature, case-outcome]                # enough/fabula.py (lint_fabula); a generic reader lists them as not run
+        interface-signature, case-outcome,                # enough/fabula.py (lint_fabula); a generic reader lists them as not run
+        standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover, ruled,
+        round-trip, target-confirmed, surface-answered, apart, evidence-stated]
+                                                          # the last thirteen: enough/transconception.py, run only on a
+                                                          # fabulac whose catalog says purpose: transconception
   contract: 'fabula-checks: the generic checks above and the own checks, with no error; its old name emf-checks is read
              wherever a manifest, a program or a trace says it'
-  severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning}
+  severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning,
+             stands-alone: warning, cases-cover: warning}
+
+# Transconception (MacroCOSM OES 18.4.9): a program carried into another language through its fabulac. The last
+# thirteen own checks run only on a fabulac whose catalog says purpose: transconception; the two gates are one function
+# each in enough/transconception.py, reporting which checks hold and which do not.
+transconception:
+  allowances: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order]   # an alike ruling's allowing: the
+                                                                                     # judge's four, extended by ruling
+  ruled-kinds: ['C:interface', 'C:behaviour', 'C:structure', 'C:setting', 'C:reliance']   # each carries a ruling
+  ruling-needs: {alike: [allowing], free: [because], kept-wrong: [because], changed: [to]}
+  stated-entry: '{in, version, at, digest} (version: any patch of the runtime''s minor; digest: the cited page''s), or
+                 {nowhere: <what no text states>}; beside the list, contradicted-by: {at, says, said}'
+  plain-kinds: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing]
+  nothing-carried: 200                  # code points: the longest run of the source's own text an item may carry
+  cases-cover: 0.6                      # a warning below this share of kept behaviours covered by outside cases
+  evidence-levels: '1 builds; 2 the original''s own tests pass, bar the failures its rulings expect; 3 the recorded
+                    cases judged and passing; 4 also inputs generated from the plain kinds'
+  round-trip-level: 2
+  gates:
+    ready-to-keep: [standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover,
+                    ruled, round-trip]
+    ready-to-entail: [standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover,
+                      ruled, round-trip, target-confirmed]
+    per-cshort: [surface-answered, apart, evidence-stated]
 
 open-questions:
   form: '{pending: "<the question>"}'
