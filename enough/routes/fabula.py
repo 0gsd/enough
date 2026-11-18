@@ -62,10 +62,14 @@ def build_router(ctx: AppContext) -> APIRouter:
         return HTTPException(e.status, str(e))
 
     async def _json_body(request: Request) -> dict[str, Any]:
+        # Before the split this name was defined twice in one scope and the
+        # later definition (the launch screen's) won, so these routes read
+        # `{}` on any failure to read the body. Kept so the move changes
+        # nothing (0.8 build, W2-SV).
         try:
             body = await request.json()
-        except ValueError:
-            body = None
+        except Exception:  # noqa: BLE001
+            return {}
         return body if isinstance(body, dict) else {}
 
     def _canon_rel(path: str) -> str:
