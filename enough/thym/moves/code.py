@@ -3177,6 +3177,7 @@ def _interfaces_present(output: Value, inputs: dict, node: dict, decl: Any, ctx:
     f, _cat, items, _fab = _cshort_parts(output, inputs)
     if f is None:
         return False, "the output is not a folder"
+    if _ac().is_entailment(f): return _ac().interfaces_present(f, _cat, items, output, ctx)  # noqa: E701
     by = _by_id(items)
     problems = []
     for it in items:
@@ -3254,6 +3255,7 @@ def _files_present(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
     f, cat, items, fab = _cshort_parts(output, inputs)
     if f is None:
         return False, "the output is not a folder"
+    if _ac().is_entailment(f): return _ac().files_present(f, cat, items, fab)  # noqa: E701 - an authored entailment
     want, _rest = rebuilt(items)
     want = [str(x["path"]) for x in want]
     pack = packaging_file(cat, items, fabulac_file(cat, fab))[0] if fab is not None else None
@@ -3289,6 +3291,7 @@ def footer_problem(output: Value, inputs: dict, ctx: Any) -> str | None:
     the fabulac's file, the language, the run's day in UTC and the model, and its last line is the licence line,
     agreeing with `source.licence`. A catem: it ends with the line that names its depth."""
     f, cat, _items, fab = _cshort_parts(output, inputs)
+    if f is not None and _ac().is_entailment(f): return _ac().footer_problem(f, cat, fab, ctx)  # noqa: E701
     if f is not None:
         if f.entry("CSHORT.md") is None:
             return "CSHORT.md is missing"
@@ -3464,8 +3467,15 @@ def derive_scaffold_branch(ctx: Any, x: Value, mods: dict) -> Any:
     return None
 
 
+def _ac() -> Any:
+    """An authored fabulac's entailment (`authored_code.py`, 0.8), reached by one dispatch line in each place."""
+    from enough.thym.moves import authored_code
+    return authored_code
+
+
 def entail_branch(ctx: Any, x: Value, mods: dict) -> Any:
     a = mods.get("as")
+    if a == "code" and _ac().is_authored_fabula(x): return _ac().entail_authored(ctx, x, **mods)  # noqa: E701
     if a == "code":
         return entail_code(ctx, x, **mods)
     if a in CATEM_DEPTHS:

@@ -1,0 +1,247 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/words
+name: words
+source:
+  kind: authored
+  language: python
+  licence: MIT
+  by:
+  - R:maker/ada
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: tool
+  start:
+  - -m
+  - words
+atem:
+  line: words, a small program for the tests.
+  focus: what it does
+  push: a person wants it
+  pull: it is small
+nodes:
+- id: R:maker/ada
+  type: maker
+  name: Ada
+  summary: Ada authored words.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms Ada offers words on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  identifier: MIT
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.10'
+- id: N:aim/count-words
+  type: aim
+  name: Count the words of a file
+  summary: words prints how many words a text file holds.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: N:use/count-a-file
+  type: use
+  name: Count a file
+  summary: A person counts the words of one file from a terminal.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: N:requirement/standard-library
+  type: requirement
+  name: Standard library only
+  summary: words needs nothing but Python's standard library.
+  force: must
+  checked-by:
+  - P:case/three-words
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: N:requirement/never-writes
+  type: requirement
+  name: It never writes
+  summary: words never writes to the file it counts.
+  force: must
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:interface/command-words
+  type: interface
+  name: words count PATH
+  summary: 'The command line: words count PATH prints the number of words in the file at PATH.'
+  surface: command
+  signature: words count PATH
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:interface/count-words
+  type: interface
+  name: count_words
+  summary: 'count_words(text) gives the number of words in text: runs of characters between white space.'
+  surface: function
+  signature: 'count_words(text: str) -> int'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:behaviour/missing-file
+  type: behaviour
+  name: A missing file
+  summary: When PATH is not there, words says so on its error output and exits with 2.
+  of:
+  - C:interface/command-words
+  does: 'prints `words: PATH: no such file` on the error output and exits with status 2'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/three-words
+  type: case
+  name: Three words
+  summary: A file holding three words counts 3.
+  of:
+  - C:interface/command-words
+  given:
+    files:
+      notes.md: 'one two three
+
+        '
+    steps:
+    - arguments:
+      - count
+      - notes.md
+  expect:
+    steps:
+    - exit: 0
+      output: '3
+
+        '
+      error-output: ''
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/missing-file
+  type: case
+  name: A missing file
+  summary: A file that is not there is an error, exit 2.
+  of:
+  - C:interface/command-words
+  given:
+    steps:
+    - arguments:
+      - count
+      - gone.md
+  expect:
+    steps:
+    - exit: 2
+      output: ''
+      error-output: 'words: gone.md: no such file
+
+        '
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/count-function
+  type: case
+  name: The function counts
+  summary: count_words counts runs between white space.
+  of:
+  - C:interface/count-words
+  given:
+    calls: C:interface/count-words
+    arguments:
+      text: 'a b  c
+
+        '
+  expect:
+    value: 3
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/only-spaces
+  type: case
+  name: Only spaces
+  summary: A file of only spaces counts nothing.
+  of:
+  - C:interface/command-words
+  given: a file blank.md holding only spaces and new lines, counted with words count blank.md
+  expect: it prints 0 and exits with 0
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/huge-file
+  type: case
+  name: A huge file
+  summary: A file too large to read at once still counts.
+  of:
+  - C:interface/command-words
+  given:
+    pending: 'What is given: the file, and the command?'
+  expect:
+    pending: What is expected back?
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1

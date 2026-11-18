@@ -692,8 +692,9 @@ def test_entail_as_code_writes_the_cshort_file_by_file(built, tmp_path):
     assert not [k for s, k, _c in cp.sent if k == "pyproject.toml"]
     assert [s for s, _k, _c in cp.sent].count("code") == 4 and [s for s, _k, _c in cp.sent].count("readme") == 1
     rec = next(r for r in t.records if r.get("name") == "entail f as code")
+    # cases-entailed joins `as code` in 0.8 (Thym 6.3 on v080-texts); of a cshort it holds with nothing to check
     assert [c["name"] for c in rec["checks"]] == ["parses", "interfaces-present", "files-present", "footer",
-                                                  "provenance"] and all(c["ok"] for c in rec["checks"])
+                                                  "cases-entailed", "provenance"] and all(c["ok"] for c in rec["checks"])
     manual = (t.dir / "outputs" / "manual.md").read_text()
     assert manual.rstrip().endswith("at depth manual, compiled on 2026-11-05 by scripted-1*")
 

@@ -70,6 +70,8 @@ S_PREFIX = f"{MODULE}:{SESSION}/"
 
 WHYS = ("missing", "unsure", "ambiguous", "intent", "conflict", "counter")
 ANSWER_KINDS = ("text", "choice", "yes-no", "number", "date", "ref", "span")
+#: A case's two fields (MacroCOSM OES 18.4.7): a text question about one takes words, or data for a surface.
+CASE_FIELDS = ("given", "expect")
 STATES = ("open", "answered", "unknown", "declined", "stale", "withdrawn")
 THROUGH = ("person", "agent")
 RAISED_BY = ("bank", "move", "model", "person")
@@ -2184,6 +2186,9 @@ def check_value(src: Any, spec: dict, value: Any, *, qid: str | None = None) -> 
     kind = spec.get("kind") or "text"
     if kind not in ANSWER_KINDS:
         raise AnswerRefused(f"{kind!r} is not an answer kind ({', '.join(ANSWER_KINDS)})", qid)
+    field = case_field(spec.get("about") or qid)
+    if kind == "text" and field is not None:
+        return _case_answer(field, value, qid)
     if spec.get("many") is True:
         vals = value if isinstance(value, list) else (
             [p.strip() for p in re.split(r"[\n;]+", value) if p.strip()] if isinstance(value, str) else [value])
@@ -2280,6 +2285,35 @@ def _check_one(src: Any, spec: dict, kind: str, v: Any, qid: str | None) -> Any:
             raise AnswerRefused(why, qid)
         return dict(span)
     raise AnswerRefused(f"{kind!r} is not an answer kind", qid)
+
+
+def _case_answer(kind: str, v: Any, qid: str | None) -> Any:
+    """A case's `given` or `expect` (MacroCOSM OES 18.4.7): words, written as text (a prose case), or data for a
+    surface, a command's or a function's; an answer in words that is a mapping written in braces is read as data.
+    Data no surface knows is refused, with what it lacks."""
+    from enough.thym.moves.authored_code import answer_shape
+    if isinstance(v, str) and v.strip().startswith("{"):
+        try:
+            data = mc.yaml_load(v)
+        except Exception:  # noqa: BLE001 - words that only begin with a brace stay words
+            data = None
+        if isinstance(data, dict):
+            v = data
+    if not isinstance(v, (str, dict)):
+        raise AnswerRefused(f"a case's {kind} is words, or data for a command or a function", qid)
+    why = answer_shape(kind, v)
+    if why:
+        raise AnswerRefused(why, qid)
+    return v.strip() if isinstance(v, str) else v
+
+
+def case_field(about: Any) -> str | None:
+    """`given` or `expect` when a question is about that field of a case (`P:case/<slug>#given`), else None: its
+    answer is words, or data for a surface (MacroCOSM OES 18.4.7), though the question's kind is text."""
+    if not isinstance(about, str) or "#" not in about:
+        return None
+    item, _, fpath = about.partition("#")
+    return fpath if fpath in CASE_FIELDS and item.startswith("P:case/") else None
 
 
 def _scalar_text(v: Any) -> str:

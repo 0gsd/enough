@@ -1,0 +1,173 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/pairs
+name: pairs
+source:
+  kind: authored
+  language: python
+  licence: MIT
+  by:
+  - R:maker/ada
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: library
+atem:
+  line: pairs, a small program for the tests.
+  focus: what it does
+  push: a person wants it
+  pull: it is small
+nodes:
+- id: R:maker/ada
+  type: maker
+  name: Ada
+  summary: Ada authored pairs.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms Ada offers pairs on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  identifier: MIT
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.10'
+- id: N:aim/read-pairs
+  type: aim
+  name: Read key=value pairs
+  summary: pairs reads a line of key=value into its two halves.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:interface/split-pair
+  type: interface
+  name: split_pair
+  summary: split_pair(line) gives the key and the value of a key=value line, each without the spaces around it.
+  surface: function
+  signature: 'split_pair(line: str) -> list'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:interface/join-pair
+  type: interface
+  name: pairs.joining.join_pair
+  summary: join_pair(key, value) gives the line key=value.
+  surface: function
+  signature: 'join_pair(key: str, value: str) -> str'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/split
+  type: case
+  name: Split a pair
+  summary: A line with one = splits in two.
+  of:
+  - C:interface/split-pair
+  given:
+    calls: C:interface/split-pair
+    arguments:
+      line: ' name = Ada '
+  expect:
+    value:
+    - name
+    - Ada
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/no-equals
+  type: case
+  name: No equals sign
+  summary: A line with no = is refused.
+  of:
+  - C:interface/split-pair
+  given:
+    calls: C:interface/split-pair
+    arguments:
+      line: name Ada
+  expect:
+    raises:
+      error: ValueError
+      message: no '=' in the line
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/join
+  type: case
+  name: Join a pair
+  summary: A key and a value join with =.
+  of:
+  - C:interface/join-pair
+  given:
+    calls: C:interface/join-pair
+    arguments:
+      key: name
+      value: Ada
+  expect:
+    value: name=Ada
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/as-a-command
+  type: case
+  name: Not a command
+  summary: A library has no command to run.
+  of:
+  - C:interface/split-pair
+  given:
+    steps:
+    - arguments:
+      - name=Ada
+  expect:
+    steps:
+    - exit: 0
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1

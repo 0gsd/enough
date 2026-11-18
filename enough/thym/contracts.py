@@ -37,7 +37,7 @@ CHECKS = (
 #   cases-whole (0.8): `entail f as cases` gives a whole cases file (enough/thym/moves/transconceive.py)
 #   authored-source (0.8): an authored fabulac's source and items (enough/thym/moves/author.py); in the text's 7.3 on
 #     cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md
-AHEAD = ("quotes-held", "cases-whole", "authored-source")
+AHEAD = ("quotes-held", "cases-whole", "authored-source", "cases-entailed")
 
 # The moves a shipped declaration names ahead of the bundled text's 6.3 table, for the same reason: in the text on
 # cosmoes-site v080-texts (Thym 20.11), here until the sync. A test holds them to the rows the text gives them.

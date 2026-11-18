@@ -15,6 +15,12 @@ runs Ascribe's, in one report (MacroCOSM OES 18.4.8):
 - `interface-signature` (warning): a `function`, `method`, `class`, `command` or `format` interface carries its
   `signature`.
 - `case-outcome` (error): a case says what is given and what is expected.
+- `requirement-cased` (warning): in an authored fabulac, every `N:requirement` of `force: must` names a case in
+  `checked-by` (MacroCOSM OES 18.4.8).
+- `cases-entailed` (error): once an authored fabulac is entailed, the folder its `entailed` key names holds every
+  runnable case as a test written by rules, and every other case as a test marked as a model's or named in
+  `ENTAILED.md` with its reason (`enough/thym/moves/authored_code.py`); nothing to check before, or for any other
+  fabulac.
 
 and the core's three checks of the dialectic (MacroCOSM OES 18.6.8), which run on every volume that holds an item of
 module D, whatever its format:
@@ -58,10 +64,10 @@ FLAVOURS = ("fabulan", "fabulap", "fabulac")
 FABULA_CHECKS = ("code-span", "licence-recorded", "reading-whose", "interface-signature", "case-outcome")
 DIALECTIC_CHECKS = mc.CORE_CHECKS            # question-about, question-shape, session-declared
 OWN_CHECKS = ("code-span", "licence-recorded", "question-about", "question-shape", "session-declared",
-              "reading-whose", "interface-signature", "case-outcome") + tc.CHECKS
+              "reading-whose", "interface-signature", "case-outcome", "requirement-cased", "cases-entailed") + tc.CHECKS
 SEVERITY = {"code-span": "error", "licence-recorded": "error", "question-about": "error", "question-shape": "error",
             "session-declared": "warning", "reading-whose": "warning", "interface-signature": "warning",
-            "case-outcome": "error", **tc.SEVERITY}
+            "case-outcome": "error", "requirement-cased": "warning", "cases-entailed": "error", **tc.SEVERITY}
 # The thirteen checks of transconception (enough/transconception.py) run only on a fabulac whose catalog says
 # purpose: transconception; on every other fabula they run and find nothing.
 # An old contract name: `emf-checks` names `fabula-checks`, the fabula's checks passing with no error (18.1, 18.4.8).
@@ -133,6 +139,7 @@ class _Own:
                 self.case_outcome(it)
         if fl == "fabulac":
             self.licence_recorded()
+            self.authored()
             self.unmeasured = tc.run_checks(self.v, self.add)
             for check, why in self.unmeasured.items():
                 self.add(check, None, f"not measured: {why}", severity="note")
@@ -193,6 +200,37 @@ class _Own:
         if missing:
             self.add("case-outcome", it, "a case says what is given and what is expected: no "
                                          + " and no ".join(missing), missing[0])
+
+    def authored(self) -> None:
+        """`requirement-cased` (a warning) and `cases-entailed` of an authored fabulac (MacroCOSM OES 18.4.8): every
+        requirement of `force: must` names a case in `checked-by`; once entailed, the folder its `entailed` key names
+        holds every case as a test, or names it with its reason. Nothing to check for any other fabulac."""
+        cat = self.v.catalog if isinstance(self.v.catalog, dict) else {}
+        src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
+        if src.get("kind") != "authored":
+            return
+        from enough.thym.moves import author as _author
+        from enough.thym.moves import authored_code as _ac
+        nodes = [it.data for it in self.items]
+        by = {it.data.get("id"): it for it in self.items}
+        for d in _author.uncovered_items(nodes):
+            self.add("requirement-cased", by.get(d.get("id")), "a requirement the program must meet names the case "
+                     "that shows it, in checked-by", "checked-by")
+        ent = cat.get("entailed") if isinstance(cat.get("entailed"), dict) else {}
+        if not (isinstance(ent.get("path"), str) and self.v.catalog_file):
+            return
+        where = Path(self.v.root) / self.v.catalog_file if self.v.root is not None else Path(self.v.catalog_file)
+        folder = where.parent / ent["path"]
+        if not folder.is_dir():
+            return
+        fab_file = where.name
+
+        def text_of(rel: str) -> str | None:
+            p = folder / rel
+            return p.read_text(encoding="utf-8") if p.is_file() and not p.is_symlink() else None
+        why = _ac.cases_entailed_problem({k: v for k, v in cat.items() if k != "nodes"}, nodes, fab_file, text_of)
+        if why:
+            self.add("cases-entailed", None, why)
 
     # ----------------------------------------------------------------- the dialectic's (the core's)
     def dialectic(self) -> None:
