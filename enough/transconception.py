@@ -82,7 +82,7 @@ PER_CSHORT = ("surface-answered", "apart", "evidence-stated")
 
 # The manifest's numbers and lists, used when the manifest does not give them (it does: `transconception:`).
 DEFAULTS = {
-    "allowances": ["exit-only", "exit-and-stdout", "stderr-said-or-not", "lines-in-any-order"],
+    "allowances": ["exit-only", "exit-and-stdout", "stderr-said-or-not", "lines-in-any-order", "own-types"],
     "ruled-kinds": ["C:interface", "C:behaviour", "C:structure", "C:setting", "C:reliance"],
     "ruling-needs": {"alike": ["allowing"], "free": ["because|said"], "kept-wrong": ["because|said"], "changed": ["to"]},
     "nothing-carried": 200,
@@ -775,6 +775,11 @@ STALE_FINDING = "recorded against another source"
 JUDGE_LABELS = {"python": ["py", "python"]}
 #: The keys of a case ruling the judge reads (x0's write_a4.JUDGE_KEYS).
 JUDGE_KEYS = ("is", "allowing", "steps", "to", "about", "said")
+#: The part of an interface a ruling is `about` when it rules only what the new program is called (x0's
+#: `a4lib.PROGRAM_NAME`). The judge starts whatever the build made and compares what it does, so such a ruling does
+#: not decide how the interface is judged (sitting 2, 2026-11-18: V-I14 and S-I0 split, changed about the program's
+#: name only, kept for the rest).
+PROGRAM_NAME_ABOUT = "the program's name"
 #: A case's keys in the order the file writes them (the runner's first, then what a recording added).
 CASE_ORDER = ("id", "of", "from", "group", "files", "env", "cwd", "burst", "steps", "reliances", "note", "item",
               "expect", "expect-says", "recorded", "stale")
@@ -939,13 +944,17 @@ def case_from_item(item: dict, iface_keys: Mapping[str, str], reliance_keys: Map
 def judge_rulings(catalog: Mapping, nodes: list[dict]) -> dict:
     """What the judge reads, for each target the fabulac names (`N:target`): the ruling of each interface (`is`,
     and the allowance of an `alike`), and each case's rulings other than kept with the steps they cover. A ruling
-    made for the target wins over one made for any target. Derived, never edited (survey 2.4)."""
+    made for the target wins over one made for any target. Two kinds of an interface's rulings do not decide how
+    the interface is judged (sitting 2, 2026-11-18): one that names `steps` (it reaches the judge as the case's
+    ruling of those steps: S-I6's byte-file steps) and one about the program's name only (V-I14, S-I0). Derived,
+    never edited (survey 2.4)."""
     targets: dict = {}
     for t in _items(nodes, "N:target/"):
         lang, tid = str(t.get("language") or t["id"][len("N:target/"):]), t["id"]
         interfaces: dict = {}
         for it in _items(nodes, "C:interface/"):
-            rs = [r for r in rulings(it) if applies(r, tid) and "pending" not in r and r.get("is")]
+            rs = [r for r in rulings(it) if applies(r, tid) and "pending" not in r and r.get("is")
+                  and not r.get("steps") and r.get("about") != PROGRAM_NAME_ABOUT]
             rs.sort(key=lambda r: r.get("made-for") != tid)
             if rs:
                 interfaces[_key(it, "C:interface/")] = {k: rs[0][k] for k in ("is", "allowing") if k in rs[0]}

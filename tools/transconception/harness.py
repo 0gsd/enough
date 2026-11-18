@@ -319,6 +319,10 @@ NORMALISERS = {
     "exit-and-stdout": lambda s: (s["exit"], s["out"]),
     "stderr-said-or-not": lambda s: (s["exit"], s["out"], bool(s["err"].strip())),
     "lines-in-any-order": lambda s: (s["exit"], sorted(s["out"].splitlines()), sorted(s["err"].splitlines())),
+    # Sitting 2 (2026-11-18): a value may take the target's own type where the kept interface cannot see the
+    # difference. The judge sees only the interface: it compares exit status, stdout and stderr exactly, as for
+    # `kept`. A type of the target's own that changed what the interface prints is a difference, not an allowance.
+    "own-types": lambda s: (s["exit"], s["out"], s["err"]),
 }
 
 

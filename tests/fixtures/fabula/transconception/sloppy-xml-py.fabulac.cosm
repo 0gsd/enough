@@ -433,12 +433,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -490,12 +492,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -528,12 +532,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -581,12 +587,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -619,12 +627,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -672,12 +682,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -710,12 +722,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -759,12 +773,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -797,12 +813,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -850,12 +868,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -888,12 +908,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -941,12 +963,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -979,12 +1003,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1048,12 +1074,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1086,12 +1114,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1146,12 +1176,14 @@ nodes:
   - so their values are 1 to 10 in the order listed.
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1184,12 +1216,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1233,12 +1267,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1271,12 +1307,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1315,12 +1353,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1359,12 +1399,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1403,12 +1445,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1447,12 +1491,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1491,12 +1537,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1535,12 +1583,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1579,12 +1629,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1619,12 +1671,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1657,12 +1711,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1695,12 +1751,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1739,12 +1797,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1783,12 +1843,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1827,12 +1889,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1871,12 +1935,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1915,12 +1981,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -1959,12 +2027,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2003,12 +2073,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2044,12 +2116,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2082,12 +2156,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2120,12 +2196,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2164,12 +2242,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2204,12 +2284,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2248,12 +2330,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2292,12 +2376,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2431,12 +2517,14 @@ nodes:
       latin1, cp1252, ascii)
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2482,12 +2570,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2577,12 +2667,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2623,12 +2715,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2721,12 +2815,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -2854,12 +2950,14 @@ nodes:
     engine: code
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -4546,12 +4644,14 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: the target's own types
+    allowing: own-types
+    because: the target's own types
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
     about: S-R22
   - is: kept
     about: the rest of the behaviour
@@ -4595,13 +4695,16 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: an lxml-like builder in Rust's own types
+    allowing: own-types
+    because: an lxml-like builder in Rust's own types
     about: 'S-R20: the builder'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q4: alike: Rust offers an lxml-like tree builder of its own under the name lxml, in Rust''s
-      own types (tags, attributes, text, tail), printed by the driver like the original''s'
+      own types (tags, attributes, text, tail), printed by the driver like the original''s; sitting 2: a fifth allowance,
+      own-types, on the closed list: a value may take the target''s own type where the kept interface cannot see
+      the difference'
   - is: alike
     allowing: exit-only
     about: 'S-R20: the refusal of an unknown name'
@@ -4722,13 +4825,14 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: the target's own tree type (S-I2)
-    because: kept at the dump
+    allowing: own-types
+    because: the target's own tree type, kept at the driver's dump (S-I2)
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: '5d Q-D1: ruled as proposed, in one batch: every pending item takes the worksheet''s proposal (sections
-      1 and 2''s last column); the owner may overrule any one later'
+      1 and 2''s last column); the owner may overrule any one later; sitting 2: a fifth allowance, own-types, on
+      the closed list: a value may take the target''s own type where the kept interface cannot see the difference'
     about: S-R15
   - is: kept
     about: the rest of the behaviour
@@ -4780,13 +4884,16 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: an lxml-like builder in Rust's own types
+    allowing: own-types
+    because: an lxml-like builder in Rust's own types
     about: 'S-R20: the builder'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q4: alike: Rust offers an lxml-like tree builder of its own under the name lxml, in Rust''s
-      own types (tags, attributes, text, tail), printed by the driver like the original''s'
+      own types (tags, attributes, text, tail), printed by the driver like the original''s; sitting 2: a fifth allowance,
+      own-types, on the closed list: a value may take the target''s own type where the kept interface cannot see
+      the difference'
   - is: alike
     allowing: exit-only
     about: 'S-R20: the refusal of an unknown name'
@@ -4854,12 +4961,14 @@ nodes:
     said: 'sitting 1, Q3: alike, exit-only allowed: fails on the same inputs at the same point; the kind need not
       be named in Python''s words'
   - is: alike
-    allowing: the target's own types
+    allowing: own-types
+    because: the target's own types
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
     about: S-R22
   - is: kept
     about: the rest of the behaviour
@@ -4956,12 +5065,14 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -5585,22 +5696,26 @@ nodes:
     engine: model:hand-g1
   ruling:
   - is: alike
-    allowing: the target's own tree type (S-I2)
-    because: kept at the dump
+    allowing: own-types
+    because: the target's own tree type, kept at the driver's dump (S-I2)
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: '5d Q-D1: ruled as proposed, in one batch: every pending item takes the worksheet''s proposal (sections
-      1 and 2''s last column); the owner may overrule any one later'
+      1 and 2''s last column); the owner may overrule any one later; sitting 2: a fifth allowance, own-types, on
+      the closed list: a value may take the target''s own type where the kept interface cannot see the difference'
     about: S-R15
   - is: alike
-    allowing: an lxml-like builder in Rust's own types
+    allowing: own-types
+    because: an lxml-like builder in Rust's own types
     about: 'S-R20: the builder'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q4: alike: Rust offers an lxml-like tree builder of its own under the name lxml, in Rust''s
-      own types (tags, attributes, text, tail), printed by the driver like the original''s'
+      own types (tags, attributes, text, tail), printed by the driver like the original''s; sitting 2: a fifth allowance,
+      own-types, on the closed list: a value may take the target''s own type where the kept interface cannot see
+      the difference'
   - is: alike
     allowing: exit-only
     about: 'S-R20: the refusal of an unknown name'
@@ -9956,13 +10071,15 @@ nodes:
   type: maker
   name: the owner, as transconceiver
   summary: 'The owner rules what the next program keeps, as transconceiver: sitting 1 on 2026-11-13 gave 29 rulings
-    across vulture and sloppy-xml-py, and its 5d answers ruled the rest in one batch and the standing.'
+    across vulture and sloppy-xml-py, and its 5d answers ruled the rest in one batch and the standing; sitting 2
+    on 2026-11-18 settled five items and a fifth allowance, own-types.'
   stance: observed
   who: E:person/owner
   capacity: transconceiver
   ruled-in:
   - _x0/sitting-1.md
   - _x0/sitting-1.md#5d
+  - _x0/sitting-2.md
   statements:
     licence: 'Apache-2.0 (LICENSE; pyproject''s `license`), not MIT: the 5d answer says "both originals MIT"; the
       files say Apache-2.0, an open lane too; recorded as the files say, for the owner to confirm'
@@ -10047,18 +10164,21 @@ nodes:
   worksheet-id: S-I0
   ruling:
   - is: kept
+    about: the driver contract
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: split: changed about the program''s name only;
+      kept for the driver contract'
   - is: changed
     to: a program sloppy-cases with the same request and lines
     about: the program's name
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: split: changed about the program''s name only;
+      kept for the driver contract'
   - is: kept
     because: the round trip carries the original as recorded
     about: the program's name
@@ -10117,16 +10237,15 @@ nodes:
     "ok"}'
   worksheet-id: S-I2
   ruling:
-  - is: alike
-    allowing: the target's own tree type
-    because: kept at the driver's dump
+  - is: kept
+    about: the tree as the driver dumps it
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
-    said: '5d Q-D1: ruled as proposed, in one batch: every pending item takes the worksheet''s proposal (sections
-      1 and 2''s last column); the owner may overrule any one later'
+    'on': '2026-11-18'
+    said: 'sitting 2: kept at the driver''s dump, as sitting 1 said ("printed by the driver like the original''s")'
   - is: kept
     because: the round trip carries the original as recorded
+    about: the tree as the driver dumps it
     made-for: N:target/python
     by: R:maker/transconceiver
     'on': '2026-11-13'
@@ -10190,12 +10309,14 @@ nodes:
   worksheet-id: S-I4
   ruling:
   - is: alike
-    allowing: 'the target''s own types: an iterator of one event type, a trait for tree builders'
+    allowing: own-types
+    because: 'the target''s own types: an iterator of one event type, a trait for tree builders'
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -10226,12 +10347,15 @@ nodes:
   worksheet-id: S-I5
   ruling:
   - is: alike
-    allowing: an lxml-like builder in Rust's own types, printed by the driver like the original's
+    allowing: own-types
+    because: an lxml-like builder in Rust's own types, printed by the driver like the original's
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q4: alike: Rust offers an lxml-like tree builder of its own under the name lxml, in Rust''s
-      own types (tags, attributes, text, tail), printed by the driver like the original''s'
+      own types (tags, attributes, text, tail), printed by the driver like the original''s; sitting 2: a fifth allowance,
+      own-types, on the closed list: a value may take the target''s own type where the kept interface cannot see
+      the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -10265,44 +10389,58 @@ nodes:
   - is: changed
     to: latin-1 and cp1252 are tried on the bytes already read
     case: P:case/x0.ruled.S-C21
+    steps:
+    - 2
     about: a byte file that is not UTF-8
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
-    said: 'sitting 1, Q5: changed: try latin-1 and cp1252 on the bytes already read, as the author meant'
+    'on': '2026-11-18'
+    said: 'sitting 1, Q5: changed: try latin-1 and cp1252 on the bytes already read, as the author meant; sitting
+      2: narrowed: kept for text input; changed only on the byte-file steps, as case rulings (S-C21 steps 2 and
+      4)'
   - is: changed
     to: refused
     case: P:case/x0.ruled.S-C21
+    steps:
+    - 4
     about: bytes given where text is expected
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q6: changed both: a lone surrogate becomes U+FFFD; bytes given where text is expected are
-      refused'
+      refused; sitting 2: narrowed: kept for text input; changed only on the byte-file steps, as case rulings (S-C21
+      steps 2 and 4)'
   - is: kept
-    about: text and text files
+    about: 'text input: text and text files'
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: '5d Q-D1: ruled as proposed, in one batch: every pending item takes the worksheet''s proposal (sections
-      1 and 2''s last column); the owner may overrule any one later'
+      1 and 2''s last column); the owner may overrule any one later; sitting 2: narrowed: kept for text input; changed
+      only on the byte-file steps, as case rulings (S-C21 steps 2 and 4)'
   - is: changed
     to: latin-1 and cp1252 are tried on the bytes already read
     case: P:case/x0.ruled.S-C21
+    steps:
+    - 2
     about: a byte file that is not UTF-8
     made-for: N:target/python
     by: R:maker/transconceiver
-    'on': '2026-11-13'
-    said: 'sitting 1, Q5: changed: try latin-1 and cp1252 on the bytes already read, as the author meant; 5d Q-D2:
-      the owner''s changed rulings apply to Python too ("unless it''s a nightmare")'
+    'on': '2026-11-18'
+    said: 'sitting 1, Q5: changed: try latin-1 and cp1252 on the bytes already read, as the author meant; sitting
+      2: narrowed: kept for text input; changed only on the byte-file steps, as case rulings (S-C21 steps 2 and
+      4); 5d Q-D2: the owner''s changed rulings apply to Python too ("unless it''s a nightmare")'
   - is: changed
     to: refused
     case: P:case/x0.ruled.S-C21
+    steps:
+    - 4
     about: bytes given where text is expected
     made-for: N:target/python
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q6: changed both: a lone surrogate becomes U+FFFD; bytes given where text is expected are
-      refused; 5d Q-D2: the owner''s changed rulings apply to Python too ("unless it''s a nightmare")'
+      refused; sitting 2: narrowed: kept for text input; changed only on the byte-file steps, as case rulings (S-C21
+      steps 2 and 4); 5d Q-D2: the owner''s changed rulings apply to Python too ("unless it''s a nightmare")'
   provenance:
     mode: manual
     confidence: 1
@@ -10910,13 +11048,14 @@ nodes:
     digest: 5e516318a17d
   ruling:
   - is: alike
-    allowing: the target's own tree type (S-I2)
-    because: kept at the dump
+    allowing: own-types
+    because: the target's own tree type, kept at the driver's dump (S-I2)
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: '5d Q-D1: ruled as proposed, in one batch: every pending item takes the worksheet''s proposal (sections
-      1 and 2''s last column); the owner may overrule any one later'
+      1 and 2''s last column); the owner may overrule any one later; sitting 2: a fifth allowance, own-types, on
+      the closed list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
@@ -11129,13 +11268,16 @@ nodes:
   - nowhere: that the KeyError's message is the key's repr (`'other'`).
   ruling:
   - is: alike
-    allowing: an lxml-like builder in Rust's own types
+    allowing: own-types
+    because: an lxml-like builder in Rust's own types
     about: the builder
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q4: alike: Rust offers an lxml-like tree builder of its own under the name lxml, in Rust''s
-      own types (tags, attributes, text, tail), printed by the driver like the original''s'
+      own types (tags, attributes, text, tail), printed by the driver like the original''s; sitting 2: a fifth allowance,
+      own-types, on the closed list: a value may take the target''s own type where the kept interface cannot see
+      the difference'
   - is: alike
     allowing: exit-only
     about: the refusal of an unknown name
@@ -11258,12 +11400,14 @@ nodes:
     digest: e1a82f4a2d34
   ruling:
   - is: alike
-    allowing: the target's own types
+    allowing: own-types
+    because: the target's own types
     made-for: N:target/rust
     by: R:maker/transconceiver
-    'on': '2026-11-13'
+    'on': '2026-11-18'
     said: 'sitting 1, Q1: as proposed: the driver contract is the kept interface, ruled changed for Rust (it ships
-      sloppy-cases); the Python API alike, made-for rust'
+      sloppy-cases); the Python API alike, made-for rust; sitting 2: a fifth allowance, own-types, on the closed
+      list: a value may take the target''s own type where the kept interface cannot see the difference'
   - is: kept
     because: the round trip carries the original as recorded
     made-for: N:target/python
