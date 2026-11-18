@@ -382,7 +382,11 @@ def test_the_fabula_carries_a_bank_per_flavour():
     banks = M.default_registry().get("fabula").banks()
     assert [(b["name"], b["for"], b["to"], len(b["questions"])) for b in banks] == [
         ("fabulan", {"flavour": "fabulan"}, "author", 17), ("fabulap", {"flavour": "fabulap"}, "author", 35),
-        ("fabulac", {"flavour": "fabulac"}, "maker", 17)]
+        ("fabulac", {"flavour": "fabulac"}, "maker", 17),
+        # 0.8 (MacroCOSM 18.6.6): a transconception's three banks, asked only of a fabulac whose purpose says so
+        ("transconception-standing", {"purpose": "transconception"}, "transconceiver", 8),
+        ("transconception-target", {"purpose": "transconception"}, "transconceiver", 2),
+        ("transconception-rulings", {"purpose": "transconception"}, "transconceiver", 6)]
     first = banks[1]["questions"][8]
     assert (first["id"], first["about"], first["kind"], first["to"]) == ("speaker", "C:voice#roles.speaker", "text",
                                                                        "author")

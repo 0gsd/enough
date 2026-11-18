@@ -56,6 +56,7 @@ from typing import Any, Callable, Iterable
 
 from . import fabula as fb
 from . import macrocosm as mc
+from . import transconception as tc
 
 # ---------------------------------------------------------------------------
 # The words (MacroCOSM OES 18.6.2)
@@ -72,14 +73,29 @@ ANSWER_KINDS = ("text", "choice", "yes-no", "number", "date", "ref", "span")
 STATES = ("open", "answered", "unknown", "declined", "stale", "withdrawn")
 THROUGH = ("person", "agent")
 RAISED_BY = ("bank", "move", "model", "person")
-TO_WORDS = ("author", "expert", "maker", "holder", "owner", "anyone")
+TO_WORDS = ("author", "expert", "maker", "holder", "owner", "transconceiver", "anyone")
 ANSWERED = ("answered", "unknown", "declined")      # the states an answer moves a question into
 ENDED = ("stale", "withdrawn")
 UNSURE_BELOW = 0.5                                   # an item below this confidence is unsure (18.6.3)
 ITEM_KINDS_ONLY = ("text", "choice")                 # the kinds an answer about a module or a kind may have (18.6.4)
 ENTRY_COPIED = ("kind", "options", "options-open", "many", "range", "hint")
 QUESTION_ORDER = ("id", "type", "about", "asks", "why", "kind", "options", "options-open", "many", "range", "hint",
-                  "to", "raised", "state", "answers", "settled", "ended")
+                  "to", "batch", "proposed", "raised", "state", "answers", "settled", "ended")
+# A transconception's rulings (MacroCOSM 18.4.9, 18.6.6): a question about an item's `ruling` field proposes a ruling
+# for the transconceiver to accept or change. Its answer is one of these words (a choice), the person's own words
+# saying the rest (the allowance, the reason, what it is changed to).
+RULING_FIELD = "ruling"
+AS_PROPOSED = "as proposed"
+RULING_WORDS = ("kept", "alike", "free", "kept-wrong", "changed")
+RULING_OPTIONS = (AS_PROPOSED,) + RULING_WORDS
+#: What a ruling question's `proposed` may carry: the proposal itself (with the case that shows a change, x0's
+#: `case`), and its scope, which every answer keeps: the target it is made for, the part of the item it rules (x0's
+#: `about`: `V-R27: a type comment that does not parse`) and, for a case, the steps it covers.
+PROPOSED_KEYS = ("is", "allowing", "because", "until", "to", "case")
+SCOPE_KEYS = ("made-for", "about", "steps")
+#: The judge's findings that no ruling covers (x0's `x0_harness.py judge`; `enough.transconception.read_verdict`):
+#: each comes back as a question about the case's ruling, `why: conflict`.
+JUDGE_FROM = "judge"
 NOT_DISCLOSED = "not-disclosed"
 WHOLE_ITEM = mc.WHOLE_ITEM                           # the field path of a pending on the whole item: `node`
 
@@ -1025,18 +1041,45 @@ class Raised:
     skipped: list = field(default_factory=list)
 
 
+#: How a bank's `for` is matched (MacroCOSM 18.6.6), one reading per key: what the volume holds for that key. A bank
+#: applies when every key it names that is listed here holds one of the words the bank gives (a word or a list of
+#: words). `module` names what the bank asks about and selects nothing (Comprise's banks), and so does a key no
+#: entry here reads: a lane that selects by another key adds its reading here, and nothing else changes.
+#: `flavour`: the catalog's flavour as the manifest reads it; `purpose`: the catalog's `purpose`
+#: (`transconception`), absent on a fabulac kept for its own sake.
+BANK_FOR: dict[str, Callable[["Ledger"], Any]] = {
+    "flavour": lambda led: led.flavour,
+    "purpose": lambda led: led.catalog.get("purpose"),
+}
+
+
+def bank_applies(led: "Ledger", bank: dict) -> bool:
+    """Whether a bank applies to the volume: every key of its `for` that `BANK_FOR` reads holds one of its words."""
+    want = bank.get("for") or {}
+    for key, words in want.items():
+        read = BANK_FOR.get(str(key))
+        if read is None:
+            continue
+        have = read(led)
+        words = words if isinstance(words, list) else [words]
+        if have not in words:
+            return False
+    return True
+
+
 def banks_for(src: Any, *, names: Iterable[str] | None = None) -> list[dict]:
     """The manifest's banks that apply to this volume (18.6.6), as the reader gives them (`Manifest.banks()`, both
-    shapes): a bank `for: {flavour: X}` applies to a volume of that flavour only; `for: {module: S}` and an empty
-    `for` apply to every volume of the format. `names` keeps only the banks named."""
+    shapes): a bank `for: {flavour: X}` applies to a volume of that flavour only; `for: {purpose: transconception}` to
+    a volume whose catalog says that purpose only (a fabulac kept for its own sake has none, and is asked none of a
+    transconception's banks); `for: {module: S}` and an empty `for` apply to every volume of the format; a `for` of
+    several keys applies when each holds (`bank_applies`, `BANK_FOR`). `names` keeps only the banks named."""
     led = ledger_of(src)
     keep = set(names) if names is not None else None
     out = []
     for b in led.manifest.banks():
         if keep is not None and b["name"] not in keep:
             continue
-        want = (b.get("for") or {}).get("flavour")
-        if want is not None and want != led.flavour:
+        if not bank_applies(led, b):
             continue
         out.append(b)
     return out
@@ -1081,16 +1124,394 @@ def _unique_slug(base: str, taken: set[str], led: Ledger) -> str:
     return cand
 
 
-def _question_item(qid: str, about: Any, asks: str, why: str, spec: dict, to: str, raised: dict) -> dict:
+def _question_item(qid: str, about: Any, asks: str, why: str, spec: dict, to: str, raised: dict, *,
+                   batch: list | None = None, proposed: dict | None = None) -> dict:
     d: dict = {"id": qid, "type": QUESTION, "about": about, "asks": asks, "why": why,
                "kind": spec.get("kind") or "text"}
     for k in ("options", "options-open", "many", "range", "hint"):
         if spec.get(k) is not None:
             d[k] = copy.deepcopy(spec[k])
     d["to"] = to
+    if batch:
+        d["batch"] = list(batch)
+    if proposed is not None:
+        d["proposed"] = copy.deepcopy(proposed)
     d["raised"] = {k: raised[k] for k in ("by", "from", "at", "run") if raised.get(k) is not None}
     d["state"] = "open"
     return d
+
+
+# ---------------------------------------------------------------------------
+# A transconception's rulings (MacroCOSM 18.4.9, 18.6.6): who rules, proposed rulings, batches, made-for, conflicts
+# ---------------------------------------------------------------------------
+
+def is_ruling_question(q: Any) -> bool:
+    """Whether a question asks for a ruling: it is about an item's `ruling` field (MacroCOSM 18.4.2), from a
+    transconception's rulings bank, from the judge (`why: conflict`) or a counter of either."""
+    if not isinstance(q, dict) or not isinstance(q.get("about"), str):
+        return False
+    return q["about"].partition("#")[2] == RULING_FIELD
+
+
+def ruling_addresses(q: dict) -> list[str]:
+    """The addresses one answer to a ruling question writes: its `about`, then each of its `batch`."""
+    out = [q["about"]] if isinstance(q.get("about"), str) else []
+    out += [a for a in (q.get("batch") or []) if isinstance(a, str) and a not in out]
+    return out
+
+
+def _rulings_of(d: dict) -> list[dict]:
+    r = d.get(RULING_FIELD)
+    if r is None:
+        return []
+    return [x for x in (r if isinstance(r, list) else [r]) if isinstance(x, dict)]
+
+
+def _is_ruled(r: dict) -> bool:
+    return "pending" not in r and isinstance(r.get("is"), str) and bool(r["is"])
+
+
+def _holds_for(r: dict, target: str | None) -> bool:
+    """A ruling holds for a target when it names it in `made-for`, or names none (MacroCOSM 18.4.9)."""
+    mf = r.get("made-for")
+    return mf is None or target is None or mf == target
+
+
+def _scope(p: Any) -> tuple:
+    """A ruling's scope, as a key: the target it is made for, the part it rules and the steps it covers. An item
+    holds at most one ruling of each scope."""
+    p = p if isinstance(p, dict) else {}
+    steps = p.get("steps")
+    return (p.get("made-for"), p.get("about") if isinstance(p.get("about"), str) else None,
+            json.dumps(steps, sort_keys=True, default=str) if steps is not None else None)
+
+
+def unruled_scopes(d: dict, target: str | None = None) -> list[dict]:
+    """The rulings an item still needs (MacroCOSM 18.4.9 "Rulings name their target"), as the scope and proposal of
+    each: `[{made-for?, steps?, is?, allowing?, because?, to?}]`, empty when it needs none.
+
+    - every pending entry of its `ruling` list (`{pending: "…", made-for?, steps?, proposed?: {is, …}}`, the shape a
+      reading or a worksheet leaves while unruled) that holds for the target in question, with its own proposal;
+    - with no target named: a ruling, when it has none at all (made for no target, proposed `kept`);
+    - with a target named: for each part of the item its rulings name (`about`, and a case's `steps`; the item whole
+      when they name none) where no ruling holds for that target, every one naming another, one made for that
+      target, proposed as the latest of them; one for no target when it has no ruling at all.
+
+    A ruling made for no target holds for every target, so a later entailment into a new target raises again only the
+    rulings that name another target."""
+    rs = _rulings_of(d)
+    ruled = [r for r in rs if _is_ruled(r)]
+    pend = [r for r in rs if not _is_ruled(r)]
+    out: list[dict] = []
+    seen: set = {_scope(r) for r in ruled}
+    for p in pend:
+        if not _holds_for(p, target) or _scope(p) in seen:
+            continue
+        seen.add(_scope(p))
+        prop = p.get("proposed") if isinstance(p.get("proposed"), dict) else {}
+        entry = {k: copy.deepcopy(prop[k]) for k in PROPOSED_KEYS if prop.get(k) is not None}
+        entry.update({k: copy.deepcopy(p[k]) for k in SCOPE_KEYS if p.get(k) is not None})
+        out.append(entry)
+    if not rs:
+        return [{"is": "kept"}]
+    if target is None:
+        return out
+    parts: dict[tuple, list[dict]] = {}              # the item's parts, each with its rulings, in order
+    for r in ruled:
+        parts.setdefault(_scope({k: r.get(k) for k in ("about", "steps")}), []).append(r)
+    for part_rs in parts.values():
+        if any(_holds_for(r, target) for r in part_rs):
+            continue
+        last = part_rs[-1]
+        prop = {k: copy.deepcopy(last[k]) for k in PROPOSED_KEYS if last.get(k) is not None}
+        for k in ("about", "steps"):
+            if k in last:
+                prop[k] = copy.deepcopy(last[k])
+        prop["made-for"] = target
+        if _scope(prop) not in seen:
+            seen.add(_scope(prop))
+            out.append(prop)
+    return out
+
+
+def proposal_words(p: dict) -> str:
+    """A proposed ruling in plain words: `kept`, `alike, allowing lines-in-any-order`, `free: <because>`,
+    `changed, to <to>`."""
+    if not isinstance(p, dict) or not p.get("is"):
+        return "none"
+    w = str(p["is"])
+    if p.get("allowing"):
+        w += f", allowing {p['allowing']}"
+    if p.get("to"):
+        w += f", to {p['to']}"
+    if p.get("because"):
+        w += f": {p['because']}"
+    return w
+
+
+def target_ref(src: Any, target: str | None) -> str | None:
+    """The `N:target` a call names: an id that resolves, or a language some `N:target` is weighed for (`go`).
+    Raises DialecticError for a target the fabulac does not hold (weigh it first)."""
+    if target is None:
+        return None
+    led = ledger_of(src)
+    hit = led.item(target) if ":" in target else None
+    if hit is not None and hit.get("type") == "target":
+        return hit["id"]
+    for d in led.items:
+        if isinstance(d, dict) and d.get("type") == "target" and isinstance(d.get("id"), str) \
+                and str(d.get("language") or "").lower() == target.lower():
+            return d["id"]
+    raise DialecticError(f"no N:target for {target} in this fabulac: weigh it first")
+
+
+def _target_word(led: "Ledger", ref: str | None) -> str:
+    if not ref:
+        return ""
+    d = led.item(ref)
+    return str((d or {}).get("language") or _bare(ref).split("/", 1)[-1])
+
+
+def _case_counts(led: "Ledger") -> Counter:
+    """How many outside cases are of each item: what the judge counts against it."""
+    n: Counter = Counter()
+    for c in led.items:
+        if isinstance(c, dict) and c.get("type") == "case" and not is_d_item(c):
+            of = c.get("of") if isinstance(c.get("of"), list) else [c.get("of")]
+            for r in of:
+                if isinstance(r, str):
+                    n[r] += 1
+    return n
+
+
+#: Where a person reaches an interface: through these surfaces the next program is judged first.
+_REACHED = ("command", "format", "stream")
+
+
+def ruling_risk(d: dict, cases: Counter) -> tuple[int, int, int]:
+    """How risky an item's ruling is, highest first (the riskiest are asked first, MacroCOSM 18.6.6): `(reach,
+    judged, marked)`. reach: 3 what a user types or reads (an interface whose surface is a command, a format or a
+    stream), else `reach_rank`'s (a public name at the top of its module 2, a method 1, a private or internal name
+    0); judged: how many outside cases are of it (for a reliance, also how many items it is used by), since a
+    difference there is what the judge will count; marked: `reach_rank`'s (unsure, then carrying an edge). The
+    bank's own order (interfaces, behaviours, reliances, settings, structures, cases) comes before all three."""
+    reach, marked = reach_rank(d)
+    if d.get("surface") in _REACHED and reach > 0:
+        reach = 3
+    judged = cases.get(d.get("id"), 0)
+    ub = d.get("used-by")
+    if isinstance(ub, list):
+        judged += len(ub)
+    return reach, judged, marked
+
+
+def _ruling_asks(led: "Ledger", e: dict, d: dict, scope: dict) -> str | None:
+    """A rulings bank entry's words for one item and scope: `{for}` the target it is made for (` (for go)`, or
+    nothing), `{proposed}` the proposal in plain words, then `{name}` and any `{<field>}` from the item."""
+    tw = _target_word(led, scope.get("made-for"))
+    filled = _fill(e["asks"].replace("{for}", f" (for {tw})" if tw else "").replace("{proposed}", "\x00"), d, led)
+    if filled is None:
+        return None
+    filled = filled.replace("\x00", proposal_words(scope))
+    if isinstance(scope.get("about"), str):
+        filled += f" (Its part: {scope['about']}.)"
+    steps = scope.get("steps")
+    if steps is not None:
+        filled += f" (Its steps: {', '.join(map(str, steps)) if isinstance(steps, list) else steps}.)"
+    return filled
+
+
+def _batch_hint(led: "Ledger", members: list[dict], shown: int = 6) -> str:
+    names = [str(m.get("name") or _bare(m["id"]).split("/", 1)[-1]) for m in members]
+    more = f", and {len(names) - shown} more" if len(names) > shown else ""
+    return (f"One answer rules all {len(names)} alike, together: " + ", ".join(names[:shown]) + more + ". Any one can "
+            "be ruled again on its own later.")
+
+
+_RULING_WORD = re.compile(r"^\s*(as[\s-]+proposed|yes|accept(?:ed)?|agreed?|kept[\s-]+wrong|kept|alike|free|changed)"
+                          r"(?![\w-])", re.I)
+
+
+def ruling_word(says: Any, options: Any = None) -> str | None:
+    """The ruling a person's words begin with (`alike, the lines in any order` → `alike`; `kept wrong` →
+    `kept-wrong`; `yes`, `accept`, `agreed`, `as proposed` → `as proposed` where the question offers it), or None."""
+    m = _RULING_WORD.match(str(says or ""))
+    if not m:
+        return None
+    w = re.sub(r"[\s-]+", "-", m.group(1).lower())
+    if w in ("as-proposed", "yes", "accept", "accepted", "agree", "agreed"):
+        opts = [str(o) for o in options] if isinstance(options, list) else list(RULING_OPTIONS)
+        return AS_PROPOSED if AS_PROPOSED in opts else None
+    return w
+
+
+_QUOTE_MAX = 160
+
+
+def _shown(run: Any) -> str:
+    """One recorded run of a step in plain words, its outputs cut to a readable length."""
+    if not isinstance(run, dict):
+        return "nothing recorded"
+
+    def cut(s: Any) -> str:
+        t = json.dumps(str(s or ""), ensure_ascii=False)
+        return t if len(t) <= _QUOTE_MAX else t[:_QUOTE_MAX - 2] + "…\""
+    parts = [f"exit {run.get('exit')}"]
+    if run.get("out"):
+        parts.append(f"output {cut(run.get('out'))}")
+    if run.get("err"):
+        parts.append(f"error output {cut(run.get('err'))}")
+    return ", ".join(parts)
+
+
+def _case_item(led: "Ledger", case: Any) -> dict | None:
+    """The `P:case` a verdict's finding names: by id, by the worksheet id it was recorded under, or by its slug's end
+    (`V-C07` is `P:case/x0.V-C07`)."""
+    if not isinstance(case, str) or not case:
+        return None
+    hit = led.item(case if case.startswith("P:case/") else f"P:case/{case}")
+    if hit is not None:
+        return hit
+    for d in led.items:
+        if not (isinstance(d, dict) and d.get("type") == "case" and isinstance(d.get("id"), str)):
+            continue
+        slug = _bare(d["id"]).split("/", 1)[-1]
+        if d.get("worksheet-id") == case or slug.endswith("." + case):
+            return d
+    return None
+
+
+def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None, run: str | None = None,
+                           at: Any = None) -> Raised:
+    """The judge's differences that no ruling covers, as questions (MacroCOSM 18.6.6; the brief's phase 3): one per
+    case and target, about the case's ruling (`P:case/<id>#ruling`), `why: conflict`, quoting what the original did
+    and what the entailment did at the first step found, `to: transconceiver`, `raised: {by: move, from: judge}`, a
+    choice of the ruling words (nothing is proposed), and `proposed: {made-for, steps}`: the target the verdict
+    judged (`target`, else the verdict's own, as an `N:target` of the fabulac) and the steps found. The verdict is
+    read by `enough.transconception.read_verdict` (a path, its text or the mapping). Writes nothing (`land` adds
+    them). A finding about a case the fabulac does not hold is skipped, with why; so is a case that already has a
+    standing question from the judge for that target. Findings shown and needing no ruling (`ruled difference`,
+    `ruled change not seen`) raise nothing."""
+    led = ledger_of(src)
+    v = tc.read_verdict(verdict)
+    when = now(at)
+    out = Raised()
+    try:
+        tref = target_ref(led, target or v.get("target")) if (target or v.get("target")) else None
+    except DialecticError:
+        tref = None
+    standing = {(_about_key(a), _scope({"made-for": (q.get("proposed") or {}).get("made-for")}))
+                for q in led.questions() if q.get("state") not in ENDED
+                and (q.get("raised") or {}).get("from") == JUDGE_FROM for a in ruling_addresses(q)}
+    by_case: dict[str, list[dict]] = {}
+    order: list[str] = []
+    for f in v["findings"]:
+        if not f["unruled"]:
+            continue
+        c = _case_item(led, f["case"])
+        if c is None:
+            out.skipped.append((str(f["case"]), "the fabulac holds no such case"))
+            continue
+        if c["id"] not in by_case:
+            by_case[c["id"]] = []
+            order.append(c["id"])
+        by_case[c["id"]].append(f)
+    taken = led.ids()
+    tw = _target_word(led, tref)
+    for cid in order:
+        c = led.item(cid)
+        addr = f"{cid}#{RULING_FIELD}"
+        if (_about_key(addr), _scope({"made-for": tref})) in standing:
+            out.skipped.append((cid, "a question from the judge about this case, for this target, already stands"))
+            continue
+        fs = by_case[cid]
+        steps = [f["step"] for f in fs if f["step"] is not None]
+        first = fs[0]
+        name = c.get("name") or cid
+        where = f", step {first['step']}" if first["step"] is not None else ""
+        entailment = f"the {tw} entailment" if tw else "the entailment"
+        if first["original"] is not None or first["cshort"] is not None:
+            asks = (f"{name}{where}: the original gave {_shown(first['original'])}; {entailment} gave "
+                    f"{_shown(first['cshort'])}. No ruling covers the difference. Which ruling should it have?")
+        else:
+            asks = (f"{name}{where}: the judge found {first['kind']}, and no ruling covers it. Which ruling should it "
+                    "have?")
+        more = [f"step {f['step']}: {f['kind']}" for f in fs[1:]]
+        spec = {"kind": "choice", "options": list(RULING_WORDS),
+                "hint": f"The judge found: {first['kind']}" + (f"; also {'; '.join(more)}" if more else "")
+                + (f". Verdict {v['where']}" if v.get("where") else "") + "."}
+        proposed = {**({"made-for": tref} if tref else {}), **({"steps": steps} if steps else {})}
+        slug = _unique_slug(f"{_bare(cid).split('/', 1)[-1]}-conflict" + (f"-{tw}" if tw else ""), taken, led)
+        out.questions.append(_question_item(Q_PREFIX + slug, addr, asks, "conflict", spec, "transconceiver",
+                                            {"by": "move", "from": JUDGE_FROM, "at": when, "run": run},
+                                            proposed=proposed))
+    return out
+
+
+def _already_written(led: "Ledger", module: str, e: dict) -> bool:
+    """Whether the volume holds the item an entry about a module would write, with every field its `sets` gives: who
+    rules a transconception is asked only while nobody does."""
+    writes, sets = e.get("writes"), e.get("sets")
+    if not (isinstance(writes, str) and writes.strip() and isinstance(sets, dict) and sets):
+        return False
+    mod, sep, k = writes.strip().partition(":")
+    mod, k = (mod, k) if sep else (module, mod)
+    return any(all(_same(d.get(f), v) for f, v in sets.items()) for d in _items_of_kind(led, mod, k))
+
+
+def _raise_rulings(led: "Ledger", e: dict, frm: str, raised: dict, why: str, pool: list[dict], bound: tuple,
+                   tref: str | None, taken: set[str], who: Callable, add: Callable, by_from: set, out: "Raised") -> None:
+    """The questions of one rulings bank entry (about `<M>:<kind>#ruling`): for each item of the kind (within the
+    entry's bounds) every ruling it still needs for the target in question (`unruled_scopes`), riskiest first
+    (`ruling_risk`); with `batch: true`, one question per proposal and scope, about the riskiest and naming the others
+    in `batch`."""
+    only_with, at_most, only_where = bound
+    cases = _case_counts(led)
+    cands = []
+    for pos, d in enumerate(pool):
+        if only_with is not None and not _holds(d, only_with):
+            continue
+        if only_where is not None and not _holds_one_of(d, only_where):
+            continue
+        cands.append((ruling_risk(d, cases), pos, d))
+    cands.sort(key=lambda t: (tuple(-x for x in t[0]), t[1]))
+    if at_most is not None:
+        cands = cands[:at_most]
+    groups: dict[str, list] = {}
+    order: list[str] = []
+    for _risk, _pos, d in cands:
+        addr = f"{d['id']}#{RULING_FIELD}"
+        for scope in unruled_scopes(d, tref):
+            if (frm, _about_key(addr), _scope(scope)) in by_from:
+                out.skipped.append((f"{frm} {addr}", "a question about this ruling, for this target, already stands"))
+                continue
+            key = json.dumps(scope, sort_keys=True, default=str) if e.get("batch") is True else addr + "|" + \
+                json.dumps(scope, sort_keys=True, default=str)
+            if key not in groups:
+                groups[key] = []
+                order.append(key)
+            groups[key].append((d, scope))
+    spec = dict(e)
+    spec.setdefault("kind", "choice")
+    if spec["kind"] == "choice" and not spec.get("options"):
+        spec["options"] = list(RULING_OPTIONS)
+    for key in order:
+        members = groups[key]
+        d, scope = members[0]
+        asks = _ruling_asks(led, e, d, scope)
+        if asks is None:
+            out.skipped.append((f"{frm} {d['id']}", "a placeholder the item cannot fill"))
+            continue
+        tw = _target_word(led, scope.get("made-for"))
+        tail = _slug(f"for-{tw}") if tw else ""
+        head = _slug(f"{e['id']}-{_bare(d['id']).split('/', 1)[-1]}", 44 - len(tail)).rstrip("-")
+        slug = _unique_slug(f"{head}-{tail}" if tail else head, taken, led)
+        qspec = dict(spec)
+        if len(members) > 1:
+            qspec["hint"] = _batch_hint(led, [m for m, _s in members])
+        batch = [f"{m['id']}#{RULING_FIELD}" for m, _s in members[1:]]
+        add(_question_item(Q_PREFIX + slug, f"{d['id']}#{RULING_FIELD}", asks, why, qspec, who(e.get("to")),
+                           {**raised}, batch=batch, proposed=scope), f"{frm} {d['id']}")
 
 
 def _items_of_kind(led: Ledger, module: str, kind: str | None) -> list[dict]:
@@ -1311,7 +1732,7 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     unsure: bool = True, conflicts: bool = True, to: str | None = None,
                     author_unavailable: bool = False,
                     run: str | None = None, at: Any = None, proposed: Any = None,
-                    checker: Checker | None = None) -> Raised:
+                    checker: Checker | None = None, target: str | None = None) -> Raised:
     """The move `question` without a model (Thym 22.1; MacroCOSM 18.6.3, 18.6.5, 18.6.6). Reads the volume and gives
     the new open questions; writes nothing (`land` adds them). In order:
 
@@ -1354,13 +1775,37 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
     question asks of the same address is a duplicate. `to`: the entry's or its bank's, else `default_to`; `to=` gives
     every question that word; `author_unavailable=True` sends what would go `to: author` to `expert` (18.4.6).
     `raised.at` is `at` (default now) and `raised.run` is `run` when given. Atomic in the sense of 18.6.1: the result is
-    whole; `land` adds all of it or raises."""
+    whole; `land` adds all of it or raises.
+
+    A transconception's banks (`for: {purpose: transconception}`, MacroCOSM 18.4.9, 18.6.6), with `target` the
+    `N:target` in question (an id, or a language some `N:target` is weighed for; `target_ref`), or none:
+
+    - an entry about `N:target` (or a field of it) is asked only of the target named, and not at all with none named
+      (the target bank: asked once per target);
+    - an entry about a module that `writes` a kind with `sets` (who rules: an `R:maker` of capacity
+      `transconceiver`) is not asked while the volume holds such an item already;
+    - an entry about a kind's `ruling` field (the rulings bank) asks of each item of the kind the rulings it still
+      needs (`unruled_scopes`: none at all, a pending one, or, with a target named, none that holds for it), each
+      question carrying `proposed` (the proposal, and its `made-for` and `steps`, which any answer keeps), its words
+      filling `{for}` and `{proposed}`. Items are asked riskiest first (`ruling_risk`, after the bank's own order of
+      entries). An entry with `batch: true` asks once of every item it would ask with the same proposal and scope:
+      `about` the riskiest, `batch` the others, a `hint` naming them. A ruling question is no duplicate of one about
+      the same address for another scope: a later target asks again only the rulings that name another target."""
     led = ledger_of(src)
     when = now(at)
     out = Raised()
     taken = led.ids()
+    tref = target_ref(led, target)
     standing = [q for q in led.questions() if q.get("state") not in ENDED]
-    by_from = {((q.get("raised") or {}).get("from"), _about_key(q.get("about"))) for q in standing}
+
+    def keys_of(q: dict) -> list[tuple]:
+        frm = (q.get("raised") or {}).get("from")
+        if is_ruling_question(q):
+            sc = _scope(q.get("proposed"))
+            return [(frm, _about_key(a), sc) for a in ruling_addresses(q)]
+        return [(frm, _about_key(q.get("about")), None)]
+
+    by_from = {k for q in standing for k in keys_of(q)}
     by_about = {_about_key(q.get("about")) for q in standing}
     from_any = {(q.get("raised") or {}).get("from") for q in standing}   # a module entry is asked once of the volume
     asked_texts = {(_about_key(q.get("about")), str(q.get("asks", "")).strip().lower()) for q in standing}
@@ -1370,13 +1815,18 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
         w = to or (word if isinstance(word, str) else fallback_to)
         return "expert" if author_unavailable and w == "author" else w
 
+    def ruling_covered() -> set[str]:
+        return {_about_key(a) for q in standing + out.questions if is_ruling_question(q)
+                for a in ruling_addresses(q)}
+
     def add(q: dict, origin: str) -> None:
-        key = ((q.get("raised") or {}).get("from"), _about_key(q["about"]))
+        keys = keys_of(q)
+        key = keys[0]
         if key in by_from:
             out.skipped.append((origin, f"a question from {key[0]} about {key[1]} already stands"))
             taken.discard(q["id"])
             return
-        by_from.add(key)
+        by_from.update(keys)
         by_about.add(_about_key(q["about"]))
         asked_texts.add((_about_key(q["about"]), str(q["asks"]).strip().lower()))
         out.questions.append(q)
@@ -1399,6 +1849,9 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     if frm in from_any:
                         out.skipped.append((frm, f"{frm} was asked of this volume already"))
                         continue
+                    if (b.get("for") or {}).get("purpose") and _already_written(led, head, e):
+                        out.skipped.append((frm, "the volume holds what it would write already"))
+                        continue
                     asks = _fill(e["asks"], None, led)
                     if asks is None:
                         out.skipped.append((frm, "a placeholder the volume cannot fill"))
@@ -1412,8 +1865,17 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     out.skipped.append((frm, bound))
                     continue
                 only_with, at_most, only_where = bound
+                if (module, kind) == ("N", "target"):
+                    # the target bank: asked only of the target named, once per target (18.6.6)
+                    pool = [d for d in _items_of_kind(led, module, kind) if tref is not None and d["id"] == tref]
+                else:
+                    pool = _items_of_kind(led, module, kind or None)
+                if sep and fpath == RULING_FIELD:
+                    _raise_rulings(led, e, frm, raised, why, pool, (only_with, at_most, only_where), tref, taken,
+                                   who, add, by_from, out)
+                    continue
                 cands = []
-                for d in _items_of_kind(led, module, kind or None):
+                for d in pool:
                     if sep:
                         found, v = get_field(d, fpath)
                         if found and not mc.is_pending(v):
@@ -1456,6 +1918,9 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                 q_about = d["id"] if fpath == WHOLE_ITEM else f"{d['id']}#{fpath}"
                 if _about_key(q_about) in by_about:
                     continue
+                if re.match(rf"{RULING_FIELD}(\[|\.|$)", fpath) and f"{d['id']}#{RULING_FIELD}" in ruling_covered():
+                    continue                        # a ruling still pending is the rulings bank's to ask
+
                 asks, hint = pending_question(text, d, fpath)
                 slug = _unique_slug(f"{_bare(d['id']).split('/', 1)[-1]}-{fpath}", taken, led)
                 add(_question_item(Q_PREFIX + slug, q_about, asks, "missing",
@@ -1832,6 +2297,8 @@ def record(src: Any, answers: Iterable[Any], *, session: dict | None = None, at:
             if act == "answered":
                 spec = q if q is not None else (a.spec or {"kind": "text"})
                 raw_value = a.value if value_given else a.says
+                if not value_given and q is not None and is_ruling_question(q):
+                    raw_value = ruling_word(a.says, q.get("options")) or a.says
                 value = check_value(led, spec, raw_value, qid=ref)
                 says = a.says or _scalar_text(value if not isinstance(value, list) else "; ".join(map(str, value)))
                 entry.update({"says": says, "value": value, "confidence": _confidence(a.confidence, 1)})
@@ -2354,12 +2821,22 @@ def _apply_reread(led, cand, index, question, answer, reread, sid, conf, checker
     return _commit(led, cand, wrote, checker)
 
 
-def _commit(led: Ledger, cand: Ledger, wrote: list[str], checker: Checker | None) -> Folded:
+#: A transconception's checks that say how ready a fabulac is, not whether what is written is well formed: a gate
+#: reads them (enough/transconception.py). Their new errors never stop a dialectic write: an answer that records a
+#: closed lane is true, and the leave it then lacks is the next question, not a refusal; a transconceiver written
+#: from who-rules answers their statements in the next run. `ruled` is not among them: a ruling that lacks what its
+#: word needs (an alike with no allowance) is refused, and asked again by a counter.
+GATE_ONLY_CHECKS = tuple(c for c in tc.CHECKS if c != "ruled")
+
+
+def _commit(led: Ledger, cand: Ledger, wrote: list[str], checker: Checker | None,
+            ignore: tuple[str, ...] = ()) -> Folded:
+    """The write made when it adds no check error, but those of `GATE_ONLY_CHECKS` and of `ignore`."""
     before = _errors(led, checker)
     if cand.manifest.single_file:
         cand.catalog[_items_key(cand.manifest)] = cand.items
     after = _errors(cand, checker)
-    new = _new_errors(before, after)
+    new = [e for e in _new_errors(before, after) if e[0] not in ignore and e[0] not in GATE_ONLY_CHECKS]
     if new:
         return Folded(refused=new)
     led.items[:] = cand.items
@@ -2367,6 +2844,138 @@ def _commit(led: Ledger, cand: Ledger, wrote: list[str], checker: Checker | None
         led.catalog[_items_key(led.manifest)] = led.items
     led.origin[:] = cand.origin
     return Folded(wrote=wrote)
+
+
+def _allowances(led: Ledger) -> list[str]:
+    blk = led.manifest._block("transconception") or {}
+    al = blk.get("allowances") if isinstance(blk, dict) else None
+    return [str(a) for a in al] if isinstance(al, list) else list(tc.DEFAULTS["allowances"])
+
+
+def ruled_by(src: Any) -> str | None:
+    """Who rules a transconception, as an id a ruling's `by` names: the catalog's `ruled-by` where it resolves, else
+    the `R:maker` of capacity `transconceiver`; None when nobody is recorded."""
+    led = ledger_of(src)
+    rb = led.catalog.get("ruled-by")
+    if isinstance(rb, str) and rb != "none" and led.item(rb) is not None:
+        return led.item(rb)["id"]
+    for d in led.items:
+        if isinstance(d, dict) and d.get("type") == "maker" and d.get("capacity") == tc.CAPACITY:
+            return d.get("id")
+    return None
+
+
+def _day(at: Any) -> str:
+    try:
+        return now(at).date().isoformat()
+    except Exception:  # noqa: BLE001 - a time that does not read: today
+        return now(None).date().isoformat()
+
+
+def ruling_from_answer(src: Any, q: dict, answer: dict) -> dict:
+    """The ruling one answer to a ruling question writes (MacroCOSM 18.4.2, 18.4.9), every entry recorded with the
+    answer's day and words: `{is, allowing?, because?, to?, made-for?, steps?, by?, on, said}`.
+
+    `as proposed` takes the question's `proposed` whole. Any other answer is the ruling word it gave (`kept`, `alike`,
+    `free`, `kept-wrong`, `changed`) and, from the person's own words after it, what that word needs: for `alike` the
+    first allowance of the manifest's closed list they name (else the proposal's, when it was `alike` too); for
+    `changed` what it is changed `to`; for `free` and `kept-wrong` the reason, `because`. What a word needs and the
+    words do not give is left out: the check `ruled` then refuses the write and a counter question asks for it.
+    The scope (`made-for`, `steps`) is the question's, whatever the answer; `by` is who rules (`ruled_by`); `said`
+    is the person's words. Raises AnswerRefused for an answer that is no ruling."""
+    led = ledger_of(src)
+    value = answer.get("value")
+    says = str(answer.get("says") or "").strip()
+    prop = q.get("proposed") if isinstance(q.get("proposed"), dict) else {}
+    if value == AS_PROPOSED or (value is not None and ruling_word(str(value), q.get("options")) == AS_PROPOSED):
+        if not prop.get("is"):
+            raise AnswerRefused("nothing was proposed: say kept, alike, free, kept-wrong or changed", q.get("id"))
+        r = {k: copy.deepcopy(prop[k]) for k in PROPOSED_KEYS if prop.get(k) is not None}
+    else:
+        word = value if value in RULING_WORDS else ruling_word(str(value if value is not None else says))
+        if word not in RULING_WORDS:
+            raise AnswerRefused(f"{value!r} is no ruling: {', '.join(RULING_OPTIONS)}", q.get("id"))
+        m = _RULING_WORD.match(says)
+        rest = says[m.end():] if m and ruling_word(m.group(1)) == word else says
+        rest = rest.strip(" \t\n,;:.-—–")
+        r = {"is": word}
+        same = prop.get("is") == word
+        if word == "alike":
+            hit = next((a for a in _allowances(led) if re.search(rf"(?<![\w-]){re.escape(a)}(?![\w-])", says)), None)
+            allow = hit or (prop.get("allowing") if same else None)
+            if allow:
+                r["allowing"] = allow
+        elif word == "changed":
+            to = re.sub(r"^to\s+", "", rest, flags=re.I).strip()
+            to = to or (prop.get("to") if same else "")
+            if to:
+                r["to"] = to
+        else:
+            because = re.sub(r"^because\s+", "", rest, flags=re.I).strip()
+            because = because or (prop.get("because") if same else "")
+            if because and word != "kept":
+                r["because"] = because
+    for k in SCOPE_KEYS:
+        if prop.get(k) is not None:
+            r[k] = copy.deepcopy(prop[k])
+    by = ruled_by(led)
+    if by:
+        r["by"] = by
+    r["on"] = _day(answer.get("at"))
+    if says:
+        r["said"] = says
+    return r
+
+
+def fold_ruling(src: Any, q: dict, answer: dict, *, checker: Checker | None = None) -> Folded:
+    """Fold one answer to a ruling question into every item it names (`about`, then each of `batch`), as one write
+    (MacroCOSM 18.6.6, `batch`): each item's `ruling` list loses the entries of the same scope (its target and steps,
+    a pending one included) and gains the answer's ruling (`ruling_from_answer`); "I don't know" gains `{pending:
+    <their words>}` of that scope instead, so the item stays unruled in the person's words (18.6.4); a refusal adds
+    `ruling` to `withheld` and sets `provenance.state: not-disclosed`, as any refused field. Each item's provenance
+    names the session (`provenance.answered.ruling`). An address that no longer resolves is left out. A write that
+    would add a check error (an `alike` with no allowance, a `changed` with nothing it is changed to) is not made,
+    and `refused` lists the errors, for `settle` to raise the counter question."""
+    led = ledger_of(src)
+    sid = _session_source(str(answer.get("session") or ""))
+    declined = answer.get("declined") is True
+    unknown = not declined and answer.get("value") is None
+    words = str(answer.get("says") or "").strip()
+    prop = q.get("proposed") if isinstance(q.get("proposed"), dict) else {}
+    scope = {k: copy.deepcopy(prop[k]) for k in SCOPE_KEYS if prop.get(k) is not None}
+    if not (unknown or declined):
+        try:
+            entry = ruling_from_answer(led, q, answer)
+        except AnswerRefused as e:
+            return Folded(refused=[("ruled", str(q.get("about")), RULING_FIELD, str(e))])
+    else:
+        entry = {"pending": words or "I don't know", **scope}
+    cand = led.copy()
+    wrote: list[str] = []
+    for addr in ruling_addresses(q):
+        w = resolve_about(cand, addr)
+        if not w.resolves or w.index is None:
+            continue
+        d = cand.items[w.index]
+        if declined:
+            wh = d.get("withheld") if isinstance(d.get("withheld"), list) else []
+            if RULING_FIELD not in wh:
+                wh.append(RULING_FIELD)
+            d["withheld"] = wh
+            prov = d.get("provenance")
+            if isinstance(prov, dict):
+                prov["state"] = NOT_DISCLOSED
+            else:
+                d["provenance"] = {"mode": "dialectic", "sources": [sid], "confidence": 1, "state": NOT_DISCLOSED}
+        else:
+            key = _scope(scope)
+            kept = [x for x in _rulings_of(d) if _scope(x) != key]
+            d[RULING_FIELD] = kept + [copy.deepcopy(entry)]
+            if not unknown:
+                _provenance_answered(d, RULING_FIELD, sid, answer.get("confidence"))
+        wrote.append(f"{d['id']}#{RULING_FIELD}")
+    # "I don't know" and a refusal leave the item unruled on purpose: `ruled` says so, and that is no refusal
+    return _commit(led, cand, wrote, checker, ignore=("ruled",) if (unknown or declined) else ())
 
 
 @dataclass
@@ -2457,7 +3066,10 @@ def settle(src: Any, *, run: str | None = None, program: str | None = None, at: 
         if _has_counter(led, q):
             out.waiting.append((q["id"], "its counter question stands"))
             continue
-        res = fold(led, q.get("about"), last, question=q, checker=checker, make_item=make_item, reread=reread)
+        if is_ruling_question(q):
+            res = fold_ruling(led, q, last, checker=checker)
+        else:
+            res = fold(led, q.get("about"), last, question=q, checker=checker, make_item=make_item, reread=reread)
         if res.needs_reading:
             out.needs_reading.append((q["id"], _about_key(q.get("about")), res.needs_reading))
             continue
@@ -2466,7 +3078,8 @@ def settle(src: Any, *, run: str | None = None, program: str | None = None, at: 
             slug = _unique_slug(q["id"][len(Q_PREFIX):] + "-counter", taken, led)
             cq = _question_item(Q_PREFIX + slug, copy.deepcopy(q.get("about")),
                                 _counter_text(led, q, res.refused, last.get("value")), "counter", q,
-                                q.get("to") or "anyone", {"by": "move", "from": "settle", "at": when, "run": run})
+                                q.get("to") or "anyone", {"by": "move", "from": "settle", "at": when, "run": run},
+                                batch=q.get("batch"), proposed=q.get("proposed"))
             led.add(cq)
             out.counters.append((q["id"], cq["id"], res.refused))
             continue
@@ -2796,6 +3409,8 @@ def main(argv: list[str] | None = None, *, ask: Callable[[str], str] = input, ou
     p.add_argument("volume")
     p.add_argument("--rules", action="store_true", help="the rules part only (always so here: no model is asked)")
     p.add_argument("--to", help="who answers every question raised")
+    p.add_argument("--target", help="a transconception's target (an N:target, or its language): its rulings and its "
+                                    "target bank are asked")
     p.add_argument("--author-unavailable", action="store_true", help="questions for the author go to an expert")
     p.add_argument("--run", help="the run's id, written in raised.run")
     p.add_argument("--dry-run", action="store_true", help="say what would be raised; write nothing")
@@ -2805,7 +3420,7 @@ def main(argv: list[str] | None = None, *, ask: Callable[[str], str] = input, ou
     p.add_argument("--into", action="store_true", help="record into the volume at once (default: write an answers "
                                                        "volume beside it)")
     p.add_argument("--who", default="a person answering at the terminal", help="a plain description, never a name")
-    p.add_argument("--to", help="the answerer's word (author, expert, maker, holder, owner, anyone)")
+    p.add_argument("--to", help="the answerer's word (author, expert, maker, holder, owner, transconceiver, anyone)")
     p.add_argument("--through", choices=THROUGH, default="person")
     p.add_argument("--model", help="the agent's model, with --through agent")
     p = sub.add_parser("settle", help="fold the answered questions into the volume, by rules")
@@ -2826,7 +3441,8 @@ def main(argv: list[str] | None = None, *, ask: Callable[[str], str] = input, ou
             return 0
         twin = open_twin(vpath)
         if args.cmd == "raise":
-            r = raise_questions(twin, to=args.to, author_unavailable=args.author_unavailable, run=args.run)
+            r = raise_questions(twin, to=args.to, author_unavailable=args.author_unavailable, run=args.run,
+                                target=args.target)
             for q in r.questions:
                 print(f"  {q['id']}  about {_about_key(q['about'])}: {q['asks']}", file=out)
             for s, why in r.skipped:
@@ -2923,12 +3539,17 @@ def _thym_ledger(volume: dict) -> Ledger:
     return ledger_of(volume["path"]) if "path" in volume else _thym_twin(volume).ledger
 
 
-def thym_question(volume: dict, *, proposed: list | None = None, run: str | None = None, at: Any = None) -> dict:
+def thym_question(volume: dict, *, proposed: list | None = None, run: str | None = None, at: Any = None,
+                  target: str | None = None) -> dict:
     """The volume's new open questions: the rules', then the `proposed` ones that pass the hook (`raise_questions`).
-    `{questions, refused: [{index, about, asks, why}], skipped: [{source, why}]}`; nothing is written."""
+    `{questions, refused: [{index, about, asks, why}], skipped: [{source, why}]}`; nothing is written. `target` names
+    a transconception's target (an `N:target` or its language): its rulings and its target bank are asked."""
     led = _thym_ledger(volume)
     props = [dict(p) for p in proposed or []]
-    r = raise_questions(led, run=run, at=at, proposed=props)
+    try:
+        r = raise_questions(led, run=run, at=at, proposed=props, target=target)
+    except DialecticError as e:
+        return {"questions": [], "refused": [], "skipped": [{"source": "target", "why": str(e)}]}
     refused = []
     for obj, why in r.refused:
         idx = next((i for i, p in enumerate(props) if obj is p or (
@@ -3013,6 +3634,9 @@ __all__ = [
     "ANSWERED", "ANSWER_KINDS", "Answer", "AnswerRefused", "AnswersVolume", "Carried", "DECLINE", "DONT_KNOW",
     "DialecticError", "ENDED", "Folded", "Ledger", "MODULE", "Q_PREFIX", "Raised", "Recorded", "STATES", "S_PREFIX",
     "Settled", "THROUGH", "Twin", "UNSURE_BELOW", "WHYS", "Where", "answers_delta", "answers_path", "ask_by_bank",
+    "AS_PROPOSED", "BANK_FOR", "RULING_OPTIONS", "RULING_WORDS", "bank_applies", "conflicts_from_verdict",
+    "fold_ruling", "is_ruling_question", "proposal_words", "ruled_by", "ruling_addresses", "ruling_from_answer",
+    "ruling_risk", "ruling_word", "target_ref", "unruled_scopes",
     "banks_for", "carry_over", "check_value", "default_checker", "default_to", "del_field", "dump_text", "fold",
     "get_field", "is_answers_of", "is_d_item", "is_question", "is_session", "land", "ledger_from_items",
     "ledger_from_volume", "ledger_of", "main", "mark_stale", "now", "only_the_asked", "open_questions", "open_twin",

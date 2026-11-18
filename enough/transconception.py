@@ -501,6 +501,29 @@ class _Checks:
                     self.add("ruled", it, f"the judge knows no allowance {x['allowing']!r} ("
                                           f"{', '.join(sorted(allowances))}); it holds until entailing for "
                                           f"{x.get('made-for', 'any target')}", f"{fld}.allowing", severity="warning")
+        self.ruling_questions()
+
+    def ruling_questions(self) -> None:
+        """A question about a ruling that stands (open, skipped included, or answered and not yet settled) blocks the
+        gate (MacroCOSM 18.6.6): each item it names, its `about` and its `batch`, is not ruled while it stands. A
+        question the judge raised about a case's ruling (`why: conflict`) blocks it the same way."""
+        for q in self.of("D", "question"):
+            d = q.data
+            about = d.get("about")
+            if not (isinstance(about, str) and about.partition("#")[2] == "ruling"):
+                continue
+            state = d.get("state")
+            if state in ("stale", "withdrawn") or (state != "open" and d.get("settled")):
+                continue
+            if state not in ("open", "answered", "unknown", "declined"):
+                continue
+            what = "stands open" if state == "open" else f"is {state} and not yet settled"
+            addrs = [about] + [a for a in (d.get("batch") or []) if isinstance(a, str)]
+            for a in addrs:
+                base = a.partition("#")[0]
+                self.add("ruled", self.by_id.get(base),
+                         f"{q.id} asks for its ruling and {what}: a question skipped blocks the gate"
+                         + ("" if self.by_id.get(base) else f" ({base})"), "ruling")
 
     def not_ruled_for(self, target_ref: str) -> list[str]:
         """The items in scope with no ruling for the target the judge can read (gate 2)."""

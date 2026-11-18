@@ -524,16 +524,28 @@ def _without(res: dict, entries: frozenset) -> dict:
     return {**res, "questions": keep}
 
 
+def _target(mods: dict) -> dict:
+    """`in <language>` on `question` (a transconception's target, MacroCOSM 18.4.9): `{target: <word>}` for the
+    engine, or nothing, so that a call without it is the call it always was (and replays as recorded)."""
+    t = mods.get("in")
+    if isinstance(t, Value):
+        t = t.payload if isinstance(t.payload, str) else None
+    return {"target": t.strip()} if isinstance(t, str) and t.strip() else {}
+
+
 @implements("question")
-def question(ctx: Any, v: Value, **_: Any) -> Value:
+def question(ctx: Any, v: Value, **mods: Any) -> Value:
     """`question v`: the questions to put to a person about v (THYM 22.1): the rules' (its banks, every pending value,
     every unsure item), and those a model raises where v is unsure, ambiguous, in conflict or silent on intent. A
     list of D:question items, each `open`, landed with `gather asked with v`. Where the model is asked, the bank
-    entries its questions stand in for (`MODEL_STANDS_IN`) are not raised."""
+    entries its questions stand in for (`MODEL_STANDS_IN`) are not raised. A fabulac kept for transconception is
+    asked its three banks too (standing, target, rulings: the rules' alone, never the model's); `in <language>`
+    names the target in question, whose target bank and rulings are asked (the engine's `target`)."""
     vol = _volume_arg(v, "question", single=False)
     qfn = _engine(ctx, "question", "thym_question")
     run, at = getattr(ctx, "run", None), getattr(ctx, "now", None)
-    rules = qfn(vol, run=run, at=at)
+    tgt = _target(mods)
+    rules = qfn(vol, run=run, at=at, **tgt)
     cat, items = _doc(v)
     flavour = _flavour(cat)
     chunks = _chunks(items, flavour)
@@ -552,7 +564,7 @@ def question(ctx: Any, v: Value, **_: Any) -> Value:
         dropped += lost
     if not proposals:
         return _questions_value(rules, dropped=dropped, asked_model=True)
-    final = _without(qfn(vol, proposed=proposals, run=run, at=at), stands_in)
+    final = _without(qfn(vol, proposed=proposals, run=run, at=at, **tgt), stands_in)
     for r in final.get("refused") or []:                # across chunks: one asks what another already asked
         if isinstance(r, dict):
             dropped.append({"about": r.get("about"), "asks": r.get("asks"), "why": r.get("why")})
@@ -561,11 +573,11 @@ def question(ctx: Any, v: Value, **_: Any) -> Value:
 
 @implements("question.scaffold")
 @implements("bank")
-def bank(ctx: Any, v: Value, **_: Any) -> Value:
+def bank(ctx: Any, v: Value, **mods: Any) -> Value:
     """The scaffold `bank`: `question` by rules alone (its banks, every pending value, every unsure item)."""
     vol = _volume_arg(v, "question", single=False)
     qfn = _engine(ctx, "question", "thym_question")
-    return _questions_value(qfn(vol, run=getattr(ctx, "run", None), at=getattr(ctx, "now", None)))
+    return _questions_value(qfn(vol, run=getattr(ctx, "run", None), at=getattr(ctx, "now", None), **_target(mods)))
 
 
 # ---------------------------------------------------------------------------
@@ -935,6 +947,10 @@ def _addressed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> 
         why = about_why(q.get("about"), ids, manifest)
         if why:
             return False, f"{q.get('id')}: {why}"
+        for addr in q.get("batch") or []:              # one answer writes each of them too (MacroCOSM 18.6.2)
+            why = about_why(addr, ids, manifest)
+            if why:
+                return False, f"{q.get('id')}'s batch: {why}"
     if output.type == "list":
         return True, ""
     sessions = {_bare(it["id"]) for it in items if str(it.get("id", "")).startswith("D:session/")}
@@ -964,6 +980,17 @@ def _addressed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> 
     return True, ""
 
 
+def _ruling_scope(q: dict) -> str | None:
+    """A ruling question's scope (MacroCOSM 18.4.9): the target its ruling is made for, the part and the steps it
+    rules (`proposed`). Two questions about one item's ruling for different scopes are no duplicates: a later target
+    asks again only the rulings that name another. None for any other question."""
+    about = q.get("about")
+    if not (isinstance(about, str) and about.partition("#")[2] == "ruling"):
+        return None
+    p = q.get("proposed") if isinstance(q.get("proposed"), dict) else {}
+    return mc.dump(plain({k: p.get(k) for k in ("made-for", "about", "steps")})).strip()
+
+
 @check("no-duplicate")
 def _no_duplicate(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """No two open questions about one address ask the same thing, and no new one repeats a question already in the
@@ -976,7 +1003,8 @@ def _no_duplicate(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
     froms: dict[tuple, str] = {}
     for q in old:
         seen.setdefault((_about_key(q.get("about")), _norm(q.get("asks"))), str(q.get("id")))
-        froms.setdefault(((q.get("raised") or {}).get("from"), _about_key(q.get("about"))), str(q.get("id")))
+        froms.setdefault(((q.get("raised") or {}).get("from"), _about_key(q.get("about")), _ruling_scope(q)),
+                         str(q.get("id")))
     for q in rows:
         if q.get("state", "open") != "open" and output.type != "list":
             continue
@@ -985,7 +1013,7 @@ def _no_duplicate(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
             return False, f"{q.get('id')} asks of {key[0]} what {seen[key]} already asks"
         seen[key] = str(q.get("id"))
         if output.type == "list":
-            fk = ((q.get("raised") or {}).get("from"), key[0])
+            fk = ((q.get("raised") or {}).get("from"), key[0], _ruling_scope(q))
             if fk in froms and froms[fk] != q.get("id"):
                 return False, f"{q.get('id')} repeats {froms[fk]}: the same {fk[0]} about {fk[1]}"
             froms[fk] = str(q.get("id"))
