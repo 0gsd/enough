@@ -529,6 +529,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     gives: list of item
     code: enough.thym.moves.author:uncovered
     says: the requirements a program must meet that no case shows
+    since: 1
   # thym 1 only (since: 1; Thym 20.10): a transconception's moves (enough/thym/moves/transconceive.py)
   - name: ground
     takes: [folder]
