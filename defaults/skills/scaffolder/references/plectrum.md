@@ -261,8 +261,8 @@ half of it.
 
 ### 9. Telling a plectrum from an outline
 
-The `scaffold` skill's outline (`scaffold/references/structure.md` and its
-`SKILL.md`) also uses `#`, `##` and `###`, and stays as it is. The two never
+The outline this skill keeps for a brain dump (`structure.md` beside this
+file, and its part of `SKILL.md`) also uses `#`, `##` and `###`, and stays as it is. The two never
 mix:
 
 - An outline starts with a `# ` line and has no front matter.

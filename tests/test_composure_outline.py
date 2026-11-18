@@ -1,8 +1,8 @@
 """P5b — `composure.from_outline` and the `composure_from_outline` tool.
 
-The `scaffold` skill teaches the grammar and this parser implements it, so
+The `scaffolder` skill teaches the grammar and this parser implements it, so
 the skill's own two worked examples are the fixtures: they are lifted out of
-`defaults/skills/scaffold/references/structure.md` at test time rather than
+`defaults/skills/scaffolder/references/structure.md` at test time rather than
 copied here, which means the skill cannot drift away from the parser without
 this file going red.
 """
@@ -21,7 +21,7 @@ from enough import tools as T
 from enough.composure import ComposureError
 
 REPO = Path(__file__).resolve().parent.parent
-SKILL = REPO / "defaults" / "skills" / "scaffold"
+SKILL = REPO / "defaults" / "skills" / "scaffolder"
 
 
 # ---------------------------------------------------------------------------

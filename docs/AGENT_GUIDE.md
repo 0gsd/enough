@@ -2529,7 +2529,7 @@ preamble and is dropped. A gap card keeps its bracketed question as the
 **first line of its body** — losing the question would make the most useful
 card on the canvas the only blank one.
 
-The grammar is exactly what `defaults/skills/scaffold/SKILL.md` teaches, and
+The grammar is exactly what `defaults/skills/scaffolder/SKILL.md` teaches, and
 **the skill's two worked examples in `references/structure.md` are lifted at
 test time and used as fixtures**, so the skill cannot drift away from the
 parser without `tests/test_composure_outline.py` going red. Layout

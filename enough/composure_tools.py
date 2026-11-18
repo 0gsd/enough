@@ -1,6 +1,6 @@
 """The readvisor's composure tools, registered into `tools._DISPATCH`.
 
-Nine tools, all of them thin: they parse the XML inner tags a small local
+Ten tools, all of them thin: they parse the XML inner tags a small local
 model can reliably emit, hand the work to `enough/composure.py`'s node-level
 ops, and render the result as a sentence. Every refusal the readvisor sees
 is a `ComposureError` message from the core, so the model, the canvas and
@@ -8,7 +8,7 @@ the user are all reading the same words.
 
 Two rules the tools enforce that the UI does not:
 
-- the `composure_enabled` broker toggle gates all eight (the canvas itself
+- the `composure_enabled` broker toggle gates all ten (the canvas itself
   is ungated, exactly like wikisink and canon); and
 - `comp_remove_module` needs `<confirmed>yes</confirmed>`, meaning the user
   said so in their own words this turn. Never pre-fill it.
@@ -33,7 +33,7 @@ log = logging.getLogger("enough.composure")
 TOOL_NAMES: tuple[str, ...] = (
     "read_composure", "new_composure", "comp_add_module", "comp_update_module",
     "comp_set_page", "comp_remove_module", "comp_arrange", "comp_save_as_form",
-    "composure_from_outline",
+    "composure_from_outline", "scaffold_from_plectrum",
 )
 
 #: Past this many characters a `read_composure` body is cached under
@@ -404,7 +404,7 @@ def run_composure_from_outline(project_dir: Path, call: Any) -> Any:
     Why this exists: a small local model asked for fourteen module tool calls
     in a row produces nine, two in the wrong group and one a duplicate. Asked
     for one markdown outline it does fine. So the structure is written as
-    markdown and converted deterministically — the `scaffold` skill teaches
+    markdown and converted deterministically — the `scaffolder` skill teaches
     the grammar, and this tool is the only thing that parses it."""
     name = "composure_from_outline"
     if not broker.is_enabled("composure_enabled"):
@@ -456,6 +456,113 @@ def run_composure_from_outline(project_dir: Path, call: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
+# scaffold_from_plectrum (0.8)
+# ---------------------------------------------------------------------------
+
+def _names(items: list[str], limit: int = 6) -> str:
+    shown = ", ".join(items[:limit])
+    return shown + (f" and {len(items) - limit} more" if len(items) > limit else "")
+
+
+def run_scaffold_from_plectrum(project_dir: Path, call: Any) -> Any:
+    """`<content>` a plectrum (`plectrum: 1`), `<path>` optional → a scaffold.
+
+    The first call makes the composure from the `scaffold` form (so its `composure:scaffold`
+    block is there) at `<path>`, or at a new path from the title; a later call with the same
+    `<path>` brings the scaffold to the changed plectrum: frames added, reordered, retitled; boxes
+    added, moved, retargeted, re-plecced; empty boxes the plectrum dropped removed. It never
+    writes a box's text: no op it sends carries any, and the composure refuses one from a
+    readvisor anyway. The count of frames and boxes is said before anything is built, and a
+    plectrum past the composure's module cap is refused whole. The plectrum is kept beside the
+    composure as `<name>.plectrum.md`."""
+    from . import scaffolder as SC
+
+    name = "scaffold_from_plectrum"
+    if not broker.is_enabled("composure_enabled"):
+        return _denied(name)
+    rel = (call.path or "").strip()
+    body = (call.content or "").lstrip("\n")
+    if not body.strip():
+        return _err(name, rel, (
+            "scaffold_from_plectrum needs the plectrum in <content>: `---`, `plectrum: 1`, the "
+            "front matter, `---`, the `# ` title, then a `## ` per frame and its plecs."))
+    S = SC.state_module()
+    try:
+        model = S.loads(body)
+    except S.StateError as e:
+        return _err(name, rel, f"the plectrum was not read, and nothing was built. {e}")
+    if model.kind != "plectrum":
+        return _err(name, rel, (
+            "that is a scaffold's state (`scaffold: 1`), which carries the person's text. This "
+            "tool takes a plectrum (`plectrum: 1`) and never writes a box's text; send the "
+            "plectrum alone."))
+    counted = S.count_line(model)
+    parts = S.count(model)["parts"]
+    if parts > comp_core.MAX_MODULES:
+        return _err(name, rel, (
+            f"{counted} enough's composure holds {comp_core.MAX_MODULES} modules, frames and "
+            f"boxes together, so nothing was built. Make fewer boxes per piece, or split the "
+            f"thing into two scaffolds (a repeated section into two runs), and ask the person "
+            f"which."))
+    title = model.meta["title"]
+    try:
+        create = not rel
+        if create:
+            rel = comp_core.new_path(project_dir, title)
+        target = _resolve(project_dir, rel)
+        if target.exists():
+            comp = comp_core.load(target)
+            locked = (comp_core.scaffold_view(comp) or {}).get("locked")
+            if locked:
+                return _err(name, rel, (
+                    f"{rel} is locked: nothing in a locked scaffold changes until the person "
+                    f"unlocks it."))
+        else:
+            create = True
+            comp = comp_core.new_composure("scaffold", title, project_dir)
+        plan = SC.plectrum_ops(model, comp)
+        kept = len(plan.kept_words)
+        if parts + kept + len(plan.kept_frames) > comp_core.MAX_MODULES:
+            return _err(name, rel, (
+                f"{counted} With the {kept + len(plan.kept_frames)} part(s) kept for the "
+                f"person's words that passes the composure's {comp_core.MAX_MODULES} modules, "
+                f"so nothing was changed. Make fewer boxes, or split the thing into two "
+                f"scaffolds."))
+        if not plan.ops and not create:
+            result = None
+        else:
+            result = comp_core.apply_ops(
+                target, None, plan.ops or [{"op": "set_scaffold", "thing": model.meta["thing"]}],
+                source="readvisor", create=create, form="scaffold", title=title,
+                project_dir=project_dir, rel_path=rel)
+        side = SC.plectrum_path(target)
+        side.write_text(S.dumps(model, "plectrum"), encoding="utf-8")
+    except (ComposureError, S.StateError) as e:
+        return _err(name, rel, str(e))
+    side_rel = rel[: -len(comp_core.SUFFIX)] + SC.PLECTRUM_SUFFIX
+    if result is None:
+        return _ok(name, rel, f"{counted} {rel} already holds this plectrum; nothing changed.")
+    lines = [f"{counted} ok — {'made' if result.created else 'updated'} {rel} (rev {result.rev})."]
+    for label, items in (("frames added", plan.added_frames), ("boxes added", plan.added_boxes),
+                         ("boxes changed", plan.changed_boxes), ("boxes moved", plan.moved_boxes),
+                         ("removed (empty)", plan.removed)):
+        if items:
+            lines.append(f"- {label}: {_names(items)}")
+    if plan.kept_words:
+        lines.append(f"- kept, with the person's words (the plectrum no longer names them): "
+                     f"{_names(plan.kept_words)}")
+    if plan.kept_frames:
+        lines.append(f"- frames kept for those boxes: {_names(plan.kept_frames)}")
+    if plan.kept_plecs:
+        lines.append(f"- plecs the person wrote, kept as theirs (propose a change, do not "
+                     f"make it): {_names(plan.kept_plecs)}")
+    lines.append(f"The plectrum is at {side_rel}. The person writes every box's text.")
+    out = _ok(name, rel, "\n".join(lines))
+    out.side_effects = _emit(result)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
 
@@ -469,11 +576,12 @@ _RUNNERS = {
     "comp_arrange": run_comp_arrange,
     "comp_save_as_form": run_comp_save_as_form,
     "composure_from_outline": run_composure_from_outline,
+    "scaffold_from_plectrum": run_scaffold_from_plectrum,
 }
 
 
 def register() -> None:
-    """Add the nine tools to `tools._DISPATCH` and `_TRACE_TOGGLE`.
+    """Add the ten tools to `tools._DISPATCH` and `_TRACE_TOGGLE`.
 
     Idempotent, and called once at `tools` import time. They trace under
     the universal `trace_log_enabled` toggle like the girraph ops: a

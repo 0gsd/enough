@@ -188,7 +188,7 @@ TOGGLES: tuple[Toggle, ...] = (
             "documents in .comp files: read_composure, new_composure, "
             "comp_add_module, comp_update_module, comp_set_page, "
             "comp_remove_module, comp_arrange, comp_save_as_form, "
-            "composure_from_outline. turn off "
+            "composure_from_outline, scaffold_from_plectrum. turn off "
             "to keep composures a place only you write — the canvas keeps "
             "working either way."
         ),
