@@ -1,0 +1,355 @@
+"""Metaparadigms (0.8, tracker `paradigms-several-active` P2, P2g, P3, P5) and
+the faces hook (`transcognition-paradigm` T2).
+
+A metaparadigm is the one text that rides for two or three paradigms on
+together: `rness/metaparadigms/<sorted names joined with +>.md`, a project's
+own file or a link to the install's `defaults/metaparadigms/`. It counts only
+while the fingerprints in its front matter match its members as the project
+has them; a combination with no true text is composed by rule.
+
+No metaparadigm text ships yet (a later lane writes the four), so the shipped
+check runs on an empty or absent `defaults/metaparadigms/` and a fixture
+proves it fails, naming the stale combinations, when a member changes.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from enough import prompt, skeleton
+
+SHIPPED = skeleton._install_defaults_root()
+
+
+def _paradigm(folder: Path, name: str, body: str, tooltip: str = "t") -> Path:
+    folder.mkdir(parents=True, exist_ok=True)
+    p = folder / f"{name}.md"
+    p.write_text(f"---\nname: {name}\ndescription: d\n---\n\n{body}\n\n---\n"
+                 f'enough-tooltip-text: "{tooltip}"\n', encoding="utf-8")
+    return p
+
+
+def _meta(folder: Path, paradigms: Path, members: list[str], body: str) -> Path:
+    folder.mkdir(parents=True, exist_ok=True)
+    p = folder / f"{prompt.metaparadigm_key(members)}.md"
+    p.write_text(prompt.metaparadigm_front_matter(paradigms, members) + "\n" + body + "\n",
+                 encoding="utf-8")
+    return p
+
+
+# --------------------------------------------------------------------------
+# P3: keeping them true
+# --------------------------------------------------------------------------
+
+def test_every_shipped_metaparadigm_is_true_to_its_members():
+    """Fails when a shipped paradigm changed and the combinations holding it
+    were not looked at again. Passes on none shipped."""
+    stale = prompt.stale_metaparadigms(SHIPPED / "metaparadigms", SHIPPED / "paradigms")
+    assert not stale, (
+        "these metaparadigms are stale (their members changed since they were "
+        "written; read each again, then refresh its fingerprints with "
+        "prompt.metaparadigm_front_matter): "
+        + "; ".join(f"{k} ({', '.join(v)})" for k, v in stale.items()))
+
+
+def test_every_shipped_metaparadigm_has_a_lean_head_no_heavier_than_text_planning():
+    folder = SHIPPED / "metaparadigms"
+    home = prompt._parse_paradigm_frontmatter(
+        (SHIPPED / "paradigms" / "text-planning.md").read_text(encoding="utf-8"))[1]
+    home_head = home.strip().split(prompt.LEAN_CUT, 1)[0].rstrip()
+    for p in sorted(folder.glob("*.md")) if folder.is_dir() else []:
+        whole = p.read_text(encoding="utf-8")
+        assert prompt.LEAN_CUT in whole, f"{p.name} has no lean cut"
+        body = prompt._parse_paradigm_frontmatter(whole)[1].strip()
+        head = body.split(prompt.LEAN_CUT, 1)[0].rstrip()
+        assert len(head) <= len(home_head), (p.name, len(head), len(home_head))
+        assert len(whole) <= prompt.FULL_PARADIGM_BUDGET + 200, (p.name, len(whole))
+
+
+def test_the_check_names_the_stale_combinations(tmp_path: Path):
+    """The fixture the shipped check stands on: a written combination is true
+    until a member's body changes; a tooltip or description edit does not
+    stale it; the stale one is named, with the member that moved."""
+    paradigms, metas = tmp_path / "paradigms", tmp_path / "metaparadigms"
+    _paradigm(paradigms, "alpha", "# Alpha\n\nRule one.")
+    _paradigm(paradigms, "beta", "# Beta\n\nRule two.")
+    _paradigm(paradigms, "gamma", "# Gamma\n\nRule three.")
+    _meta(metas, paradigms, ["beta", "alpha"], "# Alpha with beta")
+    _meta(metas, paradigms, ["alpha", "beta", "gamma"], "# All three")
+    assert prompt.stale_metaparadigms(metas, paradigms) == {}
+    assert prompt.stale_metaparadigms(tmp_path / "absent", paradigms) == {}
+
+    _paradigm(paradigms, "alpha", "# Alpha\n\nRule one.", tooltip="new words")   # tooltip only
+    text = (paradigms / "alpha.md").read_text(encoding="utf-8")
+    (paradigms / "alpha.md").write_text(text.replace("description: d", "description: e")
+                                        .replace("Rule one.", "Rule one.   \n\n\n"),
+                                        encoding="utf-8")                        # whitespace only
+    assert prompt.stale_metaparadigms(metas, paradigms) == {}
+
+    _paradigm(paradigms, "gamma", "# Gamma\n\nRule three, changed.")
+    assert prompt.stale_metaparadigms(metas, paradigms) == {"alpha+beta+gamma": ["gamma"]}
+    (paradigms / "beta.md").unlink()
+    assert prompt.stale_metaparadigms(metas, paradigms) == {
+        "alpha+beta": ["beta"], "alpha+beta+gamma": ["beta", "gamma"]}
+
+
+def test_members_must_be_the_file_s_own():
+    paradigms = SHIPPED / "paradigms"
+    head = prompt.metaparadigm_front_matter(paradigms, ["text-planning", "transcognition"])
+    assert head.startswith("---\nmembers: text-planning transcognition\n")
+    assert "fingerprint.text-planning: sha256:" in head
+    fp = prompt.paradigm_fingerprint((paradigms / "text-planning.md").read_text(encoding="utf-8"))
+    assert len(fp) == len("sha256:") + 16
+    # a text whose members are not its stem's is stale throughout
+    assert prompt.metaparadigm_stale_members(head, "text-planning+workflow-design", paradigms) == \
+        ["text-planning", "transcognition", "workflow-design"]
+
+
+# --------------------------------------------------------------------------
+# P2 / P5: the text for each of the seven states
+# --------------------------------------------------------------------------
+
+@pytest.fixture
+def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
+    monkeypatch.setenv("ENOUGH_PROJECTS_STATE", str(tmp_path / "state" / "projects.json"))
+    monkeypatch.setenv("ENOUGH_READVISORS_ROOT", str(tmp_path / "readvisors-global"))
+    proj = tmp_path / "project"
+    proj.mkdir()
+    skeleton.ensure_skeleton(proj)
+    return proj
+
+
+SEVEN = [
+    ["text-planning"], ["transcognition"], ["workflow-design"],
+    ["text-planning", "transcognition"], ["text-planning", "workflow-design"],
+    ["transcognition", "workflow-design"],
+    ["text-planning", "transcognition", "workflow-design"],
+]
+
+
+@pytest.mark.parametrize("names", SEVEN, ids=["+".join(s) for s in SEVEN])
+def test_each_of_the_seven_states_gets_one_text(project: Path, names: list[str]):
+    rness = project / "rness"
+    prompt.set_active_paradigms(rness, names)
+    choice = prompt.choose_paradigm_text(rness)
+    assert list(choice.names) == names
+    shipped = SHIPPED / "metaparadigms" / f"{prompt.metaparadigm_key(names)}.md"
+    if len(names) == 1:
+        assert choice.kind == "paradigm" and choice.path == f"paradigms/{names[0]}.md"
+    elif shipped.is_file():
+        assert choice.kind == "metaparadigm" and choice.level == "global"
+    else:
+        assert choice.kind == "composed"
+    for profile in ("chat", "lean"):
+        system = prompt.assemble_system_prompt(project, profile=profile)
+        heading = (f"# Paradigm: {names[0]}" if len(names) == 1
+                   else "# Paradigms: " + " + ".join(names))
+        assert system.count(heading + "\n") == 1, (profile, heading)
+
+
+def test_the_composed_fallback_weighs_about_one_lean_head(project: Path):
+    rness = project / "rness"
+    names = ["text-planning", "transcognition", "workflow-design"]
+    prompt.set_active_paradigms(rness, names)
+    choice = prompt.choose_paradigm_text(rness)
+    assert choice.kind == "composed" and choice.stale == ()
+    lean = prompt.load_paradigm_text(rness, choice, lean=True)
+    full = prompt.load_paradigm_text(rness, choice, lean=False)
+    assert lean.startswith(prompt.COMPOSED_LEAD)
+    for n in names:
+        assert f"## From `{n}`" in lean and f"## From `{n}`" in full
+        assert f"`rness/paradigms/{n}.md`" in lean
+    # lean: held to the measure; full: each member's whole lean head
+    assert len(lean) <= prompt.LEAN_HEAD_BUDGET + 300, len(lean)
+    for n in names:
+        head = prompt._paradigm_body(rness, (rness / "paradigms" / f"{n}.md").read_text(encoding="utf-8"))
+        assert head.split(prompt.LEAN_CUT, 1)[0].rstrip() in full
+    assert prompt.LEAN_CUT not in full and prompt.LEAN_CUT not in lean
+
+
+def test_a_member_without_a_cut_gets_an_even_share(tmp_path: Path):
+    rness = tmp_path / "rness"
+    long_body = "\n\n".join(f"Paragraph {i}. " + "x" * 400 for i in range(80))
+    _paradigm(rness / "paradigms", "alpha", "# Alpha\n\n" + long_body)
+    _paradigm(rness / "paradigms", "beta", "# Beta\n\nShort.")
+    choice = prompt.choose_paradigm_text(rness, ["alpha", "beta"])
+    full = prompt.load_paradigm_text(rness, choice)
+    alpha = full.split("## From `alpha`", 1)[1].split("## From `beta`", 1)[0]
+    assert len(alpha) <= prompt.FULL_PARADIGM_BUDGET // 2 + 300
+    assert "The rest of `rness/paradigms/alpha.md`" in alpha
+    assert "The rest of `rness/paradigms/beta.md`" not in full     # beta rides whole
+
+
+def test_a_project_s_own_metaparadigm_rides_while_true(project: Path):
+    rness = project / "rness"
+    names = ["text-planning", "transcognition"]
+    _meta(rness / "metaparadigms", rness / "paradigms", names,
+          "# Both\n\nOWN-PAIR-TEXT\n\n<!-- lean-cut -->\n\nLONG-TAIL")
+    prompt.set_active_paradigms(rness, names)
+    choice = prompt.choose_paradigm_text(rness)
+    assert (choice.kind, choice.level, choice.path) == \
+        ("metaparadigm", "project", "metaparadigms/text-planning+transcognition.md")
+    lean = prompt.assemble_system_prompt(project, profile="lean")
+    full = prompt.assemble_system_prompt(project)
+    assert "OWN-PAIR-TEXT" in lean and "LONG-TAIL" not in lean
+    assert "`rness/metaparadigms/text-planning+transcognition.md`" in lean   # the pointer
+    assert "LONG-TAIL" in full and "members:" not in full
+    # the person makes transcognition their own and changes it: the pair is
+    # stale for this project, set aside (never rewritten), composed instead
+    link = rness / "paradigms" / "transcognition.md"
+    body = link.read_text(encoding="utf-8")
+    link.unlink()
+    link.write_text(body.replace("# Transcognition Paradigm", "# My Transcognition"), encoding="utf-8")
+    choice = prompt.choose_paradigm_text(rness)
+    assert choice.kind == "composed" and choice.stale == ("transcognition",)
+    assert "OWN-PAIR-TEXT" not in prompt.assemble_system_prompt(project)
+    assert "OWN-PAIR-TEXT" in (rness / "metaparadigms" / "text-planning+transcognition.md").read_text(
+        encoding="utf-8")
+
+
+# --------------------------------------------------------------------------
+# P2g: links at the global level
+# --------------------------------------------------------------------------
+
+def _install(tmp_path: Path) -> Path:
+    root = tmp_path / "install-defaults"
+    _paradigm(root / "paradigms", "alpha", "# Alpha")
+    _paradigm(root / "paradigms", "beta", "# Beta")
+    _paradigm(root / "paradigms", "gamma", "# Gamma")
+    _meta(root / "metaparadigms", root / "paradigms", ["alpha", "beta"], "# AB")
+    _meta(root / "metaparadigms", root / "paradigms", ["alpha", "gamma"], "# AG")
+    return root
+
+
+def test_global_combinations_link_while_every_member_is_the_global_link(tmp_path: Path):
+    root = _install(tmp_path)
+    proj = tmp_path / "proj"
+    (proj / "rness").mkdir(parents=True)
+    skeleton._populate_paradigm_symlinks(proj, root)
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    metas = proj / "rness" / "metaparadigms"
+    assert sorted(p.name for p in metas.iterdir()) == ["alpha+beta.md", "alpha+gamma.md"]
+    assert all(p.is_symlink() for p in metas.iterdir())
+    choice = prompt.choose_paradigm_text(proj / "rness", ["beta", "alpha"])
+    assert (choice.kind, choice.level) == ("metaparadigm", "global")
+
+    # the person makes gamma their own: alpha+gamma is never wider than its
+    # members, so its link goes; alpha+beta stays
+    g = proj / "rness" / "paradigms" / "gamma.md"
+    g.unlink()
+    g.write_text("---\nname: gamma\n---\n# My gamma\n", encoding="utf-8")
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    assert sorted(p.name for p in metas.iterdir()) == ["alpha+beta.md"]
+
+    # a project's own real file is never touched
+    own = metas / "alpha+gamma.md"
+    own.write_text("---\nmembers: alpha gamma\n---\nMINE\n", encoding="utf-8")
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    assert own.read_text(encoding="utf-8").endswith("MINE\n") and not own.is_symlink()
+
+    # the global is removed: its dangling link is pruned
+    (root / "metaparadigms" / "alpha+beta.md").unlink()
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    assert not (metas / "alpha+beta.md").is_symlink()
+    # a member removed from the install: nothing links
+    (root / "paradigms" / "beta.md").unlink()
+    _meta(root / "metaparadigms", root / "paradigms", ["alpha", "beta"], "# AB again")
+    skeleton._populate_paradigm_symlinks(proj, root)
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    assert not (metas / "alpha+beta.md").exists()
+
+
+def test_no_folder_is_made_when_nothing_ships(tmp_path: Path):
+    root = tmp_path / "bare-defaults"
+    _paradigm(root / "paradigms", "alpha", "# Alpha")
+    proj = tmp_path / "proj"
+    (proj / "rness").mkdir(parents=True)
+    skeleton._populate_paradigm_symlinks(proj, root)
+    skeleton._populate_metaparadigm_symlinks(proj, root)
+    assert not (proj / "rness" / "metaparadigms").exists()
+
+
+def test_the_folder_is_hidden_from_the_tree():
+    from enough.server import HIDDEN_TREE_PATHS
+    assert "rness/metaparadigms" in HIDDEN_TREE_PATHS
+
+
+# --------------------------------------------------------------------------
+# Faces: blocks kept or dropped by the skills that are on
+# --------------------------------------------------------------------------
+
+FACED = """# Fixture paradigm
+
+Opening.
+
+<!-- face: translator -->
+TRANSLATOR-FACE nllb_optin: true
+<!-- /face -->
+
+<!-- face: macrocosm-oes -->
+FABULA-FACE
+<!-- /face -->
+
+Closing.
+"""
+
+
+def _faces(on: set[str], body: str = FACED) -> str:
+    return prompt.apply_faces(body, lambda s: s in on)
+
+
+def test_a_face_rides_only_with_its_skill_on():
+    one = _faces({"translator"})
+    assert "TRANSLATOR-FACE" in one and "FABULA-FACE" not in one
+    assert "Opening." in one and "Closing." in one and "<!-- face" not in one
+    other = _faces({"macrocosm-oes"})
+    assert "FABULA-FACE" in other and "TRANSLATOR-FACE" not in other
+
+
+def test_both_on_rides_both_and_asks_once():
+    both = _faces({"translator", "macrocosm-oes"})
+    assert "TRANSLATOR-FACE" in both and "FABULA-FACE" in both
+    assert "ask the person\nonce" in both or "ask the person once" in both.replace("\n", " ")
+
+
+def test_neither_on_names_the_two_skills():
+    neither = _faces(set())
+    assert "TRANSLATOR-FACE" not in neither and "FABULA-FACE" not in neither
+    assert "`translator`" in neither and "`macrocosm-oes`" in neither
+    assert "active skills" in neither
+
+
+def test_a_text_may_write_its_own_both_and_neither_lines():
+    own = FACED + "\n<!-- face: both -->\nOWN-BOTH\n<!-- /face -->\n" \
+                  "<!-- face: none -->\nOWN-NONE\n<!-- /face -->\n"
+    assert "OWN-NONE" in _faces(set(), own) and "OWN-BOTH" not in _faces(set(), own)
+    assert "active skills" not in _faces(set(), own)
+    both = _faces({"translator", "macrocosm-oes"}, own)
+    assert "OWN-BOTH" in both and "OWN-NONE" not in both and "ask the person" not in both
+    assert "OWN-BOTH" not in _faces({"translator"}, own)
+
+
+def test_a_text_without_faces_is_unchanged():
+    body = "# Plain\n\nNo faces here.\n"
+    assert prompt.apply_faces(body, lambda s: True) == body
+
+
+def test_faces_follow_the_project_s_skills_in_both_profiles(project: Path):
+    rness = project / "rness"
+    (rness / "paradigms" / "faced.md").write_text(
+        "---\nname: faced\n---\n" + FACED + "\n<!-- lean-cut -->\n\nTAIL\n", encoding="utf-8")
+    prompt.set_active_paradigm(rness, "faced")
+    for skill in ("translator", "macrocosm-oes"):
+        prompt.set_skill_enabled(rness, skill, False)
+    assert "TRANSLATOR-FACE" not in prompt.assemble_system_prompt(project, profile="lean")
+    prompt.set_skill_enabled(rness, "translator", True)
+    for profile in ("chat", "lean"):
+        system = prompt.assemble_system_prompt(project, profile=profile)
+        assert "TRANSLATOR-FACE nllb_optin: true" in system, profile
+        assert "FABULA-FACE" not in system, profile
