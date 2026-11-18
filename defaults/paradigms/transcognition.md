@@ -1,9 +1,9 @@
 ---
-name: translation
+name: transcognition
 description: Offline multi-language translation as a first-class capability. Switch to this when the user wants to translate text between languages (especially long-form, batch, or low-resource), and the translator skill is enabled.
 ---
 
-# Translation Paradigm
+# Transcognition Paradigm
 
 This paradigm declares offline machine translation as a first-class
 capability of this enough instance. When it's in scope, you have a
@@ -22,13 +22,13 @@ engages on translation intent regardless of skill state and the
 skill-off case is surfaced as a user-actionable warning.
 
 - **From `text-planning` paradigm, skill enabled:** switch to this paradigm by
-  writing `translation` to `rness/active-paradigm` with `write_file`.
+  writing `transcognition` to `rness/active-paradigm` with `write_file`.
   The switch takes effect next turn; for the current turn, tell the user
   you're switching and let them re-send (or, if the request is short,
   do the translation immediately under text-planning and switch for the
   follow-up).
 - **From `text-planning` paradigm, skill OFF:** *still switch* (write
-  `translation` to `rness/active-paradigm`). In the same turn, tell the
+  `transcognition` to `rness/active-paradigm`). In the same turn, tell the
   user that the `translator` skill is currently disabled and they need
   to toggle it on in the **active skills** section of the sidebar for
   the MADLAD-backed offline translator. The paradigm's own off-skill
@@ -52,19 +52,6 @@ user:
 
 Then defer translation work until they confirm the toggle, or proceed
 under the prompt-engineered fallback with the quality caveat surfaced.
-
-## Capability summary
-
-- **Default engine:** MADLAD-400-3B-MT (Apache 2.0), served via
-  CTranslate2 with int8 quantization. ~3 GB on disk, runs on
-  CPU or Apple Silicon.
-- **Coverage:** ~419 languages, including most national languages and
-  a meaningful long tail of indigenous, regional, and low-resource
-  languages.
-- **Round-trip:** plain text in, plain text out. Source language is
-  auto-detected; only the target needs to be specified.
-- **First-use cost:** one-time model download (~3 GB). After that,
-  fully offline.
 
 ## When to route to the translator skill
 
@@ -119,6 +106,21 @@ There are three weight options, gated by license and resource trade-offs:
    Until that flag is present, do NOT install or invoke NLLB-200, even
    if the user asks for "the best possible translation". Surface the
    tradeoff first; let them opt in explicitly.
+
+<!-- lean-cut -->
+
+## Capability summary
+
+- **Default engine:** MADLAD-400-3B-MT (Apache 2.0), served via
+  CTranslate2 with int8 quantization. ~3 GB on disk, runs on
+  CPU or Apple Silicon.
+- **Coverage:** ~419 languages, including most national languages and
+  a meaningful long tail of indigenous, regional, and low-resource
+  languages.
+- **Round-trip:** plain text in, plain text out. Source language is
+  auto-detected; only the target needs to be specified.
+- **First-use cost:** one-time model download (~3 GB). After that,
+  fully offline.
 
 ## Fallback policy
 
@@ -191,4 +193,4 @@ The rest is convention: you read this file, know the routing rules
 above, and decide per-request which engine to invoke.
 
 ---
-enough-tooltip-text: "use the translator skill and the translation paradigm to translate any text into another language."
+enough-tooltip-text: "use the translator skill and the transcognition paradigm to translate any text into another language."

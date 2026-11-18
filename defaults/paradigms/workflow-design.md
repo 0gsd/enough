@@ -89,6 +89,8 @@ reversible; writing into `~/enough/defaults/` mutates the source of
 truth for every other project on the user's machine. The allowlist is
 the user's standing consent for that.
 
+<!-- lean-cut -->
+
 ## Completion message format
 
 When a build is complete (whether project-local or global), end with a
@@ -236,7 +238,7 @@ than "This paradigm provides…".
 
 ### Pairing with skills
 
-Some paradigms pair with a specific skill (translation paradigm ↔
+Some paradigms pair with a specific skill (transcognition paradigm ↔
 translator skill). When designing a paired pair, encode the pairing
 explicitly in both the paradigm body and the skill description. You
 should know to switch paradigms when the user invokes the pairing
