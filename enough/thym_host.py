@@ -1013,6 +1013,7 @@ SIBLING_ENGINES: dict[str, tuple[str, str]] = {
     "syntax": ("enough.repo_engine", "syntax_engine"),
     "dialectic": ("enough.dialectic", "thym_engine"),
     "ascribe": ("enough.ascribe", "thym_engine"),
+    "transconception": ("enough.transconception", "thym_engine"),
 }
 #: Engines whose module, without its maker function, is the engine: its public functions as a namespace.
 _MODULE_IS_ENGINE = frozenset({"dialectic"})

@@ -417,16 +417,20 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     scaffold: outline
     code: enough.thym.moves.emf:entail
     says: an entailment of the fabula, in an order, in a morph
-    thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7)
-      modifiers: {as: 'order | code | line | overview | manual', by: order, with: morph}
+    thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7),
+                                        # or its cases file for the outside judge (transconception, THYM 20.10; no model)
+      modifiers: {as: 'order | code | line | overview | manual | cases', by: order, with: morph}
       gives-when:
         - {as: [code], gives: folder}
+        - {as: [cases], gives: text}
       contract-when:
         - {as: [code], contract: [parses, interfaces-present, files-present, footer, provenance]}
         - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
-      scaffold-when:                    # code has none: --rules refuses it
+        - {as: [cases], contract: [cases-whole, provenance]}
+      scaffold-when:                    # code has none: --rules refuses it; cases needs no model, so its scaffold is itself
         - {as: [line, overview, manual], scaffold: uses-outline}
         - {as: [code], scaffold: none}
+        - {as: [cases], scaffold: cases-file}
   - name: atem
     takes: ['text | fabula | short | item']
     gives: atem
@@ -494,7 +498,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most, batch]
   banks:
     fabulan:
       for: {flavour: fabulan}
@@ -585,6 +589,45 @@ dialectic:
         - {id: licence, about: R:licence#identifier, asks: "Under which licence may it be used?", kind: text, why: missing}
         - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}
         - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most, and why?", kind: text, why: intent, writes: N:requirement, sets: {force: must}}
+    # A transconception's three banks (MacroCOSM 18.4.9, 18.6.6), asked only of a fabulac whose catalog says
+    # purpose: transconception, and answered by its transconceiver. standing: who rules, the source's terms and the
+    # transconceiver's statements about them (who rules is asked only while nobody does; the leave only of a closed
+    # lane). target: asked once of the N:target named, and of none when no target is named (phase 5 adds the twelve
+    # points). rulings: one question per interface, behaviour, reliance, setting, structure and ruled case that still
+    # needs a ruling for the target in question, in this order and riskiest first within each, each proposing a
+    # ruling ({proposed}; {for} names its target when it is made for one); batch: true asks once of every item with
+    # the same proposal and scope. A ruling question's answer is a choice: as proposed, or a ruling word, the
+    # person's own words after it giving the allowance, the reason or what it is changed to.
+    transconception-standing:
+      for: {purpose: transconception}
+      to: transconceiver
+      questions:
+        - {id: who-rules, about: R, asks: "Who will rule what the next program keeps of {name}: someone who made it, maintains it or knows it well? Say who, and how they know it.", kind: text, why: missing, writes: maker, sets: {capacity: transconceiver}}
+        - {id: lane, about: R:licence#lane, asks: "Do the terms of {name} let anyone make a new work from the source and pass it on (open), bind such a work to the same terms (bound), or let the source be read and not made into a new work (closed)?", kind: choice, options: [open, bound, closed], why: missing}
+        - {id: leave, about: R:licence#leave, only-where: {lane: [closed]}, asks: "The terms of {name} let the source be read, not made into a new work. Has its holder asked for this, or given leave in writing? Where is that leave kept?", kind: text, why: missing}
+        - {id: licence, about: R:maker#statements.licence, only-where: {capacity: [transconceiver]}, asks: "Under which licence did the source come to you?", kind: text, why: missing}
+        - {id: lane-said, about: R:maker#statements.lane, only-where: {capacity: [transconceiver]}, asks: "Do the source's terms let you make a new program from it and pass it on? Say why, in your own words.", kind: text, why: missing}
+        - {id: confidential, about: R:maker#statements.confidential, only-where: {capacity: [transconceiver]}, asks: "Did any of the source, or anything about it, reach you in confidence, or on terms other than its licence?", kind: text, why: missing}
+        - {id: programs, about: R:maker#statements.programs, only-where: {capacity: [transconceiver]}, asks: "What will the new program be called, in each language it is written in?", kind: text, why: missing}
+        - {id: attribution, about: R:maker#statements.attribution, only-where: {capacity: [transconceiver]}, asks: "Whose notices and credit will the new program carry?", kind: text, why: missing}
+    transconception-target:
+      for: {purpose: transconception}
+      to: transconceiver
+      questions:
+        - {id: version, about: N:target#version, asks: "Which version of {language} should the new program be written for?", kind: text, why: missing}
+        - {id: conditions, about: N:target#conditions, asks: "On what conditions may the new program be written in {language}: may it use libraries others wrote, each pinned and named, and what must it never lean on?", kind: text, why: missing}
+    transconception-rulings:
+      for: {purpose: transconception}
+      to: transconceiver
+      counters:
+        ruled: "That ruling needs one more thing: for alike, which allowance (exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order); for changed, what it is changed to. Which ruling, with it?"
+      questions:
+        - {id: interface, about: C:interface#ruling, asks: "Must the next program{for} offer {name} exactly as it is? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
+        - {id: behaviour, about: C:behaviour#ruling, asks: "Must the next program{for} do exactly this: {name}? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
+        - {id: reliance, about: C:reliance#ruling, asks: "Must the next program{for} keep what this gives: {name}? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
+        - {id: setting, about: C:setting#ruling, asks: "Must the next program{for} keep the setting {name} as it is? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
+        - {id: structure, about: C:structure#ruling, asks: "Must the next program{for} keep the shape of {name} as it is? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
+        - {id: case, about: P:case#ruling, only-with: ruling, asks: "Must the next program{for} give what this case records: {name}? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
 
 extension:
   status: not built
