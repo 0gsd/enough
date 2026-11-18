@@ -436,12 +436,14 @@ def test_the_fabula_manifest():
         for k, spec in m.kinds(L).items():
             assert spec["flavours"] == list(fabula.FLAVOURS), (L, k)
     # the four emf/1 declared, the fabulac's two stages and the fabulap's two helper moves, thym 1 only (THYM 6.2,
-    # 6.3, 20.9)
+    # 6.3, 20.9); then a transconception's moves (0.8, Thym 20.10)
     assert [mv["name"] for mv in m.data["moves"]] == ["derive", "entail", "atem", "expand", "survey", "history", "scan",
-                                                      "construe"]
+                                                      "construe", "ground"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
     assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:6])
-    assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:])
+    assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:8])
+    assert all(mv["code"].startswith("enough.thym.moves.transconceive:") and mv["since"] == 1
+               for mv in m.data["moves"][8:])
     assert "emf-checks" in m.data["moves"][0]["contract"]
     assert all(m.matches_catalog(n) for n in ("close.md.fabulan.cosm", "rose.txt.fabulap.cosm",
                                                "tool.fabulac.cosm", "close.md.cosm"))

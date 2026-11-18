@@ -68,7 +68,11 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
     assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "quotes-held", "uses-told",
                                                              "footer", "provenance")
     assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
-    assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "entail", "count", "words"}
+    # a move declared ahead of the bundled text's table (contracts.AHEAD_MOVES) is no row of it until the text is synced
+    from enough.thym.contracts import AHEAD_MOVES
+    assert not set(AHEAD_MOVES) & {r[0] for r in rows}, "a move the text now lists: take it out of AHEAD_MOVES"
+    assert {n for n in d if d[n].since >= 1} - set(AHEAD_MOVES) == {r[0] for r in rows} - {"derive", "entail", "count",
+                                                                                           "words"}
 
 
 def compile_with(text: str, decls: dc.Declarations, path: str | None = None):

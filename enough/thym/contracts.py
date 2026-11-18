@@ -34,7 +34,15 @@ CHECKS = (
 # yet, for the next revision of the specification at cosmoes.org. A test holds each to being no row of the table, so
 # that it leaves this list the day the text takes it.
 #   quotes-held (0.7): every name a catem quotes is in its fabulac (enough/thym/moves/code.py)
-AHEAD = ("quotes-held",)
+#   ground-cited (0.8, Thym 7.3 as approved for the coming edition): every reliance on the language or its runtime
+#     cites where its gift is written (enough/thym/moves/transconceive.py)
+AHEAD = ("quotes-held", "ground-cited")
+
+# The moves a shipped declaration adds ahead of the text's table of the moves `thym 1` adds (6.3): an owner's ruling
+# or an approved text that the bundled copy of the specification does not hold yet. A test holds each to being no
+# row of that table, so that it leaves this list the day the text is synced.
+#   ground (0.8, Thym 20.10): `ground repo with f` (enough/thym/moves/transconceive.py)
+AHEAD_MOVES = ("ground",)
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}

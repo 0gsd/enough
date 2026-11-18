@@ -482,6 +482,15 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.verse:construe
     says: one axis of a poem read by a model, every reading held as the model's own
     since: 1
+  # thym 1 only (since: 1; Thym 20.10): a transconception's moves (enough/thym/moves/transconceive.py)
+  - name: ground
+    takes: [folder]
+    gives: fabula
+    modifiers: {with: fabula}
+    contract: [ground-cited, code-span, nothing-lost, fabula-checks, provenance]
+    code: enough.thym.moves.transconceive:ground
+    says: the fabula so far with a reliance for each ground entry the syntax shows, each citing its gift, nothing run
+    since: 1
 
 # The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
 # about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
