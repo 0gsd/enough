@@ -604,12 +604,34 @@ def test_every_shipped_paradigm_has_a_lean_head_no_heavier_than_text_planning(pr
 
 def test_the_nllb_line_rides_above_transcognition_s_cut(project: Path):
     """The NLLB opt-in is read by the model from the text, never by code, so
-    the line the person adds must be in the lean head too."""
+    the line the person adds must be in the lean head too. It sits in the
+    translation face (pins 5), so it rides whenever `translator` is on, in
+    both profiles, and with the skill off the face and the line go."""
     rness = project / "rness"
+    prompt.set_skill_enabled(rness, "translator", True)
     head = prompt.paradigm_lean_head(rness, "transcognition")
     assert "nllb_optin: true" in head
     assert "`rness/paradigms/transcognition.md`" in head          # the pointer names it
     assert "nllb_optin: true" in prompt._load_active_paradigm_body(rness, "transcognition")
+    prompt.set_skill_enabled(rness, "translator", False)
+    assert "nllb_optin" not in prompt.paradigm_lean_head(rness, "transcognition")
+
+
+def test_transcognition_s_lean_head_fits_in_every_skill_state(project: Path):
+    """Each face state (neither skill, either, both) keeps transcognition's
+    lean head no larger than text-planning's, and says what is presumed."""
+    rness = project / "rness"
+    home = len(prompt.paradigm_lean_head(rness, "text-planning"))
+    states = {(): "Neither skill is on", ("translator",): "MADLAD-400-3B",
+              ("macrocosm-oes",): "never run",
+              ("translator", "macrocosm-oes"): "ask once"}
+    for on, marker in states.items():
+        for skill in ("translator", "macrocosm-oes"):
+            prompt.set_skill_enabled(rness, skill, skill in on)
+        head = prompt.paradigm_lean_head(rness, "transcognition")
+        assert len(head) <= home, (on, len(head), home)
+        assert marker in head, (on, marker)
+        assert "<!-- face" not in head and "<!-- /face" not in head, on
 
 
 def test_the_lean_tool_docs_summarise_the_long_sections(project: Path, monkeypatch: pytest.MonkeyPatch):

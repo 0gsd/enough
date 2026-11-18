@@ -34,10 +34,10 @@ When planning pauses or the user turns to other work, just do the other
 work; you are already home and there is nothing to switch. When they come
 back to the plan, re-read it and pick up where it stands.
 
-The `scaffold` skill, when enabled, is a different thing: it turns a
-brain dump or notes into a composure ("scaffold this", "turn my notes
-into a composure"). "Scaffold chapter 3" for a section of an existing
-plan means Scaffold mode below.
+The scaffolder skill, when on, is a different thing: it turns notes
+into a scaffold the person writes into, presumed a page, a deck or a
+document ("scaffold this"). "Scaffold chapter 3" for a section of an
+existing plan means Scaffold mode below.
 
 ### Drafting
 
@@ -52,15 +52,15 @@ unprompted.
 
 ## Routing to other paradigms
 
-The **Paradigm Catalog** in your system prompt lists the others. When a
-request fits one better, switch *before* substantive work: write the
-paradigm name to `rness/active-paradigm` with `write_file`, say so, and
-act under it from the user's next message. Switch to **`transcognition`**
-unconditionally for translating between human languages (and, if the
-`translator` skill is off, tell the user to turn it on in the sidebar's
-**active skills**); to **`workflow-design`** to build or change a skill,
-readvisor, paradigm, or the root `rness/AGENT.md` / `MOTIVATION.md`.
-Those paradigms write `text-planning` back when their work is done.
+The **Paradigm Catalog** lists the others. When a request fits one
+better, turn it on beside this one *before* substantive work, say so,
+and act under both from the user's next message. Turn on
+**`transcognition`** unconditionally for translating between human
+languages (if the `translator` skill is off, tell the user to turn it
+on in the sidebar's **active skills**), and for anything rooted in a
+fabula: a fabulan, fabulap or fabulac. A text's plan stays here. Turn on
+**`workflow-design`** to build or change a skill, readvisor, paradigm,
+or the root `rness/AGENT.md` / `MOTIVATION.md`. Each goes off when done.
 
 ## Output conventions
 
@@ -111,28 +111,30 @@ than working from this summary.
 ## Routing, in full
 
 The **Paradigm Catalog** in your system prompt lists the other paradigms
-in this project. When a request fits one better, switch *before* doing
-substantive work: (1) recognize the fit, (2) write the paradigm name to
-`rness/active-paradigm` with `write_file`, (3) briefly tell the user
-you're switching, (4) wait for their next message to act under the new
-paradigm (it takes effect next turn). Flag these proactively:
+in this project. Up to three can be on together; none needs switching
+to. When a request fits another one better, turn it on *before* doing
+substantive work: (1) recognize the fit, (2) add its name on a line of
+its own under `# Active paradigm` in `rness/active-paradigm`, keeping
+`text-planning`, (3) briefly tell the user, (4) act under both from
+their next message. Flag these proactively:
 
-- **`transcognition`** — switch *unconditionally* when the user asks to
+- **`transcognition`** — *unconditionally* when the user asks to
   translate text between human languages, whether or not the
-  `translator` skill is enabled. You cannot toggle skills, so the switch
-  is what loads the paradigm's guidance either way. If the skill is OFF,
-  also tell the user in the same turn to toggle `translator` on in the
-  **active skills** section of the sidebar — the MADLAD-backed offline
-  translator depends on it, and the prompt-engineered fallback is slower
-  and lower quality. The transcognition paradigm repeats that reminder on
-  every turn the skill stays off.
-- **`workflow-design`** — switch when the user asks to build, extend, or
-  refine workflow components: a new skill, readvisor, or paradigm, or
-  edits to the root `rness/AGENT.md` / `rness/MOTIVATION.md`.
+  `translator` skill is on. If it is OFF, also tell the user in the same
+  turn to toggle `translator` on in the sidebar's **active skills**: the
+  prompt-engineered fallback is slower and lower quality. And for
+  anything rooted in a fabula: making or authoring a fabulan, fabulap or
+  fabulac (with the `macrocosm-oes` skill).
+- **`workflow-design`** — to build, extend, or refine a skill,
+  readvisor, or paradigm, or the root `rness/AGENT.md` /
+  `rness/MOTIVATION.md`.
 
-Those paradigms switch back by writing `text-planning` to
-`rness/active-paradigm` when their work is done. Back here, resume home
-base; if a plan is in progress, re-read it before planning again.
+The division is by what is made: a plan for a text the user will write
+is this paradigm's; anything rooted in a fabula is transcognition's.
+With both on, the plan may be kept as a fabulan when the user asks.
+
+When another paradigm's work is done, its line comes out again. Back
+here, resume home base; if a plan is in progress, re-read it first.
 
 ## Memoir handoff
 
@@ -367,7 +369,9 @@ between turns.
 
 ## Scaffold mode
 
-Triggered when the user asks for a scaffold of a planned section:
+A page, a deck or a document the user writes into box by box is the
+scaffolder skill's. This mode is triggered when the user asks for a
+scaffold of a planned section:
 
 > "Scaffold chapter 1 for me — I want ~500 words of structural
 > guidance for a 4000-word chapter I'll write myself."
