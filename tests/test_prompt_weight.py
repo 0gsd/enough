@@ -582,6 +582,36 @@ def test_the_lean_paradigm_is_cut_at_its_marker(project: Path):
     assert "All of it." in _lean(project)
 
 
+def test_every_shipped_paradigm_has_a_lean_head_no_heavier_than_text_planning(project: Path):
+    """0.8 (pins 5): the measure that binds is the lean head. Every shipped
+    paradigm carries a cut, and what the lean profile carries for it alone
+    (skills off, as the fit test) is no larger than text-planning's, whose
+    head is the 8,192 windows' fit."""
+    rness = project / "rness"
+    shipped = sorted(p.stem for p in (skeleton._install_defaults_root() / "paradigms").glob("*.md"))
+    assert {"text-planning", "transcognition", "workflow-design"} <= set(shipped)
+    home = prompt.paradigm_lean_head(rness, "text-planning")
+    assert len(home) <= prompt.LEAN_HEAD_BUDGET + 50, len(home)
+    for name in shipped:
+        whole = (rness / "paradigms" / f"{name}.md").read_text(encoding="utf-8")
+        assert prompt.LEAN_CUT in whole, f"{name} has no lean cut"
+        assert len(whole) <= prompt.FULL_PARADIGM_BUDGET + 200, (name, len(whole))
+        head = prompt.paradigm_lean_head(rness, name)
+        assert len(head) <= len(home), (name, len(head), len(home))
+        prompt.set_active_paradigm(rness, name)
+        assert f"# Paradigm: {name}" in _lean(project)
+
+
+def test_the_nllb_line_rides_above_transcognition_s_cut(project: Path):
+    """The NLLB opt-in is read by the model from the text, never by code, so
+    the line the person adds must be in the lean head too."""
+    rness = project / "rness"
+    head = prompt.paradigm_lean_head(rness, "transcognition")
+    assert "nllb_optin: true" in head
+    assert "`rness/paradigms/transcognition.md`" in head          # the pointer names it
+    assert "nllb_optin: true" in prompt._load_active_paradigm_body(rness, "transcognition")
+
+
 def test_the_lean_tool_docs_summarise_the_long_sections(project: Path, monkeypatch: pytest.MonkeyPatch):
     set_toggle("composure_enabled", True)
     open_gates(monkeypatch)

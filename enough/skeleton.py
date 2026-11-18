@@ -535,11 +535,11 @@ def _populate_paradigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
     Paradigms differ from skills/readvisors in two ways:
       - they're single files (`paradigms/*.md`), not folders.
       - they're always selectable — there is no `.disabled` notion.
-        Exactly one is active at a time, named in `rness/active-paradigm`.
+        One to three are on at a time, named in `rness/active-paradigm`.
 
     If the currently-active paradigm gets removed from
     `defaults/paradigms/`, the dangling symlink is pruned here and
-    `get_active_paradigm()` falls back to the home paradigm
+    `get_active_paradigms()` falls back to the home paradigm
     (`text-planning`) on the next read.
     Project-local paradigm files (real files, not symlinks) are never
     touched."""
@@ -565,6 +565,66 @@ def _populate_paradigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
         if dst.exists() or dst.is_symlink():
             continue
         dst.symlink_to(entry.resolve())
+
+
+def _populate_metaparadigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
+    """Sync the install's metaparadigms (`defaults/metaparadigms/*.md`, the
+    texts for two or three paradigms on together) into
+    `rness/metaparadigms/`, and prune the links that no longer hold.
+
+    A global combination is linked into a project only while every member
+    (the file stem split at `+`) is, in this project, the link to the same
+    global paradigm: a member the person made their own makes the global
+    combination not apply here, since a metaparadigm is never wider than its
+    members. So a link is pruned when its target is gone, or when any member
+    is missing from `rness/paradigms/` or is no longer that link. Real files
+    (the project's own metaparadigms) are never touched. Whether a text is
+    still true to its members is the fingerprints' question, asked when the
+    prompt chooses it (`prompt.choose_paradigm_text`).
+
+    The folder is made only when there is something to link."""
+    src = defaults_root / "metaparadigms"
+    dst = project_dir / "rness" / "metaparadigms"
+    src_paradigms = defaults_root / "paradigms"
+    dst_paradigms = project_dir / "rness" / "paradigms"
+
+    def _members_linked(stem: str) -> bool:
+        for name in stem.split("+"):
+            mine = dst_paradigms / f"{name}.md"
+            ours = src_paradigms / f"{name}.md"
+            if not (mine.is_symlink() and mine.exists() and ours.is_file()):
+                return False
+            try:
+                if mine.resolve() != ours.resolve():
+                    return False
+            except OSError:
+                return False
+        return True
+
+    # 1. Prune: a dangling link, or one whose members no longer all hold.
+    if dst.is_dir():
+        for entry in sorted(dst.iterdir()):
+            if not entry.is_symlink():
+                continue
+            if not entry.exists() or not _members_linked(entry.stem):
+                try:
+                    entry.unlink()
+                except OSError:
+                    pass
+
+    # 2. Link every global combination whose members all hold here.
+    if not src.is_dir():
+        return
+    for entry in sorted(src.glob("*.md")):
+        if entry.name.startswith("."):
+            continue
+        target = dst / entry.name
+        if target.exists() or target.is_symlink():
+            continue
+        if not _members_linked(entry.stem):
+            continue
+        dst.mkdir(parents=True, exist_ok=True)
+        target.symlink_to(entry.resolve())
 
 
 def _migrate_undot(project_dir: Path) -> None:
@@ -885,6 +945,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
     _populate_skill_symlinks(project_dir, defaults)
     _populate_role_symlinks(project_dir, defaults)
     _populate_paradigm_symlinks(project_dir, defaults)
+    _populate_metaparadigm_symlinks(project_dir, defaults)
 
     # ALWAYS run (idempotent): re-point any skeleton symlinks a cloud-sync
     # filesystem broke between machines (the static plan links).
@@ -980,6 +1041,7 @@ def resync_globals(project_dir: Path) -> None:
     _populate_skill_symlinks(project_dir, defaults)
     _populate_role_symlinks(project_dir, defaults)
     _populate_paradigm_symlinks(project_dir, defaults)
+    _populate_metaparadigm_symlinks(project_dir, defaults)
 
 
 def _migrate_allowlist(project_dir: Path, defaults: Path) -> None:

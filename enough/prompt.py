@@ -6,9 +6,11 @@ next message. No caching.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path
 
 TOOL_INSTRUCTIONS = """\
@@ -1780,7 +1782,9 @@ def _policy_gist(text: str, limit: int = 120) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Paradigms — exactly one active at a time; the agent and user can switch.
+# Paradigms — one to three on at a time (0.8); the agent and user switch
+# them on and off. One text rides for the set: the paradigm's own file for
+# one, a metaparadigm (or the composed fallback) for two or three.
 # Each paradigm file may carry a YAML-style frontmatter block:
 #     ---
 #     name: <slug>
@@ -1901,16 +1905,64 @@ _MP_HIGHLIGHTS_HEAD = "Help bubbles"
 #: lands on. Until 0.4.1 this was `default`, which `text-planning` absorbed;
 #: `ensure_multipurpose_file` migrates a stored `default` on launch.
 HOME_PARADIGM = "text-planning"
-#: The retired name. Still honoured where a user kept their own copy.
-_RETIRED_PARADIGM = "default"
+#: Retired paradigm names and the names that replaced them (0.4.1: `default`
+#: into `text-planning`; 0.8: `translation` renamed `transcognition`). The
+#: migration keys on the name stored in `rness/active-paradigm`, never on the
+#: file: by the time it runs, the launch has already pruned the dangling link.
+#: A retired name is still honoured where the person kept their own copy.
+_RETIRED_PARADIGM: dict[str, str] = {
+    "default": "text-planning",
+    "translation": "transcognition",
+}
+#: How many paradigms may be on at once (0.8). The set has no order and no
+#: leader: one text is chosen for the whole set (see `choose_paradigm_text`).
+MAX_ACTIVE_PARADIGMS = 3
+#: Where the texts for two or three paradigms together live, per project
+#: (`rness/metaparadigms/`) and per install (`defaults/metaparadigms/`).
+METAPARADIGMS_DIR = "metaparadigms"
+#: The measure a paradigm's lean head is held to: text-planning's, about
+#: 5,150 characters (the 8,192 windows' fit). The full measure is
+#: text-planning's whole file. A composed text shares these out evenly.
+LEAN_HEAD_BUDGET = 5150
+FULL_PARADIGM_BUDGET = 19330
 
 
-def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
+class ParadigmSetRefused(ValueError):
+    """A set of active paradigms that cannot be stored. `reason` is a short
+    code the route turns into a `data-*` attribute (`cap`, `empty`); the
+    message is the English sentence."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(message)
+        self.reason = reason
+
+
+PARADIGM_REFUSALS: dict[str, str] = {
+    "cap": (f"At most {MAX_ACTIVE_PARADIGMS} paradigms can be on at once: "
+            "turn one off before turning another on."),
+    "empty": "One paradigm stays on: turn another on before turning this one off.",
+}
+
+
+def _dedupe(names: list[str]) -> list[str]:
+    seen: list[str] = []
+    for n in names:
+        if n and n not in seen:
+            seen.append(n)
+    return seen
+
+
+def _parse_multipurpose_set(text: str) -> tuple[list[str], bool]:
     """Parse the multipurpose active-paradigm file. Returns
-    ``(paradigm_name | None, bubbles_enabled)``. Help bubbles are enabled
-    unless the section value is literally ``off`` — a missing section and
-    every legacy value (``all``, id lists, empty) read as enabled. A legacy
-    bare file (no ``#`` headings) yields ``(first_line, True)``."""
+    ``(paradigm_names, bubbles_enabled)``.
+
+    The names are the non-blank lines under ``# Active paradigm`` (a leading
+    ``- `` is tolerated), deduplicated, the first three kept: a set, one name
+    a line, order without meaning. A legacy bare file (no ``#`` headings)
+    reads the same way, every non-blank line a name, so a single line still
+    means that paradigm alone. Help bubbles are enabled unless the section
+    value is literally ``off`` — a missing section and every legacy value
+    (``all``, id lists, empty) read as enabled."""
     lines = text.splitlines()
     heads = [(i, ln) for i, ln in enumerate(lines) if re.match(r"^#\s+\S", ln)]
 
@@ -1921,19 +1973,15 @@ def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
                 return lines[i + 1:end]
         return None
 
-    if not heads:  # legacy bare form
-        for ln in lines:
-            if ln.strip():
-                return ln.strip(), True
-        return None, True
+    def _names(body: list[str]) -> list[str]:
+        vals = [re.sub(r"^-\s+", "", ln.strip()).strip() for ln in body]
+        return _dedupe([v for v in vals if v])[:MAX_ACTIVE_PARADIGMS]
 
-    name = None
+    if not heads:  # legacy bare form
+        return _names(lines), True
+
     para = _section(_MP_PARADIGM_HEAD)
-    if para is not None:
-        for ln in para:
-            if ln.strip():
-                name = ln.strip()
-                break
+    names = _names(para) if para is not None else []
 
     enabled = True
     hl = _section(_MP_HIGHLIGHTS_HEAD)
@@ -1946,54 +1994,104 @@ def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
         # Only an explicit `off` disables; every legacy value reads as on.
         if len(vals) == 1 and vals[0].lower() == "off":
             enabled = False
-    return name, enabled
+    return names, enabled
 
 
-def _render_multipurpose(name: str, bubbles_enabled: bool) -> str:
-    """Render the multipurpose file from a paradigm name + the help-bubble
-    on/off state."""
-    out = [f"# {_MP_PARADIGM_HEAD}", name or HOME_PARADIGM, "",
+def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
+    """The one-name reading of the file, kept for old callers: ``(the first
+    name written | None, bubbles_enabled)``. See `_parse_multipurpose_set`."""
+    names, enabled = _parse_multipurpose_set(text)
+    return (names[0] if names else None), enabled
+
+
+def _render_multipurpose(names: str | list[str] | tuple[str, ...],
+                         bubbles_enabled: bool) -> str:
+    """Render the multipurpose file from one paradigm name or a set of up to
+    three (one a line) + the help-bubble on/off state. One name renders
+    byte for byte as it always has."""
+    if isinstance(names, str):
+        names = [names]
+    names = _dedupe([n.strip() for n in names]) or [HOME_PARADIGM]
+    out = [f"# {_MP_PARADIGM_HEAD}", *names, "",
            f"# {_MP_HIGHLIGHTS_HEAD}", "on" if bubbles_enabled else "off"]
     return "\n".join(out).rstrip("\n") + "\n"
 
 
-def get_active_paradigm(rness: Path) -> str:
-    """Read the active paradigm name from `rness/active-paradigm` (markdown or
-    legacy bare form). Falls back to the home paradigm when the file is
-    missing OR names a paradigm that doesn't exist on disk — and, should the
-    home paradigm itself be gone, to the first paradigm that does exist, so
-    the system prompt never silently loses its Paradigm section."""
+def _read_multipurpose(rness: Path) -> tuple[list[str], bool]:
+    """The stored names (unfiltered) and the bubble state; ``([], True)``
+    when the file is missing or unreadable."""
     f = rness / _ACTIVE_PARADIGM_FILE
-    name = HOME_PARADIGM
-    if f.is_file():
-        try:
-            parsed, _hl = _parse_multipurpose(f.read_text(encoding="utf-8"))
-            if parsed:
-                name = parsed
-        except OSError:
-            pass
+    if not f.is_file():
+        return [], True
+    try:
+        return _parse_multipurpose_set(f.read_text(encoding="utf-8"))
+    except OSError:
+        return [], True
+
+
+def get_active_paradigms(rness: Path) -> list[str]:
+    """The set of active paradigms, sorted: the names stored in
+    `rness/active-paradigm` (markdown or legacy bare form) that exist on disk
+    as `rness/paradigms/<name>.md`. When none does — the file is missing, or
+    names only paradigms that are gone — the home paradigm alone, and, should
+    the home paradigm itself be gone, the first paradigm that does exist, so
+    the system prompt never silently loses its Paradigm section."""
     paradigms = rness / "paradigms"
-    if (paradigms / f"{name}.md").is_file():
-        return name
+    stored, _hl = _read_multipurpose(rness)
+    present = [n for n in stored if (paradigms / f"{n}.md").is_file()]
+    if present:
+        return sorted(present)
     if (paradigms / f"{HOME_PARADIGM}.md").is_file():
-        return HOME_PARADIGM
-    present = sorted(p.stem for p in paradigms.glob("*.md") if p.is_file()) \
+        return [HOME_PARADIGM]
+    found = sorted(p.stem for p in paradigms.glob("*.md") if p.is_file()) \
         if paradigms.is_dir() else []
-    return present[0] if present else HOME_PARADIGM
+    return [found[0]] if found else [HOME_PARADIGM]
+
+
+def get_active_paradigm(rness: Path) -> str:
+    """One name, for old callers: the first of the sorted active set (see
+    `get_active_paradigms`). With one paradigm on, that paradigm."""
+    return get_active_paradigms(rness)[0]
+
+
+def _write_names(rness: Path, names: list[str]) -> None:
+    f = rness / _ACTIVE_PARADIGM_FILE
+    f.parent.mkdir(parents=True, exist_ok=True)
+    _stored, bubbles = _read_multipurpose(rness)
+    f.write_text(_render_multipurpose(names, bubbles), encoding="utf-8")
 
 
 def set_active_paradigm(rness: Path, name: str) -> None:
-    """Record `name` as the active paradigm, PRESERVING the help-bubble
-    on/off state. Caller validates that the paradigm exists."""
-    f = rness / _ACTIVE_PARADIGM_FILE
-    f.parent.mkdir(parents=True, exist_ok=True)
-    bubbles = True
-    if f.is_file():
-        try:
-            _n, bubbles = _parse_multipurpose(f.read_text(encoding="utf-8"))
-        except OSError:
-            bubbles = True
-    f.write_text(_render_multipurpose(name, bubbles), encoding="utf-8")
+    """Record `name` as the one active paradigm (that one alone), PRESERVING
+    the help-bubble on/off state. Caller validates that the paradigm exists."""
+    _write_names(rness, [name])
+
+
+def set_active_paradigms(rness: Path, names: list[str] | tuple[str, ...]) -> list[str]:
+    """Record a set of one to three active paradigms (written sorted, one a
+    line), preserving the help-bubble state. Returns the set written.
+
+    Raises `ParadigmSetRefused` with a sentence for a fourth (`cap`) or for
+    none at all (`empty`); nothing is written then. Caller validates that
+    each paradigm exists."""
+    wanted = sorted(_dedupe([n.strip() for n in names]))
+    if len(wanted) > MAX_ACTIVE_PARADIGMS:
+        raise ParadigmSetRefused("cap", PARADIGM_REFUSALS["cap"])
+    if not wanted:
+        raise ParadigmSetRefused("empty", PARADIGM_REFUSALS["empty"])
+    _write_names(rness, wanted)
+    return wanted
+
+
+def toggle_paradigm(rness: Path, name: str, on: bool) -> list[str]:
+    """Switch one paradigm on or off within the active set and return the set
+    written. Refusals as `set_active_paradigms`."""
+    current = get_active_paradigms(rness)
+    if on:
+        wanted = current if name in current else [*current, name]
+    else:
+        wanted = [n for n in current if n != name]
+    return set_active_paradigms(rness, wanted)
 
 
 def get_help_bubbles(rness: Path) -> bool:
@@ -2002,29 +2100,17 @@ def get_help_bubbles(rness: Path) -> bool:
     section as ``on``/``off``. A missing file/section and every legacy value
     (the old ``all`` sentinel, id lists, an empty section, an unreadable
     file) read as **on** — the default."""
-    f = rness / _ACTIVE_PARADIGM_FILE
-    if not f.is_file():
-        return True
-    try:
-        _n, enabled = _parse_multipurpose(f.read_text(encoding="utf-8"))
-    except OSError:
-        return True
-    return enabled
+    return _read_multipurpose(rness)[1]
 
 
 def set_help_bubbles(rness: Path, enabled: bool) -> None:
-    """Persist the help-bubble on/off state, preserving the active paradigm."""
+    """Persist the help-bubble on/off state, preserving every active
+    paradigm name as stored."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
-    name = HOME_PARADIGM
-    if f.is_file():
-        try:
-            n, _b = _parse_multipurpose(f.read_text(encoding="utf-8"))
-            if n:
-                name = n
-        except OSError:
-            pass
-    f.write_text(_render_multipurpose(name, enabled), encoding="utf-8")
+    names, _b = _read_multipurpose(rness)
+    f.write_text(_render_multipurpose(names or [HOME_PARADIGM], enabled),
+                 encoding="utf-8")
 
 
 def seed_multipurpose_file(rness: Path) -> None:
@@ -2035,23 +2121,25 @@ def seed_multipurpose_file(rness: Path) -> None:
     f.write_text(_render_multipurpose(HOME_PARADIGM, True), encoding="utf-8")
 
 
-def _kept_retired_paradigm(rness: Path) -> bool:
-    """True when the user kept their own `default` paradigm: a real file at
-    `rness/paradigms/default.md`, not the symlink every project used to get.
-    A customised copy is theirs, and `default` keeps working for them."""
-    p = rness / "paradigms" / f"{_RETIRED_PARADIGM}.md"
+def _kept_retired_paradigm(rness: Path, name: str = "default") -> bool:
+    """True when the person kept their own copy of the retired paradigm
+    `name`: a real file at `rness/paradigms/<name>.md`, not the symlink every
+    project used to get. A customised copy is theirs, and the old name keeps
+    working for them."""
+    p = rness / "paradigms" / f"{name}.md"
     return p.is_file() and not p.is_symlink()
 
 
 def ensure_multipurpose_file(rness: Path) -> None:
     """Idempotently ensure the file exists in markdown form (for existing
     projects). Runs on every launch. Missing → create with bubbles on; legacy
-    bare → upgrade preserving the paradigm value (bubbles on); already
+    bare → upgrade preserving the paradigm names (bubbles on); already
     markdown → leave untouched.
 
-    One migration rides along (0.4.1): a stored `default` — the paradigm
-    `text-planning` absorbed — becomes `text-planning`, in either form,
-    unless `rness/paradigms/default.md` is a real file the user kept. The
+    The retired-name migration rides along, keyed on the stored name: each
+    retired name in the set (`default` since 0.4.1, `translation` since 0.8)
+    becomes the name that replaced it, in either form, unless
+    `rness/paradigms/<old>.md` is a real file the person kept. The
     help-bubble state is preserved either way."""
     f = rness / _ACTIVE_PARADIGM_FILE
     if not f.is_file():
@@ -2064,63 +2152,359 @@ def ensure_multipurpose_file(rness: Path) -> None:
         return
     markdown = bool(re.search(rf"^#\s+{re.escape(_MP_PARADIGM_HEAD)}\b",
                               text, re.I | re.M))
-    name, bubbles = _parse_multipurpose(text)
-    retired = name == _RETIRED_PARADIGM and not _kept_retired_paradigm(rness)
-    if markdown and not retired:
+    names, bubbles = _parse_multipurpose_set(text)
+    migrated = _dedupe([
+        _RETIRED_PARADIGM[n]
+        if n in _RETIRED_PARADIGM and not _kept_retired_paradigm(rness, n) else n
+        for n in names])
+    if markdown and migrated == names:
         return  # already in markdown form, nothing to migrate
-    if retired:
-        name = HOME_PARADIGM
     # A legacy bare file reads as bubbles-on; a markdown one keeps its state.
     try:
-        f.write_text(_render_multipurpose(name or HOME_PARADIGM,
+        f.write_text(_render_multipurpose(migrated or [HOME_PARADIGM],
                                           bubbles if markdown else True),
                      encoding="utf-8")
     except OSError:
         pass
 
 
-def _load_active_paradigm_body(rness: Path, active: str, *, lean: bool = False) -> str:
-    """Read the active paradigm's content, stripping its frontmatter so
-    the YAML doesn't leak into the system prompt. For the lean profile a
-    paradigm that carries the `LEAN_CUT` marker is cut there, and a short
-    paragraph says where the rest is; one without the marker rides whole."""
-    p = rness / "paradigms" / f"{active}.md"
-    text = _read_or_empty(p)
+# ---------------------------------------------------------------------------
+# Faces (0.8): a paradigm's text may hold blocks that ride only when a skill
+# is on —
+#
+#     <!-- face: translator -->
+#     …what the paradigm presumes with the translator skill on…
+#     <!-- /face -->
+#
+# A block is kept when its skill is on (`_skill_enabled`) and dropped when it
+# is off. With two or more of the text's face skills on, every kept face
+# rides and an "ask once" line goes with them; with none on, the faces go and
+# two lines name the skills. A text may write those lines itself in
+# `<!-- face: both -->` and `<!-- face: none -->` blocks; where it does not,
+# enough writes them. The hook runs before the lean cut, so a face above the
+# cut rides in both profiles.
+# ---------------------------------------------------------------------------
+
+_FACE_RE = re.compile(
+    r"<!--\s*face:\s*([A-Za-z0-9_.-]+)\s*-->[ \t]*\n?(.*?)<!--\s*/face\s*-->[ \t]*\n?",
+    re.S,
+)
+_FACE_BOTH = "both"
+_FACE_NONE = "none"
+
+
+def _face_default_both(on: list[str]) -> str:
+    named = " and ".join(f"`{s}`" for s in on)
+    return (f"With {named} both on, each face above is presumed: let the "
+            "request's own words say which one it is, and ask the person "
+            "once when they do not.\n")
+
+
+def _face_default_none(skills: list[str]) -> str:
+    named = ", ".join(f"`{s}`" for s in skills)
+    return (f"None of the skills this paradigm leans on is on ({named}).\n"
+            "Name the one the request needs and tell the person to switch it "
+            "on in the sidebar's **active skills**.\n")
+
+
+def apply_faces(body: str, enabled) -> str:
+    """Keep or drop the face blocks of a paradigm's `body`; `enabled(skill)`
+    says whether a skill is on. A body without face blocks comes back
+    unchanged."""
+    blocks = list(_FACE_RE.finditer(body))
+    if not blocks:
+        return body
+    skills = _dedupe([m.group(1) for m in blocks
+                      if m.group(1) not in (_FACE_BOTH, _FACE_NONE)])
+    on = [s for s in skills if enabled(s)]
+    named = {m.group(1) for m in blocks}
+    generated = ""
+    if len(on) >= 2 and _FACE_BOTH not in named:
+        generated = _face_default_both(on)
+    elif not on and skills and _FACE_NONE not in named:
+        generated = _face_default_none(skills)
+    first = [True]
+
+    def _keep(m: re.Match) -> str:
+        name, content = m.group(1), m.group(2)
+        if name == _FACE_BOTH:
+            keep = len(on) >= 2
+        elif name == _FACE_NONE:
+            keep = not on
+        else:
+            keep = name in on
+        out = content if keep else ""
+        if out and not out.endswith("\n"):
+            out += "\n"
+        if first[0]:
+            first[0] = False
+            out = generated + ("\n" if generated and out else "") + out
+        return out
+
+    out = _FACE_RE.sub(_keep, body)
+    return re.sub(r"\n{3,}", "\n\n", out)
+
+
+def _lean_pointer(rel_path: str) -> str:
+    return ("\n\n*(lean prompt)* The rest of this paradigm — everything after the\n"
+            f"line `{LEAN_CUT}` in `{rel_path}` — is read with\n"
+            "`read_file` the moment it applies, before acting on it.\n")
+
+
+def _paradigm_body(rness: Path, text: str) -> str:
+    """A paradigm's (or metaparadigm's) body as the prompt carries it: front
+    matter stripped, faces kept or dropped by the skills that are on."""
+    _meta, body = _parse_paradigm_frontmatter(text)
+    return apply_faces(body.strip(), lambda s: _skill_enabled(rness, s)).strip()
+
+
+def _load_text_at(rness: Path, rel_path: str, *, lean: bool) -> str:
+    """Load the text at `rness/<rel_path>`, cut for the lean profile at its
+    `LEAN_CUT` with a short paragraph naming where the rest is; one without
+    the marker rides whole."""
+    text = _read_or_empty(rness / rel_path)
     if not text:
         return ""
-    _meta, body = _parse_paradigm_frontmatter(text)
-    body = body.strip()
+    body = _paradigm_body(rness, text)
     if lean and LEAN_CUT in body:
         head = body.split(LEAN_CUT, 1)[0].rstrip()
-        return (head + "\n\n*(lean prompt)* The rest of this paradigm — everything after the\n"
-                f"line `{LEAN_CUT}` in `rness/paradigms/{active}.md` — is read with\n"
-                "`read_file` the moment it applies, before acting on it.\n")
+        return head + _lean_pointer(f"rness/{rel_path}")
     return body
 
 
-def _load_paradigm_catalog(rness: Path, active: str) -> str:
-    """Build a brief catalog of available paradigms for the agent — so it
-    knows what alternatives exist and how to switch.
+def _load_active_paradigm_body(rness: Path, active: str, *, lean: bool = False) -> str:
+    """Read one paradigm's content, stripping its frontmatter so the YAML
+    doesn't leak into the system prompt and keeping the faces whose skill is
+    on. For the lean profile a paradigm that carries the `LEAN_CUT` marker is
+    cut there, and a short paragraph says where the rest is; one without the
+    marker rides whole."""
+    return _load_text_at(rness, f"paradigms/{active}.md", lean=lean)
+
+
+def paradigm_lean_head(rness: Path, name: str) -> str:
+    """What the lean profile carries for paradigm `name` alone (the head
+    above its cut plus the pointer paragraph). The weight test holds every
+    shipped paradigm's to text-planning's."""
+    return _load_active_paradigm_body(rness, name, lean=True)
+
+
+# ---------------------------------------------------------------------------
+# Metaparadigms (0.8): one text for two or three paradigms on together, in
+# `rness/metaparadigms/<sorted names joined with +>.md`, a project's own real
+# file or a link to the install's `defaults/metaparadigms/`
+# (`skeleton._populate_metaparadigm_symlinks`). Front matter, one key a line:
+#
+#     ---
+#     members: text-planning transcognition
+#     fingerprint.text-planning: sha256:<16 hex>
+#     fingerprint.transcognition: sha256:<16 hex>
+#     ---
+#
+# A fingerprint is of the member's body as written (`paradigm_fingerprint`).
+# A metaparadigm counts only while every fingerprint matches the members as
+# this project has them; otherwise it is stale, set aside for this project,
+# and the combination is composed by rule (`_compose_paradigms`).
+# ---------------------------------------------------------------------------
+
+def paradigm_fingerprint(text: str) -> str:
+    """`sha256:<16 hex>` of a paradigm's body: front matter and the tooltip
+    line left out, trailing spaces stripped, runs of blank lines collapsed,
+    a closing `---` rule dropped. So a tooltip or description edit does not
+    make the combinations holding it stale; an edit to what the model reads
+    does."""
+    _meta, body = _parse_paradigm_frontmatter(text)
+    out: list[str] = []
+    for ln in body.splitlines():
+        if _ENOUGH_TOOLTIP_RE.match(ln):
+            continue
+        ln = ln.rstrip()
+        if not ln and out and not out[-1]:
+            continue
+        out.append(ln)
+    norm = "\n".join(out).strip()
+    while norm.endswith("---"):
+        norm = norm[:-3].rstrip()
+    return "sha256:" + hashlib.sha256(norm.encode("utf-8")).hexdigest()[:16]
+
+
+def metaparadigm_key(names) -> str:
+    """The file stem for a set of paradigms: sorted, joined with `+`."""
+    return "+".join(sorted(_dedupe(list(names))))
+
+
+def metaparadigm_front_matter(paradigms_dir: Path, members) -> str:
+    """The front matter a metaparadigm for `members` carries today, from the
+    paradigms in `paradigms_dir` (for the hand that writes one)."""
+    names = sorted(_dedupe(list(members)))
+    lines = ["---", "members: " + " ".join(names)]
+    for n in names:
+        lines.append(f"fingerprint.{n}: "
+                     + paradigm_fingerprint(_read_or_empty(paradigms_dir / f"{n}.md")))
+    lines.append("---")
+    return "\n".join(lines) + "\n"
+
+
+def metaparadigm_stale_members(text: str, stem: str, paradigms_dir: Path) -> list[str]:
+    """The members of the metaparadigm `text` (file stem `stem`) whose
+    fingerprint does not match the paradigm in `paradigms_dir`, or that are
+    missing there; [] when it is true to its members. Members named in the
+    front matter must be the file's own (its stem split at `+`): when they
+    are not, every member is stale."""
+    meta, _body = _parse_paradigm_frontmatter(text)
+    by_name = sorted(_dedupe(stem.split("+")))
+    listed = meta.get("members", "")
+    members = sorted(_dedupe(re.split(r"[\s,+]+", listed.strip()))) if listed.strip() else by_name
+    if members != by_name:
+        return sorted(set(members) | set(by_name))
+    stale: list[str] = []
+    for n in members:
+        member = paradigms_dir / f"{n}.md"
+        if not member.is_file() or meta.get(f"fingerprint.{n}", "") != \
+                paradigm_fingerprint(_read_or_empty(member)):
+            stale.append(n)
+    return stale
+
+
+def stale_metaparadigms(metaparadigms_dir: Path, paradigms_dir: Path) -> dict[str, list[str]]:
+    """{combination: [stale members]} for every metaparadigm in
+    `metaparadigms_dir` that is not true to the paradigms in `paradigms_dir`.
+    Empty when every one is true (or there are none)."""
+    out: dict[str, list[str]] = {}
+    if not metaparadigms_dir.is_dir():
+        return out
+    for p in sorted(metaparadigms_dir.glob("*.md")):
+        stale = metaparadigm_stale_members(_read_or_empty(p), p.stem, paradigms_dir)
+        if stale:
+            out[p.stem] = stale
+    return out
+
+
+@dataclass(frozen=True)
+class ParadigmChoice:
+    """Which text rides for the active set.
+
+    `kind` is `paradigm` (one name: its own file), `metaparadigm` (a written
+    text for the set; `level` is `project` for the project's own file,
+    `global` for a link) or `composed` (no text true to this set: composed by
+    rule; `stale` names the members a written one was set aside for)."""
+    names: tuple[str, ...]
+    kind: str
+    path: str | None = None
+    level: str | None = None
+    stale: tuple[str, ...] = ()
+
+    @property
+    def heading(self) -> str:
+        if len(self.names) == 1:
+            return f"Paradigm: {self.names[0]}"
+        return "Paradigms: " + " + ".join(self.names)
+
+
+def choose_paradigm_text(rness: Path, names=None) -> ParadigmChoice:
+    """Choose the text for the active set (or for `names`). One name: the
+    paradigm's file. Two or three: `rness/metaparadigms/<key>.md` — the
+    project's own real file, or the linked global — only while its
+    fingerprints match the members as this project has them; otherwise the
+    composed fallback."""
+    names = tuple(sorted(_dedupe(list(names)))) if names else \
+        tuple(get_active_paradigms(rness))
+    if len(names) == 1:
+        return ParadigmChoice(names, "paradigm", f"paradigms/{names[0]}.md")
+    key = metaparadigm_key(names)
+    rel = f"{METAPARADIGMS_DIR}/{key}.md"
+    p = rness / rel
+    if p.is_file():
+        level = "global" if p.is_symlink() else "project"
+        stale = metaparadigm_stale_members(_read_or_empty(p), key, rness / "paradigms")
+        if not stale:
+            return ParadigmChoice(names, "metaparadigm", rel, level)
+        return ParadigmChoice(names, "composed", None, level, tuple(stale))
+    return ParadigmChoice(names, "composed")
+
+
+COMPOSED_LEAD = (
+    "No text of its own is written for these paradigms together, so enough "
+    "composed this one by rule: the opening of each, under its name. They "
+    "are all on: none needs switching to. Where two pull different ways, "
+    "ask the person once."
+)
+
+
+def _cut_at_paragraph(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    t = text[:limit]
+    i = t.rfind("\n\n")
+    return (t[:i] if i > 0 else t).rstrip()
+
+
+def _compose_paradigms(rness: Path, names: tuple[str, ...], *, lean: bool) -> str:
+    """The composed fallback (P5): each member's lean head (its text above
+    `LEAN_CUT`), or, where a member has no cut, an even share of the
+    full measure, under one heading each. In the lean profile every piece is
+    held to an even share of `LEAN_HEAD_BUDGET`, so the whole weighs about
+    what one paradigm's lean head does."""
+    n = max(1, len(names))
+    pointer_room = 160
+    lean_share = max(0, (LEAN_HEAD_BUDGET - len(COMPOSED_LEAD)) // n - pointer_room)
+    full_share = FULL_PARADIGM_BUDGET // n
+    parts = [COMPOSED_LEAD]
+    for name in names:
+        text = _read_or_empty(rness / "paradigms" / f"{name}.md")
+        if not text:
+            continue
+        body = _paradigm_body(rness, text)
+        piece = body.split(LEAN_CUT, 1)[0].rstrip() if LEAN_CUT in body \
+            else _cut_at_paragraph(body, full_share)
+        if lean:
+            piece = _cut_at_paragraph(piece, lean_share)
+        block = f"## From `{name}`\n\n{piece}"
+        if piece != body:
+            block += (f"\n\n*(composed)* The rest of `rness/paradigms/{name}.md` "
+                      "is read with `read_file` the moment it applies.")
+        parts.append(block)
+    return "\n\n".join(parts)
+
+
+def load_paradigm_text(rness: Path, choice: ParadigmChoice, *, lean: bool = False) -> str:
+    """The body that rides under the Paradigm heading for `choice`."""
+    if choice.kind == "composed":
+        return _compose_paradigms(rness, choice.names, lean=lean)
+    return _load_text_at(rness, choice.path or "", lean=lean)
+
+
+def _load_paradigm_catalog(rness: Path, active) -> str:
+    """Build a brief catalog of the paradigms for the agent — which are on,
+    what else exists, and how to turn one on or off. `active` is one name or
+    the active set.
 
     Returns "" if there's only one paradigm (no choice to make)."""
+    on = [active] if isinstance(active, str) else list(active)
     items = list_paradigms(rness)
     if len(items) <= 1:
         return ""
-    lines = [f"Currently active: **{active}**", ""]
+    lines = ["Currently active: " + ", ".join(f"**{n}**" for n in on), ""]
     lines.append(
-        "Other paradigms available in this project. To switch, write the "
-        "paradigm name (no extension) to `rness/active-paradigm` using "
-        "`write_file`. The switch takes effect on the NEXT turn — for "
-        "the current turn you remain under the active paradigm above."
+        "Other paradigms in this project. Up to three can be on together: "
+        "edit the names, one a line, under `# Active paradigm` in "
+        "`rness/active-paradigm` with `write_file`; one name alone means that "
+        "one alone. A change takes effect on the NEXT turn."
     )
     lines.append("")
     for name, desc, _tooltip in items:
-        if name == active:
+        if name in on:
             continue
         if desc:
             lines.append(f"- **{name}** — {desc}")
         else:
             lines.append(f"- **{name}**")
+    present = {n for n, _d, _t in items}
+    for old, new in _RETIRED_PARADIGM.items():
+        if old in present and new in present and _kept_retired_paradigm(rness, old):
+            lines.append(
+                f"\n**{old}** is this project's own copy of a paradigm since "
+                f"renamed **{new}**. Offer once to carry what the person changed "
+                f"in it into a project copy of **{new}**.")
     return "\n".join(lines)
 
 
@@ -2230,9 +2614,9 @@ def assemble_system_prompt(
     motivation = _read_or_empty(rness / "MOTIVATION.md")
     project_profile = _read_or_empty(rness / "knowledge" / "project-profile.md")
     description = project_meta.load(project_dir)["description"].strip()
-    active_paradigm = get_active_paradigm(rness)
-    paradigm = _load_active_paradigm_body(rness, active_paradigm, lean=lean)
-    catalog = _load_paradigm_catalog(rness, active_paradigm)
+    paradigm_choice = choose_paradigm_text(rness)
+    paradigm = load_paradigm_text(rness, paradigm_choice, lean=lean)
+    catalog = _load_paradigm_catalog(rness, paradigm_choice.names)
     intention = _read_or_empty(rness / "INTENTION.md")
 
     parts = [
@@ -2267,7 +2651,7 @@ def assemble_system_prompt(
         # because since 0.3.5 that is what it is: not advisors you may
         # consult, but the rest of who you are this conversation.
         parts.append(_section("Active Readvisors", roles_block))
-    parts.append(_section(f"Paradigm: {active_paradigm}", paradigm))
+    parts.append(_section(paradigm_choice.heading, paradigm))
     if catalog:
         parts.append(_section("Paradigm Catalog", catalog))
     policies_block = _load_policies(rness, lean=lean)

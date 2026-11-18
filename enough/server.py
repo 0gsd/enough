@@ -67,7 +67,6 @@ from .logger import ExchangeLog, log_exchange
 from . import prompt as prompt_mod
 from .prompt import (
     assemble_system_prompt,
-    get_active_paradigm,
     get_help_bubbles,
     list_paradigms,
     list_roles,
@@ -211,6 +210,9 @@ HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
     # still be sitting on `rness/roles/` and shouldn't suddenly sprout a
     # duplicate tree section for it.
     "rness/paradigms",
+    # The texts for two or three paradigms on together (0.8): chosen for
+    # the person by the paradigm picker's toggles, never picked directly.
+    "rness/metaparadigms",
     "rness/readvisors",
     "rness/roles",
     "rness/skills",
@@ -1984,18 +1986,25 @@ def create_app(
         tree = build_file_tree(project_dir)
         return HTMLResponse(_tree_to_html(tree))
 
-    @app.get("/api/paradigm", response_class=HTMLResponse)
-    async def api_paradigm() -> HTMLResponse:
-        from .skeleton import resync_globals
-        resync_globals(project_dir)  # pick up globals added since launch
+    def _paradigm_list_html(refused: str | None = None) -> str:
+        """The sidebar's paradigm list (0.8): one toggle per paradigm, up to
+        `MAX_ACTIVE_PARADIGMS` on at once. Notes ride as rows of their own
+        carrying `data-*` attributes (and an English fallback) for the page
+        to translate: `data-paradigm-note="cap"` / `"empty"` for a refused
+        toggle, `"composed"` when the set on has no text of its own (with
+        `data-stale` naming the members a written one was set aside for)."""
+        def _attr(s: str) -> str:
+            return _escape_html(s).replace('"', "&quot;").replace("'", "&#39;")
+
         rness = project_dir / "rness"
         items = list_paradigms(rness)
         if not items:
-            return HTMLResponse('<div class="empty-note">no paradigms in rness/paradigms/</div>')
-        active = get_active_paradigm(rness)
+            return '<div class="empty-note">no paradigms in rness/paradigms/</div>'
+        choice = prompt_mod.choose_paradigm_text(rness)
+        active = set(choice.names)
         rows = []
         for name, desc, tooltip in items:
-            is_active = name == active
+            is_active = name in active
             cls = "on" if is_active else "off"
             marker = "●" if is_active else "○"
             # Prefer the user-facing tooltip; fall back to the agent-facing
@@ -2003,32 +2012,72 @@ def create_app(
             # until each one's `enough-tooltip-text:` is populated.
             tip_text = tooltip if tooltip else desc
             tip = _escape_html(tip_text) if tip_text else ""
+            vals = json.dumps({"name": name, "on": "0" if is_active else "1"})
             rows.append(
                 f'<li class="paradigm-row {cls}" title="{tip}">'
                 f'  <button class="paradigm-toggle" '
-                f'    hx-post="/api/paradigm/set" '
-                f'    hx-vals=\'{{"name": "{_escape_html(name)}"}}\' '
+                f'    hx-post="/api/paradigm/toggle" '
+                f"    hx-vals='{_attr(vals)}' "
                 f'    hx-target="#paradigm-list" hx-swap="innerHTML">'
                 f'    {marker}'
                 f'  </button>'
                 f'  <span class="paradigm-name">{_escape_html(name)}</span>'
                 f'</li>'
             )
-        return HTMLResponse('<ul class="paradigms">' + "".join(rows) + "</ul>")
+        if refused:
+            rows.append(
+                f'<li class="paradigm-note" data-paradigm-note="{_attr(refused)}" '
+                f'data-limit="{prompt_mod.MAX_ACTIVE_PARADIGMS}">'
+                f'{_escape_html(prompt_mod.PARADIGM_REFUSALS.get(refused, ""))}</li>')
+        if choice.kind == "composed":
+            stale = " ".join(choice.stale)
+            rows.append(
+                '<li class="paradigm-note" data-paradigm-note="composed" '
+                f'data-paradigms="{_attr(" ".join(choice.names))}" '
+                f'data-stale="{_attr(stale)}">'
+                "These paradigms have no text of their own together: enough "
+                "composes one from each.</li>")
+        kind = _attr(choice.kind)
+        return (f'<ul class="paradigms" data-paradigm-text="{kind}" '
+                f'data-active-count="{len(choice.names)}">' + "".join(rows) + "</ul>")
 
-    @app.post("/api/paradigm/set", response_class=HTMLResponse)
-    async def api_paradigm_set(request: Request) -> HTMLResponse:
-        form = await request.form()
+    @app.get("/api/paradigm", response_class=HTMLResponse)
+    async def api_paradigm() -> HTMLResponse:
+        from .skeleton import resync_globals
+        resync_globals(project_dir)  # pick up globals added since launch
+        return HTMLResponse(_paradigm_list_html())
+
+    def _paradigm_name(form) -> str:
         name = (form.get("name") or "").strip()
         if not name:
             raise HTTPException(400, "missing name")
-        rness = project_dir / "rness"
         # Validate: only allow names that resolve to an existing paradigm file.
-        valid_names = {n for n, _d, _t in list_paradigms(rness)}
+        valid_names = {n for n, _d, _t in list_paradigms(project_dir / "rness")}
         if name not in valid_names:
             raise HTTPException(400, f"unknown paradigm: {name}")
-        set_active_paradigm(rness, name)
-        return await api_paradigm()  # type: ignore[return-value]
+        return name
+
+    @app.post("/api/paradigm/toggle", response_class=HTMLResponse)
+    async def api_paradigm_toggle(request: Request) -> HTMLResponse:
+        """Switch one paradigm on (`on=1`) or off (`on=0`) within the set. A
+        fourth, or turning off the last, is refused: 200 with the list
+        re-rendered and a note row saying why (the skills' refusal path)."""
+        form = await request.form()
+        name = _paradigm_name(form)
+        want_on = (form.get("on") or "").strip() == "1"
+        try:
+            prompt_mod.toggle_paradigm(project_dir / "rness", name, want_on)
+        except prompt_mod.ParadigmSetRefused as refusal:
+            return HTMLResponse(_paradigm_list_html(refused=refusal.reason))
+        return HTMLResponse(_paradigm_list_html())
+
+    @app.post("/api/paradigm/set", response_class=HTMLResponse)
+    async def api_paradigm_set(request: Request) -> HTMLResponse:
+        """This one alone (the pre-0.8 switch, kept for old callers)."""
+        form = await request.form()
+        name = _paradigm_name(form)
+        set_active_paradigm(project_dir / "rness", name)
+        return HTMLResponse(_paradigm_list_html())
 
     # ------------------------------------------------------------------
     # Skills — the sidebar list, the guarded toggle, and the first-use
