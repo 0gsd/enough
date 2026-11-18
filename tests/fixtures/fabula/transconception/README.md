@@ -25,7 +25,9 @@ The 0.7 words are mapped (`purpose: transcoding` to `transconception`, the role 
 `ruling` is always a list; a reliance's `of` names the dependency it is a gift of and `used-by` the items that use it;
 `cited` is dropped; `source.obtained: public` and `ruled-by` are added from the transconceiver's standing statement;
 a path on the recording machine inside a recorded traceback is written from the home folder (`~/`). Everything else
-is as the experiment wrote it. Re-make them with:
+is as the experiment wrote it. Re-made on 2026-11-18 after the owner's second sitting (`_x0/sitting-2.md`): the
+experiment's generator wrote its rulings in (V-I14 and S-I0 split, S-I2 kept at the driver's dump, S-I6 narrowed to
+the byte-file steps, the allowance `own-types` on 62 Rust rulings). Re-make them with:
 
     python tools/transconception/promote_x0.py <_x0>/vulture/vulture.fabulac.cosm \
         <_x0>/results/2026-11-13-1006/vulture/py-roundtrip/verdict.json \

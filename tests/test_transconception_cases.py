@@ -587,3 +587,32 @@ def test_the_promoted_judge_judges_the_experiments_recording_against_itself(tmp_
     (tmp_path / "d").mkdir()
     v = _judge(harness, tmp_path / "d", derived, rec, run)
     assert v["unruled"] == 0 and v["steps"]["kept"] == v["steps"]["agree"] and v["passes"]
+
+
+def test_the_judge_knows_own_types_and_compares_it_as_kept(harness):
+    """Sitting 2 (2026-11-18): `own-types` is the fifth allowance. The judge sees only the interface, so it compares
+    exit status, stdout and stderr exactly, as for kept; the manifest's closed list and the judge's are the same."""
+    manifest = _load(REPO / "defaults" / "cosm" / "manifests" / "fabula.manifest.cosm")
+    assert list(harness.NORMALISERS) == tc.DEFAULTS["allowances"] == manifest["transconception"]["allowances"]
+    assert manifest["modules"]["P"]["kinds"]["case"]["closed"]["allowing"] == tc.DEFAULTS["allowances"]
+    rule = {"is": "alike", "allowing": "own-types"}
+    step = {"exit": 0, "out": '{"tree":{"tag":"r"}}\n', "err": ""}
+    assert harness.same(step, dict(step), rule) is True
+    for k, v in (("out", '{"tree":{"tag":"R"}}\n'), ("err", "x"), ("exit", 1)):
+        assert harness.same(step, {**step, k: v}, rule) is False
+    assert harness.same(step, step, {"is": "alike", "allowing": "the target's own types"}) is None
+
+
+@pytest.mark.skipif(not (X0 / "vulture" / "rulings.json").is_file(), reason="the experiment is on the owner's machine")
+def test_the_derived_rulings_are_the_experiments_after_sitting_2(sloppy, vulture):
+    """W2-X4 found the derived rulings and x0's rulings.json disagreeing on V-I14, S-I0, S-I2, S-I4 and S-I6. After
+    sitting 2 (an interface's ruling about the program's name only, or naming steps, does not decide how it is
+    judged; own-types on the list) they agree on every interface and case, for every target."""
+    for name, doc in (("vulture", vulture), ("sloppy-xml-py", sloppy)):
+        x0 = json.loads((X0 / name / "rulings.json").read_text(encoding="utf-8"))["targets"]
+        derived = tc.cases_document(doc, doc["nodes"])[0]["rulings"]["targets"]
+        assert set(derived) == set(x0)
+        for t, ours in derived.items():
+            theirs = {k: {f: v for f, v in r.items() if f in ("is", "allowing")} for k, r in x0[t]["interfaces"].items()}
+            assert {k: ours["interfaces"][k] for k in theirs} == theirs, (name, t)
+            assert ours["cases"] == x0[t]["cases"], (name, t)
