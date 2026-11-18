@@ -26,12 +26,17 @@ Trigger phrases (route here from `text-planning`):
 - "set this up so you always…" (often a paradigm or AGENT.md edit)
 - "expand the workflow", "extend enough to…"
 
-Switch by writing `workflow-design` to `rness/active-paradigm` with
-`write_file`, then briefly tell the user you're switching. The effect
-applies next turn.
+Turn it on by adding `workflow-design` on a line of its own under
+`# Active paradigm` in `rness/active-paradigm` with `write_file` (up to
+three are on together), then briefly tell the user. The effect applies
+next turn. When the build is complete, take its line out the same way
+(and put `text-planning` back if nothing else is left).
 
-When the build is complete and the user wants to return to general work,
-switch back to `text-planning` the same way.
+With the scaffolder skill on, a scaffold made here is presumed to lay
+out a higher-order-creativity system: a paradigm of the user's own,
+readvisors and skills, so that whatever their creative vision needs can
+be built and used. Help build it, and let a short dialectic trim the
+plan to what can be made (just a bit). They can always say otherwise.
 
 ## Tracking the build
 
@@ -89,6 +94,14 @@ reversible; writing into `~/enough/defaults/` mutates the source of
 truth for every other project on the user's machine. The allowlist is
 the user's standing consent for that.
 
+## Paradigms and their combinations, in brief
+
+For two or three paradigms on together, one text rides in their place:
+a metaparadigm. When you make, change or remove a paradigm, its
+combinations follow: say how many there are, ask which to write or
+bring up to date, show each before it is kept, and write nothing
+without the user's yes. The detail is Target 2, below.
+
 <!-- lean-cut -->
 
 ## Completion message format
@@ -110,8 +123,9 @@ completion message in this shape:
 > on in the **active skills** sidebar section to use it.
 >
 > *(Paradigm-specific:)* The paradigm is added to the catalog but not
-> activated. Switch to it via the **paradigm** sidebar section or by
-> writing its name to `rness/active-paradigm`.
+> turned on. Turn it on in the **paradigm** sidebar section (up to three
+> on together). These combinations were written: …; the others are
+> composed by rule until you ask for them.
 
 The `/api/reveal` links are real — clicking them pops the path open in
 Finder. Use absolute (`~/...`) paths in those URLs for global locations;
@@ -195,10 +209,81 @@ per-project via the sidebar.
 
 ## Target 2: Paradigms
 
-A paradigm is the reasoning framework you run under. Exactly one is
-active at a time (see the **paradigm** section at the top of the
-sidebar). Switching paradigms reshapes your mode for the duration of
-the build.
+A paradigm is a reasoning framework you run under. Up to three are on
+at once (the **paradigm** section at the top of the sidebar); a fourth
+is refused. They are a set: none leads.
+
+### One text for a set: metaparadigms
+
+When two or three paradigms are on, one text rides in their place: a
+**metaparadigm**, at `rness/metaparadigms/<names, sorted, joined with
++>.md` (`text-planning+transcognition.md`). It holds:
+
+- who does what among its members, and nothing about switching between
+  them, since they are all on;
+- the posture;
+- each member's core, with a pointer to the member's own file for the
+  long procedures;
+- hints about what the user most likely means in that set.
+
+A set with no metaparadigm of its own is composed by rule from the
+opening of each member, and the sidebar says so. It works, less well.
+
+Its front matter names the members and a fingerprint of each, one key a
+line:
+
+```markdown
+---
+members: alpha beta
+fingerprint.alpha: sha256:<16 hex>
+fingerprint.beta: sha256:<16 hex>
+---
+```
+
+A fingerprint is of the member's text as it was when the combination
+was written. It is enough's to work out, never yours to make up by
+hand. When a member changes, its fingerprint no longer matches, and the
+combination is set aside for this project, composed by rule instead,
+until it is brought up to date.
+
+**The measure.** A metaparadigm weighs what one paradigm does: no
+longer than `text-planning` (about 19,000 characters), with a
+`<!-- lean-cut -->` line whose head is no longer than text-planning's
+(about 5,000).
+
+### When the user asks for a new paradigm
+
+1. **Write the paradigm first**, after the clarifying pass. Show it;
+   keep it only on the user's yes.
+2. **Say how many combinations it makes** with the paradigms this
+   project has. Beside n others, a new one makes n pairs and n(n-1)/2
+   triples: beside three, six; beside four, ten.
+3. **Ask which to write.** Propose the sets the user says they will use
+   together. The rest are written the first time they are switched on
+   together, if the user asks; until then the composed text serves.
+4. **Write those, one at a time.** Show each before it is kept. Nothing
+   is written without the user's yes.
+
+### When a paradigm changes, or is removed
+
+- **Changed:** every combination holding it is stale. Name them and ask:
+  "shall I bring these up to date?" On a yes, read each again against
+  the changed paradigm, rewrite what moved, show it, and keep it on a
+  yes. On a no, they stay set aside and the composed text serves.
+- **Removed:** its combinations can no longer be on. Name them and ask
+  before removing any.
+- A project that changes its own copy of a global paradigm stales the
+  global combinations for this project alone. The ones brought up to
+  date are the project's own.
+
+### Level: global or the project's own
+
+A metaparadigm is never wider than its members. It is global
+(`~/enough/defaults/metaparadigms/`) only when every member is global
+and the user says so, under the rules of "Project vs global" above.
+Otherwise it is the project's own, in `rness/metaparadigms/`, which is
+the default for anything this paradigm builds. A project's own file
+wins over a global one.
 
 ### File format
 
@@ -238,12 +323,22 @@ than "This paradigm provides…".
 
 ### Pairing with skills
 
-Some paradigms pair with a specific skill (transcognition paradigm ↔
-translator skill). When designing a paired pair, encode the pairing
-explicitly in both the paradigm body and the skill description. You
-should know to switch paradigms when the user invokes the pairing
-keyword, and to surface a hint when one half of the pair is inactive
-while the other is engaged.
+Some paradigms pair with a skill (the transcognition paradigm with the
+translator and macrocosm-oes skills). Encode the pairing in both the
+paradigm body and the skill description, and surface a hint when one
+half is off while the other is engaged.
+
+A paradigm may hold **faces**: a block that rides only while its skill
+is on, written `<!-- face: <skill> -->` … `<!-- /face -->`. A `both`
+face rides when two or more of its face skills are on, a `none` face
+when none is.
+
+### The lean cut
+
+Every paradigm carries a `<!-- lean-cut -->` line. On a small context
+window only the text above it rides; the rest is read with `read_file`
+when it applies. Keep above it what is needed every turn (when it
+applies, the routing, the hard rules), no longer than text-planning's.
 
 ---
 
