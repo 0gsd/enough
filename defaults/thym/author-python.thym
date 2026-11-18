@@ -1,0 +1,49 @@
+thym 1
+
+-- An authored fabulac, begun from a brief or by an interview. The interview goes on as the dialectic's
+-- pair of runs, raise-the-questions and settle-the-answers (section 22.4), one stage at a time, until no
+-- question is open; ready-to-entail stands before the entailment (section 20.7).
+
+program begin-from-a-brief
+  why: the person's brief answers what it can about the program they mean to make, and the rest is
+       asked.
+  must: nothing is fetched; the brief is the person's own.
+
+  takes brief: text
+  gives f: fabula
+
+  let begun = author brief as tool                 -- the catalog, and items from the brief, every one an axiom
+  let asked = question begun
+  give gather asked with begun
+end
+
+program begin-by-interview
+  why: a program begun with nothing written: its catalog, and the first stage's questions.
+
+  gives f: fabula
+
+  let begun = author as tool                       -- the catalog alone, by rules
+  let asked = question begun
+  give gather asked with begun
+end
+
+program state-a-requirement
+  why: a requirement the person states goes into the fabulac they authored, in their own words.
+
+  takes f: fabula, said: string
+  gives g: fabula
+
+  give add said as requirement with f
+end
+
+program ready-to-entail
+  why: an authored fabulac is entailed only when every requirement it must meet has a case.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let left = uncovered f
+  assert count left < 1 else "a requirement the program must meet has no case"
+  give f
+end

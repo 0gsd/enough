@@ -35,7 +35,13 @@ CHECKS = (
 # that it leaves this list the day the text takes it.
 #   quotes-held (0.7): every name a catem quotes is in its fabulac (enough/thym/moves/code.py)
 #   cases-whole (0.8): `entail f as cases` gives a whole cases file (enough/thym/moves/transconceive.py)
-AHEAD = ("quotes-held", "cases-whole")
+#   authored-source (0.8): an authored fabulac's source and items (enough/thym/moves/author.py); in the text's 7.3 on
+#     cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md
+AHEAD = ("quotes-held", "cases-whole", "authored-source")
+
+# The moves a shipped declaration names ahead of the bundled text's 6.3 table, for the same reason: in the text on
+# cosmoes-site v080-texts (Thym 20.11), here until the sync. A test holds them to the rows the text gives them.
+AHEAD_MOVES = ("author", "add", "compare", "uncovered")
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}

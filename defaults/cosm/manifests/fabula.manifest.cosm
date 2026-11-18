@@ -56,8 +56,8 @@ volume:
   single-file: true                                   # identified by its declaration, never by its file name
 
 catalog:
-  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, atem, shorts, catems,
-         nodes]
+  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, atem, shorts,
+         catems, nodes]
   purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
                                                        # checks and gates of transconception (MacroCOSM OES 18.4.9),
                                                        # written after flavour; enough/transconception.py runs them
@@ -75,7 +75,14 @@ catalog:
   source-folder-fields: [path, kind, language, files, bytes, skipped, tree, commit, origin, licence, obtained, swhid]   # a folder (fabulac)
   source-obtained: [public, permitted, own]                        # how the source came to the reader
   source-swhid: '{dir: swh:1:dir:<hex>, rev: swh:1:rev:<hex>}: the folder''s and the revision''s identifiers, by rule'
-  source-kind: [text, folder]                                      # absent: text
+  source-kind: [text, folder, authored]                            # absent: text; authored: a fabulac a person wrote
+                                                                   # first, its own source (MacroCOSM OES 18.4.1, 18.4.7)
+  source-authored-fields: [kind, language, licence, by, at, brief] # by: refs R:maker; brief: the brief's path beside it
+  program-fields: [kind, start, serve]                             # a fabulac's program: what it specifies, how it starts
+  program-kind: [tool, library, service]                           # tool: started, then it ends; library: called;
+                                                                   # service: keeps running and answers on a port
+  program-serve-fields: [port, reach]                              # a service's: the port (0: the host chooses) and the
+                                                                   # addresses it may reach; served in a later minor
   tree: 'sha256 over the read set: for each file read, sorted by the UTF-8 bytes of its relative path, the bytes of
          <relative path> NUL <lowercase hex sha256 of its bytes> LF (MacroCOSM OES 18.4.1; Thym 20.1 uses the same digest)'
   derived-fields: [at, by, model, route, provider, program, run, mode, completeness, chunks, dropped, runs]
@@ -486,6 +493,43 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.verse:construe
     says: one axis of a poem read by a model, every reading held as the model's own
     since: 1
+  # thym 1 only (since: 1; THYM 6.3, 20.11): authoring a fabulac. author begins one from a brief (a model places what
+  # the brief's headings do not; the rules read the rest) or, with no operand, by rules alone: the catalog and what
+  # the person said in beginning it. add, compare and uncovered are its helpers, by rules. The moves live in
+  # enough/thym/moves/author.py; authored-source is Thym's own check (THYM 7.3), held there too.
+  - name: author
+    takes: ['text | nothing']                # the brief, or nothing: an interview (a last operand that may be left out)
+    gives: fabula
+    modifiers: {as: 'tool | library | service'}
+    asks: true
+    contract: [authored-source, fabula-checks, provenance]
+    scaffold: catalog-alone
+    scaffold-when:                          # a brief: none (a model places what the rules cannot); no brief: the move
+      - {takes: text, scaffold: none}
+    code: enough.thym.moves.author:author
+    says: an authored fabulac begun, from the person's brief or from nothing, its every item an axiom
+    since: 1
+  - name: add
+    takes: [string]
+    gives: fabula
+    modifiers: {as: 'requirement | decision | case | interface', with: fabula}
+    contract: [authored-source, nothing-lost, ids-unique, fabula-checks, provenance]
+    code: enough.thym.moves.author:add
+    says: the person's own sentence written into the fabulac they authored, as a new item of that kind
+    since: 1
+  - name: compare
+    takes: [fabula]
+    gives: report
+    modifiers: {with: fabula}
+    code: enough.thym.moves.author:compare
+    says: what differs between two fabulacs, item by item
+    since: 1
+  - name: uncovered
+    takes: [fabula]
+    gives: list of item
+    code: enough.thym.moves.author:uncovered
+    says: the requirements a program must meet that no case shows
+    since: 1
 
 # The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
 # about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
@@ -498,7 +542,8 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most, batch]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most, batch,
+                 stage, brief]
   banks:
     fabulan:
       for: {flavour: fabulan}
@@ -569,8 +614,8 @@ dialectic:
         - {id: sung, about: C, asks: "Where does the tune move a word's stress, or hold one syllable over several notes?", kind: text, why: missing, writes: device, sets: {figure: sung stress}}
         - {id: performed, about: R, asks: "Is it sung as written, or are lines repeated, cut or added when it is performed?", kind: text, why: missing, writes: change}
     fabulac:
-      for: {flavour: fabulac}
-      to: maker
+      for: {flavour: fabulac, source: [folder, none]}   # a fabulac decompiled from a folder (or standalone); never an
+      to: maker                                         # authored one: its questions are about code that exists
       questions:
         - {id: modelled-on, about: I, asks: "What existing tool or program was this modelled on, or made to replace?", kind: text, why: missing, writes: influence}
         - {id: prompted, about: I, asks: "What problem or moment set it going?", kind: text, why: missing, writes: occasion}
@@ -589,6 +634,43 @@ dialectic:
         - {id: licence, about: R:licence#identifier, asks: "Under which licence may it be used?", kind: text, why: missing}
         - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}
         - {id: worry, about: P:case, asks: "Which test, if it failed, would worry you most, and why?", kind: text, why: intent, writes: N:requirement, sets: {force: must}}
+    # An authored fabulac's interview (MacroCOSM OES 18.4.7, "How a fabulac is authored"; Thym 20.11), asked only of a
+    # fabulac whose source is the authored form, by its author. The entries carry the interview's order: `stage` names
+    # the stage each belongs to, and the stages go in the order their entries first appear: what it is for and for
+    # whom; the ways in; what it needs and the settings it reads; what it leaves out on purpose; the cases; the open
+    # questions. A stage is raised only when the one before it has landed (every question of the volume answered and
+    # settled, and every open field asked), so the person meets one stage at a time; the page shows them one or two
+    # at a time. An entry about a module writes the kind `writes` names, with `sets` giving what the answer cannot (an
+    # open field asks it next, in the same stage), and is not asked when the volume holds that item already (the
+    # brief gave it). `brief` lists the headings of a written brief whose sections answer the entry by rule: each list
+    # item, or each paragraph, under such a heading is one item, in the person's own words (structured-intake); the
+    # paragraphs before the first heading answer `aim`. Every item an answer or the brief writes is an axiom.
+    fabulac-authored:
+      for: {flavour: fabulac, source: authored}
+      to: author
+      questions:
+        # what it is for, and for whom
+        - {id: aim, stage: for, about: N, asks: "What should {name} do, in a sentence or two: what does a person have once it has run?", kind: text, why: intent, writes: aim, brief: [what it is for, what it does, aim, aims, purpose]}
+        - {id: audience, stage: for, about: N, asks: "Who is {name} for, and what do they already know?", kind: text, why: missing, writes: audience, brief: [for whom, who it is for, audience, who]}
+        - {id: use, stage: for, about: N, asks: "Name one thing a person will do with {name}, from start to end.", kind: text, why: missing, writes: use, brief: [uses, use, what a person does with it]}
+        - {id: occasion, stage: for, about: I, asks: "What set you to make {name}: a problem, a moment, a need?", kind: text, why: missing, writes: occasion, brief: [why, occasion, what prompted it]}
+        - {id: licence, stage: for, about: R:licence#identifier, asks: "Under which licence will you offer the program to others: MIT, Apache-2.0, or another? Give its short name.", kind: text, why: missing}
+        # the ways in
+        - {id: way-in, stage: ways-in, about: C, asks: "How does a person or another program reach {name}: a command and its arguments, or a function and what it takes? Name one way in.", kind: text, why: missing, writes: interface, sets: {surface: {pending: "Is it a command (a person types it) or a function (a program calls it)? Say command or function."}}, brief: [ways in, way in, commands, interface, interfaces]}
+        - {id: signature, stage: ways-in, about: C:interface#signature, asks: "What is the exact signature of {name}: its name, and every argument it takes, in order?", kind: text, why: missing}
+        # what it needs, and the settings it reads
+        - {id: needs, stage: needs, about: C, asks: "Does {name} need anything besides Python and its standard library to run? Name one thing it needs.", kind: text, why: missing, writes: dependency, sets: {scope: run-time}, hint: "decline this question when it needs nothing else", brief: [needs, what it needs, dependencies, requires]}
+        - {id: python, stage: needs, about: C:dependency#version, asks: "Which version of {name} at least?", kind: text, why: missing}
+        - {id: setting, stage: needs, about: C, asks: "Which setting will {name} read: an option on its command line, a variable of the environment, a file? Name one.", kind: text, why: missing, writes: setting, sets: {set-in: {pending: "Where is it set: an option, the environment, a file, or a constant? Say option, environment, file or constant."}}, hint: "decline this question when it reads none", brief: [settings, setting, options, configuration]}
+        # what it leaves out on purpose
+        - {id: left-out, stage: left-out, about: N, asks: "What will {name} not do, on purpose, for now or for good?", kind: text, why: intent, writes: exclusion, brief: [leaves out, left out, what it leaves out, not doing, out of scope, exclusions, non-goals]}
+        - {id: must, stage: left-out, about: N, asks: "What must {name} always do, and what must it never do, whatever a person asks of it? Name one.", kind: text, why: intent, writes: requirement, sets: {force: must}, brief: [requirements, must, always, never, must never]}
+        # the cases
+        - {id: case, stage: cases, about: P, asks: "Give one example {name} must get right: what is given (a command and its arguments, or a call), and what is expected back.", kind: text, why: missing, writes: case, sets: {of: {pending: "Which way in, or which use, is this case of? Name it by its id."}, given: {pending: "What is given: the command and its arguments, or the call, and any file it starts with?"}, expect: {pending: "What is expected back: the output, the exit, or the value?"}}, brief: [cases, case, examples, example]}
+        # the open questions: a requirement the program must meet that no case shows yet (asked once the cases are
+        # in), and what is still undecided
+        - {id: checked-by, stage: open, about: N:requirement#checked-by, only-where: {force: [must]}, asks: "Which case shows that {name} holds? Name the case by its id.", kind: ref, why: missing}
+        - {id: open, stage: open, about: N, asks: "What is still undecided about {name}: a choice you have not made yet?", kind: text, why: intent, writes: decision, sets: {chose: {pending: "not decided yet: what will you choose?"}}, hint: "decline this question when nothing is", brief: [open questions, undecided, questions]}
     # A transconception's three banks (MacroCOSM 18.4.9, 18.6.6), asked only of a fabulac whose catalog says
     # purpose: transconception, and answered by its transconceiver. standing: who rules, the source's terms and the
     # transconceiver's statements about them (who rules is asked only while nobody does; the leave only of a closed

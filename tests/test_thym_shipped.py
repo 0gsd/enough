@@ -68,7 +68,11 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
     assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "quotes-held", "uses-told",
                                                              "footer", "provenance")
     assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
-    assert {n for n in d if d[n].since >= 1} == {r[0] for r in rows} - {"derive", "entail", "count", "words"}
+    # the authoring moves are declared ahead of the bundled text (Thym 20.11 on v080-texts): tests/test_fabulac_author.py
+    # holds them to the text's rows until the sync brings the rows here (contracts.AHEAD_MOVES)
+    from enough.thym.contracts import AHEAD_MOVES
+    assert {n for n in d if d[n].since >= 1} == ({r[0] for r in rows} - {"derive", "entail", "count", "words"}
+                                                 | set(AHEAD_MOVES))
 
 
 def compile_with(text: str, decls: dc.Declarations, path: str | None = None):
@@ -150,8 +154,10 @@ def test_every_shipped_program_compiles_plans_and_enumerates(path):
 
 
 def test_the_shipped_programs_are_the_six_of_the_design_and_the_three_of_0_5_0():
+    # author-python (0.8) is Thym 20.11's block on v080-texts, ahead of the bundled text: tests/test_fabulac_author.py
+    # compiles, plans and enumerates it; it joins ROUND when the sync brings 20.11 here
     assert sorted(p.stem for p in SHIPPED.glob("*.thym")) == sorted(ROUND + ("open-house", "publish-story",
-                                                                             "read-my-way"))
+                                                                             "read-my-way", "author-python"))
 
 
 def test_the_shipped_programs_plan_as_the_text_says():

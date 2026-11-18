@@ -1250,7 +1250,7 @@ for _move, _builder in PROMPTS.items():
 #: it is there, exports `PROMPTS: dict[str, builder]`, the move's name -> `builder(contract, inputs) -> messages |
 #: None`. A builder returns None for a request that is not its own (a `derive` that is not `as code`), and the next
 #: one is asked: the siblings' in this order, then the host's own (`PROMPTS` above).
-PROMPT_MODULES = ("enough.fabulac_prompts", "enough.fabulap_prompts", "enough.thym.moves.code",
+PROMPT_MODULES = ("enough.fabulac_prompts", "enough.fabulap_prompts", "enough.thym.moves.code", "enough.thym.moves.author",
                   "enough.thym.moves.edit",
                   "enough.thym.moves.dialectic", "enough.dialectic")
 

@@ -382,7 +382,10 @@ def test_the_fabula_carries_a_bank_per_flavour():
     banks = M.default_registry().get("fabula").banks()
     assert [(b["name"], b["for"], b["to"], len(b["questions"])) for b in banks] == [
         ("fabulan", {"flavour": "fabulan"}, "author", 17), ("fabulap", {"flavour": "fabulap"}, "author", 35),
-        ("fabulac", {"flavour": "fabulac"}, "maker", 17),
+        # 0.8: the decompile bank is a folder's (or a standalone fabulac's), never an authored fabulac's
+        ("fabulac", {"flavour": "fabulac", "source": ["folder", "none"]}, "maker", 17),
+        # 0.8 (MacroCOSM 18.4.7, 18.6.6): an authored fabulac's interview, its entries in stages
+        ("fabulac-authored", {"flavour": "fabulac", "source": "authored"}, "author", 15),
         # 0.8 (MacroCOSM 18.6.6): a transconception's three banks, asked only of a fabulac whose purpose says so
         ("transconception-standing", {"purpose": "transconception"}, "transconceiver", 8),
         ("transconception-target", {"purpose": "transconception"}, "transconceiver", 2),
@@ -442,10 +445,13 @@ def test_the_fabula_manifest():
     # the four emf/1 declared, the fabulac's two stages and the fabulap's two helper moves, thym 1 only (THYM 6.2,
     # 6.3, 20.9)
     assert [mv["name"] for mv in m.data["moves"]] == ["derive", "entail", "atem", "expand", "survey", "history", "scan",
-                                                      "construe"]
+                                                      "construe",
+                                                      # 0.8: authoring a fabulac, thym 1 only (THYM 20.11)
+                                                      "author", "add", "compare", "uncovered"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
     assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:6])
-    assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:])
+    assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:8])
+    assert all(mv["code"].startswith("enough.thym.moves.author:") and mv["since"] == 1 for mv in m.data["moves"][8:])
     assert "emf-checks" in m.data["moves"][0]["contract"]
     assert all(m.matches_catalog(n) for n in ("close.md.fabulan.cosm", "rose.txt.fabulap.cosm",
                                                "tool.fabulac.cosm", "close.md.cosm"))

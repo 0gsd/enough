@@ -171,8 +171,29 @@ def folder_of(fabulac: Path) -> Path | None:
     return Path(fabulac).with_name(name[: -len(FABULAC_SUFFIX)])
 
 
+def authored_twin(folder: Path) -> Path | None:
+    """The fabulac beside `folder` when it is authored (its source the authored form, MacroCOSM OES 18.4.1): then the
+    folder is that fabulac's entailment, never a program to decompile. None otherwise."""
+    fab = fabulac_path(Path(folder))
+    if not fab.is_file() or fab.is_symlink():
+        return None
+    src = _load(fab).get("source")
+    return fab if isinstance(src, dict) and src.get("kind") == "authored" else None
+
+
+def refuse_authored(folder: Path) -> None:
+    """The twin guard (pins section 4; MacroCOSM OES 18.4.1, Thym 20.11): a build refuses a folder whose fabulac is
+    authored, in the pins' words."""
+    fab = authored_twin(folder)
+    if fab is not None:
+        raise BuildError(f"{fab.name} is authored; {Path(folder).name}/ is its entailment. Entail again, or take a "
+                         "hand edit back", 409)
+
+
 def target_of(project_dir: Path, rel: str) -> tuple[Path, Path]:
-    """`(folder, fabulac)` for a request's `path`: the folder itself, or its `<folder>.fabulac.cosm`."""
+    """`(folder, fabulac)` for a request's `path`: the folder itself, or its `<folder>.fabulac.cosm`. A build of a
+    folder whose fabulac is authored is refused where it starts (`refuse_authored`, in `start_build` and
+    `run_build`); its status and a cancel still name it."""
     p = project_path(project_dir, rel)
     if p.name.endswith(FABULAC_SUFFIX):
         folder = folder_of(p)
@@ -500,6 +521,7 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
     from .thym import run as _run
     project_dir = Path(project_dir)
     fab = fabulac_path(folder)
+    refuse_authored(folder)                            # never a decompile over an authored fabulac (18.4.1)
     state = build_state(project_dir, folder)
     first = start_index(state, restart=restart, resume_only=resume_only)
     prog = program_path()
@@ -990,6 +1012,7 @@ def build_router(*, project_dir: Path, llm_url: str | None, jobs: Any,
             raise HTTPException(400, f"job_calls is a ceiling of at least 1 model call, not {job_calls!r}")
         try:
             folder, fab = await asyncio.to_thread(target_of, project_dir, str(body.get("path") or ""))
+            refuse_authored(folder)                    # the twin guard: an authored fabulac's folder is its entailment
             state = await asyncio.to_thread(build_state, project_dir, folder)
             first = start_index(state, restart=bool(body.get("restart")), resume_only=resume_only)
         except BuildError as e:

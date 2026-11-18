@@ -1311,7 +1311,12 @@ class _Checker:
         if not takes and c.operands:
             self.fail("type", f"{c.move} takes no operand" + (f"; its argument is its of: {c.move} of …"
                                                               if "of" in target.modifiers else ""), c.line)
-        if len(c.operands) != len(takes):
+        # a last operand whose alternatives include `nothing` may be left out (`author as tool`, an interview with no
+        # brief: THYM 6.3); one that is written is held to the others
+        need = len(takes)
+        while need and ty.NOTHING in takes[need - 1]:
+            need -= 1
+        if not (need <= len(c.operands) <= len(takes)):
             self.fail("type", f"{c.move} takes {len(takes)} operand(s) ({'; '.join(ty.show(a) for a in takes)}); "
                       f"given {len(c.operands)}", c.line)
         for op, alts in zip(c.operands, takes):

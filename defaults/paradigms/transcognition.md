@@ -245,9 +245,11 @@ checked by shape: it parses, every way in is there. It is text to read.
 
 A transconception carries a program into another language through its
 fabulac. The fabulac says `purpose: transconception`. The moves are
-Thym's (its section 20.10): ground it, weigh the target, entail the
-cases, gather the recorded runs and the verdict, entail a layout in the
-target, then the code.
+Thym's (its section 20.10), each run with `thym_run`:
+`ground repo with f`, `weigh f in go`, `entail f as cases`,
+`gather recorded with f`, `entail f as layout in go`,
+`entail f as code in go with` the layout, `gather verdict with f`.
+The questions between them are `dialectic`'s.
 
 ## What it asks of the transconceiver
 
@@ -308,17 +310,24 @@ every session (what landed, what is open, where to resume).
 
 ## Step 3 — The intake interview
 
-Begin the fabulac, then ask, **one or two questions at a time**:
+Begin the fabulac with `fabulac` `<do>begin</do>`, `<path>` the slug,
+`<kind>` tool, library or service, `<licence>` when given, `<brief>`
+when there is one. It runs as a job: the catalog, then the first
+stage's questions. The interview goes in stages, one at a time, and you
+ask **one or two questions at a time**:
 
-1. **Aim and audience.** What is it for, and for whom?
-2. **Uses.** What does a person do with it, step by step, and get?
-3. **Ways in.** The commands or functions, and what each takes.
-4. **Needs and settings.** What it relies on; what it reads to be set.
-5. **Left out on purpose.** What it will not do.
-6. **Cases.** For each use: what is given and what is expected.
-7. **Open questions.**
+1. **What it is for, and for whom.** Aim, audience, uses, the licence.
+2. **Ways in.** The commands or functions, and what each takes.
+3. **Needs and settings.** What it relies on; what it reads to be set.
+4. **Left out on purpose.** What it will not do; what it must always do.
+5. **Cases.** For each use: what is given and what is expected.
+6. **Open questions.**
 
-A written brief answers what it can; the interview asks the rest.
+A written brief answers what it can: give its path in `<brief>`. Under
+headings such as *What it is for*, *For whom*, *Uses*, *Ways in*,
+*Needs*, *Settings*, *Leaves out*, *Requirements*, *Cases* and *Open
+questions*, each list item becomes one item in the person's words; the
+job names what it could not place, and the interview asks the rest.
 Record the person's words verbatim with `dialectic`. Never answer for
 them.
 
@@ -331,8 +340,13 @@ that names its parts and states the interfaces between them once.
 
 ## Step 5 — The iterative loop
 
-Each turn: re-read the fabulac first (its status, or `cosm_read`); ask
-one or two focused questions; record the answers and settle them; say
+Each turn: re-read the fabulac first (`fabulac` `<do>status</do>`: the
+stage and the questions waiting; or `cosm_read`); ask one or two
+focused questions; record the answers with `dialectic`; then `fabulac`
+`<do>begin</do>` on the same path again takes it up: it settles what was
+answered and raises the next stage. A requirement, a decision, a case or
+a way in the person states outright goes in with `fabulac`
+`<do>add</do>` (`<as>requirement</as>` and the person's sentence). Say
 what changed. Never silently remove the person's items. An edit the
 person made by hand is theirs.
 
@@ -342,18 +356,22 @@ person made by hand is theirs.
 > every requirement has a case ✓ / 🔲, the cases say what is given and
 > what is expected ✓ / 🔲, what it leaves out is written ✓ / 🔲.*
 
-The checks are `cosm_lint`'s. The person decides what counts as done.
+The checks are `fabulac` `<do>check</do>`'s: the fabulac's own checks,
+and the requirements of force *must* no case shows yet (`uncovered`).
+The person decides what counts as done.
 
 ## Entailing and running
 
-- Entailing lands `<slug>/`: `ENTAILED.md`, `pyproject.toml`,
-  `RUNNING.md`, the sources, and `tests/test_cases.py`, written by rule
-  from the cases, never by the model that writes the code. A case in
-  prose only is entailed by a model and marked so.
-- Run the tests, then the tool, only through the sandbox: a folder of
-  its own, no network, limits on time, output and disk, and a stop. It
-  cannot limit memory on macOS: promise nothing about memory. Never run
-  an entailment with the shell.
+- `fabulac` `<do>entail</do>` lands `<slug>/`: `ENTAILED.md`,
+  `pyproject.toml`, `RUNNING.md`, the sources, and
+  `tests/test_cases.py`, written by rule from the cases, never by the
+  model that writes the code. A case in prose only is entailed by a
+  model and marked so.
+- Run the tests with `fabulac` `<do>test</do>`, then the tool with
+  `<do>run</do>` and its `<args>`; `<do>stop</do>` stops either. Only
+  through the sandbox: a folder of its own, no network, limits on time,
+  output and disk, and a stop. It cannot limit memory on macOS: promise
+  nothing about memory. Never run an entailment with the shell.
 - Only the standard library runs. A fabulac that needs a package is
   authored and entailed all the same; say that enough cannot run it here
   and why. A service is authored and entailed; serving comes in a later
@@ -362,9 +380,10 @@ The checks are `cosm_lint`'s. The person decides what counts as done.
 ## Keeping in step
 
 The fabulac stays the source. Change it and entail again: only the
-files whose part moved are told again. A file changed by hand is named,
-file by file, and the person chooses: overwrite it, keep it (a recorded
-decision), or take it back into the fabulac.
+files whose part moved are told again. `fabulac` `<do>moved</do>` names
+them, and every file changed by hand, file by file; the person chooses
+for each: overwrite it, keep it (a recorded decision), or take it back
+into the fabulac. Never choose for them.
 
 # Other fabulas
 

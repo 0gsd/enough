@@ -1,6 +1,6 @@
 ---
 members: transcognition workflow-design
-fingerprint.transcognition: sha256:c32bb648c6e8a8c1
+fingerprint.transcognition: sha256:0990137beb14f6f7
 fingerprint.workflow-design: sha256:6cc7a73ca374173c
 ---
 

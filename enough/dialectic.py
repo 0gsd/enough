@@ -1047,11 +1047,28 @@ class Raised:
 #: words). `module` names what the bank asks about and selects nothing (Comprise's banks), and so does a key no
 #: entry here reads: a lane that selects by another key adds its reading here, and nothing else changes.
 #: `flavour`: the catalog's flavour as the manifest reads it; `purpose`: the catalog's `purpose`
-#: (`transconception`), absent on a fabulac kept for its own sake.
+#: (`transconception`), absent on a fabulac kept for its own sake; `source`: the kind of the catalog's `source`
+#: (`source_word`: `text`, `folder` or `authored`, and `none` for a standalone fabula), so that an authored fabulac is
+#: asked its author's interview and never the questions about code that exists (MacroCOSM OES 18.4.7, 18.6.6).
 BANK_FOR: dict[str, Callable[["Ledger"], Any]] = {
     "flavour": lambda led: led.flavour,
     "purpose": lambda led: led.catalog.get("purpose"),
+    "source": lambda led: source_word(led.catalog),
 }
+
+#: The source kind of an authored fabulac (MacroCOSM OES 18.4.1): its own source, with no folder behind it.
+AUTHORED = "authored"
+
+
+def source_word(catalog: Any) -> str:
+    """The kind of a catalog's `source`, as a bank's `for: {source: …}` names it: its `kind` (`folder`, `authored`),
+    `text` for a text's source that names no kind (the default, 18.4.1), and `none` when the fabula has no source (a
+    standalone fabula)."""
+    src = catalog.get("source") if isinstance(catalog, dict) else None
+    if not isinstance(src, dict):
+        return "none"
+    kind = src.get("kind")
+    return str(kind) if isinstance(kind, str) and kind.strip() else "text"
 
 
 def bank_applies(led: "Ledger", bank: dict) -> bool:
@@ -1457,15 +1474,69 @@ def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None,
     return out
 
 
-def _already_written(led: "Ledger", module: str, e: dict) -> bool:
+def _already_written(led: "Ledger", module: str, e: dict, *, any_of_kind: bool = False) -> bool:
     """Whether the volume holds the item an entry about a module would write, with every field its `sets` gives: who
-    rules a transconception is asked only while nobody does."""
+    rules a transconception is asked only while nobody does. With `any_of_kind` (an authored fabulac's interview), an
+    entry with no `sets` holds when the volume has any item of the kind it writes, and an open field in `sets` (a
+    pending the answer leaves) matches whatever the item now holds there: what a brief answered is not asked again."""
     writes, sets = e.get("writes"), e.get("sets")
-    if not (isinstance(writes, str) and writes.strip() and isinstance(sets, dict) and sets):
+    if not (isinstance(writes, str) and writes.strip()):
+        return False
+    if not (isinstance(sets, dict) and sets) and not any_of_kind:
         return False
     mod, sep, k = writes.strip().partition(":")
     mod, k = (mod, k) if sep else (module, mod)
-    return any(all(_same(d.get(f), v) for f, v in sets.items()) for d in _items_of_kind(led, mod, k))
+    want = {f: v for f, v in (sets or {}).items() if not (any_of_kind and mc.is_pending(v))}
+    return any(all(_same(d.get(f), v) for f, v in want.items()) for d in _items_of_kind(led, mod, k))
+
+
+def stages_of(entries: Iterable[dict]) -> list[str]:
+    """A bank's interview order (MacroCOSM OES 18.4.7, 18.6.6): the stages its entries name in `stage`, in the order
+    they first appear. Empty for a bank whose entries name none: it is asked all at once."""
+    out: list[str] = []
+    for e in entries:
+        s = e.get("stage") if isinstance(e, dict) else None
+        if isinstance(s, str) and s.strip() and s.strip() not in out:
+            out.append(s.strip())
+    return out
+
+
+def stage_of_question(led: "Ledger", q: dict) -> str | None:
+    """The interview stage a bank question belongs to (its entry's `stage`), or None."""
+    _bank, e = _bank_entry(led, (q.get("raised") or {}).get("from"))
+    s = (e or {}).get("stage")
+    return s.strip() if isinstance(s, str) and s.strip() else None
+
+
+def unsettled_questions(led: "Ledger") -> list[dict]:
+    """The questions a person still owes or a settle still has to fold: open ones, and ones answered (or answered
+    "I don't know", or declined) whose answer is not settled yet."""
+    return [q for q in led.questions()
+            if q.get("state") == "open" or (q.get("state") in ANSWERED and not q.get("settled"))]
+
+
+def unasked_pendings(led: "Ledger", covered: set[str] | None = None) -> list[str]:
+    """The open fields of the volume's items (`{pending: …}`, and a whole item's `pending`) that no standing question
+    asks yet: what the next `question` raises by rule."""
+    if covered is None:
+        covered = {_about_key(q.get("about")) for q in led.questions() if q.get("state") not in ENDED}
+    out = []
+    for d in led.items:
+        if not isinstance(d, dict) or not isinstance(d.get("id"), str) or is_d_item(d):
+            continue
+        for fpath, text in mc.walk_pending(d):
+            if not (isinstance(text, str) and text.strip()):
+                continue
+            addr = d["id"] if fpath == WHOLE_ITEM else f"{d['id']}#{fpath}"
+            if _about_key(addr) not in covered:
+                out.append(addr)
+    return out
+
+
+def stage_waits(led: "Ledger", *, pending: bool = True, covered: set[str] | None = None) -> bool:
+    """Whether an interview's current stage has not landed yet: a question is still open or its answer unsettled, or
+    (with the pending rule on) an open field is still to be asked. The next stage is raised only when it has."""
+    return bool(unsettled_questions(led)) or (pending and bool(unasked_pendings(led, covered)))
 
 
 def _raise_rulings(led: "Ledger", e: dict, frm: str, raised: dict, why: str, pool: list[dict], bound: tuple,
@@ -1841,11 +1912,13 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
         out.questions.append(q)
 
     raised_base = {"at": when, "run": run}
-    if rules:
-        for b in banks_for(led, names=banks):
+
+    def ask_entries(b: dict, entries: list[dict]) -> None:
+        """The questions of some of a bank's entries (step 1 above), added to `out`."""
+        if True:
             older = b["name"] == led.manifest.name and not (led.manifest._block("dialectic").get("banks") or {}) \
                 .get(b["name"])
-            for e in b["questions"]:
+            for e in entries:
                 eid, about = str(e.get("id", "")), e.get("about")
                 if not eid or not isinstance(about, str) or not isinstance(e.get("asks"), str):
                     out.skipped.append((f"{b['name']}/{eid}", "a bank entry needs id, about and asks"))
@@ -1858,7 +1931,9 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     if frm in from_any:
                         out.skipped.append((frm, f"{frm} was asked of this volume already"))
                         continue
-                    if (b.get("for") or {}).get("purpose") and _already_written(led, head, e):
+                    by_source = bool((b.get("for") or {}).get("source"))
+                    if ((b.get("for") or {}).get("purpose") or by_source) and \
+                            _already_written(led, head, e, any_of_kind=by_source):
                         out.skipped.append((frm, "the volume holds what it would write already"))
                         continue
                     asks = _fill(e["asks"], None, led)
@@ -1917,6 +1992,23 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                         continue
                     slug = _unique_slug(f"{eid}-{_bare(d['id']).split('/', 1)[-1]}", taken, led)
                     add(_question_item(Q_PREFIX + slug, q_about, asks, why, e, who(e.get("to")), {**raised}), frm)
+
+    if rules:
+        for b in banks_for(led, names=banks):
+            entries = b["questions"]
+            order = stages_of(entries)
+            if not order:
+                ask_entries(b, entries)
+                continue
+            # An interview (MacroCOSM OES 18.4.7): the entries no stage names, then one stage at a time. A stage is
+            # raised only when the one before it has landed (`stage_waits`), and while it stands its questions are the
+            # only new ones; an earlier stage's entries that now find something to ask (an interface written in the
+            # stage before) are asked in the stage that follows.
+            ask_entries(b, [e for e in entries if not (isinstance(e.get("stage"), str) and e["stage"].strip())])
+            for st in order:
+                if out.questions or stage_waits(led, pending=pending, covered=by_about):
+                    break
+                ask_entries(b, [e for e in entries if isinstance(e.get("stage"), str) and e["stage"].strip() == st])
     if rules and pending:
         for d in led.items:
             if not isinstance(d, dict) or not isinstance(d.get("id"), str) or is_d_item(d):
@@ -2676,7 +2768,7 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
     - **a module or a kind** (a bank question asked of the volume): a value (text or choice only) writes a new item of
       the kind (`<M>:<kind>`'s; for a module, the kind its bank entry is named after when the module has one, else the
       module's first kind) with `name` its first words, `summary` the answer, `stance: hearsay` where the kind requires
-      a stance, and `provenance: {mode: dialectic, sources: [D:session/<id>], confidence}`; `make_item(question,
+      a stance (`stance: axiom` always, in an authored fabulac: its author says so, 18.4.7), and `provenance: {mode: dialectic, sources: [D:session/<id>], confidence}`; `make_item(question,
       answer, item)` may change or replace it (Ascribe's form discovery), or return None (nothing written). "I don't
       know" and a refusal write nothing.
     - **a whole item**: "I don't know" writes `pending: "<their words>"` on the item; a refusal sets
@@ -2731,7 +2823,9 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
             slug, n = f"{base}-{n}", n + 1
         item: dict = {"id": g.item_id(mod, k, slug), "type": k, "name": _first_words(text), "summary": text}
         required = led.manifest.required_fields(mod, k)
-        if "stance" in required:
+        if source_word(led.catalog) == AUTHORED:
+            item["stance"] = "axiom"                # the author says so: the program is to be so (18.4.7)
+        elif "stance" in required:
             item["stance"] = "hearsay"
         for f, v in _entry_sets(led, ((question or {}).get("raised") or {}).get("from")).items():
             item[f] = copy.deepcopy(v)              # what the answer cannot say: a device's figure (`sets`, 18.6.6)
