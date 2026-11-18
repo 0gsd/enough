@@ -60,10 +60,10 @@ name: paradigma
 path: rness/active-paradigm
 
 ### what
-el marco de razonamiento que tu readvisor está usando en este momento. hay exactamente un paradigma activo en cada momento; haz clic en otro para cambiar. el paradigma activo se carga por completo en el system prompt en cada turno, y tu readvisor también ve un breve catálogo de los demás paradigmas disponibles para poder sugerir (o iniciar) un cambio cuando el trabajo se beneficiaría de uno.
+los marcos de razonamiento que tu readvisor está usando en este momento. siempre hay un paradigma activo, y puede haber hasta tres activos a la vez; haz clic en ● para activar o desactivar uno. un paradigma solo se carga por completo en el system prompt en cada turno; dos o tres juntos llevan un texto escrito para esa combinación (un metaparadigma) o, donde nadie lo escribió, un texto que enough compone con el comienzo de cada uno, y la lista lo indica. tu readvisor también ve un breve catálogo de los demás paradigmas disponibles para poder sugerir (o hacer) un cambio cuando el trabajo se beneficiaría de uno.
 
 ### how
-haz clic en ● junto a un paradigma para activarlo en este proyecto. la elección queda registrada en <code>rness/active-paradigm</code>. los cambios iniciados por tu readvisor también se hacen escribiendo ese archivo, y surten efecto en el siguiente turno. añade paradigmas nuevos colocando un archivo markdown en <code>~/enough/defaults/paradigms/</code> (o en el <code>rness/paradigms/</code> de tu proyecto para paradigmas locales al proyecto). un bloque de frontmatter YAML al principio — <code>name:</code> y <code>description:</code> — le dice a tu readvisor para qué sirve el paradigma.
+haz clic en ● junto a un paradigma para activarlo o desactivarlo en este proyecto. un cuarto se rechaza hasta que desactives uno, y el último activo sigue activo hasta que actives otro. el conjunto queda registrado en <code>rness/active-paradigm</code>, un nombre por línea; los cambios que hace tu readvisor también se hacen escribiendo ese archivo, y surten efecto en el siguiente turno. algunos paradigmas tienen facetas, partes que solo cuentan mientras una habilidad está activa: la nota bajo la lista nombra la faceta que va incluida. añade paradigmas nuevos colocando un archivo markdown en <code>~/enough/defaults/paradigms/</code> (o en el <code>rness/paradigms/</code> de tu proyecto para paradigmas locales al proyecto). un bloque de frontmatter YAML al principio — <code>name:</code> y <code>description:</code> — le dice a tu readvisor para qué sirve el paradigma.
 
 ### ideas
 - Paradigmas disponibles en este proyecto: {{paradigms-list}}
@@ -167,7 +167,7 @@ name: paradigms/
 path: rness/paradigms/
 
 ### what
-el conjunto completo de marcos de razonamiento disponibles en este proyecto. cada paradigma es un archivo markdown con un bloque de frontmatter YAML (<code>name</code> + <code>description</code>) y un cuerpo que describe cómo abordar el trabajo — heurísticas, criterios de decisión, cuándo preguntar y cuándo actuar. hay exactamente uno activo en cada momento (consulta la sección <strong>paradigma</strong> en lo alto de la barra lateral para cambiarlo).
+el conjunto completo de marcos de razonamiento disponibles en este proyecto. cada paradigma es un archivo markdown con un bloque de frontmatter YAML (<code>name</code> + <code>description</code>) y un cuerpo que describe cómo abordar el trabajo — heurísticas, criterios de decisión, cuándo preguntar y cuándo actuar. siempre hay uno activo y puede haber hasta tres a la vez; dos o tres juntos llevan un metaparadigma, un texto escrito para esa combinación, cuando lo hay (consulta la sección <strong>paradigma</strong> en lo alto de la barra lateral para activarlos y desactivarlos).
 
 ### how
 enlazado simbólicamente desde <code>~/enough/defaults/paradigms/</code>. edita a nivel global para actualizar el comportamiento en todos los proyectos; haz clic en <em>personalizar</em> en cualquier archivo para bifurcarlo solo para este proyecto. se pueden añadir paradigmas nuevos simplemente colocando un archivo markdown en la carpeta de valores predeterminados — dale un <code>name:</code> y <code>description:</code> en el frontmatter para que tu readvisor sepa cuándo recomendarlo.

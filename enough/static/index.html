@@ -899,6 +899,40 @@
       font-size: 12.5px;
     }
 
+    /* 0.8: up to three paradigms on at once. With the set full, the rows
+       still off read quieter (a click on one is refused, with the note
+       below saying why). */
+    ul.paradigms[data-active-count="3"] li.paradigm-row.off button.paradigm-toggle,
+    ul.paradigms[data-active-count="3"] li.paradigm-row.off .paradigm-name {
+      opacity: 0.6;
+    }
+
+    /* A note under the rows, the server's English painted through t() by
+       paradigmPaintNotes(): which face rides, a combination with no text of
+       its own, a retired paradigm kept as the person's own copy, and a
+       refused toggle. The same second-line shape as the skills' notes. */
+    ul.paradigms li.paradigm-note {
+      padding: 0 4px 4px 24px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--fg-faint);
+      overflow-wrap: anywhere;
+    }
+
+    ul.paradigms li.paradigm-note[data-paradigm-note="composed"] {
+      font-style: italic;
+    }
+
+    ul.paradigms li.paradigm-note[data-paradigm-note="cap"],
+    ul.paradigms li.paradigm-note[data-paradigm-note="empty"] {
+      color: var(--accent-error);
+    }
+
+    ul.paradigms li.paradigm-note[data-paradigm-note="kept"] {
+      color: var(--fg-muted);
+      padding-top: 0;
+    }
+
     ul.roles {
       list-style: none;
       margin: 0 0 12px 0;
@@ -18550,7 +18584,7 @@
             <img class="svg-icon cosm-mode-icon" data-icon="cosm" alt="" draggable="false">
             <span class="cosm-title" data-ef="title"></span>
             <span class="cosm-decl" data-ef="stale" hidden data-i18n="emf.face.stale">out of date</span>
-            <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.scaffold">scaffold, no model</span>
+            <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.outline">outline, no model</span>
             <span class="cosm-decl" data-ef="agentfree" hidden data-i18n="canon.agentFree">agent-free: a rules reading, no model</span>
             <span class="cosm-spacer"></span>
             <select class="cosm-lens" data-ef="lens" hidden
@@ -18699,7 +18733,7 @@
             <img class="svg-icon cosm-mode-icon" data-icon="cosm" alt="" draggable="false">
             <span class="cosm-title" data-ef="title"></span>
             <span class="cosm-decl" data-ef="stale" hidden data-i18n="emf.face.stale">out of date</span>
-            <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.scaffold">scaffold, no model</span>
+            <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.outline">outline, no model</span>
             <span class="cosm-decl" data-ef="agentfree" hidden data-i18n="canon.agentFree">agent-free: a rules reading, no model</span>
             <span class="cosm-spacer"></span>
             <select class="cosm-lens" data-ef="lens" hidden
@@ -20896,6 +20930,7 @@
       if (window.ctxNoticeOnLanguage) window.ctxNoticeOnLanguage();
       if (window.agentFreeOnLanguage) window.agentFreeOnLanguage();
       if (window.docsOnLanguage) window.docsOnLanguage();
+      if (window.paradigmPaintNotes) window.paradigmPaintNotes();
       if (!(opts && opts.skipSave)) saveUIConfig({ ui_language: lang });
     }
 
@@ -27446,6 +27481,80 @@
       if (e.target && e.target.id === 'skills-list') skillPaintAuditMsgs();
     });
 
+    // ---------- Paradigms: up to three on (0.8) ----------
+    //
+    // The rows are server-rendered toggles; the notes under them carry
+    // `data-paradigm-note` and the facts as `data-*`, with English inside.
+    // This side translates them, the way skillPaintAuditMsgs paints the
+    // skills' progress lines. Idempotent: a note is rebuilt from its
+    // attributes every time, never from its own (already painted) text.
+    function paradigmNoteText(n) {
+      const d = n.dataset;
+      const list = (s) => (s || '').split(' ').filter(Boolean);
+      switch (d.paradigmNote) {
+        case 'cap':
+          return t('paradigm.note.cap', 'At most {limit} paradigms can be on at once: turn one off before turning another on.')
+            .replace('{limit}', d.limit || '3');
+        case 'empty':
+          return t('paradigm.note.empty', 'One paradigm stays on: turn another on before turning this one off.');
+        case 'composed':
+          if (d.stale) {
+            return t('paradigm.note.composedStale', 'This combination’s own text was written before {names} changed: enough composes one from each paradigm.')
+              .replace('{names}', list(d.stale).join(', '));
+          }
+          return t('paradigm.note.composed', 'This combination has no text of its own: enough composes one from each paradigm.');
+        case 'kept':
+          return t('paradigm.note.kept', '{old} is your own copy, kept under its old name: the shipped paradigm is now {new}.')
+            .replace('{old}', d.paradigm || '').replace('{new}', d.renamed || '');
+        case 'face':
+          return t('paradigm.note.face', 'face: {skill}').replace('{skill}', list(d.facesOn)[0] || '');
+        case 'faces':
+          return t('paradigm.note.faces', 'faces: {skills}; the readvisor asks once which')
+            .replace('{skills}', list(d.facesOn).join(' + '));
+        case 'noface':
+          return t('paradigm.note.noface', 'no face: turn on {skills} for the part it leans on')
+            .replace('{skills}', list(d.faces).join(t('paradigm.note.or', ' or ')));
+        default:
+          return null;
+      }
+    }
+
+    function paradigmPaintNotes() {
+      document.querySelectorAll('#paradigm-list li.paradigm-note[data-paradigm-note]').forEach((n) => {
+        const text = paradigmNoteText(n);
+        if (text != null) n.textContent = text;
+      });
+      // The rows still off read quieter once the set is full; say why on hover.
+      const ul = document.querySelector('#paradigm-list ul.paradigms');
+      const full = ul && ul.dataset.activeCount === '3';
+      document.querySelectorAll('#paradigm-list li.paradigm-row.off button.paradigm-toggle').forEach((b) => {
+        if (full) b.setAttribute('aria-label', t('paradigm.full', 'three paradigms are on: turn one off first'));
+        else b.removeAttribute('aria-label');
+      });
+    }
+    window.paradigmPaintNotes = paradigmPaintNotes;
+
+    // The face a paradigm presumes follows the skills that are on. After a
+    // skill toggle, refresh the paradigm list when the faces the riding
+    // text leans on no longer match the skills now on (else the 10 s poll
+    // would catch it up).
+    function paradigmFacesStale() {
+      const n = document.querySelector('#paradigm-list li.paradigm-note[data-faces]');
+      if (!n) return false;
+      const on = new Set(Array.from(document.querySelectorAll('#skills-list li.skill-row.on'))
+        .map((r) => r.dataset.skill));
+      const want = (n.dataset.faces || '').split(' ').filter((s) => on.has(s)).join(' ');
+      return want !== (n.dataset.facesOn || '');
+    }
+
+    document.body.addEventListener('htmx:afterSettle', (e) => {
+      if (!e.target) return;
+      if (e.target.id === 'paradigm-list') paradigmPaintNotes();
+      if (e.target.id === 'skills-list' && window.htmx && paradigmFacesStale()) {
+        htmx.ajax('GET', '/api/paradigm', { target: '#paradigm-list', swap: 'innerHTML' });
+      }
+    });
+
     // The audit report is an ordinary project file — open it the ordinary way.
     function skillOpenReport(path) {
       if (!path) return;
@@ -33308,7 +33417,7 @@
       if (cosmIsMap(cat.derived) && cat.derived.mode === 'rules') {
         h += '<div class="cosm-scaffold">' + cosmEsc(AGENT_FREE
           ? t('canon.agentFree', 'agent-free: a rules reading, no model')
-          : t('cosm.scaffold', 'scaffold, no model')) + '</div>';
+          : t('cosm.outline', 'outline, no model')) + '</div>';
       }
       // 0.6 (U1a): who made a fabula (model, route, its runs), and a
       // fabulac's licence, a pending one said plainly.

@@ -515,6 +515,34 @@ def test_paradigm_rows_are_toggles(client: TestClient, tmp_path: Path):
     assert 'data-paradigms="extra text-planning"' in r.text
 
 
+def test_paradigm_list_names_the_presumed_face(client: TestClient):
+    """W3-PP: the riding text's faces, and which of their skills are on, ride
+    on a note for the page to translate (and to refresh on a skill toggle)."""
+    html = client.get("/api/paradigm").text
+    assert "data-faces=" not in html                         # text-planning has no faces
+    client.post("/api/paradigm/set", data={"name": "transcognition"})
+    for want in ("0", "1"):
+        client.post("/api/skills/toggle", data={"name": "translator", "enabled": want})
+        html = client.get("/api/paradigm").text
+        if want == "0":
+            assert 'data-paradigm-note="noface"' in html
+            assert 'data-faces="translator macrocosm-oes"' in html and 'data-faces-on=""' in html
+        else:
+            assert 'data-paradigm-note="face"' in html and 'data-faces-on="translator"' in html
+    assert 'data-paradigm="transcognition"' in html
+
+
+def test_paradigm_list_notes_a_kept_retired_copy(client: TestClient, tmp_path: Path):
+    rness = tmp_path / "project" / "rness"
+    kept = rness / "paradigms" / "translation.md"
+    if kept.is_symlink():
+        kept.unlink()
+    kept.write_text("---\nname: translation\n---\nmy own\n", encoding="utf-8")
+    html = client.get("/api/paradigm").text
+    assert ('data-paradigm-note="kept" data-paradigm="translation" '
+            'data-renamed="transcognition"') in html
+
+
 def test_paradigm_toggle_refuses_a_fourth_and_the_last(client: TestClient, tmp_path: Path):
     rness = tmp_path / "project" / "rness"
     (rness / "paradigms" / "extra.md").write_text("---\nname: extra\n---\nx\n", encoding="utf-8")

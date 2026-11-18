@@ -60,10 +60,10 @@ name: paradigme
 path: rness/active-paradigm
 
 ### what
-le cadre de raisonnement dans lequel vos readvisors travaillent actuellement. un seul paradigme est actif à la fois ; cliquez sur un autre pour en changer. le paradigme actif est chargé en entier dans le prompt système à chaque tour, et votre readvisor en chef voit aussi un bref catalogue des autres paradigmes disponibles afin de pouvoir suggérer (ou déclencher) un changement quand le travail en tirerait profit.
+les cadres de raisonnement dans lesquels vos readvisors travaillent actuellement. un paradigme est toujours actif, et jusqu'à trois peuvent l'être ensemble ; cliquez sur ● pour en activer ou en désactiver un. un paradigme seul est chargé en entier dans le prompt système à chaque tour ; deux ou trois ensemble apportent un texte écrit pour cette combinaison (un métaparadigme) ou, quand personne n'en a écrit, un texte qu'enough compose à partir du début de chacun, et la liste le signale. votre readvisor en chef voit aussi un bref catalogue des autres paradigmes disponibles afin de pouvoir suggérer (ou faire) un changement quand le travail en tirerait profit.
 
 ### how
-cliquez sur ● à côté d'un paradigme pour l'activer pour ce projet. le choix est enregistré dans <code>rness/active-paradigm</code>. un changement initié par votre readvisor en chef passe aussi par l'écriture de ce fichier, et prennent effet au tour suivant. ajoutez de nouveaux paradigmes en déposant un fichier markdown dans <code>~/enough/defaults/paradigms/</code> (ou dans le <code>rness/paradigms/</code> de votre projet pour des paradigmes locaux). un bloc de frontmatter YAML en tête — <code>name:</code> et <code>description:</code> — indique à vos readvisors à quoi sert le paradigme.
+cliquez sur ● à côté d'un paradigme pour l'activer ou le désactiver pour ce projet. un quatrième est refusé tant que vous n'en désactivez pas un, et le dernier actif le reste tant que vous n'en activez pas un autre. l'ensemble est enregistré dans <code>rness/active-paradigm</code>, un nom par ligne ; un changement fait par votre readvisor en chef passe aussi par l'écriture de ce fichier, et prend effet au tour suivant. certains paradigmes ont des facettes, des parties qui ne valent que tant qu'une compétence est active : la note sous la liste nomme la facette retenue. ajoutez de nouveaux paradigmes en déposant un fichier markdown dans <code>~/enough/defaults/paradigms/</code> (ou dans le <code>rness/paradigms/</code> de votre projet pour des paradigmes locaux). un bloc de frontmatter YAML en tête — <code>name:</code> et <code>description:</code> — indique à vos readvisors à quoi sert le paradigme.
 
 ### ideas
 - Paradigmes disponibles dans ce projet : {{paradigms-list}}
@@ -167,7 +167,7 @@ name: paradigmes/
 path: rness/paradigms/
 
 ### what
-l'ensemble complet des cadres de raisonnement disponibles dans ce projet. chaque paradigme est un fichier markdown avec un bloc de frontmatter YAML (<code>name</code> + <code>description</code>) et un corps décrivant comment aborder le travail — heuristiques, critères de décision, quand demander plutôt qu'agir. un seul est actif à la fois (voir la section <strong>paradigme</strong> en haut de la barre latérale pour en changer).
+l'ensemble complet des cadres de raisonnement disponibles dans ce projet. chaque paradigme est un fichier markdown avec un bloc de frontmatter YAML (<code>name</code> + <code>description</code>) et un corps décrivant comment aborder le travail — heuristiques, critères de décision, quand demander plutôt qu'agir. un est toujours actif et jusqu'à trois peuvent l'être ensemble ; deux ou trois ensemble apportent un métaparadigme, un texte écrit pour cette combinaison, quand il y en a un (voir la section <strong>paradigme</strong> en haut de la barre latérale pour les activer et les désactiver).
 
 ### how
 lié par symlink depuis <code>~/enough/defaults/paradigms/</code>. modifiez-le globalement pour changer le comportement dans tous les projets ; cliquez sur <em>personnaliser</em> sur n'importe quel fichier pour le forker rien que pour ce projet. de nouveaux paradigmes peuvent être ajoutés simplement en déposant un fichier markdown dans le dossier des défauts — donnez-lui un <code>name:</code> et une <code>description:</code> en frontmatter pour que votre readvisor en chef sache quand le recommander.

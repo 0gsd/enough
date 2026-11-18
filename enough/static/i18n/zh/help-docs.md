@@ -59,10 +59,10 @@ name: 范式
 path: rness/active-paradigm
 
 ### what
-你的阅问此刻在用的推理框架。任何时候都恰好有一个范式在生效；点另一个就切过去。生效的范式每一轮都会完整地载入系统提示词，同时他也能看到其他可用范式的简要目录，好在工作需要时建议（或直接发起）一次切换。
+你的阅问此刻在用的推理框架。总有一个范式在生效，最多可以三个一起生效；点 ● 就能打开或关掉一个。只有一个范式时，它每一轮都会完整地载入系统提示词；两三个一起时，载入的是专为这个组合写的文本（元范式），要是没人写过，就用 enough 从每个范式的开头拼出来的文本，列表里会注明。他也能看到其他可用范式的简要目录，好在工作需要时建议（或直接做出）一次调整。
 
 ### how
-点范式旁边的 ● 让它在这个项目里生效。这个选择记在 <code>rness/active-paradigm</code> 里。阅问主动切换的方式也是写这个文件，下一轮生效。想加新范式，往 <code>~/enough/defaults/paradigms/</code> 丢一个 markdown 文件（或者放进项目的 <code>rness/paradigms/</code>，只在本项目用）。文件开头的一小段 YAML frontmatter——<code>name:</code> 和 <code>description:</code>——告诉你的阅问这个范式是干什么用的。
+点范式旁边的 ● 就能在这个项目里打开或关掉它。第四个会被拒绝，直到你关掉一个；最后一个在生效的会一直开着，直到你打开另一个。这一组记在 <code>rness/active-paradigm</code> 里，一行一个名字。阅问做出的调整也是写这个文件，下一轮生效。有些范式带有侧面——只在某个技能打开时才保留的部分——列表下方的注释会写明当前用的是哪个侧面。想加新范式，往 <code>~/enough/defaults/paradigms/</code> 丢一个 markdown 文件（或者放进项目的 <code>rness/paradigms/</code>，只在本项目用）。文件开头的一小段 YAML frontmatter——<code>name:</code> 和 <code>description:</code>——告诉你的阅问这个范式是干什么用的。
 
 ### ideas
 - 这个项目里可用的范式：{{paradigms-list}}
@@ -166,7 +166,7 @@ name: paradigms/
 path: rness/paradigms/
 
 ### what
-这个项目里可用的全部推理框架。每个范式是一个 markdown 文件，带一段 YAML frontmatter（<code>name</code> + <code>description</code>），正文写清该怎么开展工作——启发法、判断标准、什么时候该问而不是直接做。任何时候恰好有一个在生效（去侧栏顶部的 <strong>范式</strong> 区切换）。
+这个项目里可用的全部推理框架。每个范式是一个 markdown 文件，带一段 YAML frontmatter（<code>name</code> + <code>description</code>），正文写清该怎么开展工作——启发法、判断标准、什么时候该问而不是直接做。总有一个在生效，最多可以三个一起生效；两三个一起时，如果有专为这个组合写的文本，也就是元范式，就用它（去侧栏顶部的 <strong>范式</strong> 区打开或关掉它们）。
 
 ### how
 从 <code>~/enough/defaults/paradigms/</code> 符号链接过来。改全局就能更新所有项目的行为；在任意文件上点<em>自定义</em>，就只为这个项目分叉一份。加新范式很简单，往默认文件夹里丢一个 markdown 文件即可——给它写上 frontmatter 里的 <code>name:</code> 和 <code>description:</code>，你的阅问才知道什么时候该推荐它。
