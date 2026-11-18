@@ -74,7 +74,7 @@ PER_CSHORT = ("surface-answered", "apart", "evidence-stated")
 DEFAULTS = {
     "allowances": ["exit-only", "exit-and-stdout", "stderr-said-or-not", "lines-in-any-order"],
     "ruled-kinds": ["C:interface", "C:behaviour", "C:structure", "C:setting", "C:reliance"],
-    "ruling-needs": {"alike": ["allowing"], "free": ["because"], "kept-wrong": ["because"], "changed": ["to"]},
+    "ruling-needs": {"alike": ["allowing"], "free": ["because|said"], "kept-wrong": ["because|said"], "changed": ["to"]},
     "nothing-carried": 200,
     "cases-cover": 0.6,
     "round-trip-level": 2,
@@ -441,13 +441,13 @@ class _Checks:
             for k, e in pairs:
                 if not (isinstance(e, dict) and "exit" in e):
                     self.add("case-outside", it, "each expected step says its exit status", f"expect.steps[{k}]")
-            gf = given.get("files")
-            for name in (gf if isinstance(gf, dict) else {}):
-                if str(name) in files:
+            gf = given.get("files")                 # a file an interface names (a format the program reads, such
+            for name in (gf if isinstance(gf, dict) else {}):     # as pyproject.toml) is the boundary, not the source
+                if str(name) in files and str(name) not in calls:
                     self.add("case-outside", it, f"given.files names {name}, a file of the source", "given.files")
             for i, s in enumerate(steps):
                 for a in s.get("arguments") or []:
-                    if isinstance(a, str) and a in files:
+                    if isinstance(a, str) and a in files and a not in calls:
                         self.add("case-outside", it, f"step {i} names {a}, a file of the source",
                                  f"given.steps[{i}].arguments")
                 inp = s.get("input")
@@ -494,8 +494,9 @@ class _Checks:
                     self.add("ruled", it, "not ruled yet", fld)
                     continue
                 for k in needs.get(x["is"], []):
-                    if not x.get(k):
-                        self.add("ruled", it, f"a ruling {x['is']} says {k}", f"{fld}.{k}")
+                    alts = str(k).split("|")            # a|b: either will do
+                    if not any(x.get(a) for a in alts):
+                        self.add("ruled", it, f"a ruling {x['is']} says {' or '.join(alts)}", f"{fld}.{alts[0]}")
                 if x["is"] == "alike" and x.get("allowing") and x["allowing"] not in allowances:
                     self.add("ruled", it, f"the judge knows no allowance {x['allowing']!r} ("
                                           f"{', '.join(sorted(allowances))}); it holds until entailing for "

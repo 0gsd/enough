@@ -352,7 +352,8 @@ transconception:
   allowances: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order]   # an alike ruling's allowing: the
                                                                                      # judge's four, extended by ruling
   ruled-kinds: ['C:interface', 'C:behaviour', 'C:structure', 'C:setting', 'C:reliance']   # each carries a ruling
-  ruling-needs: {alike: [allowing], free: [because], kept-wrong: [because], changed: [to]}
+  ruling-needs: {alike: [allowing], free: [because|said], kept-wrong: [because|said], changed: [to]}
+                                        # a|b: either; said (the person's own words at the sitting) stands as the reason
   stated-entry: '{in, version, at, digest} (version: any patch of the runtime''s minor; digest: the cited page''s), or
                  {nowhere: <what no text states>}; beside the list, contradicted-by: {at, says, said}'
   plain-kinds: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing]
