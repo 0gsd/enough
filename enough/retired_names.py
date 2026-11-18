@@ -11,6 +11,8 @@ needs only a line:
 - `FIELDS`: `{old key: new key}`, for a key itself renamed in a query, a request body or an answer: a handler reads
   the new key through `field()`, which falls back to the old one, and an answer passed through `answer()` carries
   the old key beside the new one.
+- `SKILLS`: `{old skill name: new skill name}`; `skeleton._populate_skill_symlinks` carries a project's switch from
+  the old name to the new one (on stays on, off stays off) before it prunes the old name's dangling link.
 
 Removed in 0.7: the 0.6 fabula renames (`/api/canon/emf`, `/derive`, `/compile`; the tool `emf_derive`; `what: emf`).
 
@@ -19,6 +21,8 @@ as `plane` and saved back as `plane`; a `set_meta` op may still say `board`), so
 governing body. The Canon routes' `box` (query and body, a transfer's `src`/`dst` included) and the tree's
 `cacheboxes`, now `volume` and `volumes`: a request may still say `box`, and the tree, an ingest's answer and a
 transfer's answer still carry the old keys beside the new.
+
+Added in 0.8, to go in 0.9: the skill `scaffold`, now `scaffolder` (it took in the outline and gained the plectrum).
 """
 from __future__ import annotations
 
@@ -40,6 +44,11 @@ WORDS: dict[str, dict[str, str]] = {
 FIELDS: dict[str, str] = {
     "box": "volume",                 # the Canon routes' query, body, src/dst and answers (0.7)
     "cacheboxes": "volumes",         # GET /api/canon/tree (0.7)
+}
+
+#: `{old skill name: new skill name}`: a project's switch for the old skill carries over to the new one.
+SKILLS: dict[str, str] = {
+    "scaffold": "scaffolder",        # defaults/skills/scaffold, moved and taken in (0.8)
 }
 
 
@@ -71,4 +80,4 @@ def answer(data: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
-__all__ = ["FIELDS", "ROUTES", "TOOLS", "WORDS", "answer", "field", "tool", "word"]
+__all__ = ["FIELDS", "ROUTES", "SKILLS", "TOOLS", "WORDS", "answer", "field", "tool", "word"]

@@ -241,6 +241,53 @@ USER_PROFILE_MD = PROJECT_PROFILE_MD
 # Skeleton creation
 # ---------------------------------------------------------------------------
 
+def _disabled_lines(dst_skills: Path) -> list[str]:
+    f = dst_skills / ".disabled"
+    return f.read_text(encoding="utf-8").splitlines() if f.is_file() else []
+
+
+def carry_retired_skills(dst_skills: Path, src_skills: Path) -> list[str]:
+    """For each `retired_names.SKILLS` pair whose old name is still a link in
+    `rness/skills/`, link the new name and give it the old one's switch: a
+    project that had the old skill on finds the new one on, one that had it
+    off finds it off. The old link and its `.disabled` line go. A real
+    folder under the old name (a materialized or hand-made copy) is the
+    person's: it is left as it is, and the returned lines say so. A new
+    name the project already holds keeps its own switch. Returns what it
+    reports; changes nothing when no old link is there."""
+    from . import retired_names
+
+    reports: list[str] = []
+    for old, new in retired_names.SKILLS.items():
+        old_entry = dst_skills / old
+        if not old_entry.is_symlink():
+            if old_entry.exists():
+                reports.append(
+                    f"rness/skills/{old} is a folder of its own, not enough's link, so it is "
+                    f"left as it is; the skill it copied is now {new!r}, which arrives switched "
+                    f"off. Remove the old folder once nothing in it is yours.")
+            continue
+        lines = _disabled_lines(dst_skills)
+        names = {ln.strip() for ln in lines if ln.strip() and not ln.startswith("#")}
+        was_off = old in names
+        new_entry = dst_skills / new
+        src = src_skills / new
+        carried = not (new_entry.exists() or new_entry.is_symlink()) and src.exists()
+        if carried:
+            new_entry.symlink_to(src.resolve())
+        keep = [ln for ln in lines if ln.strip() != old
+                and not (carried and ln.strip() == new)]
+        if carried and was_off:
+            keep.append(new)
+        if keep != lines:
+            (dst_skills / ".disabled").write_text(
+                "\n".join(keep) + ("\n" if keep else ""), encoding="utf-8")
+        old_entry.unlink()
+        if carried:
+            log.info("skill %s is now %s (%s)", old, new, "off" if was_off else "on")
+    return reports
+
+
 def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
     """Sync global skills into `rness/skills/` and prune dangling symlinks.
 
@@ -258,6 +305,15 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
     src_skills = defaults_root / "skills"
     dst_skills = project_dir / "rness" / "skills"
     dst_skills.mkdir(parents=True, exist_ok=True)
+
+    # 0. Carry a renamed skill's switch to its new name, before step 1 prunes
+    #    the old name's (now dangling) link and step 2 would bring the new
+    #    name in switched off.
+    try:
+        for line in carry_retired_skills(dst_skills, src_skills):
+            log.warning("%s: %s", project_dir.name, line)
+    except Exception:  # noqa: BLE001 — a carry-over must never break a launch
+        log.exception("retired skill carry-over failed")
 
     # 1. Prune dangling symlinks.
     for entry in sorted(dst_skills.iterdir()):
