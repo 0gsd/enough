@@ -319,7 +319,9 @@ def derive_rules(ctx: Any, story: Value, **mods: Any) -> Value:
 @implements("entail")
 def entail(ctx: Any, x: Value, **mods: Any) -> Request:
     """An entailment of a fabula, in an order, in a morph (THYM.md 6.3), cited sentence by sentence. `as code` and a
-    catem's depths are the fabulac's (`code.py`, THYM 20.7)."""
+    catem's depths are the fabulac's (`code.py`, THYM 20.7); `as cases` is transconception's (`transconceive.py`)."""
+    if mods.get("as") == "cases":
+        return transconceive.entail_cases(ctx, x, **mods)
     branch = _code.entail_branch(ctx, x, mods)
     if branch is not None:
         return branch
@@ -347,7 +349,9 @@ def entail(ctx: Any, x: Value, **mods: Any) -> Request:
 def entail_outline(ctx: Any, x: Value, **mods: Any) -> Value:
     """`outline`: Canon's rules-mode short, the ordered outline said in the items' own sentences with the footer that
     says "by rules, without a model". A morph cannot be kept by rules, and is not. A catem's depth takes
-    `uses-outline`, and `as code` has no scaffold (`code.py`)."""
+    `uses-outline`, and `as code` has no scaffold (`code.py`); `as cases` needs no model, and is its own scaffold."""
+    if mods.get("as") == "cases":
+        return transconceive.entail_cases(ctx, x, **mods)
     branch = _code.entail_scaffold_branch(ctx, x, mods)
     if branch is not None:
         return branch
@@ -736,5 +740,6 @@ def _span_inside(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
 
 from enough.thym.moves import code as _code  # noqa: E402 - the fabulac's branches of derive and entail
 from enough.thym.moves import verse as _verse  # noqa: E402 - the fabulap's helper moves and derive's with branch
+from enough.thym.moves import transconceive  # noqa: E402 - transconception's kind of entail: as cases
 
 __all__ = ["as_fabula", "atem", "cited_outline", "default_order", "derive", "entail", "expand", "ordered"]
