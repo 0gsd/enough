@@ -300,7 +300,7 @@ def test_lint_a_bad_volume(project: Path):
     assert "bad.cosm — fabula/1, 1 items: 1 errors · 0 warnings · 0 notes · 0 open questions" in r.body
     assert "errors:\n- ref-unresolved K:concept/x (bad.cosm): defined-by -> L:term/missing does not exist" in r.body
     # 0.6: cosm_lint runs a fabula's own checks (enough/fabula.py), as the viewer does: none is left "not run"
-    assert "(25 checks run)" in r.body and "not run" not in r.body
+    assert "(38 checks run)" in r.body and "not run" not in r.body
 
 
 def test_lint_a_holotype_names_what_comprise_keeps_in_one_line(project: Path):
