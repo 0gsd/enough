@@ -93,8 +93,9 @@ RULING_OPTIONS = (AS_PROPOSED,) + RULING_WORDS
 #: `about`: `V-R27: a type comment that does not parse`) and, for a case, the steps it covers.
 PROPOSED_KEYS = ("is", "allowing", "because", "until", "to", "case")
 SCOPE_KEYS = ("made-for", "about", "steps")
-#: The judge's findings that no ruling covers (x0's `x0_harness.py judge`; `enough.transconception.read_verdict`):
-#: each comes back as a question about the case's ruling, `why: conflict`.
+#: The judge's findings that no ruling covers (x0's `x0_harness.py judge`; read by
+#: `enough.transconception.differences_from_verdict`, `needs-ruling`): each comes back as a question about the case's
+#: ruling, `why: conflict`, raised from here.
 JUDGE_FROM = "judge"
 NOT_DISCLOSED = "not-disclosed"
 WHOLE_ITEM = mc.WHOLE_ITEM                           # the field path of a pending on the whole item: `node`
@@ -1387,17 +1388,25 @@ def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None,
     case and target, about the case's ruling (`P:case/<id>#ruling`), `why: conflict`, quoting what the original did
     and what the entailment did at the first step found, `to: transconceiver`, `raised: {by: move, from: judge}`, a
     choice of the ruling words (nothing is proposed), and `proposed: {made-for, steps}`: the target the verdict
-    judged (`target`, else the verdict's own, as an `N:target` of the fabulac) and the steps found. The verdict is
-    read by `enough.transconception.read_verdict` (a path, its text or the mapping). Writes nothing (`land` adds
-    them). A finding about a case the fabulac does not hold is skipped, with why; so is a case that already has a
-    standing question from the judge for that target. Findings shown and needing no ruling (`ruled difference`,
-    `ruled change not seen`) raise nothing."""
+    judged (`target`, else the verdict's own, as an `N:target` of the fabulac) and the steps found. `verdict` is the
+    judge's file (a path) or its mapping; its findings are read by the one reading the cases lane and this one share,
+    `enough.transconception.differences_from_verdict`, and only those with `needs-ruling` raise a question (a ruled
+    difference, a ruled change not seen and a case recorded against another source raise nothing). Writes nothing
+    (`land` adds them). A finding about a case the fabulac does not hold is skipped, with why; so is a case that
+    already has a standing question from the judge for that target."""
     led = ledger_of(src)
-    v = tc.read_verdict(verdict)
+    where = None
+    if isinstance(verdict, (str, Path)):
+        where = str(verdict)
+        verdict = json.loads(Path(verdict).read_text(encoding="utf-8"))
+    if not isinstance(verdict, dict):
+        raise DialecticError("a verdict is the judge's file, or its mapping")
+    findings = tc.differences_from_verdict(verdict)
     when = now(at)
     out = Raised()
+    vt = target or verdict.get("target")
     try:
-        tref = target_ref(led, target or v.get("target")) if (target or v.get("target")) else None
+        tref = target_ref(led, vt) if vt else None
     except DialecticError:
         tref = None
     standing = {(_about_key(a), _scope({"made-for": (q.get("proposed") or {}).get("made-for")}))
@@ -1405,8 +1414,8 @@ def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None,
                 and (q.get("raised") or {}).get("from") == JUDGE_FROM for a in ruling_addresses(q)}
     by_case: dict[str, list[dict]] = {}
     order: list[str] = []
-    for f in v["findings"]:
-        if not f["unruled"]:
+    for f in findings:
+        if not f["needs-ruling"]:
             continue
         c = _case_item(led, f["case"])
         if c is None:
@@ -1425,21 +1434,21 @@ def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None,
             out.skipped.append((cid, "a question from the judge about this case, for this target, already stands"))
             continue
         fs = by_case[cid]
-        steps = [f["step"] for f in fs if f["step"] is not None]
+        steps = [f["step"] for f in fs if f.get("step") is not None]
         first = fs[0]
         name = c.get("name") or cid
-        where = f", step {first['step']}" if first["step"] is not None else ""
+        at_step = f", step {first['step']}" if first.get("step") is not None else ""
         entailment = f"the {tw} entailment" if tw else "the entailment"
-        if first["original"] is not None or first["cshort"] is not None:
-            asks = (f"{name}{where}: the original gave {_shown(first['original'])}; {entailment} gave "
-                    f"{_shown(first['cshort'])}. No ruling covers the difference. Which ruling should it have?")
+        if first.get("original") is not None or first.get("cshort-gave") is not None:
+            asks = (f"{name}{at_step}: the original gave {_shown(first.get('original'))}; {entailment} gave "
+                    f"{_shown(first.get('cshort-gave'))}. No ruling covers the difference. Which ruling should it have?")
         else:
-            asks = (f"{name}{where}: the judge found {first['kind']}, and no ruling covers it. Which ruling should it "
-                    "have?")
-        more = [f"step {f['step']}: {f['kind']}" for f in fs[1:]]
+            asks = (f"{name}{at_step}: the judge found {first['kind']}, and no ruling covers it. Which ruling should "
+                    "it have?")
+        more = [f"step {f.get('step')}: {f['kind']}" for f in fs[1:]]
         spec = {"kind": "choice", "options": list(RULING_WORDS),
                 "hint": f"The judge found: {first['kind']}" + (f"; also {'; '.join(more)}" if more else "")
-                + (f". Verdict {v['where']}" if v.get("where") else "") + "."}
+                + (f". Verdict {where}" if where else "") + "."}
         proposed = {**({"made-for": tref} if tref else {}), **({"steps": steps} if steps else {})}
         slug = _unique_slug(f"{_bare(cid).split('/', 1)[-1]}-conflict" + (f"-{tw}" if tw else ""), taken, led)
         out.questions.append(_question_item(Q_PREFIX + slug, addr, asks, "conflict", spec, "transconceiver",

@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import copy
 import datetime as dt
-import hashlib
 import json
 from collections import Counter
 from pathlib import Path
@@ -420,24 +419,27 @@ def fake_verdict() -> dict:
         ]}
 
 
-def test_read_verdict_is_the_one_reading_both_lanes_use(tmp_path):
+def test_the_conflicts_read_the_verdict_as_the_cases_lane_does(tmp_path):
+    """One reading of a verdict for both lanes: `differences_from_verdict`, whose `needs-ruling` says what comes
+    back as a question; a file and its mapping raise the same questions, and the file is named in the hint."""
+    rows = tc.differences_from_verdict(fake_verdict())
+    assert [(f["case"], f["needs-ruling"]) for f in rows] == [
+        ("V-C07", False), ("V-C10", True), ("V-C33", True), ("V-C99", True)]
     p = tmp_path / "verdict.json"
     p.write_text(json.dumps(fake_verdict()), encoding="utf-8")
-    v = tc.read_verdict(p)
-    assert v["digest"] == hashlib.sha256(p.read_bytes()).hexdigest() and v["where"] == str(p)
-    assert (v["target"], v["steps"], v["passes"]) == ("go", {"kept": 92, "agree": 90}, False)
-    assert [(f["case"], f["unruled"]) for f in v["findings"]] == [
-        ("V-C07", False), ("V-C10", True), ("V-C33", True), ("V-C99", True)]
-    assert tc.read_verdict(fake_verdict())["digest"] is None
-    assert tc.read_verdict(json.dumps(fake_verdict()))["findings"] == v["findings"]
-    with pytest.raises(ValueError):
-        tc.read_verdict({"findings": "none"})
+    from_file = dl.conflicts_from_verdict(twin(), p, at=RAISED).questions
+    from_map = dl.conflicts_from_verdict(twin(), fake_verdict(), at=RAISED).questions
+    assert [q["about"] for q in from_file] == [q["about"] for q in from_map] == [
+        "P:case/x0.V-C10#ruling", "P:case/x0.V-C33#ruling"]
+    assert str(p) in from_file[0]["hint"] and str(p) not in from_map[0]["hint"]
+    stale = {**fake_verdict(), "findings": [{"case": "V-C10", "step": 0, "kind": "recorded against another source"}]}
+    assert dl.conflicts_from_verdict(twin(), stale).questions == []          # it needs a recording, not a ruling
 
 
 @pytest.mark.skipif(not X0_VERDICT.is_file(), reason="the experiment's verdicts are not on this machine")
 def test_the_experiments_own_verdict_raises_nothing():
-    v = tc.read_verdict(X0_VERDICT)
-    assert v["steps"] == {"kept": 92, "agree": 92} and not any(f["unruled"] for f in v["findings"])
+    rows = tc.differences_from_verdict(json.loads(X0_VERDICT.read_text(encoding="utf-8")))
+    assert rows and not any(f["needs-ruling"] for f in rows)
     r = dl.conflicts_from_verdict(twin(), X0_VERDICT)
     assert r.questions == [] and r.skipped == []
 
