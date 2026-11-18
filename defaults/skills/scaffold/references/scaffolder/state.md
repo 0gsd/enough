@@ -37,7 +37,7 @@ id: cover
 ### cover-title · Title
 
 ```plec
-role: title
+as: title
 kind: text
 target: 40c
 row: 1
@@ -107,9 +107,9 @@ and plecs as the others.
 ### 3. Boxes
 
 Every box is in the block form, `### id · Name`, never the line form. Its
-`plec` block always holds `role`, `kind`, `row`, `col`, `plec-by` and `plec`,
+`plec` block always holds `as`, `kind`, `row`, `col`, `plec-by` and `plec`,
 and `target` for a text box or `shape` for a graphic. The writer's order is:
-`role`, `kind`, `target`, `shape`, `row`, `col`, `place`, `fixed`, `chips`,
+`as`, `kind`, `target`, `shape`, `row`, `col`, `place`, `fixed`, `chips`,
 `plec-by`, `state`, `href`, `plec`, then keys it did not know.
 
 The state's own keys:
@@ -238,7 +238,7 @@ file; lists keep the file's order):
   "frames": [
     {"id": "cover", "name": "Cover", "shape": null, "copy_of": null, "copy": null, "extra": {},
      "boxes": [
-       {"id": "cover-title", "name": "Title", "role": "title", "kind": "text",
+       {"id": "cover-title", "name": "Title", "as": "title", "kind": "text",
         "target": "40c", "shape": null, "row": 1, "col": 1, "place": null,
         "fixed": null, "chips": [], "plec_by": "readvisor", "state": "written",
         "href": null, "plec": "…", "text": "A garden on Mill Lane", "extra": {}}

@@ -20,7 +20,7 @@ About 2,120 characters on the slides and 900 in the speaker notes.
 ### cover-title · Title
 
 ```plec
-role: title
+as: title
 target: 40c
 plec: The garden's name and the place, as the committee will say it afterwards.
 ```
@@ -28,7 +28,7 @@ plec: The garden's name and the place, as the committee will say it afterwards.
 ### cover-who · Who is asking
 
 ```plec
-role: lede
+as: lede
 target: 90c
 fixed: Mill Lane Growers · March 2027
 plec: Who stands in front of them, in one line: how many people, and since when.
@@ -44,7 +44,7 @@ plec: Who stands in front of them, in one line: how many people, and since when.
 ### plot-headline · The plot today
 
 ```plec
-role: headline
+as: headline
 target: 60c
 plec: What the plot is now, in words a councillor who never walked past it would understand.
 ```
@@ -78,7 +78,7 @@ plec: The plot from above: beds, paths, the shed and the gate, with north marked
 ### plan-body · How the plot will be used
 
 ```plec
-role: body
+as: body
 target: 180c
 row: 1
 plec: What goes where on the plan, and who may use each part. Read the plan aloud for someone who cannot see it.
@@ -94,7 +94,7 @@ plec: What goes where on the plan, and who may use each part. Read the plan alou
 ### gets-headline · What the town gets
 
 ```plec
-role: headline
+as: headline
 target: 60c
 plec: The benefit to people who will never pick up a spade.
 ```
@@ -102,7 +102,7 @@ plec: The benefit to people who will never pick up a spade.
 ### gets-1 · First gain
 
 ```plec
-role: tile
+as: tile
 target: 100c
 row: 2
 plec: A gain someone can see from the street.
@@ -111,7 +111,7 @@ plec: A gain someone can see from the street.
 ### gets-2 · Second gain
 
 ```plec
-role: tile
+as: tile
 target: 100c
 row: 2
 plec: A gain for a group the council already worries about.
@@ -120,7 +120,7 @@ plec: A gain for a group the council already worries about.
 ### gets-3 · Third gain
 
 ```plec
-role: tile
+as: tile
 target: 100c
 row: 2
 plec: A gain that lasts after the people who started it have moved on.
@@ -141,7 +141,7 @@ plec: A gain that lasts after the people who started it have moved on.
 ### close-call · The one thing
 
 ```plec
-role: call
+as: call
 target: 60c
 plec: The single thing you want them to do when they vote. One verb.
 ```
@@ -149,7 +149,7 @@ plec: The single thing you want them to do when they vote. One verb.
 ### close-contact · How to reach us
 
 ```plec
-role: body
+as: body
 target: 80c
 fixed: growers@mill-lane.example.org
 plec: Who to ask, and when they will answer.

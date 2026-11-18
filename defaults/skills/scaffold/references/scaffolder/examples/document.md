@@ -20,7 +20,7 @@ times. 27 frames and 125 boxes, 152 parts in all. About 11,000 words.
 ### intro-why · Why this book
 
 ```plec
-role: lede
+as: lede
 target: 200w
 plec: Why the book exists and who it is for, said to them directly.
 ```
@@ -45,7 +45,7 @@ repeat: 24
 ### dish · Name of the dish
 
 ```plec
-role: headline
+as: headline
 target: 8w
 plec: What the family calls dish {n}, even if the rest of the world calls it something else.
 ```

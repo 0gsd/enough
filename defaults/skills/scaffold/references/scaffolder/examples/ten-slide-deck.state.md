@@ -26,7 +26,7 @@ id: cover
 ### cover-title · Title
 
 ```plec
-role: title
+as: title
 kind: text
 target: 40c
 row: 1
@@ -41,7 +41,7 @@ A garden on Mill Lane
 ### cover-who · Who is asking
 
 ```plec
-role: lede
+as: lede
 kind: text
 target: 90c
 row: 2
@@ -60,7 +60,7 @@ id: the-ask
 ### the-ask-in-one-sentence · The ask in one sentence
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 90c
 row: 1
@@ -75,7 +75,7 @@ We ask the comittee to lease the Mill Lane plot to us for five years, at no rent
 ### speaker-notes-the-ask · Speaker notes, the ask
 
 ```plec
-role: speaker
+as: speaker
 kind: text
 target: 300c
 row: 2
@@ -93,7 +93,7 @@ id: the-plot-today
 ### plot-headline · The plot today
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 60c
 row: 1
@@ -105,7 +105,7 @@ plec: What the plot is now, in words a councillor who never walked past it would
 ### plot-picture · Photo of the plot
 
 ```plec
-role: body
+as: body
 kind: graphic
 shape: 16:9
 row: 2
@@ -117,7 +117,7 @@ plec: The plot as it is today, taken from the lane, so the committee sees what a
 ### caption-to-the-photo · Caption to the photo
 
 ```plec
-role: caption
+as: caption
 kind: text
 target: 80c
 row: 3
@@ -135,7 +135,7 @@ id: who-we-are
 ### we-in-a-line · We, in a line
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 60c
 row: 1
@@ -147,7 +147,7 @@ plec: The group in a line that a stranger could repeat.
 ### what-we-have-done-already · What we have done already
 
 ```plec
-role: body
+as: body
 kind: text
 target: 220c
 row: 2
@@ -165,7 +165,7 @@ id: the-plan
 ### plan-picture · Site plan
 
 ```plec
-role: body
+as: body
 kind: graphic
 shape: 4:3
 row: 1
@@ -178,7 +178,7 @@ plec: The plot from above: beds, paths, the shed and the gate, with north marked
 ### plan-body · How the plot will be used
 
 ```plec
-role: body
+as: body
 kind: text
 target: 180c
 row: 1
@@ -197,7 +197,7 @@ id: what-it-costs
 ### the-total · The total
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 60c
 row: 1
@@ -209,7 +209,7 @@ plec: The total, and who pays it.
 ### where-the-money-comes-from · Where the money comes from
 
 ```plec
-role: body
+as: body
 kind: text
 target: 200c
 row: 2
@@ -227,7 +227,7 @@ id: what-the-town-gets
 ### gets-headline · What the town gets
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 60c
 row: 1
@@ -239,7 +239,7 @@ plec: The benefit to people who will never pick up a spade.
 ### gets-1 · First gain
 
 ```plec
-role: tile
+as: tile
 kind: text
 target: 100c
 row: 2
@@ -251,7 +251,7 @@ plec: A gain someone can see from the street.
 ### gets-2 · Second gain
 
 ```plec
-role: tile
+as: tile
 kind: text
 target: 100c
 row: 2
@@ -263,7 +263,7 @@ plec: A gain for a group the council already worries about.
 ### gets-3 · Third gain
 
 ```plec
-role: tile
+as: tile
 kind: text
 target: 100c
 row: 2
@@ -281,7 +281,7 @@ id: questions-you-may-have
 ### the-questions-and-our-answers · The questions and our answers
 
 ```plec
-role: body
+as: body
 kind: text
 target: 300c
 row: 1
@@ -293,7 +293,7 @@ plec: The two or three worries a councillor will raise, each with a short, hones
 ### speaker-notes-the-questions · Speaker notes, the questions
 
 ```plec
-role: speaker
+as: speaker
 kind: text
 target: 300c
 row: 2
@@ -311,7 +311,7 @@ id: what-happens-next
 ### the-first-step · The first step
 
 ```plec
-role: headline
+as: headline
 kind: text
 target: 60c
 row: 1
@@ -323,7 +323,7 @@ plec: The first step after a yes, and when.
 ### the-first-year · The first year
 
 ```plec
-role: body
+as: body
 kind: text
 target: 180c
 row: 2
@@ -341,7 +341,7 @@ id: thank-you
 ### close-call · The one thing
 
 ```plec
-role: call
+as: call
 kind: text
 target: 60c
 row: 1
@@ -353,7 +353,7 @@ plec: The single thing you want them to do when they vote. One verb.
 ### close-contact · How to reach us
 
 ```plec
-role: body
+as: body
 kind: text
 target: 80c
 row: 2
@@ -366,7 +366,7 @@ plec: Who to ask, and when they will answer.
 ### speaker-notes-closing · Speaker notes, closing
 
 ```plec
-role: speaker
+as: speaker
 kind: text
 target: 300c
 row: 3
@@ -384,7 +384,7 @@ id: not-in-the-deck
 ### notes-to-the-readvisor · Notes to the readvisor
 
 ```plec
-role: notes
+as: notes
 kind: text
 target: 0
 row: 1

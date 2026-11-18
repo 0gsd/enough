@@ -51,7 +51,7 @@ next: HTML for the club's site, and a PDF for the noticeboard
 ### headline · Headline
 
 ```plec
-role: headline
+as: headline
 target: 50c
 plec: The day, the place and the one reason to come, in one line.
 ```
@@ -151,7 +151,7 @@ order in the file is the order in the frame.
     ### headline · Headline
 
     ```plec
-    role: headline
+    as: headline
     target: 60c
     plec: The one promise that holds for every subject alike.
     ```
@@ -177,10 +177,10 @@ order in the file is the order in the frame.
   plec. The name runs to the first ` [`; the bracket ends at the first `]`,
   which must be followed by `: `.
 - The bracket holds one of: a target (`250c`, `300w`, `250`, `0`); the word
-  `graphic` and a shape (`graphic 4:3`); or a role and a target (`notes`,
+  `graphic` and a shape (`graphic 4:3`); or what the box is, and a target (`notes`,
   `call 80c`). The bracket's first word tells which: a number is a target,
-  `graphic` is a graphic, anything else is a role. A bare role means the role
-  with no target.
+  `graphic` is a graphic, anything else says what the box is (its `as`). A bare
+  `as` word means that, with no target.
 - The id is the name's slug. Everything not said takes its default.
 
 The plec's keys:
@@ -191,7 +191,7 @@ The plec's keys:
 | `target` | no | how long the person's text should be: a number and a unit, `140c` or `300w`. A bare number takes the front matter's `unit`. `0`, the default, means no target. Give every text box but a notes box a target. A target is a guide, not a wall |
 | `kind` | no | `text` (the default) or `graphic` |
 | `shape` | for a graphic | the picture's shape: `16:9`, `4:3`, `1:1`, `3:4`, `9:16`, any `W:H`, or `portrait`, `landscape`, `square`. Default `16:9` |
-| `role` | no | what the box is on the finished thing. Known roles: `title`, `headline`, `lede`, `body`, `step`, `tile`, `deck`, `call`, `caption`, `quote`, `speaker`, `notes`. Default `body`. A role a harness does not know is shown as `body` |
+| `as` | no | what the box is on the finished thing. Known values: `title`, `headline`, `lede`, `body`, `step`, `tile`, `deck`, `call`, `caption`, `quote`, `speaker`, `notes`. Default `body`. A value a harness does not know is shown as `body` |
 | `fixed` | no | a fixed part shown with the box that is not the person's to write: a product name, an address, a label (`Comprise`, `10 slides`). Shown in grey, exported as it is |
 | `chips` | no | fixed buttons or tags shown with the box, separated by commas (`PDF, PPTX, play`) |
 | `row` | no | which row of the frame the box sits in, counting from 1. Boxes with the same `row` sit side by side. A box with no `row` takes the row after the last one used |
@@ -200,8 +200,8 @@ The plec's keys:
 A graphic has no target. Its plec says what the picture must show. The
 person supplies the picture, always.
 
-A box with role `speaker` holds a slide's speaker notes: written by the
-person, kept out of the slide itself. A box with role `notes` is never
+A box `as: speaker` holds a slide's speaker notes: written by the
+person, kept out of the slide itself. A box `as: notes` is never
 exported: it is where the person tells the readvisor what the scaffold gets
 wrong. Every plectrum ends with a frame that holds one notes box, unless the
 person asks for none. A frame that holds only notes boxes is not part of the
@@ -286,7 +286,7 @@ it and corrects it before anything is built. After that:
 | frames: add, drop, rename, reorder, repeat | when the person asks | yes |
 | boxes: add, drop, rename, move (`row`, `col`, frame) | when the person asks | yes |
 | a box's `plec` | writes it, and rewrites it until the person edits it; after that only proposes | yes. Once they edit it, it is theirs |
-| `target`, `kind`, `shape`, `role`, `fixed`, `chips` | yes | yes |
+| `target`, `kind`, `shape`, `as`, `fixed`, `chips` | yes | yes |
 | ids | sets them at the start | no; ids do not change |
 | the text in a box | **never** | only the person |
 | a graphic's picture | **never** | only the person |
