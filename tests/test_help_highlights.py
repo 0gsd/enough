@@ -495,17 +495,24 @@ def test_a_set_has_one_heading_and_the_catalog_says_how_to_toggle(tmp_path: Path
 # The route: toggles, a refused fourth, the composed note
 # --------------------------------------------------------------------------
 
-def test_paradigm_rows_are_toggles(client: TestClient):
+def test_paradigm_rows_are_toggles(client: TestClient, tmp_path: Path):
     html = client.get("/api/paradigm").text
     assert 'hx-post="/api/paradigm/toggle"' in html
     assert 'data-active-count="1"' in html and 'data-paradigm-text="paradigm"' in html
     r = client.post("/api/paradigm/toggle", data={"name": "transcognition", "on": "1"})
     assert r.status_code == 200
     assert 'data-active-count="2"' in r.text
-    assert 'data-paradigm-note="composed"' in r.text           # no text written for the pair
-    assert 'data-paradigms="text-planning transcognition"' in r.text
+    assert 'data-paradigm-text="metaparadigm"' in r.text        # the shipped pair's own text
+    assert 'data-paradigm-note="composed"' not in r.text
     r = client.post("/api/paradigm/toggle", data={"name": "workflow-design", "on": "1"})
     assert 'data-active-count="3"' in r.text
+    # a paradigm of the project's own has no combination written: composed
+    rness = tmp_path / "project" / "rness"
+    (rness / "paradigms" / "extra.md").write_text("---\nname: extra\n---\nx\n", encoding="utf-8")
+    client.post("/api/paradigm/set", data={"name": "text-planning"})
+    r = client.post("/api/paradigm/toggle", data={"name": "extra", "on": "1"})
+    assert 'data-paradigm-note="composed"' in r.text           # no text written for the pair
+    assert 'data-paradigms="extra text-planning"' in r.text
 
 
 def test_paradigm_toggle_refuses_a_fourth_and_the_last(client: TestClient, tmp_path: Path):

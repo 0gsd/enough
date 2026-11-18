@@ -7,9 +7,11 @@ own file or a link to the install's `defaults/metaparadigms/`. It counts only
 while the fingerprints in its front matter match its members as the project
 has them; a combination with no true text is composed by rule.
 
-No metaparadigm text ships yet (a later lane writes the four), so the shipped
-check runs on an empty or absent `defaults/metaparadigms/` and a fixture
-proves it fails, naming the stale combinations, when a member changes.
+The four shipped texts (lane W2-PT) are checked for their fingerprints, their
+weight and their hints; a fixture proves the shipped check fails, naming the
+stale combinations, when a member changes. A test that needs a set with no
+text of its own takes the project's link away, or uses a paradigm of the
+project's own.
 """
 
 from __future__ import annotations
@@ -66,6 +68,32 @@ def test_every_shipped_metaparadigm_has_a_lean_head_no_heavier_than_text_plannin
         head = body.split(prompt.LEAN_CUT, 1)[0].rstrip()
         assert len(head) <= len(home_head), (p.name, len(head), len(home_head))
         assert len(whole) <= prompt.FULL_PARADIGM_BUDGET + 200, (p.name, len(whole))
+
+
+def test_the_four_shipped_texts_carry_their_hints():
+    """Pins 5 and 6 (E8): each shipped combination says who does what, and
+    above its cut what the scaffolder presumes for that set: with
+    workflow-design in it, a higher-order-creativity system; text-planning
+    with transcognition alone, a map of a mind, a world and a universe."""
+    folder = SHIPPED / "metaparadigms"
+    keys = {"text-planning+transcognition", "text-planning+workflow-design",
+            "transcognition+workflow-design", "text-planning+transcognition+workflow-design"}
+    assert {p.stem for p in folder.glob("*.md")} == keys
+    for key in keys:
+        body = prompt._parse_paradigm_frontmatter((folder / f"{key}.md").read_text(encoding="utf-8"))[1]
+        head = " ".join(body.split(prompt.LEAN_CUT, 1)[0].split())
+        assert "## Who does what" in body and "switching" in head, key
+        for member in key.split("+"):
+            assert f"`rness/paradigms/{member}.md`" in head, (key, member)
+        if "workflow-design" in key:
+            assert "higher-order-creativity system" in head, key
+        else:
+            assert "map of a mind, a world and a universe" in head, key
+        if "transcognition" in key:
+            assert "fabula-driven meaning enumeration foundation design" in head, key
+            assert "nllb_optin: true" in head, key
+        if key.startswith("text-planning+transcognition"):
+            assert "kept as a fabulan when the user asks" in head, key
 
 
 def test_the_check_names_the_stale_combinations(tmp_path: Path):
@@ -156,6 +184,8 @@ def test_each_of_the_seven_states_gets_one_text(project: Path, names: list[str])
 def test_the_composed_fallback_weighs_about_one_lean_head(project: Path):
     rness = project / "rness"
     names = ["text-planning", "transcognition", "workflow-design"]
+    # the triple ships: take its link away, so the set has no text of its own
+    (rness / "metaparadigms" / f"{prompt.metaparadigm_key(names)}.md").unlink(missing_ok=True)
     prompt.set_active_paradigms(rness, names)
     choice = prompt.choose_paradigm_text(rness)
     assert choice.kind == "composed" and choice.stale == ()
@@ -189,6 +219,10 @@ def test_a_member_without_a_cut_gets_an_even_share(tmp_path: Path):
 def test_a_project_s_own_metaparadigm_rides_while_true(project: Path):
     rness = project / "rness"
     names = ["text-planning", "transcognition"]
+    # The pair ships, so the project holds a link to it: a project's own
+    # file takes the link's place (writing through the link would write
+    # into the install's own text).
+    (rness / "metaparadigms" / f"{prompt.metaparadigm_key(names)}.md").unlink(missing_ok=True)
     _meta(rness / "metaparadigms", rness / "paradigms", names,
           "# Both\n\nOWN-PAIR-TEXT\n\n<!-- lean-cut -->\n\nLONG-TAIL")
     prompt.set_active_paradigms(rness, names)
