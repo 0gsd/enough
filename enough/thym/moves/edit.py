@@ -727,6 +727,9 @@ def gather(ctx: Any, parts: Value, **mods: Any) -> Value:
     the volume already has is the same item, and may add what it says (a reading enriching the outline): the fields
     the volume's lacks, never a field it has said otherwise; such a clash is refused, naming the item and the field."""
     w = mods.get("with")
+    if isinstance(parts, Value) and parts.type in ("folder", "text"):     # a recording or a verdict: transconception's
+        from enough.thym.moves import transconceive
+        return transconceive.gather_outside(ctx, parts, **mods)
     if not isinstance(w, Value) or w.type not in ("fabula", "volume"):
         raise MoveError("gather needs the volume it gathers into: gather parts with f")
     if not isinstance(parts, Value) or parts.type != "list":
