@@ -873,10 +873,10 @@ def atem_lines(atem: dict) -> list[str]:
 
 
 def _mode_note(mode: str, model_id: Any, why: str) -> str:
-    """The `mode:` line's value: the model's id, or what a scaffold is and why."""
+    """The `mode:` line's value: the model's id, or what an outline (rules, no model) is and why."""
     if mode == "model":
         return f"model ({model_id})" if model_id else "model"
-    return f"rules — a scaffold, no model read it ({why})"
+    return f"rules — an outline, no model read it ({why})"
 
 
 def _module_counts(counts: dict) -> str:

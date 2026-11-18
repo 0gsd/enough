@@ -336,7 +336,7 @@ def test_derive_in_rules_mode(project: Path):
     assert data["oes"] == "fabula/1" and data["derived"]["mode"] == "rules"
     assert data["derived"]["by"] == "Mo" and data["derived"]["completeness"] == "full"
     assert lint_errors(twin) == []
-    assert "mode: rules — a scaffold, no model read it" in r.body and "by Mo" in r.body
+    assert "mode: rules — an outline, no model read it" in r.body and "by Mo" in r.body
     assert "items: I " in r.body and " · L Lexicon " in r.body and "atem: " in r.body   # all ten modules, I first
     snap = r.side_effects[CT.SIDE_EFFECT]
     assert snap["kind"] == "emf" and snap["state"] == "done" and snap["by"] == "Mo"

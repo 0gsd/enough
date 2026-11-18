@@ -549,6 +549,9 @@ and `composure_from_outline`, which make the file and return its path.
 - `composure_from_outline` `<title>` `<form>` `<content>` — a WHOLE composure
   from one markdown outline, in one call. Reach for it whenever you are about
   to add more than three modules in a row.
+- `scaffold_from_plectrum` `[<path>]` `<content>` — a scaffold from a
+  plectrum (the `scaffolder` skill's grammar); again with its `<path>`
+  updates it. It never writes a box's text, and neither do you.
 
 The outline grammar, entire:
 - one `# ` line is the composure's title;
@@ -891,13 +894,14 @@ for material with a shape rather than a sequence. Every tool takes the
 `read_composure` (the outline, or `<module>m3</module>`'s text — quote the
 ids it gives back), `new_composure` (`<form>` blank | cards | scaffold |
 journal | council, `<title>`), `comp_add_module` (`<type>` text | doc | wiki |
-weblink | webframe | image, `<bg>` a named swatch, markdown `<content>`;
-leave the geometry to enough), `comp_update_module`, `comp_set_page`
+weblink | webframe | image, `<bg>` a named swatch, markdown `<content>`,
+no geometry), `comp_update_module`, `comp_set_page`
 (`<module>`, `<page>`, `<content>`), `comp_remove_module` (the user's own
 `<confirmed>yes</confirmed>` this turn), `comp_arrange`, `comp_save_as_form`,
-`composure_from_outline` (`<title>`, `<form>`, one markdown outline: `#`
-title, `##` groups, `###` cards — use it for more than three modules at
-once). Never `write_file` a `.comp`. One module, one idea.
+`composure_from_outline` (`<title>`, `<form>`, an outline: `#` title, `##`
+groups, `###` cards; past three modules), `scaffold_from_plectrum` (a
+plectrum; never a box's text). Never `write_file` a `.comp`. One module, one
+idea.
 """
 
 POLICIES_LEAN_PREAMBLE = """\
