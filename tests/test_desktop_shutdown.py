@@ -27,6 +27,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from enough import server as _server
+from enough.routes import home as home_routes
 from enough.server import create_app
 from enough.supervisor import LlamaSupervisor
 
@@ -74,7 +75,7 @@ def desktop(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(_server, "LlamaSupervisor", lambda **kw: fake)
 
     exit_calls: list[float] = []
-    monkeypatch.setattr(_server, "request_process_exit",
+    monkeypatch.setattr(home_routes, "request_process_exit",
                         lambda delay=0.25: exit_calls.append(delay))
 
     app = create_app(project, "http://localhost:9", supervise=True)

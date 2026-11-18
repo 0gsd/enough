@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 from starlette.testclient import TestClient
 
-from enough import server as server_mod
+from enough.routes import help as help_routes
 from enough.server import create_app
 
 REPO = Path(__file__).resolve().parent.parent
@@ -76,13 +76,13 @@ def test_boot_state_carries_language(client: TestClient):
 def test_help_center_language_fallback(client: TestClient, tmp_path: Path,
                                        monkeypatch: pytest.MonkeyPatch):
     # A pretend static dir with one translated manual. The endpoint reads
-    # server_mod.STATIC_DIR at request time; the app's /static mount was
+    # STATIC_DIR at request time (enough/routes/help.py's, since 0.8); the app's /static mount was
     # bound at create_app time and is irrelevant here.
     fake_static = tmp_path / "static"
     (fake_static / "i18n" / "fr").mkdir(parents=True)
     (fake_static / "i18n" / "fr" / "help-center.md").write_text(
         "# BONJOUR MANUEL\n", encoding="utf-8")
-    monkeypatch.setattr(server_mod, "STATIC_DIR", fake_static)
+    monkeypatch.setattr(help_routes, "STATIC_DIR", fake_static)
 
     # Translated when present…
     assert "BONJOUR MANUEL" in client.get("/api/help-center?lang=fr").text

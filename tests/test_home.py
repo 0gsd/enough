@@ -18,7 +18,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from enough import home
-from enough import server as _server
+from enough.routes import home as home_routes
 from enough.server import create_app
 
 # The counting fixture. Deliberately awkward: three blank lines in a row, a
@@ -436,9 +436,9 @@ def exits(monkeypatch: pytest.MonkeyPatch):
     """Recorders for the two process-level hooks, so a handoff can be
     asserted instead of performed."""
     calls: dict[str, list] = {"exit": [], "exec": []}
-    monkeypatch.setattr(_server, "request_process_exit",
+    monkeypatch.setattr(home_routes, "request_process_exit",
                         lambda delay=0.25, code=None: calls["exit"].append(code))
-    monkeypatch.setattr(_server, "request_process_exec",
+    monkeypatch.setattr(home_routes, "request_process_exec",
                         lambda argv, delay=0.25: calls["exec"].append(argv))
     return calls
 
