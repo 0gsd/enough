@@ -1,0 +1,57 @@
+{
+  "format": "cosmoes-library/1",
+  "about": "The language library's registry. Shelves, and one entry per text: kept (aboard true, written by scripts/fetch_library.py with the text's folder) or pinned by name and version only (aboard false, never copied). Never in specs/specs.json. See README.md.",
+  "shelves": [
+    {"slug": "python", "title": "Python", "kind": "language", "about": "The Python documentation, kept as the publisher's plain-text build for each version a transcoding names and the current release."},
+    {"slug": "ecmascript", "title": "ECMAScript", "kind": "language", "about": "ECMA-262 for each edition, under Ecma International's alternative copyright notice; its conformance tests are pinned."},
+    {"slug": "go", "title": "Go", "kind": "language", "about": "The Go Programming Language Specification for each release."},
+    {"slug": "rust", "title": "Rust", "kind": "language", "about": "The Rust Reference and the FLS for each release; neither claims to be complete."},
+    {"slug": "json", "title": "JSON", "kind": "standard", "about": "RFC 8259, kept whole and served only as the publisher's own file."},
+    {"slug": "unicode", "title": "Unicode", "kind": "standard", "about": "The Unicode Character Database's data files, kept whole; the core specification is pinned, not kept."},
+    {"slug": "ieee-754", "title": "IEEE 754", "kind": "standard", "about": "Floating-point arithmetic: sold, all rights reserved, so pinned by name and version only."}
+  ],
+  "texts": [
+    {
+      "shelf": "python", "text": "cpython", "version": "3.13", "name": "CPython", "publisher": "Python Software Foundation",
+      "what": "implementation", "lane": "open", "aboard": false,
+      "licence": {"name": "PSF License Version 2", "url": "https://docs.python.org/3.13/license.html"},
+      "from": "https://github.com/python/cpython", "release": null, "swhid": null, "digest": null,
+      "note": "The implementation tally runs on (3.13.11 on this Mac, 2026-11-18). Release, digest and swhid are filled when a transcoding names it; never copied."
+    },
+    {
+      "shelf": "ecmascript", "text": "test262", "version": "17.0", "name": "test262", "publisher": "Ecma International (TC39)",
+      "what": "tests", "lane": "open", "aboard": false,
+      "licence": {"name": "BSD 3-Clause", "url": "https://github.com/tc39/test262/blob/main/LICENSE"},
+      "from": "https://github.com/tc39/test262", "release": null, "swhid": null, "digest": null,
+      "note": "The conformance tests for ECMA-262's 17th edition: pinned by commit when one is chosen; never copied."
+    },
+    {
+      "shelf": "go", "text": "go", "version": "1.27", "name": "The Go toolchain (gc)", "publisher": "The Go Authors (Google)",
+      "what": "implementation", "lane": "open", "aboard": false,
+      "licence": {"name": "BSD-style (the repository's LICENSE)", "url": "https://go.dev/copyright"},
+      "from": "https://go.dev/dl/", "release": "go1.27.4", "swhid": null, "digest": null,
+      "note": "go1.27.4 was on this Mac on 2026-11-13. Digest and swhid are filled when a transcoding names it; never copied."
+    },
+    {
+      "shelf": "rust", "text": "rustc", "version": "1.97", "name": "rustc", "publisher": "The Rust Project",
+      "what": "implementation", "lane": "open", "aboard": false,
+      "licence": {"name": "MIT or Apache License 2.0", "url": "https://www.rust-lang.org/policies/licenses"},
+      "from": "https://static.rust-lang.org/dist/", "release": "1.97.1", "swhid": null, "digest": null,
+      "note": "1.97.1 was on this Mac on 2026-11-13. Digest and swhid are filled when a transcoding names it; never copied."
+    },
+    {
+      "shelf": "unicode", "text": "standard", "version": "15.1.0", "name": "The Unicode Standard", "publisher": "Unicode, Inc.",
+      "what": "standard", "lane": "closed", "aboard": false,
+      "licence": {"name": "Unicode Terms of Use (personal or internal business use only)", "url": "https://www.unicode.org/copyright.html"},
+      "from": "https://www.unicode.org/versions/Unicode15.1.0/", "swhid": null, "digest": null,
+      "note": "The core specification: may not be passed on (copyright.html 3.2.2, 3.4), so named and pinned only. The address follows the publisher's pattern; the owner confirms it."
+    },
+    {
+      "shelf": "ieee-754", "text": "standard", "version": "2019", "name": "IEEE 754-2019, Standard for Floating-Point Arithmetic", "publisher": "IEEE",
+      "what": "standard", "lane": "closed", "aboard": false,
+      "licence": {"name": "IEEE, all rights reserved (sold)", "url": "https://standards.ieee.org/ieee/754/6210/"},
+      "from": "https://standards.ieee.org/ieee/754/6210/", "swhid": null, "digest": null,
+      "note": "Offered by purchase or subscription; named and pinned only."
+    }
+  ]
+}

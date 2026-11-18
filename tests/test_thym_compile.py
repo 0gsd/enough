@@ -623,8 +623,8 @@ def test_declarations_load_from_the_real_manifests():
     assert set(decls) - set(decls.view(0)) == {"survey", "history", "gather", "question", "record", "settle", "lines",
                                                "replace", "drop", "insert", "edit", "reword", "join", "say",
                                                "folders", "propose", "scan", "construe",
-                                               # 0.8, ahead of the bundled text (contracts.AHEAD_MOVES; Thym 20.11)
-                                               "author", "add", "compare", "uncovered"}
+                                               # 0.8, ahead of the bundled text (contracts.AHEAD_MOVES; Thym 20.10, 20.11)
+                                               "author", "add", "compare", "uncovered", "ground"}
     tell = decls["entail"]
     assert tell.owner == "fabula" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)
     assert list(tell.modifiers) == ["as", "by", "with"] and tell.modifiers["with"] == ("morph",)

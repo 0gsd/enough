@@ -28,6 +28,8 @@ import ast
 import configparser
 import datetime as dt
 import doctest
+import hashlib
+import json
 import os
 import re
 import subprocess
@@ -37,6 +39,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+from enough import languages as _languages
 from enough import macrocosm as mc
 from enough.thym import folder as _folder
 
@@ -247,17 +250,71 @@ def text(folder: Any, path: str) -> str:
     return _folder.read(root).text(path)
 
 
-REPO = SimpleNamespace(history=history, tree=tree, files=files, text=text)
+_EMPTY_TREE = b""
+
+
+def _git_tree(d: Path, counts: dict) -> bytes:
+    """The git tree object id (sha1, 20 bytes) of a folder on disk: files as blobs (mode 100755 when executable, else
+    100644), links as blobs of their target (120000, never followed), folders as trees (40000), an empty folder as
+    the empty tree, `.git` left out at every depth; entries in git's order (by name, a folder's name with `/`)."""
+    rows: list[tuple[bytes, bytes, bytes]] = []
+    with os.scandir(d) as it:
+        for e in it:
+            if e.name == ".git":
+                continue
+            name = os.fsencode(e.name)
+            if e.is_symlink():
+                target = os.fsencode(os.readlink(e.path))
+                rows.append((name, b"120000", hashlib.sha1(b"blob %d\0" % len(target) + target).digest()))
+            elif e.is_dir(follow_symlinks=False):
+                rows.append((name + b"/", b"40000", _git_tree(Path(e.path), counts)))
+            elif e.is_file(follow_symlinks=False):
+                data = Path(e.path).read_bytes()
+                counts["files"] += 1
+                counts["bytes"] += len(data)
+                if counts["bytes"] > SWHID_MAX_BYTES:
+                    raise ValueError("the folder is larger than this build hashes")
+                mode = b"100755" if e.stat(follow_symlinks=False).st_mode & 0o111 else b"100644"
+                rows.append((name, mode, hashlib.sha1(b"blob %d\0" % len(data) + data).digest()))
+    rows.sort(key=lambda r: r[0])
+    body = b"".join(mode + b" " + (name[:-1] if name.endswith(b"/") else name) + b"\0" + sha
+                    for name, mode, sha in rows)
+    return hashlib.sha1(b"tree %d\0" % len(body) + body).digest()
+
+
+#: The most bytes `swhid` reads (every file of the folder, binaries included).
+SWHID_MAX_BYTES = 256 * 1024 * 1024
+
+
+def swhid(folder: Any) -> dict:
+    """The folder's Software Heritage identifier, by rule (MacroCOSM OES 18.4.1, `source.swhid`): `{ok: true, dir:
+    "swh:1:dir:<hex>", files, bytes}`, the git tree id of the folder as it is on disk, `.git` left out, every other
+    file read as bytes and none run; for a clean clone it is the commit's tree. The revision's identifier is the
+    commit's (`swh:1:rev:<commit>`), which the move writes from the folder's commit. `{ok: false, why}` for a
+    snapshot or a folder past the cap."""
+    root = _root(folder)
+    if root is None or not root.is_dir():
+        return {"ok": False, "why": "the folder was read from a snapshot, and only a folder on disk is hashed"}
+    counts = {"files": 0, "bytes": 0}
+    try:
+        tid = _git_tree(root, counts)
+    except (OSError, ValueError) as e:
+        return {"ok": False, "why": f"the folder could not be hashed: {e}"}
+    return {"ok": True, "dir": f"swh:1:dir:{tid.hex()}", **counts}
+
+
+REPO = SimpleNamespace(history=history, tree=tree, files=files, text=text, swhid=swhid)
 
 
 # ---------------------------------------------------------------------------
 # syntax: Python's outline, parse, and the packaging files
 # ---------------------------------------------------------------------------
 
-LANGUAGES = {"py": "python", "pyi": "python", "md": "markdown", "rst": "restructuredtext", "txt": "text",
-             "toml": "toml", "cfg": "ini", "ini": "ini", "json": "json", "yaml": "yaml", "yml": "yaml", "js": "javascript",
-             "ts": "typescript", "c": "c", "h": "c", "rs": "rust", "go": "go", "sh": "shell", "html": "html",
-             "css": "css", "in": "text"}
+#: A file's language by its suffix: the registry's languages (enough/languages.py: py and pyi, go, rs) and the other
+#: kinds of file a tree holds.
+LANGUAGES = {"md": "markdown", "rst": "restructuredtext", "txt": "text", "toml": "toml", "cfg": "ini", "ini": "ini",
+             "json": "json", "yaml": "yaml", "yml": "yaml", "js": "javascript", "ts": "typescript", "c": "c", "h": "c",
+             "sh": "shell", "html": "html", "css": "css", "in": "text", **_languages.suffixes()}
 
 
 def language(path: str) -> str:
@@ -270,7 +327,7 @@ def language(path: str) -> str:
 def parse(path: str, text: str) -> dict:
     """`{ok: true}` or `{ok: false, line, message}` for a file in a language this edition parses (Python), by
     `ast.parse` on the text; `{ok: null, why}` for any other language. Nothing is imported or executed."""
-    if language(path) != "python":
+    if not _languages.reads(language(path)):
         return {"ok": None, "why": f"{path} is not Python, and this edition parses Python only"}
     try:
         ast.parse(text, filename=path)
@@ -736,7 +793,7 @@ def outline(path: str, text: str) -> dict:
     functions are left out. A file that does not parse gives `{ok: false, line, message}`; a file in another
     language `{ok: null, language, why}`."""
     lang = language(path)
-    if lang != "python":
+    if not _languages.reads(lang):
         return {"ok": None, "language": lang, "why": f"no outline of {lang} in this edition, which reads Python"}
     try:
         tree = ast.parse(text, filename=path)
@@ -1094,6 +1151,390 @@ def manifest(path: str, text: str) -> dict:
     return {k: v for k, v in out.items() if v is not None}
 
 
+# ---------------------------------------------------------------------------
+# uses: what a file takes from its language and its library, by its syntax (the ground's input, Thym 20.10)
+# ---------------------------------------------------------------------------
+
+#: At most this many sites of one kind a file's uses keep (each distinct call or form once per definition it is in).
+USES_CAP = 4000
+#: A tested call that answers yes or no by its name: its truth is no gift of the language (`truth-test` skips it).
+_YES_NO = re.compile(r"^(is|has|can|should|startswith|endswith|exists|isinstance|issubclass|callable|any|all|bool|"
+                     r"match|fullmatch|search)")
+
+
+def _dotted(n: ast.AST, aliases: dict[str, str]) -> str | None:
+    """A name or an attribute chain as the module it reaches: `json.dumps` (after `import json`), `pathlib.Path.home`
+    (after `from pathlib import Path`), `int`; None for a chain on anything but a name."""
+    parts: list[str] = []
+    while isinstance(n, ast.Attribute):
+        parts.append(n.attr)
+        n = n.value
+    if not isinstance(n, ast.Name):
+        return None
+    head = aliases.get(n.id, n.id)
+    return ".".join([head] + parts[::-1])
+
+
+def _const_text(n: ast.AST | None, strings: dict[str, str] | None = None) -> str | None:
+    if isinstance(n, ast.Constant) and isinstance(n.value, str):
+        return n.value
+    if strings is not None and isinstance(n, ast.Name) and n.id in strings:
+        return strings[n.id]
+    return None
+
+
+def _kind_of(n: ast.AST | None, strings: dict[str, str]) -> str | None:
+    if isinstance(n, ast.JoinedStr) or _const_text(n, strings) is not None:
+        return "str"
+    if isinstance(n, ast.Constant):
+        return {bytes: "bytes", int: "int", float: "float", bool: "bool"}.get(type(n.value))
+    return None
+
+
+def _written(n: ast.AST | None) -> str | None:
+    """A keyword's value as written, for a name, a dotted name or a constant (`int`, `version`, `?`)."""
+    if isinstance(n, ast.Constant) and isinstance(n.value, (str, int, bool)) and not isinstance(n.value, float):
+        return str(n.value)
+    if isinstance(n, (ast.Name, ast.Attribute)):
+        return ast.unparse(n)
+    return None
+
+
+def uses(path: str, text: str) -> dict:
+    """What a Python file takes from its language and its library, read from its syntax (never run): the ground's
+    input (MacroCOSM OES 18.4.9; Thym 20.10). Gives `{ok, language, imports, calls, attrs, annotations, forms,
+    decorators, bases, handlers, strings, entry}`, each site with its `line` and the definition it is in (`in`, the
+    outline's qualified name, absent at module level):
+
+    - `imports`: `{module, line}`, a relative import's module with its dots;
+    - `calls`: `{name, method, kw, kwv, arg0, kind0, mode, line, in}`: `name` the callee as the module it reaches
+      (`json.dumps`, `pathlib.Path.home`, `int`), `method` the last attribute of a call on anything, `kw` the keyword
+      names, `kwv` those written as a name or a constant, `arg0` the first argument when it is text (at most 200
+      characters), `kind0` its kind, `mode` the mode of an `open`;
+    - `attrs`: `{name, line, in}`, a dotted name read (`sys.argv`, `re.IGNORECASE`, a name imported from a module);
+    - `annotations`: `{name, line, in}`, every name an annotation uses;
+    - `forms`: `{form, line, in}`: `true-division`, `floor-division`, `f-string`, `format-spec`, `format-width`,
+      `conversion-r`, `percent-format`, `truth-test`, `or-default`, `map`, `set`, `compare-in`, `text-repeat`,
+      `slice`, `map-lookup` (a module's own map looked up by a key from outside), `yield`, `handler`,
+      `handler-text`, `raise-from`, `package-main`, and `path-join` (a path joined with `/`, never a division);
+    - `decorators`, `bases`: `{name, line, in}` as the module they reach and as written;
+    - `handlers`: `{name, line, in}`, every error kind an `except` names;
+    - `strings`: the distinct text constants of the file (at most 80 characters each);
+    - `entry`: the line of the `__main__` guard, 1 for a package's `__main__.py`, or absent.
+
+    A file that does not parse gives `{ok: false, line, message}`; a file in another language `{ok: null, why}`."""
+    lang = language(path)
+    if not _languages.reads(lang):
+        return {"ok": None, "language": lang, "why": f"no uses of {lang} in this edition, which reads Python"}
+    try:
+        tree = ast.parse(text, filename=path)
+    except (SyntaxError, ValueError) as e:
+        return {"ok": False, "language": lang, "line": int(getattr(e, "lineno", 0) or 0),
+                "message": str(getattr(e, "msg", None) or e)}
+    aliases: dict[str, str] = {}
+    imports: list[dict] = []
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Import):
+            for a in n.names:
+                imports.append({"module": a.name, "line": n.lineno})
+                aliases[a.asname or a.name.split(".", 1)[0]] = a.name if a.asname else a.name.split(".", 1)[0]
+        elif isinstance(n, ast.ImportFrom):
+            mod = "." * n.level + (n.module or "")
+            imports.append({"module": mod, "line": n.lineno})
+            if not n.level:
+                for a in n.names:
+                    if a.name != "*":
+                        aliases[a.asname or a.name] = f"{n.module}.{a.name}"
+    # the definition each line is in: the outline's qualified names (nested functions are their outer one's)
+    spans: list[tuple[int, int, str]] = []
+
+    def walk_defs(body: list, prefix: str) -> None:
+        for d in body:
+            if isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                q = f"{prefix}{d.name}"
+                spans.append((d.lineno, int(getattr(d, "end_lineno", d.lineno) or d.lineno), q))
+                if isinstance(d, ast.ClassDef):
+                    walk_defs(d.body, f"{q}.")
+            elif not prefix:
+                for sub in (getattr(d, "body", None), getattr(d, "orelse", None), getattr(d, "finalbody", None)):
+                    if isinstance(sub, list):
+                        walk_defs(sub, prefix)
+                for h in getattr(d, "handlers", None) or []:
+                    walk_defs(h.body, prefix)
+    walk_defs(tree.body, "")
+
+    def owner(line: int) -> str | None:
+        best = None
+        for a, b, q in spans:
+            if a <= line <= b and (best is None or a >= best[0]):
+                best = (a, q)
+        return best[1] if best else None
+
+    strings = _string_names(tree)
+    # the module's own maps: names bound at the top to a map written out (a lookup by a key from outside may miss)
+    maps = {t.id for s in tree.body if isinstance(s, (ast.Assign, ast.AnnAssign)) and isinstance(
+        s.value, (ast.Dict, ast.DictComp)) for t in (s.targets if isinstance(s, ast.Assign) else [s.target])
+        if isinstance(t, ast.Name)}
+    out: dict[str, list] = {k: [] for k in ("calls", "attrs", "annotations", "forms", "decorators", "bases",
+                                            "handlers")}
+    seen: set = set()
+
+    def put(kind: str, row: dict, line: int) -> None:
+        row = {k: v for k, v in row.items() if v not in (None, [], {})}
+        o = owner(line)
+        key = (kind, json.dumps(row, sort_keys=True), o)
+        if key in seen or len(out[kind]) >= USES_CAP:
+            return
+        seen.add(key)
+        row["line"] = line
+        if o:
+            row["in"] = o
+        out[kind].append(row)
+
+    def form(name: str, n: ast.AST) -> None:
+        put("forms", {"form": name}, int(getattr(n, "lineno", 1) or 1))
+
+    func_nodes = {id(c.func) for c in ast.walk(tree) if isinstance(c, ast.Call)}
+    for n in ast.walk(tree):
+        line = int(getattr(n, "lineno", 0) or 0)
+        if isinstance(n, ast.Call):
+            f = n.func
+            name = _dotted(f, aliases)
+            method = f.attr if isinstance(f, ast.Attribute) else None
+            first = n.args[0] if n.args else None
+            row: dict = {"name": name, "method": method, "kw": sorted(k.arg for k in n.keywords if k.arg),
+                         "kwv": {k.arg: w for k in n.keywords if k.arg and (w := _written(k.value)) is not None}}
+            t0 = _const_text(first, strings)
+            if t0 is not None:
+                row["arg0"] = t0[:200]
+            row["kind0"] = _kind_of(first, strings)
+            if (name == "open" or method == "open") and (len(n.args) > (1 if name == "open" else 0) or _kw(n, "mode")):
+                mode = _kw(n, "mode") or n.args[1 if name == "open" else 0]
+                row["mode"] = _const_text(mode)
+            elif name == "open" or method == "open":
+                row["mode"] = "r"
+            put("calls", row, line)
+            if method == "format" and isinstance(f.value, ast.Constant) and isinstance(f.value.value, str) \
+                    and re.search(r"\{[^{}]*:[^{}]*\}", f.value.value):
+                form("format-spec", n)
+        elif isinstance(n, (ast.Attribute, ast.Name)) and isinstance(getattr(n, "ctx", None), ast.Load) \
+                and id(n) not in func_nodes:
+            d = _dotted(n, aliases)
+            root = n
+            while isinstance(root, ast.Attribute):
+                root = root.value
+            if d and isinstance(root, ast.Name) and root.id in aliases and "." in d:
+                put("attrs", {"name": d}, line)
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            anns = [a.annotation for a in n.args.posonlyargs + n.args.args + n.args.kwonlyargs if a.annotation]
+            anns += [x.annotation for x in (n.args.vararg, n.args.kwarg) if x is not None and x.annotation]
+            anns += [n.returns] if n.returns is not None else []
+            for a in anns:
+                for x in ast.walk(a):
+                    if isinstance(x, ast.Name):
+                        put("annotations", {"name": x.id}, int(getattr(a, "lineno", line) or line))
+                    elif isinstance(x, ast.Attribute):
+                        put("annotations", {"name": x.attr}, int(getattr(a, "lineno", line) or line))
+            for dec in n.decorator_list:
+                tgt = dec.func if isinstance(dec, ast.Call) else dec
+                put("decorators", {"name": _dotted(tgt, aliases), "as": _seg(text, tgt)}, dec.lineno)
+        elif isinstance(n, ast.AnnAssign):
+            for x in ast.walk(n.annotation):
+                if isinstance(x, (ast.Name, ast.Attribute)):
+                    put("annotations", {"name": x.id if isinstance(x, ast.Name) else x.attr}, line)
+        elif isinstance(n, ast.ClassDef):
+            for dec in n.decorator_list:
+                tgt = dec.func if isinstance(dec, ast.Call) else dec
+                put("decorators", {"name": _dotted(tgt, aliases), "as": _seg(text, tgt)}, dec.lineno)
+            for b in n.bases:
+                tgt = b.value if isinstance(b, ast.Subscript) else b
+                put("bases", {"name": _dotted(tgt, aliases), "as": _seg(text, tgt)}, n.lineno)
+        elif isinstance(n, (ast.BinOp, ast.AugAssign)):
+            op = n.op
+            if isinstance(op, ast.Div):
+                sides = (n.left, n.right) if isinstance(n, ast.BinOp) else (n.target, n.value)
+                pathy = any(_kind_of(s, strings) == "str" or (isinstance(s, ast.Call) and re.search(
+                    r"Path\b|\b(home|cwd|expanduser|resolve|absolute)$", _dotted(s.func, aliases) or getattr(
+                        s.func, "attr", "") or "")) or (isinstance(s, ast.Attribute) and s.attr in ("parent", "parents"))
+                    for s in sides)
+                form("path-join" if pathy else "true-division", n)
+            elif isinstance(op, ast.FloorDiv):
+                form("floor-division", n)
+            elif isinstance(op, ast.Mod) and isinstance(n, ast.BinOp) and _const_text(n.left) is not None \
+                    and "%" in (_const_text(n.left) or ""):
+                form("percent-format", n)
+                if re.search(r"%(\([^)]*\))?[-#0 +]*\d*(\.\d+)?r", _const_text(n.left) or ""):
+                    form("conversion-r", n)
+            elif isinstance(op, ast.Mult) and isinstance(n, ast.BinOp) and (
+                    _kind_of(n.left, strings) == "str" or _kind_of(n.right, strings) == "str"):
+                form("text-repeat", n)
+        elif isinstance(n, ast.JoinedStr):
+            form("f-string", n)
+            for v in n.values:
+                if isinstance(v, ast.FormattedValue):
+                    if v.conversion == 114:
+                        form("conversion-r", n)
+                    if v.format_spec is not None:
+                        form("format-spec", n)
+                        spec = template(text, v.format_spec) or ""
+                        if re.search(r"(^|[<>=^])\d+", spec) or re.match(r"^[+\- ]?#?0?\d+", spec):
+                            form("format-width", n)
+        elif isinstance(n, (ast.If, ast.While, ast.IfExp, ast.Assert)):
+            t = n.test
+            t = t.operand if isinstance(t, ast.UnaryOp) and isinstance(t.op, ast.Not) else t
+            if isinstance(t, (ast.Name, ast.Attribute, ast.Subscript)) or (
+                    isinstance(t, ast.Call) and not _YES_NO.match(
+                        (t.func.attr if isinstance(t.func, ast.Attribute) else getattr(t.func, "id", "")) or "")):
+                form("truth-test", n)
+        elif isinstance(n, ast.BoolOp) and isinstance(n.op, ast.Or) and isinstance(n.values[-1], ast.Constant):
+            form("or-default", n)
+        elif isinstance(n, (ast.Dict, ast.DictComp)):
+            form("map", n)
+        elif isinstance(n, (ast.Set, ast.SetComp)):
+            form("set", n)
+        elif isinstance(n, ast.Compare) and any(isinstance(o, (ast.In, ast.NotIn)) for o in n.ops):
+            form("compare-in", n)
+        elif isinstance(n, ast.Subscript) and isinstance(n.slice, ast.Slice):
+            form("slice", n)
+        elif isinstance(n, ast.Subscript) and isinstance(n.ctx, ast.Load) and isinstance(n.value, ast.Name) \
+                and n.value.id in maps and not isinstance(n.slice, ast.Constant):
+            form("map-lookup", n)
+        elif isinstance(n, (ast.Yield, ast.YieldFrom)):
+            form("yield", n)
+        elif isinstance(n, ast.Raise) and n.cause is not None:
+            form("raise-from", n)
+        elif isinstance(n, ast.ExceptHandler):
+            kinds = n.type.elts if isinstance(n.type, ast.Tuple) else ([n.type] if n.type is not None else [])
+            for k in kinds:
+                nm = k.id if isinstance(k, ast.Name) else (k.attr if isinstance(k, ast.Attribute) else None)
+                if nm:
+                    put("handlers", {"name": nm}, n.lineno)
+            if kinds:
+                form("handler", n)
+            if n.name:
+                said = any((isinstance(x, ast.FormattedValue) and isinstance(x.value, ast.Name) and x.value.id ==
+                            n.name) or (isinstance(x, ast.Call) and isinstance(x.func, ast.Name) and x.func.id in (
+                                "str", "print", "repr") and any(isinstance(a, ast.Name) and a.id == n.name
+                                                                 for a in x.args))
+                           for b in n.body for x in ast.walk(b))
+                if said:
+                    form("handler-text", n)
+    entry = None
+    if path.rsplit("/", 1)[-1] == "__main__.py":
+        entry = 1
+        put("forms", {"form": "package-main"}, 1)
+    for n in tree.body:
+        if _is_main_guard(n):
+            entry = n.lineno
+    consts = sorted({n.value for n in ast.walk(tree) if isinstance(n, ast.Constant) and isinstance(n.value, str)
+                     and 0 < len(n.value) <= 80})
+    res: dict = {"ok": True, "language": lang, "imports": sorted(imports, key=lambda r: (r["line"], r["module"]))}
+    for k in ("calls", "attrs", "annotations", "forms", "decorators", "bases", "handlers"):
+        res[k] = sorted(out[k], key=lambda r: (r["line"], json.dumps(r, sort_keys=True)))
+    res["strings"] = consts[:USES_CAP]
+    if entry is not None:
+        res["entry"] = entry
+    return res
+
+
+def locks(path: str, text: str) -> dict:
+    """What a lock file or a version file pins, read as text, never run: `{ok: true, kind, runtime, packages:
+    [{package, version, digest, address, line}]}`. Read: `.python-version` (the runtime's release), `uv.lock` and
+    `poetry.lock` (each package's version and the sha256 of its first distribution), `Pipfile.lock`, and a
+    `requirements*.txt` line pinned with `==` (and its first `--hash=sha256:`). `address` is the package's page on
+    the index the lock names (PyPI's when it names none). `{ok: null, why}` for any other file."""
+    name = path.rsplit("/", 1)[-1]
+    pkgs: list[dict] = []
+    out: dict = {"ok": True}
+
+    def pypi(pkg: str) -> str:
+        return f"https://pypi.org/project/{re.sub(r'[-_.]+', '-', pkg).lower()}/"
+    try:
+        if name == ".python-version":
+            first = next((ln.strip() for ln in text.splitlines() if ln.strip() and not ln.startswith("#")), "")
+            if not re.fullmatch(r"\d+\.\d+(\.\d+)?", first):
+                return {"ok": None, "why": f"{path} names no release ({first[:40]!r})"}
+            out.update(kind="python-version", runtime=first)
+        elif name in ("uv.lock", "poetry.lock"):
+            data = tomllib.loads(text)
+            out["kind"] = name
+            for p in data.get("package") or []:
+                if not isinstance(p, dict) or not isinstance(p.get("name"), str):
+                    continue
+                row = {"package": p["name"], "version": str(p.get("version") or ""), "line": _line_of(
+                    text, f'name = "{p["name"]}"')}
+                src = p.get("source") if isinstance(p.get("source"), dict) else {}
+                if src.get("editable") or src.get("virtual") or src.get("directory"):
+                    continue                                         # the project itself, or a path inside it
+                files_ = ([p.get("sdist")] if isinstance(p.get("sdist"), dict) else []) + list(p.get("wheels") or []) \
+                    + list(p.get("files") or [])
+                h = next((f.get("hash") for f in files_ if isinstance(f, dict) and str(f.get("hash", "")).startswith(
+                    "sha256:")), None)
+                if h:
+                    row["digest"] = h
+                reg = src.get("registry") if isinstance(src.get("registry"), str) else None
+                row["address"] = pypi(p["name"]) if reg in (None, "https://pypi.org/simple") else reg
+                pkgs.append(row)
+        elif name == "Pipfile.lock":
+            data = json.loads(text)
+            out["kind"] = "Pipfile.lock"
+            for group in ("default", "develop"):
+                for pk, v in (data.get(group) or {}).items():
+                    if isinstance(v, dict) and str(v.get("version", "")).startswith("=="):
+                        row = {"package": pk, "version": v["version"][2:], "address": pypi(pk),
+                               "line": _line_of(text, f'"{pk}"')}
+                        h = next((x for x in v.get("hashes") or [] if str(x).startswith("sha256:")), None)
+                        if h:
+                            row["digest"] = h
+                        pkgs.append(row)
+        elif re.fullmatch(r"requirements[\w.-]*\.txt", name):
+            out["kind"] = "requirements"
+            joined = re.sub(r"\\\n", " ", text)
+            for i, ln in enumerate(joined.splitlines(), 1):
+                m = re.match(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)(\[[^\]]*\])?\s*==\s*([^\s;#\\]+)", ln)
+                if m:
+                    row = {"package": m.group(1), "version": m.group(3), "address": pypi(m.group(1)), "line": i}
+                    h = re.search(r"--hash=(sha256:[0-9a-f]{64})", ln)
+                    if h:
+                        row["digest"] = h.group(1)
+                    pkgs.append(row)
+        else:
+            return {"ok": None, "why": f"{path} is no lock or version file this edition reads"}
+    except (tomllib.TOMLDecodeError, ValueError) as e:
+        return {"ok": False, "why": f"{path} could not be read: {' '.join(str(e).split())[:200]}"}
+    out["packages"] = pkgs
+    return out
+
+
+def catalogue(language: str) -> dict:
+    """A language's ground, as the move `ground` takes it through this engine (Thym moves read no file and import
+    nothing outside enough.thym): `{ok: true, language: {name, title, runtime, suffixes}, catalogue}`, the catalogue
+    whole as `enough.languages` reads it from `defaults/cosm/ground/<language>.ground.cosm`; `{ok: null, why}` for a
+    language the builder does not read or that has no catalogue. Recorded like any engine call, so a replay grounds
+    with the catalogue of its run."""
+    lang = _languages.get(language)
+    if lang is None or not lang.reads or not lang.ground:
+        name = lang.title if lang else repr(language)
+        return {"ok": None, "why": f"{name} has no ground catalogue in this build: it can be entailed into, not "
+                                   "grounded"}
+    try:
+        data = _languages.catalogue(lang.name)
+    except (KeyError, OSError, ValueError) as e:
+        return {"ok": False, "why": f"the ground catalogue of {lang.title} could not be read: {e}"}
+    return {"ok": True, "language": {"name": lang.name, "title": lang.title, "runtime": lang.runtime,
+                                     "suffixes": list(lang.suffixes)},
+            "catalogue": json.loads(json.dumps(data))}
+
+
+LOCKS = (".python-version", "uv.lock", "poetry.lock", "Pipfile.lock")
+
+
+def is_lock(path: str) -> bool:
+    """A lock or version file at the top of the tree, which `locks` reads."""
+    name = path.rsplit("/", 1)[-1]
+    return "/" not in path and (name in LOCKS or re.fullmatch(r"requirements[\w.-]*\.txt", name) is not None)
+
+
 PACKAGING = ("pyproject.toml", "setup.cfg")
 
 
@@ -1102,7 +1543,8 @@ def is_packaging(path: str) -> bool:
     return "/" not in path and (name in PACKAGING or re.fullmatch(r"requirements[\w.-]*\.txt", name) is not None)
 
 
-SYNTAX = SimpleNamespace(outline=outline, parse=parse, manifest=manifest, language=language)
+SYNTAX = SimpleNamespace(outline=outline, parse=parse, manifest=manifest, language=language, uses=uses, locks=locks,
+                         catalogue=catalogue)
 
 
 def repo_engine() -> Any:
@@ -1120,5 +1562,5 @@ def engines() -> dict:
     return {"repo": REPO, "syntax": SYNTAX}
 
 
-__all__ = ["GIT_OVERRIDES", "REPO", "SYNTAX", "engines", "repo_engine", "syntax_engine", "template", "files", "git_binary", "git_env", "history", "is_packaging",
-           "language", "manifest", "outline", "parse", "run_git", "text", "tree"]
+__all__ = ["GIT_OVERRIDES", "REPO", "SYNTAX", "engines", "repo_engine", "syntax_engine", "template", "files", "git_binary", "git_env", "history", "is_lock",
+           "catalogue", "is_packaging", "language", "locks", "manifest", "outline", "parse", "run_git", "swhid", "text", "tree", "uses"]

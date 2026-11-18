@@ -43,6 +43,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from . import agent_free as _agent_free
 from . import canon_tools as _canon_tools
 from . import fabula_names as _fabula_names
+from . import languages as _languages
 from . import macrocosm as _macrocosm
 from . import thym_api as _thym_api
 from . import thym_host as _host
@@ -52,8 +53,8 @@ from .thym import Refusal
 log = logging.getLogger("enough.fabulac_job")
 
 #: The five programs of the shipped file, in the order the job runs them, and the stage each one is.
-PROGRAM_FILE = "decompile-python.thym"
-COMPILE_FILE = "compile-python.thym"
+PROGRAM_FILE = _languages.program(_languages.DEFAULT, "decompile")      # decompile-python.thym
+COMPILE_FILE = _languages.program(_languages.DEFAULT, "compile")        # compile-python.thym
 STAGES: tuple[str, ...] = ("survey-the-repo", "read-the-history", "read-every-file", "fold-the-whole",
                            "raise-the-questions")
 STAGE_WORDS = {"survey-the-repo": "survey", "read-the-history": "history", "read-every-file": "read",
@@ -300,7 +301,7 @@ def build_state(project_dir: Path, folder: Path) -> dict:
             "completeness": derived.get("completeness") if exists else None,
             "python_files": sum(1 for it in nodes if isinstance(it, dict)
                                 and str(it.get("id", "")).startswith("C:file/")
-                                and str(it.get("language") or "").lower() == "python") if exists else None}
+                                and _languages.reads(str(it.get("language") or "").lower())) if exists else None}
 
 
 def start_index(state: dict, *, restart: bool = False, resume_only: bool = False) -> int:
@@ -787,7 +788,7 @@ def run_compile(project_dir: Path, fab: Path, *, what: str, mode: str, why: str 
         entry = {"path": f"{dst.name}/", "at": at, "by": by, "mode": run_mode, "order": "code"}
         if run_route:
             entry["route"] = run_route
-        entry.update({"language": "python", "files": len(files)})
+        entry.update({"language": _languages.DEFAULT, "files": len(files)})
         entries.append(("shorts", entry))
         out["cshort"] = {"path": rel_of(project_dir, dst) + "/", "files": len(files)}
         manual = Path(t.outputs["manual"])

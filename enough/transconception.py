@@ -67,6 +67,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from . import languages as _languages
 from . import macrocosm as mc
 
 PURPOSE = "transconception"
@@ -94,18 +95,10 @@ LANES_NEEDING_LEAVE = ("closed",)
 SPIKE_LEVEL = 2
 SOURCE_SUFFIXES = (".py", ".md", ".toml", ".txt", ".cfg", ".rst", ".yml", ".yaml", ".in", "")
 
-# The names a text uses when it names a source language, its runtime or its standard library, by language. Pin 3 of
-# the 0.8 build puts everything the builder does by language behind one registry (enough/languages.py); this table
-# moves there when the registry lands. Python's is the experiment's own (x0, a4lib.NAMES).
-SOURCE_NAMES: dict[str, re.Pattern] = {
-    "python": re.compile(
-        r"\b(Python|python3?|CPython|PyPy|argparse|ast\b|ast\.\w+|fnmatch\w*|tomllib|tomli|pathlib|rglob|tokenize|"
-        r"pkgutil|sys\.\w+|os\.path\.?\w*|IntEnum|NamedTuple|namedtuple|dataclass\w*|typing|html\.entities|html5|"
-        r"xml\.etree|ElementTree|lxml|etree|codecs|collections|functools|logging|re\.\w+|regular expression|"
-        r"literal_eval|splitlines|isspace|strip\(\)|str\(\)|int\(\)|chr\(\)|sorted\(\)|any\(\)|generator|yield|"
-        r"pytest|traceback|TypeError|ValueError|KeyError|ImportError|UnicodeDecodeError|SyntaxError|OSError|"
-        r"dict(?:ionary)?|tuple|bytes|glob)\b"),
-}
+# The names a text uses when it names a source language, its runtime or its standard library, by language: the
+# registry's (enough/languages.py, pin 3 of the 0.8 build), read here by name. Python's is the experiment's own (x0,
+# a4lib.NAMES).
+SOURCE_NAMES: dict[str, re.Pattern] = {n: lang.names for n, lang in _languages.LANGUAGES.items() if lang.names}
 # Kinds whose words are not read by stands-alone: they record what the source was (R), are data (P:case), or say
 # what they rely on or depend on (C:reliance, C:dependency, N:target); D is the dialectic's.
 STANDS_ALONE_SKIP_MODULES = ("R", "D")
