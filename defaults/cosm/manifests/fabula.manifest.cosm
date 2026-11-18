@@ -417,16 +417,20 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     scaffold: outline
     code: enough.thym.moves.emf:entail
     says: an entailment of the fabula, in an order, in a morph
-    thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7)
-      modifiers: {as: 'order | code | line | overview | manual', by: order, with: morph}
+    thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7),
+                                        # or its cases file for the outside judge (transconception, THYM 20.10; no model)
+      modifiers: {as: 'order | code | line | overview | manual | cases', by: order, with: morph}
       gives-when:
         - {as: [code], gives: folder}
+        - {as: [cases], gives: text}
       contract-when:
         - {as: [code], contract: [parses, interfaces-present, files-present, footer, provenance]}
         - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
-      scaffold-when:                    # code has none: --rules refuses it
+        - {as: [cases], contract: [cases-whole, provenance]}
+      scaffold-when:                    # code has none: --rules refuses it; cases needs no model, so its scaffold is itself
         - {as: [line, overview, manual], scaffold: uses-outline}
         - {as: [code], scaffold: none}
+        - {as: [cases], scaffold: cases-file}
   - name: atem
     takes: ['text | fabula | short | item']
     gives: atem

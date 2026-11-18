@@ -34,7 +34,8 @@ CHECKS = (
 # yet, for the next revision of the specification at cosmoes.org. A test holds each to being no row of the table, so
 # that it leaves this list the day the text takes it.
 #   quotes-held (0.7): every name a catem quotes is in its fabulac (enough/thym/moves/code.py)
-AHEAD = ("quotes-held",)
+#   cases-whole (0.8): `entail f as cases` gives a whole cases file (enough/thym/moves/transconceive.py)
+AHEAD = ("quotes-held", "cases-whole")
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}
