@@ -18,6 +18,7 @@ from enough import broker
 from enough import intro as I
 from enough import prompt as prompt_mod
 from enough import server
+from enough.routes import chat as chat_routes
 from enough import skeleton
 from enough import tools as T
 from enough.server import Session, create_app
@@ -56,7 +57,7 @@ def turns(monkeypatch: pytest.MonkeyPatch) -> list[str]:
     def _run(session, message, *, pal=False, log_user=None):
         started.append(message)
         return _nothing()
-    monkeypatch.setattr(server, "_run_turn", _run)
+    monkeypatch.setattr(chat_routes, "_run_turn", _run)
     return started
 
 

@@ -24,6 +24,7 @@ from enough import cloud
 from enough import pal_tools as P
 from enough import prompt as prompt_mod
 from enough import server
+from enough.routes import chat as chat_routes
 from enough import skeleton
 from enough import tools as T
 from enough.server import Session, create_app
@@ -461,7 +462,7 @@ def turns(monkeypatch: pytest.MonkeyPatch) -> list[dict]:
         # gets back to the turn, and that is the point of fire-and-forget.
         started.append({"message": message, "pal": pal, "log_user": log_user})
         return _nothing()
-    monkeypatch.setattr(server, "_run_turn", _run)
+    monkeypatch.setattr(chat_routes, "_run_turn", _run)
     return started
 
 
