@@ -22,7 +22,7 @@ The checks, one method each on `_Checks`:
 - `ground-cited` (error): every reliance on the language or its runtime carries `stated`, a list of
   `{in, version, at, digest}` and `{nowhere: text}`; a version is a patch of the runtime's minor. Resolving a
   citation against the language library comes with the library: `resolve_citation` is the one place it will go.
-- `stands-alone` (warning): no `summary` or `means` names the source language, its runtime or a dependency, unless a
+- `stands-alone` (error): no `summary` or `means` names the source language, its runtime or a dependency, unless a
   reliance says the same without the name (the item is in its `used-by`). Cases, production (R), dependencies,
   reliances and targets are not read: they record what the source was, or say what they rely on.
 - `nothing-carried` (error): outside cases, spans, signatures and items ruled kept everywhere (a kept message is
@@ -64,7 +64,7 @@ PURPOSE = "transconception"
 CAPACITY = "transconceiver"
 CHECKS = ("standing", "ground-given", "ground-cited", "stands-alone", "nothing-carried", "case-outside", "cases-cover",
           "ruled", "round-trip", "target-confirmed", "surface-answered", "apart", "evidence-stated")
-SEVERITY = {c: "error" for c in CHECKS} | {"stands-alone": "warning", "cases-cover": "warning"}
+SEVERITY = {c: "error" for c in CHECKS} | {"cases-cover": "warning"}   # the owner, checkpoint A, 2026-11-18
 READY_TO_KEEP = ("standing", "ground-given", "ground-cited", "stands-alone", "nothing-carried", "case-outside",
                  "cases-cover", "ruled", "round-trip")
 READY_TO_ENTAIL = READY_TO_KEEP + ("target-confirmed",)

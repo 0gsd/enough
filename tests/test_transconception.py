@@ -1,9 +1,11 @@
 """Transconception (0.8, phase 1): the schema in the fabula manifest, the thirteen checks and the two gates of
 enough/transconception.py, and the experiment's two working fabulacs promoted as fixtures.
 
-Held here: both promoted fabulacs lint with no error; gate 1 (ready to keep) holds for both, as the experiment
-measured by hand (with the sources at hand when this machine has them; without them `nothing-carried` is not
-measured and says so); gate 2 does not hold for Go or Rust (neither is weighed); a fabulac nobody could rule is kept
+Held here: both promoted fabulacs lint with no error but `stands-alone`'s, an error since the owner's ruling at
+checkpoint A (2026-11-18): vulture names Python, its runtime or a dependency in seven items (nine findings),
+sloppy-xml-py in one; so gate 1 (ready to keep) does not hold for either, and every other check of it holds, as the
+experiment measured by hand (with the sources at hand when this machine has them; without them `nothing-carried` is
+not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust (neither is weighed); a fabulac nobody could rule is kept
 unruled; each check, on a small fabulac that passes all of them, made to fail; every other fabula untouched.
 """
 from __future__ import annotations
@@ -42,11 +44,25 @@ def vols():
     return {p.name: M.load_volume(p) for p in (VULTURE, SLOPPY)}
 
 
-def test_the_promoted_fabulacs_lint_with_no_error(vols):
+# What stands-alone finds in the promoted fabulacs: (item, the name it says). The ground lane's reliances fix them.
+STANDS_ALONE = {
+    "vulture.fabulac.cosm": {
+        ("C:interface/vulture.config._parse_toml", "dict"), ("C:interface/vulture.config._parse_args", "sys.argv"),
+        ("C:interface/vulture.config._parse_args", "dict"), ("C:interface/vulture.config.make_config", "sys.argv"),
+        ("C:interface/vulture.config.make_config", "dict"), ("C:setting/vulture.core.PYTEST_FUNCTION_NAMES", "pytest"),
+        ("C:setting/vulture.core.PYTEST_METHOD_NAMES", "pytest"), ("N:requirement/python-version", "Python"),
+        ("I:influence/pytest-conventions", "pytest")},
+    "sloppy-xml-py.fabulac.cosm": {("C:interface/x0.S-I3", "bytes")},
+}
+
+
+def test_the_promoted_fabulacs_lint_with_no_error_but_stands_alone(vols):
     for name, v in vols.items():
         assert v.catalog["purpose"] == "transconception" and v.catalog["ruled-by"] == "R:maker/transconceiver"
         rep = fabula.lint(v)
-        assert rep.errors == [], (name, _errors(rep)[:10])
+        assert {p.check for p in rep.errors} == {"stands-alone"}, (name, _errors(rep)[:10])
+        found = {(p.item, p.message.split(":")[0].removeprefix("names ")) for p in rep.errors}
+        assert found == STANDS_ALONE[name]
         assert not [c for c in rep.not_run if c in tc.CHECKS]
 
 
@@ -64,18 +80,22 @@ def test_the_fixtures_carry_no_old_word_and_no_machine_path():
 def test_ready_to_keep_without_the_sources_measures_all_but_nothing_carried(vols):
     for v in vols.values():
         g = tc.ready_to_keep(v)
-        assert g["do-not-hold"] == [] and g["not-measured"] == ["nothing-carried"]
+        assert g["do-not-hold"] == ["stands-alone"] and g["not-measured"] == ["nothing-carried"]
         assert not g["holds"] and g["says"] == "not ready to keep"
         assert "source folder" in g["checks"]["nothing-carried"]["why"]
 
 
 @pytest.mark.parametrize("fix, clone", [(VULTURE, "vulture"), (SLOPPY, "sloppy-xml-py")])
-def test_ready_to_keep_holds_for_both_as_the_experiment_measured(fix, clone):
+def test_ready_to_keep_fails_only_on_stands_alone(fix, clone):
+    """The experiment measured gate 1 as holding, with stands-alone's items "left open"; as an error they stop it.
+    Every other check holds, as measured, with the source read as text."""
     if not (CLONES / clone).is_dir():
         pytest.skip("the cloned original is not on this machine")
     g = tc.ready_to_keep(fix, source=CLONES / clone)
-    assert g["holds"] and g["says"] == "ready to keep", g["do-not-hold"]
-    assert g["hold"] == list(tc.READY_TO_KEEP)
+    assert not g["holds"] and g["says"] == "not ready to keep"
+    assert g["do-not-hold"] == ["stands-alone"] and g["not-measured"] == []
+    assert g["hold"] == [c for c in tc.READY_TO_KEEP if c != "stands-alone"]
+    assert len(g["checks"]["stands-alone"]["errors"]) == len(STANDS_ALONE[fix.name])
 
 
 def test_ready_to_entail_waits_for_the_target_to_be_weighed(vols):
@@ -248,13 +268,18 @@ def test_each_check_fails(tmp_path, check, change, says):
         assert check in tc.ready_to_keep(_write(tmp_path, doc))["do-not-hold"]
 
 
-def test_the_two_warnings_stay_warnings(tmp_path):
+def test_cases_cover_alone_is_a_warning_and_stands_alone_an_error(tmp_path):
+    """The owner, checkpoint A (2026-11-18): every check of transconception is an error but cases-cover."""
+    assert {c for c, s in tc.SEVERITY.items() if s != "error"} == {"cases-cover"}
     doc = mini()
     _uncover(doc)
+    rep = fabula.lint(_write(tmp_path, doc))
+    assert {p.check for p in rep.warnings} == {"cases-cover"} and rep.errors == []
+    assert tc.ready_to_keep(_write(tmp_path, doc))["holds"]       # a warning is shown, it does not stop keeping
     _node(doc, "C:interface/greet")["summary"] = "Runs as a Python script."
     rep = fabula.lint(_write(tmp_path, doc))
-    assert {p.check for p in rep.warnings} == {"cases-cover", "stands-alone"} and rep.errors == []
-    assert tc.ready_to_keep(_write(tmp_path, doc))["holds"]       # a warning is shown, it does not stop keeping
+    assert [p.check for p in rep.errors] == ["stands-alone"]
+    assert tc.ready_to_keep(_write(tmp_path, doc))["do-not-hold"] == ["stands-alone"]
 
 
 def test_target_confirmed_holds_once_weighed_and_gate_2_follows(tmp_path):

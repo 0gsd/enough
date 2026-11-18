@@ -343,7 +343,8 @@ checks:
   contract: 'fabula-checks: the generic checks above and the own checks, with no error; its old name emf-checks is read
              wherever a manifest, a program or a trace says it'
   severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning,
-             stands-alone: warning, cases-cover: warning}
+             cases-cover: warning}               # every other check of transconception is an error (the owner,
+                                                 # checkpoint A, 2026-11-18)
 
 # Transconception (MacroCOSM OES 18.4.9): a program carried into another language through its fabulac. The last
 # thirteen own checks run only on a fabulac whose catalog says purpose: transconception; the two gates are one function
