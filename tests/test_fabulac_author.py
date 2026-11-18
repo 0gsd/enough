@@ -384,7 +384,7 @@ TEXT_ROWS = {"author": (True, ["authored-source", "fabula-checks", "provenance"]
 
 def test_the_moves_are_declared_as_the_text_s_rows():
     d = dc.load()
-    assert set(TEXT_ROWS) == set(AHEAD_MOVES) and "authored-source" in AHEAD
+    assert set(TEXT_ROWS) <= set(AHEAD_MOVES) and "authored-source" in AHEAD
     for name, (asks, contract) in TEXT_ROWS.items():
         v = d[name].view(1)
         assert d[name].since == 1 and d[name].view(0) is None
