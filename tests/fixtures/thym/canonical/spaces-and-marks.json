@@ -1,0 +1,10 @@
+{
+  "lead": " lead",
+  "trail": "trail ",
+  "colon": "a: b",
+  "hash": "a #b",
+  "quote": "it's",
+  "dq": "\"quoted\"",
+  "dash": "- item",
+  "star": "*x"
+}

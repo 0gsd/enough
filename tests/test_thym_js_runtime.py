@@ -301,18 +301,24 @@ def test_a_changed_input_is_refused_at_plan_time_in_the_page(tmp_path: Path) -> 
     assert js["refusal"] == py["refusal"] and js["refusal"]["check"] == "input"
 
 
-def test_the_page_dumps_as_macrocosm_does() -> None:
-    """The canonical dump every digest is over (THYM 12.6), on the scalars PyYAML quotes, folds or escapes."""
+CANONICAL = SUITE / "canonical"
+
+
+@pytest.mark.parametrize("name", sorted(p.stem for p in CANONICAL.glob("*.json")))
+def test_the_page_dumps_the_suites_canonical_vectors(name: str) -> None:
+    """The canonical dump every digest is over (THYM 12.6), on the suite's vectors (24.3: `canonical/`): the page
+    writes each mapping as the bytes of its `.cosm`."""
+    data = json.loads((CANONICAL / f"{name}.json").read_text(encoding="utf-8"))
+    got = _node({"dump": bundle.jsonable(data)})["text"]
+    assert got.encode("utf-8") == (CANONICAL / f"{name}.cosm").read_bytes()
+
+
+def test_the_page_dumps_dates_and_moments_as_macrocosm_does() -> None:
+    """The vectors JSON cannot hold, so the suite's folder does not: a date and a moment, plain and nested."""
     import datetime as dt
-    long = "word " * 40 + "end"
-    data = {"name": "x", "oes": "thym/1", "plain": "a plain string", "yes": "yes", "on": "on", "null": "null",
-            "empty": "", "num": "123", "float": "1.5", "date": "2026-11-01", "colon": "a: b", "hash": "a #b",
-            "lead": " lead", "trail": "trail ", "quote": "it's", "dq": '"quoted"', "tab": "a\tb", "nl": "line\nnext",
-            "nl2": "end\n", "uni": "café —   ﻿", "long": long, "long_q": "'" + long,
-            "long_nl": long + "\n" + long, "dash": "- item", "star": "*x", "bool": True, "none": None, "int": -7,
-            "flt": 0.25, "when": dt.date(2019, 3, 1), "at": dt.datetime(2026, 11, 1, 12, 0, tzinfo=dt.timezone.utc),
-            "list": [], "map": {}, "nested": {"a": [1, {"b": [], "c": [long]}], "7": "index-like key"},
-            "rows": [{"k": "v", "w": ["x", "y"]}, ["deep", ["deeper"]]]}
+    data = {"name": "x", "oes": "thym/1", "when": dt.date(2019, 3, 1),
+            "at": dt.datetime(2026, 11, 1, 12, 0, tzinfo=dt.timezone.utc),
+            "rows": [{"on": dt.date(2026, 11, 1)}, ["deep", [dt.date(2026, 1, 2)]]]}
     got = _node({"dump": bundle.jsonable(data)})["text"]
     assert got == mc.dump(data)
 

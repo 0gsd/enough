@@ -1,0 +1,7 @@
+'yes': 'yes'
+'on': 'on'
+'null': 'null'
+num: '123'
+float: '1.5'
+date: '2026-11-01'
+empty: ''

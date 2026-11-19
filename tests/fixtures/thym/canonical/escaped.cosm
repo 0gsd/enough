@@ -1,0 +1,4 @@
+tab: "a\tb"
+uni: "café \Lx"
+nbsp: a b
+mixed: "café — \L \uFEFF"

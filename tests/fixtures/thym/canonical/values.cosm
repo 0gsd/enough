@@ -1,0 +1,7 @@
+plain: a plain string
+bool: true
+none: null
+int: -7
+flt: 0.25
+list: []
+map: {}

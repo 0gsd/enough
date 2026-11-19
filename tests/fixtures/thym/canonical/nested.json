@@ -1,0 +1,30 @@
+{
+  "name": "x",
+  "nested": {
+    "a": [
+      1,
+      {
+        "b": [],
+        "c": [
+          "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word end"
+        ]
+      }
+    ],
+    "7": "index-like key"
+  },
+  "rows": [
+    {
+      "k": "v",
+      "w": [
+        "x",
+        "y"
+      ]
+    },
+    [
+      "deep",
+      [
+        "deeper"
+      ]
+    ]
+  ]
+}
