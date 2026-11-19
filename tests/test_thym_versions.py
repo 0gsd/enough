@@ -73,6 +73,7 @@ def test_the_tables_of_the_two_grammars():
     assert one.modifier_words == zero.modifier_words + ("before", "after")
     assert set(one.types) - set(zero.types) == {"folder", "line", "change"}
     assert not zero.features and one.admits("side-call")
+    assert set(ps.FEATURES) == set(one.features)         # every phrase a feature the thym 1 grammar admits, and back
 
 
 @pytest.mark.parametrize("name", sorted(p.stem for p in SUITE.glob("programs/*.thym")
