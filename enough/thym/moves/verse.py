@@ -781,11 +781,31 @@ def _sound_grounded(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any
     return True, ""
 
 
+def _rules_agree(got: Any, want: list) -> str | None:
+    """Whether a `C:form`'s `rules` are held as the rule reads them: the same rules in the same order; a rule the rule
+    reads held or broken, held so; a rule it cannot read, `held: {pending: "…"}`, or held or broken since by a
+    person's answer (Thym 20.9: a pending rule counts once it is held or broken). None when they agree."""
+    got = got if isinstance(got, list) else []
+    if [r.get("rule") if isinstance(r, dict) else None for r in got] != \
+            [r.get("rule") if isinstance(r, dict) else None for r in want]:
+        return "its rules are not the form's rules as the rule reads them"
+    for g, w in zip(got, want):
+        gh, wh = g.get("held"), w.get("held")
+        if isinstance(wh, bool):
+            if gh is not wh:
+                return (f"the rule {w.get('rule')!r} is {'held' if wh else 'broken'} as the fabulap shows it, and "
+                        f"the form says held: {gh!r}")
+        elif not (isinstance(gh, bool) or mc.is_pending(gh)):
+            return f"the rule {w.get('rule')!r} is held true, false or {{pending: …}}, not {gh!r}"
+    return None
+
+
 @check("form-grounded")
 def _form_grounded(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """A `C:form` names a form of the table only when the poem keeps its defining rules, read from the fabula's own
-    lines, parts, metre, rhymes and recurrences; every other rule is in `rules`, held as the fabula shows it; every
-    departure names a line or a part (Thym 7.3)."""
+    lines, parts, metre, rhymes and recurrences; every other rule is in `rules`, held as the fabula shows it, or
+    `held: {pending: "…"}` where no rule reads it (or held or broken since, by a person's answer); its `scheme` is
+    the one read across the whole poem; every departure names a line or a part (Thym 7.3)."""
     src = _poem_of(inputs)
     if src is None:
         return False, "no poem to read the form from"
@@ -803,8 +823,12 @@ def _form_grounded(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
         return False, "the poem holds no line, and the fabulap names a form"
     if got.get("form") != want.get("form"):
         return False, f"the fabulap names {got.get('form')!r}, and the rule reads {want.get('form')!r}"
-    if (got.get("rules") or []) != (want.get("rules") or []):
-        return False, f"{got.get('id')}: its rules are not held as the fabulap shows them"
+    if "scheme" in want and got.get("scheme") != want.get("scheme"):
+        return False, (f"{got.get('id')}: its scheme is {got.get('scheme')!r}; read across the whole poem it is "
+                       f"{want.get('scheme')!r}")
+    why = _rules_agree(got.get("rules") or [], want.get("rules") or [])
+    if why:
+        return False, f"{got.get('id')}: {why}"
     ids = {it.get("id") for it in items}
     for d in got.get("departures") or []:
         at = d.get("at") if isinstance(d, dict) else None

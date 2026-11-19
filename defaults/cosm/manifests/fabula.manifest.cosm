@@ -177,7 +177,7 @@ closed-lists:
   whose.by: [author, expert, critic, model, reader]                       # P:reading
   intended: [true, false]                                                 # C:behaviour, C:device, C:form, P:reading
   senses: [sight, hearing, touch, taste, smell, movement]                 # C:device: the senses an image reaches
-  rules.held: [true, false]                                               # C:form: a rule of its form kept or not
+  rules.held: [true, false]                                               # C:form: a rule of its form kept or not, or {pending: "…"}
   division: [chapter, section, paragraph, scene, list, quotation, stanza, verse, chorus, refrain, bridge, other]
   foot: [iamb, trochee, anapaest, dactyl, spondee, amphibrach, mixed, none]
   basis: [accentual-syllabic, accentual, syllabic, quantitative, free]
@@ -595,10 +595,11 @@ dialectic:
         - {id: overheard, about: C:voice#roles.listener, asks: "Is anyone meant to overhear {name}, beside the one it speaks to?", kind: text, why: missing, at-most: 2}
         - {id: shift, about: C:voice, asks: "Does the speaker or the tone change anywhere? Where?", kind: text, why: unsure, writes: voice}
         - {id: tone, about: C:voice#tone, asks: "In what tone should {name} be heard?", kind: text, why: unsure}
-        # sound and form (C:line, C:rhyme, C:metre, C:form, C:part)
+        # sound and form (C:line, C:rhyme, C:metre, C:form, C:part); breaks and stanza fill no field of a line or a
+        # part: an answer writes the answerer's P:reading of them, never a new line or part (MacroCOSM OES 18.4.6)
         - {id: stresses, about: C:line#stresses, asks: "How should line {number} be read aloud: where do the stresses fall?", kind: text, why: unsure}
-        - {id: breaks, about: C:line, asks: "Why do the lines break where they do?", kind: text, why: intent}
-        - {id: stanza, about: C:part, asks: "Why this stanza shape, and these lengths?", kind: text, why: intent}
+        - {id: breaks, about: C:line, asks: "Why do the lines break where they do?", kind: text, why: intent, writes: P:reading}
+        - {id: stanza, about: C:part, asks: "Why this stanza shape, and these lengths?", kind: text, why: intent, writes: P:reading}
         - {id: rhyme, about: C:rhyme, asks: "Was the rhyme (or its absence) chosen early or late, and why?", kind: text, why: intent}
         - {id: metre-break, about: C:metre#departures, asks: "Where the metre breaks, is that on purpose?", kind: yes-no, why: intent}
         - {id: form, about: C:form#intended, asks: "Did you set out to write it as {name}?", kind: yes-no, why: intent}

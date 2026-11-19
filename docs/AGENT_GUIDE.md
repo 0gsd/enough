@@ -227,7 +227,9 @@ skeletons by `skeleton.py`:
   byte (`tests/test_thym_shipped.py`). Since 0.7 `decompile-verse` holds the
   fabulap's five programs (THYM 20.9: `scan-the-poem`, `hear-the-poem`,
   `read-the-poem`, `read-closely`, `raise-the-questions`), and the one-call
-  program `decompile-verse` of THYM 20.5 is `decompile-verse-quick`. Read in place, never copied; listed
+  program of THYM 20.5 is `decompile-verse-quick`, file and program (0.8;
+  until `docs/THYM.md` is synced, `RENAMED_AHEAD` in
+  `tests/test_thym_shipped.py` reads it under its old name). Read in place, never copied; listed
   last by `run with…`
 - `defaults/models.json` — local-model registry template
 - `defaults/openrouter-config.json` — cloud-slot metadata template

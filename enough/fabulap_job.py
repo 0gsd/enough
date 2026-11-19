@@ -37,6 +37,7 @@ from . import fabulac_job as _fj
 from . import macrocosm as _macrocosm
 from . import thym_api as _thym_api
 from . import thym_host as _host
+from . import verse_forms as _verse_forms
 from .canon_derive import DeriveCancelled
 from .fabulac_job import BuildError
 from .thym import Refusal
@@ -131,9 +132,10 @@ def _intended(v: Any) -> Any:
 
 
 def card_of(doc: dict) -> dict:
-    """What the fabulap card draws (plain data): the `C:form` (its name, scheme, each rule held, not held or open, its
-    departures), the metre, each device with its `cue` and `senses`, a lyric's labelled parts and its hook, and the
-    counts of lines, readings and voices."""
+    """What the fabulap card draws (plain data): the `C:form` (its name, its scheme read across the whole poem, each
+    rule held, not held or open, its departures, and its confidence counted over the rules held or broken), the
+    metre, each device with its `cue` and `senses`, a lyric's labelled parts and its hook, and the counts of lines,
+    readings and voices."""
     nodes = [it for it in (doc.get("nodes") or []) if isinstance(it, dict)]
 
     def kind(it: dict) -> str:
@@ -155,6 +157,11 @@ def card_of(doc: dict) -> dict:
             "intended": _intended(form.get("intended")),
             "confidence": (form.get("provenance") or {}).get("confidence") if isinstance(form.get("provenance"), dict)
             else None}
+        rules = [r for r in (form.get("rules") or []) if isinstance(r, dict)]
+        if rules:
+            # a rule held {pending: …} counts only once held or broken (Thym 20.9): an answer since counts
+            out["form"]["counted"] = len(_verse_forms.counted(rules))
+            out["form"]["confidence"] = _verse_forms.confidence_of(rules)
     metre = next((it for it in nodes if kind(it) == "metre"), None)
     if metre is not None:
         out["metre"] = {"id": metre.get("id"), "name": plain(metre.get("name")),
