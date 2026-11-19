@@ -839,7 +839,8 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_idle", "")),
            teardown=(PARADIGMS_RESET, ("wait_idle", "")),
            note="two paradigms on (text-planning + transcognition, their own metaparadigm), "
-                "the third toggleable; no face note (the shipped metaparadigm has no face block)"),
+                "the third toggleable; a face note row, since the shipped metaparadigm carries "
+                "transcognition's faces (W5-MF): which follows the scratch project's skills"),
     Screen("paradigms-composed", "project",
            setup=(PARADIGMS_COMPOSED,
                   ("wait_for", PARADIGMS_LIST + ' li.paradigm-note[data-paradigm-note="cap"]'),

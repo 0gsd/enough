@@ -16,6 +16,7 @@ project's own.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -459,3 +460,97 @@ def test_macrocosm_skill_says_authored_entailment_runs_in_the_sandbox():
     s = (SHIPPED / "skills" / "macrocosm-oes" / "SKILL.md").read_text()
     assert "Nothing read or entailed is ever run" not in s
     assert "sandbox" in s and "did not author is read, never run" in s
+
+
+# --- W5-MF: transcognition's faces ride in the combinations that hold it ----
+
+HOLDING_TRANSCOGNITION = [
+    ["text-planning", "transcognition"],
+    ["transcognition", "workflow-design"],
+    ["text-planning", "transcognition", "workflow-design"],
+]
+_HOLDING_IDS = ["+".join(s) for s in HOLDING_TRANSCOGNITION]
+
+# What each skill state presumes, as the combination says it (pins 5).
+FACE_STATES = {
+    ("translator",): ("`translator` is on:", "MADLAD-400-3B"),
+    ("macrocosm-oes",): ("`macrocosm-oes` is on:", "never run"),
+    ("macrocosm-oes", "translator"): ("`translator` is on:", "`macrocosm-oes` is on:",  # both faces,
+                                      "Both are on", "ask once"),                      # plus ask once
+    (): ("Neither is on", "chat model alone"),
+}
+FACE_MARKERS = ("`translator` is on:", "`macrocosm-oes` is on:", "Both are on", "Neither is on")
+
+
+def _skills(rness: Path, on: tuple[str, ...]) -> None:
+    for skill in ("translator", "macrocosm-oes"):
+        prompt.set_skill_enabled(rness, skill, skill in on)
+
+
+def _paradigm_section(project: Path, names: list[str], profile: str) -> str:
+    """The combination's text as the profile carries it (faces applied, cut
+    for lean), checked to ride in the assembled prompt under its heading;
+    measured alone so the skills' own texts do not count."""
+    rness = project / "rness"
+    rel = f"metaparadigms/{prompt.metaparadigm_key(names)}.md"
+    text = prompt._load_text_at(rness, rel, lean=profile == "lean")
+    system = prompt.assemble_system_prompt(project, profile=profile)
+    heading = "# Paradigms: " + " + ".join(names) + "\n"
+    assert text and heading in system, (names, profile)
+    assert text.strip() in system.split(heading, 1)[1], (names, profile)
+    return " ".join(text.split())
+
+
+@pytest.mark.parametrize("names", HOLDING_TRANSCOGNITION, ids=_HOLDING_IDS)
+def test_a_combination_holding_transcognition_presumes_by_skill_state(project: Path, names: list[str]):
+    """Each shipped combination with transcognition in it carries its faces:
+    the presumption per skill state, its own "ask once" and "neither"
+    lines (so enough's generated ones stay out), no face markup left, in
+    both profiles."""
+    rness = project / "rness"
+    prompt.set_active_paradigms(rness, names)
+    assert prompt.choose_paradigm_text(rness).kind == "metaparadigm"
+    for on, wanted in FACE_STATES.items():
+        _skills(rness, on)
+        for profile in ("chat", "lean"):
+            section = _paradigm_section(project, names, profile)
+            for marker in wanted:
+                assert marker in section, (names, on, profile, marker)
+            for marker in FACE_MARKERS:
+                if marker not in wanted:
+                    assert marker not in section, (names, on, profile, marker)
+            assert "<!-- face" not in section and "<!-- /face" not in section, (names, on, profile)
+            assert "each face above is presumed" not in section, (names, on, profile)
+            assert "None of the skills this paradigm leans on" not in section, (names, on, profile)
+
+
+@pytest.mark.parametrize("names", HOLDING_TRANSCOGNITION, ids=_HOLDING_IDS)
+def test_a_combination_keeps_nllb_optin_visible_with_translator_on(project: Path, names: list[str]):
+    """Pin 5: `nllb_optin` is read by the model from the text, so with
+    `translator` on it is in the translation face in the lean and full
+    profiles; with it off, the face and the line go."""
+    rness = project / "rness"
+    prompt.set_active_paradigms(rness, names)
+    for on in (("translator",), ("macrocosm-oes", "translator")):
+        _skills(rness, on)
+        for profile in ("chat", "lean"):
+            section = _paradigm_section(project, names, profile)
+            assert "nllb_optin: true" in section, (names, on, profile)
+            assert "`rness/paradigms/transcognition.md`" in section, (names, on, profile)
+    for on in ((), ("macrocosm-oes",)):
+        _skills(rness, on)
+        for profile in ("chat", "lean"):
+            assert "nllb_optin" not in _paradigm_section(project, names, profile), (names, on, profile)
+
+
+@pytest.mark.parametrize("names", HOLDING_TRANSCOGNITION, ids=_HOLDING_IDS)
+def test_a_combination_s_lean_head_fits_in_every_skill_state(project: Path, names: list[str]):
+    """With faces applied, the lean head of each combination holding
+    transcognition is no larger than text-planning's, in every skill state."""
+    rness = project / "rness"
+    home = len(prompt.paradigm_lean_head(rness, "text-planning"))
+    rel = f"metaparadigms/{prompt.metaparadigm_key(names)}.md"
+    for on in FACE_STATES:
+        _skills(rness, on)
+        head = prompt._load_text_at(rness, rel, lean=True)
+        assert head and len(head) <= home, (names, on, len(head), home)
