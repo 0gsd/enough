@@ -1305,6 +1305,22 @@ def test_an_allograph_is_held_to_its_own_schema(holo):
     assert not ok and "epoch" in why
 
 
+def test_a_missing_epoch_is_epochs_alone(holo):
+    """A projection with no epoch fails `epoch`, and only `epoch`: default-deny leaves every epoch problem to it."""
+    from enough.thym import checks as C
+    from enough.thym.moves import ascribe as _M  # noqa: F401 - registers the isograph and allograph kinds' checks
+    from enough.thym.values import Value
+
+    class Ctx:
+        engines = {"ascribe": A.thym_engine()}
+    for spec, kind in ((SPEC_ISOGRAPH, "isograph"), (SPEC_ALLOGRAPH, "allograph")):
+        doc = {k: v for k, v in json.loads(spec).items() if k != "epoch"}
+        call = {"modifiers": {"as": kind}}
+        ok, why = C.verdict("epoch", Value("volume", doc), {}, call, None, Ctx())
+        assert (ok, why) == (False, "no epoch"), kind
+        assert C.verdict("default-deny", Value("volume", doc), {}, call, None, Ctx()) == (True, ""), kind
+
+
 def test_project_as_isograph_runs_on_the_sample_to_the_texts_example(tmp_path):
     from enough import thym_host as H
     from enough.thym import Refusal
