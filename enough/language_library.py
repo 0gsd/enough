@@ -22,6 +22,12 @@ What it gives:
 - `Library.volume(...)`: a kept text, or one page of it, as a DocOES volume (`oes: doc/1`) built at runtime: the
   notice first, then the sections in the publisher's order, each citable by its id, its anchor and its digest.
 
+An installed enough has no synced shelf: there the shelf is the cache of texts fetched on demand from
+cosmoes.org's library (`enough/library_fetch.py`, ruled 2026-11-19), `<ENOUGH_LANGUAGES_ROOT>/shelf/`. A citation
+of a text not aboard starts its fetch and reads `fetching` until it is kept (then it resolves); offline, or with the
+fetch off, it reads `not-aboard`. A synced shelf, where there is one (a developer's checkout), is read instead and
+nothing is fetched into it.
+
 `in` is a shelf and text (`python/docs`), or a name a language's ground catalogue cites a text as (`cited-as:
 python` in `defaults/cosm/ground/python.ground.cosm`'s head). `version` is the kept version or any patch of it
 (`3.13.18` names the kept `3.13`). `at` is `<page>[.html|.txt][#<anchor or heading path>]`; a heading path is the
@@ -35,6 +41,7 @@ import os
 import re
 import sqlite3
 import threading
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -46,7 +53,7 @@ INDEX_DB = "library.sqlite"
 SHELF_DIR = "reflib/languages"
 COPY_LINE = ("A copy kept in enough's language library, synced from the cosmoes.org library: not the publisher's own "
              "page.")
-STATES = ("resolved", "changed", "unplaced", "missing", "not-aboard", "unknown")
+STATES = ("resolved", "changed", "unplaced", "missing", "fetching", "not-aboard", "unknown")
 PAGE_SUFFIXES = (".html", ".htm", ".xhtml", ".txt", ".rst", ".md")
 PATH_SEP = " > "
 
@@ -75,6 +82,12 @@ def index_path() -> Path:
     return state_root() / INDEX_DB
 
 
+def cache_dir() -> Path:
+    """The shelf of texts fetched on demand from cosmoes.org: `<state root>/shelf/`."""
+    from . import library_fetch
+    return state_root() / library_fetch.CACHE_DIR
+
+
 def present(root: Path | None = None) -> bool:
     """Whether a shelf has been synced here (its registry is there)."""
     return (Path(root or source_dir()) / li.REGISTRY).is_file()
@@ -85,16 +98,25 @@ _LOCAL_GUARD = threading.Lock()
 
 
 def local() -> "Library | None":
-    """The library synced on this machine, or None when there is none (no `library.json` in the source folder).
-    One object per (source, index) pair; its index is built on first use."""
-    root, db = source_dir(), index_path()
+    """The library on this machine: the synced shelf when there is one (no fetch into it); else the cache of texts
+    fetched on demand, with its fetcher when a fetch may run (the first use in a launch fetches the registry again
+    in the background); None when there is neither a shelf nor a cache nor a fetch allowed. One object per (shelf,
+    index) pair; its index is built on first use."""
+    from . import library_fetch
+    root, db, fetcher = source_dir(), index_path(), None
     if not present(root):
-        return None
+        root = cache_dir()
+        fetcher = library_fetch.shared(root)
+        if fetcher is None and not present(root):
+            return None
     key = (str(root), str(db))
     with _LOCAL_GUARD:
         lib = _LOCAL.get(key)
         if lib is None:
             lib = _LOCAL[key] = Library(root, db)
+        lib.fetcher = fetcher
+    if fetcher is not None and present(root):
+        fetcher.refresh_once()
     return lib
 
 
@@ -186,8 +208,10 @@ class Library:
     is built (rebuilt when stale, under a lock). `cited` maps extra `stated.in` names to head texts (tests); the
     ground catalogues' `cited-as` names are always known."""
 
-    def __init__(self, root: Path, db: Path, *, cited: dict[str, dict] | None = None):
+    def __init__(self, root: Path, db: Path, *, cited: dict[str, dict] | None = None, fetcher: Any = None):
         self.root, self.db = Path(root), Path(db)
+        #: `enough.library_fetch.Fetcher` filling this shelf on demand, or None (a synced shelf; the fetch off)
+        self.fetcher = fetcher
         self._cited_extra = dict(cited or {})
         self._cited: dict[str, dict] | None = None
         self._lock = threading.Lock()
@@ -300,13 +324,17 @@ class Library:
         try:
             entry, why = self.text_for(stated.get("in"), stated.get("version"))
         except LibraryUnavailable as e:
-            return f"not-aboard:{e}"
+            return self._absent(stated, None) or f"not-aboard:{e}"
         if entry is None:
-            return f"unknown:{why}"
+            return self._absent(stated, None) or f"unknown:{why}"
         key = f"{entry['shelf']}/{entry['text']}/{entry['version']}"
-        if not entry.get("aboard"):
-            return f"not-aboard:{key} is pinned, not kept: it is not aboard the language library"
-        if not self.folder(entry).is_dir():
+        if not entry.get("aboard") or not self.folder(entry).is_dir():
+            got = self._absent(stated, entry)
+            if got:
+                return got
+            if not entry.get("aboard") and not (self.fetcher is not None and (
+                    self.fetcher.remote_entry(entry["shelf"], entry["text"], entry["version"]) or {}).get("aboard")):
+                return f"not-aboard:{key} is pinned, not kept: it is not aboard the language library"
             return f"not-aboard:{key} is not aboard the language library here (run scripts/sync_languages.py)"
         try:
             con = self._connect()
@@ -357,6 +385,58 @@ class Library:
         finally:
             con.close()
 
+    def _absent(self, stated: dict, entry: dict | None) -> str | None:
+        """A text not here, with a fetcher: start its fetch (or the registry's first, when the name is not known
+        here) and say `fetching:…`, or `not-aboard:…` when a fetch failed a moment ago (offline, refused). None when
+        nothing can be fetched (no fetcher; the site's shelf does not keep it either)."""
+        f = self.fetcher
+        if f is None:
+            return None
+
+        def then() -> None:                     # after the registry: the text's own fetch, if it names one
+            self._find(stated)
+        if entry is None:
+            got = f.demand_registry(then=then)
+        else:
+            got = f.demand(entry["shelf"], entry["text"], entry["version"], then=then)
+        return f"{got[0]}:{got[1]}" if got else None
+
+    def _waiting(self, ask, wait: float):
+        """`ask()` again while it says `fetching` and the fetch runs, up to `wait` seconds."""
+        out = ask()
+        if wait <= 0 or self.fetcher is None:
+            return out
+        deadline = time.monotonic() + wait
+        while isinstance(out, str) and out.startswith("fetching:"):
+            left = deadline - time.monotonic()
+            if left <= 0:
+                break
+            self.fetcher.wait(left)
+            out = ask()
+        return out
+
+    def fetch_for(self, shelf: str, text: str, version: str, wait: float = 0.0) -> dict | None:
+        """For a viewer asking for a kept text by name: None when it is here or nothing can be fetched; else `{state,
+        why}` with state `fetching` or `not-aboard` (after waiting up to `wait` seconds for a fetch to end)."""
+        f = self.fetcher
+        if f is None:
+            return None
+
+        def ask():
+            try:
+                e = self.entry(shelf, text, version)
+            except LibraryUnavailable:
+                e = None
+            if e is not None and e.get("aboard") and self.folder(e).is_dir():
+                return None
+            got = f.demand(shelf, text, version, then=lambda: f.demand(shelf, text, version))
+            return f"{got[0]}:{got[1]}" if got else None
+        out = self._waiting(ask, wait)
+        if out is None:
+            return None
+        state, _, why = out.partition(":")
+        return {"state": state, "why": why}
+
     @staticmethod
     def _by_path(con: sqlite3.Connection, tid: int, f: str, frag: str) -> int | None:
         want = [p.strip() for p in re.split(r"\s*>\s*", frag) if p.strip()]
@@ -402,14 +482,15 @@ class Library:
                    s["anchor"], s["heading"] or "", json.loads(s["path"]), s["kind"], s["level"], s["line_from"],
                    s["line_to"], f["sha256"] if f else "", s["sha256"], s["parent"], by, entry)
 
-    def cite(self, stated: dict) -> dict:
+    def cite(self, stated: dict, wait: float = 0.0) -> dict:
         """What came of a citation: `{state, why, hit}`. `resolved` (the section is there and its digest, or its
         page's when no section digest is cited, agrees); `changed` (found, but the cited section digest differs, or
         the page differs and no section digest says whether the section did); `unplaced` (the page is there but no
         section of it carries the cited id: the kept build names it otherwise); `missing` (the text is aboard, the
         page is not); `not-aboard` (the text is not synced here, or only pinned); `unknown` (the registry has no
-        such text)."""
-        out = self._find(stated)
+        such text); `fetching` (not here, being fetched from cosmoes.org now: ask again). With `wait`, a citation
+        whose text is being fetched is asked again when the fetch ends, up to `wait` seconds."""
+        out = self._waiting(lambda: self._find(stated), wait)
         if isinstance(out, str):
             state, _, why = out.partition(":")
             return {"state": state, "why": why, "hit": None}
@@ -451,10 +532,10 @@ class Library:
                 "changed": (li.FORMS.get(form) or {}).get("changed"), "copy": COPY_LINE,
                 "notice": _read("NOTICE"), "fetched": _read("FETCHED")}
 
-    def section(self, stated: dict) -> dict:
+    def section(self, stated: dict, wait: float = 0.0) -> dict:
         """The route's payload for a citation: `{cited, state, why, text, section}`. `text` is the kept text's
         notice block (None when the registry has no such text); `section` is None unless the section was found."""
-        c = self.cite(stated)
+        c = self.cite(stated, wait=wait)
         hit: Hit | None = c["hit"]
         entry = hit.entry if hit else None
         if entry is None:

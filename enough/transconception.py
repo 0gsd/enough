@@ -180,7 +180,7 @@ def resolve_citation(entry: dict, library: Any = None) -> tuple[bool | None, str
     of a text aboard the language library (`enough.language_library.Library`, synced by `scripts/sync_languages.py`).
     Returns (True, '') when it does; (False, why) when the text is aboard and the citation is wrong (no such page, or
     the cited section digest differs); (None, why) when it cannot be told: no library here, the text not aboard (not
-    synced, or only pinned), a text the registry does not have, a page that changed with no `section-digest` to say
+    synced, only pinned, being fetched from cosmoes.org right now, or offline), a text the registry does not have, a page that changed with no `section-digest` to say
     whether the cited section did, or an id the kept build does not carry on a page that is there. `ground-cited` makes (False, …) an error and (None, …) a warning: the library
     may not be on a machine, and a fabulac is not wrong for that."""
     if library is None:
