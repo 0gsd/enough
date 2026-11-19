@@ -1,0 +1,14 @@
+thym 1
+
+program raise-the-questions
+  why: where the build was unsure it asks the person who knows, and the questions land with the
+       fabulac.
+  decided 2026-11-05: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end

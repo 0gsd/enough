@@ -1,0 +1,14 @@
+engine: transconception.language_info
+inputs:
+  call: fa56533c476e26b9a4e56e6a1ad246735e91ba655fef9c9701999028b1e5ef75
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  name: rust
+  title: Rust
+  suffixes:
+  - rs
+  target: true
+  parses: false

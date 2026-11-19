@@ -1,0 +1,14 @@
+engine: transconception.language_info
+inputs:
+  call: 4009bd644d48dc42c02a7285f5965c6063556550c5454b4cfaeb74b4b1e70b5e
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  name: go
+  title: Go
+  suffixes:
+  - go
+  target: true
+  parses: false

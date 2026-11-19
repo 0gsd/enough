@@ -1,0 +1,124 @@
+oes: thym/1
+kind: program
+id: thym/raise-the-questions
+name: raise-the-questions
+source:
+  path: raise-the-questions.thym
+  sha256: beff2f93ac4620e68b337e8efb81dbb04be935a58f13fb450d4b4b61dd5e67a0
+  size: 361
+front: 'thym 1
+
+
+  '
+built:
+  at: '2026-11-18T12:00:00Z'
+  by: enough/0.7.0
+nodes:
+- id: P:program/raise-the-questions
+  type: program
+  name: raise-the-questions
+  summary: Where the build was unsure it asks the person who knows, and the questions land with the fabulac.
+  why: where the build was unsure it asks the person who knows, and the questions land with the fabulac.
+  must: []
+  decided:
+  - date: 2026-11-05
+    what: the answers come back in a second run, settle; nothing waits inside a run.
+  takes:
+  - name: f
+    type: fabula
+  gives:
+  - name: g
+    type: fabula
+  keeps:
+  - fabula-checks
+  lines: 3-14
+  order: 1
+  body: "program raise-the-questions\n  why: where the build was unsure it asks the person who knows, and the questions\
+    \ land with the\n       fabulac.\n  decided 2026-11-05: the answers come back in a second run, settle; nothing\
+    \ waits inside a run.\n\n  takes f: fabula\n  gives g: fabula\n  keeps fabula-checks\n\n  let asked = question\
+    \ f\n  give gather asked with f\nend\n"
+  steps:
+  - P:step/raise-the-questions.1
+  - P:step/raise-the-questions.2
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L3-L14
+    confidence: 1
+- id: P:step/raise-the-questions.1
+  type: step
+  name: let asked = question f
+  summary: let asked = question f
+  of: P:program/raise-the-questions
+  n: 1
+  text: '  let asked = question f'
+  line: 12
+  form: let
+  move: question
+  calls:
+  - question
+  binds: asked
+  uses:
+  - f
+  asks: true
+  contracts:
+  - P:contract/raise-the-questions.1
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L12
+    confidence: 1
+- id: P:step/raise-the-questions.2
+  type: step
+  name: give gather asked with f
+  summary: give gather asked with f
+  of: P:program/raise-the-questions
+  n: 2
+  text: '  give gather asked with f'
+  line: 13
+  form: give
+  move: gather
+  calls:
+  - gather
+  uses:
+  - asked
+  - f
+  asks: false
+  contracts:
+  - P:contract/raise-the-questions.2
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L13
+    confidence: 1
+- id: P:contract/raise-the-questions.1
+  type: contract
+  name: question
+  summary: What question must leave true of what it gives.
+  of: P:step/raise-the-questions.1
+  move: question
+  checks:
+  - addressed
+  - no-duplicate
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L12
+    confidence: 1
+- id: P:contract/raise-the-questions.2
+  type: contract
+  name: gather
+  summary: What gather must leave true of what it gives.
+  of: P:step/raise-the-questions.2
+  move: gather
+  checks:
+  - nothing-lost
+  - ids-unique
+  - fabula-checks
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L13
+    confidence: 1

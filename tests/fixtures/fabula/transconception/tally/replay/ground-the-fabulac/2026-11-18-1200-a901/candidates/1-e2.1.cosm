@@ -1,0 +1,20 @@
+engine: syntax.uses
+inputs:
+  call: 2d750f094e65286fe1c1723bdc8939a3a38b9646e3e10cfd4c851478960aad6b
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports: []
+  calls: []
+  attrs: []
+  annotations: []
+  forms: []
+  decorators: []
+  bases: []
+  handlers: []
+  strings:
+  - 0.2.0
+  - 'tally: count things from the command line, in an append-only ledger.'

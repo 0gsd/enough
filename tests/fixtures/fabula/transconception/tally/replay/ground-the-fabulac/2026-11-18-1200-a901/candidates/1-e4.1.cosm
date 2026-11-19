@@ -1,0 +1,288 @@
+engine: syntax.uses
+inputs:
+  call: 47e45c33238b2e9a330707dc396561bc283201aacbf0eb8e27712e7de65a9621
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports:
+  - module: __future__
+    line: 9
+  - module: argparse
+    line: 11
+  - module: json
+    line: 12
+  - module: sys
+    line: 13
+  - module: .
+    line: 15
+  calls:
+  - name: argparse.ArgumentParser
+    method: ArgumentParser
+    kw:
+    - description
+    - prog
+    kwv:
+      prog: tally
+      description: Count things from the command line.
+    line: 19
+    in: build_parser
+  - name: p.add_argument
+    method: add_argument
+    kw:
+    - action
+    - version
+    kwv:
+      action: version
+    arg0: --version
+    kind0: str
+    line: 20
+    in: build_parser
+  - name: p.add_subparsers
+    method: add_subparsers
+    kw:
+    - dest
+    - required
+    kwv:
+      dest: command
+      required: 'True'
+    line: 21
+    in: build_parser
+  - name: sub.add_parser
+    method: add_parser
+    kw:
+    - help
+    kwv:
+      help: add to a count
+    arg0: add
+    kind0: str
+    line: 22
+    in: build_parser
+  - name: a.add_argument
+    method: add_argument
+    arg0: name
+    kind0: str
+    line: 23
+    in: build_parser
+  - name: a.add_argument
+    method: add_argument
+    kw:
+    - default
+    - nargs
+    - type
+    kwv:
+      nargs: '?'
+      type: int
+      default: '1'
+    arg0: n
+    kind0: str
+    line: 24
+    in: build_parser
+  - name: sub.add_parser
+    method: add_parser
+    kw:
+    - help
+    kwv:
+      help: show every total
+    arg0: show
+    kind0: str
+    line: 25
+    in: build_parser
+  - name: s.add_argument
+    method: add_argument
+    kw:
+    - action
+    - help
+    kwv:
+      action: store_true
+      help: include totals of 0
+    arg0: --all
+    kind0: str
+    line: 26
+    in: build_parser
+  - name: s.add_argument
+    method: add_argument
+    kw:
+    - action
+    - help
+    kwv:
+      action: store_true
+      help: print the totals as one JSON object
+    arg0: --json
+    kind0: str
+    line: 27
+    in: build_parser
+  - name: sub.add_parser
+    method: add_parser
+    kw:
+    - help
+    kwv:
+      help: cancel the latest add
+    arg0: undo
+    kind0: str
+    line: 28
+    in: build_parser
+  - method: parse_args
+    line: 33
+    in: main
+  - name: build_parser
+    line: 33
+    in: main
+  - name: ledger.ledger_path
+    method: ledger_path
+    line: 34
+    in: main
+  - name: ledger.add
+    method: add
+    line: 37
+    in: main
+  - name: ledger.read
+    method: read
+    line: 38
+    in: main
+  - name: ledger.totals
+    method: totals
+    line: 38
+    in: main
+  - name: print
+    kind0: str
+    line: 39
+    in: main
+  - name: totals.items
+    method: items
+    line: 43
+    in: main
+  - name: json.dumps
+    method: dumps
+    kw:
+    - sort_keys
+    kwv:
+      sort_keys: 'True'
+    line: 44
+    in: main
+  - name: print
+    line: 44
+    in: main
+  - name: render.rows
+    method: rows
+    kw:
+    - show_all
+    kwv:
+      show_all: args.all
+    line: 46
+    in: main
+  - name: render.empty_message
+    method: empty_message
+    line: 47
+    in: main
+  - method: join
+    line: 47
+    in: main
+  - name: ledger.undo
+    method: undo
+    line: 49
+    in: main
+  - name: print
+    arg0: nothing to undo
+    kind0: str
+    line: 51
+    in: main
+  - name: print
+    kw:
+    - file
+    kwv:
+      file: sys.stderr
+    kind0: str
+    line: 56
+    in: main
+  - name: sys.exit
+    method: exit
+    line: 62
+  - name: main
+    line: 62
+  attrs:
+  - name: argparse.ArgumentParser
+    line: 18
+    in: build_parser
+  - name: sys.stderr
+    line: 56
+    in: main
+  annotations:
+  - name: ArgumentParser
+    line: 18
+    in: build_parser
+  - name: argparse
+    line: 18
+    in: build_parser
+  - name: int
+    line: 32
+    in: main
+  - name: list
+    line: 32
+    in: main
+  - name: str
+    line: 32
+    in: main
+  forms:
+  - form: f-string
+    line: 20
+    in: build_parser
+  - form: f-string
+    line: 39
+    in: main
+  - form: truth-test
+    line: 42
+    in: main
+  - form: map
+    line: 43
+    in: main
+  - form: format-spec
+    line: 54
+    in: main
+  - form: handler
+    line: 55
+    in: main
+  - form: handler-text
+    line: 55
+    in: main
+  decorators: []
+  bases: []
+  handlers:
+  - name: LedgerError
+    line: 55
+    in: main
+  strings:
+  - '
+
+    '
+  - ' on '
+  - +d
+  - --all
+  - --json
+  - --version
+  - ': '
+  - '; '
+  - '?'
+  - Count things from the command line.
+  - __main__
+  - add
+  - add to a count
+  - cancel the latest add
+  - command
+  - include totals of 0
+  - n
+  - name
+  - nothing to undo
+  - print the totals as one JSON object
+  - show
+  - show every total
+  - store_true
+  - tally
+  - 'tally '
+  - 'tally: '
+  - 'undid '
+  - undo
+  - version
+  entry: 61

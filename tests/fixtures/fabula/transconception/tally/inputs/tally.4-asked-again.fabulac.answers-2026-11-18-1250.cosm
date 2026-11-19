@@ -1,0 +1,32 @@
+oes: fabula/1
+macrocosm: 0.7.0
+id: fabula/tally
+nodes:
+  - id: D:session/session-2
+    type: session
+    at: 2026-11-18T12:50:00Z
+    with: {to: transconceiver, who: "simulated for the conformance fixture: nobody sat; each ruling is answered as proposed, the rest from tally's own files"}
+    through: person
+    asked: [D:question/licence-nobody-a-transconceiver-simulated-for-th, D:question/lane-said-nobody-a-transconceiver-simulated-for, D:question/confidential-nobody-a-transconceiver-simulated-f, D:question/programs-nobody-a-transconceiver-simulated-for-t, D:question/attribution-nobody-a-transconceiver-simulated-fo]
+    answered: [D:question/licence-nobody-a-transconceiver-simulated-for-th, D:question/lane-said-nobody-a-transconceiver-simulated-for, D:question/confidential-nobody-a-transconceiver-simulated-f, D:question/programs-nobody-a-transconceiver-simulated-for-t, D:question/attribution-nobody-a-transconceiver-simulated-fo]
+    skipped: []
+  - id: D:question/licence-nobody-a-transconceiver-simulated-for-th
+    state: answered
+    answers:
+      - {at: 2026-11-18T12:50:00Z, by: transconceiver, says: "MIT, as tally/LICENSE says (simulated)", value: "MIT, as tally/LICENSE says (simulated)", confidence: 1, session: D:session/session-2}
+  - id: D:question/lane-said-nobody-a-transconceiver-simulated-for
+    state: answered
+    answers:
+      - {at: 2026-11-18T12:50:00Z, by: transconceiver, says: "MIT lets anyone make a new program from the source and pass it on, keeping its notice (simulated)", value: "MIT lets anyone make a new program from the source and pass it on, keeping its notice (simulated)", confidence: 1, session: D:session/session-2}
+  - id: D:question/confidential-nobody-a-transconceiver-simulated-f
+    state: answered
+    answers:
+      - {at: 2026-11-18T12:50:00Z, by: transconceiver, says: "nothing reached the fixture in confidence: tally is a public test fixture (simulated)", value: "nothing reached the fixture in confidence: tally is a public test fixture (simulated)", confidence: 1, session: D:session/session-2}
+  - id: D:question/programs-nobody-a-transconceiver-simulated-for-t
+    state: answered
+    answers:
+      - {at: 2026-11-18T12:50:00Z, by: transconceiver, says: "tally, in Go and in Rust (simulated)", value: "tally, in Go and in Rust (simulated)", confidence: 1, session: D:session/session-2}
+  - id: D:question/attribution-nobody-a-transconceiver-simulated-fo
+    state: answered
+    answers:
+      - {at: 2026-11-18T12:50:00Z, by: transconceiver, says: "tally's MIT notice and its holder's credit, as tally/LICENSE gives them (simulated)", value: "tally's MIT notice and its holder's credit, as tally/LICENSE gives them (simulated)", confidence: 1, session: D:session/session-2}

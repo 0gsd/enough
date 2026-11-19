@@ -1,0 +1,163 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-18-1255-a906
+name: settle-the-answers run 2026-11-18-1255-a906
+program:
+  name: settle-the-answers
+  sha256: ed2cb780b628c18e0d2b92949cbc4837a784f0f96cf8813132e0d812c4296b0b
+plan:
+  sha256: 612539d57a2e30c1fb01c0f07adbd8113e712cfeba336b33583310a44f59b3d6
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-18T12:55:00Z'
+ended: '2026-11-19T01:32:16Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-18-1255-a906
+  type: trace
+  name: settle-the-answers run 2026-11-18-1255-a906
+  summary: 'ran settle-the-answers on tally.4-asked-again.fabulac.cosm, tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm
+    in 45436 s on rules: 2 steps, all checks green'
+  records:
+  - R:record/1
+  - R:record/2
+  outcome: landed
+  inputs_root: .
+  rules: true
+  engines:
+  - ascribe
+  - canon
+  - dialectic
+  - docoes
+  - repo
+  - syntax
+  - transconception
+  - verse
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-18-1255-a906.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: record said in f
+  summary: code, 1 attempt, 3 checks green.
+  node: R:node/1
+  move: record
+  inputs:
+  - name: said
+    sha256: 5a70231b083a6b12dd18360025e2f415f477ec2ccfa86595c01ad060a660d55b
+    path: inputs/tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm
+  - name: f
+    sha256: f5e23e28cef2305315e3dcc63d8b836cf049620ee513148f6c31212605769667
+    path: inputs/tally.4-asked-again.fabulac.cosm
+  outputs:
+  - name: answered
+    sha256: 2cd92b91f63f35c626edecc6c557249675df36a832252333bc8522f0de2e52b3
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 2
+  checks:
+  - name: addressed
+    ok: true
+    why: ''
+  - name: only-the-asked
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-18-1255-a906.plan.cosm#R:node/1
+    confidence: 1
+- id: R:record/2
+  type: record
+  name: settle answered
+  summary: rules, 1 attempt, 4 checks green.
+  node: R:node/2
+  move: settle
+  inputs:
+  - name: answered
+    sha256: 2cd92b91f63f35c626edecc6c557249675df36a832252333bc8522f0de2e52b3
+  outputs:
+  - name: g
+    sha256: 9ad9c3154907857b11b1fcb9b5abecbede8cbc3d3e2d77256124e4b4614923dc
+    path: outputs/g.cosm
+  engine: rules
+  attempts: 1
+  tokens: 0
+  seconds: 2
+  checks:
+  - name: addressed
+    ok: true
+    why: ''
+  - name: fabula-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  - name: only-the-asked
+    ok: true
+    why: ''
+  state: pending
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-18-1255-a906.plan.cosm#R:node/2
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: record said in f
+  summary: record said in f
+  step:
+    program: settle-the-answers
+    n: 1
+  move: record
+  asks: false
+  takes:
+  - said
+  - f
+  gives: answered
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - settle-the-answers.thym#L13
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: settle answered
+  summary: settle answered
+  step:
+    program: settle-the-answers
+    n: 2
+  move: settle
+  asks: true
+  takes:
+  - answered
+  gives: g
+  keeps:
+  - only-the-asked
+  after:
+  - R:node/1
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - settle-the-answers.thym#L14
+    confidence: 1

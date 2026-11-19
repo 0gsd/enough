@@ -1,0 +1,68 @@
+contract:
+  move: entail
+  schema:
+    format: markdown
+    says: 'the whole of main.go in one fenced block, then what you chose where the fabulac is silent, under ## Notes'
+  checks:
+  - target-confirmed
+  - files-present
+  - surface-answered
+  - apart
+  - footer
+  - provenance
+inputs:
+  fabulac: ce49f52f74fa0f060acd0f5090322f58acac31c33b5a7c9d29a40be66664af30
+  name: b01e26d3f5a5130b9d8d821c5a9d61e7c7d86df735f28bdcd6620fc58ac1006e
+  language: 6cc8519b91584e8bd435d63341e0838a99721948718b1c9c1e9c358c64ba992a
+  path: 2873f79a86c0d8b3335cd7731b0ecf7dd4301eb19a82ef7a1cba7589b5252261
+  layout: d9c0a6b8f470954a104ffdabc6180074210ce421a4d354e8f8e1bcbc9f44e7ae
+  brief: bad8726c7999c9f0787860532a13e7e67e567e4f6b35f09fab69088a477f9390
+  entailed: 1d40973eccd8c0aacfed387df6d69cf600f9439cd53fe60a3f6d7e8de0eda328
+engine: model:scripted
+attempts: 1
+tokens: 10
+seconds: 0
+output: '```go
+
+  // a stub by the recorded fake model of the conformance fixture; never built
+
+  package main
+
+
+  func N_command_tally() {}
+
+  func N_command_add() {}
+
+  func N_command_show() {}
+
+  func N_command_undo() {}
+
+  func N_tally_cli_main() {}
+
+  func N_tally_ledger_ledger_path() {}
+
+  func N_tally_ledger_read() {}
+
+  func N_tally_ledger_add() {}
+
+  func N_tally_ledger_undo() {}
+
+  func N_tally_ledger_totals() {}
+
+  func N_tally_ledger_LedgerError() {}
+
+  func N_tally_render_rows() {}
+
+  func N_tally_render_empty_message() {}
+
+  func N_format_ledger_line() {}
+
+  ```
+
+
+  ## Notes
+
+
+  - the fabulac does not say the line width: 80 chosen (a recorded fake''s guess, written down)
+
+  '

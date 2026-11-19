@@ -1,0 +1,227 @@
+engine: syntax.uses
+inputs:
+  call: 333bf1fd1fb4a92ef15e6257f1307588842403d5fd5579790bcdd29578380f1c
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports:
+  - module: json
+    line: 1
+  - module: pytest
+    line: 3
+  - module: tally
+    line: 5
+  calls:
+  - name: tally.ledger.add
+    method: add
+    kw:
+    - now
+    line: 10
+    in: test_add_and_totals
+  - name: tally.ledger.read
+    method: read
+    line: 13
+    in: test_add_and_totals
+  - name: tally.ledger.totals
+    method: totals
+    line: 13
+    in: test_add_and_totals
+  - name: tally.ledger.add
+    method: add
+    kw:
+    - now
+    line: 18
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - name: tally.ledger.undo
+    method: undo
+    kw:
+    - now
+    line: 22
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - name: tally.ledger.read
+    method: read
+    line: 23
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - name: tally.ledger.totals
+    method: totals
+    line: 23
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - name: pytest.raises
+    method: raises
+    kw:
+    - match
+    kwv:
+      match: one word
+    line: 28
+    in: test_bad_names_and_zero_are_refused
+  - name: tally.ledger.add
+    method: add
+    line: 29
+    in: test_bad_names_and_zero_are_refused
+  - name: pytest.raises
+    method: raises
+    kw:
+    - match
+    kwv:
+      match: changes nothing
+    line: 30
+    in: test_bad_names_and_zero_are_refused
+  - name: p.exists
+    method: exists
+    line: 32
+    in: test_bad_names_and_zero_are_refused
+  - name: p.write_text
+    method: write_text
+    kw:
+    - encoding
+    kwv:
+      encoding: utf-8
+    arg0: '{"at": 1, "name": "tea", "delta": 1}
+
+      not json
+
+      '
+    kind0: str
+    line: 37
+    in: test_a_broken_line_names_its_number
+  - name: pytest.raises
+    method: raises
+    kw:
+    - match
+    kwv:
+      match: line 2 is not a tally entry
+    line: 38
+    in: test_a_broken_line_names_its_number
+  - name: tally.ledger.read
+    method: read
+    line: 39
+    in: test_a_broken_line_names_its_number
+  - name: tally.render.rows
+    method: rows
+    line: 43
+    in: test_rows_scale_bars_and_hide_zero
+  - name: tally.render.rows
+    method: rows
+    kw:
+    - show_all
+    kwv:
+      show_all: 'True'
+    line: 46
+    in: test_rows_scale_bars_and_hide_zero
+  - name: monkeypatch.setenv
+    method: setenv
+    arg0: TALLY_FILE
+    kind0: str
+    line: 50
+    in: test_cli_show_json_and_error_exit
+  - name: str
+    line: 50
+    in: test_cli_show_json_and_error_exit
+  - name: tally.cli.main
+    method: main
+    line: 51
+    in: test_cli_show_json_and_error_exit
+  - name: json.loads
+    method: loads
+    line: 53
+    in: test_cli_show_json_and_error_exit
+  - method: splitlines
+    line: 53
+    in: test_cli_show_json_and_error_exit
+  - name: capsys.readouterr
+    method: readouterr
+    line: 55
+    in: test_cli_show_json_and_error_exit
+  attrs:
+  - name: tally.ledger
+    line: 10
+    in: test_add_and_totals
+  - name: tally.ledger
+    line: 18
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - name: tally.ledger
+    line: 28
+    in: test_bad_names_and_zero_are_refused
+  - name: tally.ledger.LedgerError
+    line: 28
+    in: test_bad_names_and_zero_are_refused
+  - name: tally.ledger
+    line: 38
+    in: test_a_broken_line_names_its_number
+  - name: tally.ledger.LedgerError
+    line: 38
+    in: test_a_broken_line_names_its_number
+  - name: tally.render
+    line: 43
+    in: test_rows_scale_bars_and_hide_zero
+  - name: tally.cli
+    line: 51
+    in: test_cli_show_json_and_error_exit
+  annotations: []
+  forms:
+  - form: path-join
+    line: 9
+    in: test_add_and_totals
+  - form: map
+    line: 13
+    in: test_add_and_totals
+  - form: path-join
+    line: 17
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - form: map
+    line: 23
+    in: test_undo_walks_back_and_never_undoes_an_undo
+  - form: path-join
+    line: 27
+    in: test_bad_names_and_zero_are_refused
+  - form: path-join
+    line: 36
+    in: test_a_broken_line_names_its_number
+  - form: map
+    line: 43
+    in: test_rows_scale_bars_and_hide_zero
+  - form: text-repeat
+    line: 43
+    in: test_rows_scale_bars_and_hide_zero
+  - form: path-join
+    line: 50
+    in: test_cli_show_json_and_error_exit
+  - form: map
+    line: 53
+    in: test_cli_show_json_and_error_exit
+  decorators: []
+  bases: []
+  handlers: []
+  strings:
+  - '#'
+  - --json
+  - '3'
+  - TALLY_FILE
+  - a
+  - 'a   10  '
+  - a  -2
+  - add
+  - bb
+  - 'bb   1  ###'
+  - c
+  - c  0
+  - changes nothing
+  - line 2 is not a tally entry
+  - one word
+  - show
+  - t.jsonl
+  - 'tally: a name is one word, with no spaces
+
+    '
+  - tea
+  - two words
+  - utf-8
+  - walks
+  - '{"at": 1, "name": "tea", "delta": 1}
+
+    not json
+
+    '

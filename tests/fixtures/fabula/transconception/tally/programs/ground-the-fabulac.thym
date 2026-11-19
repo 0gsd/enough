@@ -1,0 +1,12 @@
+thym 1
+
+program ground-the-fabulac
+  why: what the program leans on in its language is found by rule, each reliance citing where the
+       language's own text states it.
+  must: nothing in the repository is run, imported or installed.
+
+  takes repo: folder, f: fabula
+  gives g: fabula
+
+  give ground repo with f                          -- one reliance per ground entry the syntax shows
+end

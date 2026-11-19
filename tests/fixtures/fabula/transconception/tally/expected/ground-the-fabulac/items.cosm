@@ -1,0 +1,87 @@
+oes: thym/1
+kind: program
+id: thym/ground-the-fabulac
+name: ground-the-fabulac
+source:
+  path: ground-the-fabulac.thym
+  sha256: ad5f48cea4e3f63a2e39e01ab662e0c03af4d3bb5f16b3deba30ddd1d2dc740b
+  size: 393
+front: 'thym 1
+
+
+  '
+built:
+  at: '2026-11-18T12:00:00Z'
+  by: enough/0.7.0
+nodes:
+- id: P:program/ground-the-fabulac
+  type: program
+  name: ground-the-fabulac
+  summary: What the program leans on in its language is found by rule, each reliance citing where the language's
+    own text states it.
+  why: what the program leans on in its language is found by rule, each reliance citing where the language's own
+    text states it.
+  must:
+  - nothing in the repository is run, imported or installed.
+  decided: []
+  takes:
+  - name: repo
+    type: folder
+  - name: f
+    type: fabula
+  gives:
+  - name: g
+    type: fabula
+  lines: 3-12
+  order: 1
+  body: "program ground-the-fabulac\n  why: what the program leans on in its language is found by rule, each reliance\
+    \ citing where the\n       language's own text states it.\n  must: nothing in the repository is run, imported\
+    \ or installed.\n\n  takes repo: folder, f: fabula\n  gives g: fabula\n\n  give ground repo with f         \
+    \                 -- one reliance per ground entry the syntax shows\nend\n"
+  steps:
+  - P:step/ground-the-fabulac.1
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym#L3-L12
+    confidence: 1
+- id: P:step/ground-the-fabulac.1
+  type: step
+  name: give ground repo with f
+  summary: one reliance per ground entry the syntax shows
+  of: P:program/ground-the-fabulac
+  n: 1
+  text: '  give ground repo with f                          -- one reliance per ground entry the syntax shows'
+  line: 11
+  form: give
+  move: ground
+  calls:
+  - ground
+  uses:
+  - repo
+  - f
+  asks: false
+  contracts:
+  - P:contract/ground-the-fabulac.1
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym#L11
+    confidence: 1
+- id: P:contract/ground-the-fabulac.1
+  type: contract
+  name: ground
+  summary: What ground must leave true of what it gives.
+  of: P:step/ground-the-fabulac.1
+  move: ground
+  checks:
+  - ground-cited
+  - code-span
+  - nothing-lost
+  - fabula-checks
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym#L11
+    confidence: 1

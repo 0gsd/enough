@@ -1,0 +1,38 @@
+contract:
+  move: entail
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'the layout of the program in Go, as one YAML mapping: files (each {path, holds, interfaces: [{id, name}]},
+      in the order they are written), types ([{for, type}]), gaps ([{for, fill}])'
+  checks:
+  - target-confirmed
+  - surface-answered
+  - no-invention
+  - footer
+  - provenance
+inputs:
+  fabulac: 1dc5ae5b68174891b6aa9850aa05ee0d9ae8a20468d9517259951a2dd9e9c0f0
+  name: b01e26d3f5a5130b9d8d821c5a9d61e7c7d86df735f28bdcd6620fc58ac1006e
+  language: 6cc8519b91584e8bd435d63341e0838a99721948718b1c9c1e9c358c64ba992a
+  suffixes: 02f0595b9b21b9791d6df6b625aa3b2c55cc38ccf8905af2a29e0d37bf3947f8
+  program: d36c230321cb0f0e9e600afeb8b10fb72f26b16105a1076e2cc8bdd6e0a93f0f
+  map: f671e6333d20e258a776bf7e730b9dd4b2c58737a445eae28242b15e7c21ddbc
+  types: 552e423045fcbd949252397b4bee754f0b8f99b1bbbe41edc9b25dbfc81b146a
+  gaps: e2b1917c5e6b425f46e83c1637fa126f1c172100f4d4f965c1cac276fcc62d32
+  conditions: dbb8ba9532687415d4fe6f31a05cab2f6c29c54f7d4f32064e7778e3fbb23e8d
+engine: model:scripted
+attempts: 1
+tokens: 10
+seconds: 0
+output: "files:\n- path: go.mod\n  holds: the Go package\n  interfaces: []\n- path: main.go\n  holds: the whole\
+  \ program\n  interfaces:\n  - id: C:interface/command.tally\n    name: N_command_tally\n  - id: C:interface/command.add\n\
+  \    name: N_command_add\n  - id: C:interface/command.show\n    name: N_command_show\n  - id: C:interface/command.undo\n\
+  \    name: N_command_undo\n  - id: C:interface/tally.cli.main\n    name: N_tally_cli_main\n  - id: C:interface/tally.ledger.ledger_path\n\
+  \    name: N_tally_ledger_ledger_path\n  - id: C:interface/tally.ledger.read\n    name: N_tally_ledger_read\n\
+  \  - id: C:interface/tally.ledger.add\n    name: N_tally_ledger_add\n  - id: C:interface/tally.ledger.undo\n \
+  \   name: N_tally_ledger_undo\n  - id: C:interface/tally.ledger.totals\n    name: N_tally_ledger_totals\n  - id:\
+  \ C:interface/tally.ledger.LedgerError\n    name: N_tally_ledger_LedgerError\n  - id: C:interface/tally.render.rows\n\
+  \    name: N_tally_render_rows\n  - id: C:interface/tally.render.empty_message\n    name: N_tally_render_empty_message\n\
+  \  - id: C:interface/format.ledger-line\n    name: N_format_ledger_line\ntypes: []\ngaps:\n- for: C:reliance/argparse-surface\n\
+  \  fill: written in main.go\nengine: model:scripted\n"

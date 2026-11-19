@@ -1,0 +1,112 @@
+engine: syntax.uses
+inputs:
+  call: 2c1f02fb60ea07de8da20987f68ca5cd212b3effb8cd743f7548bc2dc9059bbb
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports:
+  - module: __future__
+    line: 2
+  calls:
+  - name: totals.items
+    method: items
+    line: 13
+    in: rows
+  - name: len
+    line: 16
+    in: rows
+  - name: max
+    line: 16
+    in: rows
+  - name: shown.values
+    method: values
+    line: 17
+    in: rows
+  - name: str
+    line: 17
+    in: rows
+  - name: max
+    kw:
+    - default
+    kwv:
+      default: '0'
+    line: 18
+    in: rows
+  - name: shown.items
+    method: items
+    line: 20
+    in: rows
+  - name: max
+    kind0: int
+    line: 23
+    in: rows
+  - name: round
+    line: 23
+    in: rows
+  - name: out.append
+    method: append
+    line: 24
+    in: rows
+  - name: name.ljust
+    method: ljust
+    line: 24
+    in: rows
+  - method: rjust
+    line: 24
+    in: rows
+  - method: rstrip
+    line: 24
+    in: rows
+  attrs: []
+  annotations:
+  - name: bool
+    line: 8
+    in: rows
+  - name: dict
+    line: 8
+    in: rows
+  - name: int
+    line: 8
+    in: rows
+  - name: list
+    line: 8
+    in: rows
+  - name: str
+    line: 8
+    in: rows
+  - name: bool
+    line: 28
+    in: empty_message
+  - name: str
+    line: 28
+    in: empty_message
+  forms:
+  - form: map
+    line: 13
+    in: rows
+  - form: truth-test
+    line: 14
+    in: rows
+  - form: text-repeat
+    line: 23
+    in: rows
+  - form: true-division
+    line: 23
+    in: rows
+  - form: f-string
+    line: 24
+    in: rows
+  - form: truth-test
+    line: 29
+    in: empty_message
+  decorators: []
+  bases: []
+  handlers: []
+  strings:
+  - '  '
+  - '#'
+  - nothing tallied yet
+  - nothing tallied yet (or every total is 0; try --all)

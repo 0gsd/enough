@@ -7,6 +7,9 @@ recorded cases, and the program's own words where a ruling keeps them (messages,
 
 Nothing here is run. The tests (`tests/test_transconception.py`) read them through enough's reader.
 
+`tally/` is another kind of fixture: tally's whole transconception, from ground to a cshort in Go and in Rust, as a
+Thym conformance suite of its own, with its cases file (its README says what is recorded and what is simulated).
+
 ## Credit and licences
 
 - `vulture.fabulac.cosm` is written about **vulture** by Jendrik Seipp and its contributors

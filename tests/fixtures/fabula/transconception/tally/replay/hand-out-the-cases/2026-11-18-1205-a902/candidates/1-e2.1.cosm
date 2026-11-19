@@ -1,0 +1,1604 @@
+engine: transconception.cases_document
+inputs:
+  call: 43039b3992e17863b86327cad354a75b315505d825031b34abfdcef19b091f96
+keys: []
+tokens: 0
+seconds: 0
+output:
+- repo: tally
+  fabulac: fabula/tally
+  source:
+    tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+  drafted: 2026-11-05, the migration trial's 53 scenarios (harness/diff.py); written as cases 2026-11-18 by tools/transconception/trial_cases.py
+  boundary: argv, the environment (TALLY_FILE, HOME), the files of the case folder (the ledger), stdout, stderr,
+    exit status; working folder = the case folder. The trial's harness set HOME and TALLY_FILE as these cases do;
+    the promoted runner also sets COLUMNS=80, NO_COLOR and PYTHONHASHSEED, which the trial did not.
+  groups:
+    A ordinary use: 47
+    B command-line edges: 24
+    C numbers: 25
+    D text: 34
+    E ledger as found: 30
+    F at once: 1
+  masks:
+    written:
+    - pattern: ("at":\s*)-?\d+(?:\.\d+(?:[eE][+-]?\d+)?|[eE][+-]?\d+)
+      to: \1<float>
+    - pattern: ("at":\s*)-?\d+
+      to: \1<int>
+  cases:
+  - id: A1
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - tea
+    - - add
+      - pages
+      - '12'
+    - - add
+      - pages
+      - '-2'
+    - - show
+    - - show
+      - --json
+    - - undo
+    - - show
+    - - undo
+    - - undo
+    - - undo
+    - - show
+    - - show
+      - --all
+    - - show
+      - --json
+    - - show
+      - --all
+      - --json
+    note: A1 add, show, undo, walk back
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13: not in the trial''s document (both ports agreed
+      with the original, and the report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A2
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - a
+      - '10'
+    - - add
+      - bb
+      - '1'
+    - - add
+      - c
+      - '1'
+    - - add
+      - c
+      - '-1'
+    - - show
+    - - show
+      - --all
+    note: A2 bars scale to the largest
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4, 5: not in the trial''s document (both ports agreed with the original, and
+      the report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A3
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - a
+      - '-2'
+    - - show
+    - - show
+      - --json
+    note: A3 a negative total
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A4
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+    - - show
+      - --all
+    - - show
+      - --json
+    - - undo
+    note: A4 an empty ledger
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A5
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - two words
+    - - add
+      - tea
+      - '0'
+    - - add
+      - ''
+    - - add
+      - '   '
+    - - add
+      - ' tea '
+    - - show
+    note: A5 refused names and zero
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4, 5: not in the trial''s document (both ports agreed with the original, and
+      the report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A6
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - walks
+      - '2'
+    - - undo
+    - - add
+      - walks
+      - '-3'
+    - - undo
+    - - show
+      - --all
+    note: A6 undo says what it undid
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4: not in the trial''s document (both ports agreed with the original, and the
+      report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A7
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - --version
+    note: A7 version
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A8
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: null
+    steps:
+    - - add
+      - tea
+    - - show
+    note: A8 the default ledger in the home folder
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A9
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: '   '
+    steps:
+    - - add
+      - tea
+    - - show
+    note: A9 a blank TALLY_FILE means the default
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A10
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: ~/sub/t.jsonl
+    steps:
+    - - add
+      - tea
+    - - show
+    note: A10 a tilde in TALLY_FILE
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: A11
+    of: command.tally
+    from: document
+    group: A ordinary use
+    env:
+      TALLY_FILE: <CASE>/a/b/c.jsonl
+    steps:
+    - - add
+      - tea
+    - - show
+    note: A11 missing parent folders are made
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B1
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - []
+    note: B1 no command
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B2
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - frob
+    note: B2 unknown command
+    expect:
+      steps:
+      - exit: 2
+        out: ''
+        err: 'usage: tally [-h] [--version] {add,show,undo} ...
+
+          tally: error: argument command: invalid choice: ''frob'' (choose from add, show, undo)
+
+          '
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B3
+    of: command.add
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+    note: B3 add with no name
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B4
+    of: command.add
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - tea
+      - '1'
+      - '2'
+    note: B4 add with too many
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B5
+    of: command.add
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - tea
+      - x
+    - - add
+      - tea
+      - '1.5'
+    - - add
+      - tea
+      - 1e3
+    - - add
+      - tea
+      - '0x10'
+    note: B5 a count that is not a whole number
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B6
+    of: command.show
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --nope
+    note: B6 unknown option
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B7
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - --help
+    - - -h
+    - - add
+      - --help
+    - - show
+      - -h
+    note: B7 help
+    expect:
+      steps:
+      - exit: 0
+        out: "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional\
+          \ arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n\
+          \    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help messa"
+        err: ''
+        cut:
+        - out
+      - exit: 0
+        out: "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional\
+          \ arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n\
+          \    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help messa"
+        err: ''
+        cut:
+        - out
+      - exit: 0
+        out: "usage: tally add [-h] name [n]\n\npositional arguments:\n  name\n  n\n\noptions:\n  -h, --help  show\
+          \ this help message and exit\n"
+        err: ''
+      - exit: 0
+        out: "usage: tally show [-h] [--all] [--json]\n\noptions:\n  -h, --help  show this help message and exit\n\
+          \  --all       include totals of 0\n  --json      print the totals as one JSON object\n"
+        err: ''
+    expect-says: 'steps 0, 1, 2, 3: the original''s result as the trial''s report printed it, where a port differed;
+      the files it leaves: not in the trial''s document; a value named in `cut` is only the beginning the report
+      printed.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B8
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - tea
+    - - show
+      - --al
+    - - show
+      - --j
+    - - show
+      - --a
+      - --j
+    note: B8 shortened options
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B9
+    of: command.undo
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - undo
+      - extra
+    note: B9 undo with an extra word
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B10
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - '-5'
+    - - add
+      - --
+      - -x
+      - '2'
+    - - add
+      - -x
+    - - show
+      - --json
+      - --all
+    note: B10 names that look like options or numbers
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: B11
+    of: command.tally
+    from: document
+    group: B command-line edges
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - --json
+      - show
+    - - show
+      - --json
+      - --json
+    note: B11 options before the command
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C1
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - big
+      - '99999999999999999999999'
+    - - add
+      - big
+      - '1'
+    - - show
+    - - show
+      - --json
+    note: C1 a count past 64 bits
+    expect:
+      steps:
+      - exit: 0
+        out: 'big: 99999999999999999999999
+
+          '
+        err: ''
+      - exit: 0
+        out: 'big: 100000000000000000000000
+
+          '
+        err: ''
+      - exit: 0
+        out: 'big  100000000000000000000000  ##############################
+
+          '
+        err: ''
+      - exit: 0
+        out: '{"big": 100000000000000000000000}
+
+          '
+        err: ''
+      written:
+        t.jsonl: '{"at": <float>, "delta": 99999999999999999999999, "name": "big"}
+
+          {"at": <float>, "delta": 1, "name": "big"}
+
+          '
+    expect-says: 'steps 0, 1, 2, 3: the original''s result as the trial''s report printed it, where a port differed;
+      the files it leaves (t.jsonl): as the report printed the original''s.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C2
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - tea
+      - '+5'
+    - - add
+      - tea
+      - '007'
+    - - add
+      - tea
+      - ' 7 '
+    - - add
+      - tea
+      - '1_000'
+    - - add
+      - tea
+      - ٣
+    - - add
+      - tea
+      - '-0'
+    - - show
+      - --json
+    note: C2 spellings of a whole number
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - exit: 0
+        out: 'tea: 1022
+
+          '
+        err: ''
+      - null
+      - exit: 0
+        out: '{"tea": 1022}
+
+          '
+        err: ''
+      written:
+        t.jsonl: '{"at": <float>, "delta": 5, "name": "tea"}
+
+          {"at": <float>, "delta": 7, "name": "tea"}
+
+          {"at": <float>, "delta": 7, "name": "tea"}
+
+          {"at": <float>, "delta": 1000, "name": "tea"}
+
+          {"at": <float>, "delta": 3, "name": "tea"}
+
+          '
+    expect-says: 'steps 4, 6: the original''s result as the trial''s report printed it, where a port differed; steps
+      0, 1, 2, 3, 5: not in the trial''s document (both ports agreed with the original, and the report prints only
+      differences); the files it leaves (t.jsonl): as the report printed the original''s.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C3
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - top
+      - '12'
+    - - add
+      - one
+      - '1'
+    - - add
+      - five
+      - '5'
+    - - show
+    note: C3 a bar that lands on a half (2.5, 12.5)
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C4
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - top
+      - '20'
+    - - add
+      - three
+      - '3'
+    - - show
+    note: C4 a bar that lands on a half (4.5)
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C5
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - top
+      - '4'
+    - - add
+      - one
+      - '1'
+    - - show
+    note: C5 a bar that lands on a half (7.5)
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: C6
+    of: command.tally
+    from: document
+    group: C numbers
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - a
+      - '1000'
+    - - add
+      - b
+      - '-5'
+    - - add
+      - c
+      - '7'
+    - - show
+    note: C6 column widths with a minus sign
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: D1
+    of: command.tally
+    from: document
+    group: D text
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - café
+    - - add
+      - 茶
+      - '3'
+    - - add
+      - naïve
+      - '2'
+    - - show
+    - - show
+      - --json
+    note: D1 names outside ASCII
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4: not in the trial''s document (both ports agreed with the original, and the
+      report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: D2
+    of: command.tally
+    from: document
+    group: D text
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - 𝒳
+      - '2'
+    - - add
+      - é
+      - '3'
+    - - add
+      - ab
+      - '1'
+    - - show
+    note: D2 how long is a name
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: D3
+    of: command.tally
+    from: document
+    group: D text
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - b
+    - - add
+      - B
+    - - add
+      - a
+    - - add
+      - é
+    - - add
+      - '~'
+    - - add
+      - ～
+    - - add
+      - 𝒳
+    - - add
+      - Z
+    - - add
+      - '10'
+    - - add
+      - '9'
+    - - show
+    - - show
+      - --json
+    note: D3 the order of names
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11: not in the trial''s document (both ports agreed with
+      the original, and the report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: D4
+    of: command.tally
+    from: document
+    group: D text
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - a b
+    - - add
+      - "a\uFEFFb"
+    - - add
+      - "a\x1Cb"
+    - - add
+      -  tea 
+    - - add
+      - 'tea
+
+        '
+    - - add
+      - "te\tea"
+    - - add
+      - a​b
+    - - show
+      - --json
+    note: D4 what counts as a space
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4, 5, 6, 7: not in the trial''s document (both ports agreed with the original,
+      and the report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: D5
+    of: command.tally
+    from: document
+    group: D text
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - add
+      - q"uote
+    - - add
+      - back\slash
+    - - add
+      - "a\x01b"
+    - - show
+      - --json
+    - - show
+    note: D5 quotes, backslashes, a control character
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2, 3, 4: not in the trial''s document (both ports agreed with the original, and the
+      report prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E1
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: "{\"at\": 1, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": 2.5, \"name\": \"tea\", \"delta\"\
+        : 2}\n"
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    - - undo
+    - - show
+      - --json
+    note: E1 blank lines are skipped
+    expect:
+      steps:
+      - null
+      - null
+      - null
+      written:
+        t.jsonl: "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\",\
+          \ \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 2}\n"
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves (t.jsonl): as the report printed the original''s.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E2
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "tea", "delta": 1}
+
+        not json
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+    - - add
+      - tea
+    - - undo
+    note: E2 a broken line names its number
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3a
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x", "delta": "3"}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3a a count written as text
+    expect:
+      steps:
+      - exit: 0
+        out: '{"x": 3}
+
+          '
+        err: ''
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3b
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x", "delta": 2.7}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3b a count with a fraction
+    expect:
+      steps:
+      - exit: 0
+        out: '{"x": 2}
+
+          '
+        err: ''
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3c
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x", "delta": true}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3c a count that is true
+    expect:
+      steps:
+      - exit: 0
+        out: '{"x": 1}
+
+          '
+        err: ''
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3d
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": 5, "delta": 1}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3d a name that is a number
+    expect:
+      steps:
+      - exit: 0
+        out: '{"5": 1}
+
+          '
+        err: ''
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3e
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x", "delta": 1, "note": "hello"}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3e extra keys
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3f
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x"}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3f a missing key
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3g
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": null, "name": "x", "delta": 1}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3g a null time
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3h
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": NaN, "name": "x", "delta": 1}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3h a time that is NaN
+    expect:
+      steps:
+      - exit: 0
+        out: '{"x": 1}
+
+          '
+        err: ''
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3i
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '[1, 2]
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E3i a line that is a list
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E3j
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "x", "delta": 1}
+
+        {"at": 2, "name": "x", "delta": -1, "undoes": 7}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    - - undo
+    note: E3j an undo of a line that is not there
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E4
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: "{\"at\": 1, \"name\": \"tea\", \"delta\": 1}\r\n{\"at\": 2, \"name\": \"tea\", \"delta\": 2}\r\n"
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    - - add
+      - tea
+    - - show
+      - --json
+    note: E4 Windows line endings
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E5
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "tea", "delta": 1}'
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    - - add
+      - tea
+    - - show
+      - --json
+    note: E5 no newline at the end
+    expect:
+      steps:
+      - null
+      - null
+      - null
+    expect-says: 'steps 0, 1, 2: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E6
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: "\uFEFF{\"at\": 1, \"name\": \"tea\", \"delta\": 1}\n"
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E6 a byte-order mark
+    expect:
+      steps:
+      - exit: 1
+        out: ''
+        err: 'tally: <CASE>/t.jsonl: line 1 is not a tally entry
+
+          '
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E7
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl:
+        b64: //4K
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E7 bytes that are not UTF-8
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E8
+    of: command.tally
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl:
+        dir: true
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+    - - add
+      - tea
+    note: E8 the ledger is a folder
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E9
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "a         b", "delta": 1}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    note: E9 a line separator inside a name
+    expect:
+      steps:
+      - exit: 1
+        out: ''
+        err: 'tally: <CASE>/t.jsonl: line 1 is not a tally entry
+
+          '
+    expect-says: 'steps 0: the original''s result as the trial''s report printed it, where a port differed; the
+      files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: E10
+    of: command.show
+    from: document
+    group: E ledger as found
+    files:
+      t.jsonl: '{"at": 1, "name": "caf\u00e9", "delta": 1}
+
+        {"at": 2, "name": "\ud835\udcb3", "delta": 2}
+
+        '
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    steps:
+    - - show
+      - --json
+    - - show
+    note: E10 escaped names read back
+    expect:
+      steps:
+      - null
+      - null
+    expect-says: 'steps 0, 1: not in the trial''s document (both ports agreed with the original, and the report
+      prints only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  - id: F1
+    of: command.show
+    from: document
+    group: F at once
+    env:
+      TALLY_FILE: <CASE>/t.jsonl
+    burst:
+      argv:
+      - add
+      - x
+      times: 40
+    steps:
+    - - show
+      - --json
+    note: F1 forty adds at the same moment
+    expect:
+      steps:
+      - null
+    expect-says: 'steps 0: not in the trial''s document (both ports agreed with the original, and the report prints
+      only differences); the files it leaves: not in the trial''s document.'
+    recorded:
+      source:
+        tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+      run: the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)
+      python: 3.13.11
+  rulings:
+    targets: {}
+- cases: 53
+  from-items: 0
+  from-file: 53
+  stale: []

@@ -1,0 +1,12 @@
+thym 1
+
+program entail-in-a-language
+  why: a weighed and confirmed language gets a layout first, then the code, apart from the source.
+
+  takes f: fabula, language: string
+  gives arrangement: short, code: folder
+
+  let drawn = entail f as layout in language       -- the files, their parts, the names kept interfaces take
+  give arrangement: drawn
+  give code: entail f as code in language with drawn
+end

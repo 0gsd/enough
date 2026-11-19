@@ -1,0 +1,10 @@
+thym 1
+
+program hand-out-the-cases
+  why: the cases that stand outside go to the recorder as data, written by rules.
+
+  takes f: fabula
+  gives cases: text
+
+  give entail f as cases
+end

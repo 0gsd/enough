@@ -1,0 +1,16 @@
+engine: transconception.source_paths
+inputs:
+  call: f1b36eaa23a79ba9281b4317b59eff4bea991cc026eff0f5e2a88b185ee98037
+keys: []
+tokens: 0
+seconds: 0
+output:
+- CHANGES.md
+- LICENSE
+- README.md
+- tally/__init__.py
+- tally/__main__.py
+- tally/cli.py
+- tally/ledger.py
+- tally/render.py
+- tests/test_tally.py

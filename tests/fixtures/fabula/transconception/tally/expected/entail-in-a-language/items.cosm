@@ -1,0 +1,153 @@
+oes: thym/1
+kind: program
+id: thym/entail-in-a-language
+name: entail-in-a-language
+source:
+  path: entail-in-a-language.thym
+  sha256: 08fb8200090294cd0168a2267be4601947775e170b03153c8ad4ff05828f8daf
+  size: 407
+front: 'thym 1
+
+
+  '
+built:
+  at: '2026-11-18T12:00:00Z'
+  by: enough/0.7.0
+nodes:
+- id: P:program/entail-in-a-language
+  type: program
+  name: entail-in-a-language
+  summary: A weighed and confirmed language gets a layout first, then the code, apart from the source.
+  why: a weighed and confirmed language gets a layout first, then the code, apart from the source.
+  must: []
+  decided: []
+  takes:
+  - name: f
+    type: fabula
+  - name: language
+    type: string
+  gives:
+  - name: arrangement
+    type: short
+  - name: code
+    type: folder
+  lines: 3-12
+  order: 1
+  body: "program entail-in-a-language\n  why: a weighed and confirmed language gets a layout first, then the code,\
+    \ apart from the source.\n\n  takes f: fabula, language: string\n  gives arrangement: short, code: folder\n\n\
+    \  let drawn = entail f as layout in language       -- the files, their parts, the names kept interfaces take\n\
+    \  give arrangement: drawn\n  give code: entail f as code in language with drawn\nend\n"
+  steps:
+  - P:step/entail-in-a-language.1
+  - P:step/entail-in-a-language.2
+  - P:step/entail-in-a-language.3
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L3-L12
+    confidence: 1
+- id: P:step/entail-in-a-language.1
+  type: step
+  name: let drawn = entail f as layout in language
+  summary: the files, their parts, the names kept interfaces take
+  of: P:program/entail-in-a-language
+  n: 1
+  text: '  let drawn = entail f as layout in language       -- the files, their parts, the names kept interfaces
+    take'
+  line: 9
+  form: let
+  move: entail
+  calls:
+  - entail
+  binds: drawn
+  uses:
+  - f
+  - language
+  asks: true
+  contracts:
+  - P:contract/entail-in-a-language.1
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L9
+    confidence: 1
+- id: P:step/entail-in-a-language.2
+  type: step
+  name: 'give arrangement: drawn'
+  summary: 'give arrangement: drawn'
+  of: P:program/entail-in-a-language
+  n: 2
+  text: '  give arrangement: drawn'
+  slot: arrangement
+  line: 10
+  form: give
+  calls: []
+  uses:
+  - drawn
+  asks: false
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L10
+    confidence: 1
+- id: P:step/entail-in-a-language.3
+  type: step
+  name: 'give code: entail f as code in language with drawn'
+  summary: 'give code: entail f as code in language with drawn'
+  of: P:program/entail-in-a-language
+  n: 3
+  text: '  give code: entail f as code in language with drawn'
+  slot: code
+  line: 11
+  form: give
+  move: entail
+  calls:
+  - entail
+  uses:
+  - f
+  - language
+  - drawn
+  asks: true
+  contracts:
+  - P:contract/entail-in-a-language.3
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L11
+    confidence: 1
+- id: P:contract/entail-in-a-language.1
+  type: contract
+  name: entail
+  summary: What entail must leave true of what it gives.
+  of: P:step/entail-in-a-language.1
+  move: entail
+  checks:
+  - target-confirmed
+  - surface-answered
+  - no-invention
+  - footer
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L9
+    confidence: 1
+- id: P:contract/entail-in-a-language.3
+  type: contract
+  name: entail
+  summary: What entail must leave true of what it gives.
+  of: P:step/entail-in-a-language.3
+  move: entail
+  checks:
+  - target-confirmed
+  - files-present
+  - surface-answered
+  - apart
+  - footer
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - entail-in-a-language.thym#L11
+    confidence: 1
