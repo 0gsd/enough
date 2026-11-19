@@ -9793,6 +9793,16 @@
       flex-wrap: wrap;
     }
 
+    #fabula-modal ul.fab-tc-cshorts li .fab-tc-acts {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* the language library's section in the docs viewer (W4-X7) */
     #docs-mode .lib-doc {
       max-width: 900px;
@@ -40133,10 +40143,10 @@
           : '<span class="fab-made-meta">' + cosmEsc(t('fab.tc.cshorts.layoutGone', 'its layout is not here')) + '</span>') : '';
         return '<li><span class="fab-made-name">' + cosmEsc(canonBase(rel.replace(/\/$/, '')) + '/') + '</span>'
           + '<span class="fab-made-meta">' + cosmEsc(bits.join(' · ')) + '</span>'
-          + '<span class="fab-made-meta">' + cosmEsc(evw) + '</span>' + lay
+          + '<span class="fab-made-meta">' + cosmEsc(evw) + '</span><span class="fab-tc-acts">' + lay
           + (c.there ? '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(fabTcRel(rel)) + '">' + cosmEsc(t('fab.tc.cshorts.read', 'read')) + '</button>'
             : '<span class="fab-made-meta">' + cosmEsc(t('fab.made.gone', 'not there any more')) + '</span>')
-          + '</li>';
+          + '</span></li>';
       }).join('') + '</ul>';
     }
 
