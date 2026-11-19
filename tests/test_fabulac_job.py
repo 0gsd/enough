@@ -428,3 +428,24 @@ def test_every_retired_route_in_the_table_answers_with_its_new_routes_handler(cl
              for m in (getattr(r, "methods", None) or ())}
     for method, old, new in retired_names.ROUTES:
         assert paths[(method, old)] is paths[(method, new)], old
+
+
+
+def test_a_decompile_done_again_carries_what_was_ruled_while_its_item_resolves(project: Path):
+    from enough import dialectic as dl
+    build(project)
+    path = project / "tiny-tool.fabulac.cosm"
+    twin = dl.twin_from_text(path.read_text(encoding="utf-8"), filename=path.name)
+    file_item = next(n for n in twin.doc["nodes"] if str(n["id"]).startswith("C:file/"))
+    gone = {"id": "C:file/vanished.py", "ruling": [{"is": "free", "because": "ruled on a file since removed"}]}
+    file_item["ruling"] = [{"is": "free", "because": "ruled by the person"}]
+    twin.doc["nodes"].append(gone)
+    path.write_text(twin.render(), encoding="utf-8")
+    out = build(project, restart=True)
+    assert out["complete"]
+    assert file_item["id"] in out["carried"]["rulings"]
+    assert {"id": "C:file/vanished.py", "what": "ruling",
+            "because": "the item is gone from the new fabulac"} in out["carried"]["stale"]
+    now = {n["id"]: n for n in fabulac(project)["nodes"]}
+    assert now[file_item["id"]]["ruling"] == [{"is": "free", "because": "ruled by the person"}]
+    assert "C:file/vanished.py" not in now

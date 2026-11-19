@@ -372,6 +372,20 @@ def with_run(text: str, entry: dict, *, filename: str) -> str:
     return twin.render()
 
 
+def with_carry(text: str, old: dict, *, filename: str, now: dt.datetime | None = None) -> tuple[str, dict]:
+    """A fabulac decompiled again: the fabulac's text with what the person and the ground settled in the one it
+    replaces carried over while its item resolves (`transconception.carry_over`: an item's `ruling`, a
+    `C:reliance` that something still resolves), every byte outside the change kept. Returns `(text, report)`;
+    the text is the same when nothing carried."""
+    from . import dialectic as _dl
+    from . import transconception as _tc
+    twin = _dl.twin_from_text(text, filename=filename)
+    rep = _tc.carry_over(old, twin.doc, at=now.isoformat() if now is not None else None, by="decompile")
+    if not (rep["rulings"] or rep["reliances"]):
+        return text, rep
+    return twin.render(), rep
+
+
 def write_atomic(path: Path, text: str) -> None:
     from . import dialectic as _dl
     _dl.write_atomic(path, text)
@@ -530,6 +544,10 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
     make = runtime or app_runtime(project_dir, why=why, route=route, model=model, calls=calls, complete=complete)
     tally: dict = {"calls": 0}
     ceiling = job_ceiling(calls, job_calls)
+    # A decompile done again over a fabulac the build replaces: what was ruled and relied on there is carried into
+    # each stage's landing while its item resolves (MacroCOSM 18.6.3), the stale named once the build is whole.
+    old = _load(fab) if first == 0 and fab.is_file() else {}
+    carried: dict | None = None
     ran: list[dict] = []
     refusal: dict | None = None
     stop_note = ""
@@ -619,6 +637,16 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
         out = Path(t.outputs[OUTPUT.get(stage, "g")])
         text = out.read_text(encoding="utf-8")
         text = with_run(text, _run_entry(t, stage), filename=fab.name)
+        if old.get("nodes"):
+            try:
+                text, rep = with_carry(text, old, filename=fab.name, now=now)
+                if carried is None:
+                    carried = {"rulings": [], "reliances": [], "refs-dropped": [], "stale": []}
+                for k in ("rulings", "reliances", "refs-dropped"):     # what each stage's landing carried
+                    carried[k] += [x for x in rep[k] if x not in carried[k]]
+                carried["stale"] = rep["stale"]                       # stale is judged against what is there now
+            except Exception:  # noqa: BLE001 - a fabulac that cannot carry lands as it is; nothing is lost from disk
+                log.warning("%s: nothing carried over from the fabulac it replaces", fab.name, exc_info=True)
         write_atomic(fab, text)
         ran.append({"stage": word, "program": stage, "run": t.run_id, "trace": str(t.path)})
         state = build_state(project_dir, folder)
@@ -631,6 +659,8 @@ def run_build(project_dir: Path, folder: Path, *, mode: str, why: str = "", rout
            "message": msg}
     if refusal is not None:
         out["refusal"] = refusal
+    if carried is not None:
+        out["carried"] = {k: carried[k] for k in ("rulings", "reliances", "refs-dropped", "stale")}
     return out
 
 
