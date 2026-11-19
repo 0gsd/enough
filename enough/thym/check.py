@@ -907,8 +907,7 @@ class _Checker:
             params = target.params
             values = [(b.name, out.type, "gives")] + [(a, own[a], "is") for a in k.against]
             wrong = None
-            if len(params) != len(values):
-                wrong = values[0] if len(params) < len(values) else None
+            if len(params) != len(values):                # the count refuses alone: no type is read past it
                 takes = ", ".join(f"{p.name}: {p.type}" for p in params)
                 given = f"it is given {len(values)} value{'s' if len(values) != 1 else ''}"
                 self.fail("type", f"{said}: {k.name} takes {takes}, and {given}", k.line)
