@@ -66,6 +66,11 @@ FIXED_SEAMS: dict[str, str] = {
     "ENOUGH_ALLOGRAPH_URL": "http://127.0.0.1:1",
     # The keychain (0.7): held in memory, never the OS keychain, for a listing's key and Connect's token.
     "ENOUGH_KEYCHAIN": "memory",
+    # The fabulac-first doors (0.8): the running enough the Python client talks to (enough_client.py), and the
+    # local model `python -m enough.fabulac` asks: loopback ports nothing listens on, so a scratch run never
+    # reaches a person's live enough or their model.
+    "ENOUGH_URL": "http://127.0.0.1:1",
+    "ENOUGH_LLM_URL": "http://127.0.0.1:1",
 }
 
 # Seams that change behaviour rather than location, cleared: a developer who has one exported would otherwise get
