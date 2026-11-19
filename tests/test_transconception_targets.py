@@ -508,8 +508,7 @@ def test_a_program_weighs_tally_in_go_under_contract(tmp_path, tally):
 @pytest.mark.parametrize("fix, language, verdict, spike_cases", [
     (VULTURE, "go", "feasible-with", ["P:case/x0.V-C32", "P:case/x0.V-C33"]),
     (SLOPPY, "rust", "feasible", ["P:case/x0.S-C05", "P:case/x0.S-C06"])])
-def test_the_promoted_fixtures_carry_a7s_weighing_and_reach_gate_2_but_for_gate_1(fix, language, verdict,
-                                                                                    spike_cases):
+def test_the_promoted_fixtures_carry_a7s_weighing_and_reach_gate_2(fix, language, verdict, spike_cases):
     v = mc.load_volume(fix)
     t = v.items[f"N:target/{language}"].data
     assert t["verdict"] == verdict and t["by"] == "R:maker/agent-w1-xp" and t["made"]["by-hand"] is True
@@ -523,7 +522,8 @@ def test_the_promoted_fixtures_carry_a7s_weighing_and_reach_gate_2_but_for_gate_
     g = tc.ready_to_entail(v, language)
     assert g["checks"]["target-confirmed"]["state"] == "holds"
     assert g["checks"]["ruled"]["state"] == "holds"
-    assert g["do-not-hold"] == ["stands-alone"]                 # gate 1's, until the ground stands behind it
+    assert g["do-not-hold"] == []                  # since the ground (pins 25): stands-alone holds; rows by rules
+    assert g["not-measured"] == ["nothing-carried"]            # no source given here
     rep = FAB.lint(v)
     assert not [p for p in rep.problems() if p.item == f"N:target/{language}" and p.severity == "error"]
     # A7 wrote a row per reliance only; target-weighed asks one for every interface and behaviour kept as well, so a
@@ -534,15 +534,18 @@ def test_the_promoted_fixtures_carry_a7s_weighing_and_reach_gate_2_but_for_gate_
 
 
 @pytest.mark.skipif(not (X0 / "vulture" / "target-go.md").is_file(), reason="the experiment's files are not here")
-def test_the_promoter_writes_the_fixtures_from_the_experiments_files(tmp_path):
+@pytest.mark.skipif(not (TG.CLONES / "vulture" / "vulture").is_dir(), reason="the experiment's clones are not here")
+def test_the_promoter_writes_the_fixtures_from_the_experiments_files(tmp_path, monkeypatch):
     import importlib.util
     spec = importlib.util.spec_from_file_location("promote_x0", PROMOTER)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
+    monkeypatch.setattr(mod, "_scratch_seams", lambda: None)       # the suite holds every seam at scratch already
     for name, language in (("vulture", "go"), ("sloppy-xml-py", "rust")):
         out = tmp_path / f"{name}.fabulac.cosm"
         src = X0 / name / f"{name}.fabulac.cosm"         # the verdicts' paths are written from the x0 fabulac's folder
         mod.main([str(src), str(X0 / "results/2026-11-13-1006" / name / "py-roundtrip/verdict.json"), str(out),
                   "--target", str(X0 / name / f"target-{language}.md"),
-                  str(X0 / "results/2026-11-18-1819" / name / f"{language}-spike/verdict.json")])
+                  str(X0 / "results/2026-11-18-1819" / name / f"{language}-spike/verdict.json"),
+                  "--ground", str(TG.CLONES / name)])
         assert out.read_text(encoding="utf-8") == (PROMOTED / f"{name}.fabulac.cosm").read_text(encoding="utf-8")

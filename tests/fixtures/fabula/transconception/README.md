@@ -34,13 +34,22 @@ the byte-file steps, the allowance `own-types` on 62 Rust rulings). Since phase 
 hand weighing of its target from step A7 (`_x0/vulture/target-go.md`, `_x0/sloppy-xml-py/target-rust.md`) in place
 of the unweighed placeholder, its points named by number, and its spike's level read from the judge's verdict on the
 spike at O9 (`results/2026-11-18-1819/<repo>/<language>-spike/verdict.json`; only the spike's own cases count).
-Re-make them with:
+A row the shape expects a `gap` on carries one: the four things A7's verdict for vulture in Go names as to be
+written or fetched, in A7's words, and `weigh`'s rule (`library: <what>`) on its one other library row.
+
+Since 2026-11-19 (the owner's ruling, enough-dev `docs/v080-pins.md` section 25) each is grounded with 0.8's ground
+catalogue (`--ground`: the move `ground`'s pure core over the clone read as text, nothing run, under scratch
+seams): 67 reliances for vulture, 34 for sloppy-xml-py, each `kept` as the owner ruled it; and A7's weighing gains a
+`provides` row for each, by `weigh`'s rules from the target table (`answered: rules`; no row A7 wrote changes).
+Both gates hold for both. Re-make them (the clones at `<clones>/vulture` and `<clones>/sloppy-xml-py`) with:
 
     python tools/transconception/promote_x0.py <_x0>/vulture/vulture.fabulac.cosm \
         <_x0>/results/2026-11-13-1006/vulture/py-roundtrip/verdict.json \
         tests/fixtures/fabula/transconception/vulture.fabulac.cosm \
-        --target <_x0>/vulture/target-go.md <_x0>/results/2026-11-18-1819/vulture/go-spike/verdict.json
+        --target <_x0>/vulture/target-go.md <_x0>/results/2026-11-18-1819/vulture/go-spike/verdict.json \
+        --ground <clones>/vulture
     python tools/transconception/promote_x0.py <_x0>/sloppy-xml-py/sloppy-xml-py.fabulac.cosm \
         <_x0>/results/2026-11-13-1006/sloppy-xml-py/py-roundtrip/verdict.json \
         tests/fixtures/fabula/transconception/sloppy-xml-py.fabulac.cosm \
-        --target <_x0>/sloppy-xml-py/target-rust.md <_x0>/results/2026-11-18-1819/sloppy-xml-py/rust-spike/verdict.json
+        --target <_x0>/sloppy-xml-py/target-rust.md <_x0>/results/2026-11-18-1819/sloppy-xml-py/rust-spike/verdict.json \
+        --ground <clones>/sloppy-xml-py

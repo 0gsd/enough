@@ -17,6 +17,9 @@ source:
   origin: https://github.com/mitsuhiko/sloppy-xml-py.git
   licence: Apache-2.0
   obtained: public
+  swhid:
+    dir: swh:1:dir:fdf1b9a8c0a31b4b595835ab73b811ccbd5e2c1a
+    rev: swh:1:rev:74a02907a402eed6d0016bfacca5db3d72003be5
 derived:
   at: '2026-11-06T03:38:34Z'
   by: person
@@ -36,6 +39,11 @@ derived:
     run: 2026-11-05-2238-85bd
     at: '2026-11-06T03:38:34Z'
     model: hand-g1
+  - program: ground
+    mode: rules
+    at: 2026-11-19T12:00
+    by: tools/transconception/promote_x0.py --ground (0.8's catalogue, python ground catalogue, 96 entries, version
+      3.13)
   model: hand-g1
 atem:
   line: A single-file Python library that parses malformed, often machine-written XML without failing, as a stream
@@ -3060,6 +3068,7 @@ nodes:
   pinned: '3.13'
   pinned-by: 'sitting 1, Q8: Python 3.13 (past the author''s CI, which stops at 3.12); recorded on 3.13.11; cited
     to the 3.13.18 docs (Q-X1)'
+  address: https://github.com/python/cpython
 - id: C:dependency/lxml
   type: dependency
   name: lxml
@@ -3088,6 +3097,7 @@ nodes:
     node: '6'
     engine: code
   needs: The second tree builder only, and only when it can be loaded (6.1.3 was installed for the recording).
+  address: https://pypi.org/project/lxml/
 - id: C:dependency/pytest
   type: dependency
   name: pytest
@@ -3114,6 +3124,7 @@ nodes:
     node: '6'
     engine: code
   needs: 'Nothing at run time: the original''s tests run under it.'
+  address: https://pypi.org/project/pytest/
 - id: C:dependency/ruff
   type: dependency
   name: ruff
@@ -3140,6 +3151,7 @@ nodes:
     node: '6'
     engine: code
   needs: 'Nothing at run time: the author''s linter.'
+  address: https://pypi.org/project/ruff/
 - type: licence
   stance: observed
   file: LICENSE
@@ -10072,7 +10084,8 @@ nodes:
   name: the owner, as transconceiver
   summary: 'The owner rules what the next program keeps, as transconceiver: sitting 1 on 2026-11-13 gave 29 rulings
     across vulture and sloppy-xml-py, and its 5d answers ruled the rest in one batch and the standing; sitting 2
-    on 2026-11-18 settled five items and a fifth allowance, own-types.'
+    on 2026-11-18 settled five items and a fifth allowance, own-types. On 2026-11-19 the owner ruled the reliances
+    0.8''s ground catalogue raised kept, as proposed (pins 25).'
   stance: observed
   who: E:person/owner
   capacity: transconceiver
@@ -10080,6 +10093,7 @@ nodes:
   - _x0/sitting-1.md
   - _x0/sitting-1.md#5d
   - _x0/sitting-2.md
+  - enough-dev docs/v080-pins.md section 25 (2026-11-19, by questionnaire)
   statements:
     licence: 'Apache-2.0 (LICENSE; pyproject''s `license`), not MIT: the 5d answer says "both originals MIT"; the
       files say Apache-2.0, an open lane too; recorded as the files say, for the owner to confirm'
@@ -10246,6 +10260,160 @@ nodes:
     by: built-in
     what: an enum with named fields
     note: alike
+  - for: C:reliance/whole-numbers-unbounded
+    by: library
+    what: num-bigint, or i128 where the program's numbers stay small
+    note: the standard library has no unbounded whole number; i64 overflow panics in a debug build and wraps in
+      a release build
+    gap: num-bigint pinned in Cargo.lock and fetched once, or the numbers held in i128 with a refusal past it, ruled
+      by the transconceiver
+    answered: rules
+  - for: C:reliance/number-from-text
+    by: built-in
+    what: str::parse::<i64> after trimming
+    note: underscores between digits, signs and non-ASCII digits the original accepts are glue to write
+    answered: rules
+  - for: C:reliance/number-as-text
+    by: written
+    what: the printed form of a number around f64's Display
+    note: 'Display gives the shortest digits but never an exponent, Debug writes 1e16: where the form switches to
+      an exponent, and inf and nan, are written'
+    answered: rules
+  - for: C:reliance/conversions
+    by: written
+    what: each conversion the program makes, with the original's refusals
+    answered: rules
+  - for: C:reliance/value-kinds
+    by: written
+    what: the kind names the original prints, written as words
+    answered: rules
+  - for: C:reliance/text-length-in-code-points
+    by: built-in
+    what: str::chars().count()
+    answered: rules
+  - for: C:reliance/text-indexed-by-code-point
+    by: built-in
+    what: a Vec<char>
+    note: a str indexes bytes; a position the program shows is counted in chars
+    answered: rules
+  - for: C:reliance/text-order-by-code-point
+    by: built-in
+    what: str's Ord
+    note: UTF-8 bytes order as their code points do
+    answered: rules
+  - for: C:reliance/what-is-a-space
+    by: written
+    what: char::is_whitespace with U+001C to U+001F added
+    note: the set is written out
+    answered: rules
+  - for: C:reliance/text-split-on-space
+    by: built-in
+    what: str::split with the written space test
+    answered: rules
+  - for: C:reliance/text-replace
+    by: built-in
+    what: str::replace, str::replacen
+    answered: rules
+  - for: C:reliance/code-points-by-number
+    by: built-in
+    what: char::from_u32
+    note: it refuses surrogates
+    answered: rules
+  - for: C:reliance/printed-form
+    by: written
+    what: the original's printed form of texts, lists and maps
+    note: Debug prints differently
+    answered: rules
+  - for: C:reliance/truth-of-values
+    by: written
+    what: each test of truth written out
+    note: 'Rust has no truth of values: a test names what it tests'
+    answered: rules
+  - for: C:reliance/any-all-stop-early
+    by: built-in
+    what: Iterator::any, Iterator::all
+    answered: rules
+  - for: C:reliance/map-keeps-order
+    by: written
+    what: a Vec of pairs, replaced in place
+    note: HashMap keeps no order; indexmap would do it as a library
+    answered: rules
+  - for: C:reliance/set-members
+    by: built-in
+    what: HashSet, BTreeSet
+    answered: rules
+  - for: C:reliance/set-order-varies
+    by: built-in
+    what: HashSet iteration
+    note: its order varies from run to run as well; only a sort makes it repeatable
+    answered: rules
+  - for: C:reliance/membership-identity-then-equality
+    by: written
+    what: == on values, with the identity cases written
+    answered: rules
+  - for: C:reliance/records-compare-by-fields
+    by: built-in
+    what: derive(PartialEq)
+    answered: rules
+  - for: C:reliance/generators-lazy
+    by: built-in
+    what: an Iterator
+    answered: rules
+  - for: C:reliance/error-text
+    by: built-in
+    what: Display of the error
+    answered: rules
+  - for: C:reliance/error-kinds
+    by: written
+    what: an enum of the program's errors, matched by kind
+    answered: rules
+  - for: C:reliance/optional-library
+    by: written
+    what: a cargo feature with the part that needs the library behind it
+    answered: rules
+  - for: C:reliance/missing-key-error
+    by: written
+    what: the message naming the key
+    answered: rules
+  - for: C:reliance/text-decoding-strict
+    by: built-in
+    what: String::from_utf8
+    note: the error the original raises is written
+    answered: rules
+  - for: C:reliance/bytes-decoded
+    by: built-in
+    what: Vec<u8> and String
+    answered: rules
+  - for: C:reliance/pattern-syntax
+    by: written
+    what: each pattern written as a small matcher with the same outcome
+    note: the standard library has no regular expressions; the regex crate has no look-around
+    answered: rules
+  - for: C:reliance/pattern-unicode-classes
+    by: written
+    what: the Unicode classes in each matcher (char::is_alphanumeric and the written space test)
+    answered: rules
+  - for: C:reliance/pattern-flags
+    by: written
+    what: case folding, line anchors and dot-all in each matcher
+    answered: rules
+  - for: C:reliance/html5-entities
+    by: written
+    what: the table carried as data and looked up as the original does
+    answered: rules
+  - for: C:reliance/tree-text-and-tail
+    by: written
+    what: an element type with its text and tail
+    answered: rules
+  - for: C:reliance/runtime-version
+    by: built-in
+    what: the edition and rust-version of Cargo.toml
+    answered: rules
+  - for: C:reliance/pytest-conventions
+    by: dropped
+    what: 'nothing: cargo test reads its own names'
+    note: the original's test runner's names mean nothing to the new program
+    answered: rules
   spike:
     use: the patterns (C:reliance/S-R01) on P:case/x0.S-C05 and P:case/x0.S-C06
     level: 3
@@ -10284,6 +10452,8 @@ nodes:
     - _x0/sitting-1.md
     - _x0/sloppy-xml-py/rulings.json
     - orangepaper "Transcoding through the fabulac", tab The paper, "Choosing the target"
+    - rows for the reliances 0.8's ground raised, by `weigh`'s rules from the target table (promote_x0.py --ground,
+      2026-11-19); every row A7 wrote is as it wrote it
     state: known
 - id: C:interface/x0.S-I0
   type: interface
@@ -15389,3 +15559,1458 @@ nodes:
     run: x0-A4-2026-11-13
     step: A4
     engine: model:claude-opus-5-5
+- id: C:reliance/whole-numbers-unbounded
+  type: reliance
+  name: whole numbers without limit
+  summary: Whole numbers have no fixed width.
+  stance: observed
+  'on': language
+  gives: Whole numbers have no fixed width. Adding, subtracting and multiplying them never overflows and never loses
+    a digit, however large they grow.
+  example: 18446744073709551615 plus 1 is 18446744073709551616, exactly; a total past two to the sixty-third is
+    kept.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#numeric-types-int-float-complex
+    digest: 736b53f803b0
+  entry: whole-numbers-unbounded
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.StartElement
+  - C:interface/sloppy_xml.EndElement
+  - C:interface/sloppy_xml.Text
+  - C:interface/sloppy_xml.Comment
+  - C:interface/sloppy_xml.ProcessingInstruction
+  - C:interface/sloppy_xml.EntityRef
+  - C:interface/sloppy_xml.ParseError
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '1223'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1223
+    - sloppy_xml.py#L74
+    - sloppy_xml.py#L81
+    - sloppy_xml.py#L88
+    - sloppy_xml.py#L95
+    - sloppy_xml.py#L102
+    - sloppy_xml.py#L109
+    - sloppy_xml.py#L116
+    - sloppy_xml.py#L179
+    - sloppy_xml.py#L526
+    - sloppy_xml.py#L1328
+    - sloppy_xml.py#L1360
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/number-from-text
+  type: reliance
+  name: a whole number read from text
+  summary: A whole number is read from text that may have spaces, tabs or line ends around it, a plus or minus sign,
+    single underscores between digits, leading zeros, and the decimal digits of any script, not only 0 to 9.
+  stance: observed
+  'on': language
+  gives: A whole number is read from text that may have spaces, tabs or line ends around it, a plus or minus sign,
+    single underscores between digits, leading zeros, and the decimal digits of any script, not only 0 to 9. Anything
+    else is refused.
+  example: ''' 5_0'', ''+7'', ''007'' and the Arabic-Indic digit seven are read as 50, 7, 7 and 7; ''5__0'' and
+    ''1.0'' are refused.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#int
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#numeric-types-int-float-complex
+    digest: 736b53f803b0
+  entry: number-from-text
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1223'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1223
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/number-as-text
+  type: reliance
+  name: numbers written as text
+  summary: A whole number is written in decimal digits with a minus sign when negative.
+  stance: observed
+  'on': language
+  gives: A whole number is written in decimal digits with a minus sign when negative. A fractional number is written
+    with the fewest digits that read back as the same number, always with a point or an exponent; from 1e16 up and
+    below 1e-4 it takes the exponent form, with a sign and at least two digits.
+  example: 1.0 is written 1.0, not 1; 1e16 is written 1e+16; 0.0001 is written 0.0001 and 0.00001 is written 1e-05.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#repr
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations
+    digest: 783ed86151eb
+  - nowhere: the exact switch to the exponent form (from 1e16 up, below 1e-4) and the two-digit exponent.
+  entry: number-as-text
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '636'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L636
+    - sloppy_xml.py#L1104
+    - sloppy_xml.py#L1241
+    - sloppy_xml.py#L1527
+    - sloppy_xml.py#L1550
+    - sloppy_xml.py#L1609
+    - sloppy_xml.py#L1646
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/conversions
+  type: reliance
+  name: values converted to a kind
+  summary: Converting a value to a whole number drops a fraction toward zero and takes yes as 1 and no as 0; converting
+    text reads it as a number (see the entries on numbers read from text); converting anything to text gives its
+    printed form.
+  stance: observed
+  'on': language
+  gives: Converting a value to a whole number drops a fraction toward zero and takes yes as 1 and no as 0; converting
+    text reads it as a number (see the entries on numbers read from text); converting anything to text gives its
+    printed form. A value that cannot be converted is refused with a value error or a type error.
+  example: a fraction 2.9 converted to a whole number is 2; yes is 1; the text '3' converted is 3; a list is refused.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#int
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#float
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#bool
+    digest: 216dc071d8fc
+  entry: conversions
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '1223'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1223
+    - sloppy_xml.py#L636
+    - sloppy_xml.py#L953
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/value-kinds
+  type: reliance
+  name: a value's kind and its name
+  summary: A value's kind can be asked for and compared exactly.
+  stance: observed
+  'on': language
+  gives: A value's kind can be asked for and compared exactly. Yes and no are a kind of whole number when asked
+    loosely, but not when the kind is compared exactly. A kind's name is its short word (int, str, list, bool, float).
+  example: yes is a whole number when asked loosely; the kind of yes is not the kind of 1; the name of the kind
+    of 1 is int.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#type
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#isinstance
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#bool
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#definition.__name__
+    digest: 736b53f803b0
+  entry: value-kinds
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:interface/sloppy_xml.tree_parse
+  span:
+    file: sloppy_xml.py
+    lines: '607'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L607
+    - sloppy_xml.py#L1172
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-length-in-code-points
+  type: reliance
+  name: text measured in code points
+  summary: The length of a text, and every padding to a width, counts Unicode code points, not bytes, not UTF-16
+    units and not the columns a terminal draws.
+  stance: observed
+  'on': language
+  gives: The length of a text, and every padding to a width, counts Unicode code points, not bytes, not UTF-16 units
+    and not the columns a terminal draws. A wide character or a combining mark counts as one.
+  example: '''café'' is 4 long; padded to 6 it gains two spaces; a name of three CJK ideographs counts 3.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#text-sequence-type-str
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.ljust
+    digest: 736b53f803b0
+  entry: text-length-in-code-points
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.ElementTreeBuilder
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '421'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L421
+    - sloppy_xml.py#L803
+    - sloppy_xml.py#L1355
+    - sloppy_xml.py#L1378
+    - sloppy_xml.py#L1424
+    - sloppy_xml.py#L1548
+    - sloppy_xml.py#L1599
+    - sloppy_xml.py#L1648
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-indexed-by-code-point
+  type: reliance
+  name: positions in text count code points
+  summary: A position in a text, a slice of it and a match's start and end count Unicode code points from 0.
+  stance: observed
+  'on': language
+  gives: A position in a text, a slice of it and a match's start and end count Unicode code points from 0. A slice
+    past either end is cut short, never refused; a negative position counts from the end.
+  example: in 'é𝒳x' the x is at position 2; the slice from 1 to 99 of 'abc' is 'bc'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#text-sequence-type-str
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#common-sequence-operations
+    digest: 736b53f803b0
+  entry: text-indexed-by-code-point
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '755'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L755
+    - sloppy_xml.py#L1223
+    - sloppy_xml.py#L1265
+    - sloppy_xml.py#L1343
+    - sloppy_xml.py#L1425
+    - sloppy_xml.py#L1592
+    - sloppy_xml.py#L1651
+    - sloppy_xml.py#L1354
+    - sloppy_xml.py#L714
+    - sloppy_xml.py#L833
+    - sloppy_xml.py#L855
+    - sloppy_xml.py#L868
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-order-by-code-point
+  type: reliance
+  name: text ordered by code point
+  summary: Texts are ordered by comparing code point by code point, not by any language's alphabet and not by locale,
+    so every capital letter of A to Z comes before every small letter, and a shorter text before a longer one it
+    begins.
+  stance: observed
+  'on': language
+  gives: Texts are ordered by comparing code point by code point, not by any language's alphabet and not by locale,
+    so every capital letter of A to Z comes before every small letter, and a shorter text before a longer one it
+    begins.
+  example: sorted, 'B', 'a', 'é' and 'b' come out as 'B', 'a', 'b', 'é'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#value-comparisons
+    digest: 9188471e6a0d
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#sorted
+    digest: 216dc071d8fc
+  entry: text-order-by-code-point
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1423'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1423
+    - sloppy_xml.py#L1424
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/what-is-a-space
+  type: reliance
+  name: what counts as white space
+  summary: White space is every character Unicode's database classes as a space separator or as a bidirectional
+    space, segment or paragraph separator.
+  stance: observed
+  'on': language
+  gives: White space is every character Unicode's database classes as a space separator or as a bidirectional space,
+    segment or paragraph separator. That is the ASCII space, tab, line feed, vertical tab, form feed and carriage
+    return, the four information separators U+001C to U+001F, U+0085, U+00A0, U+1680, U+2000 to U+200A, U+2028,
+    U+2029, U+202F, U+205F and U+3000. Trimming, splitting on white space and asking whether a text is white space
+    all use this one set.
+  example: a name of 'tea' followed by U+3000 is trimmed to 'tea'; 'a', U+001F, 'b' holds white space.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.isspace
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.strip
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.split
+    digest: 736b53f803b0
+  entry: what-is-a-space
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '698'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L698
+    - sloppy_xml.py#L900
+    - sloppy_xml.py#L1302
+    - sloppy_xml.py#L1468
+    - sloppy_xml.py#L1498
+    - sloppy_xml.py#L1651
+    - sloppy_xml.py#L990
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-split-on-space
+  type: reliance
+  name: text split into words
+  summary: Splitting a text with no separator given splits on runs of white space and drops empty pieces, so a text
+    of only white space gives no words; splitting with a separator keeps every empty piece.
+  stance: observed
+  'on': language
+  gives: Splitting a text with no separator given splits on runs of white space and drops empty pieces, so a text
+    of only white space gives no words; splitting with a separator keeps every empty piece.
+  example: '''  a  b '' split gives ''a'' and ''b''; ''a,,b'' split at commas gives ''a'', '''' and ''b''.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.split
+    digest: 736b53f803b0
+  entry: text-split-on-space
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '990'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L990
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-replace
+  type: reliance
+  name: replacing in text
+  summary: Replacing a piece of text replaces every occurrence, scanning left to right, without overlap, unless
+    a count is given; nothing found leaves the text as it was.
+  stance: observed
+  'on': language
+  gives: Replacing a piece of text replaces every occurrence, scanning left to right, without overlap, unless a
+    count is given; nothing found leaves the text as it was.
+  example: replacing 'aa' by 'b' in 'aaa' gives 'ba'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.replace
+    digest: 736b53f803b0
+  entry: text-replace
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1433'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1433
+    - sloppy_xml.py#L1496
+    - sloppy_xml.py#L1566
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/code-points-by-number
+  type: reliance
+  name: characters by number
+  summary: A character is made from any number from 0 to 1114111 (U+10FFFF); a larger or negative number is refused
+    with a value error.
+  stance: observed
+  'on': language
+  gives: A character is made from any number from 0 to 1114111 (U+10FFFF); a larger or negative number is refused
+    with a value error. Text may hold any of them, the null character and lone surrogates (U+D800 to U+DFFF) included.
+  example: number 55296 gives the lone surrogate U+D800, which the text keeps; 1114112 is refused.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#chr
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#ord
+    digest: 216dc071d8fc
+  entry: code-points-by-number
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1230'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1230
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/printed-form
+  type: reliance
+  name: a value's printed form
+  summary: Any value has a printed form.
+  stance: observed
+  'on': language
+  gives: Any value has a printed form. Text prints as itself; bytes print as b followed by the quoted bytes; a quoted
+    form of text (used in many messages) puts it in single quotes, or double quotes when it holds a single quote
+    and no double one, with backslash escapes for what cannot be shown.
+  example: the bytes of '<r>' print as b'<r>'; the quoted form of x is 'x', of it's is "it's".
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#repr
+    digest: 216dc071d8fc
+  - nowhere: the rule for choosing single or double quotes in the quoted form of text, and which characters it escapes.
+  entry: printed-form
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '636'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L636
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/truth-of-values
+  type: reliance
+  name: which values count as false
+  summary: Where a value is tested as a condition, zero of any kind, empty text, an empty list, map or set, and
+    nothing count as false; everything else counts as true unless it says otherwise.
+  stance: observed
+  'on': language
+  gives: Where a value is tested as a condition, zero of any kind, empty text, an empty list, map or set, and nothing
+    count as false; everything else counts as true unless it says otherwise.
+  example: a line holding only spaces, trimmed, is empty and so false; 0.0 is false; a list holding one empty text
+    is true.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#truth-value-testing
+    digest: 736b53f803b0
+  entry: truth-of-values
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.ElementTreeBuilder.start_element
+  - C:interface/sloppy_xml.ElementTreeBuilder.end_element
+  - C:interface/sloppy_xml.ElementTreeBuilder.parse_error
+  - C:interface/sloppy_xml.ElementTreeBuilder
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.LxmlElementTreeBuilder.start_element
+  - C:interface/sloppy_xml.LxmlElementTreeBuilder.comment
+  - C:interface/sloppy_xml.LxmlElementTreeBuilder.processing_instruction
+  - C:interface/sloppy_xml.stream_parse
+  - C:interface/sloppy_xml.tree_parse
+  span:
+    file: sloppy_xml.py
+    lines: '325'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L325
+    - sloppy_xml.py#L338
+    - sloppy_xml.py#L385
+    - sloppy_xml.py#L403
+    - sloppy_xml.py#L442
+    - sloppy_xml.py#L467
+    - sloppy_xml.py#L488
+    - sloppy_xml.py#L499
+    - sloppy_xml.py#L639
+    - sloppy_xml.py#L1192
+    - sloppy_xml.py#L1219
+    - sloppy_xml.py#L1280
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/any-all-stop-early
+  type: reliance
+  name: any and all stop at the first answer
+  summary: Asking whether any of a series holds stops at the first that does; asking whether all hold stops at the
+    first that does not; the rest are never looked at.
+  stance: observed
+  'on': language
+  gives: Asking whether any of a series holds stops at the first that does; asking whether all hold stops at the
+    first that does not; the rest are never looked at. Any of nothing is false and all of nothing is true.
+  example: of handlers checked in order, the second is never examined when the first already answers.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#any
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#all
+    digest: 216dc071d8fc
+  entry: any-all-stop-early
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '715'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L715
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/map-keeps-order
+  type: reliance
+  name: a map of keys to values
+  summary: A map from keys to values holds each key once and keeps the order in which keys were first put in; putting
+    a key in again changes its value and keeps its place; a map built from sorted pairs stays sorted.
+  stance: observed
+  'on': language
+  gives: A map from keys to values holds each key once and keeps the order in which keys were first put in; putting
+    a key in again changes its value and keeps its place; a map built from sorted pairs stays sorted. Looking up
+    a key it does not hold is refused with a key error unless a default is given.
+  example: a="1" b="2" a="3" gives a=3 then b=2; the totals of b, a and c, put in sorted, come back a, b, c.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#mapping-types-dict
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#dict.get
+    digest: 736b53f803b0
+  entry: map-keeps-order
+  of: R:means/python
+  used-by:
+  - C:setting/sloppy_xml.PATTERNS
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  - C:behaviour/sloppy_xml.attributes
+  span:
+    file: sloppy_xml.py
+    lines: '200'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L200
+    - sloppy_xml.py#L723
+    - sloppy_xml.py#L1301
+    - sloppy_xml.py#L1465
+    - sloppy_xml.py#L1553
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/set-members
+  type: reliance
+  name: a set holds each value once
+  summary: A set holds each value once, two values that compare equal (and hash alike) being one member; membership
+    is asked in about constant time.
+  stance: observed
+  'on': language
+  gives: A set holds each value once, two values that compare equal (and hash alike) being one member; membership
+    is asked in about constant time.
+  example: two findings with the same file, line and name are one finding.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#set-types-set-frozenset
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: reference/datamodel.html#object.__hash__
+    digest: 95b8a5bdc225
+  entry: set-members
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1068'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1068
+    - sloppy_xml.py#L1589
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/set-order-varies
+  type: reliance
+  name: the order of a set of texts varies from run to run
+  summary: Going through a set of texts visits them in an order that changes from one run of the program to the
+    next, because the hash of a text is salted afresh at each start; only a sort makes it repeatable.
+  stance: observed
+  'on': runtime
+  gives: Going through a set of texts visits them in an order that changes from one run of the program to the next,
+    because the hash of a text is salted afresh at each start; only a sort makes it repeatable.
+  example: the same three names, put in a set and printed, come out in a different order on another run.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/datamodel.html#object.__hash__
+    digest: 95b8a5bdc225
+  entry: set-order-varies
+  of: C:dependency/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '1068'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1068
+    - sloppy_xml.py#L1589
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/membership-identity-then-equality
+  type: reliance
+  name: membership is identity first, then equality
+  summary: Asking whether a value is among others asks, for each, whether it is that very object, then whether it
+    is equal; the first yes answers.
+  stance: observed
+  'on': language
+  gives: Asking whether a value is among others asks, for each, whether it is that very object, then whether it
+    is equal; the first yes answers.
+  example: a constant compared against a list of constants by membership finds itself even if equality was redefined.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#membership-test-operations
+    digest: 9188471e6a0d
+  entry: membership-identity-then-equality
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '702'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L702
+    - sloppy_xml.py#L1235
+    - sloppy_xml.py#L1254
+    - sloppy_xml.py#L1565
+    - sloppy_xml.py#L1596
+    - sloppy_xml.py#L1643
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/records-compare-by-fields
+  type: reliance
+  name: records equal by their fields
+  summary: A record type declared by its fields is equal to another of the same type when every field is equal;
+    it can be unpacked in field order (when declared as a tuple), may be frozen against change, and fields may have
+    defaults.
+  stance: observed
+  'on': runtime
+  gives: A record type declared by its fields is equal to another of the same type when every field is equal; it
+    can be unpacked in field order (when declared as a tuple), may be frozen against change, and fields may have
+    defaults.
+  example: two entries with the same time, name and amount are equal; a frozen entry cannot be changed.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/dataclasses.html#dataclasses.dataclass
+    digest: e1a82f4a2d34
+  - in: python
+    version: 3.13.18
+    at: library/typing.html#typing.NamedTuple
+    digest: fdda791ff698
+  entry: records-compare-by-fields
+  of: C:dependency/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.StartElement
+  - C:interface/sloppy_xml.EndElement
+  - C:interface/sloppy_xml.Text
+  - C:interface/sloppy_xml.Comment
+  - C:interface/sloppy_xml.ProcessingInstruction
+  - C:interface/sloppy_xml.EntityRef
+  - C:interface/sloppy_xml.ParseError
+  - C:behaviour/sloppy_xml.parse-options
+  - N:decision/named-tuples
+  span:
+    file: sloppy_xml.py
+    lines: '170'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L170
+    - sloppy_xml.py#L71
+    - sloppy_xml.py#L79
+    - sloppy_xml.py#L86
+    - sloppy_xml.py#L93
+    - sloppy_xml.py#L99
+    - sloppy_xml.py#L106
+    - sloppy_xml.py#L113
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/generators-lazy
+  type: reliance
+  name: a stream does nothing until asked
+  summary: A function that yields its results one at a time checks its arguments when it is called, but runs none
+    of its body until the first result is asked for, and then only as far as the next result.
+  stance: observed
+  'on': language
+  gives: A function that yields its results one at a time checks its arguments when it is called, but runs none
+    of its body until the first result is asked for, and then only as far as the next result.
+  example: an unknown option is refused at the call; a bad input is found only when the first event is asked for.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#yield-expressions
+    digest: 9188471e6a0d
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#calls
+    digest: 9188471e6a0d
+  - nowhere: the wording of the message that refuses an unknown keyword argument.
+  entry: generators-lazy
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - N:requirement/no-crash
+  - N:requirement/streaming
+  span:
+    file: sloppy_xml.py
+    lines: '1098'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1098
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/error-text
+  type: reliance
+  name: an error printed is its message
+  summary: An error turned into text gives its message as it was raised, and the empty text when it was raised with
+    none.
+  stance: observed
+  'on': language
+  gives: An error turned into text gives its message as it was raised, and the empty text when it was raised with
+    none.
+  example: an error raised with 'the ledger is broken' prints as that; one raised with no message prints as nothing.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#BaseException
+    digest: fd1dcc489d5c
+  entry: error-text
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '978'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L978
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/error-kinds
+  type: reliance
+  name: errors caught by kind
+  summary: A handler catches the kinds of error it names and every kind made from them.
+  stance: observed
+  'on': language
+  gives: A handler catches the kinds of error it names and every kind made from them. A text that is not valid JSON
+    is a kind of value error; a missing key is a key error; a wrong kind of value is usually a type error; a missing
+    file, a folder where a file was wanted and a refused permission are kinds of operating-system error.
+  example: a line that is not JSON and a line missing a field are both caught by one handler naming value and key
+    errors.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#exception-hierarchy
+    digest: fd1dcc489d5c
+  - in: python
+    version: 3.13.18
+    at: library/json.html#json.JSONDecodeError
+    digest: 12e3840498af
+  - in: python
+    version: 3.13.18
+    at: reference/compound_stmts.html#the-try-statement
+    digest: 4978b6e97f3d
+  entry: error-kinds
+  of: R:means/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '37'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L37
+    - sloppy_xml.py#L609
+    - sloppy_xml.py#L1231
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/optional-library
+  type: reliance
+  name: a library that may be absent
+  summary: Loading a library that is not installed fails with an import error that the program can catch, so a part
+    that needs it can be offered only where it is installed.
+  stance: observed
+  'on': runtime
+  gives: Loading a library that is not installed fails with an import error that the program can catch, so a part
+    that needs it can be offered only where it is installed.
+  example: the second tree builder is offered only where its library loads.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#ImportError
+    digest: fd1dcc489d5c
+  entry: optional-library
+  of: C:dependency/python
+  used-by:
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '37'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L37
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/missing-key-error
+  type: reliance
+  name: a missing key's error names the key
+  summary: Looking up a key a map does not hold raises a key error whose text is the key's quoted form.
+  stance: observed
+  'on': language
+  gives: Looking up a key a map does not hold raises a key error whose text is the key's quoted form.
+  example: looking up 'other' among the tree builders fails with the text 'other' in single quotes.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#KeyError
+    digest: fd1dcc489d5c
+  - nowhere: that the key error's message is the key's quoted form.
+  entry: missing-key-error
+  of: R:means/python
+  used-by:
+  - C:interface/sloppy_xml.tree_parse
+  span:
+    file: sloppy_xml.py
+    lines: '1156'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L1156
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-decoding-strict
+  type: reliance
+  name: text decoded strictly
+  summary: Text decoded as UTF-8 refuses the first byte sequence that is not valid UTF-8 with a decoding error,
+    a kind of value error, naming the position; a byte-order mark at the start is kept as the character U+FEFF,
+    unless the encoding asked for is the one that drops it.
+  stance: observed
+  'on': runtime
+  gives: Text decoded as UTF-8 refuses the first byte sequence that is not valid UTF-8 with a decoding error, a
+    kind of value error, naming the position; a byte-order mark at the start is kept as the character U+FEFF, unless
+    the encoding asked for is the one that drops it.
+  example: a ledger holding the byte 0xE9 alone fails to read; a file beginning with a byte-order mark gives a first
+    line that begins with U+FEFF.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#error-handlers
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#encodings-and-unicode
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#bytes.decode
+    digest: 736b53f803b0
+  entry: text-decoding-strict
+  of: C:dependency/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '608'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L608
+    - sloppy_xml.py#L614
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/bytes-decoded
+  type: reliance
+  name: bytes and text are different things
+  summary: Bytes and text are different kinds and are never mixed silently.
+  stance: observed
+  'on': runtime
+  gives: Bytes and text are different kinds and are never mixed silently. Bytes become text only by decoding them
+    with a named encoding, which fails on bytes that encoding cannot read; text read from a byte file is decoded
+    once, and a file already read to its end gives nothing more.
+  example: '"<r>é</r>" in Latin-1 bytes, decoded as UTF-8, fails at the é.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#bytes.decode
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#standard-encodings
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: library/io.html#io.BufferedIOBase.read
+    digest: 8261a1a54d06
+  entry: bytes-decoded
+  of: C:dependency/python
+  used-by:
+  - C:interface/sloppy_xml.stream_parse
+  - C:behaviour/sloppy_xml.stream-input
+  - C:interface/x0.S-I3
+  span:
+    file: sloppy_xml.py
+    lines: '608'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L608
+    - sloppy_xml.py#L614
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-syntax
+  type: reliance
+  name: text patterns
+  summary: Text patterns have repeats that are greedy unless marked lazy, look-ahead and look-behind, groups and
+    alternation; a search finds the leftmost match, a match anchors at the start or at a given position, and finding
+    all matches goes left to right without overlap.
+  stance: observed
+  'on': runtime
+  gives: Text patterns have repeats that are greedy unless marked lazy, look-ahead and look-behind, groups and alternation;
+    a search finds the leftmost match, a match anchors at the start or at a given position, and finding all matches
+    goes left to right without overlap.
+  example: the lazy pattern for a comment stops at the first '-->', so '<!-- a -- b -->' is one comment.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#regular-expression-syntax
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.search
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.finditer
+    digest: 17d3cdde81f1
+  entry: pattern-syntax
+  of: C:dependency/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.stream_parse
+  - C:setting/sloppy_xml.FLAGS
+  - C:setting/sloppy_xml.PATTERNS
+  - P:claim/sloppy_xml.precompiled-for-speed
+  - N:decision/regex-scanner
+  span:
+    file: sloppy_xml.py
+    lines: '202'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L202
+    - sloppy_xml.py#L204
+    - sloppy_xml.py#L206
+    - sloppy_xml.py#L210
+    - sloppy_xml.py#L215
+    - sloppy_xml.py#L219
+    - sloppy_xml.py#L223
+    - sloppy_xml.py#L227
+    - sloppy_xml.py#L231
+    - sloppy_xml.py#L233
+    - sloppy_xml.py#L235
+    - sloppy_xml.py#L237
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-unicode-classes
+  type: reliance
+  name: word, digit and space in patterns are Unicode's
+  summary: In a text pattern, a word character is any Unicode letter, digit or underscore, a digit any Unicode decimal
+    digit, and white space the set of the entry on white space, unless the pattern is marked ASCII-only.
+  stance: observed
+  'on': runtime
+  gives: In a text pattern, a word character is any Unicode letter, digit or underscore, a digit any Unicode decimal
+    digit, and white space the set of the entry on white space, unless the pattern is marked ASCII-only.
+  example: a word field named 'naïve' is matched whole; U+3000 is matched as white space.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#regular-expression-syntax
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.ASCII
+    digest: 17d3cdde81f1
+  entry: pattern-unicode-classes
+  of: C:dependency/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.stream_parse
+  span:
+    file: sloppy_xml.py
+    lines: '202'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L202
+    - sloppy_xml.py#L204
+    - sloppy_xml.py#L206
+    - sloppy_xml.py#L210
+    - sloppy_xml.py#L215
+    - sloppy_xml.py#L219
+    - sloppy_xml.py#L239
+    - sloppy_xml.py#L241
+    - sloppy_xml.py#L1656
+    - sloppy_xml.py#L695
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-flags
+  type: reliance
+  name: pattern flags
+  summary: A pattern may ignore case (by Unicode's simple case folding), let '^' and '$' match at every line, and
+    let '.' match a line feed; without them, '.' stops at a line feed and '$' matches at the end or before a final
+    line feed.
+  stance: observed
+  'on': runtime
+  gives: A pattern may ignore case (by Unicode's simple case folding), let '^' and '$' match at every line, and
+    let '.' match a line feed; without them, '.' stops at a line feed and '$' matches at the end or before a final
+    line feed.
+  example: ignoring case, '# noqa' matches '# NoQA'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.IGNORECASE
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.MULTILINE
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.DOTALL
+    digest: 17d3cdde81f1
+  entry: pattern-flags
+  of: C:dependency/python
+  used-by:
+  - C:setting/sloppy_xml.FLAGS
+  span:
+    file: sloppy_xml.py
+    lines: '197'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L197
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/html5-entities
+  type: reliance
+  name: the HTML5 named references
+  summary: The named character references of HTML5 are a fixed table of 2,231 names, legacy ones such as amp, lt
+    and copy also without their semicolon, each mapped to one or two characters.
+  stance: observed
+  'on': runtime
+  gives: The named character references of HTML5 are a fixed table of 2,231 names, legacy ones such as amp, lt and
+    copy also without their semicolon, each mapped to one or two characters.
+  example: '''&copy'' reads as ©; ''&notit;'' is no name of the table.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/html.entities.html#html.entities.html5
+    digest: e83ead67b495
+  entry: html5-entities
+  of: C:dependency/python
+  used-by:
+  - C:setting/sloppy_xml.HTML_ENTITIES
+  - C:component/sloppy_xml
+  span:
+    file: sloppy_xml.py
+    lines: '251'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L251
+    - sloppy_xml.py#L30
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/tree-text-and-tail
+  type: reliance
+  name: an element tree's text and tail
+  summary: In an element tree an element's text is what comes before its first child and each child's tail is what
+    follows it up to the next sibling; attributes keep their order.
+  stance: observed
+  'on': runtime
+  gives: In an element tree an element's text is what comes before its first child and each child's tail is what
+    follows it up to the next sibling; attributes keep their order.
+  example: in '<r>a<b/>c</r>', r's text is 'a' and b's tail is 'c'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element
+    digest: 5e516318a17d
+  entry: tree-text-and-tail
+  of: C:dependency/python
+  used-by:
+  - C:component/sloppy_xml
+  - C:interface/sloppy_xml.tree_parse
+  - C:interface/sloppy_xml.ElementTreeBuilder
+  - C:interface/sloppy_xml.ElementTreeBuilder.__init__
+  - C:interface/sloppy_xml.LxmlElementTreeBuilder.__init__
+  - C:structure/sloppy_xml.TreeType
+  - C:behaviour/sloppy_xml.lxml-optional
+  - C:behaviour/sloppy_xml.etree-builder
+  - N:aim/dual-api
+  - I:influence/etree
+  span:
+    file: sloppy_xml.py
+    lines: '13'
+  provenance:
+    mode: derived
+    sources:
+    - sloppy_xml.py#L13
+    - sloppy_xml.py#L1194
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/runtime-version
+  type: reliance
+  name: the runtime's release
+  summary: The program runs on the release of its runtime it names and on later releases; what it takes from the
+    runtime is that release's behaviour, as this catalogue's citations state it.
+  stance: observed
+  'on': runtime
+  gives: The program runs on the release of its runtime it names and on later releases; what it takes from the runtime
+    is that release's behaviour, as this catalogue's citations state it.
+  example: a program declaring 3.10 or later runs on 3.13.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.version_info
+    digest: 1fc32ff781c0
+  entry: runtime-version
+  of: C:dependency/python
+  provenance:
+    mode: derived
+    sources:
+    - C:dependency/python
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pytest-conventions
+  type: reliance
+  name: the test runner's own names
+  summary: The common test runner calls, without being asked, functions named setup_module, teardown_module, setup_function
+    and teardown_function, methods named setup_class, teardown_class, setup_method and teardown_method, functions
+    named test_ and classes named Test in files whose names mark them as tests; a program that reports unused code
+    must not report them.
+  stance: observed
+  'on': dependency
+  gives: The common test runner calls, without being asked, functions named setup_module, teardown_module, setup_function
+    and teardown_function, methods named setup_class, teardown_class, setup_method and teardown_method, functions
+    named test_ and classes named Test in files whose names mark them as tests; a program that reports unused code
+    must not report them.
+  example: a function named setup_module in a file named test_x.py is used, though nothing in the file calls it.
+  stated:
+  - nowhere: the test runner's own documentation is not kept in the language library.
+  entry: pytest-conventions
+  of: C:dependency/pytest
+  span:
+    file: tests/test_enhanced_recovery.py
+    lines: '6'
+  provenance:
+    mode: derived
+    sources:
+    - tests/test_enhanced_recovery.py#L6
+    - tests/test_sloppy_xml.py#L16
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'

@@ -17,6 +17,9 @@ source:
   origin: https://github.com/jendrikseipp/vulture.git
   licence: MIT
   obtained: public
+  swhid:
+    dir: swh:1:dir:23bf21dc03cdd14adab6ce02ad18a292d9fffe6c
+    rev: swh:1:rev:edd5806f56f0bec1d0fbb45c466c0f7a258a1795
 derived:
   at: '2026-11-06T04:19:05Z'
   by: person
@@ -36,6 +39,11 @@ derived:
     run: 2026-11-05-2319-437e
     at: '2026-11-06T04:19:05Z'
     model: hand-g1c
+  - program: ground
+    mode: rules
+    at: 2026-11-19T12:00
+    by: tools/transconception/promote_x0.py --ground (0.8's catalogue, python ground catalogue, 96 entries, version
+      3.13)
   model: hand-g1c
 atem:
   line: A command-line tool and library that statically finds unused code and unreachable code in Python programs
@@ -6361,6 +6369,7 @@ nodes:
   pinned: '3.13'
   pinned-by: protocol assumption A4 (one Python for all three repositories); recorded on 3.13.11; cited to the 3.13.18
     docs (sitting 1, Q-X1)
+  address: https://github.com/python/cpython
 - id: C:dependency/pint
   type: dependency
   name: pint
@@ -6388,6 +6397,7 @@ nodes:
     engine: code
   needs: 'Nothing at run time: pint is a library whose names the bundled whitelist pint_whitelist.py uses; the program
     never loads it.'
+  address: https://pypi.org/project/pint/
 - id: C:dependency/pytest
   type: dependency
   name: pytest
@@ -6412,6 +6422,7 @@ nodes:
     node: '6'
     engine: code
   needs: 'Nothing at run time: the original''s tests run under it.'
+  address: https://pypi.org/project/pytest/
 - id: C:dependency/tomli
   type: dependency
   name: tomli
@@ -6441,6 +6452,7 @@ nodes:
     engine: code
   needs: 'Nothing under the pinned 3.13: it is the TOML reader for versions before 3.11, which have none of their
     own.'
+  address: https://pypi.org/project/tomli/
 - id: C:dependency/whitelist-utils
   type: dependency
   name: whitelist_utils
@@ -6469,6 +6481,7 @@ nodes:
   needs: 'Nothing from outside: whitelist_utils is the program''s own file vulture/whitelists/whitelist_utils.py,
     imported by a bare name because whitelists are meant to sit beside the user''s code (the 0.6 summary called
     it a package from outside the tree; worksheet section 4, item 3).'
+  address: https://pypi.org/project/whitelist-utils/
 - type: licence
   stance: observed
   file: LICENSE.txt
@@ -20681,7 +20694,8 @@ nodes:
   name: the owner, as transconceiver
   summary: 'The owner rules what the next program keeps, as transconceiver: sitting 1 on 2026-11-13 gave 29 rulings
     across vulture and sloppy-xml-py, and its 5d answers ruled the rest in one batch and the standing; sitting 2
-    on 2026-11-18 settled five items and a fifth allowance, own-types.'
+    on 2026-11-18 settled five items and a fifth allowance, own-types. On 2026-11-19 the owner ruled the reliances
+    0.8''s ground catalogue raised kept, as proposed (pins 25).'
   stance: observed
   who: E:person/owner
   capacity: transconceiver
@@ -20689,6 +20703,7 @@ nodes:
   - _x0/sitting-1.md
   - _x0/sitting-1.md#5d
   - _x0/sitting-2.md
+  - enough-dev docs/v080-pins.md section 25 (2026-11-19, by questionnaire)
   statements:
     licence: MIT (LICENSE.txt; pyproject's classifiers)
     lane: open
@@ -20793,10 +20808,12 @@ nodes:
     by: written
     what: tokenizer and recursive-descent parser of the 3.13 grammar
     note: the riskiest use; spike told/go-spike
+    gap: The parser of the input language's 3.13 grammar, type comments included (written)
   - for: C:reliance/V-R03
     by: written
     what: an option reader with prefixes of long options
     note: help free and usage errors alike for Go
+    gap: The command-line reader's conventions (written)
   - for: C:reliance/V-R04
     by: built-in
     what: strconv
@@ -20815,6 +20832,7 @@ nodes:
     by: library
     what: a TOML 1.0 module pinned in go.mod and go.sum
     note: X0_FETCH=1 at build; sitting 1 Q3
+    gap: The TOML 1.0 reader (library)
   - for: C:reliance/V-R09
     by: written
     what: a check of the decoded value's kind with the original's kind names
@@ -20835,6 +20853,7 @@ nodes:
     by: library
     what: sort.SliceStable with full lower-casing from golang.org/x/text/cases
     note: ties free for Go
+    gap: 'library: sort.SliceStable with full lower-casing from golang.org/x/text/cases'
   - for: C:reliance/V-R15
     by: built-in
     what: filepath.WalkDir and filepath.EvalSymlinks
@@ -20853,6 +20872,7 @@ nodes:
     by: library
     what: golang.org/x/text/unicode/norm NFKC
     note: Unicode table version against 15.1.0
+    gap: Identifiers normalised to NFKC (library)
   - for: C:reliance/V-R20
     by: built-in
     what: unicode.IsLetter and unicode.IsNumber
@@ -20880,6 +20900,7 @@ nodes:
     by: written
     what: type comments parsed alone and walked; a bad one stops the walk
     note: kept-wrong; part of the riskiest use
+    gap: The parser of the input language's 3.13 grammar, type comments included (written)
   - for: C:reliance/V-R28
     by: built-in
     what: embed of the whitelist files, scanned by the same parser
@@ -20900,6 +20921,311 @@ nodes:
   - for: C:reliance/V-R33
     by: built-in
     what: os.Exit
+  - for: C:reliance/whole-numbers-unbounded
+    by: built-in
+    what: math/big.Int where a number may pass 64 bits
+    note: int is 64 bits and wraps silently; every sum that may grow past it is written on big.Int
+    answered: rules
+  - for: C:reliance/number-from-text
+    by: built-in
+    what: strconv.ParseInt after trimming
+    note: underscores between digits, signs and non-ASCII digits the original accepts are glue to write
+    answered: rules
+  - for: C:reliance/number-as-text
+    by: written
+    what: the printed form of a number around strconv.FormatFloat(x, 'g', -1, 64)
+    note: the shortest digits agree; where the form switches to an exponent, how the exponent is spelled, inf and
+      nan, and the trailing .0 are written
+    answered: rules
+  - for: C:reliance/conversions
+    by: written
+    what: each conversion the program makes, with the original's refusals
+    note: Go converts only where told and fails differently
+    answered: rules
+  - for: C:reliance/value-kinds
+    by: written
+    what: the kind names the original prints, written as words
+    answered: rules
+  - for: C:reliance/text-length-in-code-points
+    by: built-in
+    what: utf8.RuneCountInString
+    answered: rules
+  - for: C:reliance/text-order-by-code-point
+    by: built-in
+    what: string comparison
+    note: UTF-8 bytes order as their code points do
+    answered: rules
+  - for: C:reliance/sort-is-stable
+    by: built-in
+    what: sort.SliceStable, slices.SortStableFunc
+    answered: rules
+  - for: C:reliance/what-is-a-space
+    by: written
+    what: unicode.IsSpace with U+001C to U+001F added
+    note: the set is written out
+    answered: rules
+  - for: C:reliance/text-split-on-space
+    by: built-in
+    what: strings.FieldsFunc with the written space test
+    answered: rules
+  - for: C:reliance/lines-end-at
+    by: written
+    what: a line splitter ending lines where the original does
+    note: Go splits only where told; \r\n, \r, \v, \f, U+001C to U+001E, U+0085, U+2028 and U+2029 are written
+    answered: rules
+  - for: C:reliance/text-case-mapping
+    by: library
+    what: golang.org/x/text/cases for the full mapping
+    note: strings.ToLower maps rune by rune; the full mapping turns one character into two (İ, ß)
+    gap: golang.org/x/text pinned in go.sum and fetched once, or the few two-character mappings written
+    answered: rules
+  - for: C:reliance/printed-form
+    by: written
+    what: the original's printed form of texts, lists and maps
+    note: fmt's %v and %q print differently
+    answered: rules
+  - for: C:reliance/format-spec
+    by: written
+    what: the format fields the program uses, over fmt.Sprintf
+    note: fmt's verbs differ in alignment, grouping and rounding
+    answered: rules
+  - for: C:reliance/format-string-fields
+    by: written
+    what: a reader of brace fields ({name.attr[key]!r:spec}, {{ escapes)
+    answered: rules
+  - for: C:reliance/truth-of-values
+    by: written
+    what: each test of truth written out
+    note: 'Go has no truth of values: a test names what it tests'
+    answered: rules
+  - for: C:reliance/boolean-operators-give-operands
+    by: written
+    what: an if that gives one operand or the other
+    answered: rules
+  - for: C:reliance/any-all-stop-early
+    by: written
+    what: a loop that returns at the first answer
+    answered: rules
+  - for: C:reliance/map-keeps-order
+    by: written
+    what: a slice of keys kept beside the map
+    note: Go's maps keep no order
+    answered: rules
+  - for: C:reliance/set-members
+    by: built-in
+    what: map[T]struct{}
+    answered: rules
+  - for: C:reliance/set-order-varies
+    by: built-in
+    what: map iteration
+    note: its order varies from run to run as well; only a sort makes it repeatable
+    answered: rules
+  - for: C:reliance/membership-identity-then-equality
+    by: written
+    what: == on values, with the identity cases written
+    note: not-a-number is equal to itself under identity
+    answered: rules
+  - for: C:reliance/uncaught-error
+    by: written
+    what: recover at the top, print a report, exit 1
+    note: a panic exits 2
+    answered: rules
+  - for: C:reliance/error-text
+    by: built-in
+    what: err.Error()
+    answered: rules
+  - for: C:reliance/error-kinds
+    by: built-in
+    what: typed errors with errors.Is and errors.As
+    answered: rules
+  - for: C:reliance/exit-status-from-return
+    by: built-in
+    what: os.Exit
+    answered: rules
+  - for: C:reliance/exit-with-message
+    by: built-in
+    what: fmt.Fprintln(os.Stderr, …) and os.Exit(1)
+    answered: rules
+  - for: C:reliance/exit-status-whole-number
+    by: built-in
+    what: os.Exit
+    answered: rules
+  - for: C:reliance/chained-errors
+    by: built-in
+    what: fmt.Errorf with %w, errors.Unwrap
+    note: the report the original prints of a chain is written
+    answered: rules
+  - for: C:reliance/optional-library
+    by: written
+    what: an interface with the part that needs the library behind it, refused where it is absent
+    answered: rules
+  - for: C:reliance/missing-key-error
+    by: written
+    what: the message naming the key
+    answered: rules
+  - for: C:reliance/program-arguments
+    by: built-in
+    what: os.Args
+    answered: rules
+  - for: C:reliance/argparse-surface
+    by: written
+    what: an option reader with the original's usage line, errors and exit status 2
+    note: the flag package has none of them
+    gap: 'the option reader written (a few hundred lines): usage line, error messages, exit status 2'
+    answered: rules
+  - for: C:reliance/argparse-help
+    by: written
+    what: the help screen, laid out as the original lays it out
+    answered: rules
+  - for: C:reliance/argparse-version
+    by: written
+    what: the version option
+    answered: rules
+  - for: C:reliance/argparse-abbreviation
+    by: written
+    what: unambiguous prefixes of long options, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-negative-numbers
+    by: written
+    what: a negative number taken as a value, in the option reader
+    answered: rules
+  - for: C:reliance/terminal-width
+    by: written
+    what: COLUMNS, else 80
+    note: the terminal's own size needs golang.org/x/term; the original's order is COLUMNS first
+    answered: rules
+  - for: C:reliance/print-line-end
+    by: built-in
+    what: fmt.Println
+    answered: rules
+  - for: C:reliance/output-encoding
+    by: built-in
+    what: UTF-8 bytes written as they are
+    answered: rules
+  - for: C:reliance/path-written
+    by: built-in
+    what: path/filepath
+    answered: rules
+  - for: C:reliance/path-resolved
+    by: built-in
+    what: filepath.Abs, filepath.EvalSymlinks
+    answered: rules
+  - for: C:reliance/path-relative
+    by: built-in
+    what: filepath.Rel
+    answered: rules
+  - for: C:reliance/path-kinds
+    by: built-in
+    what: os.Stat, os.Lstat
+    answered: rules
+  - for: C:reliance/folder-walk
+    by: built-in
+    what: filepath.WalkDir
+    note: it does not enter linked folders
+    answered: rules
+  - for: C:reliance/newlines-translated
+    by: written
+    what: \r\n and \r read as \n where the original reads text
+    note: Go translates no line ends
+    answered: rules
+  - for: C:reliance/text-decoding-strict
+    by: built-in
+    what: utf8.Valid
+    note: the error the original raises is written
+    answered: rules
+  - for: C:reliance/bytes-decoded
+    by: built-in
+    what: '[]byte and string'
+    note: 'a Go string may hold any bytes: validity is checked where the original decodes'
+    answered: rules
+  - for: C:reliance/source-encodings
+    by: written
+    what: UTF-8 with or without its mark, latin-1, a cp1252 table and the coding line
+    note: golang.org/x/text/encoding/charmap would give the rest
+    answered: rules
+  - for: C:reliance/package-data
+    by: built-in
+    what: embed
+    answered: rules
+  - for: C:reliance/glob-patterns
+    by: written
+    what: a glob where * matches any run, / included
+    note: filepath.Match stops * at / and reads \ as an escape
+    answered: rules
+  - for: C:reliance/glob-case-per-platform
+    by: written
+    what: the glob, folding case where the platform does
+    answered: rules
+  - for: C:reliance/glob-case-sensitive
+    by: written
+    what: the same glob, case for case
+    answered: rules
+  - for: C:reliance/pattern-syntax
+    by: written
+    what: regexp where the pattern is regular; a matcher written where it looks around or refers back
+    note: 'regexp is RE2: no look-around, no back-references'
+    answered: rules
+  - for: C:reliance/pattern-unicode-classes
+    by: written
+    what: Unicode classes written into each pattern (\pL, \pN)
+    note: RE2's \w, \d and \s are ASCII
+    answered: rules
+  - for: C:reliance/pattern-flags
+    by: built-in
+    what: the (?i), (?m) and (?s) flags of regexp
+    answered: rules
+  - for: C:reliance/toml-read
+    by: library
+    what: a TOML 1.0 module
+    note: github.com/BurntSushi/toml or github.com/pelletier/go-toml/v2
+    gap: a TOML 1.0 module pinned in go.sum and fetched once, or a reader written for the tables the program reads
+    answered: rules
+  - for: C:reliance/source-parsed
+    by: written
+    what: a tokenizer and a parser of the input language's grammar, with its lines
+    note: no maintained pure-Go parser of it; a binding through cgo is ruled out where the build turns cgo off
+    gap: the parser written, the largest piece (thousands of lines); a spike shows it can be done
+    answered: rules
+  - for: C:reliance/identifiers-normalised
+    by: library
+    what: golang.org/x/text/unicode/norm (NFKC)
+    note: its Unicode tables may be another version than the original's
+    gap: golang.org/x/text pinned in go.sum and fetched once
+    answered: rules
+  - for: C:reliance/parser-messages
+    by: written
+    what: the parser's own messages
+    answered: rules
+  - for: C:reliance/type-comments
+    by: written
+    what: type comments read as tokens and parsed alone
+    note: part of the parser
+    answered: rules
+  - for: C:reliance/tree-dump
+    by: written
+    what: a dump of the tree
+    answered: rules
+  - for: C:reliance/literal-truth
+    by: written
+    what: constant folding on the tree
+    answered: rules
+  - for: C:reliance/program-tree-nodes
+    by: written
+    what: the kinds of the tree as Go types
+    answered: rules
+  - for: C:reliance/runtime-version
+    by: built-in
+    what: the go line of go.mod names the release it is built for
+    answered: rules
+  - for: C:reliance/run-as-module
+    by: built-in
+    what: one program, built from its module
+    answered: rules
+  - for: C:reliance/pytest-conventions
+    by: dropped
+    what: 'nothing: go test reads its own names'
+    note: the original's test runner's names mean nothing to the new program
+    answered: rules
   spike:
     use: the 3.13 grammar with type comments (C:reliance/V-R02, C:reliance/V-R27) on P:case/x0.V-C32 and P:case/x0.V-C33
     level: 3
@@ -20941,6 +21267,8 @@ nodes:
     - _x0/sitting-1.md
     - _x0/vulture/rulings.json
     - orangepaper "Transcoding through the fabulac", tab The paper, "Choosing the target"
+    - rows for the reliances 0.8's ground raised, by `weigh`'s rules from the target table (promote_x0.py --ground,
+      2026-11-19); every row A7 wrote is as it wrote it
     state: known
 - id: C:interface/x0.V-I1
   type: interface
@@ -28051,3 +28379,2845 @@ nodes:
     run: x0-A4-2026-11-13
     step: A4
     engine: model:claude-opus-5-5
+- id: C:reliance/whole-numbers-unbounded
+  type: reliance
+  name: whole numbers without limit
+  summary: Whole numbers have no fixed width.
+  stance: observed
+  'on': language
+  gives: Whole numbers have no fixed width. Adding, subtracting and multiplying them never overflows and never loses
+    a digit, however large they grow.
+  example: 18446744073709551615 plus 1 is 18446744073709551616, exactly; a total past two to the sixty-third is
+    kept.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#numeric-types-int-float-complex
+    digest: 736b53f803b0
+  entry: whole-numbers-unbounded
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Item.__init__
+  - C:interface/command.vulture
+  span:
+    file: vulture/core.py
+    lines: '144'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L144
+    - vulture/config.py#L153
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/number-from-text
+  type: reliance
+  name: a whole number read from text
+  summary: A whole number is read from text that may have spaces, tabs or line ends around it, a plus or minus sign,
+    single underscores between digits, leading zeros, and the decimal digits of any script, not only 0 to 9.
+  stance: observed
+  'on': language
+  gives: A whole number is read from text that may have spaces, tabs or line ends around it, a plus or minus sign,
+    single underscores between digits, leading zeros, and the decimal digits of any script, not only 0 to 9. Anything
+    else is refused.
+  example: ''' 5_0'', ''+7'', ''007'' and the Arabic-Indic digit seven are read as 50, 7, 7 and 7; ''5__0'' and
+    ''1.0'' are refused.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#int
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#numeric-types-int-float-complex
+    digest: 736b53f803b0
+  entry: number-from-text
+  of: R:means/python
+  used-by:
+  - C:interface/command.vulture
+  span:
+    file: vulture/config.py
+    lines: '153'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L153
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/number-as-text
+  type: reliance
+  name: numbers written as text
+  summary: A whole number is written in decimal digits with a minus sign when negative.
+  stance: observed
+  'on': language
+  gives: A whole number is written in decimal digits with a minus sign when negative. A fractional number is written
+    with the fewest digits that read back as the same number, always with a point or an exponent; from 1e16 up and
+    below 1e-4 it takes the exponent form, with a sign and at least two digits.
+  example: 1.0 is written 1.0, not 1; 1e16 is written 1e+16; 0.0001 is written 0.0001 and 0.00001 is written 1e-05.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#repr
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations
+    digest: 783ed86151eb
+  - nowhere: the exact switch to the exponent form (from 1e16 up, below 1e-4) and the two-digit exponent.
+  entry: number-as-text
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:interface/vulture.config._check_input_config
+  - C:interface/vulture.config._parse_args
+  - C:interface/vulture.core.Item.__init__
+  - C:interface/vulture.core.Item.get_report
+  - C:interface/vulture.core.Item.get_whitelist_string
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.Vulture.visit_ClassDef
+  - C:interface/vulture.core.Vulture.visit_FunctionDef
+  - C:interface/vulture.reachability.Reachability
+  - C:interface/vulture.utils.get_modules
+  - C:interface/vulture.utils.LoggingList.append
+  - C:interface/vulture.utils.LoggingSet.add
+  span:
+    file: vulture/config.py
+    lines: '207'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L207
+    - vulture/core.py#L244
+    - vulture/core.py#L309
+    - vulture/core.py#L328
+    - vulture/config.py#L42
+    - vulture/config.py#L108
+    - vulture/config.py#L225
+    - vulture/core.py#L146
+    - vulture/core.py#L161
+    - vulture/core.py#L173
+    - vulture/core.py#L234
+    - vulture/core.py#L270
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/conversions
+  type: reliance
+  name: values converted to a kind
+  summary: Converting a value to a whole number drops a fraction toward zero and takes yes as 1 and no as 0; converting
+    text reads it as a number (see the entries on numbers read from text); converting anything to text gives its
+    printed form.
+  stance: observed
+  'on': language
+  gives: Converting a value to a whole number drops a fraction toward zero and takes yes as 1 and no as 0; converting
+    text reads it as a number (see the entries on numbers read from text); converting anything to text gives its
+    printed form. A value that cannot be converted is refused with a value error or a type error.
+  example: a fraction 2.9 converted to a whole number is 2; yes is 1; the text '3' converted is 3; a list is refused.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#int
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#float
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#bool
+    digest: 216dc071d8fc
+  entry: conversions
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.reachability.Reachability
+  span:
+    file: vulture/config.py
+    lines: '207'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L207
+    - vulture/core.py#L244
+    - vulture/core.py#L309
+    - vulture/core.py#L328
+    - vulture/core.py#L525
+    - vulture/reachability.py#L65
+    - vulture/reachability.py#L199
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/value-kinds
+  type: reliance
+  name: a value's kind and its name
+  summary: A value's kind can be asked for and compared exactly.
+  stance: observed
+  'on': language
+  gives: A value's kind can be asked for and compared exactly. Yes and no are a kind of whole number when asked
+    loosely, but not when the kind is compared exactly. A kind's name is its short word (int, str, list, bool, float).
+  example: yes is a whole number when asked loosely; the kind of yes is not the kind of 1; the name of the kind
+    of 1 is int.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#type
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#isinstance
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#bool
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#definition.__name__
+    digest: 736b53f803b0
+  entry: value-kinds
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config._check_input_config
+  - C:component/vulture.core
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.Vulture.visit_Attribute
+  - C:interface/vulture.core.Vulture.visit_BinOp
+  - C:interface/vulture.core.Vulture.visit_Call
+  - C:interface/vulture.core.Vulture.visit_Name
+  - C:interface/vulture.core.Vulture.visit_Assign
+  - C:interface/vulture.core.Vulture.visit
+  - C:interface/vulture.core.Vulture.generic_visit
+  - C:interface/vulture.reachability.Reachability.visit
+  - C:interface/vulture.reachability.Reachability
+  - C:component/vulture.utils
+  - C:interface/vulture.utils.is_ast_string
+  - C:interface/vulture.utils.get_decorator_name
+  span:
+    file: vulture/config.py
+    lines: '45'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L45
+    - vulture/core.py#L69
+    - vulture/core.py#L413
+    - vulture/core.py#L482
+    - vulture/core.py#L495
+    - vulture/core.py#L502
+    - vulture/core.py#L546
+    - vulture/core.py#L610
+    - vulture/core.py#L619
+    - vulture/core.py#L649
+    - vulture/core.py#L659
+    - vulture/reachability.py#L13
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-length-in-code-points
+  type: reliance
+  name: text measured in code points
+  summary: The length of a text, and every padding to a width, counts Unicode code points, not bytes, not UTF-16
+    units and not the columns a terminal draws.
+  stance: observed
+  'on': language
+  gives: The length of a text, and every padding to a width, counts Unicode code points, not bytes, not UTF-16 units
+    and not the columns a terminal draws. A wide character or a combining mark counts as one.
+  example: '''café'' is 4 long; padded to 6 it gains two spaces; a name of three CJK ideographs counts 3.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#text-sequence-type-str
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.ljust
+    digest: 736b53f803b0
+  entry: text-length-in-code-points
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.visit_Call
+  - C:interface/vulture.reachability.Reachability
+  span:
+    file: vulture/core.py
+    lines: '503'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L503
+    - vulture/reachability.py#L53
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-order-by-code-point
+  type: reliance
+  name: text ordered by code point
+  summary: Texts are ordered by comparing code point by code point, not by any language's alphabet and not by locale,
+    so every capital letter of A to Z comes before every small letter, and a shorter text before a longer one it
+    begins.
+  stance: observed
+  'on': language
+  gives: Texts are ordered by comparing code point by code point, not by any language's alphabet and not by locale,
+    so every capital letter of A to Z comes before every small letter, and a shorter text before a longer one it
+    begins.
+  example: sorted, 'B', 'a', 'é' and 'b' come out as 'B', 'a', 'b', 'é'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#value-comparisons
+    digest: 9188471e6a0d
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#sorted
+    digest: 216dc071d8fc
+  entry: text-order-by-code-point
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:component/vulture.core
+  span:
+    file: vulture/core.py
+    lines: '348'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L348
+    - vulture/core.py#L47
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/sort-is-stable
+  type: reliance
+  name: sorting keeps ties in order
+  summary: Sorting is stable.
+  stance: observed
+  'on': language
+  gives: Sorting is stable. Things that compare equal under the sort's key keep the order they had before.
+  example: sorted by length, 'bb', 'a', 'c' give 'a', 'c', 'bb'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#sorted
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#list.sort
+    digest: 736b53f803b0
+  entry: sort-is-stable
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:component/vulture.core
+  span:
+    file: vulture/core.py
+    lines: '348'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L348
+    - vulture/core.py#L47
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/what-is-a-space
+  type: reliance
+  name: what counts as white space
+  summary: White space is every character Unicode's database classes as a space separator or as a bidirectional
+    space, segment or paragraph separator.
+  stance: observed
+  'on': language
+  gives: White space is every character Unicode's database classes as a space separator or as a bidirectional space,
+    segment or paragraph separator. That is the ASCII space, tab, line feed, vertical tab, form feed and carriage
+    return, the four information separators U+001C to U+001F, U+0085, U+00A0, U+1680, U+2000 to U+200A, U+2028,
+    U+2029, U+202F, U+205F and U+3000. Trimming, splitting on white space and asking whether a text is white space
+    all use this one set.
+  example: a name of 'tea' followed by U+3000 is trimmed to 'tea'; 'a', U+001F, 'b' holds white space.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.isspace
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.strip
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.split
+    digest: 736b53f803b0
+  entry: what-is-a-space
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.noqa._parse_error_codes
+  - C:interface/vulture.config._parse_args
+  - C:interface/vulture.core.Vulture
+  span:
+    file: vulture/core.py
+    lines: '234'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L234
+    - vulture/noqa.py#L27
+    - vulture/config.py#L105
+    - vulture/core.py#L537
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-split-on-space
+  type: reliance
+  name: text split into words
+  summary: Splitting a text with no separator given splits on runs of white space and drops empty pieces, so a text
+    of only white space gives no words; splitting with a separator keeps every empty piece.
+  stance: observed
+  'on': language
+  gives: Splitting a text with no separator given splits on runs of white space and drops empty pieces, so a text
+    of only white space gives no words; splitting with a separator keeps every empty piece.
+  example: '''  a  b '' split gives ''a'' and ''b''; ''a,,b'' split at commas gives ''a'', '''' and ''b''.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.split
+    digest: 736b53f803b0
+  entry: text-split-on-space
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config._parse_args
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.noqa._parse_error_codes
+  span:
+    file: vulture/config.py
+    lines: '105'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L105
+    - vulture/core.py#L537
+    - vulture/noqa.py#L27
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/lines-end-at
+  type: reliance
+  name: where a line ends
+  summary: A text split into lines breaks at line feed, carriage return, carriage return then line feed (one break),
+    line tabulation, form feed, the file, group and record separators U+001C to U+001E, U+0085, U+2028 and U+2029.
+  stance: observed
+  'on': language
+  gives: A text split into lines breaks at line feed, carriage return, carriage return then line feed (one break),
+    line tabulation, form feed, the file, group and record separators U+001C to U+001E, U+0085, U+2028 and U+2029.
+    The breaks are not kept, and a final break does not make an empty last line.
+  example: '''a'', U+2028, ''b'' is two lines; ''a\r\nb\n'' is two lines, ''a'' and ''b''.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.splitlines
+    digest: 736b53f803b0
+  entry: lines-end-at
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  span:
+    file: vulture/core.py
+    lines: '229'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L229
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-case-mapping
+  type: reliance
+  name: changing the case of text
+  summary: Lower-casing, upper-casing and case folding use Unicode's full mappings, so a character may become several
+    and the length may change; they ignore the locale.
+  stance: observed
+  'on': language
+  gives: Lower-casing, upper-casing and case folding use Unicode's full mappings, so a character may become several
+    and the length may change; they ignore the locale.
+  example: upper-cased, 'ß' becomes 'SS'; folded, 'ẞ' and 'ss' are equal; 'İ' lower-cased is 'i' and a combining
+    dot.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.lower
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str.casefold
+    digest: 736b53f803b0
+  entry: text-case-mapping
+  of: R:means/python
+  used-by:
+  - C:component/vulture.core
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:interface/vulture.reachability.Reachability
+  span:
+    file: vulture/core.py
+    lines: '47'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L47
+    - vulture/core.py#L328
+    - vulture/reachability.py#L54
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/printed-form
+  type: reliance
+  name: a value's printed form
+  summary: Any value has a printed form.
+  stance: observed
+  'on': language
+  gives: Any value has a printed form. Text prints as itself; bytes print as b followed by the quoted bytes; a quoted
+    form of text (used in many messages) puts it in single quotes, or double quotes when it holds a single quote
+    and no double one, with backslash escapes for what cannot be shown.
+  example: the bytes of '<r>' print as b'<r>'; the quoted form of x is 'x', of it's is "it's".
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#str
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#repr
+    digest: 216dc071d8fc
+  - nowhere: the rule for choosing single or double quotes in the quoted form of text, and which characters it escapes.
+  entry: printed-form
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:interface/vulture.core.Item.__repr__
+  - C:interface/vulture.config._check_input_config
+  - C:interface/command.vulture
+  span:
+    file: vulture/config.py
+    lines: '207'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L207
+    - vulture/core.py#L244
+    - vulture/core.py#L309
+    - vulture/core.py#L328
+    - vulture/core.py#L181
+    - vulture/config.py#L47
+    - vulture/config.py#L119
+    - vulture/config.py#L129
+    - vulture/config.py#L138
+    - vulture/config.py#L153
+    - vulture/config.py#L166
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/format-spec
+  type: reliance
+  name: the format of a value written into text
+  summary: A value written into text may carry a format of fill, alignment, sign, width, grouping, precision and
+    type.
+  stance: observed
+  'on': language
+  gives: A value written into text may carry a format of fill, alignment, sign, width, grouping, precision and type.
+    A plus sign shows the sign of positive numbers too; a width pads to that many code points; a fraction's precision
+    rounds half to even.
+  example: 1 formatted with a sign is '+1' and -2 is '-2'; 3 right-aligned in width 4 is '   3'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/string.html#format-specification-mini-language
+    digest: b1490c87ba39
+  - in: python
+    version: 3.13.18
+    at: reference/lexical_analysis.html#2-4-3-f-strings
+    digest: 26b7f8ab2fcf
+  entry: format-spec
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Item.get_report
+  - C:interface/vulture.core.Item.get_whitelist_string
+  span:
+    file: vulture/core.py
+    lines: '161'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L161
+    - vulture/core.py#L173
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/format-string-fields
+  type: reliance
+  name: the fields of a format string
+  summary: Brace fields in a format string are found by its grammar, a name followed by attributes and keys, a conversion
+    after an exclamation mark and a format after a colon; two braces are an escaped brace; a malformed string gives
+    no fields and an error.
+  stance: observed
+  'on': runtime
+  gives: Brace fields in a format string are found by its grammar, a name followed by attributes and keys, a conversion
+    after an exclamation mark and a format after a colon; two braces are an escaped brace; a malformed string gives
+    no fields and an error.
+  example: '''{a.b[0]!r:>4}'' names the field a; ''{{a}}'' names none.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/string.html#format-string-syntax
+    digest: b1490c87ba39
+  - in: python
+    version: 3.13.18
+    at: library/string.html#string.Formatter.parse
+    digest: b1490c87ba39
+  entry: format-string-fields
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture
+  - C:component/vulture.whitelists.string_whitelist
+  span:
+    file: vulture/core.py
+    lines: '527'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L527
+    - vulture/whitelists/string_whitelist.py#L3
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/truth-of-values
+  type: reliance
+  name: which values count as false
+  summary: Where a value is tested as a condition, zero of any kind, empty text, an empty list, map or set, and
+    nothing count as false; everything else counts as true unless it says otherwise.
+  stance: observed
+  'on': language
+  gives: Where a value is tested as a condition, zero of any kind, empty text, an empty list, map or set, and nothing
+    count as false; everything else counts as true unless it says otherwise.
+  example: a line holding only spaces, trimmed, is empty and so false; 0.0 is false; a list holding one empty text
+    is true.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#truth-value-testing
+    digest: 736b53f803b0
+  entry: truth-of-values
+  of: R:means/python
+  used-by:
+  - C:component/vulture
+  - C:component/vulture.config
+  - C:interface/vulture.config.make_config
+  - C:component/vulture.core
+  - C:interface/vulture.core.Item.get_report
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.get_unused_code
+  - C:interface/vulture.core.Vulture.report
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.Vulture.visit_ClassDef
+  - C:interface/vulture.core.Vulture.visit_FunctionDef
+  - C:interface/vulture.core.Vulture.visit_Assign
+  - C:interface/vulture.core.Vulture.visit
+  - C:interface/vulture.lines.get_first_line_number
+  - C:interface/vulture.noqa.parse_noqa
+  - C:interface/vulture.reachability.Reachability
+  - C:interface/vulture.utils.LoggingList.append
+  - C:interface/vulture.utils.LoggingSet.add
+  - C:component/vulture.whitelists.whitelist_utils
+  span:
+    file: vulture/__init__.py
+    lines: '4'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/__init__.py#L4
+    - vulture/config.py#L57
+    - vulture/config.py#L205
+    - vulture/core.py#L56
+    - vulture/core.py#L155
+    - vulture/core.py#L234
+    - vulture/core.py#L284
+    - vulture/core.py#L349
+    - vulture/core.py#L362
+    - vulture/core.py#L450
+    - vulture/core.py#L555
+    - vulture/core.py#L573
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/boolean-operators-give-operands
+  type: reliance
+  name: and, or give one of their operands
+  summary: '"and" and "or" stop as soon as the answer is known and give the operand that decided it, not a plain
+    yes or no: "a or b" is a when a counts as true, else b.'
+  stance: observed
+  'on': language
+  gives: '"and" and "or" stop as soon as the answer is known and give the operand that decided it, not a plain yes
+    or no: "a or b" is a when a counts as true, else b.'
+  example: an empty name or 'anonymous' gives 'anonymous'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#boolean-operations
+    digest: 9188471e6a0d
+  entry: boolean-operators-give-operands
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.noqa._parse_error_codes
+  span:
+    file: vulture/noqa.py
+    lines: '27'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/noqa.py#L27
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/any-all-stop-early
+  type: reliance
+  name: any and all stop at the first answer
+  summary: Asking whether any of a series holds stops at the first that does; asking whether all hold stops at the
+    first that does not; the rest are never looked at.
+  stance: observed
+  'on': language
+  gives: Asking whether any of a series holds stops at the first that does; asking whether all hold stops at the
+    first that does not; the rest are never looked at. Any of nothing is false and all of nothing is true.
+  example: of handlers checked in order, the second is never examined when the first already answers.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#any
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#all
+    digest: 216dc071d8fc
+  entry: any-all-stop-early
+  of: R:means/python
+  used-by:
+  - C:component/vulture.core
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.visit_Call
+  - C:interface/vulture.core.Vulture.visit_FunctionDef
+  - C:interface/vulture.reachability.Reachability
+  - C:component/vulture.utils
+  span:
+    file: vulture/core.py
+    lines: '57'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L57
+    - vulture/core.py#L70
+    - vulture/core.py#L269
+    - vulture/core.py#L516
+    - vulture/core.py#L586
+    - vulture/reachability.py#L210
+    - vulture/utils.py#L38
+    - vulture/utils.py#L36
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/map-keeps-order
+  type: reliance
+  name: a map of keys to values
+  summary: A map from keys to values holds each key once and keeps the order in which keys were first put in; putting
+    a key in again changes its value and keeps its place; a map built from sorted pairs stays sorted.
+  stance: observed
+  'on': language
+  gives: A map from keys to values holds each key once and keeps the order in which keys were first put in; putting
+    a key in again changes its value and keeps its place; a map built from sorted pairs stays sorted. Looking up
+    a key it does not hold is refused with a key error unless a default is given.
+  example: a="1" b="2" a="3" gives a=3 then b=2; the totals of b, a and c, put in sorted, come back a, b, c.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#mapping-types-dict
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#dict.get
+    digest: 736b53f803b0
+  entry: map-keeps-order
+  of: R:means/python
+  used-by:
+  - C:setting/vulture.config.DEFAULTS
+  - C:interface/vulture.config._parse_toml
+  - C:interface/vulture.config._parse_args
+  - C:interface/vulture.config.make_config
+  - C:setting/vulture.core.ERROR_CODES
+  - C:interface/vulture.core.Vulture.__init__
+  - C:setting/vulture.noqa.NOQA_CODE_MAP
+  span:
+    file: vulture/config.py
+    lines: '17'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L17
+    - vulture/config.py#L88
+    - vulture/config.py#L177
+    - vulture/config.py#L215
+    - vulture/core.py#L31
+    - vulture/core.py#L218
+    - vulture/noqa.py#L16
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/set-members
+  type: reliance
+  name: a set holds each value once
+  summary: A set holds each value once, two values that compare equal (and hash alike) being one member; membership
+    is asked in about constant time.
+  stance: observed
+  'on': language
+  gives: A set holds each value once, two values that compare equal (and hash alike) being one member; membership
+    is asked in about constant time.
+  example: two findings with the same file, line and name are one finding.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#set-types-set-frozenset
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: reference/datamodel.html#object.__hash__
+    digest: 95b8a5bdc225
+  entry: set-members
+  of: R:means/python
+  used-by:
+  - C:setting/vulture.core.IGNORED_VARIABLE_NAMES
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:component/vulture.core
+  - C:interface/vulture.core.Vulture.visit_BinOp
+  - C:interface/vulture.reachability.Reachability.__init__
+  - C:interface/vulture.reachability.Reachability.reset
+  span:
+    file: vulture/core.py
+    lines: '17'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L17
+    - vulture/core.py#L302
+    - vulture/core.py#L45
+    - vulture/core.py#L498
+    - vulture/reachability.py#L9
+    - vulture/reachability.py#L39
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/set-order-varies
+  type: reliance
+  name: the order of a set of texts varies from run to run
+  summary: Going through a set of texts visits them in an order that changes from one run of the program to the
+    next, because the hash of a text is salted afresh at each start; only a sort makes it repeatable.
+  stance: observed
+  'on': runtime
+  gives: Going through a set of texts visits them in an order that changes from one run of the program to the next,
+    because the hash of a text is salted afresh at each start; only a sort makes it repeatable.
+  example: the same three names, put in a set and printed, come out in a different order on another run.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/datamodel.html#object.__hash__
+    digest: 95b8a5bdc225
+  entry: set-order-varies
+  of: C:dependency/python
+  used-by:
+  - C:setting/vulture.core.IGNORED_VARIABLE_NAMES
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:component/vulture.core
+  - C:interface/vulture.core.Vulture.visit_BinOp
+  - C:interface/vulture.reachability.Reachability.__init__
+  - C:interface/vulture.reachability.Reachability.reset
+  span:
+    file: vulture/core.py
+    lines: '17'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L17
+    - vulture/core.py#L302
+    - vulture/core.py#L45
+    - vulture/core.py#L498
+    - vulture/reachability.py#L9
+    - vulture/reachability.py#L39
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/membership-identity-then-equality
+  type: reliance
+  name: membership is identity first, then equality
+  summary: Asking whether a value is among others asks, for each, whether it is that very object, then whether it
+    is equal; the first yes answers.
+  stance: observed
+  'on': language
+  gives: Asking whether a value is among others asks, for each, whether it is that very object, then whether it
+    is equal; the first yes answers.
+  example: a constant compared against a list of constants by membership finds itself even if equality was redefined.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/expressions.html#membership-test-operations
+    digest: 9188471e6a0d
+  entry: membership-identity-then-equality
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config._check_input_config
+  - C:component/vulture.core
+  - C:interface/vulture.core.Item.get_whitelist_string
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture.visit_FunctionDef
+  - C:interface/vulture.core.Vulture.visit_Name
+  - C:interface/vulture.noqa.ignore_line
+  - C:interface/vulture.reachability.Reachability
+  span:
+    file: vulture/config.py
+    lines: '41'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L41
+    - vulture/core.py#L45
+    - vulture/core.py#L78
+    - vulture/core.py#L92
+    - vulture/core.py#L99
+    - vulture/core.py#L110
+    - vulture/core.py#L170
+    - vulture/core.py#L269
+    - vulture/core.py#L575
+    - vulture/core.py#L611
+    - vulture/noqa.py#L44
+    - vulture/reachability.py#L42
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/uncaught-error
+  type: reliance
+  name: an error nobody catches
+  summary: An error the program does not catch ends it with exit status 1, after the runtime prints its report of
+    the error (a traceback, the error's kind and message) on standard error.
+  stance: observed
+  'on': runtime
+  gives: An error the program does not catch ends it with exit status 1, after the runtime prints its report of
+    the error (a traceback, the error's kind and message) on standard error.
+  example: a ledger path that is a folder makes the program print a traceback and exit 1.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.excepthook
+    digest: 1fc32ff781c0
+  - nowhere: that an uncaught error ends the process with exit status 1, and the traceback's exact form.
+  entry: uncaught-error
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.__main__
+  - N:decision/min-confidence-usage-error
+  span:
+    file: vulture/__main__.py
+    lines: '1'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/__main__.py#L1
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/error-text
+  type: reliance
+  name: an error printed is its message
+  summary: An error turned into text gives its message as it was raised, and the empty text when it was raised with
+    none.
+  stance: observed
+  'on': language
+  gives: An error turned into text gives its message as it was raised, and the empty text when it was raised with
+    none.
+  example: an error raised with 'the ledger is broken' prints as that; one raised with no message prints as nothing.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#BaseException
+    digest: fd1dcc489d5c
+  entry: error-text
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.main
+  span:
+    file: vulture/core.py
+    lines: '248'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L248
+    - vulture/core.py#L291
+    - vulture/core.py#L670
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/error-kinds
+  type: reliance
+  name: errors caught by kind
+  summary: A handler catches the kinds of error it names and every kind made from them.
+  stance: observed
+  'on': language
+  gives: A handler catches the kinds of error it names and every kind made from them. A text that is not valid JSON
+    is a kind of value error; a missing key is a key error; a wrong kind of value is usually a type error; a missing
+    file, a folder where a file was wanted and a refused permission are kinds of operating-system error.
+  example: a line that is not JSON and a line missing a field are both caught by one handler naming value and key
+    errors.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#exception-hierarchy
+    digest: fd1dcc489d5c
+  - in: python
+    version: 3.13.18
+    at: library/json.html#json.JSONDecodeError
+    digest: 12e3840498af
+  - in: python
+    version: 3.13.18
+    at: reference/compound_stmts.html#the-try-statement
+    digest: 4978b6e97f3d
+  entry: error-kinds
+  of: R:means/python
+  used-by:
+  - C:component/vulture.config
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.main
+  - C:component/vulture.utils
+  - C:interface/vulture.utils.format_path
+  - C:interface/vulture.utils.get_decorator_name
+  - C:interface/vulture.utils.read_file
+  span:
+    file: vulture/config.py
+    lines: '11'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L11
+    - vulture/core.py#L246
+    - vulture/core.py#L291
+    - vulture/core.py#L403
+    - vulture/core.py#L530
+    - vulture/core.py#L670
+    - vulture/utils.py#L44
+    - vulture/utils.py#L63
+    - vulture/utils.py#L77
+    - vulture/utils.py#L110
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/exit-status-from-return
+  type: reliance
+  name: the exit status from a whole number
+  summary: Ending the program with a whole number makes that number its exit status; ending it with nothing is status
+    0.
+  stance: observed
+  'on': runtime
+  gives: Ending the program with a whole number makes that number its exit status; ending it with nothing is status
+    0.
+  example: a main step that returns 1 ends the program with status 1.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.exit
+    digest: 1fc32ff781c0
+  entry: exit-status-from-return
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.main
+  - C:interface/vulture.utils.get_modules
+  span:
+    file: vulture/core.py
+    lines: '680'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L680
+    - vulture/utils.py#L95
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/exit-with-message
+  type: reliance
+  name: exiting with a message
+  summary: Ending the program with a message prints the message on standard error, followed by a line end, and exits
+    with status 1.
+  stance: observed
+  'on': runtime
+  gives: Ending the program with a message prints the message on standard error, followed by a line end, and exits
+    with status 1.
+  example: 'a missing path prints ''Error: m.py could not be found.'' and exits 1.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.exit
+    digest: 1fc32ff781c0
+  entry: exit-with-message
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.get_modules
+  span:
+    file: vulture/utils.py
+    lines: '95'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L95
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/exit-status-whole-number
+  type: reliance
+  name: named statuses are whole numbers
+  summary: A status named in an enumeration of whole numbers is that whole number wherever a number is wanted, the
+    exit status included.
+  stance: observed
+  'on': runtime
+  gives: A status named in an enumeration of whole numbers is that whole number wherever a number is wanted, the
+    exit status included.
+  example: a status named dead code found, valued 3, exits 3.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/enum.html#enum.IntEnum
+    digest: c29e837b8dbe
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.exit
+    digest: 1fc32ff781c0
+  entry: exit-status-whole-number
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.ExitCode
+  span:
+    file: vulture/utils.py
+    lines: '12'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L12
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/chained-errors
+  type: reliance
+  name: an error raised from another
+  summary: An error raised while another is handled, or raised from it, keeps the first as its cause; an uncaught
+    one reports both, the cause first.
+  stance: observed
+  'on': runtime
+  gives: An error raised while another is handled, or raised from it, keeps the first as its cause; an uncaught
+    one reports both, the cause first.
+  example: a decode error turned into a ledger error prints both, when nobody catches the second.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/simple_stmts.html#the-raise-statement
+    digest: cf5e83ddb366
+  entry: chained-errors
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.read_file
+  span:
+    file: vulture/utils.py
+    lines: '111'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L111
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/optional-library
+  type: reliance
+  name: a library that may be absent
+  summary: Loading a library that is not installed fails with an import error that the program can catch, so a part
+    that needs it can be offered only where it is installed.
+  stance: observed
+  'on': runtime
+  gives: Loading a library that is not installed fails with an import error that the program can catch, so a part
+    that needs it can be offered only where it is installed.
+  example: the second tree builder is offered only where its library loads.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#ImportError
+    digest: fd1dcc489d5c
+  entry: optional-library
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.config
+  span:
+    file: vulture/config.py
+    lines: '11'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L11
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/missing-key-error
+  type: reliance
+  name: a missing key's error names the key
+  summary: Looking up a key a map does not hold raises a key error whose text is the key's quoted form.
+  stance: observed
+  'on': language
+  gives: Looking up a key a map does not hold raises a key error whose text is the key's quoted form.
+  example: looking up 'other' among the tree builders fails with the text 'other' in single quotes.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#KeyError
+    digest: fd1dcc489d5c
+  - nowhere: that the key error's message is the key's quoted form.
+  entry: missing-key-error
+  of: R:means/python
+  used-by:
+  - C:interface/vulture.config._check_input_config
+  - C:interface/vulture.core.Vulture
+  span:
+    file: vulture/config.py
+    lines: '45'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L45
+    - vulture/core.py#L443
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/program-arguments
+  type: reliance
+  name: the program's own arguments
+  summary: The program's own arguments are the words it was started with, after its name, as text; bytes that are
+    not valid in the locale's encoding are kept as lone surrogates so that they round-trip.
+  stance: observed
+  'on': runtime
+  gives: The program's own arguments are the words it was started with, after its name, as text; bytes that are
+    not valid in the locale's encoding are kept as lone surrogates so that they round-trip.
+  example: started as 'tool add tea 3', the arguments are 'add', 'tea' and '3'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.argv
+    digest: 1fc32ff781c0
+  - in: python
+    version: 3.13.18
+    at: library/os.html#file-names-command-line-arguments-and-environment-variables
+    digest: 7df584c5ef74
+  entry: program-arguments
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config._parse_args
+  - C:interface/vulture.config.make_config
+  span:
+    file: vulture/config.py
+    lines: '176'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L176
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/argparse-surface
+  type: reliance
+  name: the option reader's errors and messages
+  summary: 'A refused command line prints the usage line, then "PROG: error: MESSAGE", on standard error and exits
+    with status 2.'
+  stance: observed
+  'on': runtime
+  gives: 'A refused command line prints the usage line, then "PROG: error: MESSAGE", on standard error and exits
+    with status 2. The messages are fixed phrases: "the following arguments are required: X", "unrecognized arguments:
+    A B", "argument X: invalid choice: ''V'' (choose from a, b)" (the choices unquoted, as 3.13.11 was recorded;
+    earlier releases quoted them), "argument X: invalid int value: ''V''", "argument X: ignored explicit argument
+    ''V''", "ambiguous option: --x could match --xa, --xb". Values are shown in their quoted form. A sub-command''s
+    errors name it ("tool add") and print its own usage line; words a sub-command does not take are reported by
+    the top level.'
+  example: 'started with no command, it prints "usage: tally [-h] [--version] {add,show,undo} ..." and "tally: error:
+    the following arguments are required: command" and exits 2.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#argparse.ArgumentParser.error
+    digest: bd7ccccdf95d
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#argparse.ArgumentParser.exit
+    digest: bd7ccccdf95d
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#prog
+    digest: bd7ccccdf95d
+  - nowhere: the exact wording of the option reader's messages and its usage line.
+  entry: argparse-surface
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  - C:component/vulture.whitelists.argparse_whitelist
+  - C:behaviour/vulture.whitelists.argparse_whitelist.argparse-whitelist
+  span:
+    file: vulture/config.py
+    lines: '110'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L110
+    - vulture/whitelists/argparse_whitelist.py#L3
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/argparse-help
+  type: reliance
+  name: the option reader's help screen
+  summary: Asking for help prints, on standard output, the usage line, a blank line, the description, then "positional
+    arguments:" and "options:" with each argument's help, indented two spaces, the help column at the longest invocation
+    plus two (capped at 24), wrapped to the terminal's width; "-h, --help" says "show this help message and exit";
+    then it exits 0.
+  stance: observed
+  'on': runtime
+  gives: Asking for help prints, on standard output, the usage line, a blank line, the description, then "positional
+    arguments:" and "options:" with each argument's help, indented two spaces, the help column at the longest invocation
+    plus two (capped at 24), wrapped to the terminal's width; "-h, --help" says "show this help message and exit";
+    then it exits 0.
+  example: '"tally -h" ends with "--version  show program''s version number and exit", and exits 0.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#add-help
+    digest: bd7ccccdf95d
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#formatter-class
+    digest: bd7ccccdf95d
+  - nowhere: the help screen's layout, its column widths, and that it wraps to the terminal's width.
+  entry: argparse-help
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  - C:component/vulture.whitelists.argparse_whitelist
+  span:
+    file: vulture/config.py
+    lines: '110'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L110
+    - vulture/whitelists/argparse_whitelist.py#L3
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/argparse-version
+  type: reliance
+  name: the version option
+  summary: The version option prints the version text and a line end on standard output and exits 0, as soon as
+    it is met, before any later word is checked.
+  stance: observed
+  'on': runtime
+  gives: The version option prints the version text and a line end on standard output and exits 0, as soon as it
+    is met, before any later word is checked.
+  example: '"tally --version add" prints "tally 0.2.0" and exits 0; "tally add tea --version" is refused.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#action
+    digest: bd7ccccdf95d
+  entry: argparse-version
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  span:
+    file: vulture/config.py
+    lines: '175'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L175
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/argparse-abbreviation
+  type: reliance
+  name: long options may be shortened
+  summary: A long option may be given by any prefix that names only one option; a prefix naming several is refused
+    as ambiguous.
+  stance: observed
+  'on': runtime
+  gives: A long option may be given by any prefix that names only one option; a prefix naming several is refused
+    as ambiguous.
+  example: '"--vers" is read as "--version"; "--a" as "--all" when no other option begins so.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#allow-abbrev
+    digest: bd7ccccdf95d
+  entry: argparse-abbreviation
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  - C:component/vulture.whitelists.argparse_whitelist
+  span:
+    file: vulture/config.py
+    lines: '110'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L110
+    - vulture/whitelists/argparse_whitelist.py#L3
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/argparse-negative-numbers
+  type: reliance
+  name: negative numbers are values
+  summary: A word that looks like a negative number (minus then digits, with a point allowed) is taken as a value,
+    not an option, while no option looks like one; a word that holds a space is always a value.
+  stance: observed
+  'on': runtime
+  gives: A word that looks like a negative number (minus then digits, with a point allowed) is taken as a value,
+    not an option, while no option looks like one; a word that holds a space is always a value.
+  example: '"tally add tea -2" adds -2; "tally add tea -1.5" is refused as an invalid whole number.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/argparse.html#arguments-containing
+    digest: bd7ccccdf95d
+  entry: argparse-negative-numbers
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  span:
+    file: vulture/config.py
+    lines: '153'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L153
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/terminal-width
+  type: reliance
+  name: the terminal's width
+  summary: The width of the terminal is read from the COLUMNS variable, else from the terminal, else taken as 80.
+  stance: observed
+  'on': platform
+  gives: The width of the terminal is read from the COLUMNS variable, else from the terminal, else taken as 80.
+  example: with COLUMNS set to 40, help is wrapped to 40 columns.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/shutil.html#shutil.get_terminal_size
+    digest: 94ae9e1cf501
+  entry: terminal-width
+  of: C:dependency/python
+  used-by:
+  - C:interface/command.vulture
+  - C:component/vulture.whitelists.argparse_whitelist
+  span:
+    file: vulture/config.py
+    lines: '110'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L110
+    - vulture/whitelists/argparse_whitelist.py#L3
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/print-line-end
+  type: reliance
+  name: printing a line
+  summary: Printing writes its values separated by one space and ends with one line feed, on standard output unless
+    another stream is named; the stream is written in order and flushed when the program ends.
+  stance: observed
+  'on': runtime
+  gives: Printing writes its values separated by one space and ends with one line feed, on standard output unless
+    another stream is named; the stream is written in order and flushed when the program ends.
+  example: 'printing ''tea: 3'' writes ''tea: 3'' and a line feed; an error printed to the error stream goes there.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#print
+    digest: 216dc071d8fc
+  entry: print-line-end
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.main
+  - C:interface/vulture.utils.LoggingList.append
+  - C:interface/vulture.utils.LoggingSet.add
+  span:
+    file: vulture/config.py
+    lines: '225'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L225
+    - vulture/core.py#L402
+    - vulture/core.py#L671
+    - vulture/utils.py#L122
+    - vulture/utils.py#L134
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/output-encoding
+  type: reliance
+  name: the encoding of printed text
+  summary: Printed text is encoded as UTF-8 on macOS and wherever the locale asks for UTF-8 or is the plain C locale;
+    elsewhere in the locale's encoding, where a character that cannot be encoded stops the program with an error.
+  stance: observed
+  'on': platform
+  gives: Printed text is encoded as UTF-8 on macOS and wherever the locale asks for UTF-8 or is the plain C locale;
+    elsewhere in the locale's encoding, where a character that cannot be encoded stops the program with an error.
+  example: a name with an ñ prints as UTF-8 bytes even with LANG=C.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/os.html#python-utf-8-mode
+    digest: 7df584c5ef74
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.stdout
+    digest: 1fc32ff781c0
+  entry: output-encoding
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.main
+  - C:interface/vulture.utils.LoggingList.append
+  - C:interface/vulture.utils.LoggingSet.add
+  - C:component/vulture.whitelists.sys_whitelist
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  span:
+    file: vulture/config.py
+    lines: '225'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L225
+    - vulture/core.py#L402
+    - vulture/core.py#L671
+    - vulture/utils.py#L122
+    - vulture/utils.py#L134
+    - vulture/core.py#L400
+    - vulture/whitelists/sys_whitelist.py#L8
+    - vulture/core.py#L237
+    - vulture/core.py#L295
+    - vulture/whitelists/sys_whitelist.py#L6
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/path-written
+  type: reliance
+  name: paths written the POSIX way
+  summary: A path is written as text with its parts joined by '/', '.' parts and repeated slashes dropped, no trailing
+    slash, a leading '//' kept, '..' left as it is, and '.' for an empty path; a relative path stays relative.
+  stance: observed
+  'on': platform
+  gives: A path is written as text with its parts joined by '/', '.' parts and repeated slashes dropped, no trailing
+    slash, a leading '//' kept, '..' left as it is, and '.' for an empty path; a relative path stays relative.
+  example: '''./a//b/'' is written ''a/b''; '''' is written ''.''.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.PurePath
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#general-properties
+    digest: ea319d48765a
+  entry: path-written
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.core.Vulture.__init__
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.scavenge
+  - C:interface/vulture.core.Item.__init__
+  - C:interface/vulture.utils.format_path
+  span:
+    file: vulture/config.py
+    lines: '209'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L209
+    - vulture/core.py#L215
+    - vulture/core.py#L228
+    - vulture/core.py#L281
+    - vulture/core.py#L304
+    - vulture/core.py#L143
+    - vulture/utils.py#L62
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/path-resolved
+  type: reliance
+  name: paths made absolute
+  summary: Making a path absolute joins it to the working folder and, when resolved, follows every link and removes
+    '..' parts, so the result names the real file.
+  stance: observed
+  'on': platform
+  gives: Making a path absolute joins it to the working folder and, when resolved, follows every link and removes
+    '..' parts, so the result names the real file.
+  example: with alias.py linking to real/m.py, the resolved alias.py is the absolute path of real/m.py.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.resolve
+    digest: ea319d48765a
+  entry: path-resolved
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:component/vulture.core
+  - C:interface/vulture.utils.get_modules
+  span:
+    file: vulture/config.py
+    lines: '209'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L209
+    - vulture/core.py#L62
+    - vulture/utils.py#L92
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/path-relative
+  type: reliance
+  name: paths shown relative to the working folder
+  summary: A path below the working folder can be shown relative to it, by comparing the texts of the two paths
+    part by part; a path not below it cannot, and is refused with a value error.
+  stance: observed
+  'on': platform
+  gives: A path below the working folder can be shown relative to it, by comparing the texts of the two paths part
+    by part; a path not below it cannot, and is refused with a value error.
+  example: in /home/ann, /home/ann/src/m.py is shown as src/m.py; /tmp/x is refused.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.PurePath.relative_to
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.cwd
+    digest: ea319d48765a
+  entry: path-relative
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.format_path
+  span:
+    file: vulture/utils.py
+    lines: '62'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L62
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/path-kinds
+  type: reliance
+  name: what a path names
+  summary: A path names a file, a folder, something else, or nothing; a broken link names nothing, so asking whether
+    it exists says no; a path under a file names nothing too.
+  stance: observed
+  'on': platform
+  gives: A path names a file, a folder, something else, or nothing; a broken link names nothing, so asking whether
+    it exists says no; a path under a file names nothing too.
+  example: a broken link named on the command line is reported as not found.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.exists
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.is_file
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.is_dir
+    digest: ea319d48765a
+  entry: path-kinds
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.utils.get_modules
+  span:
+    file: vulture/config.py
+    lines: '210'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L210
+    - vulture/utils.py#L93
+    - vulture/utils.py#L98
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/folder-walk
+  type: reliance
+  name: walking a folder
+  summary: A folder is walked at any depth in the order the file system gives, hidden folders included and linked
+    folders not entered; each file keeps the path it was found under.
+  stance: observed
+  'on': platform
+  gives: A folder is walked at any depth in the order the file system gives, hidden folders included and linked
+    folders not entered; each file keeps the path it was found under.
+  example: walking '.', a file reached through a link is named by the link.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.rglob
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/pathlib.html#pathlib.Path.glob
+    digest: ea319d48765a
+  - in: python
+    version: 3.13.18
+    at: library/os.html#os.walk
+    digest: 7df584c5ef74
+  - nowhere: the order of the walk, which is the file system's.
+  entry: folder-walk
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.get_modules
+  span:
+    file: vulture/utils.py
+    lines: '99'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L99
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/newlines-translated
+  type: reliance
+  name: line ends read and written as text
+  summary: A file read as text turns carriage return and line feed, and a lone carriage return, into a line feed;
+    written as text, a line feed is written as it is on macOS and Linux and as carriage return and line feed on
+    Windows.
+  stance: observed
+  'on': runtime
+  gives: A file read as text turns carriage return and line feed, and a lone carriage return, into a line feed;
+    written as text, a line feed is written as it is on macOS and Linux and as carriage return and line feed on
+    Windows.
+  example: a file holding 'a\r\nb' is read as 'a\nb'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/functions.html#open
+    digest: 216dc071d8fc
+  - in: python
+    version: 3.13.18
+    at: library/io.html#io.TextIOWrapper
+    digest: 8261a1a54d06
+  entry: newlines-translated
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.config.make_config
+  - C:interface/vulture.utils.read_file
+  span:
+    file: vulture/config.py
+    lines: '211'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L211
+    - vulture/utils.py#L108
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/text-decoding-strict
+  type: reliance
+  name: text decoded strictly
+  summary: Text decoded as UTF-8 refuses the first byte sequence that is not valid UTF-8 with a decoding error,
+    a kind of value error, naming the position; a byte-order mark at the start is kept as the character U+FEFF,
+    unless the encoding asked for is the one that drops it.
+  stance: observed
+  'on': runtime
+  gives: Text decoded as UTF-8 refuses the first byte sequence that is not valid UTF-8 with a decoding error, a
+    kind of value error, naming the position; a byte-order mark at the start is kept as the character U+FEFF, unless
+    the encoding asked for is the one that drops it.
+  example: a ledger holding the byte 0xE9 alone fails to read; a file beginning with a byte-order mark gives a first
+    line that begins with U+FEFF.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#error-handlers
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#encodings-and-unicode
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#bytes.decode
+    digest: 736b53f803b0
+  entry: text-decoding-strict
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scavenge
+  span:
+    file: vulture/core.py
+    lines: '315'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L315
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/bytes-decoded
+  type: reliance
+  name: bytes and text are different things
+  summary: Bytes and text are different kinds and are never mixed silently.
+  stance: observed
+  'on': runtime
+  gives: Bytes and text are different kinds and are never mixed silently. Bytes become text only by decoding them
+    with a named encoding, which fails on bytes that encoding cannot read; text read from a byte file is decoded
+    once, and a file already read to its end gives nothing more.
+  example: '"<r>é</r>" in Latin-1 bytes, decoded as UTF-8, fails at the é.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#bytes.decode
+    digest: 736b53f803b0
+  - in: python
+    version: 3.13.18
+    at: library/codecs.html#standard-encodings
+    digest: f3b35fcd2d0f
+  - in: python
+    version: 3.13.18
+    at: library/io.html#io.BufferedIOBase.read
+    digest: 8261a1a54d06
+  entry: bytes-decoded
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scavenge
+  span:
+    file: vulture/core.py
+    lines: '315'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L315
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/source-encodings
+  type: reliance
+  name: the encoding of a source file
+  summary: A program file's encoding is a UTF-8 byte-order mark, else a coding comment on its first or second line,
+    else UTF-8; any encoding the runtime knows may be declared; carriage return and line feed, and a lone carriage
+    return, are read as a line feed.
+  stance: observed
+  'on': runtime
+  gives: A program file's encoding is a UTF-8 byte-order mark, else a coding comment on its first or second line,
+    else UTF-8; any encoding the runtime knows may be declared; carriage return and line feed, and a lone carriage
+    return, are read as a line feed.
+  example: a file declaring latin-1 whose name holds the byte 0xE9 reads it as é.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/tokenize.html#tokenize.open
+    digest: 9909f187afc9
+  - in: python
+    version: 3.13.18
+    at: library/tokenize.html#tokenize.detect_encoding
+    digest: 9909f187afc9
+  - in: python
+    version: 3.13.18
+    at: reference/lexical_analysis.html#encoding-declarations
+    digest: 26b7f8ab2fcf
+  entry: source-encodings
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.utils.read_file
+  span:
+    file: vulture/utils.py
+    lines: '108'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L108
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/package-data
+  type: reliance
+  name: files read from inside the installed program
+  summary: A data file shipped inside the installed program is read as bytes by its package and relative name, wherever
+    the program is installed.
+  stance: observed
+  'on': runtime
+  gives: A data file shipped inside the installed program is read as bytes by its package and relative name, wherever
+    the program is installed.
+  example: the bundled list for one module is read from inside the program and scanned under its relative name.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/pkgutil.html#pkgutil.get_data
+    digest: 86fc20a5e589
+  entry: package-data
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scavenge
+  span:
+    file: vulture/core.py
+    lines: '309'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L309
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/glob-patterns
+  type: reliance
+  name: glob patterns
+  summary: In a glob pattern '*' matches any run of characters, '/' included, '?' one character, '[abc]' one of
+    a set and '[!abc]' one not in it; there is no escape character, and the whole text must match.
+  stance: observed
+  'on': runtime
+  gives: In a glob pattern '*' matches any run of characters, '/' included, '?' one character, '[abc]' one of a
+    set and '[!abc]' one not in it; there is no escape character, and the whole text must match.
+  example: '''*/other/*'' matches ''a/other/y.py''; ''[ab]/sub1'' must match the whole path it is given.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/fnmatch.html#module-fnmatch
+    digest: 7d13693a9cde
+  entry: glob-patterns
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.core
+  - C:interface/command.vulture
+  - C:setting/option.vulture.exclude
+  - C:interface/vulture.core.Vulture.scavenge
+  span:
+    file: vulture/core.py
+    lines: '56'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L56
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/glob-case-per-platform
+  type: reliance
+  name: case in glob patterns follows the platform
+  summary: Matching a path with a glob follows the platform's rule for case, case-sensitive on macOS and Linux and
+    case-insensitive on Windows, whatever the program's own words say.
+  stance: observed
+  'on': platform
+  gives: Matching a path with a glob follows the platform's rule for case, case-sensitive on macOS and Linux and
+    case-insensitive on Windows, whatever the program's own words say.
+  example: the pattern 'gen' does not match 'Gen/x.py' on macOS.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/fnmatch.html#fnmatch.fnmatch
+    digest: 7d13693a9cde
+  - in: python
+    version: 3.13.18
+    at: library/os.path.html#os.path.normcase
+    digest: 2e5a306b1a37
+  entry: glob-case-per-platform
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.core
+  span:
+    file: vulture/core.py
+    lines: '56'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L56
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/glob-case-sensitive
+  type: reliance
+  name: glob patterns matched case for case
+  summary: Matching names with a glob case for case compares exactly, on every platform.
+  stance: observed
+  'on': runtime
+  gives: Matching names with a glob case for case compares exactly, on every platform.
+  example: the decorator pattern '@Route' does not match '@route'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/fnmatch.html#fnmatch.fnmatchcase
+    digest: 7d13693a9cde
+  entry: glob-case-sensitive
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.core
+  span:
+    file: vulture/core.py
+    lines: '56'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L56
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-syntax
+  type: reliance
+  name: text patterns
+  summary: Text patterns have repeats that are greedy unless marked lazy, look-ahead and look-behind, groups and
+    alternation; a search finds the leftmost match, a match anchors at the start or at a given position, and finding
+    all matches goes left to right without overlap.
+  stance: observed
+  'on': runtime
+  gives: Text patterns have repeats that are greedy unless marked lazy, look-ahead and look-behind, groups and alternation;
+    a search finds the leftmost match, a match anchors at the start or at a given position, and finding all matches
+    goes left to right without overlap.
+  example: the lazy pattern for a comment stops at the first '-->', so '<!-- a -- b -->' is one comment.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#regular-expression-syntax
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.search
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.finditer
+    digest: 17d3cdde81f1
+  entry: pattern-syntax
+  of: C:dependency/python
+  used-by:
+  - C:setting/vulture.noqa.NOQA_REGEXP
+  - C:interface/vulture.core.Vulture
+  - C:interface/vulture.core.Vulture.visit_BinOp
+  - P:claim/vulture.noqa.flake8-regex
+  span:
+    file: vulture/noqa.py
+    lines: '4'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/noqa.py#L4
+    - vulture/core.py#L525
+    - vulture/core.py#L498
+    - vulture/core.py#L537
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-unicode-classes
+  type: reliance
+  name: word, digit and space in patterns are Unicode's
+  summary: In a text pattern, a word character is any Unicode letter, digit or underscore, a digit any Unicode decimal
+    digit, and white space the set of the entry on white space, unless the pattern is marked ASCII-only.
+  stance: observed
+  'on': runtime
+  gives: In a text pattern, a word character is any Unicode letter, digit or underscore, a digit any Unicode decimal
+    digit, and white space the set of the entry on white space, unless the pattern is marked ASCII-only.
+  example: a word field named 'naïve' is matched whole; U+3000 is matched as white space.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#regular-expression-syntax
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.ASCII
+    digest: 17d3cdde81f1
+  entry: pattern-unicode-classes
+  of: C:dependency/python
+  used-by:
+  - C:setting/vulture.noqa.NOQA_REGEXP
+  - C:interface/vulture.core.Vulture.visit_BinOp
+  span:
+    file: vulture/noqa.py
+    lines: '4'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/noqa.py#L4
+    - vulture/core.py#L498
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pattern-flags
+  type: reliance
+  name: pattern flags
+  summary: A pattern may ignore case (by Unicode's simple case folding), let '^' and '$' match at every line, and
+    let '.' match a line feed; without them, '.' stops at a line feed and '$' matches at the end or before a final
+    line feed.
+  stance: observed
+  'on': runtime
+  gives: A pattern may ignore case (by Unicode's simple case folding), let '^' and '$' match at every line, and
+    let '.' match a line feed; without them, '.' stops at a line feed and '$' matches at the end or before a final
+    line feed.
+  example: ignoring case, '# noqa' matches '# NoQA'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.IGNORECASE
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.MULTILINE
+    digest: 17d3cdde81f1
+  - in: python
+    version: 3.13.18
+    at: library/re.html#re.DOTALL
+    digest: 17d3cdde81f1
+  entry: pattern-flags
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.noqa
+  span:
+    file: vulture/noqa.py
+    lines: '13'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/noqa.py#L13
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/toml-read
+  type: reliance
+  name: the TOML file read
+  summary: A configuration file is read as TOML 1.0, tables, arrays, true and false, underscores in numbers and
+    escapes in strings, into maps, lists, whole numbers, fractional numbers, text, yes-or-no and dates; a file that
+    is not valid TOML is refused with a decoding error, a kind of value error.
+  stance: observed
+  'on': runtime
+  gives: A configuration file is read as TOML 1.0, tables, arrays, true and false, underscores in numbers and escapes
+    in strings, into maps, lists, whole numbers, fractional numbers, text, yes-or-no and dates; a file that is not
+    valid TOML is refused with a decoding error, a kind of value error.
+  example: min_confidence = 1_0 reads as 10; a file holding '[[' is refused.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/tomllib.html#module-tomllib
+    digest: 7e6dc3e667df
+  - in: python
+    version: 3.13.18
+    at: library/tomllib.html#conversion-table
+    digest: 7e6dc3e667df
+  entry: toml-read
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.config
+  - N:decision/tomllib
+  span:
+    file: vulture/config.py
+    lines: '12'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/config.py#L12
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/source-parsed
+  type: reliance
+  name: the input language and its lines
+  summary: Program text is read by the grammar of the runtime's own release, no other; every statement and expression
+    carries its first and last line and column; a decorated definition carries the line of its def or class, not
+    of its first decorator.
+  stance: observed
+  'on': runtime
+  gives: Program text is read by the grammar of the runtime's own release, no other; every statement and expression
+    carries its first and last line and column; a decorated definition carries the line of its def or class, not
+    of its first decorator.
+  example: the forms of a later release are syntax errors; a function decorated on line 3 and defined on line 4
+    is on line 4.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/grammar.html#full-grammar-specification
+    digest: fe32d00f620e
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.parse
+    digest: c8e0214fb37f
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.AST
+    digest: c8e0214fb37f
+  - nowhere: that a decorated definition's line is its def or class line.
+  entry: source-parsed
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.visit
+  span:
+    file: vulture/core.py
+    lines: '243'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L243
+    - vulture/core.py#L653
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/identifiers-normalised
+  type: reliance
+  name: names normalised
+  summary: Names in program text are normalised to Unicode's NFKC form while it is read, so two names that look
+    different may be one, and the name reported is the normalised one.
+  stance: observed
+  'on': runtime
+  gives: Names in program text are normalised to Unicode's NFKC form while it is read, so two names that look different
+    may be one, and the name reported is the normalised one.
+  example: a function named with a black-letter H is reported as H; 'ﬁle' is the same name as 'file'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: reference/lexical_analysis.html#2-3-identifiers-and-keywords
+    digest: 26b7f8ab2fcf
+  - in: python
+    version: 3.13.18
+    at: library/unicodedata.html#unicodedata.normalize
+    digest: 607cc720d0f3
+  entry: identifiers-normalised
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.visit
+  span:
+    file: vulture/core.py
+    lines: '243'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L243
+    - vulture/core.py#L653
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/parser-messages
+  type: reliance
+  name: the parser's messages
+  summary: A syntax error carries a message, a line and the line's text, all of the runtime's own release; a null
+    byte in the input is a syntax error with no line.
+  stance: observed
+  'on': runtime
+  gives: A syntax error carries a message, a line and the line's text, all of the runtime's own release; a null
+    byte in the input is a syntax error with no line.
+  example: a file holding a null byte is reported with no line number.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: builtins/exceptions.html#SyntaxError
+    digest: fd1dcc489d5c
+  - in: python
+    version: 3.13.18
+    at: whatsnew/3.12.html#other-language-changes
+    digest: e490fac5414f
+  - nowhere: the parser's messages, and that a null-byte syntax error carries no line.
+  entry: parser-messages
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  - C:interface/vulture.core.Vulture.visit
+  - C:interface/vulture.utils.read_file
+  span:
+    file: vulture/core.py
+    lines: '243'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L243
+    - vulture/core.py#L653
+    - vulture/core.py#L246
+    - vulture/utils.py#L110
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/type-comments
+  type: reliance
+  name: type comments read as code
+  summary: Asked to, the parser reads type comments as expressions; one that does not parse is an error at the node
+    that carries it.
+  stance: observed
+  'on': runtime
+  gives: Asked to, the parser reads type comments as expressions; one that does not parse is an error at the node
+    that carries it.
+  example: a bad type comment on one function stops the reading at that function.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.parse
+    digest: c8e0214fb37f
+  entry: type-comments
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.scan
+  span:
+    file: vulture/core.py
+    lines: '243'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L243
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/tree-dump
+  type: reliance
+  name: the parser's tree written out
+  summary: A tree from the parser can be written out as text, each node by its kind and fields.
+  stance: observed
+  'on': runtime
+  gives: A tree from the parser can be written out as text, each node by its kind and fields.
+  example: a module with one statement is written 'Module(body=[...])'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.dump
+    digest: c8e0214fb37f
+  - nowhere: the exact form of the written tree beyond a formatted dump.
+  entry: tree-dump
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture.visit
+  span:
+    file: vulture/core.py
+    lines: '639'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L639
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/literal-truth
+  type: reliance
+  name: a literal's value and truth
+  summary: A literal (numbers, text, bytes, nothing, the ellipsis, tuples, lists, maps, sets) can be evaluated without
+    running anything else, a sign on a number included; its truth follows the entry on which values count as false.
+  stance: observed
+  'on': runtime
+  gives: A literal (numbers, text, bytes, nothing, the ellipsis, tuples, lists, maps, sets) can be evaluated without
+    running anything else, a sign on a number included; its truth follows the entry on which values count as false.
+  example: '''-0'' evaluates to 0, which is false; 1e400 evaluates to infinity, which is true.'
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.literal_eval
+    digest: c8e0214fb37f
+  - in: python
+    version: 3.13.18
+    at: builtins/stdtypes.html#truth-value-testing
+    digest: 736b53f803b0
+  - nowhere: that a sign on a number is accepted, and that 1e400 reads as infinity.
+  entry: literal-truth
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.utils
+  span:
+    file: vulture/utils.py
+    lines: '43'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/utils.py#L43
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/program-tree-nodes
+  type: reliance
+  name: the kinds of a program's tree
+  summary: The parser's tree has one kind of node per construct of the grammar, visited in the order of their fields;
+    return, raise, break and continue end the flow of their block.
+  stance: observed
+  'on': runtime
+  gives: The parser's tree has one kind of node per construct of the grammar, visited in the order of their fields;
+    return, raise, break and continue end the flow of their block.
+  example: code after a return in the same block is never reached.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/ast.html#ast.NodeVisitor
+    digest: c8e0214fb37f
+  - in: python
+    version: 3.13.18
+    at: reference/simple_stmts.html#the-return-statement
+    digest: cf5e83ddb366
+  entry: program-tree-nodes
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.core.Vulture
+  span:
+    file: vulture/core.py
+    lines: '190'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L190
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/runtime-version
+  type: reliance
+  name: the runtime's release
+  summary: The program runs on the release of its runtime it names and on later releases; what it takes from the
+    runtime is that release's behaviour, as this catalogue's citations state it.
+  stance: observed
+  'on': runtime
+  gives: The program runs on the release of its runtime it names and on later releases; what it takes from the runtime
+    is that release's behaviour, as this catalogue's citations state it.
+  example: a program declaring 3.10 or later runs on 3.13.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/sys.html#sys.version_info
+    digest: 1fc32ff781c0
+  entry: runtime-version
+  of: C:dependency/python
+  used-by:
+  - C:interface/vulture.lines.get_first_line_number
+  - N:requirement/python-version
+  provenance:
+    mode: derived
+    sources:
+    - C:dependency/python
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/run-as-module
+  type: reliance
+  name: a package run by its name
+  summary: A package with a main file can be run by its name; the main file runs with the package's other modules
+    importable, and its arguments are the words after the package's name.
+  stance: observed
+  'on': runtime
+  gives: A package with a main file can be run by its name; the main file runs with the package's other modules
+    importable, and its arguments are the words after the package's name.
+  example: running the package tally runs tally's main file with the words after 'tally'.
+  stated:
+  - in: python
+    version: 3.13.18
+    at: library/__main__.html#main-py-in-python-packages
+    digest: e24b0d60cf0e
+  entry: run-as-module
+  of: C:dependency/python
+  used-by:
+  - C:component/vulture.__main__
+  span:
+    file: vulture/__main__.py
+    lines: '1'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/__main__.py#L1
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'
+- id: C:reliance/pytest-conventions
+  type: reliance
+  name: the test runner's own names
+  summary: The common test runner calls, without being asked, functions named setup_module, teardown_module, setup_function
+    and teardown_function, methods named setup_class, teardown_class, setup_method and teardown_method, functions
+    named test_ and classes named Test in files whose names mark them as tests; a program that reports unused code
+    must not report them.
+  stance: observed
+  'on': dependency
+  gives: The common test runner calls, without being asked, functions named setup_module, teardown_module, setup_function
+    and teardown_function, methods named setup_class, teardown_class, setup_method and teardown_method, functions
+    named test_ and classes named Test in files whose names mark them as tests; a program that reports unused code
+    must not report them.
+  example: a function named setup_module in a file named test_x.py is used, though nothing in the file calls it.
+  stated:
+  - nowhere: the test runner's own documentation is not kept in the language library.
+  entry: pytest-conventions
+  of: C:dependency/pytest
+  used-by:
+  - C:component/vulture.core
+  - C:setting/vulture.core.PYTEST_FUNCTION_NAMES
+  - C:setting/vulture.core.PYTEST_METHOD_NAMES
+  - C:behaviour/vulture.core.ignore-rules
+  - I:influence/pytest-conventions
+  span:
+    file: vulture/core.py
+    lines: '1'
+  provenance:
+    mode: derived
+    sources:
+    - vulture/core.py#L1
+    - tests/__init__.py#L5
+    - tests/test_config.py#L9
+    - tests/test_errors.py#L1
+    - tests/test_make_whitelist.py#L1
+    - tests/test_noqa.py#L1
+    - tests/test_report.py#L1
+    - tests/test_size.py#L4
+    - tests/test_utils.py#L5
+    confidence: 1
+    state: known
+  ruling:
+  - is: kept
+    by: R:maker/transconceiver
+    'on': '2026-11-19'
+    said: 'pins 25: the reliances 0.8''s ground catalogue raised in the experiment''s fabulacs are kept, as proposed,
+      recorded as the owner''s'

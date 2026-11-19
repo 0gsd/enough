@@ -1,14 +1,16 @@
 """Transconception (0.8, phase 1): the schema in the fabula manifest, the thirteen checks and the two gates of
 enough/transconception.py, and the experiment's two working fabulacs promoted as fixtures.
 
-Held here: both promoted fabulacs lint with no error but `stands-alone`'s, an error since the owner's ruling at
-checkpoint A (2026-11-18): vulture names Python, its runtime or a dependency in seven items (nine findings),
-sloppy-xml-py in one; so gate 1 (ready to keep) does not hold for either, and every other check of it holds, as the
-experiment measured by hand (with the sources at hand when this machine has them; without them `nothing-carried` is
-not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust
-for that reason alone: since sitting 2 (2026-11-18, the fifth allowance `own-types`) `ruled` holds for both targets,
-and since phase 5 (A7's weighings written in) `target-confirmed` does too; a fabulac nobody could rule is kept
-unruled; each check, on a small fabulac that passes all of them, made to fail; every other fabula untouched.
+Held here: both promoted fabulacs are grounded with 0.8's ground catalogue (`promote_x0.py --ground`, 2026-11-19; the
+owner's ruling in pins 25: every reliance the ground raised is `kept`) and lint with no error. `stands-alone` holds
+since the grounding: what vulture named of Python, its runtime or a dependency in seven items (nine findings) and
+sloppy-xml-py in one is now said by a reliance that stands behind it (tests/test_ground.py holds W1-X1's list). So
+gate 1 (ready to keep) holds for both, every check measured, with the sources at hand when this machine has them
+(without them `nothing-carried` is not measured and says so). Gate 2 holds for Go and for Rust: `ruled` holds for
+both targets since sitting 2 (2026-11-18, the fifth allowance `own-types`) and pins 25, and `target-confirmed` holds
+on A7's hand weighings, which the promoter gives a row by `weigh`'s rules for each reliance the ground raised after
+them. A fabulac nobody could rule is kept unruled; each check, on a small fabulac that passes all of them, made to
+fail; every other fabula untouched.
 """
 from __future__ import annotations
 
@@ -46,31 +48,86 @@ def vols():
     return {p.name: M.load_volume(p) for p in (VULTURE, SLOPPY)}
 
 
-# What stands-alone finds in the promoted fabulacs: (item, the name it says). The ground lane's reliances fix them.
-STANDS_ALONE = {
-    "vulture.fabulac.cosm": {
-        ("C:interface/vulture.config._parse_toml", "dict"), ("C:interface/vulture.config._parse_args", "sys.argv"),
-        ("C:interface/vulture.config._parse_args", "dict"), ("C:interface/vulture.config.make_config", "sys.argv"),
-        ("C:interface/vulture.config.make_config", "dict"), ("C:setting/vulture.core.PYTEST_FUNCTION_NAMES", "pytest"),
-        ("C:setting/vulture.core.PYTEST_METHOD_NAMES", "pytest"), ("N:requirement/python-version", "Python"),
-        ("I:influence/pytest-conventions", "pytest")},
-    "sloppy-xml-py.fabulac.cosm": {("C:interface/x0.S-I3", "bytes")},
-}
+# The reliances 0.8's ground raised in each promoted fabulac (pins 25). Before, stands-alone found W1-X1's nine
+# findings in vulture and one in sloppy-xml-py (tests/test_ground.py's STANDS_ALONE_FIXED holds that list).
+GROUND_RAISED = {"vulture.fabulac.cosm": 67, "sloppy-xml-py.fabulac.cosm": 34}
+TARGET = {"vulture.fabulac.cosm": "go", "sloppy-xml-py.fabulac.cosm": "rust"}
+GROUND_SAID = ("pins 25: the reliances 0.8's ground catalogue raised in the experiment's fabulacs are kept, as "
+               "proposed, recorded as the owner's")
 
 
-def test_the_promoted_fabulacs_lint_with_no_error_but_stands_alone(vols):
+def ground_raised(v: M.Volume) -> list[str]:
+    """The reliances 0.8's ground raised in a promoted fabulac: those carrying a catalogue `entry`."""
+    return [i for i, it in v.items.items() if i.startswith("C:reliance/") and it.data.get("entry")]
+
+
+def test_the_promoted_fabulacs_lint_with_no_error(vols):
     for name, v in vols.items():
         assert v.catalog["purpose"] == "transconception" and v.catalog["ruled-by"] == "R:maker/transconceiver"
         rep = fabula.lint(v)
-        assert {p.check for p in rep.errors} == {"stands-alone"}, (name, _errors(rep)[:10])
-        found = {(p.item, p.message.split(":")[0].removeprefix("names ")) for p in rep.errors}
-        assert found == STANDS_ALONE[name]
+        assert _errors(rep) == [], (name, _errors(rep)[:10])
+        assert not [p for p in rep.problems() if p.check == "stands-alone"]
         assert not [c for c in rep.not_run if c in tc.CHECKS]
 
 
+def test_the_ground_reliances_carry_the_owners_ruling_of_pins_25(vols):
+    for name, v in vols.items():
+        raised = ground_raised(v)
+        assert len(raised) == GROUND_RAISED[name]
+        for rid in raised:
+            assert v.items[rid].data["ruling"] == [{"is": "kept", "by": "R:maker/transconceiver", "on": "2026-11-19",
+                                                    "said": GROUND_SAID}], (name, rid)
+        maker = v.items["R:maker/transconceiver"].data
+        assert maker["ruled-in"][-1] == "enough-dev docs/v080-pins.md section 25 (2026-11-19, by questionnaire)"
+        assert v.catalog["source"]["swhid"]["rev"] == f"swh:1:rev:{v.catalog['source']['commit']}"
+        assert v.catalog["derived"]["runs"][-1]["program"] == "ground"
+        # the experiment's own reliances stay as x0 wrote them
+        assert not [i for i, it in v.items.items() if ("/V-R" in i or "/S-R" in i) and it.data.get("entry")]
+
+
+def test_a7s_weighings_gain_a_row_by_rules_for_each_ground_reliance_and_name_their_gaps(vols):
+    """A7 weighed every reliance x0 wrote; the promoter adds, for each reliance the ground raised, the row `weigh`'s
+    rules give it (`answered: rules`), and changes no row A7 wrote. A7's verdict names vulture's gaps in Go in a
+    numbered list; the promoter writes them on the rows (and `weigh`'s rule on the one other library row);
+    sloppy-xml-py's verdict into Rust names none."""
+    for name, v in vols.items():
+        t = v.items[f"N:target/{TARGET[name]}"].data
+        rows = {r["for"]: r for r in t["provides"]}
+        raised = ground_raised(v)
+        assert set(raised) <= set(rows)
+        assert all(rows[r]["answered"] == "rules" for r in raised)
+        assert not [r for f, r in rows.items() if f not in raised and "answered" in r]      # A7's rows as written
+        assert t["provenance"]["sources"][-1].startswith("rows for the reliances 0.8's ground raised")
+    gaps = {f: r["gap"] for f, r in ((r["for"], r) for r in vols["vulture.fabulac.cosm"].items["N:target/go"].data[
+        "provides"]) if r.get("gap") and "answered" not in r}
+    assert gaps == {
+        "C:reliance/V-R02": "The parser of the input language's 3.13 grammar, type comments included (written)",
+        "C:reliance/V-R03": "The command-line reader's conventions (written)",
+        "C:reliance/V-R08": "The TOML 1.0 reader (library)",
+        "C:reliance/V-R14": "library: sort.SliceStable with full lower-casing from golang.org/x/text/cases",
+        "C:reliance/V-R19": "Identifiers normalised to NFKC (library)",
+        "C:reliance/V-R27": "The parser of the input language's 3.13 grammar, type comments included (written)"}
+    assert not [r for r in vols["sloppy-xml-py.fabulac.cosm"].items["N:target/rust"].data["provides"]
+                if r.get("gap") and "answered" not in r]
+
+
+def _catalogue_examples() -> set[str]:
+    from enough import languages as L
+    return {str(e["example"]) for e in L.entries("python") if e.get("example")}
+
+
 def test_the_fixtures_carry_no_old_word_and_no_machine_path():
+    """No path on the machine that recorded x0 (the promoter writes those from the home folder). A ground reliance
+    carries its catalogue entry's `example` whole, and one example is about a home folder (`/home/ann`): that text is
+    the catalogue's own, so it is left out of the search only where it is the entry's example, byte for byte."""
+    examples = _catalogue_examples()
     for p in (VULTURE, SLOPPY):
-        text = p.read_text(encoding="utf-8")
+        doc = M.yaml_load(p.read_text(encoding="utf-8"))
+        for n in doc["nodes"]:
+            if isinstance(n.get("entry"), str) and isinstance(n.get("example"), str):
+                assert n["example"] in examples, (p.name, n["id"])
+                n["example"] = ""
+        text = M.dump(doc)
         for bad in ("transcoder", "transcoding", "/Users/", "/home/"):
             assert bad not in text, (p.name, bad)
     for lic in ("vulture.LICENSE.txt", "sloppy-xml-py.LICENSE"):
@@ -82,35 +139,35 @@ def test_the_fixtures_carry_no_old_word_and_no_machine_path():
 def test_ready_to_keep_without_the_sources_measures_all_but_nothing_carried(vols):
     for v in vols.values():
         g = tc.ready_to_keep(v)
-        assert g["do-not-hold"] == ["stands-alone"] and g["not-measured"] == ["nothing-carried"]
-        assert not g["holds"] and g["says"] == "not ready to keep"
+        assert g["do-not-hold"] == [] and g["not-measured"] == ["nothing-carried"]
+        assert g["hold"] == [c for c in tc.READY_TO_KEEP if c != "nothing-carried"]
+        assert not g["holds"]
         assert "source folder" in g["checks"]["nothing-carried"]["why"]
 
 
 @pytest.mark.parametrize("fix, clone", [(VULTURE, "vulture"), (SLOPPY, "sloppy-xml-py")])
-def test_ready_to_keep_fails_only_on_stands_alone(fix, clone):
-    """The experiment measured gate 1 as holding, with stands-alone's items "left open"; as an error they stop it.
-    Every other check holds, as measured, with the source read as text."""
+def test_ready_to_keep_holds_with_the_sources(fix, clone):
+    """The experiment measured gate 1 as holding, with stands-alone's items "left open"; as an error they stopped it
+    until 0.8's ground stood behind them (pins 25). Every check holds now, the source read as text."""
     if not (CLONES / clone).is_dir():
         pytest.skip("the cloned original is not on this machine")
     g = tc.ready_to_keep(fix, source=CLONES / clone)
-    assert not g["holds"] and g["says"] == "not ready to keep"
-    assert g["do-not-hold"] == ["stands-alone"] and g["not-measured"] == []
-    assert g["hold"] == [c for c in tc.READY_TO_KEEP if c != "stands-alone"]
-    assert len(g["checks"]["stands-alone"]["errors"]) == len(STANDS_ALONE[fix.name])
+    assert g["holds"] and g["says"] == "ready to keep", g["do-not-hold"]
+    assert g["do-not-hold"] == [] and g["not-measured"] == []
+    assert g["hold"] == list(tc.READY_TO_KEEP)
 
 
-def test_ready_to_entail_waits_only_for_gate_1(vols):
-    """Sitting 2 (2026-11-18) ruled `own-types` onto the closed list: sloppy's 61 Rust rulings that named the
-    target's own types now name it (S-I2 became kept at the driver's dump), so `ruled` holds for Rust as for Go.
-    Since phase 5 the fixtures carry A7's hand weighings (target-go.md, target-rust.md) with each spike's level read
-    from O9's verdict on it, so `target-confirmed` holds for both (tests/test_transconception_targets.py). What still
-    fails gate 2 for each is gate 1's `stands-alone`, until the ground lane's reliances stand behind it."""
-    for name, language in (("vulture.fabulac.cosm", "go"), ("sloppy-xml-py.fabulac.cosm", "rust")):
-        g = tc.ready_to_entail(vols[name], language)
-        assert not g["holds"] and g["do-not-hold"] == ["stands-alone"], (name, g["do-not-hold"])
-        assert g["checks"]["ruled"]["state"] == "holds" and g["checks"]["ruled"]["errors"] == []
-        assert g["checks"]["target-confirmed"]["state"] == "holds"
+@pytest.mark.parametrize("fix, clone, language", [(VULTURE, "vulture", "go"), (SLOPPY, "sloppy-xml-py", "rust")])
+def test_ready_to_entail_holds_with_the_sources(fix, clone, language):
+    """Sitting 2 (2026-11-18) ruled `own-types` onto the closed list, so `ruled` holds for Rust as for Go, and pins 25
+    keeps the ground's reliances. A7's hand weighings, with the ground's rows by rules, give `target-confirmed` a row
+    for every reliance kept; each spike's level is read from O9's verdict on it. Gate 2 holds."""
+    if not (CLONES / clone).is_dir():
+        pytest.skip("the cloned original is not on this machine")
+    g = tc.ready_to_entail(fix, language, source=CLONES / clone)
+    assert g["holds"] and g["do-not-hold"] == [] and g["not-measured"] == [], g["do-not-hold"]
+    for c in ("ruled", "target-confirmed", "stands-alone"):
+        assert g["checks"][c] == {"state": "holds", "errors": [], "warnings": [], "notes": []}, c
 
 
 def test_sitting_2_is_in_the_sloppy_fixture(vols):
