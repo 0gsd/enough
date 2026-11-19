@@ -192,11 +192,11 @@ def build_router(ctx: AppContext) -> APIRouter:
             return doing
         if _agent_free_reason(mode, why):
             return f"agent-free: {doing} by rules"
-        return f"no model is answering ({why}); writing a scaffold"
+        return f"no model is answering ({why}); writing an outline"
 
     def _rules_note(why: str) -> str:
         return (" (by rules: agent-free)" if why == _agent_free.REASON
-                else " (a scaffold: no model read it)")
+                else " (an outline: no model read it)")
 
     def _model_complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
         """The engine's `complete`: `llm.complete` at the session's model

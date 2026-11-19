@@ -34971,7 +34971,7 @@
           if (snap.mode === 'rules' && snap.reason === 'agent-free') {
             return t('canon.agentFree', 'agent-free: a rules reading, no model');
           }
-          return snap.mode === 'rules' ? t('canon.phase.rules', 'no model is running: writing a scaffold')
+          return snap.mode === 'rules' ? t('canon.phase.rules', 'no model is running: writing an outline')
             : t('canon.phase.starting', 'starting…');
         case 'lexicon': return t('canon.phase.lexicon', 'finding the words it leans on');
         case 'reading':
@@ -35058,7 +35058,7 @@
           message = res.mode === 'rules'
             ? (res.reason === 'agent-free'
               ? t('canon.job.emfAgentFree', 'fabula written — agent-free: a rules reading, no model')
-              : t('canon.job.emfRules', 'fabula written — a scaffold: no model was running'))
+              : t('canon.job.emfRules', 'fabula written — an outline: no model was running'))
             : t('canon.job.emf', 'fabula written: {n} items').replace('{n}', String(res.items == null ? '?' : res.items));
           if (!(emfFaceOn() && canonSame(EMF_FACE.text, res.text_path || e.path))) {
             actions = [{ label: t('canon.job.show', 'show'), run: () => {
@@ -35576,7 +35576,7 @@
           'agent-free: a rules reading, no model')) + '</p>';
       } else if (res.mode === 'rules') {
         h += '<p class="atem-note">' + cosmEsc(t('atem.card.scaffold',
-          'scaffold — no model was running, so push and pull are still open questions')) + '</p>';
+          'outline — no model was running, so push and pull are still open questions')) + '</p>';
       }
       body.innerHTML = h;
       show('atem-cancel', false);

@@ -978,7 +978,7 @@ def run_fabula_derive(project_dir: Path, call: Any) -> Any:
         lines.append("a scaffold holds terms and names only; concepts, claims and events need a model.")
     lines.append(f"atem: {_part_text(atem.get('line'))}")
     lines.append(f"read it with cosm_read on {t['new_twin_rel']}.")
-    message = f"wrote {twin.name}" + (" (a scaffold: no model read it)" if info["mode"] == "rules" else "")
+    message = f"wrote {twin.name}" + (" (an outline: no model read it)" if info["mode"] == "rules" else "")
     result = {"twin_path": t["new_twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
               "model": info.get("model"), "chunks": info["chunks"], "items": info["items"],
               "counts": info.get("counts") or {}, "dropped": info.get("dropped", 0), "atem": atem,
