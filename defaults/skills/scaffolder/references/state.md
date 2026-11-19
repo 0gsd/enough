@@ -166,6 +166,13 @@ findings has no `# Findings` line.
 In `quote`, `prefix`, `suffix` and `fix`, a line break is written `\n` and a
 backslash `\\`. All other values are one line as written.
 
+Values are trimmed: a reader takes the spaces off the edges of every value, so
+a `quote`, `prefix`, `suffix` or `fix` that began or ended with a space loses
+it going through the file. A quote is matched against the box's text, and a
+fix is put in its place, ignoring spaces at the edges of the span. So a fix
+that only changes the spacing at an edge of the span cannot travel in a state
+file.
+
 The outcomes:
 
 - **open**: found, and the person has not answered yet.
