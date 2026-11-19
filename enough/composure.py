@@ -116,8 +116,9 @@ SCAFFOLD_THINGS: tuple[str, ...] = ("page", "deck", "document")
 #: A box holds words or stands for a picture the person supplies.
 BOX_KINDS: tuple[str, ...] = ("text", "graphic")
 #: A box's state. `written` is the person's own mark; `empty` and `over` are
-#: what the page computes from the text and the target; `locked` belongs to
-#: the scaffold's lock (a later lane enforces it).
+#: what the page computes from the text and the target. `locked` is kept for
+#: files that carry it; the lock itself is the scaffold's, in its meta block
+#: (`lock_scaffold`), and is never set box by box.
 BOX_STATES: tuple[str, ...] = ("empty", "written", "over", "locked")
 #: Who last set a box's plec. Derived from the op's source, never sent.
 PLEC_BY: tuple[str, ...] = ("readvisor", "person")
@@ -1856,7 +1857,7 @@ OP_NAMES: tuple[str, ...] = (
     "add_strokes", "remove_strokes", "replace_strokes",
     "set_meta", "set_council", "arrange",
     "make_scaffold", "set_scaffold", "add_frame", "reorder_frames",
-    "move_to_frame",
+    "move_to_frame", "lock_scaffold", "accept_fix",
 )
 
 #: Ops that write a module's text. Refused on a filed journal page and on an
@@ -1983,7 +1984,15 @@ def _apply_one(comp: Composure, op: dict[str, Any], source: str) -> list[str]:
     if name not in OP_NAMES:
         raise ComposureError(
             f"unknown op {name!r}. known ops: {', '.join(OP_NAMES)}.")
+    # The scaffold's lock is checked first, before any module-level rule, so
+    # nothing slips past it (removing a module included: survey 6.9).
+    _check_scaffold_lock(comp, op, name)
 
+    if name == "lock_scaffold":
+        _op_lock_scaffold(comp, op, source)
+        return []
+    if name == "accept_fix":
+        return _op_accept_fix(comp, op, source)
     if name == "add_module":
         return _op_add_module(comp, op, source)
     if name == "update_module":
@@ -2669,12 +2678,12 @@ def _op_make_scaffold(comp: Composure, op: dict[str, Any],
 
 
 def _op_set_scaffold(comp: Composure, op: dict[str, Any], source: str) -> None:
-    """Patch the meta block (`thing`, `locked`, `version`, `parent`), or
-    clear it with `scaffold: null` once no frame or box is left (which is
-    how `outline_ops` lays an outline over the scaffold form and gets
-    today's plain plane). The lock, the version and the parent are the
-    person's (`ui`) or enough's own; this lane stores them and enforces
-    nothing else yet."""
+    """Patch the meta block (`thing`, `version`, `parent`), or clear it
+    with `scaffold: null` once no frame or box is left (which is how
+    `outline_ops` lays an outline over the scaffold form and gets today's
+    plain plane). The version and the parent are the person's (`ui`) or
+    enough's own. The lock is not set here: `lock_scaffold` closes it and
+    `unlock_scaffold` opens the next version as a new file."""
     if "scaffold" in op:
         if op["scaffold"] is not None:
             raise ComposureError(
@@ -2698,18 +2707,13 @@ def _op_set_scaffold(comp: Composure, op: dict[str, Any], source: str) -> None:
             f"the scaffold's {', '.join(person_keys)} belong(s) to the person "
             f"— a lock is theirs to close and open.")
     if "locked" in op:
-        value = op["locked"]
-        if value in (None, False):
-            meta["locked"] = None
-        elif value is True:
-            meta["locked"] = {"at": _now_iso(), "by": source}
-        elif isinstance(value, dict):
-            meta["locked"] = {"at": _clean_text(value.get("at"), 40) or _now_iso(),
-                              "by": _clean_text(value.get("by"), 16) or source}
-        else:
-            raise ComposureError(
-                "set_scaffold 'locked' is true, false, null or "
-                "{\"at\": …, \"by\": …}.")
+        # 0.8 (E5): one door each way. The person closes the lock with
+        # lock_scaffold (it checks the empty boxes); opening it makes the next
+        # version as a new file (`unlock_scaffold`), and this file stays locked.
+        raise ComposureError(
+            "the lock is not set with set_scaffold: the person locks with "
+            "lock_scaffold, and unlocking makes the next version as a new "
+            "file, keeping this one locked.")
     if "version" in op:
         version = int(_num(op["version"], 0))
         if version < 1:
@@ -2792,6 +2796,292 @@ def _op_move_to_frame(comp: Composure, op: dict[str, Any]) -> list[str]:
         return [box.id]
     box.x, box.y = _place_in_frame(comp, frame, box)
     return [box.id] + _grow_page_frame(frame, box)
+
+
+# ---------------------------------------------------------------------------
+# The scaffold's lock (0.8, E5)
+#
+# One lock for the whole scaffold, in the `composure:scaffold` block. The
+# person closes it (`lock_scaffold`, source `ui`, one way like the journal's
+# `file_page`). While it is closed every op from every source is refused —
+# removing a module, moving one, the council's and enough's own included —
+# with one exception: `accept_fix`, the person taking a fix the check found,
+# applied to the quoted span of one box and nothing else. Opening it is not
+# an op: `unlock_scaffold` writes the next version as a new file with
+# `parent` pointing back, and this file stays locked.
+# ---------------------------------------------------------------------------
+
+def scaffold_locked(comp: Composure) -> bool:
+    """Whether `comp` is a scaffold whose lock is closed. Any non-empty
+    `locked` counts, so a hand-edited value can only ever lock, never open."""
+    return comp.scaffold is not None and bool(comp.scaffold.get("locked"))
+
+
+def _check_scaffold_lock(comp: Composure, op: dict[str, Any], name: str) -> None:
+    if not scaffold_locked(comp) or name == "accept_fix":
+        return
+    # Where the canvas looks is not the thing: a pan or a zoom on a locked
+    # scaffold still saves (`set_meta` with only `view`).
+    if name == "set_meta" and set(op) <= {"op", "view"}:
+        return
+    lock = comp.scaffold.get("locked")
+    since = f" since {lock.get('at')}" if isinstance(lock, dict) and lock.get("at") else ""
+    version = max(1, int(_num(comp.scaffold.get("version"), 1)))
+    raise ComposureError(
+        f"this scaffold is locked{since}: nothing in it changes, for the "
+        f"person or the readvisor, while it is. The one change it takes is "
+        f"the person accepting a fix the check found. To change anything "
+        f"else, the person unlocks it, which makes version {version + 1} as "
+        f"a new file and keeps this one as it is.")
+
+
+def _box_has_picture(m: Module) -> bool:
+    return bool(m.href) or any("<img" in p.rich for p in m.pages)
+
+
+def empty_boxes(comp: Composure) -> list[str]:
+    """The scaffold-boxes nobody has written in yet, in reading order: a
+    text box with no words, a graphic box with no picture."""
+    view = scaffold_view(comp) or {"boxes": {}, "loose": []}
+    ordered = [b for ids in view["boxes"].values() for b in ids] + list(view["loose"])
+    out: list[str] = []
+    for bid in ordered:
+        m = comp.module(bid)
+        if m is None:
+            continue
+        filled = _box_has_picture(m) if m.kind == "graphic" else _has_text(m)
+        if not filled:
+            out.append(bid)
+    return out
+
+
+def _op_lock_scaffold(comp: Composure, op: dict[str, Any], source: str) -> None:
+    """Close the lock. The person's alone. Boxes still empty may be locked
+    in only once the readvisor has named them to the person: the op carries
+    the list it was shown (`empty`), and any empty box missing from it
+    refuses the lock, naming it."""
+    if source != "ui":
+        raise ComposureError(
+            "lock_scaffold is the person's: they lock their own words when "
+            "they say the scaffold is done, so no other source sends it.")
+    _need_scaffold(comp, "lock_scaffold")
+    raw = op.get("empty") or []
+    if not isinstance(raw, list):
+        raise ComposureError(
+            "lock_scaffold's 'empty' is the list of empty box ids the person "
+            "was shown, like [\"m3\", \"m9\"].")
+    shown = {str(x).strip().lower() for x in raw}
+    empty = empty_boxes(comp)
+    unnamed = [b for b in empty if b not in shown]
+    if unnamed:
+        names = ", ".join(
+            f"{b} ({comp.module(b).title})" if comp.module(b) and comp.module(b).title else b
+            for b in unnamed)
+        raise ComposureError(
+            f"{len(unnamed)} scaffold-box(es) are still empty and were not "
+            f"named to the person: {names}. Write in them, or lock once the "
+            f"readvisor has named them (send them in 'empty').")
+    meta = dict(comp.scaffold or {})
+    meta["locked"] = {"at": _now_iso(), "by": "ui", "empty": empty}
+    comp.scaffold = meta
+
+
+# -- the quoted span: a box's plain text, mapped back to its rich HTML -------
+
+_PLAIN_BREAK_TAGS = _RICH_BLOCK | {"br", "hr"}
+
+
+def _plain_map(rich: str) -> tuple[str, list[tuple[int, int]]]:
+    """The plain text of a rich fragment (tags dropped, entities decoded, a
+    block boundary a newline) and, for each of its characters, the raw span
+    it came from. A newline that stands for a tag maps to the tag, so a span
+    that crosses one can be told apart from a span inside one text run."""
+    chars: list[str] = []
+    spans: list[tuple[int, int]] = []
+    i, n = 0, len(rich)
+    while i < n:
+        c = rich[i]
+        if c == "<":
+            j = rich.find(">", i)
+            if j < 0:
+                break
+            name = rich[i + 1:j].strip().lstrip("/").split(None, 1)
+            tag = name[0].rstrip("/").lower() if name else ""
+            if tag in _PLAIN_BREAK_TAGS and chars and chars[-1] != "\n":
+                chars.append("\n")
+                spans.append((i, j + 1))
+            i = j + 1
+            continue
+        if c == "&":
+            j = rich.find(";", i, i + 12)
+            if j > 0:
+                ch = _html.unescape(rich[i:j + 1])
+                if len(ch) == 1:
+                    chars.append(ch)
+                    spans.append((i, j + 1))
+                    i = j + 1
+                    continue
+        chars.append(c)
+        spans.append((i, i + 1))
+        i += 1
+    return "".join(chars), spans
+
+
+def box_text(m: Module) -> str:
+    """A box's words as the check reads them and a finding quotes them:
+    page 1's plain text, a newline between blocks."""
+    rich = m.pages[0].rich if m.pages else ""
+    return _plain_map(rich)[0].rstrip("\n")
+
+
+def find_span(text: str, quote: str, prefix: str = "",
+              suffix: str = "") -> list[int]:
+    """Where `quote` sits in `text`, narrowed by the characters just before
+    (`prefix`) and after (`suffix`) it when they are given."""
+    out: list[int] = []
+    if not quote:
+        return out
+    # Spaces at the junction do not count: a finding's prefix and suffix are
+    # kept without their outer spaces (the state file's values are one
+    # trimmed line), so "the" before " comittee" still tells the place apart.
+    prefix, suffix = prefix.strip(), suffix.strip()
+    start = text.find(quote)
+    while start >= 0:
+        before_ok = not prefix or text[:start].rstrip().endswith(prefix)
+        after_ok = not suffix or text[start + len(quote):].lstrip().startswith(suffix)
+        if before_ok and after_ok:
+            out.append(start)
+        start = text.find(quote, start + 1)
+    return out
+
+
+def replace_span(rich: str, quote: str, fix: str, *, prefix: str = "",
+                 suffix: str = "") -> str:
+    """`rich` with the one place `quote` stands (told apart by `prefix` and
+    `suffix`) replaced by `fix`, and nothing else touched. Refused when the
+    span is gone, stands in more than one place, or crosses formatting."""
+    text, spans = _plain_map(rich)
+    hits = find_span(text, quote, prefix, suffix)
+    if not hits:
+        raise ComposureError(
+            f"the quoted span {quote!r} is no longer in the box's text, so "
+            f"the fix has nothing to replace. Decline it, or edit the box "
+            f"after unlocking.")
+    if len(hits) > 1:
+        raise ComposureError(
+            f"the quoted span {quote!r} stands in {len(hits)} places in the "
+            f"box, and the finding does not say which (no prefix or suffix "
+            f"tells them apart). Decline it, or edit the box after unlocking.")
+    at = hits[0]
+    rng = spans[at:at + len(quote)]
+    for k, (a, b) in enumerate(rng):
+        if rich[a] == "<" or (k and rng[k - 1][1] != a):
+            raise ComposureError(
+                f"the quoted span {quote!r} crosses formatting (a paragraph "
+                f"break, a bold or a link), so a fix to it would change more "
+                f"than words. Decline it, or edit the box after unlocking.")
+    start, end = rng[0][0], rng[-1][1]
+    return sanitize_rich(rich[:start] + _html.escape(fix, quote=False) + rich[end:])
+
+
+def _op_accept_fix(comp: Composure, op: dict[str, Any], source: str) -> list[str]:
+    """The person takes a fix the check found: the quoted span of one box's
+    text becomes the fix, and nothing else changes. The one op a locked
+    scaffold takes. The finding is recorded by `answer_finding`, which is
+    the door the page uses; the op alone records nothing."""
+    if source != "ui":
+        raise ComposureError(
+            "accept_fix is the person's: they take a fix into their own "
+            "words, so no other source sends it.")
+    _need_scaffold(comp, "accept_fix")
+    m = _module_for(comp, op, "module", "accept_fix")
+    if m.type != BOX:
+        raise ComposureError(
+            f"accept_fix applies to a scaffold-box's text, and module {m.id} "
+            f"is a {m.type} module.")
+    quote = str(op.get("quote") or "")
+    if not quote:
+        raise ComposureError(
+            "accept_fix needs the quoted span ('quote') the fix replaces; a "
+            "finding about the whole box has no fix to accept.")
+    if op.get("fix") is None:
+        raise ComposureError("accept_fix needs a 'fix' (the words that replace the span).")
+    fix = str(op["fix"])
+    if "\n" in fix or "\n" in quote:
+        raise ComposureError(
+            "a fix is accepted within one line of the box; a span or a fix "
+            "across lines is edited by hand after unlocking.")
+    if not m.pages:
+        m.pages = [Page(n=1)]
+    page = m.pages[0]
+    page.rich = replace_span(page.rich, quote, fix,
+                             prefix=str(op.get("prefix") or ""),
+                             suffix=str(op.get("suffix") or ""))
+    return [m.id]
+
+
+def _version_path(comp_path: Path, version: int) -> Path:
+    """`garden.comp` (version 1) → `garden-v2.comp`; `garden-v2.comp` →
+    `garden-v3.comp`. A name already taken gets `-2`, `-3` … (`new_path`'s
+    rule): nothing is ever overwritten."""
+    stem = re.sub(r"-v\d+$", "", comp_path.name[: -len(SUFFIX)])
+    base = f"{stem}-v{version}"
+    candidate = comp_path.with_name(f"{base}{SUFFIX}")
+    n = 2
+    while candidate.exists():
+        candidate = comp_path.with_name(f"{base}-{n}{SUFFIX}")
+        n += 1
+        if n > 999:  # pragma: no cover
+            raise ComposureError("too many copies of this version beside it.")
+    return candidate
+
+
+def unlock_scaffold(comp_path: Path, project_dir: Path | None = None
+                    ) -> tuple[Path, Composure]:
+    """Open a locked scaffold the only way it opens: the next version as a
+    new file beside it, unlocked, with `version` one higher and `parent` the
+    locked file's path (project-relative when `project_dir` is given). The
+    locked file is not touched. Its comments and findings are carried over
+    as they are (each finding keeps the version that found it), and the
+    plectrum beside it is copied to the new name."""
+    with path_lock(comp_path):
+        comp = load(comp_path)
+        view = scaffold_view(comp)
+        if view is None:
+            raise ComposureError("this composure is not a scaffold, so it has no lock to open.")
+        if not scaffold_locked(comp):
+            raise ComposureError(
+                "this scaffold is not locked: it is open for writing as it is.")
+        dest = _version_path(comp_path, view["version"] + 1)
+        parent = comp_path.name
+        if project_dir is not None:
+            try:
+                parent = str(comp_path.resolve().relative_to(project_dir.resolve())
+                             ).replace(os.sep, "/")
+            except ValueError:
+                pass
+        clone = copy.deepcopy(comp)
+        meta = dict(clone.scaffold or {})
+        meta.update(locked=None, version=view["version"] + 1, parent=parent)
+        clone.scaffold = meta
+        clone.rev = 0
+        clone.created = _now_iso()
+        clone.modified = clone.created
+        clone.generator = _generator()
+        save(dest, clone)
+    side = comments_path(comp_path)
+    if side.is_file():
+        with _finding_lock(comp_path):
+            doc = json.loads(side.read_text(encoding="utf-8"))
+            doc.pop("check", None)              # the new version has not been checked
+            doc["doc_path"] = dest.name
+            comments_path(dest).write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    plec = comp_path.with_name(comp_path.name[: -len(SUFFIX)] + ".plectrum.md")
+    if plec.is_file():
+        dest_plec = dest.with_name(dest.name[: -len(SUFFIX)] + ".plectrum.md")
+        if not dest_plec.exists():
+            dest_plec.write_bytes(plec.read_bytes())
+    return dest, clone
 
 
 # ---------------------------------------------------------------------------
@@ -3144,7 +3434,7 @@ def load_comments(comp_path: Path, doc_rel: str = "") -> dict[str, Any]:
 
 def _save_comments(comp_path: Path, doc: dict[str, Any]) -> None:
     p = comments_path(comp_path)
-    if not doc.get("comments"):
+    if not doc.get("comments") and not doc.get("check"):
         p.unlink(missing_ok=True)
         return
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -3221,11 +3511,233 @@ def add_reply(comp_path: Path, comment_id: str, body: str,
 
 def delete_comment(comp_path: Path, comment_id: str, doc_rel: str = "") -> None:
     doc = load_comments(comp_path, doc_rel)
+    entry = next((c for c in doc["comments"] if c.get("id") == comment_id), None)
+    if entry is not None and isinstance(entry.get("finding"), dict):
+        raise ComposureError(
+            "this comment is a finding of the check, and a finding stays as "
+            "the record of what the check found and what the person did with "
+            "it. Decline it instead.")
     before = len(doc["comments"])
     doc["comments"] = [c for c in doc["comments"] if c.get("id") != comment_id]
     if len(doc["comments"]) == before:
         raise KeyError(comment_id)
     _save_comments(comp_path, doc)
+
+
+# ---------------------------------------------------------------------------
+# Findings (0.8, E5): what the scaffold's check found, as comments with a fix
+#
+# A finding is a comment entry in the sidecar with `by: "check"` and a
+# `finding` object: `{id, box, kind, quote, prefix, suffix, fix, why, status,
+# version, pass, answered_at}`. `id` is `f1`, `f2` … for the file, never
+# reused (`findings_next` in the sidecar counts them). `box` is the module id;
+# `quote` the span of the box's plain text (`box_text`), empty for the whole
+# box; `fix` the replacement or None. `status` moves once: `open` → `accepted`
+# or `declined`, by the person; `cannot be checked` is final from the start.
+# The sidecar's `check` key records the last run: `{at, version, mode, reason,
+# passes, not_checked, counts}`.
+# ---------------------------------------------------------------------------
+
+FINDING_KINDS: tuple[str, ...] = ("spelling", "grammar", "truth")
+FINDING_STATUSES: tuple[str, ...] = ("open", "accepted", "declined", "cannot be checked")
+FINDING_PASSES: tuple[str, ...] = ("rules", "model")
+CANNOT = "cannot be checked"
+
+_FINDING_LOCKS: dict[str, threading.Lock] = {}
+
+
+def _finding_lock(comp_path: Path) -> threading.Lock:
+    """One lock per sidecar for the writes that read a finding and change
+    it (a check landing, an answer), so two answers never both win."""
+    key = str(comments_path(comp_path).resolve())
+    with _LOCKS_GUARD:
+        return _FINDING_LOCKS.setdefault(key, threading.Lock())
+
+
+def _clean_finding(raw: dict[str, Any]) -> dict[str, Any]:
+    """A finding's fields, checked: the kinds, statuses and passes above, a
+    status of `cannot be checked` with no fix."""
+    kind = str(raw.get("kind") or "").strip().lower()
+    if kind not in FINDING_KINDS:
+        raise ComposureError(
+            f"unknown finding kind {kind!r}. kinds: {', '.join(FINDING_KINDS)}.")
+    status = str(raw.get("status") or "open").strip().lower()
+    if status not in FINDING_STATUSES:
+        raise ComposureError(
+            f"unknown finding status {status!r}. statuses: "
+            f"{', '.join(FINDING_STATUSES)}.")
+    box = _clean_text(raw.get("box"), 32).lower()
+    if not box:
+        raise ComposureError("a finding names the box it is about ('box').")
+    fix = raw.get("fix")
+    # Quote, fix, prefix and suffix are kept without outer spaces: the state
+    # file holds each as one trimmed line, so this is what survives it.
+    fix = None if fix is None or status == CANNOT else str(fix)[:2000].strip()
+    why = _clean_text(raw.get("why"), 500) or None
+    pass_ = str(raw.get("pass") or "rules")
+    return {
+        "box": box, "kind": kind,
+        "quote": str(raw.get("quote") or "")[:2000].strip(),
+        "prefix": str(raw.get("prefix") or "")[-60:].strip(),
+        "suffix": str(raw.get("suffix") or "")[:60].strip(),
+        "fix": fix, "why": why, "status": status,
+        "version": max(1, int(_num(raw.get("version"), 1))),
+        "pass": pass_ if pass_ in FINDING_PASSES else "rules",
+        "answered_at": None,
+    }
+
+
+def finding_body(f: dict[str, Any]) -> str:
+    """The sentence a finding's comment shows."""
+    head = f["kind"] if f["status"] != CANNOT else f"{f['kind']}, {CANNOT}"
+    what = f"“{f['quote']}”" if f["quote"] else "the whole box"
+    line = f"{head}: {what}"
+    if f.get("fix") is not None:
+        line += f" → “{f['fix']}”"
+    if f.get("why"):
+        line += f" ({f['why']})"
+    return line
+
+
+def _finding_entry(doc: dict[str, Any], f: dict[str, Any]) -> dict[str, Any]:
+    n = int(_num(doc.get("findings_next"), 0))
+    used = {str((c.get("finding") or {}).get("id")) for c in doc["comments"]
+            if isinstance(c.get("finding"), dict)}
+    n = max(n, 1)
+    while f"f{n}" in used:
+        n += 1
+    f = {"id": f"f{n}", **f}
+    doc["findings_next"] = n + 1
+    anchor = _normalize_anchor({"type": "quote" if f["quote"] else "module",
+                                "module": f["box"], "page": 1, "quote": f["quote"],
+                                "prefix": f["prefix"], "suffix": f["suffix"]})
+    return {
+        "id": f"c_{secrets.token_hex(4)}",
+        "body": finding_body(f),
+        "created_at": _now_iso(),
+        "updated_at": None,
+        "resolved": f["status"] in ("accepted", "declined"),
+        "replies": [],
+        "anchor": anchor,
+        "state": "anchored" if anchor["type"] == "quote" and anchor["quote"] else "module",
+        "by": "check",
+        "finding": f,
+    }
+
+
+def add_finding(comp_path: Path, finding: dict[str, Any], doc_rel: str = "") -> dict[str, Any]:
+    """One finding as a comment with its fix attached (beside `add_comment`).
+    Returns the comment entry; its `finding.id` is the next `fN`."""
+    f = _clean_finding(finding)
+    with _finding_lock(comp_path):
+        doc = load_comments(comp_path, doc_rel)
+        entry = _finding_entry(doc, f)
+        doc["comments"].append(entry)
+        _save_comments(comp_path, doc)
+    return entry
+
+
+def list_findings(comp_path: Path, doc_rel: str = "") -> list[dict[str, Any]]:
+    """Every finding in the sidecar, in the order found, each with the id of
+    the comment that carries it (`comment`)."""
+    doc = load_comments(comp_path, doc_rel)
+    return [{**c["finding"], "comment": c.get("id")} for c in doc["comments"]
+            if isinstance(c.get("finding"), dict)]
+
+
+def _finding_key(f: dict[str, Any]) -> tuple:
+    return (f.get("box"), f.get("kind"), f.get("quote") or "",
+            f.get("prefix") or "", f.get("suffix") or "")
+
+
+def record_check(comp_path: Path, findings: list[dict[str, Any]],
+                 stamp: dict[str, Any], doc_rel: str = "") -> dict[str, Any]:
+    """Land one run of the check, all at once. The open findings an earlier
+    run left for the same version go (this run found again whatever still
+    stands); answered findings and findings that cannot be checked stay, and
+    a new finding that says what one of them already says is not added
+    twice. `stamp` becomes the sidecar's `check`. Returns
+    `{added, kept, findings}`."""
+    clean = [_clean_finding(f) for f in findings]
+    version = max(1, int(_num(stamp.get("version"), 1)))
+    with _finding_lock(comp_path):
+        doc = load_comments(comp_path, doc_rel)
+        keep: list[dict[str, Any]] = []
+        for c in doc["comments"]:
+            f = c.get("finding") if isinstance(c.get("finding"), dict) else None
+            if f and f.get("status") == "open" and int(_num(f.get("version"), 1)) == version:
+                continue
+            keep.append(c)
+        doc["comments"] = keep
+        have = {_finding_key(c["finding"]) for c in keep if isinstance(c.get("finding"), dict)}
+        added = []
+        for f in clean:
+            if _finding_key(f) in have:
+                continue
+            have.add(_finding_key(f))
+            entry = _finding_entry(doc, f)
+            doc["comments"].append(entry)
+            added.append(entry["finding"]["id"])
+        doc["check"] = {**stamp, "version": version}
+        _save_comments(comp_path, doc)
+        out = [{**c["finding"], "comment": c.get("id")} for c in doc["comments"]
+               if isinstance(c.get("finding"), dict)]
+    return {"added": added, "kept": len(out) - len(added), "findings": out}
+
+
+def answer_finding(comp_path: Path, finding_id: str, answer: str, *,
+                   doc_rel: str = "", project_dir: Path | None = None
+                   ) -> tuple[dict[str, Any], OpsResult | None]:
+    """The person's answer to an open finding. `accept` applies its fix as
+    the person (`accept_fix`, source `ui`: the one change a locked scaffold
+    takes) to the quoted span only, then records it on the finding;
+    `decline` records only that. A finding answered already, or one that
+    cannot be checked, is refused: both are final. Returns the finding and
+    the applied batch (None for a decline)."""
+    if answer not in ("accept", "decline"):
+        raise ComposureError("a finding is answered with accept or decline.")
+    with _finding_lock(comp_path):
+        doc = load_comments(comp_path, doc_rel)
+        entry = next((c for c in doc["comments"]
+                      if isinstance(c.get("finding"), dict)
+                      and c["finding"].get("id") == finding_id), None)
+        if entry is None:
+            raise KeyError(finding_id)
+        f = entry["finding"]
+        if f.get("status") == CANNOT:
+            raise ComposureError(
+                f"finding {finding_id} cannot be checked, and that is final: "
+                f"it has no fix to take, and it is never counted as passed. "
+                f"The words are the person's to keep or change.")
+        if f.get("status") != "open":
+            raise ComposureError(
+                f"finding {finding_id} was {f.get('status')} already"
+                f"{' on ' + f['answered_at'] if f.get('answered_at') else ''}.")
+        result: OpsResult | None = None
+        if answer == "accept":
+            if f.get("fix") is None or not f.get("quote"):
+                raise ComposureError(
+                    f"finding {finding_id} has no fix to accept (it is about "
+                    f"{'the whole box' if not f.get('quote') else 'a span with no suggestion'}). "
+                    f"Decline it, or change the words after unlocking.")
+            result = apply_ops(comp_path, None, [{
+                "op": "accept_fix", "module": f["box"], "quote": f["quote"],
+                "prefix": f.get("prefix") or "", "suffix": f.get("suffix") or "",
+                "fix": f["fix"], "finding": finding_id}],
+                source="ui", project_dir=project_dir, rel_path=doc_rel)
+            f["rev"] = result.rev
+            if f["fix"]:
+                entry["anchor"]["quote"] = f["fix"]
+            else:
+                entry["anchor"]["type"] = "module"
+                entry["anchor"]["quote"] = ""
+                entry["state"] = "module"
+        f["status"] = "accepted" if answer == "accept" else "declined"
+        f["answered_at"] = _now_iso()
+        entry["resolved"] = True
+        entry["updated_at"] = f["answered_at"]
+        _save_comments(comp_path, doc)
+    return {**f, "comment": entry.get("id")}, result
 
 
 def write_denial(target: Path) -> str | None:
@@ -3363,7 +3875,7 @@ def page_markdown(comp: Composure, module_id: str, n: int | None = None) -> str:
 # for fourteen cards and you get nine, two of them in the wrong group and one
 # a duplicate. So structure is produced as MARKDOWN, in one shot, and turned
 # into a plane deterministically here. The grammar is exactly the one
-# `defaults/skills/scaffold/SKILL.md` teaches; its two worked examples are
+# `defaults/skills/scaffolder/references/structure.md` teaches; its worked examples are
 # test fixtures, which is what keeps the skill and the parser honest about
 # each other.
 # ---------------------------------------------------------------------------

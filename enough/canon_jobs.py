@@ -34,8 +34,8 @@ log = logging.getLogger(__name__)
 
 EVENT = "canon"
 # thym: a program's run; read: a reading (0.5.0); fabulac: a folder's build, stage by stage; dialectic: a settle (0.6);
-# fabulap: a poem decompiled in steps (0.7)
-KINDS = ("emf", "atem", "compile", "pin", "thym", "read", "fabulac", "dialectic", "fabulap")
+# fabulap: a poem decompiled in steps (0.7); scaffold: a locked scaffold's check (0.8)
+KINDS = ("emf", "atem", "compile", "pin", "thym", "read", "fabulac", "dialectic", "fabulap", "scaffold")
 #: The kinds whose `result` keeps its `message` (the snapshot's `message` says it too): a fabulac's build and a
 #: settle (0.6), a poem's build in steps (0.7), and a fabulac's compile (kind `compile`, `flavour: fabulac`). Every
 #: other kind's result loses it to the snapshot, as before.

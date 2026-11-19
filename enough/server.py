@@ -1945,6 +1945,13 @@ def create_app(
         start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
     )
     app.include_router(_fabulap_router)
+    # 0.8: a scaffold's lock, check, findings and export (`composure_api.build_scaffold_router`,
+    # `/api/composure/scaffold*`; the check is a CanonJob of kind `scaffold`, keyed by the composure).
+    app.include_router(_composure_api.build_scaffold_router(
+        project_dir=project_dir, resolve_path=_resolve_project_path, emit=session.emit, jobs=canon_jobs,
+        canon_mode=_canon_mode, start_job=_start_canon_job, model_complete=_model_complete,
+        llm_url=session.llm_url,
+    ))
     _dialectic_router = _dialectic_api.build_router(
         project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
         start_job=_start_canon_job, model_complete=_model_complete, catalog_after=_canon_catalog_after,
