@@ -111,7 +111,15 @@ def verdict(name: str, output: Value, inputs: dict, node: dict, decl: Any, ctx: 
 # ---------------------------------------------------------------------------
 
 _FRONT = re.compile(r"\A---\n(.*?)\n---\n?", re.S)
-_SPLIT = re.compile(r"(?<=[.!?])[\"”’)\]]*\s+(?=[\"“‘(\[]?[A-Z0-9])")
+#: Thym's one sentence rule (THYM 7.3, the owner's ruling A of 2026-11-19), read by the checks' `sentences` and the
+#: moves' `segment` alike. Inside a paragraph a sentence ends at `.`, `!` or `?` where space and then a capital or a
+#: digit follow, the next sentence perhaps opening behind a mark (`"` `'` `“` `‘` `(` `[`). The marks English prose
+#: closes a quotation or an aside with after its stop (`"` `'` `”` `’` `)` `]`: the typographic quotes and their
+#: typewriter forms, the plain `'` among them, and the closing brackets) stay with the sentence they close:
+#: `He said "Go." Then he left.` is `He said "Go."` and `Then he left.`. An abbreviation (`Dr.`, `etc.`) ends none.
+_CLOSING = "\"'”’)]"
+_END = re.compile(r"[.!?][\"'”’)\]]*(\s+)(?=[\"'“‘(\[]?[A-Z0-9])")
+ABBREVIATIONS = frozenset("mr mrs ms dr prof st vs etc eg ie jr sr no fig".split())
 _WORDS = re.compile(r"[A-Za-z0-9À-ɏ]+(?:['’][A-Za-z]+)?")
 
 
@@ -148,8 +156,8 @@ def body(text: str, *, footer: bool = False) -> str:
 
 def sentences(text: str) -> list[str]:
     """The sentences of a text, by a simple rule: paragraphs split on blank lines, a heading or a list line is a
-    sentence of its own, and inside a paragraph a sentence ends at `.`, `!` or `?` followed by space and a capital or a
-    digit. Whitespace inside a sentence is folded to one space."""
+    sentence of its own, and inside a paragraph sentences split by `split_sentences`, the rule the moves' `segment`
+    reads too. Whitespace inside a sentence is folded to one space."""
     out: list[str] = []
     for para in re.split(r"\n\s*\n", body(text, footer=True)):
         buf: list[str] = []
@@ -167,8 +175,29 @@ def sentences(text: str) -> list[str]:
     return out
 
 
+def split_sentences(para: str) -> list[str]:
+    """A paragraph's sentences by Thym's one rule (`_END` above), each a slice of `para` as written: its closing
+    marks kept, its whitespace as it was. The space between two sentences belongs to neither."""
+    spans: list[list[int]] = []
+    start = 0
+    cuts = [(m.start(1), m.end(1)) for m in _END.finditer(para)] + [(len(para), len(para))]
+    for a, b in cuts:
+        if spans and _abbreviated(para[spans[-1][0]:spans[-1][1]]):
+            spans[-1][1] = a
+        else:
+            spans.append([start, a])
+        start = b
+    return [para[a:b] for a, b in spans]
+
+
+def _abbreviated(sentence: str) -> bool:
+    """Whether a piece ends at an abbreviation (`Dr.`), which ends no sentence."""
+    ws = sentence.split()
+    return bool(ws) and ws[-1].lower().rstrip(_CLOSING).rstrip(".") in ABBREVIATIONS
+
+
 def _split(para: str) -> list[str]:
-    return [" ".join(p.split()) for p in _SPLIT.split(para) if p.strip()]
+    return [" ".join(p.split()) for p in split_sentences(para) if p.strip()]
 
 
 def words(text: str) -> int:
