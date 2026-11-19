@@ -445,7 +445,24 @@ def make(dest: Path = DEST, scratch: Path | None = None) -> Path:
     return dest
 
 
+def _scratch_seams() -> None:
+    """Hold every ENOUGH_* seam at its scratch value before anything is made, as the test suite does: run by hand,
+    the maker must never reach the network (the language library's fetch, cosmoes.org) or a person's ~/enough, and
+    the fixture must not record what one machine's environment happened to allow (0.8 build: a run outside the
+    seams once recorded a live 404 from cosmoes.org/library)."""
+    import os
+    import tempfile
+    from enough import seams
+    scratch = Path(tempfile.mkdtemp(prefix="tally-fixture-seams-"))
+    for name in seams.BEHAVIOUR_SEAMS:
+        os.environ.pop(name, None)
+    for name, value in seams.scratch_env(scratch, {}).items():
+        if name.startswith("ENOUGH_"):
+            os.environ[name] = value
+
+
 if __name__ == "__main__":
+    _scratch_seams()
     print(make(Path(sys.argv[1]) if len(sys.argv) > 1 else DEST))
 
 
