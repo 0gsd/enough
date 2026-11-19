@@ -1,0 +1,8 @@
+fetched: 2026-11-18T12:00:00Z
+from: https://example.invalid/memo7.txt
+by: the owner, with scripts/fetch_library.py
+archive: memo7.txt
+archive-bytes: 288
+archive-sha256: dc52a3eed643cb27f018e4f4e1cf01d3b188027345eb8082b6c9a5158544ce58
+obtained-as: a file the owner already had (memo7.txt), said to be the one at the address above
+licence-read: https://example.invalid/licence, read whole by the owner before this run

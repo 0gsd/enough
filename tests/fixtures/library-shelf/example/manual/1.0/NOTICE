@@ -1,0 +1,38 @@
+The Example Manual 1.0, as kept in the cosmoes.org library
+==========================================================
+
+This folder is a copy of The Example Manual 1.0, kept at
+https://cosmoes.org/library/example/manual/1.0/, not the publisher's own page.
+The publisher is The Example Society; its own page for this text is https://example.invalid/manual/1.0/
+The files under files/ are the publisher's files as they came from https://example.invalid/archives/example-1.0-docs-text.tar.bz2
+on 2026-11-18T12:00:00Z (FETCHED, SHA256SUMS). Nothing in them is changed.
+
+Changed in form
+---------------
+Rendered as HTML from the publisher's plain-text build, by rule: titles from their underlines, paragraphs as paragraphs, indented blocks as preformatted text, anchors from the titles and from the definition lines. No word is changed, and the publisher's file is kept unchanged beside the page.
+
+Licence
+-------
+The Example Licence (made up)
+https://example.invalid/licence
+
+Copyright notice, as the publisher states it
+--------------------------------------------
+Copyright © 2026 The Example Society. All rights reserved.
+
+files/license.txt, whole
+------------------------
+The Example Licence
+*******************
+
+Anyone may copy, change and pass on this made-up manual, with this
+notice kept. It exists only for the cosmoes.org library's tests.
+
+files/copyright.txt, whole
+--------------------------
+Copyright
+*********
+
+Copyright © 2026 The Example Society. All rights reserved.
+
+This notice is made up for the cosmoes.org library's tests.

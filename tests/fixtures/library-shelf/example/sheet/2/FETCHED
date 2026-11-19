@@ -1,0 +1,8 @@
+fetched: 2026-11-18T12:00:00Z
+from: https://example.invalid/sheet/2/
+by: the owner, with scripts/fetch_library.py
+archive: sheet.html
+archive-bytes: 482
+archive-sha256: 8649acff6ffb6f1294f0cfd7c51b9e411d6b6e044e99713a3d5f305193f3fa02
+obtained-as: a file the owner already had (sheet.html), said to be the one at the address above
+licence-read: https://example.invalid/licence, read whole by the owner before this run

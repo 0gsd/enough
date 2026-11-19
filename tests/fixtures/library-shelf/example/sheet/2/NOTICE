@@ -1,0 +1,23 @@
+The Example Sheet 2, as kept in the cosmoes.org library
+=======================================================
+
+This folder is a copy of The Example Sheet 2, kept at
+https://cosmoes.org/library/example/sheet/2/, not the publisher's own page.
+The publisher is The Example Society; its own page for this text is https://example.invalid/sheet/2/
+The files under files/ are the publisher's files as they came from https://example.invalid/sheet/2/
+on 2026-11-18T12:00:00Z (FETCHED, SHA256SUMS). Nothing in them is changed.
+
+Changed in form
+---------------
+Rendered as HTML from a text extraction of the publisher's HTML, by rule: headings, paragraphs, list items, table cells and preformatted blocks kept in order with their ids; scripts, styles, images, navigation and all other markup dropped. The publisher's file is kept unchanged beside the page.
+
+Licence
+-------
+The Example Licence (made up)
+https://example.invalid/licence
+
+Copyright notice, as the publisher states it
+--------------------------------------------
+Copyright © 2026 The Example Society.
+
+Made up for the tests.
