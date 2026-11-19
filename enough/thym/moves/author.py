@@ -191,8 +191,8 @@ def begin(name: str, *, kind: str = "tool", licence: Any = None, by: str | None 
           registry: mc.Registry | None = None) -> dict:
     """The catalog of an authored fabulac with the items its person stated in beginning it, by rules: who authored it
     (`R:maker`, capacity `author`), the licence (`R:licence`, its identifier when given, else asked by the interview),
-    and the language (`C:dependency/python`, its version asked). `at` is a timestamp in UTC; the source's `at` is its
-    day."""
+    and the language (`C:dependency/python`, with no `version`: MacroCOSM's `version` is optional, and no stage of the
+    interview asks it). `at` is a timestamp in UTC; the source's `at` is its day."""
     name = fold(name or "")
     if not name:
         raise MoveError("an authored fabulac needs a name: the program's")
