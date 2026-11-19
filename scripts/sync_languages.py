@@ -48,7 +48,21 @@ from pathlib import Path
 from types import ModuleType
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_COSMOES = REPO_ROOT.parent.parent / "cosmoes-site"
+
+
+def find_cosmoes(start: Path = REPO_ROOT) -> Path:
+    """The sibling cosmoes-site checkout, as sync_specs finds it (two folders above the repository); from a worktree
+    (`<repo>/.claude/worktrees/<name>`) the first ancestor that holds a `cosmoes-site` folder is used instead."""
+    first = start.parent.parent / "cosmoes-site"
+    if first.is_dir():
+        return first
+    for up in start.parents:
+        if (up / "cosmoes-site").is_dir():
+            return up / "cosmoes-site"
+    return first
+
+
+DEFAULT_COSMOES = find_cosmoes()
 
 SHELF = "library"                                   # in the checkout
 REGISTRY = "library.json"

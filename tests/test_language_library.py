@@ -555,3 +555,13 @@ def test_the_volume_and_status_routes(tmp_path, client):
     assert v["nodes"][0]["id"] == "S:section/notice" and v["document"]["copy"] == ll.COPY_LINE
     assert c.get("/api/library/volume", params={"shelf": "example", "text": "runner",
                                                 "version": "1"}).status_code == 404
+
+
+def test_default_source_is_found_from_a_worktree_too(tmp_path):
+    (tmp_path / "cosmoes-site").mkdir()
+    deep = tmp_path / "enough-dev" / ".claude" / "worktrees" / "agent-x"
+    deep.mkdir(parents=True)
+    assert sync_languages.find_cosmoes(deep) == tmp_path / "cosmoes-site"
+    plain = tmp_path / "enough-dev"
+    assert sync_languages.find_cosmoes(plain) == tmp_path.parent / "cosmoes-site" or \
+        sync_languages.find_cosmoes(plain) == tmp_path / "cosmoes-site"

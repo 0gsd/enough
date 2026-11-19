@@ -1907,6 +1907,11 @@ def _check_writable(comp: Composure, m: Module, page: Page | None,
             f"permanently read-only — add a new page instead. (Comments on a "
             f"filed page are still allowed.)"
         )
+    if op_name == "remove_module" and any(p.filed for p in m.pages):
+        filed = [p for p in m.pages if p.filed]
+        raise ComposureError(
+            f"module {m.id} holds {len(filed)} filed page(s) (the first on {filed[0].date}) and a filed page is "
+            f"permanently read-only — removing the module would delete it. Leave the module where it is.")
     if m.locked and source != "council":
         raise ComposureError(
             f"module {m.id} is a council statement by {m.speaker!r} — the "

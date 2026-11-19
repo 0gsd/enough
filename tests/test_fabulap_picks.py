@@ -208,3 +208,17 @@ def test_a_one_call_fabulap_under_either_name_is_rebuilt_in_steps_only_when_aske
         state = P.build_state(tmp_path, poem)
         assert state["exists"] and not state["built"], name
 
+
+
+def test_a_settled_rule_answer_recomputes_the_forms_saved_confidence(tmp_path):
+    ctx, poem, got = heard(tmp_path, "sonnet-116.txt")
+    form = _form(got)
+    assert form["provenance"]["confidence"] == 0.67 and mc.is_pending(form["rules"][-1]["held"])
+    led = dl.ledger_from_items(mc.default_registry().get("fabula"), list(items(got["form"]).values()),
+                               catalog={k: v for k, v in got["form"].payload.items() if k != "nodes"})
+    n = len(form["rules"]) - 1
+    r = dl.fold(led, f"{form['id']}#rules[{n}].held", {"value": True, "session": "s1"},
+                spec={"kind": "yes-no"}, session="s1")
+    assert r.ok, r
+    saved = next(d for d in led.items if d.get("id") == form["id"])
+    assert saved["rules"][n]["held"] is True and saved["provenance"]["confidence"] == 0.75

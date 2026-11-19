@@ -387,8 +387,8 @@ entries:
   usual: kept
   from: [TS 3.28, SW 2.25]
   stated:
-    - {in: python, version: 3.13.18, at: library/string.html#formatspec, digest: b1490c87ba39}
-    - {in: python, version: 3.13.18, at: reference/lexical_analysis.html#formatted-string-literals,
+    - {in: python, version: 3.13.18, at: library/string.html#format-specification-mini-language, digest: b1490c87ba39}
+    - {in: python, version: 3.13.18, at: reference/lexical_analysis.html#2-4-3-f-strings,
        digest: 26b7f8ab2fcf}
 
 - id: percent-format
@@ -592,7 +592,7 @@ entries:
   usual: kept
   from: [V-R25, TS 2.4, SW 2.6]
   stated:
-    - {in: python, version: 3.13.18, at: builtins/exceptions.html#BaseException.args, digest: fd1dcc489d5c}
+    - {in: python, version: 3.13.18, at: builtins/exceptions.html#BaseException, digest: fd1dcc489d5c}
 
 - id: error-kinds
   on: language
@@ -900,7 +900,7 @@ entries:
   usual: alike
   from: [V-R32, TS 3.29, SW 3.27]
   stated:
-    - {in: python, version: 3.13.18, at: library/os.html#utf8-mode, digest: 7df584c5ef74}
+    - {in: python, version: 3.13.18, at: library/os.html#python-utf-8-mode, digest: 7df584c5ef74}
     - {in: python, version: 3.13.18, at: library/sys.html#sys.stdout, digest: 1fc32ff781c0}
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1323,11 +1323,7 @@ entries:
   usual: kept
   from: [S-R15]
   stated:
-    - {in: python, version: 3.13.18, at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.text,
-       digest: 5e516318a17d}
-    - {in: python, version: 3.13.18, at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.tail,
-       digest: 5e516318a17d}
-    - {in: python, version: 3.13.18, at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.attrib,
+    - {in: python, version: 3.13.18, at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element,
        digest: 5e516318a17d}
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -1349,7 +1345,7 @@ entries:
   stated:
     - {in: python, version: 3.13.18, at: reference/grammar.html#full-grammar-specification, digest: fe32d00f620e}
     - {in: python, version: 3.13.18, at: library/ast.html#ast.parse, digest: c8e0214fb37f}
-    - {in: python, version: 3.13.18, at: library/ast.html#ast.AST.lineno, digest: c8e0214fb37f}
+    - {in: python, version: 3.13.18, at: library/ast.html#ast.AST, digest: c8e0214fb37f}
     - nowhere: that a decorated definition's line is its def or class line.
 
 - id: identifiers-normalised
@@ -1363,7 +1359,7 @@ entries:
   usual: kept
   from: [V-R19]
   stated:
-    - {in: python, version: 3.13.18, at: reference/lexical_analysis.html#identifiers, digest: 26b7f8ab2fcf}
+    - {in: python, version: 3.13.18, at: reference/lexical_analysis.html#2-3-identifiers-and-keywords, digest: 26b7f8ab2fcf}
     - {in: python, version: 3.13.18, at: library/unicodedata.html#unicodedata.normalize, digest: 607cc720d0f3}
 
 - id: parser-messages
