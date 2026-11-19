@@ -572,6 +572,17 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.author:uncovered
     says: the requirements a program must meet that no case shows
     since: 1
+  # thym 1 only (since: 1; THYM 6.3, 20.12): an authored fabulac's entailment run by the host's sandbox (the engine
+  # sandbox, enough/thym_sandbox.py), the answer recorded as an engine call, so a replay runs nothing. The move lives
+  # in enough/thym/moves/run_entailment.py, with only-authored and in-sandbox (THYM 7.3).
+  - name: run
+    takes: [folder]
+    gives: report
+    modifiers: {as: 'tests | tool | service', with: list of string}
+    contract: [only-authored, in-sandbox, provenance]
+    code: enough.thym.moves.run_entailment:run
+    says: the host's report of a run of an authored fabulac's entailment in its sandbox, its tests or its tool
+    since: 1
   # thym 1 only (since: 1; Thym 20.10): a transconception's moves (enough/thym/moves/transconceive.py)
   - name: ground
     takes: [folder]

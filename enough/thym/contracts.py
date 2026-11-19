@@ -45,11 +45,9 @@ AHEAD_MOVES: tuple[str, ...] = ()
 
 # The other way round: rows of the bundled text's 6.3 table that no declaration here builds yet. A test holds each to
 # being undeclared, so it leaves this list the day its move is declared, and the text's blocks that call it are held
-# to being refused as an unknown move until then.
-#   run (0.8, Thym 6.3, 20.12): `run code as tests | tool | service`, with its checks `only-authored` and
-#     `in-sandbox` (7.3); the host's sandbox and its fabulac-first doors, outside this package, run an authored
-#     entailment, but no Thym move does yet
-BEHIND_MOVES: tuple[str, ...] = ("run",)
+# to being refused as an unknown move until then. Empty since `run` (Thym 20.12) was built in 0.8
+# (enough/thym/moves/run_entailment.py).
+BEHIND_MOVES: tuple[str, ...] = ()
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}

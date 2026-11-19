@@ -60,6 +60,8 @@
     read: { asks: true, gives: ['short'], contract: ['coverage', 'no-invention', 'stance-kept', 'scales-met', 'labelled', 'never-source', 'provenance'], modifiers: { with: ['morph'], in: ['context'] } },
     record: { gives: ['same-as-in'], contract: ['addressed', 'only-the-asked', 'provenance'], modifiers: { in: ['fabula', 'volume'] }, since: 1 },
     replace: { gives: ['change'], modifiers: { with: ['string', 'line', 'short'] }, since: 1 },
+    // 0.8 (Thym 20.12): an authored fabulac's entailment run by the server's sandbox (enough/thym/moves/run_entailment.py)
+    run: { gives: ['report'], contract: ['only-authored', 'in-sandbox', 'provenance'], modifiers: { as: ['tests', 'tool', 'service'], with: ['list of string'] }, since: 1 },
     reword: { asks: true, gives: ['line', 'string', 'short'], contract: ['length', 'one-line', 'nothing-added', 'provenance'], modifiers: { to: ['words'], with: ['morph'] }, since: 1 },
     say: { gives: ['string'], since: 1 },
     scan: { gives: ['fabula'], contract: ['lines-found', 'scansion-grounded', 'span-resolves', 'fabula-checks', 'provenance'], modifiers: { as: ['rhyme', 'sound', 'recurrence', 'form'], with: ['fabula'] }, since: 1 },
@@ -129,6 +131,7 @@
     author: "it reads a brief, or a starter's bank, through the server's engines; with a brief it asks a model",
     weigh: "it reads the target language's table through the server's engines, and asks a model",
     entail: "it asks a model, but for entailing a fabulac as cases, which reads its cases through MacroCOSM's manifests, which the server holds",
+    run: "it hands an authored fabulac's entailment to the server's sandbox, which runs it; the page runs nothing",
   };
 
   // -------------------------------------------------------------------------------------------------------------

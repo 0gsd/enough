@@ -2395,8 +2395,11 @@ class _Run:
             raise _Stop(e.refusal) from None
         except Exception as e:  # noqa: BLE001 - THYM.md 9: a deterministic move that raises refuses the run
             if any(k.__name__ == "MoveError" for k in type(e).__mro__):
-                # a move that cannot go on says why in the program's terms (moves.MoveError)
-                raise _Stop(Refusal("run", "move", str(e) or f"{move} cannot go on with what it was given")) from None
+                # a move that cannot go on says why in the program's terms (moves.MoveError); one that refuses by
+                # one of its checks' names (`run`'s only-authored, Thym 20.12) carries it as `check`
+                check = getattr(e, "check", None)
+                raise _Stop(Refusal("run", check if isinstance(check, str) and check else "move",
+                                    str(e) or f"{move} cannot go on with what it was given")) from None
             raise _Stop(Refusal("run", "move", f"{move} failed inside its implementation; that is {_RUNTIME_FAULT}"),
                         fault=f"{move}: {type(e).__name__}: {e}") from None
 

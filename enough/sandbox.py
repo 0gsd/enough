@@ -906,6 +906,34 @@ def run_tests(run: Run, *, limits: Limits = Limits()) -> Result:
     return _execute(run, "tests", inner, b"", limits, [])
 
 
+_TEST_HEAD = re.compile(r"^(?P<name>\w+) \((?P<where>[\w.]+)\)")
+_TEST_VERDICT = re.compile(r" \.\.\. (?P<v>ok|FAIL|ERROR|skipped(?: .*)?|expected failure|unexpected success)$")
+_VERDICT_WORDS = {"ok": "passed", "FAIL": "failed", "ERROR": "error", "expected failure": "expected failure",
+                  "unexpected success": "unexpected success"}
+
+
+def test_verdicts(stderr: str) -> list[dict[str, str]]:
+    """Each test `unittest -v` reported, in the order it ran, with its verdict: `[{test, verdict}]`, the test by its
+    id (`tests.test_cases.Cases.test_counts`), the verdict `passed`, `failed`, `error`, `skipped`, `expected
+    failure` or `unexpected success`. A test with a docstring is reported over two lines; both are read."""
+    out: list[dict[str, str]] = []
+    pending: str | None = None
+    for line in (stderr or "").splitlines():
+        head = _TEST_HEAD.match(line)
+        if head:
+            where, name = head.group("where"), head.group("name")
+            pending = where if where.endswith("." + name) else f"{where}.{name}"
+        v = _TEST_VERDICT.search(line)
+        if v and pending:
+            word = v.group("v")
+            out.append({"test": pending, "verdict": "skipped" if word.startswith("skipped")
+                        else _VERDICT_WORDS[word]})
+            pending = None
+        elif not head and line.startswith(("=====", "-----", "Ran ")):
+            pending = None
+    return out
+
+
 def run_tool(run: Run, argv: Sequence[str] = (), *, stdin: bytes = b"",
              handed_over: Sequence[str | os.PathLike] = (), limits: Limits = Limits()) -> Result:
     """The tool itself: its `start` plus `argv`. What the person hands over is copied into handed/ (read-only), and

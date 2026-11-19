@@ -351,13 +351,14 @@ def test_the_poems_programs_are_refused_in_the_page_with_the_reason(program: str
 
 # 0.8 (lane W4-X7): the moves 0.8 added, declared in the page as Python declares them, and each refused there with
 # its reason (the page runs none of them: the deterministic ones need the server's engines or reader, the others ask)
-MOVES_08 = ("add", "author", "compare", "uncovered", "ground", "weigh", "entail")
+MOVES_08 = ("add", "author", "compare", "uncovered", "ground", "weigh", "entail", "run")
 PROGRAMS_08 = {
     "ground": ("takes repo: folder, f: fabula\n  gives g: fabula\n\n  give ground repo with f", ("repo", "f"), "move"),
     "add": ("takes f: fabula, said: string\n  gives g: fabula\n\n  give add said as requirement with f", ("f", "said"),
             "move"),
     "compare": ("takes f: fabula, g: fabula\n  gives r: report\n\n  give compare f with g", ("f", "g"), "move"),
     "uncovered": ("takes f: fabula\n  gives n: number\n\n  give count (uncovered f)", ("f",), "move"),
+    "run": ("takes repo: folder\n  gives r: report\n\n  give run repo as tool with [\"count\"]", ("repo",), "move"),
     "weigh": ("takes f: fabula\n  gives g: fabula\n\n  give weigh f in \"go\"", ("f",), "agent-free"),
     "author": ("gives f: fabula\n\n  give author as tool", (), "agent-free"),
     "entail-cases": ("takes f: fabula\n  gives c: text\n\n  give entail f as cases", ("f",), "agent-free"),

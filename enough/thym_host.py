@@ -16,7 +16,8 @@
 - `engines()` is the mapping the moves reach as `ctx.engines` (THYM.md 11.2): `canon` (`canon_derive`'s derivation,
   outline, footer and atems, wired so that the moves stay free of engine imports), `docoes`, and `feed` (FEED's batch
   lookup, when the dictionary is built); a test passes its own. The sibling lanes' engines join when their modules
-  are there (`SIBLING_ENGINES`: `repo`, `syntax`, `dialectic`, `ascribe`), imported by name and skipped quietly when absent.
+  are there (`SIBLING_ENGINES`: `repo`, `syntax`, `dialectic`, `ascribe`, `transconception`, `sandbox`), imported
+  by name and skipped quietly when absent.
 - The prompt builders of the model-backed moves (`registry.prompt_for`): each turns a move's contract and inputs into
   the messages the model reads, on Canon's prompts where Canon has one (the atem's, the EMF passage's, the compile's
   stance words). A move whose engine wrote the messages itself (`derive`) passes them through unchanged. The sibling
@@ -1014,6 +1015,7 @@ SIBLING_ENGINES: dict[str, tuple[str, str]] = {
     "dialectic": ("enough.dialectic", "thym_engine"),
     "ascribe": ("enough.ascribe", "thym_engine"),
     "transconception": ("enough.transconception", "thym_engine"),
+    "sandbox": ("enough.thym_sandbox", "thym_engine"),     # Thym 20.12: `run`, an authored entailment in the sandbox
 }
 #: Engines whose module, without its maker function, is the engine: its public functions as a namespace.
 _MODULE_IS_ENGINE = frozenset({"dialectic"})
