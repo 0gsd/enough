@@ -88,8 +88,12 @@ def check(name: str, *, registry: Checks | None = None, kind: str | None = None)
 def verdict(name: str, output: Value, inputs: dict, node: dict, decl: Any, ctx: Any = None, *,
             registry: Checks | None = None) -> tuple[bool, str] | Refusal:
     """One check's verdict, `(ok, why)`; `why` is empty when it holds. A check the registry lacks is a refusal; a
-    check that raises fails, with what it raised."""
-    fn = (registry or CHECKS).lookup(name, _mods(node).get("as"))
+    check that raises fails, with what it raised. A check implemented for one move (`kind="move:<name>"`, a check
+    whose sense that move's own text gives, as `weigh` gives `no-invention`'s) is that move's, before any `as` kind."""
+    reg = registry or CHECKS
+    mv = decl.get("name") if isinstance(decl, dict) else getattr(decl, "name", None)
+    fn = reg.lookup(name, f"move:{mv}") if isinstance(mv, str) and (name, f"move:{mv}") in reg._kinds else None
+    fn = fn or reg.lookup(name, _mods(node).get("as"))
     if fn is None:
         return Refusal("run", name, "check not implemented", line=(node or {}).get("line"))
     try:

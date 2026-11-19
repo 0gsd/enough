@@ -252,7 +252,8 @@ modules:
                  required: [id, type, name, summary, provenance, stance, chose]}
       exclusion: {refs: [], checked: [stance, horizon, because], flavours: [fabulan, fabulap, fabulac],
                   required: [id, type, name, summary, provenance, stance]}
-      target: {refs: [provides.for], checked: [language, version, weighed, provides, spike, verdict, conditions, at, by, stance],
+      target: {refs: [provides.for], checked: [language, version, weighed, provides, spike, verdict, conditions, at, by, stance,
+                                               edition, program, library, made],
                flavours: [fabulac], required: [id, type, name, summary, provenance, stance, language],
                closed: {weighed.score: [0, 1, 2, 3], provides.by: [built-in, library, binding, written, cannot, dropped],
                         verdict: [feasible, feasible-with, not]}}
@@ -542,6 +543,15 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.transconceive:ground
     says: the fabula so far with a reliance for each ground entry the syntax shows, each citing its gift, nothing run
     since: 1
+  - name: weigh                         # Thym 6.3, 20.10: rules from the language's target table, then a model
+    takes: [fabula]
+    gives: fabula
+    modifiers: {in: string}
+    asks: true
+    contract: [target-weighed, no-invention, fabula-checks, provenance]
+    code: enough.thym.moves.transconceive:weigh
+    says: the fabulac with one dated N:target for the language, its twelve points scored, what provides each thing kept, its verdict
+    since: 1
 
 # The opening questions (MacroCOSM's dialectic, pin P4): one bank per flavour, in plain words and in no one's voice.
 # about names a module (M), a kind (M:kind) or a kind's field (M:kind#field). A question about a module is asked of
@@ -686,8 +696,8 @@ dialectic:
     # A transconception's three banks (MacroCOSM 18.4.9, 18.6.6), asked only of a fabulac whose catalog says
     # purpose: transconception, and answered by its transconceiver. standing: who rules, the source's terms and the
     # transconceiver's statements about them (who rules is asked only while nobody does; the leave only of a closed
-    # lane). target: asked once of the N:target named, and of none when no target is named (phase 5 adds the twelve
-    # points). rulings: one question per interface, behaviour, reliance, setting, structure and ruled case that still
+    # lane). target: asked once of the N:target named, and of none when no target is named (its version and
+    # conditions, then each of the twelve points a weighing scored). rulings: one question per interface, behaviour, reliance, setting, structure and ruled case that still
     # needs a ruling for the target in question, in this order and riskiest first within each, each proposing a
     # ruling ({proposed}; {for} names its target when it is made for one); batch: true asks once of every item with
     # the same proposal and scope. A ruling question's answer is a choice: as proposed, or a ruling word, the
@@ -710,6 +720,21 @@ dialectic:
       questions:
         - {id: version, about: N:target#version, asks: "Which version of {language} should the new program be written for?", kind: text, why: missing}
         - {id: conditions, about: N:target#conditions, asks: "On what conditions may the new program be written in {language}: may it use libraries others wrote, each pinned and named, and what must it never lean on?", kind: text, why: missing}
+        # the twelve points (MacroCOSM 18.4.9), once weighed: each score the weighing gave (by rules or a model,
+        # weighed[n].answered) is put to the transconceiver, whose word is kept in weighed[n].ruled. Points 1, 4, 5
+        # are gates: a score of 0 makes the target not feasible.
+        - {id: stewardship, about: 'N:target#weighed[0].ruled', only-with: 'weighed[0].score', asks: "Point 1, a gate: does {language} have stewardship that outlives one company? The weighing scored it {weighed[0].score} of 3: {weighed[0].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: specification, about: 'N:target#weighed[1].ruled', only-with: 'weighed[1].score', asks: "Point 2: does {language} have a written specification, and more than one implementation? The weighing scored it {weighed[1].score} of 3: {weighed[1].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: old-programs-build, about: 'N:target#weighed[2].ruled', only-with: 'weighed[2].score', asks: "Point 3: does {language} promise that old programs keep building? The weighing scored it {weighed[2].score} of 3: {weighed[2].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: provided, about: 'N:target#weighed[3].ruled', only-with: 'weighed[3].score', asks: "Point 4, a gate: is everything the program leans on provided in {language}? The weighing scored it {weighed[3].score} of 3: {weighed[3].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: runs-and-ships, about: 'N:target#weighed[4].ruled', only-with: 'weighed[4].score', asks: "Point 5, a gate: does a program in {language} run where it must and ship as it must? The weighing scored it {weighed[4].score} of 3: {weighed[4].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: fits-shapes, about: 'N:target#weighed[5].ruled', only-with: 'weighed[5].score', asks: "Point 6: does {language} fit the program's shapes? The weighing scored it {weighed[5].score} of 3: {weighed[5].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: safe-by-default, about: 'N:target#weighed[6].ruled', only-with: 'weighed[6].score', asks: "Point 7: is {language} safe by default? The weighing scored it {weighed[6].score} of 3: {weighed[6].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: tools-check, about: 'N:target#weighed[7].ruled', only-with: 'weighed[7].score', asks: "Point 8: can the tools of {language} check what the fabulac states? The weighing scored it {weighed[7].score} of 3: {weighed[7].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: agent-skill, about: 'N:target#weighed[8].ruled', only-with: 'weighed[8].score', asks: "Point 9: how well does the writing agent write {language}? The weighing scored it {weighed[8].score} of 3: {weighed[8].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: budgets, about: 'N:target#weighed[9].ruled', only-with: 'weighed[9].score', asks: "Point 10: does a program in {language} meet the budgets? The weighing scored it {weighed[9].score} of 3: {weighed[9].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: readable, about: 'N:target#weighed[10].ruled', only-with: 'weighed[10].score', asks: "Point 11: can the people who keep the program read {language}? The weighing scored it {weighed[10].score} of 3: {weighed[10].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
+        - {id: can-be-left, about: 'N:target#weighed[11].ruled', only-with: 'weighed[11].score', asks: "Point 12: could the program leave {language} for another language later? The weighing scored it {weighed[11].score} of 3: {weighed[11].evidence} Is that right? Say yes, or give your score and why.", kind: text, why: unsure}
     transconception-rulings:
       for: {purpose: transconception}
       to: transconceiver

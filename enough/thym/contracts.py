@@ -38,14 +38,17 @@ CHECKS = (
 #   authored-source (0.8): an authored fabulac's source and items (enough/thym/moves/author.py)
 #   ground-cited (0.8): every reliance on the language or its runtime cites where its gift is written
 #     (enough/thym/moves/transconceive.py)
-# All three are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
-AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited")
+#   target-weighed (0.8): a weighing's N:target names its language and version, scores the twelve points with their
+#     evidence, says what provides everything kept, and is `not` when a gate fails (enough/thym/moves/transconceive.py)
+# All of them are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
+AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited", "target-weighed")
 
 # The moves a shipped declaration names ahead of the bundled text's 6.3 table (an approved text the bundled copy does
 # not hold yet). A test holds each to being no row of that table, so it leaves this list the day the text is synced.
 #   author, add, compare, uncovered (0.8, Thym 20.11): enough/thym/moves/author.py
 #   ground (0.8, Thym 20.10): `ground repo with f`, enough/thym/moves/transconceive.py
-AHEAD_MOVES = ("author", "add", "compare", "uncovered", "ground")
+#   weigh (0.8, Thym 20.10): `weigh f in <language>`, enough/thym/moves/transconceive.py
+AHEAD_MOVES = ("author", "add", "compare", "uncovered", "ground", "weigh")
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}
