@@ -729,13 +729,29 @@ var copyOut = function () {
   } catch (e) { say("Selected below: copy it with your keyboard.", "warn"); }
 }
 var saveFile = function () {
-  try {
-    var md = document.getElementById("out-text").value;
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([md], { type: "text/markdown;charset=utf-8" }));
-    a.download = (slug(model.meta.title) || "scaffold") + (model.meta.version > 1 ? ".v" + model.meta.version : "") + ".scaffold.md";
-    document.body.appendChild(a); a.click(); a.remove();
-  } catch (e) { say("This page cannot save a file here; copy the text instead.", "warn"); }
+  var md = document.getElementById("out-text").value;
+  var name = (slug(model.meta.title) || "scaffold") + (model.meta.version > 1 ? ".v" + model.meta.version : "") + ".scaffold.md";
+  var plain = function () {
+    /* Outside an artifact (one HTML file opened in a browser): an ordinary download. */
+    try {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([md], { type: "text/markdown;charset=utf-8" }));
+      a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) { say("This page cannot save a file here; copy the text instead.", "warn"); }
+  };
+  /* Inside an artifact the frame may not download: the page's `downloads` capability offers the file instead. */
+  if (!(window.claude && window.claude.use)) { plain(); return; }
+  Promise.resolve(window.claude.use("downloads")).then(function (dl) {
+    if (!dl) { say("This page cannot save a file here; copy the text instead.", "warn"); return; }
+    return dl.save({ filename: name, data: md }).then(function () { say("Saved as " + name + ".", "ok"); },
+      function (e) {
+        var code = (e && e.code) || "unavailable";
+        if (code === "declined") say("Not saved: you said no. The text is still here to copy.", "warn");
+        else if (code === "rate_limited") say("A save is already waiting for your answer.", "warn");
+        else say("This page cannot save a file here (" + code + "); copy the text instead.", "warn");
+      });
+  }, function () { say("This page cannot save a file here; copy the text instead.", "warn"); });
 }
 
 /* ---- start: the embedded scaffold, then the person's own saved words ---- */

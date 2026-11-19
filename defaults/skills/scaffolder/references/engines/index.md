@@ -36,7 +36,7 @@ until a row is tried, say so when you rely on it.
 |---|---|---|---|---|---|---|
 | enough | composure | enough's own canvas | the project's files | yes | all (HTML, PDF, PPTX, Markdown) | not tried |
 | Claude Code | artifact with a store; else one HTML file | the published artifact, or the file opened in a browser | the artifact's store (`db`); else the browser | yes, with the person's Python | what `export.py can` reports | not tried |
-| claude.ai | artifact with a store | the published artifact | the artifact's store (`db`) | yes, in its sandbox when code runs there | what `export.py can` reports there | not tried |
+| claude.ai | artifact with a store | the published artifact | the artifact's store (`db`); "Save as a file" through `downloads` | yes, in its sandbox when code runs there | what `export.py can` reports there | tried 2026-11-19 (a page): plectrum, scaffold, saving, lock and check worked; "Save as a file" failed until the page used `downloads` |
 | a chat harness with an HTML preview and no store | one HTML file | the preview, or the file saved and opened | the browser only | if it runs code | HTML always; the rest if it runs the script | not tried |
 | a chat with no page at all | the chat alone | none | the chat itself | no | the plectrum and the state as text; HTML by hand from the state | not tried |
 

@@ -20,10 +20,12 @@ the store is how you see the person's words; writing it is theirs.
    `python3 scripts/export.py fill PLECTRUM.md` writes `<slug>.scaffold.html`.
    Without Python: write the JSON by hand in the shape `../state.md` gives
    "for a program", with every `<` written `<`.
-3. Publish that file as an artifact that declares the `db` capability (in
-   claude.ai and Claude Code, load the artifact capabilities guidance first
-   for the declaration). The page needs nothing else: no fonts, no scripts,
-   no network.
+3. Publish that file as an artifact that declares the `db` and `downloads`
+   capabilities (in claude.ai and Claude Code, load the artifact capabilities
+   guidance first for the declaration): `db` keeps the person's words,
+   `downloads` lets "Save as a file" hand them the scaffold (a page in an
+   artifact cannot download a file any other way). The page needs nothing
+   else: no fonts, no scripts, no network.
 4. Give the person the link. Tell them: each dashed box is theirs; the
    bracketed line says what it must get across; it saves as they type;
    "+ scaffold-box" and "+ page" (or "+ slide") add parts; "Lock" closes
