@@ -59,6 +59,9 @@ FIXED_SEAMS: dict[str, str] = {
     "ENOUGH_MODELS_URL_BASE": "http://127.0.0.1:1/weights",
     "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
     "ENOUGH_SPECS_SYNC": "0",
+    # The language library's published home (0.8), where a text a citation asks for is fetched on demand: a port
+    # nothing listens on, and the fetch is off anyway with ENOUGH_SPECS_SYNC=0. A test of the fetch sets a stand-in.
+    "ENOUGH_LIBRARY_URL": "http://127.0.0.1:1/library",
     # Comprise Connect, where enough signs in to the Allograph Registry (0.7), and the registry's own address,
     # allograph.net, which Connect serves: a loopback port nothing listens on, so a run that forgot to replace
     # `allograph_registry.TRANSPORT` fails at once instead of asking compriseconnect.com or allograph.net.

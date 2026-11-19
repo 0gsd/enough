@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from .. import docoes as _docoes
 from .. import language_library as _language_library
+from .. import library_fetch as _library_fetch
 from .. import macrocosm as _macrocosm
 from .. import specs as _specs
 from .common import AppContext
@@ -515,28 +516,45 @@ def build_router(ctx: AppContext) -> APIRouter:
     # (HOME_PREFIXES has /api/library/); the index is built on first use in a
     # worker thread. A machine with no copy answers every citation with
     # state `not-aboard`, never an error.
+    #
+    # An installed enough has no synced shelf: a text a citation or the
+    # viewer asks for is fetched on demand from cosmoes.org's library into
+    # the cache (`enough/library_fetch.py`, ruled 2026-11-19). The routes
+    # wait up to `wait` seconds (default 2) for that fetch, then answer
+    # `fetching` (ask again) or, offline, `not-aboard`.
 
     def _library() -> "_language_library.Library | None":
         return _language_library.local()
 
     @router.get("/api/library/status")
     async def api_library_status() -> dict[str, Any]:
-        """The synced shelf: `{source, index, present, current, problems,
-        texts: [{shelf, text, version, name, what, aboard, here, volume}]}`."""
+        """The shelf: `{source, index, present, current, problems,
+        texts: [{shelf, text, version, name, what, aboard, here, volume}],
+        fetch}`. `source` is the synced shelf, or the cache of fetched texts
+        where there is none; `fetch` (null over a synced shelf) is `{allowed,
+        reason, url, cache, registry, refreshed, cached: [{key, at, url,
+        files, bytes, digest}], jobs: {key: {state, why, at}}}`: what is
+        cached, and what is being fetched or failed."""
         lib = _library()
+        fetch = await asyncio.to_thread(_library_fetch.status, _language_library.cache_dir())
         if lib is None:
             return {"source": str(_language_library.source_dir()), "index": str(_language_library.index_path()),
-                    "present": False, "current": False, "texts": []}
-        return await asyncio.to_thread(lib.status)
+                    "present": False, "current": False, "texts": [], "fetch": fetch}
+        body = await asyncio.to_thread(lib.status)
+        body["fetch"] = fetch if lib.root == _language_library.cache_dir() else None
+        return body
 
     @router.get("/api/library/section")
     async def api_library_section(in_: str = Query(..., alias="in"), version: str = Query(...),
                                   at: str = Query(...), digest: str = Query(""),
-                                  section_digest: str = Query("", alias="section-digest")) -> dict[str, Any]:
+                                  section_digest: str = Query("", alias="section-digest"),
+                                  wait: float = Query(2.0, ge=0, le=10)) -> dict[str, Any]:
         """One citation, opened: a reliance's `stated` as the query
         (`in`, `version`, `at`, optional `digest` and `section-digest`).
         Always 200 with `{cited, state, why, text, section}`: `state` is
-        resolved | changed | missing | not-aboard | unknown; `text` is the
+        resolved | changed | unplaced | missing | fetching | not-aboard |
+        unknown (`fetching`: the text is being fetched from cosmoes.org, ask
+        again; offline it is `not-aboard`); `text` is the
         kept text's notice block (`name, publisher, version, licence {name,
         url}, copyright, changed, copy, notice, fetched, publisher_page,
         address, here, …`, null when the registry has no such text);
@@ -554,21 +572,27 @@ def build_router(ctx: AppContext) -> APIRouter:
         if lib is None:
             return {"cited": stated, "state": "not-aboard", "text": None, "section": None,
                     "why": "no language library is synced here (scripts/sync_languages.py)"}
-        return await asyncio.to_thread(lib.section, stated)
+        return await asyncio.to_thread(lib.section, stated, wait)
 
     @router.get("/api/library/volume")
     async def api_library_volume(shelf: str = Query(...), text: str = Query(...), version: str = Query(...),
-                                 page: str = Query("")) -> dict[str, Any]:
+                                 page: str = Query(""), wait: float = Query(2.0, ge=0, le=10)) -> Any:
         """A kept text as a DocOES volume built at runtime: `{doc, id,
         title, document, nodes}` — without `page` the contents (the notice,
         then one section per page), with `page` that page's sections, bodies
         verbatim, each with `cite` (the `stated` that names it) and `sha256`.
         `document` carries the licence, copyright, change of form and the
         copy line. 404 for a text not kept here or a page it lacks; 503 when
-        the shelf does not verify."""
+        the shelf does not verify. A text the site keeps but this machine
+        does not yet is fetched: 202 `{state: fetching, why}` (ask again);
+        404 `{state: not-aboard, why}` when it cannot be (offline)."""
         lib = _library()
         if lib is None:
             raise HTTPException(404, "no language library is synced here (scripts/sync_languages.py)")
+        pending = await asyncio.to_thread(lib.fetch_for, shelf, text, version, wait)
+        if pending is not None:
+            return JSONResponse({**pending, "detail": pending["why"]},
+                                status_code=202 if pending["state"] == "fetching" else 404)
         try:
             cat = await asyncio.to_thread(lib.volume, shelf, text, version, page.strip() or None)
         except KeyError as e:
