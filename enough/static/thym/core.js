@@ -1109,7 +1109,8 @@
       return sortTold(rows);
     }
     if ((value.type === 'short' || value.type === 'text') && typeof p === 'string') {
-      return pySplitlines(p).filter((l) => pyStrip(l)).map((l) => new Value('short', l));
+      // each line a string, as the compiler types it (types.member; the owner's ruling C of 2026-11-19)
+      return pySplitlines(p).filter((l) => pyStrip(l)).map((l) => new Value('string', l));
     }
     return null;
   }

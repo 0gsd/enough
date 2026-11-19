@@ -262,6 +262,20 @@ program folder-moves
   give said: join sizes with " "
 end
 """, "repo", "folder", "inputs/little-tool"),
+    "short-lines": ("""thym 1
+
+program short-lines
+  why: the lines of a short that say TODO, each a string (the owner's ruling C), joined into one short.
+
+  takes s: short
+  gives said: short
+
+  let kept = for each l in s where "TODO" in l
+    keep l
+  end
+  give said: join kept with " / "
+end
+""", "s", "short", "inputs/draft.md"),
 }
 
 

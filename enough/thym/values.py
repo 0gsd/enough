@@ -367,7 +367,7 @@ def make_change(at: int, was: str, of: str, do: str, lines: list[str] | None = N
 
 def members(value: Value) -> list[Value] | None:
     """What a `for each` walks (THYM.md 8.1): the items of a volume or a fabula in told order (by span, then by id),
-    the lines of a short or a text, the members of a list, the text files of a folder in path order (THYM 20.2). None
+    the lines of a short or a text (each a string), the members of a list, the text files of a folder in path order (THYM 20.2). None
     when the value is not a collection."""
     p = value.payload
     if value.type == "list":
@@ -388,7 +388,8 @@ def members(value: Value) -> list[Value] | None:
                 for n in p["nodes"] if isinstance(n, dict)]
         return sorted(rows, key=lambda v: _told_key(v.payload))
     if value.type in ("short", "text") and isinstance(p, str):
-        return [Value("short", line) for line in p.splitlines() if line.strip()]
+        # each line a string, as the compiler types it (types.member; the owner's ruling C of 2026-11-19)
+        return [Value("string", line) for line in p.splitlines() if line.strip()]
     return None
 
 

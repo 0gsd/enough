@@ -47,7 +47,7 @@ from typing import Any
 
 from enough import macrocosm as mc
 from enough.thym import Refusal
-from enough.thym.checks import body
+from enough.thym.checks import split_sentences
 from enough.thym.coprocessor import ask
 from enough.thym.registry import decl_get
 from enough.thym.trace import node_number
@@ -90,8 +90,6 @@ _FENCE = re.compile(r"^\s{0,3}(```|~~~)")
 _HEADING = re.compile(r"^\s{0,3}#{1,6}\s+\S")
 _LIST = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 _RULE = re.compile(r"^\s*[-=*_]{3,}\s*$")
-_SPLIT = re.compile(r"(?<=[.!?])[\"'”’)\]]*\s+(?=[\"'“‘(\[]?[A-Z0-9])")
-_ABBR = frozenset("mr mrs ms dr prof st vs etc eg ie jr sr no fig".split())
 _INLINE = [
     (re.compile(r"!\[([^\]]*)\]\([^)]*\)"), r"\1"),
     (re.compile(r"\[([^\]]+)\]\([^)]*\)"), r"\1"),
@@ -145,8 +143,10 @@ def _is_footer(line: str) -> bool:
 
 def segment(text: str, *, footer: bool = False) -> list[Sentence]:
     """The sentences of a markdown text, by rule (THYM.md 7.3): front matter, fenced code, tables and rules are not
-    text; a heading is a sentence of its own; a list item starts a sentence; inside a paragraph a sentence ends at
-    `.`, `!` or `?` followed by space and a capital or a digit (an abbreviation such as `Dr.` does not end one). The
+    text; a heading is a sentence of its own; a list item starts a sentence; inside a paragraph sentences split by
+    the one rule the checks read too (`checks.split_sentences`: a sentence ends at `.`, `!` or `?` followed by space
+    and a capital or a digit, a closing quotation mark or bracket after the stop stays with it, and an abbreviation
+    such as `Dr.` ends none). The
     closing footer paragraph (a last paragraph in italics, MacroCOSM 18.4.4 and THYM.md 14) is left out unless
     `footer`. Line numbers count the text as written, front matter included, so that a span's lines can be laid
     over them."""
@@ -181,15 +181,7 @@ def segment(text: str, *, footer: bool = False) -> list[Sentence]:
             joined += s
             owners.extend([ln] * len(s))
         pos = 0
-        pieces = [x for x in _SPLIT.split(joined)]
-        merged: list[str] = []
-        for x in pieces:
-            last = merged[-1].split()[-1].lower().rstrip(".") if merged and merged[-1].split() else ""
-            if merged and last in _ABBR:
-                merged[-1] = f"{merged[-1]} {x}"
-            else:
-                merged.append(x)
-        for x in merged:
+        for x in split_sentences(joined):
             at = joined.find(x, pos)
             at = pos if at < 0 else at
             end = max(at, at + len(x) - 1)
@@ -478,7 +470,7 @@ def cover_map(fabula: Value, said: Value) -> CoverMap:
         words = _content(f"{it.get('name') or ''} {it.get('summary') or ''}")
         names = {w.lower() for w in words_in(str(it.get("name") or "")) if w[:1].isupper() or w.isdigit()}
         sigs.append((it["id"], words, names))
-    for s in segment(body(text)):
+    for s in segment(text):       # lines counted in the file as written, front matter included, as in every mode
         if not claim_bearing(s):
             continue
         mine = _content(s.text)
