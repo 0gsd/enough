@@ -9644,6 +9644,152 @@
       overflow-wrap: anywhere;
     }
 
+    /* 0.8 (W4-FP): the card of an authored fabulac — the interview's
+       questions, add and check, the entailment's files with a hand edit's
+       three choices, and a sandbox run's output and what the box promised. */
+    #fabula-modal #fab-author:not(:empty),
+    #fabula-modal #fab-run:not(:empty) {
+      margin: 10px 0 4px;
+      position: relative;
+    }
+
+    #fabula-modal .fap-help {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    #fabula-modal .fap-field label {
+      flex: 0 0 9.5em;
+    }
+
+    #fabula-modal textarea.fap-text {
+      box-sizing: border-box;
+      width: 100%;
+      margin: 4px 0;
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 7px;
+      resize: vertical;
+    }
+
+    #fabula-modal textarea.fap-mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    #fabula-modal .fap-as {
+      margin: 4px 0;
+    }
+
+    #fabula-modal .fap-qs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #fabula-modal .fap-q {
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    #fabula-modal .fap-q-asks {
+      display: block;
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fap-case label {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal ul.fap-files li {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    #fabula-modal ul.fap-files .fap-choices {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    #fabula-modal ul.fap-files .fap-choices button,
+    #fabula-modal ul.fap-files .fap-choices label {
+      font-size: 11.5px;
+    }
+
+    #fabula-modal ul.fap-files li.st-edited-by-hand {
+      border-color: var(--accent-tool);
+    }
+
+    #fabula-modal ul.fap-list {
+      margin: 2px 0 4px;
+      padding-left: 18px;
+      font-size: 11.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal details.fap-instep,
+    #fabula-modal details.fap-stdin,
+    #fabula-modal details.fap-guar {
+      margin: 6px 0;
+      font-size: 12px;
+    }
+
+    #fabula-modal details summary {
+      cursor: pointer;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fap-out-h {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal pre.fap-out {
+      max-height: 16em;
+      overflow: auto;
+      margin: 2px 0 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+
+    #fabula-modal .fap-guar dl {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 2px 10px;
+      margin: 4px 0;
+      font-size: 11.5px;
+    }
+
+    #fabula-modal .fap-guar dt {
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fap-guar dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
     /* 0.7 (V2c): the fabulap card, a poem decompiled in steps — scan,
        hear, read closely — and what they found: the form and its rules,
        each device's cue and senses, a lyric's parts and its hook. */
@@ -19293,6 +19439,9 @@
           <button type="button" class="cosm-tool-btn" id="cosm-fab-btn" hidden onclick="fabFolderOpen(COSM.path)"
             title="this fabulac's build, stage by stage, and what it compiles into" data-i18n-title="fab.cosm.title"
             data-i18n="fab.cosm.label">build and compile…</button>
+          <button type="button" class="cosm-tool-btn" id="cosm-fap-btn" hidden onclick="fapOpen(COSM.path)"
+            title="this fabulac you authored: its interview, entailing it, its tests and its tool in the sandbox"
+            data-i18n-title="fap.cosm.title" data-i18n="fap.cosm.label">entail and run…</button>
           <button type="button" class="cosm-tool-btn" id="cosm-dlg-btn" hidden onclick="dlgOpen(COSM.path)"
             title="what this volume asks of a person: answer its questions, settle the answers"
             data-i18n-title="dlg.cosm.title"><span data-i18n="dlg.cosm.label">questions</span><span
@@ -20829,9 +20978,11 @@
       </div>
       <div class="modal-body thym-body" id="fab-body">
         <div id="fab-main"></div>
+        <div id="fab-author"></div>
         <div id="fab-verse"></div>
         <div id="fab-route-box"></div>
         <div id="fab-compile"></div>
+        <div id="fab-run"></div>
         <div id="fab-dialectic"></div>
         <div class="thym-status" id="fab-status" role="status" hidden></div>
       </div>
@@ -33539,6 +33690,7 @@
       cosmEl('cosm-lens').hidden = true;
       cosmEl('cosm-about-btn').hidden = true;
       cosmEl('cosm-fab-btn').hidden = true;
+      cosmEl('cosm-fap-btn').hidden = true;
       cosmEl('cosm-dlg-btn').hidden = true;
       cosmEl('cosm-iso-btn').hidden = true;
       cosmEl('cosm-allo-btn').hidden = true;
@@ -33611,6 +33763,11 @@
       cosmEl('cosm-about-btn').hidden = refused || !COSM_SPEC_SECTION[data.minicosm];
       // 0.6 (U1a): a fabulac in the project offers its build and its compiles.
       cosmEl('cosm-fab-btn').hidden = !(window.__fabReady && !refused && !IS_HOME && fabIsFabulac(COSM.path, data));
+      // 0.8 (W4-FP): a fabulac the person authored is entailed and run, never built from a folder.
+      const fapAuthored = !cosmEl('cosm-fab-btn').hidden && cosmIsMap((data.catalog || {}).source)
+        && data.catalog.source.kind === 'authored';
+      cosmEl('cosm-fap-btn').hidden = !fapAuthored;
+      if (fapAuthored) cosmEl('cosm-fab-btn').hidden = true;
       // 0.6 (U1b): any volume of the project: its questions (with a count of
       // the open ones), and a holograph's isograph.
       if (window.__dlgReady) dlgCosmPaint(data);
@@ -34754,6 +34911,8 @@
       if (e.want === 'fabulac' && window.__fabReady) fabJobOnSnap(e, snap);
       // 0.7 (V2c): a poem's build in steps that the fabula card follows.
       if (e.want === 'fabulap' && window.__fabReady) fabVerseOnSnap(e, snap);
+      // 0.8 (W4-FP): an authored fabulac's authoring, entailing or sandbox run.
+      if (e.want === 'fabulac-first' && window.__fabReady) fapJobOnSnap(e, snap);
       // 0.6 (U1b): a settle the dialectic card follows.
       if (e.want === 'dialectic' && window.__dlgReady) dlgJobOnSnap(e, snap);
       if (end) {
@@ -34774,6 +34933,8 @@
       if (snap && (snap.kind === 'thym' || snap.kind === 'read')) { if (window.__thymReady) thymAfterWrite(snap); return; }
       // 0.6 (U1b): answers settled into a volume.
       if (snap && snap.kind === 'dialectic') { if (window.__dlgReady) dlgAfterWrite(snap); return; }
+      // 0.8 (W4-FP): an authored fabulac written, or its entailment (a sandbox run writes nothing of the project).
+      if (snap && (snap.kind === 'fabulac-author' || snap.kind === 'fabulac-entail')) { if (window.__fabReady) fapAfterWrite(snap); return; }
       const wrote = snap.kind === 'emf' || snap.kind === 'pin' || snap.kind === 'compile' || snap.kind === 'fabulac'
         || snap.kind === 'fabulap' || (snap.kind === 'atem' && res.written);
       if (!wrote) return;
@@ -34842,6 +35003,11 @@
       // 0.8: a scaffold's check (kind `scaffold`) tells its own progress and
       // its end, and hands the findings to the composure it read.
       if (e.kind === 'scaffold') { compScaffoldJobToast(e, snap, id, dismiss); return; }
+      // 0.8 (W4-FP): an authored fabulac's jobs tell their own progress and end.
+      if ((e.kind === 'fabulac-author' || e.kind === 'fabulac-entail' || e.kind === 'sandbox') && window.__fabReady) {
+        fapToast(e, snap, id, dismiss);
+        return;
+      }
       // 0.5.0: the run / read card shows its own progress while it is open.
       if (thym && thymPickShowing(e.id)) { convertToastClose(id); return; }
       // 0.6: so does the fabula card.
@@ -34978,6 +35144,8 @@
         : busy.kind === 'fabulac' ? t('fab.busy.build', 'building the fabulac of {name}').replace('{name}', () => name)
         : busy.kind === 'fabulap' ? t('fab.verse.busy', 'decompiling {name} in steps').replace('{name}', () => name)
         : busy.kind === 'dialectic' ? t('dlg.busy', 'settling the answers into {name}').replace('{name}', () => name)
+        : busy.kind === 'fabulac-author' ? t('fap.busy.author', 'authoring {name}').replace('{name}', () => name)
+        : busy.kind === 'fabulac-entail' ? t('fap.busy.entail', 'entailing {name}').replace('{name}', () => name)
         : (busy.kind === 'compile' ? t('canon.busy.compile', 'compiling {name}').replace('{name}', () => name)
           : (busy.kind === 'thym' ? t('thym.busy.run', 'running a program on {name}').replace('{name}', () => name)
             : (busy.kind === 'read' ? t('thym.busy.read', 'reading {name} through a morph').replace('{name}', () => name)
@@ -38912,6 +39080,9 @@
         else if (a.name) again = 'input[name="' + CSS.escape(a.name) + '"][value="' + CSS.escape(a.value) + '"]';
         else if (a.dataset && a.dataset.fab) again = '[data-fab="' + CSS.escape(a.dataset.fab) + '"]'
           + (a.dataset.fabPath ? '[data-fab-path="' + CSS.escape(a.dataset.fabPath) + '"]' : '');
+        else if (a.dataset && a.dataset.fap) again = '[data-fap="' + CSS.escape(a.dataset.fap) + '"]'
+          + (a.dataset.fapPath ? '[data-fap-path="' + CSS.escape(a.dataset.fapPath) + '"]' : '');
+        else if (a.dataset && a.dataset.fapQ) again = '[data-fap-q="' + CSS.escape(a.dataset.fapQ) + '"]';
       }
       el.innerHTML = html;
       el._fabHtml = html;
@@ -39099,7 +39270,10 @@
         csnap: null, cresult: null, busy: false, error: null, cerror: null,
         verse: null, vjob: null, vsnap: null, vresult: null, verror: null });
       fabRouteReset('fab');
-      ['fab-main', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-dialectic', 'fab-status'].forEach((id) => {
+      // 0.8 (W4-FP): the authored faces' state
+      fabRouteReset('fap');
+      fapReset();
+      ['fab-main', 'fab-author', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-run', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
       });
@@ -39120,7 +39294,7 @@
       m.setAttribute('aria-hidden', 'true');
       FAB.open = false;
       // A build or a compile still running carries on in a toast.
-      [FAB.job, FAB.cjob, FAB.vjob].forEach((id) => {
+      [FAB.job, FAB.cjob, FAB.vjob, FA.ajob, FA.ejob, FA.rjob].forEach((id) => {
         const e = id && id !== 'pending' ? CANON.jobs.get(id) : null;
         if (e && !e.terminal) { e.want = 'toast'; canonToast(e, e.snap || { state: 'running', kind: e.kind }); }
       });
@@ -39128,7 +39302,7 @@
     }
     window.fabCardClose = fabCardClose;
 
-    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id)); }
+    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id || fapShowing(id))); }
 
     // "decompile" on a text: the card's text face.
     async function fabDecompileOpen(path, state, opts = {}) {
@@ -39164,6 +39338,11 @@
     // "build its fabulac…" on a folder, "build and compile…" on a fabulac.
     async function fabFolderOpen(path) {
       if (IS_HOME || !path) return;
+      // 0.8 (W4-FP): a fabulac the person authored (or its entailment's folder) is entailed and run, not built.
+      const asked = String(path).replace(/\/+$/, '');
+      const twin = FAB_FABULAC_RE.test(asked) ? asked : asked + '.fabulac.cosm';
+      const probe = await canonJSON('/api/fabulac/status?path=' + encodeURIComponent(twin));
+      if (probe.ok && probe.data) { await fapOpen(twin, FAB_FABULAC_RE.test(asked) ? null : 'compile'); return; }
       fabCardReset('folder');
       FAB.target = String(path).replace(/\/+$/, '');
       fabCardOpenModal();
@@ -39204,6 +39383,7 @@
 
     function fabCardPaint() {
       if (!FAB.open) return;
+      if (FAB.face === 'begin' || FAB.face === 'authored') { fapPaint(); return; }
       const text = FAB.face === 'text';
       fabEl('fab-title').textContent = text ? t('fab.title.decompile', 'decompile…') : t('fab.title.fabulac', 'the fabulac');
       const src = fabEl('fab-source');
@@ -39886,15 +40066,21 @@
     });
     fabEl('fab-go').addEventListener('click', () => {
       if (FAB.face === 'text') { void fabDecompileGo(); return; }
+      if (FAB.face === 'begin') { void fapBeginGo(); return; }
+      if (FAB.face === 'authored') return;
       void fabBuildGo(fabResumable(FAB.build) ? 'resume' : 'build');
     });
     fabEl('fab-restart').addEventListener('click', () => { void fabBuildGo('restart'); });
     fabEl('fab-open').addEventListener('click', () => {
-      const f = FAB.build && FAB.build.fabulac;
+      const f = FAB.face === 'authored' ? FA.path : (FAB.build && FAB.build.fabulac);
       fabCardClose();
       if (f && !(COSM.path && canonSame(COSM.path, f) && cosmEl('cosm-mode').classList.contains('open'))) void enterCosmMode(f);
     });
-    fabEl('fab-cancel-job').addEventListener('click', () => { void fabCancelGo(); });
+    fabEl('fab-cancel-job').addEventListener('click', () => {
+      if (FAB.face === 'begin') { if (FA.ajob && FA.ajob !== 'pending') void canonCancel(FA.ajob); return; }
+      if (FAB.face === 'authored') { void fapStopGo(); return; }
+      void fabCancelGo();
+    });
     fabEl('fab-close').addEventListener('click', fabCardClose);
     // Esc closes the card (capture, like the run card's, so it wins over the mode-stack ladder).
     document.addEventListener('keydown', (e) => {
@@ -40011,6 +40197,850 @@
       fabViewClose();
     }, true);
 
+    // ---- 0.8 (W4-FP): the card of an AUTHORED fabulac ----
+    // Two more faces of the fabula card, over the routes of fabulac-first
+    // (`/api/fabulac/*`, enough/routes/fabulac.py; docs/DEVELOPERS.md):
+    // `begin` makes a new authored fabulac (from a starter, a brief or
+    // nothing; a tool, a library or a service), and `authored` is where one
+    // stands: the interview's stages and the questions shown, add a
+    // requirement / decision / case / interface, check, entail (the folder
+    // beside it), what moved and every hand edit with its three choices
+    // (write over it, keep it, take it back), a head and its parts, and its
+    // tests and its tool run in the sandbox, with Stop, the output capped
+    // and what the box did and did not promise. Every POST sends the
+    // promise header (`X-Enough-Api: 1`, enough/api_promise.py): it is the
+    // gate those routes keep. Only an authored fabulac's entailment runs
+    // here; a cshort of code the person did not author is read, never run,
+    // and nothing on this card offers to run one.
+    const FAP_KINDS = ['tool', 'library', 'service'];
+    const FAP_ADD = ['requirement', 'decision', 'case', 'interface'];
+    const FAP_OUT_MAX = 20000;                   // characters of a stream the card shows
+    const FAP_SIMPLE = new Set(['text', 'number', 'date']);
+    const FAP_HEADER = 'X-Enough-Api';
+    const FA = {};
+
+    function fapReset() {
+      Object.assign(FA, {
+        // the begin face
+        where: '', name: '', kind: 'tool', way: 'starter', brief: '', licence: '', by: '', starters: null,
+        // the authored face
+        path: null, status: null, parts: null, focus: null, error: null,
+        answers: {}, sending: false, aerrorQ: null,
+        addAs: 'requirement', addSays: '', addGiven: '', addExpect: '', added: null, addError: null, adding: false,
+        check: null, checking: false,
+        overwrite: new Set(), fileBusy: null, fileNote: null, fileError: null,
+        headName: '', headParts: '', head: null, headError: null,
+        args: '', stdin: '', hand: '',
+        // jobs: a = begin / go on, e = entail / take back, r = a sandbox run
+        ajob: null, asnap: null, aresult: null, aerror: null,
+        ejob: null, esnap: null, eresult: null, eerror: null,
+        rjob: null, rsnap: null, rresult: null, rerror: null, rwhat: null,
+      });
+    }
+    fapReset();
+
+    // Every POST to /api/fabulac/* carries the promise header.
+    function fapPost(url, body) {
+      return canonJSON(url, { method: 'POST', headers: { 'Content-Type': 'application/json', [FAP_HEADER]: '1' },
+        body: JSON.stringify(body) });
+    }
+    function fapIsKind(kind) { return kind === 'fabulac-author' || kind === 'fabulac-entail' || kind === 'sandbox'; }
+    function fapName() { return canonBase(String(FA.path || '')); }
+    function fapDir(p) { const s = String(p || ''); const i = s.lastIndexOf('/'); return i < 0 ? '' : s.slice(0, i); }
+    function fapRunning(s) {
+      const id = FA[s + 'job'], snap = FA[s + 'snap'];
+      return !!(id && (id === 'pending' || !snap || !CANON_TERMINAL.has(snap.state)));
+    }
+    function fapSlot(kind) { return kind === 'sandbox' ? 'r' : (kind === 'fabulac-entail' ? 'e' : 'a'); }
+    function fapShowing(id) { return !!(id && (FA.ajob === id || FA.ejob === id || FA.rjob === id)); }
+
+    // Follow a job of this fabulac on the card (and in a toast once it closes).
+    function fapFollow(job, label) {
+      if (!job || !job.id) return;
+      const s = fapSlot(job.kind);
+      if (!FA[s + 'job'] || FA[s + 'job'] === 'pending') {
+        FA[s + 'job'] = job.id;
+        FA[s + 'snap'] = job;
+        if (s === 'r') FA.rwhat = job.what || FA.rwhat;
+      }
+      const e = CANON.jobs.get(job.id);
+      if (e) e.want = 'fabulac-first';
+      else canonTrack(job, { want: 'fabulac-first', label: label || fapName(), writes: job.kind !== 'sandbox' });
+    }
+
+    // "begin a fabulac here…": the begin face, the new fabulac to go in `where`.
+    async function fapBeginOpen(where) {
+      if (IS_HOME) return;
+      fabCardReset('begin');
+      FA.where = String(where || '').replace(/\/+$/, '');
+      fabCardOpenModal();
+      fabCardPaint();
+      const seq = FAB.seq;
+      const [st] = await Promise.all([canonJSON('/api/fabulac/starters'), fabGateLoad()]);
+      if (seq !== FAB.seq) return;
+      FA.starters = st.ok && st.data && Array.isArray(st.data.starters) ? st.data.starters : [];
+      if (!st.ok) FA.error = st.error;
+      fabCardPaint();
+      const n = fabEl('fap-name');
+      if (n) n.focus({ preventScroll: true });
+    }
+    window.fapBeginOpen = fapBeginOpen;
+
+    // An authored fabulac's card; `focus` brings a section into view
+    // ('entail' or 'run', from the entailment folder's menu).
+    async function fapOpen(fab, focus) {
+      if (IS_HOME || !fab) return;
+      fabCardReset('authored');
+      FA.path = String(fab);
+      FA.focus = focus || null;
+      fabCardOpenModal();
+      fabCardPaint();
+      const seq = FAB.seq;
+      await Promise.all([fapLoad(seq), fabGateLoad()]);
+      if (seq !== FAB.seq) return;
+      fabCardPaint();
+      const sec = FA.focus && fabEl(FA.focus === 'run' ? 'fab-run' : 'fab-compile');
+      if (sec) sec.scrollIntoView({ block: 'nearest' });
+    }
+    window.fapOpen = fapOpen;
+
+    // GET /api/fabulac/status is the card's one read (and parts-moved, for a head).
+    async function fapLoad(seq = FAB.seq) {
+      const q = encodeURIComponent(FA.path);
+      const [r, pm] = await Promise.all([canonJSON('/api/fabulac/status?path=' + q),
+        canonJSON('/api/fabulac/parts-moved?path=' + q)]);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.status = { error: r.error || t('canon.job.failed', 'that did not work') }; return; }
+      FA.status = r.data;
+      FA.parts = pm.ok && pm.data && Array.isArray(pm.data.parts) && pm.data.parts.length ? pm.data : null;
+      (Array.isArray(r.data.jobs) ? r.data.jobs : []).forEach((j) => { if (j && !CANON_TERMINAL.has(j.state)) fapFollow(j); });
+    }
+
+    function fapReload() {
+      const seq = FAB.seq;
+      void fapLoad(seq).then(() => { if (seq === FAB.seq) fabCardPaint(); });
+    }
+
+    // ---- words ----
+    function fapKindWords(kind) {
+      const w = {
+        tool: t('fap.kind.tool', 'a tool: a command a person types'),
+        library: t('fap.kind.library', 'a library: functions another program calls'),
+        service: t('fap.kind.service', 'a service: a program that serves on a port (authored and entailed now; serving comes in a later minor)'),
+      };
+      return w[kind] || t('fap.kind.none', 'no program of its own: a head over parts, or its kind not said yet');
+    }
+    function fapKindName(kind) {
+      return { tool: t('fap.kind.tool.name', 'a tool'), library: t('fap.kind.library.name', 'a library'),
+        service: t('fap.kind.service.name', 'a service') }[kind] || String(kind || '');
+    }
+    function fapAddName(a) {
+      return { requirement: t('fap.add.requirement', 'a requirement'), decision: t('fap.add.decision', 'a decision'),
+        case: t('fap.add.case', 'a case'), interface: t('fap.add.interface', 'an interface') }[a] || String(a || '');
+    }
+    function fapStageWord(s) {
+      const w = {
+        for: t('fap.stage.for', 'what it is for'), 'ways-in': t('fap.stage.waysIn', 'its ways in'),
+        needs: t('fap.stage.needs', 'what it needs'), 'left-out': t('fap.stage.leftOut', 'what it leaves out'),
+        cases: t('fap.stage.cases', 'its cases'), open: t('fap.stage.open', 'what is still open'),
+      };
+      return w[s] || String(s || '');
+    }
+    function fapFileWord(st) {
+      const w = {
+        'in step': t('fap.file.inStep', 'in step'), moved: t('fap.file.moved', 'its fabulac moved: entailing again tells it'),
+        'edited by hand': t('fap.file.edited', 'changed by hand'), gone: t('fap.file.gone', 'not there any more: entailing again tells it'),
+        kept: t('fap.file.kept', 'kept as changed by hand'), new: t('fap.file.new', 'new: the fabulac tells it now'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fapProgressText(snap) {
+      const s = snap || {};
+      if (s.state === 'queued' || s.phase === 'waiting') return t('canon.phase.waiting', 'waiting for the model');
+      if (s.state === 'cancelling') return t('canon.phase.cancelling', 'cancelling…');
+      if (s.kind === 'sandbox') {
+        return s.what === 'tests' ? t('fap.run.testing', 'running its tests in the sandbox…')
+          : t('fap.run.running', 'running it in the sandbox…');
+      }
+      if (s.kind === 'fabulac-entail') return t('fap.entail.running', 'entailing: a model writes each source; the tests are written from its cases by rules');
+      return t('fap.author.running', 'authoring: settling the answers, then asking what follows');
+    }
+
+    // ---- painting ----
+    function fapPaint() {
+      const begin = FAB.face === 'begin';
+      fabEl('fab-title').textContent = begin ? t('fap.title.begin', 'begin a fabulac') : t('fab.title.fabulac', 'the fabulac');
+      const src = fabEl('fab-source');
+      src.textContent = begin ? (FA.where ? FA.where + '/' : t('fap.begin.top', 'the project’s top folder')) : fapName();
+      src.title = (begin ? FA.where : FA.path) || '';
+      fabSet(fabEl('fab-verse'), '');
+      fabSet(fabEl('fab-dialectic'), '');
+      if (begin) fapBeginPaint(); else fapAuthoredPaint();
+    }
+
+    function fapRadios(name, labelled, rows, chosen) {
+      return '<div class="thym-list" role="radiogroup" aria-labelledby="' + labelled + '">'
+        + rows.map(([v, label, why]) => '<label class="thym-opt"><input type="radio" name="' + name + '" value="' + cosmEsc(v) + '"'
+          + (chosen === v ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">' + cosmEsc(label)
+          + '</span></span>' + (why ? '<span class="thym-opt-meta">' + cosmEsc(why) + '</span>' : '') + '</label>').join('') + '</div>';
+    }
+
+    function fapField(id, label, value, opts = {}) {
+      const ph = opts.placeholder ? ' placeholder="' + cosmEsc(opts.placeholder) + '"' : '';
+      return '<div class="thym-row fap-field"><label for="' + id + '">' + cosmEsc(label) + '</label>'
+        + '<input type="text" id="' + id + '" value="' + cosmEsc(value || '') + '"' + ph + ' spellcheck="false" autocomplete="off"></div>';
+    }
+
+    function fapBeginValid() {
+      const name = FA.name.trim();
+      return !!name && !/[\\/]/.test(name) && !/\s/.test(name) && (FA.way !== 'brief' || !!FA.brief.trim());
+    }
+
+    function fapBeginPaint() {
+      const running = fapRunning('a');
+      let h = '';
+      if (FA.starters === null) {
+        h = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else {
+        const starter = (FA.starters || []).find((s) => s && s.kind === FA.kind) || null;
+        h += '<div class="thym-sec-h dict-sc" id="fap-kind-h">' + cosmEsc(t('fap.begin.kind', 'what it is')) + '</div>'
+          + fapRadios('fap-kind', 'fap-kind-h', FAP_KINDS.map((k) => [k, fapKindName(k), fapKindWords(k)]), FA.kind);
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.begin.name', 'its name')) + '</div>'
+          + fapField('fap-name', t('fap.begin.nameLabel', 'name'), FA.name, { placeholder: 'tally' });
+        const nm = FA.name.trim() || '…';
+        h += '<p class="thym-meta" id="fap-writes">' + cosmEsc(t('fap.begin.writes', 'writes {fabulac}; entailing it writes the folder {folder} beside it')
+          .replace('{fabulac}', () => (FA.where ? FA.where + '/' : '') + nm + '.fabulac.cosm').replace('{folder}', () => nm + '/')) + '</p>';
+        const starterWhy = starter
+          ? t('fap.way.starter.why', 'begins as {name}, the starter for {kind}, under your name: {line} ({n} cases)')
+            .replace('{kind}', () => fapKindName(FA.kind)).replace('{name}', () => String(starter.name || ''))
+            .replace('{line}', () => String(starter.line || '')).replace('{n}', () => String((starter.cases || []).length))
+          : t('fap.way.starter.none', 'no starter of this kind is installed');
+        h += '<div class="thym-sec-h dict-sc" id="fap-way-h">' + cosmEsc(t('fap.begin.way', 'begin it')) + '</div>'
+          + fapRadios('fap-way', 'fap-way-h', [
+            ['starter', t('fap.way.starter', 'from a starter'), starterWhy],
+            ['brief', t('fap.way.brief', 'from a brief'), t('fap.way.brief.why', 'a markdown text you wrote: its sections are read by rules, and a model only places what they cannot')],
+            ['nothing', t('fap.way.nothing', 'from nothing'), t('fap.way.nothing.why', 'the interview asks what it is for, its ways in, what it needs, what it leaves out, its cases and what is still open, a stage at a time')],
+          ], FA.way);
+        if (FA.way === 'brief') h += fapField('fap-brief', t('fap.begin.brief', 'the brief'), FA.brief, { placeholder: 'brief.md' });
+        h += fapField('fap-licence', t('fap.begin.licence', 'licence'), FA.licence, { placeholder: 'MIT' })
+          + fapField('fap-by', t('fap.begin.by', 'authored by'), FA.by, { placeholder: t('fap.begin.byHint', 'your name') });
+        h += '<p class="thym-note">' + cosmEsc(t('fap.begin.yours', 'what you write here is yours: every item is an axiom, in your words. The licence is the one you offer it under; left empty, the interview asks for it.')) + '</p>';
+        if (running) {
+          h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.asnap)) + '</span></p>';
+        }
+        if (FA.aerror || FA.error) h += '<p class="thym-refusal">' + cosmEsc(FA.aerror || FA.error) + '</p>';
+      }
+      fabSet(fabEl('fab-main'), h);
+      ['fab-author', 'fab-compile', 'fab-run'].forEach((id) => fabSet(fabEl(id), ''));
+      fabSet(fabEl('fab-route-box'), FA.starters !== null && FA.way !== 'starter' ? fabRouteHTML('fap') : '');
+      fabStatusPaint('');
+      const go = fabEl('fab-go');
+      go.hidden = false;
+      go.textContent = t('fap.begin.go', 'begin');
+      go.disabled = running || FA.starters === null || !fapBeginValid();
+      fabEl('fab-restart').hidden = true;
+      fabEl('fab-open').hidden = true;
+      fabEl('fab-cancel-job').hidden = !running || FA.ajob === 'pending';
+    }
+
+    function fapAuthoredPaint() {
+      const st = FA.status;
+      const arun = fapRunning('a'), erun = fapRunning('e'), rrun = fapRunning('r');
+      let h = '';
+      if (!st) {
+        h = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else if (st.error) {
+        h = '<p class="thym-refusal">' + cosmEsc(st.error) + '</p>';
+      } else {
+        h = fapInterviewHTML(st, arun);
+      }
+      fabSet(fabEl('fab-main'), h);
+      const ok = !!(st && !st.error);
+      fabSet(fabEl('fab-author'), ok ? fapAddHTML() + fapHeadHTML() : '');
+      fabSet(fabEl('fab-route-box'), ok ? fabRouteHTML('fap') : '');
+      fabSet(fabEl('fab-compile'), ok ? fapEntailHTML(st, erun) : '');
+      fabSet(fabEl('fab-run'), ok ? fapRunHTML(st, rrun) : '');
+      fabStatusPaint('');
+      fabEl('fab-go').hidden = true;
+      fabEl('fab-restart').hidden = true;
+      fabEl('fab-open').hidden = !ok;
+      fabEl('fab-cancel-job').hidden = !((arun && FA.ajob !== 'pending') || (erun && FA.ejob !== 'pending'));
+      applyHelpBubbles();
+    }
+
+    // The interview: its stages, what is next, the questions shown (one or two).
+    function fapInterviewHTML(st, arun) {
+      const iv = cosmIsMap(st.interview) ? st.interview : {};
+      const prog = cosmIsMap(st.program) ? st.program : {};
+      let h = '<p class="fab-say fap-kind">' + cosmEsc(fapKindWords(prog.kind)) + '</p>';
+      const lic = iv.licence;
+      h += '<p class="thym-meta">' + cosmEsc(typeof lic === 'string' && lic
+        ? t('fap.licence', 'offered under {licence}').replace('{licence}', () => lic)
+        : t('fap.licence.pending', 'no licence given yet: the interview asks for one')) + '</p>';
+      h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.interview.head', 'the interview, stage by stage')) + '</div>';
+      const rows = Array.isArray(iv.stages) ? iv.stages : [];
+      h += '<ol class="fab-stages fap-stages">' + rows.map((s) => {
+        const now = !s.landed && iv.stage === s.stage;
+        const cls = s.landed ? 'landed' : (now ? 'running' : '');
+        const mark = s.landed ? '✓' : (now ? '▸' : '·');
+        const meta = s.landed ? t('fap.stage.landed', 'answered')
+          : (s.asked ? t('fap.stage.asked', '{asked} asked, {open} open').replace('{asked}', String(s.asked)).replace('{open}', String(s.open || 0))
+            : (now ? t('fap.stage.now', 'asked next') : t('fab.stage.waits', 'waits')));
+        return '<li class="' + cls + '"><span class="fab-mark" aria-hidden="true">' + mark + '</span>'
+          + '<span class="fab-stage-name">' + cosmEsc(s.n + '. ' + fapStageWord(s.stage)) + '</span>'
+          + '<span class="fab-stage-meta">' + cosmEsc(meta) + '</span></li>';
+      }).join('') + '</ol>';
+      const open = Array.isArray(iv.open) ? iv.open.length : 0;
+      const next = {
+        settle: t('fap.next.settle', 'answers wait to be settled into the fabulac: go on settles them, then asks what follows'),
+        answer: t('fap.next.answer', '{n} questions wait for you, a stage at a time').replace('{n}', String(open)),
+        raise: t('fap.next.raise', 'nothing waits in this stage: go on asks the next one'),
+        done: t('fap.next.done', 'the interview is done: nothing waits'),
+        begin: t('fap.next.begin', 'not begun'),
+      }[iv.next] || '';
+      if (next) h += '<p class="fab-say">' + cosmEsc(next) + '</p>';
+      const reading = Array.isArray(iv.reading) ? iv.reading.length : 0;
+      if (reading) {
+        h += '<p class="thym-note">' + cosmEsc(t('fap.next.reading', '{n} answers wait for a model to read their items again: answer again with a plain yes, or go on with a model')
+          .replace('{n}', String(reading))) + '</p>';
+      }
+      const shown = Array.isArray(iv.shown) ? iv.shown.filter(cosmIsMap) : [];
+      if (shown.length) {
+        h += '<div class="fap-qs">' + shown.map((q) => {
+          const id = String(q.id || '');
+          const inp = 'fap-q-' + id.replace(/[^A-Za-z0-9_-]/g, '-');
+          let x = '<div class="fap-q"><label class="fap-q-asks" for="' + inp + '">' + cosmEsc(String(q.asks || id)) + '</label>';
+          if (q.hint) x += '<p class="thym-meta">' + cosmEsc(String(q.hint)) + '</p>';
+          if (FAP_SIMPLE.has(String(q.kind || 'text'))) {
+            x += '<textarea id="' + inp + '" class="fap-text" rows="2" data-fap-q="' + cosmEsc(id) + '"' + (arun ? ' disabled' : '') + '>'
+              + cosmEsc(FA.answers[id] || '') + '</textarea>';
+          } else {
+            x += '<p class="thym-meta">' + cosmEsc(t('fap.q.card', 'this one is answered in the questions card')) + '</p>';
+          }
+          return x + '</div>';
+        }).join('') + '</div>';
+      }
+      const typed = shown.some((q) => FAP_SIMPLE.has(String(q.kind || 'text')) && String(FA.answers[q.id] || '').trim());
+      h += '<div class="fab-row">';
+      if (shown.length) {
+        h += '<button type="button" data-fap="answer"' + (!typed || arun || FA.sending ? ' disabled' : '') + '>'
+          + cosmEsc(t('fap.q.send', 'send these answers')) + '</button>';
+      }
+      if (open || reading) h += '<button type="button" data-fap="questions">' + cosmEsc(t('fap.q.all', 'every question, in the questions card…')) + '</button>';
+      if (iv.next === 'settle' || iv.next === 'raise') {
+        h += '<button type="button" data-fap="go-on"' + (arun ? ' disabled' : '') + '>' + cosmEsc(t('fap.goOn', 'go on')) + '</button>';
+      }
+      h += '</div>';
+      if (arun) h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.asnap)) + '</span></p>';
+      else if (FA.aresult && FA.aresult.message) h += '<p class="thym-fits">' + cosmEsc(String(FA.aresult.message)) + '</p>';
+      if (FA.aerror) h += '<p class="thym-refusal">' + cosmEsc(FA.aerror) + '</p>';
+      if (FA.aerrorQ) h += '<p class="thym-refusal">' + cosmEsc(FA.aerrorQ) + '</p>';
+      return h;
+    }
+
+    // Add an item in the person's words, and check.
+    function fapAddHTML() {
+      let h = '<div class="thym-sec-h dict-sc" id="fap-add-h">' + cosmEsc(t('fap.add.head', 'add to it, in your words')) + '</div>'
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-author"></span>';
+      h += '<div class="fab-route fap-as" role="radiogroup" aria-labelledby="fap-add-h">' + FAP_ADD.map((a) => '<label class="fab-rt"><input type="radio" name="fap-as" value="' + a + '"'
+        + (FA.addAs === a ? ' checked' : '') + '><span>' + cosmEsc(fapAddName(a)) + '</span></label>').join('') + '</div>';
+      h += '<textarea id="fap-says" class="fap-text" rows="2" aria-labelledby="fap-add-h" placeholder="' + cosmEsc(t('fap.add.says', 'one sentence, as you would say it')) + '">'
+        + cosmEsc(FA.addSays) + '</textarea>';
+      if (FA.addAs === 'case') {
+        h += '<div class="fap-case"><label for="fap-given">' + cosmEsc(t('fap.add.given', 'given')) + '</label>'
+          + '<textarea id="fap-given" class="fap-text fap-mono" rows="2" placeholder="{&quot;calls&quot;: &quot;C:interface/…&quot;, &quot;arguments&quot;: {}}">' + cosmEsc(FA.addGiven) + '</textarea>'
+          + '<label for="fap-expect">' + cosmEsc(t('fap.add.expect', 'expect')) + '</label>'
+          + '<textarea id="fap-expect" class="fap-text fap-mono" rows="2" placeholder="{&quot;value&quot;: 3}">' + cosmEsc(FA.addExpect) + '</textarea></div>'
+          + '<p class="thym-meta">' + cosmEsc(t('fap.add.caseNote', 'given and expect as data become a test, written by rules; in words, the case stays prose; left empty, the interview asks')) + '</p>';
+      }
+      h += '<div class="fab-row"><button type="button" data-fap="add"' + (FA.adding || !FA.addSays.trim() ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.add.go', 'add')) + '</button><button type="button" data-fap="check"' + (FA.checking ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.check.go', 'check it')) + '</button></div>';
+      if (FA.added) h += '<p class="thym-fits">' + cosmEsc(String(FA.added)) + '</p>';
+      if (FA.addError) h += '<p class="thym-refusal">' + cosmEsc(FA.addError) + '</p>';
+      const c = FA.check;
+      if (c && c.error) h += '<p class="thym-refusal">' + cosmEsc(c.error) + '</p>';
+      else if (c) {
+        const list = (xs) => '<ul class="fap-list">' + xs.map((x) => '<li>' + cosmEsc(typeof x === 'string' ? x : JSON.stringify(x)) + '</li>').join('') + '</ul>';
+        const errs = Array.isArray(c.errors) ? c.errors : [], warns = Array.isArray(c.warnings) ? c.warnings : [];
+        const unc = Array.isArray(c.uncovered) ? c.uncovered : [], src = Array.isArray(c.source) ? c.source : [];
+        h += '<p class="' + (c.ok && !src.length ? 'thym-fits' : 'thym-refusal') + '">' + cosmEsc(c.ok && !src.length
+          ? t('fap.check.ok', 'its checks pass') : t('fap.check.bad', 'its checks found what must change before it is entailed')) + '</p>';
+        if (errs.length) h += list(errs);
+        if (src.length) h += list(src);
+        if (warns.length) h += '<p class="thym-meta">' + cosmEsc(t('fap.check.warnings', 'warnings:')) + '</p>' + list(warns);
+        if (unc.length) h += '<p class="thym-note">' + cosmEsc(t('fap.check.uncovered', 'requirements no case shows yet: {list}').replace('{list}', () => unc.join(', '))) + '</p>';
+      }
+      return h;
+    }
+
+    // A head names fabulacs as parts of one program and states the interfaces between them once.
+    function fapHeadHTML() {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.head.head', 'a head and its parts')) + '</div>';
+      const pm = FA.parts;
+      if (pm) {
+        const moved = new Set(Array.isArray(pm.moved) ? pm.moved : []);
+        h += '<ul class="fab-made-list fap-parts">' + pm.parts.filter(cosmIsMap).map((p) => {
+          const word = moved.has(p.uri) ? t('fap.head.moved', 'moved since the head last read it') : t('fap.head.inStep', 'in step with the head');
+          return '<li><span class="fab-made-name">' + cosmEsc(String(p.path || p.uri || '')) + '</span><span class="fab-made-meta">'
+            + cosmEsc(String(p.uri || '') + ' · ' + word) + '</span></li>';
+        }).join('') + '</ul>';
+        return h;
+      }
+      h += '<p class="thym-meta">' + cosmEsc(t('fap.head.what', 'a head names fabulacs as the parts of one program, and states the interfaces between them once')) + '</p>'
+        + fapField('fap-head-name', t('fap.head.name', 'the head’s name'), FA.headName, { placeholder: 'suite' })
+        + fapField('fap-head-parts', t('fap.head.parts', 'its other parts'), FA.headParts, { placeholder: 'counter-core, counter-cli' })
+        + '<div class="fab-row"><button type="button" data-fap="head"' + (!FA.headName.trim() ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.head.go', 'make a head over this and them')) + '</button></div>';
+      if (FA.head) h += '<p class="thym-fits">' + cosmEsc(t('fap.head.made', 'wrote {head}, over {parts}').replace('{head}', () => String(FA.head.head || ''))
+        .replace('{parts}', () => (FA.head.parts || []).join(', '))) + '</p>';
+      if (FA.headError) h += '<p class="thym-refusal">' + cosmEsc(FA.headError) + '</p>';
+      return h;
+    }
+
+    // Entail it: the folder beside it, what moved, and each hand edit's three choices.
+    function fapEntailHTML(st, erun) {
+      const ent = cosmIsMap(st.entailment) ? st.entailment : null;
+      const folder = ent && ent.folder ? String(ent.folder) : (String(st.name || fapName().replace(/\.fabulac\.cosm$/i, '')) + '/');
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.entail.head', 'entail it')) + '</div>';
+      h += '<p class="thym-note">' + cosmEsc(t('fap.entail.rule', 'its entailment is the folder {folder} beside it. Only the entailment of a fabulac you authored runs, and only in the sandbox; a cshort of code you did not author is read, never run.')
+        .replace('{folder}', () => folder)) + '</p>';
+      const files = ent && Array.isArray(ent.files) ? ent.files.filter(cosmIsMap) : [];
+      const edited = files.filter((f) => f.state === 'edited by hand');
+      if (!ent || !ent.entailed) {
+        h += '<p class="fab-say">' + cosmEsc(t('fap.entail.none', 'not entailed yet')) + '</p>';
+      } else {
+        const n = (k) => (Array.isArray(ent[k]) ? ent[k].length : 0);
+        const bits = [];
+        if (n('moved')) bits.push(t('fap.entail.nMoved', '{n} moved').replace('{n}', String(n('moved'))));
+        if (n('edited')) bits.push(t('fap.entail.nEdited', '{n} changed by hand').replace('{n}', String(n('edited'))));
+        if (n('gone')) bits.push(t('fap.entail.nGone', '{n} gone').replace('{n}', String(n('gone'))));
+        if (n('new')) bits.push(t('fap.entail.nNew', '{n} new').replace('{n}', String(n('new'))));
+        if (n('kept')) bits.push(t('fap.entail.nKept', '{n} kept').replace('{n}', String(n('kept'))));
+        h += '<p class="fab-say">' + cosmEsc(bits.length ? t('fap.entail.since', 'since the last entailing: {what}').replace('{what}', () => bits.join(', '))
+          : t('fap.entail.inStep', 'in step: every file is as the last entailing wrote it')) + '</p>';
+        const base = (fapDir(FA.path) ? fapDir(FA.path) + '/' : '') + folder.replace(/\/?$/, '/');
+        const row = (f) => {
+          const p = String(f.path || '');
+          let x = '<li class="fap-file st-' + cosmEsc(String(f.state || '').replace(/\s+/g, '-')) + '"><span class="fab-made-name">' + cosmEsc(p) + '</span>'
+            + '<button type="button" data-fap="file" data-fap-path="' + cosmEsc(base + p) + '"' + (f.state === 'gone' ? ' disabled' : '') + '>'
+            + cosmEsc(t('canon.job.open', 'open')) + '</button>'
+            + '<span class="fab-made-meta">' + cosmEsc(fapFileWord(f.state)) + '</span>';
+          if (f.state === 'edited by hand') {
+            const busy = FA.fileBusy === p || erun;
+            x += '<span class="fap-choices"><label class="fap-over"><input type="checkbox" data-fap-over="' + cosmEsc(p) + '"' + (FA.overwrite.has(p) ? ' checked' : '') + '>'
+              + cosmEsc(t('fap.edit.over', 'write over it')) + '</label>'
+              + '<button type="button" data-fap="keep" data-fap-path="' + cosmEsc(p) + '"' + (busy ? ' disabled' : '') + '>' + cosmEsc(t('fap.edit.keep', 'keep it')) + '</button>'
+              + '<button type="button" data-fap="take-back" data-fap-path="' + cosmEsc(p) + '"' + (busy ? ' disabled' : '') + '>' + cosmEsc(t('fap.edit.back', 'take it back')) + '</button></span>';
+          } else if (f.state === 'kept') {
+            x += '<span class="fap-choices"><button type="button" data-fap="let-go" data-fap-path="' + cosmEsc(p) + '"' + (FA.fileBusy === p ? ' disabled' : '') + '>'
+              + cosmEsc(t('fap.edit.letGo', 'let it go')) + '</button></span>';
+          }
+          return x + '</li>';
+        };
+        const odd = files.filter((f) => f.state !== 'in step'), even = files.filter((f) => f.state === 'in step');
+        if (odd.length) h += '<ul class="fab-made-list fap-files">' + odd.map(row).join('') + '</ul>';
+        if (edited.length) {
+          h += '<p class="thym-note">' + cosmEsc(t('fap.edit.choices', 'a file changed by hand stops the next entailing until you choose: write over it, keep it (a recorded decision; it is never written again until you let it go), or take it back into the fabulac (a model reads it, and you answer what it proposes)')) + '</p>';
+        }
+        if (even.length) {
+          h += '<details class="fap-instep"><summary>' + cosmEsc(t('fap.entail.files', '{n} files in step').replace('{n}', String(even.length))) + '</summary>'
+            + '<ul class="fab-made-list fap-files">' + even.map(row).join('') + '</ul></details>';
+        }
+      }
+      if (FA.fileNote) h += '<p class="thym-fits">' + cosmEsc(FA.fileNote) + '</p>';
+      if (FA.fileError) h += '<p class="thym-refusal">' + cosmEsc(FA.fileError) + '</p>';
+      const blocked = edited.some((f) => !FA.overwrite.has(String(f.path)));
+      h += '<div class="fab-row"><button type="button" data-fap="entail"' + (erun || blocked ? ' disabled' : '') + '>'
+        + cosmEsc(ent && ent.entailed ? t('fap.entail.again', 'entail again') : t('fap.entail.go', 'entail')) + '</button></div>';
+      if (ent && ent.entailed) h += '<p class="thym-meta">' + cosmEsc(t('fap.entail.againWhy', 'entailing again asks a model only for the files whose part of the fabulac moved')) + '</p>';
+      if (blocked) h += '<p class="thym-meta">' + cosmEsc(t('fap.entail.blocked', 'choose for each file changed by hand first')) + '</p>';
+      if (erun) h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.esnap)) + '</span></p>';
+      else if (FA.eresult && FA.eresult.message) h += '<p class="thym-fits">' + cosmEsc(String(FA.eresult.message)) + '</p>';
+      if (FA.eerror) h += '<p class="thym-refusal">' + cosmEsc(FA.eerror) + '</p>';
+      return h;
+    }
+
+    // Test and run it in the sandbox; Stop; the output, capped; what the box promised.
+    function fapRunHTML(st, rrun) {
+      const prog = cosmIsMap(st.program) ? st.program : {};
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.run.head', 'test and run it in the sandbox')) + '</div>'
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-run"></span>';
+      h += '<p class="thym-note">' + cosmEsc(t('fap.box.line', 'the sandbox runs a copy of the entailment with no network and Python’s standard library only; it writes only in its own folder, and its time, output and disk are limited. On macOS it does not limit memory, and promises nothing about it.')) + '</p>';
+      h += '<div class="fab-row"><button type="button" data-fap="test"' + (rrun ? ' disabled' : '') + '>' + cosmEsc(t('fap.run.test', 'run its tests')) + '</button>';
+      if (rrun) h += '<button type="button" data-fap="stop" class="fap-stop">' + cosmEsc(t('fap.run.stop', 'stop')) + '</button>';
+      h += '</div>';
+      if (prog.kind === 'tool') {
+        h += fapField('fap-args', t('fap.run.args', 'its arguments'), FA.args, { placeholder: 'count notes.md' })
+          + fapField('fap-hand', t('fap.run.hand', 'files handed over'), FA.hand, { placeholder: 'notes.md' })
+          + '<p class="thym-meta">' + cosmEsc(t('fap.run.handWhy', 'paths from the project’s top folder, separated by commas; each goes in as a read-only copy, and an argument naming one reaches that copy')) + '</p>'
+          + '<details class="fap-stdin"' + (FA.stdin ? ' open' : '') + '><summary>' + cosmEsc(t('fap.run.stdin', 'its input')) + '</summary>'
+          + '<textarea id="fap-stdin" class="fap-text fap-mono" rows="3" aria-label="' + cosmEsc(t('fap.run.stdin', 'its input')) + '">' + cosmEsc(FA.stdin) + '</textarea></details>'
+          + '<div class="fab-row"><button type="button" data-fap="run"' + (rrun ? ' disabled' : '') + '>' + cosmEsc(t('fap.run.go', 'run it')) + '</button></div>';
+      }
+      if (rrun) {
+        h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(Object.assign({ kind: 'sandbox', what: FA.rwhat }, FA.rsnap || {}))) + '</span></p>';
+      }
+      if (FA.rerror) h += '<p class="thym-refusal">' + cosmEsc(FA.rerror) + '</p>';
+      const res = FA.rresult || (!rrun && !FA.rerror && cosmIsMap(st.last_run) ? st.last_run : null);
+      if (res && !rrun) h += fapResultHTML(res, !FA.rresult);
+      return h;
+    }
+
+    function fapStream(label, text, cut) {
+      const s = String(text || '');
+      if (!s) return '';
+      const shown = s.length > FAP_OUT_MAX ? s.slice(0, FAP_OUT_MAX) : s;
+      let h = '<div class="fap-out-h">' + cosmEsc(label) + '</div><pre class="fap-out" tabindex="0">' + cosmEsc(shown) + '</pre>';
+      if (s.length > FAP_OUT_MAX) h += '<p class="thym-meta">' + cosmEsc(t('fap.out.capped', 'the first {n} characters are shown here').replace('{n}', FAP_OUT_MAX.toLocaleString(I18N.lang))) + '</p>';
+      if (cut) h += '<p class="thym-meta">' + cosmEsc(t('fap.out.truncated', 'the sandbox kept only the first part of this stream: a run past its output limit is stopped')) + '</p>';
+      return h;
+    }
+
+    function fapResultHTML(r, last) {
+      const ok = !!r.ok;
+      let h = '<div class="fap-result">';
+      if (last) h += '<p class="thym-meta">' + cosmEsc(t('fap.run.last', 'the last run')) + '</p>';
+      h += '<p class="' + (ok ? 'thym-fits' : 'thym-refusal') + ' fap-said">' + cosmEsc(String(r.message || '')) + '</p>';
+      const bits = [];
+      if (r.what === 'tests' && r.ran != null) bits.push(t('fap.run.ran', '{n} tests ran').replace('{n}', String(r.ran)));
+      if (r.exit_code != null) bits.push(t('fap.run.exit', 'exit {code}').replace('{code}', String(r.exit_code)));
+      if (r.wall_time != null) bits.push(t('fap.run.time', '{s} seconds').replace('{s}', Number(r.wall_time).toLocaleString(I18N.lang, { maximumFractionDigits: 2 })));
+      if (bits.length) h += '<p class="thym-meta">' + cosmEsc(bits.join(' · ')) + '</p>';
+      h += '<p class="' + (r.enforced ? 'thym-meta' : 'thym-refusal') + ' fap-held">' + cosmEsc(r.enforced
+        ? t('fap.box.held', 'the box held this run')
+        : t('fap.box.notHeld', 'the box did not hold this run: nothing it promises was enforced')) + '</p>';
+      h += fapStream(t('fap.out.stdout', 'its output'), r.stdout, r.stdout_truncated);
+      h += fapStream(t('fap.out.stderr', 'its error output'), r.stderr, r.stderr_truncated);
+      const refused = Array.isArray(r.refused) ? r.refused : [];
+      if (refused.length) h += '<p class="thym-meta">' + cosmEsc(t('fap.box.refused', 'what the box refused:')) + '</p><ul class="fap-list">'
+        + refused.map((x) => '<li>' + cosmEsc(String(x)) + '</li>').join('') + '</ul>';
+      const g = cosmIsMap(r.guarantees) ? r.guarantees : null;
+      if (g) {
+        const words = {
+          network: t('fap.box.network', 'network'), writes: t('fap.box.writes', 'writes'), reads: t('fap.box.reads', 'reads'),
+          processes: t('fap.box.processes', 'processes'), memory: t('fap.box.memory', 'memory'), time: t('fap.box.time', 'time'),
+          output: t('fap.box.output', 'output'), disk: t('fap.box.disk', 'disk'), packages: t('fap.box.packages', 'packages'),
+        };
+        h += '<details class="fap-guar"><summary>' + cosmEsc(t('fap.box.promised', 'what the box promised for this run, and what not')) + '</summary><dl>'
+          + Object.keys(g).map((k) => '<dt>' + cosmEsc(words[k] || k) + '</dt><dd>' + cosmEsc(String(g[k])) + '</dd>').join('')
+          + '</dl><p class="thym-meta">' + cosmEsc(t('fap.box.mechanism', 'held by {mechanism}').replace('{mechanism}', () => String(r.mechanism || '?'))) + '</p></details>';
+      }
+      return h + '</div>';
+    }
+
+    // ---- acting ----
+    async function fapBeginGo() {
+      if (!fapBeginValid() || fapRunning('a')) return;
+      const name = FA.name.trim();
+      const body = { path: (FA.where ? FA.where + '/' : '') + name, kind: FA.kind };
+      if (FA.licence.trim()) body.licence = FA.licence.trim();
+      if (FA.by.trim()) body.by = FA.by.trim();
+      if (FA.way === 'starter') body.starter = FA.kind;
+      else {
+        fabRouteBody('fap', body);
+        if (FA.way === 'brief') body.brief = FA.brief.trim();
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { ajob: 'pending', asnap: null, aresult: null, aerror: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/begin', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.ajob = null; FA.aerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      if (r.data.job) {
+        FA.ajob = r.data.job.id;
+        FA.asnap = r.data.job;
+        canonTrack(r.data.job, { want: 'fabulac-first', label: name + '.fabulac.cosm', writes: true });
+        fabCardPaint();
+        return;
+      }
+      // From a starter: at once, not a job.
+      const res = r.data;
+      fapAfterWrite({ result: res });
+      await fapOpen(res.fabulac || body.path + '.fabulac.cosm');
+      FA.aresult = res;
+      fabCardPaint();
+    }
+
+    async function fapAuthorGo() {
+      if (fapRunning('a') || !FA.path) return;
+      const body = fabRouteBody('fap', { path: FA.path });
+      const seq = FAB.seq;
+      Object.assign(FA, { ajob: 'pending', asnap: null, aresult: null, aerror: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/begin', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { FA.ajob = null; FA.aerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.ajob = null;
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    async function fapAnswerGo() {
+      const st = FA.status, iv = st && cosmIsMap(st.interview) ? st.interview : {};
+      const answers = (Array.isArray(iv.shown) ? iv.shown : []).filter((q) => q && FAP_SIMPLE.has(String(q.kind || 'text')))
+        .map((q) => ({ question: q.id, says: String(FA.answers[q.id] || '').trim() })).filter((a) => a.says);
+      if (!answers.length || FA.sending) return;
+      const seq = FAB.seq;
+      Object.assign(FA, { sending: true, aerrorQ: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/answer', { path: FA.path, answers });
+      if (seq !== FAB.seq) return;
+      FA.sending = false;
+      if (!r.ok) { FA.aerrorQ = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      const refused = r.data && Array.isArray(r.data.refused) ? r.data.refused : [];
+      answers.forEach((a) => { if (!refused.some((x) => cosmIsMap(x) && x.question === a.question)) delete FA.answers[a.question]; });
+      if (refused.length) FA.aerrorQ = refused.map((x) => (cosmIsMap(x) ? (x.why || x.message || x.question) : String(x))).join(' · ');
+      // Settled and the next stage raised by the authoring job, as "go on" does.
+      await fapAuthorGo();
+    }
+
+    async function fapAddGo() {
+      const says = FA.addSays.trim();
+      if (!says || FA.adding) return;
+      const body = { path: FA.path, as: FA.addAs, says };
+      if (FA.addAs === 'case') {
+        const fields = {};
+        const data = (s) => { const x = s.trim(); if (!x) return undefined; if (x[0] === '{') { try { return JSON.parse(x); } catch (_e) { /* words */ } } return x; };
+        const g = data(FA.addGiven), e = data(FA.addExpect);
+        if (g !== undefined) fields.given = g;
+        if (e !== undefined) fields.expect = e;
+        if (Object.keys(fields).length) body.fields = fields;
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { adding: true, added: null, addError: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/add', body);
+      if (seq !== FAB.seq) return;
+      FA.adding = false;
+      if (!r.ok || !r.data) { FA.addError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      Object.assign(FA, { added: String(r.data.message || r.data.added || ''), addSays: '', addGiven: '', addExpect: '', check: null });
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fapReload();
+    }
+
+    async function fapCheckGo() {
+      if (FA.checking) return;
+      const seq = FAB.seq;
+      FA.checking = true;
+      fabCardPaint();
+      const r = await canonJSON('/api/fabulac/check?path=' + encodeURIComponent(FA.path));
+      if (seq !== FAB.seq) return;
+      FA.checking = false;
+      FA.check = r.ok && r.data ? r.data : { error: r.error || t('canon.job.failed', 'that did not work') };
+      fabCardPaint();
+    }
+
+    async function fapEntailGo() {
+      if (fapRunning('e')) return;
+      const body = fabRouteBody('fap', { path: FA.path });
+      if (FA.overwrite.size) body.overwrite = Array.from(FA.overwrite);
+      const seq = FAB.seq;
+      Object.assign(FA, { ejob: 'pending', esnap: null, eresult: null, eerror: null, fileNote: null, fileError: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/entail', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { FA.ejob = null; FA.eerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.ejob = null;
+      FA.overwrite.clear();
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    async function fapFileGo(what, file) {
+      if (!file || FA.fileBusy) return;
+      const seq = FAB.seq;
+      Object.assign(FA, { fileBusy: file, fileNote: null, fileError: null });
+      fabCardPaint();
+      if (what === 'take-back') {
+        const r = await fapPost('/api/fabulac/take-back', fabRouteBody('fap', { path: FA.path, file }));
+        if (seq !== FAB.seq) return;
+        FA.fileBusy = null;
+        if (!r.ok || !r.data || !r.data.job) { FA.fileError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+        fapFollow(r.data.job, fapName());
+        fabCardPaint();
+        return;
+      }
+      const url = what === 'keep' ? '/api/fabulac/keep' : '/api/fabulac/let-go';
+      const r = await fapPost(url, { path: FA.path, files: [file] });
+      if (seq !== FAB.seq) return;
+      FA.fileBusy = null;
+      if (!r.ok || !r.data) { FA.fileError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.overwrite.delete(file);
+      FA.fileNote = String(r.data.message || '');
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fapReload();
+    }
+
+    function fapArgs(s) {
+      const out = [];
+      const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
+      let m;
+      while ((m = re.exec(String(s || '')))) out.push(m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3]));
+      return out;
+    }
+
+    async function fapRunGo(what) {
+      if (fapRunning('r')) return;
+      const body = { path: FA.path };
+      if (what === 'tool') {
+        body.args = fapArgs(FA.args);
+        const hand = FA.hand.split(',').map((x) => x.trim()).filter(Boolean);
+        if (hand.length) body.hand_over = hand;
+        if (FA.stdin) body.stdin = FA.stdin;
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { rjob: 'pending', rsnap: null, rresult: null, rerror: null, rwhat: what === 'tool' ? 'tool' : 'tests' });
+      fabCardPaint();
+      const r = await fapPost(what === 'tool' ? '/api/fabulac/run' : '/api/fabulac/test', body);
+      if (seq !== FAB.seq) return;
+      // A service, a library run as a tool, a fabulac not entailed: refused before anything is copied, in the server's words.
+      if (!r.ok || !r.data || !r.data.job) { FA.rjob = null; FA.rerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.rjob = null;
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    // Stop: what of it is running (a sandbox run, a job), through its own route.
+    async function fapStopGo() {
+      if (!FA.path) return;
+      const r = await fapPost('/api/fabulac/stop', { path: FA.path });
+      if (r.ok && r.data && Array.isArray(r.data.stopped)) r.data.stopped.forEach((s) => canonOnSnap(s));
+      else if (!r.ok && FAB.open && r.status !== 409) { FA.rerror = r.error; fabCardPaint(); }
+    }
+
+    async function fapHeadGo() {
+      const name = FA.headName.trim();
+      if (!name) return;
+      const dir = fapDir(FA.path);
+      const at = (p) => (p.indexOf('/') < 0 && dir ? dir + '/' + p : p);
+      const parts = [FA.path].concat(FA.headParts.split(',').map((x) => x.trim()).filter(Boolean).map(at));
+      const seq = FAB.seq;
+      Object.assign(FA, { head: null, headError: null });
+      const r = await fapPost('/api/fabulac/head', { path: at(name), parts });
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.headError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.head = r.data;
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fabCardPaint();
+    }
+
+    // Every snapshot of a job the card follows (canonApply, `want: 'fabulac-first'`).
+    function fapJobOnSnap(e, snap) {
+      if (!FAB.open || (FAB.face !== 'authored' && FAB.face !== 'begin')) return;
+      const s = ['a', 'e', 'r'].find((k) => FA[k + 'job'] === e.id);
+      if (!s) return;
+      FA[s + 'snap'] = snap;
+      if (CANON_TERMINAL.has(snap.state)) {
+        const done = snap.state === 'done';
+        FA[s + 'job'] = null;
+        FA[s + 'result'] = done ? (snap.result || {}) : null;
+        FA[s + 'error'] = done ? null : (snap.state === 'cancelled' ? t('fap.job.stopped', 'stopped')
+          : (snap.message || snap.error || t('canon.job.failed', 'that did not work')));
+        if (FAB.face === 'begin') {
+          const fab = done && snap.result && snap.result.fabulac;
+          if (fab) { const res = snap.result; void fapOpen(fab).then(() => { FA.aresult = res; fabCardPaint(); }); return; }
+          fabCardPaint();
+          return;
+        }
+        fapReload();
+      }
+      fabCardPaint();
+    }
+
+    // A finished job of an authored fabulac, as a toast when the card is not showing it.
+    function fapToast(e, snap, id, dismiss) {
+      if (FAB.open && fapShowing(e.id)) { convertToastClose(id); return; }
+      const icon = 'cosm';
+      if (!CANON_TERMINAL.has(snap.state)) {
+        convertToast(id, { state: 'running', icon, square: true, title: e.label, message: fapProgressText(Object.assign({ kind: e.kind }, snap)),
+          progress: null, actions: [{ label: t('canon.job.cancel', 'cancel'), run: () => { void canonCancel(e.id); } }] });
+        return;
+      }
+      const res = snap.result || {};
+      const fab = res.fabulac || e.path;
+      const open = { label: t('canon.job.open', 'open'), run: () => { convertToastClose(id); void fapOpen(fab, e.kind === 'sandbox' ? 'run' : null); } };
+      if (snap.state === 'done') {
+        const ok = e.kind !== 'sandbox' || !!res.ok;
+        convertToast(id, { state: ok ? 'done' : 'failed', icon, square: true, title: e.label,
+          message: String(res.message || t('fap.job.done', 'done')), actions: fab ? [open, dismiss] : [dismiss], ttl: 15000 });
+        return;
+      }
+      convertToast(id, { state: 'failed', icon, square: true, title: e.label,
+        message: snap.state === 'cancelled' ? t('fap.job.stopped', 'stopped') : (snap.message || snap.error || t('canon.job.failed', 'that did not work')),
+        ttl: 15000, actions: [dismiss] });
+    }
+
+    // A fabulac or its entailment was written: the tree, Canon and an open viewer catch up.
+    function fapAfterWrite(snap) {
+      const res = (snap && snap.result) || {};
+      if (document.getElementById('canon-mode')?.classList.contains('open')) cnLoadTree();
+      if (!IS_HOME) htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      const fab = res.fabulac || (snap && snap.path);
+      if (fab && COSM.path && canonSame(COSM.path, fab) && cosmEl('cosm-mode').classList.contains('open')) cosmLoad(COSM.path);
+    }
+
+    // -- its controls --
+    fabEl('fab-body').addEventListener('change', (e) => {
+      if (FAB.face !== 'begin' && FAB.face !== 'authored') return;
+      if (fabRouteOnEvent(e, 'fap', () => fabCardPaint())) return;
+      const n = e.target.name;
+      if (n === 'fap-kind' && FAP_KINDS.includes(e.target.value)) { FA.kind = e.target.value; fabCardPaint(); return; }
+      if (n === 'fap-way') { FA.way = e.target.value; fabCardPaint(); return; }
+      if (n === 'fap-as' && FAP_ADD.includes(e.target.value)) { FA.addAs = e.target.value; fabCardPaint(); return; }
+      if (e.target.dataset && e.target.dataset.fapOver) {
+        if (e.target.checked) FA.overwrite.add(e.target.dataset.fapOver); else FA.overwrite.delete(e.target.dataset.fapOver);
+        fabCardPaint();
+      }
+    });
+    fabEl('fab-body').addEventListener('input', (e) => {
+      if (FAB.face !== 'begin' && FAB.face !== 'authored') return;
+      const el = e.target;
+      const map = { 'fap-name': 'name', 'fap-brief': 'brief', 'fap-licence': 'licence', 'fap-by': 'by', 'fap-says': 'addSays',
+        'fap-given': 'addGiven', 'fap-expect': 'addExpect', 'fap-head-name': 'headName', 'fap-head-parts': 'headParts',
+        'fap-args': 'args', 'fap-hand': 'hand', 'fap-stdin': 'stdin' };
+      if (map[el.id]) FA[map[el.id]] = el.value;
+      else if (el.dataset && el.dataset.fapQ) FA.answers[el.dataset.fapQ] = el.value;
+      else return;
+      // Only what a keystroke changes: the begin button, the line of what it writes, add, send, head.
+      if (FAB.face === 'begin') {
+        fabEl('fab-go').disabled = fapRunning('a') || !fapBeginValid();
+        const w = fabEl('fap-writes');
+        if (w) {
+          const nm = FA.name.trim() || '…';
+          w.textContent = t('fap.begin.writes', 'writes {fabulac}; entailing it writes the folder {folder} beside it')
+            .replace('{fabulac}', () => (FA.where ? FA.where + '/' : '') + nm + '.fabulac.cosm').replace('{folder}', () => nm + '/');
+        }
+        return;
+      }
+      const set = (sel, off) => { const b = fabEl('fab-body').querySelector(sel); if (b) b.disabled = off; };
+      set('button[data-fap="add"]', FA.adding || !FA.addSays.trim());
+      set('button[data-fap="head"]', !FA.headName.trim());
+      const iv = FA.status && cosmIsMap(FA.status.interview) ? FA.status.interview : {};
+      set('button[data-fap="answer"]', FA.sending || fapRunning('a') || !(iv.shown || []).some((q) => q && String(FA.answers[q.id] || '').trim()));
+    });
+    fabEl('fab-body').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-fap]');
+      if (!b || b.disabled) return;
+      const p = b.dataset.fapPath;
+      switch (b.dataset.fap) {
+        case 'answer': void fapAnswerGo(); break;
+        case 'go-on': void fapAuthorGo(); break;
+        case 'questions': { const f = FA.path; fabCardClose(); if (window.__dlgReady) void dlgOpen(f); break; }
+        case 'add': void fapAddGo(); break;
+        case 'check': void fapCheckGo(); break;
+        case 'head': void fapHeadGo(); break;
+        case 'entail': void fapEntailGo(); break;
+        case 'keep': case 'let-go': case 'take-back': void fapFileGo(b.dataset.fap, p); break;
+        case 'file': fabCardClose(); openReadEdit(p, { size: 'full', face: 'read' }); break;
+        case 'test': void fapRunGo('tests'); break;
+        case 'run': void fapRunGo('tool'); break;
+        case 'stop': void fapStopGo(); break;
+        default: break;
+      }
+    });
+    window.fapOnSnap = fapJobOnSnap;
+
     // ---- the cosm viewer's rail: who made a fabula; a fabulac's licence ----
     function fabMadeHTML(cat) {
       const d = cosmIsMap(cat.derived) ? cat.derived : null;
@@ -40033,6 +41063,13 @@
       }
       const src = cosmIsMap(cat.source) ? cat.source : null;
       const lic = src ? src.licence : undefined;
+      // 0.8 (W4-FP): an authored fabulac's licence is the one its author offers it under.
+      if (src && src.kind === 'authored') {
+        h += '<div class="fab-licence' + (typeof lic === 'string' && lic ? '' : ' pending') + '">' + cosmEsc(typeof lic === 'string' && lic
+          ? t('fap.licence', 'offered under {licence}').replace('{licence}', () => lic)
+          : t('fap.licence.pending', 'no licence given yet: the interview asks for one')) + '</div>';
+        return h;
+      }
       if (cosmIsMap(lic) && lic.pending !== undefined) {
         h += '<div class="fab-licence pending">' + cosmEsc(t('fab.licence.pending', 'no licence was found in the source, so none is recorded: {why}')
           .replace('{why}', () => String(lic.pending || ''))) + '</div>';
@@ -40043,20 +41080,33 @@
     }
 
     // ---- menus and the tree ----
-    function fabMenuItems(path, isDir, holotype) {
+    function fabMenuItems(path, isDir, holotype, target) {
       if (IS_HOME || !path) return '';
       const p = String(path);
       const item = (act, label) => '<button type="button" class="ctx-item" data-act="' + act + '">' + escapeHtml(label) + '</button>';
       if (isDir) {
         if (FAB_CSHORT_RE.test(p)) return item('fab-view', t('fab.menu.cshort', 'read the cshort'));
         if (holotype || /^rness(\/|$)/.test(p) || /\.thym$/i.test(p)) return '';
-        return item('fab-build', t('fab.menu.build', 'build its fabulac…'));
+        // 0.8 (W4-FP, the twin guard): a folder whose fabulac is authored is
+        // that fabulac's entailment: it is entailed again and run, never
+        // decompiled into a fabulac of its own.
+        if (target && target.fabTwin) {
+          return item('fap-entail', t('fap.menu.entail', 'entail again…')) + item('fap-run', t('fap.menu.run', 'test and run…'))
+            + item('fap-moved', t('fap.menu.moved', 'what moved…'));
+        }
+        return item('fab-build', t('fab.menu.build', 'build its fabulac…')) + item('fap-begin', t('fap.menu.begin', 'begin a fabulac here…'));
       }
+      if (FAB_FABULAC_RE.test(p) && target && target.fabAuthored) return item('fap-open', t('fap.cosm.label', 'entail and run…'));
       if (FAB_FABULAC_RE.test(p)) return item('fab-build', t('fab.cosm.label', 'build and compile…'));
       if (FAB_CATEM_RE.test(p)) return item('fab-view', t('fab.menu.catem', 'read the catem'));
       return '';
     }
     function fabMenuRun(act, path) {
+      const twin = String(path || '').replace(/\/+$/, '') + '.fabulac.cosm';
+      if (act === 'fap-begin') { void fapBeginOpen(path); return true; }
+      if (act === 'fap-open') { void fapOpen(path); return true; }
+      if (act === 'fap-entail' || act === 'fap-moved') { void fapOpen(twin, 'compile'); return true; }
+      if (act === 'fap-run') { void fapOpen(twin, 'run'); return true; }
       if (act === 'fab-build') { void fabFolderOpen(path); return true; }
       if (act === 'fab-view') { void fabViewOpen(path); return true; }
       return false;
@@ -40077,6 +41127,17 @@
         tag.textContent = t('fab.tag.old', 'old twin');
         tag.title = t('fab.tag.old.title', 'an old-named twin, kept as an ordinary file: the twin of {text} is {twin}')
           .replace('{text}', () => canonBase(text)).replace('{twin}', () => canonBase(twin));
+        row.appendChild(tag);
+      });
+      // 0.8 (W4-FP): the folder an authored fabulac entailed.
+      tree.querySelectorAll('li.dir[data-fab-twin]').forEach((li) => {
+        const row = li.querySelector(':scope > .dir-row');
+        if (!row || row.querySelector('.tree-fab-tag')) return;
+        const tag = document.createElement('span');
+        tag.className = 'tree-fab-tag';
+        tag.textContent = t('fap.tag.entailment', 'entailment');
+        tag.title = t('fap.tag.entailment.title', 'the entailment of {fabulac}, a fabulac you authored: it runs only in the sandbox')
+          .replace('{fabulac}', () => canonBase(li.dataset.fabTwin || ''));
         row.appendChild(tag);
       });
       tree.querySelectorAll('li.dir[data-path]').forEach((li) => {
@@ -42648,7 +43709,7 @@
       const thymMenu = window.__thymReady ? thymOtherMenuItems(target.path, target.kind === 'dir') : '';
       if (thymMenu) items.push(thymMenu + '<div class="ctx-sep"></div>');
       // 0.6 (U1a): a folder builds its fabulac; a fabulac, a cshort and a catem open as what they are.
-      const fabMenu = window.__fabReady ? fabMenuItems(target.path, target.kind === 'dir', target.holotype) : '';
+      const fabMenu = window.__fabReady ? fabMenuItems(target.path, target.kind === 'dir', target.holotype, target) : '';
       if (fabMenu) items.push(fabMenu + '<div class="ctx-sep"></div>');
       if (target.kind === 'dir') {
         items.push('<button type="button" class="ctx-item" data-act="new-folder">' + t('menu.tree.newFolder', 'new subfolder') + '</button>');
@@ -42697,6 +43758,9 @@
           cosm: /\.cosm$/i.test(li.dataset.path || ''),
           holotype: li.dataset.holotype === '1',
           emf: li.dataset.emfState || '',
+          // 0.8 (W4-FP): an authored fabulac, and the folder that is its entailment
+          fabAuthored: li.dataset.fabAuthored === '1',
+          fabTwin: li.dataset.fabTwin || '',
         });
       }, true);   // <-- capture phase
     })();

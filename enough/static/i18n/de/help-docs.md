@@ -374,6 +374,36 @@ was ein fabulac kompiliert, hier gelesen. ein <strong>cshort</strong> ist ein Or
 - leg einen cshort neben das Original und vergleiche: was dem fabulac fehlte, fehlt dem cshort.
 - Abschnitt 12.8 des Hilfe-Centers sagt, was ein cshort und ein catem sind und warum enough einen cshort nie ausführt.
 
+## fabulac-author
+name: dein fabulac
+path: tally.fabulac.cosm → tally/
+
+### what
+die Karte eines fabulac, das <strong>du verfasst hast</strong>: der Plan eines Programms, das du in enough schreibst, jeder Eintrag ein Axiom in deinen Worten. ein <strong>Werkzeug</strong> ist ein Befehl, den jemand eintippt, eine <strong>Bibliothek</strong> sind Funktionen, die ein anderes Programm aufruft, ein <strong>Dienst</strong> dient auf einem Port (jetzt verfasst und gefolgert; das Bereitstellen kommt in einer späteren Nebenversion). die Karte zeigt das Interview Stufe für Stufe — wofür es ist, seine Zugänge, was es braucht, was es auslässt, seine Fälle, was noch offen ist — und die ein oder zwei Fragen, die es jetzt stellt. du kannst eine Anforderung, eine Entscheidung, einen Fall oder eine Schnittstelle in deinen eigenen Worten hinzufügen und es prüfen. <strong>folgern</strong> schreibt das Programm, den Ordner <code>tally/</code> daneben: ein Modell schreibt jede Quelldatei, und die Tests werden nach Regeln aus seinen Fällen geschrieben.
+
+### how
+<strong>hier ein fabulac beginnen …</strong> im Wahltaste-Klick-Menü eines Ordners öffnet die Seite zum Beginnen: was es ist, sein Name und wie es beginnt — aus einer Vorlage (sofort), aus einer Kurzbeschreibung, die du geschrieben hast, oder aus dem Nichts (das Interview fragt). bei einem fabulac, das du verfasst hast, öffnet <strong>folgern und ausführen …</strong> diese Karte, im cosm-Betrachter oder im Menü; bei seinem Ordner bietet das Menü <strong>erneut folgern …</strong>, <strong>testen und ausführen …</strong> und <strong>was sich bewegt hat …</strong>, nie „sein fabulac bauen …“. beantworte die gezeigten Fragen und <strong>sende diese Antworten</strong>; <strong>weiter</strong> arbeitet sie ein und fragt die nächste Stufe. given und expect eines Falls, als Daten geschrieben, werden zu einem Test. nach dem Folgern listet die Karte jede Datei, die sich bewegt hat oder von Hand geändert wurde; eine von Hand geänderte Datei wartet auf deine Wahl: <strong>überschreiben</strong>, <strong>behalten</strong> (eine festgehaltene Entscheidung, bis du sie <strong>freigibst</strong>) oder ins fabulac <strong>zurücknehmen</strong>. ein <strong>Kopf</strong> nennt mehrere fabulacs als die Teile eines Programms.
+
+### ideas
+- beginne mit der Werkzeug-Vorlage, ändere ihre Fälle so, dass sie dein Programm sagen, und folgere dann: die Tests kommen aus deinen Fällen.
+- prüfe, bevor du folgerst: es listet die Anforderungen, die noch kein Fall zeigt.
+- das Entwicklerhandbuch im Dokumentbetrachter sagt jeden Schritt an jeder Tür: die Seite, die Kommandozeile und der Client.
+
+## fabulac-run
+name: in der Sandbox testen und ausführen
+path: tally/ · tally/tests/test_cases.py
+
+### what
+wo enough die Folgerung eines fabulac ausführt, das du verfasst hast: seine Tests, und sein Werkzeug mit den Argumenten, die du gibst. sie führt eine Kopie des Ordners aus, ohne Netzwerk und nur mit Pythons Standardbibliothek; sie schreibt nur in ihren eigenen Ordner, und Zeit, Ausgabe und Speicherplatz sind begrenzt. unter macOS begrenzt sie den Arbeitsspeicher nicht und verspricht dazu nichts; unter Linux braucht sie bubblewrap. nach jedem Lauf zeigt die Karte, was die Sandbox für diesen Lauf versprochen hat und was nicht, und sagt klar, wenn die Sandbox ihn nicht gehalten hat.
+
+### how
+<strong>seine Tests ausführen</strong> führt die aus seinen Fällen geschriebenen Tests aus; bei einem Werkzeug gib <strong>seine Argumente</strong>, die <strong>übergebenen Dateien</strong> (jede kommt als schreibgeschützte Kopie hinein) und, wenn es welche liest, <strong>seine Eingabe</strong> an, dann <strong>ausführen</strong>. <strong>anhalten</strong> beendet einen Lauf sofort. die Ausgabe wird gezeigt, wie sie behalten wurde, bei langer Ausgabe nur der erste Teil. ein Dienst wird abgelehnt, in enoughs Worten: das Bereitstellen kommt in einer späteren Nebenversion. eine Bibliothek hat kein Werkzeug zum Ausführen; führe ihre Tests aus. nichts hier führt einen cshort aus, den Code eines Programms, das du nicht verfasst hast: der wird gelesen, nie ausgeführt.
+
+### ideas
+- führe die Tests nach jedem Folgern aus: die Fälle sind der Richter.
+- übergib eine kleine eigene Datei und führe das Werkzeug darauf aus, bevor du ihm eine große anvertraust.
+- die Versprechen der Sandbox stehen unter jedem Ergebnis: öffne die Liste, um zu sehen, was gehalten hat.
+
 ## dialectic-card
 name: die Fragen
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

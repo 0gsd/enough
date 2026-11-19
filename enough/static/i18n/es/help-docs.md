@@ -375,6 +375,36 @@ abre uno desde la lista de la tarjeta del fabulac, desde un aviso cuando termina
 - pon un cshort junto al original y compáralos: lo que le faltó al fabulac le falta al cshort.
 - la sección 12.8 del centro de ayuda dice qué son un cshort y un catem, y por qué enough nunca ejecuta un cshort.
 
+## fabulac-author
+name: tu fabulac
+path: tally.fabulac.cosm → tally/
+
+### what
+la tarjeta de un fabulac <strong>que redactaste tú</strong>: el plan de un programa que escribes en enough, cada elemento un axioma con tus palabras. una <strong>herramienta</strong> es una orden que alguien escribe, una <strong>biblioteca</strong> son funciones que llama otro programa, un <strong>servicio</strong> sirve en un puerto (se redacta e implica ya; servirlo llega en una versión menor posterior). la tarjeta muestra la entrevista etapa por etapa — para qué sirve, sus entradas, lo que necesita, lo que deja fuera, sus casos, lo que sigue abierto — y la pregunta o las dos que hace ahora. puedes añadirle un requisito, una decisión, un caso o una interfaz con tus propias palabras, y comprobarlo. <strong>implicar</strong> escribe el programa, la carpeta <code>tally/</code> a su lado: un modelo escribe cada fuente, y las pruebas se escriben a partir de sus casos, por reglas.
+
+### how
+<strong>empezar un fabulac aquí…</strong> en el menú de opción-clic de una carpeta abre la cara para empezar: qué es, su nombre y cómo empezar — a partir de una plantilla (al instante), de un resumen que escribiste, o desde cero (la entrevista pregunta). en un fabulac que redactaste, <strong>implicar y ejecutar…</strong> abre esta tarjeta, en el visor cosm o en el menú; en su carpeta el menú ofrece <strong>implicar de nuevo…</strong>, <strong>probar y ejecutar…</strong> y <strong>lo que se movió…</strong>, nunca «construir su fabulac…». responde a las preguntas que se muestran y <strong>envía estas respuestas</strong>; <strong>seguir</strong> las asienta y pregunta la siguiente etapa. el given y el expect de un caso escritos como datos se convierten en una prueba. tras implicar, la tarjeta lista cada archivo que se movió o se cambió a mano; un archivo cambiado a mano espera tu elección: <strong>sobrescribirlo</strong>, <strong>conservarlo</strong> (una decisión registrada, hasta que lo <strong>sueltes</strong>) o <strong>recuperarlo</strong> en el fabulac. una <strong>cabeza</strong> nombra varios fabulacs como las partes de un solo programa.
+
+### ideas
+- empieza desde la plantilla de herramienta, cambia sus casos para que digan tu programa y luego implica: las pruebas salen de tus casos.
+- comprueba antes de implicar: la comprobación lista los requisitos que ningún caso muestra aún.
+- el manual de desarrolladores, en el visor de documentos, dice cada paso en cada puerta: la página, la línea de órdenes y el cliente.
+
+## fabulac-run
+name: probarlo y ejecutarlo en el sandbox
+path: tally/ · tally/tests/test_cases.py
+
+### what
+donde enough ejecuta la implicación de un fabulac que redactaste: sus pruebas, y su herramienta con los argumentos que des. ejecuta una copia de la carpeta, sin red y solo con la biblioteca estándar de Python; escribe solo en su propia carpeta, y su tiempo, su salida y su disco están limitados. en macOS no limita la memoria, y no promete nada sobre ella; en Linux necesita bubblewrap. tras cada ejecución, la tarjeta muestra lo que el sandbox prometió para ella y lo que no, y dice claramente cuándo el sandbox no la sostuvo.
+
+### how
+<strong>ejecutar sus pruebas</strong> ejecuta las pruebas escritas a partir de sus casos; para una herramienta, da <strong>sus argumentos</strong>, los <strong>archivos entregados</strong> (cada uno entra como una copia de solo lectura) y, si lee alguna, <strong>su entrada</strong>, y luego <strong>ejecutarlo</strong>. <strong>detener</strong> termina una ejecución al momento. la salida se muestra tal como se guardó, solo la primera parte cuando es larga. un servicio se rechaza, con las palabras de enough: servirlo llega en una versión menor posterior. una biblioteca no tiene herramienta que ejecutar; ejecuta sus pruebas. nada aquí ejecuta un cshort, el código de un programa que no redactaste: se lee, nunca se ejecuta.
+
+### ideas
+- ejecuta las pruebas después de cada implicación: los casos son el juez.
+- entrega un archivo pequeño tuyo y ejecuta la herramienta sobre él antes de confiarle uno grande.
+- las promesas del sandbox se listan bajo cada resultado: abre la lista para ver qué se sostuvo.
+
 ## dialectic-card
 name: las preguntas
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

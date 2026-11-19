@@ -53,6 +53,20 @@ Say no more than enough does. In 0.8:
 - For the client door: enough running. It listens on `http://127.0.0.1:3456` unless `ENOUGH_URL` says another address.
 - For the sandbox: macOS with `/usr/bin/sandbox-exec`, or Linux with bubblewrap.
 
+### 1.5 The page
+
+The page's door is the fabulac card. It calls the routes of section 6.3, and every POST it makes carries the header `X-Enough-Api: 1`.
+
+- **Begin.** Option-click a folder in the project tree and choose **begin a fabulac here…**. Say what it is (a tool, a library or a service), its name, and how to begin: from a starter (at once), from a brief (its path from the project's top folder), or from nothing (the interview asks). The licence and the author are optional; the interview asks for a licence left out.
+- **Open it again.** On a fabulac you authored, **entail and run…** opens the card: in the tree's menu, or in the cosm viewer's toolbar. On the folder it entailed, the menu offers **entail again…**, **test and run…** and **what moved…**, and never **build its fabulac…**: that folder is an entailment, not a program to decompile. The tree tags the folder **entailment**.
+- **The interview.** The card shows the stages and the one or two questions asked now. Answer a text question on the card and **send these answers**; **go on** settles them and asks the next stage. Every question, of any kind, can be answered in the questions card.
+- **Add and check.** Add a requirement, a decision, a case or an interface in your own words. A case's `given` and `expect` may be data (section 6.8). **check it** shows the checks and the requirements no case shows yet.
+- **Entail.** **entail** (or **entail again**) starts the job; the model line says where the model runs. The card lists every file that moved, is new, is gone, or was changed by hand. A file changed by hand has its three choices on its row: **write over it**, **keep it** (and later **let it go**), **take it back**. Entailing waits until each one is chosen.
+- **Test and run.** **run its tests**; for a tool, **its arguments**, **files handed over** (paths from the project's top folder, separated by commas) and **its input**, then **run it**. **stop** ends a run. The output is shown as the sandbox kept it, the first 20,000 characters on the card. Under each result, the card says whether the box held the run, and lists what it promised for that run and what not. A service is refused with the sentence of section 1.3.
+- **A head.** Name a head and its other parts, and the card makes it over this fabulac and them. On a head, the card lists its parts and which moved.
+
+The page offers nothing that runs a cshort.
+
 ---
 
 ## 2. A worked example: tally

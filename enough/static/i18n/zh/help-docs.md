@@ -374,6 +374,36 @@ fabulac 编译出来的东西，在这里阅读。<strong>cshort</strong> 是一
 - 把 cshort 放在原代码旁边比较：fabulac 漏掉的，cshort 也会缺。
 - 帮助中心的第 12.8 节讲 cshort 和 catem 是什么，以及 enough 为什么从不运行 cshort。
 
+## fabulac-author
+name: 你的 fabulac
+path: tally.fabulac.cosm → tally/
+
+### what
+<strong>你撰写的</strong> fabulac 的卡片：你在 enough 里写的程序的计划，每一项都是你用自己的话写下的公理。<strong>工具</strong>是人输入的命令，<strong>库</strong>是另一个程序调用的函数，<strong>服务</strong>在端口上提供服务（现在就能撰写和蕴含；提供服务要等以后的小版本）。卡片一阶段一阶段地显示访谈——它是做什么的、它的入口、它需要什么、它不做什么、它的用例、还悬而未决的——以及它现在问的一两个问题。你可以用自己的话添加一个需求、一个决定、一个用例或一个接口，并检查它。<strong>蕴含</strong>会写出程序，也就是旁边的文件夹 <code>tally/</code>：模型写出每个源文件，测试按规则从它的用例写出。
+
+### how
+文件夹的 Option 点击菜单里的<strong>在这里开始一个 fabulac…</strong>会打开开始的一面：它是什么、它的名字、怎样开始——从起步模板开始（立即），从你写的简介开始，或从零开始（访谈会来问）。在你撰写的 fabulac 上，cosm 查看器或菜单里的<strong>蕴含并运行…</strong>会打开这张卡片；在它的文件夹上，菜单提供<strong>再次蕴含…</strong>、<strong>测试并运行…</strong>和<strong>变动了什么…</strong>，从不提供“构建它的 fabulac…”。回答显示的问题，然后<strong>发送这些回答</strong>；<strong>继续</strong>会把它们落定并问下一个阶段。以数据写出的用例 given 和 expect 会成为测试。蕴含之后，卡片列出每个有变动或被手改的文件；被手改的文件等你选择：<strong>覆盖它</strong>、<strong>保留</strong>（一个记录在案的决定，直到你<strong>放手</strong>），或把它<strong>收回</strong>到 fabulac 里。<strong>头</strong>把几个 fabulac 列为一个程序的各个部分。
+
+### ideas
+- 从工具的起步模板开始，改它的用例，让它们说出你的程序，然后蕴含：测试来自你的用例。
+- 蕴含之前先检查：它会列出还没有用例体现的需求。
+- 开发者手册（在文档查看器里）在每一扇门上讲了每一步：页面、命令行和客户端。
+
+## fabulac-run
+name: 在沙箱里测试并运行它
+path: tally/ · tally/tests/test_cases.py
+
+### what
+enough 运行你撰写的 fabulac 的蕴含的地方：它的测试，以及带上你给的参数运行它的工具。它运行文件夹的一份副本，没有网络，只用 Python 的标准库；它只写自己的文件夹，时间、输出和磁盘都有上限。在 macOS 上它不限制内存，对内存也不作任何承诺；在 Linux 上它需要 bubblewrap。每次运行之后，卡片会显示沙箱为这次运行承诺了什么、没承诺什么，沙箱没有守住时会明白地说出来。
+
+### how
+<strong>运行它的测试</strong>会运行从它的用例写出的测试；对于工具，填上<strong>它的参数</strong>、<strong>交给它的文件</strong>（每个都以只读副本进入），如果它要读输入，再填上<strong>它的输入</strong>，然后<strong>运行它</strong>。<strong>停止</strong>会立即结束一次运行。输出按保留下来的样子显示，太长时只显示前一部分。服务会被拒绝，用的是 enough 自己的话：提供服务要等以后的小版本。库没有可运行的工具；运行它的测试。这里从不运行 cshort，也就是不是你撰写的程序的代码：它只供阅读，从不运行。
+
+### ideas
+- 每次蕴含之后都运行测试：用例就是裁判。
+- 先交给工具一个你自己的小文件试运行，再把大文件交给它。
+- 沙箱的承诺列在每个结果下面：打开列表，看看哪些守住了。
+
 ## dialectic-card
 name: 问题
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

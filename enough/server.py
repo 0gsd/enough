@@ -416,6 +416,11 @@ def _walk_tree(
             # in the cosm viewer; the sidebar still shows its files.
             if _canon.is_holotype_folder(p):
                 node["holotype"] = True
+            # 0.8 (fabulac-first, the twin guard): the folder an authored fabulac entailed; the page offers to
+            # entail it again and run it, never to build a fabulac of it.
+            twin = p.with_name(p.name + _FABULAC_SUFFIX)
+            if twin.is_file() and not twin.is_symlink() and _fabulac_authored(twin):
+                node["fabulac_twin"] = "/".join(rel_parts + (twin.name,))
             node["children"] = _walk_tree(root, rel_parts + (p.name,), visited, wikisink_real)
         elif p.name == "article.html":
             try:
@@ -459,6 +464,9 @@ def _walk_tree(
                 node["catalog"] = True
             elif p.suffix == ".cosm":
                 node["cosm"] = True
+                # 0.8: a fabulac the person authored (its card entails and runs it)
+                if p.name.endswith(_FABULAC_SUFFIX) and not p.is_symlink() and _fabulac_authored(p):
+                    node["fabulac_authored"] = True
             entry = _canon.listing_entry(p, "/".join(rel_parts), emf_found)
             if entry is not None:
                 node["emf"] = entry
@@ -467,6 +475,30 @@ def _walk_tree(
                 node["old_twin"] = old_twin
         out.append(node)
     return out
+
+
+_FABULAC_SUFFIX = ".fabulac.cosm"
+#: Whether a fabulac is authored, by path, kept while its size and time stay (the tree is drawn every 3 s).
+_AUTHORED_SEEN: dict[str, tuple[int, int, bool]] = {}
+
+
+def _fabulac_authored(p: Path) -> bool:
+    """Whether the fabulac at `p` is authored (its `source.kind`, MacroCOSM OES 18.4.1), read once per change."""
+    try:
+        st = p.stat()
+    except OSError:
+        return False
+    key = str(p)
+    seen = _AUTHORED_SEEN.get(key)
+    if seen is not None and seen[:2] == (st.st_mtime_ns, st.st_size):
+        return seen[2]
+    from . import fabulac_job as _fj
+    src = _fj._load(p).get("source")
+    got = isinstance(src, dict) and src.get("kind") == "authored"
+    if len(_AUTHORED_SEEN) > 4096:
+        _AUTHORED_SEEN.clear()
+    _AUTHORED_SEEN[key] = (st.st_mtime_ns, st.st_size, got)
+    return got
 
 
 def _hidden_global_dirs() -> frozenset[Path]:
@@ -545,6 +577,8 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             emf_path = str(n["emf"].get("path", "")).replace('"', "&quot;")
             conv_attr += (f' data-emf="{emf_path}"'
                           f' data-emf-state="{n["emf"].get("state", "")}"')
+        if n.get("fabulac_authored"):
+            conv_attr += ' data-fab-authored="1"'
         if isinstance(n.get("old_twin"), dict):
             # An old-named twin kept beside the flavour-named one that superseded
             # it (0.6, S2): the row says which twin replaced it and of which text.
@@ -562,6 +596,9 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             saved_attr = ' data-wiki-saved="1"' if n.get("wiki_saved") else ""
             if n.get("holotype"):
                 saved_attr += ' data-holotype="1"'
+            if n.get("fabulac_twin"):
+                twin_rel = str(n["fabulac_twin"]).replace('"', "&quot;")
+                saved_attr += f' data-fab-twin="{twin_rel}"'
             # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
