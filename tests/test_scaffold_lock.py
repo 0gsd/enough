@@ -159,6 +159,23 @@ def test_accept_fix_is_the_one_op_a_locked_scaffold_takes_and_only_from_the_pers
     assert "five years" in C.box_text(C.load(deck).module(ask_box()))
 
 
+def test_a_councils_composure_is_never_caught_by_the_lock(tmp_path: Path):
+    """The council writes `form=scaffold` files through the outline (fix-w5): they are plain planes with no
+    `composure:scaffold` block, so the lock never reads them as locked, and the council's own source and the
+    page's still write to them."""
+    comp = C.from_outline("The decision", "scaffold", "# The decision\n\n## Act one\n\n- A beat\n- Another\n")
+    path = tmp_path / "council.comp"
+    C.save(path, comp)
+    loaded = C.load(path)
+    assert loaded.form == "scaffold" and loaded.scaffold is None and not C.scaffold_locked(loaded)
+    mid = next(m.id for m in loaded.modules if m.type == "text")
+    ops(path, {"op": "update_module", "id": mid, "x": 40}, source="council")
+    ops(path, {"op": "set_page", "module": mid, "n": 1, "markdown": "The person's note."})
+    ops(path, {"op": "add_module", "type": "text"}, source="enough")
+    with pytest.raises(ComposureError, match="not a scaffold"):
+        ops(path, {"op": "lock_scaffold"})
+
+
 def test_a_pan_still_saves_on_a_locked_scaffold(deck: Path):
     lock(deck)
     ops(deck, {"op": "set_meta", "view": {"x": 10, "y": 20, "zoom": 1.5}})

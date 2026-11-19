@@ -1033,6 +1033,11 @@ def _council_open(d: Driver, **body) -> None:
         " document.getElementById('comp-council-footer').hidden; i++)"
         " await new Promise((r) => setTimeout(r, 50));"
         " return true; })()")
+    # The footer can show before the council's state has loaded, and under a
+    # loaded machine (late in a full sweep) the 8 s above can run out: wait
+    # for the state itself, with the budget kept here (0.8, fix-w5).
+    _wait_js(d, "typeof COMP_COUNCIL !== 'undefined' && !!COMP_COUNCIL.state"
+                " && !!COMP_COUNCIL.state.council", 20000)
     d.wait_idle()
 
 
@@ -1471,6 +1476,11 @@ def scenario_composure_council_reconvene(d: Driver) -> list[str]:
     _reset(d)
     _comp_blank(d)
     _council_open(d)
+    if not d.js("!!(COMP_COUNCIL.state && COMP_COUNCIL.state.council)"):
+        fails.append("the council did not open (its state never loaded)")
+        _comp_blank(d)
+        _reset(d)
+        return fails
     if d.js("!!document.getElementById('cc-reconvene')"):
         fails.append("a running council offered reconvene")
     # Concluded in the MODEL only — a real conclude wants a model, and this
@@ -5207,8 +5217,17 @@ def scenario_allograph_panel(d: Driver) -> list[str]:
         d.click("#allo-waiting [data-dlg='allo-accept']")
         if not _wait_js(d, "Array.isArray(DLG.allo.waiting) && !DLG.allo.waiting.length && !!DLG.allo.done.waiting", 15000):
             fails.append("accepting it did not leave nothing waiting: " + str(d.js("(document.getElementById('allo-waiting') || {}).innerText")))
-    d.click("[data-dlg='allo-withdraw']")
-    if not _wait_js(d, "!!document.querySelector('#allo-listing [role=\"alertdialog\"]')"):
+    # Accepting sets `done.waiting` before it reloads the entry and repaints, so a click right after can land on
+    # the panel as it is being replaced: wait until nothing is busy and the button is there, and give the click a
+    # second chance if the repaint swallowed it (0.8, fix-w5: seen late in a full sweep).
+    _wait_js(d, "!DLG.allo.busy && !!document.querySelector(\"[data-dlg='allo-withdraw']:not([disabled])\")", 15000)
+    asked = False
+    for _try in range(3):
+        d.click("[data-dlg='allo-withdraw']")
+        if _wait_js(d, "!!document.querySelector('#allo-listing [role=\"alertdialog\"]')", 5000):
+            asked = True
+            break
+    if not asked:
         fails.append("withdraw… did not ask first")
     else:
         d.click("[data-dlg='allo-withdraw-yes']")
