@@ -17,6 +17,9 @@ runs Ascribe's, in one report (MacroCOSM OES 18.4.8):
 - `case-outcome` (error): a case says what is given and what is expected.
 - `requirement-cased` (warning): in an authored fabulac, every `N:requirement` of `force: must` names a case in
   `checked-by` (MacroCOSM OES 18.4.8).
+- `parts-resolve` and `interfaces-agree` (errors): a head fabulac names parts the reader knows, each naming it as its
+  head and told in one of its `C:component`s; a part's `stated-in` names an interface of its head, with the same name,
+  surface, signature and parameters (`enough/fabulac_head.py`; a part that moved since the head checked it is a note).
 - `cases-entailed` (error): once an authored fabulac is entailed, the folder its `entailed` key names holds every
   runnable case as a test written by rules, and every other case as a test marked as a model's or named in
   `ENTAILED.md` with its reason (`enough/thym/moves/authored_code.py`); nothing to check before, or for any other
@@ -64,10 +67,12 @@ FLAVOURS = ("fabulan", "fabulap", "fabulac")
 FABULA_CHECKS = ("code-span", "licence-recorded", "reading-whose", "interface-signature", "case-outcome")
 DIALECTIC_CHECKS = mc.CORE_CHECKS            # question-about, question-shape, session-declared
 OWN_CHECKS = ("code-span", "licence-recorded", "question-about", "question-shape", "session-declared",
-              "reading-whose", "interface-signature", "case-outcome", "requirement-cased", "cases-entailed") + tc.CHECKS
+              "reading-whose", "interface-signature", "case-outcome", "requirement-cased", "cases-entailed",
+              "parts-resolve", "interfaces-agree") + tc.CHECKS
 SEVERITY = {"code-span": "error", "licence-recorded": "error", "question-about": "error", "question-shape": "error",
             "session-declared": "warning", "reading-whose": "warning", "interface-signature": "warning",
-            "case-outcome": "error", "requirement-cased": "warning", "cases-entailed": "error", **tc.SEVERITY}
+            "case-outcome": "error", "requirement-cased": "warning", "cases-entailed": "error",
+            "parts-resolve": "error", "interfaces-agree": "error", **tc.SEVERITY}
 # The thirteen checks of transconception (enough/transconception.py) run only on a fabulac whose catalog says
 # purpose: transconception; on every other fabula they run and find nothing.
 # An old contract name: `emf-checks` names `fabula-checks`, the fabula's checks passing with no error (18.1, 18.4.8).
@@ -140,6 +145,7 @@ class _Own:
         if fl == "fabulac":
             self.licence_recorded()
             self.authored()
+            self.head()
             self.unmeasured = tc.run_checks(self.v, self.add)
             for check, why in self.unmeasured.items():
                 self.add(check, None, f"not measured: {why}", severity="note")
@@ -231,6 +237,13 @@ class _Own:
         why = _ac.cases_entailed_problem({k: v for k, v in cat.items() if k != "nodes"}, nodes, fab_file, text_of)
         if why:
             self.add("cases-entailed", None, why)
+
+    def head(self) -> None:
+        """`parts-resolve` and `interfaces-agree` of a head fabulac, a part, or a head citing another program's
+        interface (MacroCOSM OES 18.4.7, 18.4.8; `enough/fabulac_head.py`)."""
+        from enough import fabulac_head as _head
+        for check, item, msg, fld, sev in _head.problems(self.v):
+            self.add(check, item, msg, fld, severity=sev if sev == "note" else None)
 
     # ----------------------------------------------------------------- the dialectic's (the core's)
     def dialectic(self) -> None:

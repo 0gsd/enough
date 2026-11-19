@@ -377,6 +377,9 @@ def plan_sources(cat: dict, items: list[dict]) -> list[dict]:
 
 #: What every source's request carries of the program (its aims, uses, requirements…), whichever file it is.
 PROGRAM_KINDS = ("aim", "audience", "use", "requirement", "exclusion", "decision", "setting", "dependency")
+#: A decision to keep a file changed by hand (`enough/fabulac_entail.py` `keep`) is about the entailment, not the
+#: program: no source is told from it, so keeping or letting go of one file moves no other.
+KEPT_DECISION = "N:decision/kept-by-hand-"
 
 
 def source_brief(cat: dict, items: list[dict], src: dict, plan: list[dict]) -> tuple[dict, list[str]]:
@@ -390,7 +393,7 @@ def source_brief(cat: dict, items: list[dict], src: dict, plan: list[dict]) -> t
              and (set(_code._refs(x)) & ids or (isinstance(x.get("given"), dict) and x["given"].get("calls") in ids))]
     if src["role"] == "the command line":
         about += [x for x in _items_of(items, "case") if x not in about and case_surface(x)[0] == "command"]
-    program = [x for x in items if item_kind(x) in PROGRAM_KINDS]
+    program = [x for x in items if item_kind(x) in PROGRAM_KINDS and not str(x.get("id")).startswith(KEPT_DECISION)]
     elsewhere = []
     for other in plan:
         if other["path"] == src["path"]:
@@ -437,6 +440,44 @@ def rules_digest(inputs: list[Any]) -> str:
     for x in inputs:
         h.update(canonical({"input": _without_provenance(x)}))
     return h.hexdigest()
+
+
+def briefs(cat: dict, items: list[dict]) -> dict[str, dict]:
+    """What each file an entailment writes would be told from now, by rules (keeping in step, MacroCOSM OES 18.4.1):
+    `{path: {from, brief}}` for every planned source, the prose cases' tests when there are any, and the files rules
+    write; `ENTAILED.md` is left out (it is written again whenever anything is). The same `from` and `brief`
+    `entail_authored` records."""
+    plan = plan_sources(cat, items)
+    out: dict[str, dict] = {}
+    for src in plan:
+        _brief, frm = source_brief(cat, items, src, plan)
+        out[src["path"]] = {"from": frm, "brief": brief_digest(items, frm)}
+    prose = [c for c, s, _ in runnable(cat, items) if s == "prose"]
+    if prose:
+        frm = [str(c["id"]) for c in prose] + sorted({r for c in prose for r in _code._refs(c)
+                                                     if r in _code._by_id(items)})
+        out[PROSE_TESTS] = {"from": frm, "brief": brief_digest(items, frm)}
+    out[TESTS] = {"from": "rules", "brief": rules_digest(tests_inputs(cat, items))}
+    out[TESTS_INIT] = {"from": "rules", "brief": rules_digest([])}
+    out[PYPROJECT] = {"from": "rules", "brief": rules_digest(pyproject_inputs(cat, items))}
+    out[RUNNING] = {"from": "rules", "brief": rules_digest(running_inputs(cat, items))}
+    return out
+
+
+#: The host's engine that hands an entailment done again the files it leaves as they are (keeping in step):
+#: `held() -> {texts: {path: text}, kept: [path]}`; `enough/fabulac_entail.py` registers it for its own runs.
+HELD_ENGINE = "entailment"
+
+
+def held_by_host(ctx: Any) -> tuple[dict[str, str], set[str]]:
+    """The texts the host holds back from telling again (files in step, and files kept by hand), and the paths kept
+    by hand, which are never asked again; nothing when the host registered no such engine."""
+    eng = (getattr(ctx, "engines", None) or {}).get(HELD_ENGINE)
+    got = eng() if callable(eng) else None
+    if not isinstance(got, dict):
+        return {}, set()
+    texts = got.get("texts") if isinstance(got.get("texts"), dict) else {}
+    return {str(k): str(v) for k, v in texts.items()}, {str(p) for p in got.get("kept") or []}
 
 
 def _catalog_part(cat: dict) -> dict:
@@ -989,6 +1030,13 @@ def entail_authored(ctx: Any, fab: Value, **mods: Any) -> Value:
     redo = _code._failed_paths(getattr(ctx, "failed", None) or [], paths) if texts else set(paths)
     if texts and not redo:
         redo = set(paths)
+    held, kept = held_by_host(ctx)                 # keeping in step: what is in step or kept by hand is not told again
+    if held and not texts:
+        texts, redo = {p: held[p] for p in paths if p in held}, set()
+    for p in kept:
+        if p in held and p in paths:
+            texts[p] = held[p]
+        redo.discard(p)
     atem = _code._yaml(plain(cat.get("atem") or {}))
     rows: list[dict] = []
 
@@ -1051,7 +1099,9 @@ def entail_authored(ctx: Any, fab: Value, **mods: Any) -> Value:
             syntax[p] = {"sha256": hashlib.sha256(texts[p].encode("utf-8")).hexdigest(),
                          "outline": syn.outline(p, texts[p])}
     not_entailed = [(str(c["id"]), why) for c, s, why in cases if s is None]
-    footer = entailed_footer(fab_file, utc_day(ctx), _code._who(meta))
+    last = _ENTAILED_FOOT.match(read_entailed(held[ENTAILED])["footer"]) if ENTAILED in held else None
+    who = last.group("who") if last and not meta.get("model") else _code._who(meta)   # nothing asked again: as before
+    footer = entailed_footer(fab_file, utc_day(ctx), who)
     texts[ENTAILED] = entailed_text(cat, footer, rows, model_cases=model_cases, not_entailed=not_entailed)
     folder = _code.folder_of_texts(f"{name}/", texts)
     files = [{"path": r["path"], "sha256": r["sha256"], "from": r["from"], "brief": r["brief"]}

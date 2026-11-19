@@ -56,8 +56,8 @@ volume:
   single-file: true                                   # identified by its declaration, never by its file name
 
 catalog:
-  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, atem, shorts,
-         catems, entailed, nodes]
+  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, head, parts,
+         atem, shorts, catems, entailed, nodes]
   purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
                                                        # checks and gates of transconception (MacroCOSM OES 18.4.9),
                                                        # written after flavour; enough/transconception.py runs them
@@ -85,6 +85,14 @@ catalog:
                                                                    # addresses it may reach; served in a later minor
   entailed-fields: [path, at, run, files, kept]                    # an authored fabulac's last entailment (MacroCOSM OES
                                                                    # 18.4.1): path, the folder beside it (tally/)
+  entailed-kept-fields: [path, decision]                           # a file changed by hand and kept: decision, the
+                                                                   # N:decision that records the choice (keeping in step,
+                                                                   # enough/fabulac_entail.py)
+  head-form: 'oes:fabula/<database>: a part''s head fabulac, by its URI (MacroCOSM OES 18.4.7); a text field, resolved
+              over the fabulacs the reader knows (enough/fabulac_head.py), not a reference'
+  parts-fields: [uri, path, sha256]                                # a head's parts: the part's URI, its file's path
+                                                                   # relative to the head, that file's sha256 when the
+                                                                   # head last checked it (MacroCOSM OES 18.4.7)
   entailed-files-fields: [path, sha256, from, brief]               # one per file written: from, refs or rules; brief,
                                                                    # the sha256 of what it was entailed from
                                                                    # (enough/thym/moves/authored_code.py brief_digest)
@@ -281,10 +289,10 @@ modules:
              required: [id, type, name, summary, provenance, stance, form]}
       file: {refs: [component], checked: [path, language, holds, length, sha256, entry, stance], flavours: [fabulac],
              required: [id, type, name, summary, provenance, stance, path]}
-      component: {refs: [files, of, exposes, uses], checked: [does, stance], flavours: [fabulac],
+      component: {refs: [files, of, exposes, uses], checked: [does, told-in, stance], flavours: [fabulac],
                   required: [id, type, name, summary, provenance, stance]}
       interface: {refs: [defined-in, ruling.made-for, ruling.by], checked: [surface, signature, takes, gives, raises, exported,
-                  plain, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
+                  plain, stated-in, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
                   closed: {plain.takes.*: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing],
                            plain.gives: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing]}}
       structure: {refs: [defined-in, ruling.made-for, ruling.by], checked: [shape, fields, invariants, ruling, stance],
@@ -348,7 +356,8 @@ checks:
              ref-grammar, ref-unresolved, closed-list, pending-shape, catalog-key, flavour, flavour-kind]
   own: [code-span, licence-recorded, question-about, question-shape, session-declared, reading-whose,
         interface-signature, case-outcome, requirement-cased, cases-entailed,   # enough/fabula.py (lint_fabula); a
-                                                          # generic reader lists them as not run
+        parts-resolve, interfaces-agree,                  # generic reader lists them as not run; the head's two:
+                                                          # enough/fabulac_head.py (MacroCOSM OES 18.4.7, 18.4.8)
         standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover, ruled,
         round-trip, target-confirmed, surface-answered, apart, evidence-stated]
                                                           # the last thirteen: enough/transconception.py, run only on a

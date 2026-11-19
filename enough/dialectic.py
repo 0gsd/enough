@@ -2832,6 +2832,10 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
     cand = led.copy()
     wrote: list[str] = []
 
+    taken = _taken_back(cand, question, w, value if not (unknown or declined) else None, sid, conf)
+    if taken is not None:                           # a hand edit taken back: the item read from the code, or nothing
+        return _commit(led, cand, taken, checker) if taken else Folded()
+
     if w.form == "span":
         if unknown or declined:
             return Folded()
@@ -2941,6 +2945,38 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
     _provenance_answered(d, fpath, sid, conf)
     wrote.append(addr)
     return _commit(led, cand, wrote, checker)
+
+
+#: A hand edit taken back (keeping in step, MacroCOSM OES 18.4.1; `enough/fabulac_entail.py` `take_back`): a choice
+#: question raised from `take-back`, whose `proposed` carries the item read from the edited file. Its answer `take it
+#: back` writes that item (a new one, or over the item of the same id), `stance: observed`; `leave it out` writes nothing.
+TAKE_BACK = "take-back"
+TAKE_IT_BACK = "take it back"
+LEAVE_IT_OUT = "leave it out"
+
+
+def _taken_back(cand: Ledger, question: dict | None, w: Where, value: Any, sid: str, conf: Any) -> list[str] | None:
+    """None when the question is not a take-back's; else the ids written into `cand` ([] for nothing written)."""
+    q = question or {}
+    prop = q.get("proposed")
+    if (q.get("raised") or {}).get("from") != TAKE_BACK or not isinstance(prop, dict) \
+            or not isinstance(prop.get("item"), dict) or w.form not in ("item", "kind", "module"):
+        return None
+    if value != TAKE_IT_BACK:
+        return []
+    item = copy.deepcopy(prop["item"])
+    item["stance"] = "observed"                     # taken back from code: it is how the code is (Thym 20.11)
+    prov = item.get("provenance") if isinstance(item.get("provenance"), dict) else {}
+    sources = [s for s in (prov.get("sources") or []) if isinstance(s, str)]
+    item["provenance"] = {**prov, "mode": prov.get("mode") or "derived",
+                          "sources": sources + ([sid] if sid and sid not in sources else []),
+                          "confidence": conf if conf is not None else prov.get("confidence", 1)}
+    at = next((i for i, d in enumerate(cand.items) if d.get("id") == item.get("id")), None)
+    if at is None:
+        cand.add(item)
+    else:
+        cand.items[at] = item
+    return [str(item["id"])]
 
 
 def _apply_reread(led, cand, index, question, answer, reread, sid, conf, checker) -> Folded:

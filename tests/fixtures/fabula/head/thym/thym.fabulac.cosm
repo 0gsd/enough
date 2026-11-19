@@ -1,0 +1,146 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/thym
+name: Thym
+source: {kind: authored, language: python, licence: Apache-2.0, at: "2026-11-18"}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+parts:
+  - {uri: oes:fabula/thym-values, path: thym-values.fabulac.cosm, sha256: 0885e7a239445bd6b9106a0809f0d7297e312d2192d9ddf74506434c45b249be}
+  - {uri: oes:fabula/thym-compiler, path: thym-compiler.fabulac.cosm, sha256: d5754259de0c42c81974e4a9fabd306397830ca4a1cc50ad641adcb710deaf26}
+  - {uri: oes:fabula/thym-runtime, path: thym-runtime.fabulac.cosm, sha256: 1e6bd93d1044db8118b13867b31eed4ed8a5f02642370cb8f049d5c5ffa9e117}
+  - {uri: oes:fabula/thym-cli, path: thym-cli.fabulac.cosm, sha256: f84e08a047d4be26cc1eb1e690bfd3179091a8a91623aee5d7a4dcde6eac3f53}
+  - {uri: oes:fabula/thym-base-moves, path: thym-base-moves.fabulac.cosm, sha256: 7fa2b7e937bb198fe3174c075c031ba5fa49b574b5df160fa68d1df183b074e8}
+  - {uri: oes:fabula/thym-prose-moves, path: thym-prose-moves.fabulac.cosm, sha256: cbf5628d53e94f67e2d582896ee689bf432847ec03fd56588abc2f3a252185bb}
+  - {uri: oes:fabula/thym-code-moves, path: thym-code-moves.fabulac.cosm, sha256: f4b5ec700bfbf2579505360ec8fc743d6bfa0b250b3f524328958db3848ff015}
+atem:
+  line: Thym, enough's program language, told as seven parts under one head.
+  focus: the seven parts of the parts map and the interfaces between them
+  push: Thym is four times the builder's band
+  pull: the parts are declared, not yet read
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: The terms Thym is offered on.
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: Apache-2.0
+  - id: N:aim/run-programs
+    type: aim
+    name: Run Thym programs
+    summary: Thym compiles and runs programs over fabulas and texts, with a model as its coprocessor.
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-values
+    type: component
+    name: "Thym: values, types, folders, check registry"
+    summary: "Thym: values, types, folders, check registry, told in its own fabulac."
+    does: "enough/thym/: __init__, types, values, folder, checks"
+    told-in: oes:fabula/thym-values
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-compiler
+    type: component
+    name: "Thym: compiler"
+    summary: "Thym: compiler, told in its own fabulac."
+    does: "enough/thym/: parse, contracts, declarations, check, enumerate, plan"
+    told-in: oes:fabula/thym-compiler
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-runtime
+    type: component
+    name: "Thym: runtime"
+    summary: "Thym: runtime, told in its own fabulac."
+    does: "enough/thym/: registry, trace, coprocessor, engines, run"
+    told-in: oes:fabula/thym-runtime
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-cli
+    type: component
+    name: "Thym: command line, conformance, sealed packages"
+    summary: "Thym: command line, conformance, sealed packages, told in its own fabulac."
+    does: "enough/thym/: cli, __main__, conform, vault, bundle"
+    told-in: oes:fabula/thym-cli
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-base-moves
+    type: component
+    name: "Thym: base moves"
+    summary: "Thym: base moves, told in its own fabulac."
+    does: "enough/thym/: moves/__init__, pack, project, doc, ascribe, dialectic"
+    told-in: oes:fabula/thym-base-moves
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-prose-moves
+    type: component
+    name: "Thym: prose moves"
+    summary: "Thym: prose moves, told in its own fabulac."
+    does: "enough/thym/: moves/edit, morph, emf, verse"
+    told-in: oes:fabula/thym-prose-moves
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:component/thym-code-moves
+    type: component
+    name: "Thym: code moves"
+    summary: "Thym: code moves, told in its own fabulac."
+    does: "enough/thym/: moves/code"
+    told-in: oes:fabula/thym-code-moves
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/canonical
+    type: interface
+    name: canonical
+    summary: A value's canonical bytes, as Thym digests it (12.6). Offered by thym-values; called by thym-compiler, thym-runtime.
+    surface: function
+    signature: "def canonical(mapping: dict) -> bytes"
+    takes:
+      - {name: mapping, type: dict, required: true}
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/value
+    type: interface
+    name: Value
+    summary: A value of a Thym type, with its payload, origin and digest. Offered by thym-values.
+    surface: class
+    signature: class Value
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/check
+    type: interface
+    name: check
+    summary: "The check registry: a check registers itself by its name. Offered by thym-values; called by thym-compiler, thym-code-moves."
+    surface: function
+    signature: "def check(name: str, *, registry: Checks | None = None, kind: str | None = None) -> Callable[[CheckFn], CheckFn]"
+    takes:
+      - {name: name, type: str, required: true}
+      - {name: registry, type: Checks | None, default: null}
+      - {name: kind, type: str | None, default: null}
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/implements
+    type: interface
+    name: implements
+    summary: "The move registry: a move registers itself by its name on import; the names implemented are the interface, not only the functions. Offered by thym-runtime; called by thym-base-moves, thym-prose-moves, thym-code-moves."
+    surface: function
+    signature: "def implements(name: str, *, replace: bool = True) -> Callable[[MoveFn], MoveFn]"
+    takes:
+      - {name: name, type: str, required: true}
+      - {name: replace, type: bool, default: true}
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/move-error
+    type: interface
+    name: MoveError
+    summary: A move that cannot go on; the runtime refuses the run with its words. Offered by thym-base-moves; called by thym-prose-moves, thym-code-moves.
+    surface: class
+    signature: class MoveError(RuntimeError)
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/command-thym
+    type: interface
+    name: python -m enough.thym
+    summary: "Thym's command line: check, run, replay and conform a program. Offered by thym-cli."
+    surface: command
+    signature: python -m enough.thym <command> [options]
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}

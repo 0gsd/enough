@@ -1,0 +1,35 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/thym-cli
+name: "Thym: command line, conformance, sealed packages"
+source: {path: enough/thym/, kind: folder, language: python, licence: Apache-2.0}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+head: oes:fabula/thym
+atem:
+  line: "Thym: command line, conformance, sealed packages: a part of Thym, declared from the parts map; not read yet."
+  focus: cli, __main__, conform, vault, bundle
+  push: Thym is over the builder's band
+  pull: no Thym fabulac exists yet
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: "The terms Thym: command line, conformance, sealed packages is offered on."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: Apache-2.0
+  - id: C:component/thym-cli
+    type: component
+    name: "Thym: command line, conformance, sealed packages"
+    summary: "enough/thym/: cli, __main__, conform, vault, bundle."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/command-thym
+    type: interface
+    name: python -m enough.thym
+    summary: "Offered here: Thym's command line: check, run, replay and conform a program."
+    surface: command
+    signature: python -m enough.thym <command> [options]
+    stated-in: oes:fabula/thym/C/interface/command-thym
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}

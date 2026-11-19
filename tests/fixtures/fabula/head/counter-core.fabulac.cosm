@@ -1,0 +1,27 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/counter-core
+name: counter-core
+source: {path: counter-core/, kind: folder, language: python, files: 1, bytes: 118, skipped: 0, tree: 90ab598a36f0281276f2bec918712c571bce959fe89827e4a334b0c30ed46270, licence: MIT}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+head: oes:fabula/counter
+atem: {line: "counter-core, a part of counter.", focus: one part, push: the head names it, pull: it is small}
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: The terms counter-core is offered on.
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: MIT
+  - id: C:interface/count-lines
+    type: interface
+    name: count_lines
+    summary: count_lines(text) gives the number of lines in text.
+    surface: function
+    signature: "def count_lines(text: str) -> int"
+    takes:
+      - {name: text, type: str, required: true, means: the text whose lines are counted}
+    stated-in: oes:fabula/counter/C/interface/count-lines
+    stance: axiom
+    provenance: {mode: manual, sources: [the fixture's author], confidence: 1}
