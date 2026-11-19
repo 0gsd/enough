@@ -28,20 +28,6 @@ SHIPPED = REPO / "defaults" / "thym"
 #: holds the three thym 0 programs of 0.5.0.
 ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "decompile-verse-quick", "settle",
          "tighten")
-#: A program renamed by an owner's ruling ahead of the synced text (pins 13: 20.5's program is `decompile-verse-quick`,
-#: in cosmoes-site's v080 texts): the file is the text's block with the old name, until docs/THYM.md is synced. Once
-#: the text names it, take it out of here.
-RENAMED_AHEAD = {"decompile-verse-quick.thym": ("program decompile-verse-quick\n", "program decompile-verse\n")}
-
-
-def as_the_text_has_it(path: Path, text: str, blocks: list[str]) -> str:
-    """The file's text as the synced text's block reads it: a program renamed ahead of the text under its old name."""
-    ahead = RENAMED_AHEAD.get(path.name)
-    if ahead is None:
-        return text
-    assert ahead[0] in text and text not in blocks, f"the text now names {path.name}'s program: take it out of " \
-                                                    "RENAMED_AHEAD"
-    return text.replace(ahead[0], ahead[1])
 
 
 def scratch_decls() -> dc.Declarations:
@@ -150,10 +136,13 @@ def test_folder_outline_compiles_as_the_text_now_writes_it():
 
 def test_the_draft_holds_the_blocks_this_round_names():
     names = sorted(_first_name(b) for _, b in DRAFT_BLOCKS)
-    assert names == sorted(["plain-enough", "aims-in-brief", "folder-outline", "python-files", "decompile-verse",
+    assert names == sorted(["plain-enough", "aims-in-brief", "folder-outline", "python-files", "decompile-verse-quick",
                             "scan-the-poem",
                             "its-own-file", "compile-python", "shorter", "drop-the-todos", "decompile-prose",
-                            "settle-the-answers"]), names
+                            "settle-the-answers",
+                            # 0.8: transconception (20.10), authoring (20.11), the authored entailment run (20.12)
+                            "ground-the-fabulac", "begin-from-a-brief", "entail-authored-python",
+                            "test-the-entailment"]), names
 
 
 SHIPPED_FILES = [SHIPPED / f"{n}.thym" for n in ROUND]
@@ -165,7 +154,7 @@ def test_every_shipped_program_compiles_plans_and_enumerates(path):
     as the text has them, each a block of the text byte for byte."""
     text = path.read_text(encoding="utf-8")
     blocks = [b for _, b in DRAFT_BLOCKS]
-    assert as_the_text_has_it(path, text, blocks) in blocks, f"{path.name} is not a block of docs/THYM.md as written"
+    assert text in blocks, f"{path.name} is not a block of docs/THYM.md as written"
     d = scratch_decls()
     c = compile_with(text, d, str(path))
     assert not isinstance(c, Refusal), str(c)
