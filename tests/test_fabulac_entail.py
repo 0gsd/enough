@@ -352,6 +352,20 @@ def test_pyproject_and_running_are_written_by_rules_for_each_kind():
     assert "serving comes in a later minor" in AC.running_text(*doc_of("hello"), "hello.fabulac.cosm")
 
 
+def test_a_service_s_running_says_enough_runs_neither_its_tests_nor_it_as_the_sandbox_does():
+    """W5-F7's find: a service's RUNNING.md said enough runs its tests, and the sandbox refuses a service's tests."""
+    from enough import sandbox as sb
+    run = AC.running_text(*doc_of("hello"), "hello.fabulac.cosm")
+    said = run.split("## What enough runs here", 1)[1]
+    assert "enough runs its tests" not in said
+    assert "runs neither its tests nor the service" in said and "its tests included" in said
+    prog = sb.program_from_block("hello", {"kind": "service", "start": ["-m", "hello"],
+                                           "serve": {"port": 0, "reach": []}})
+    with pytest.raises(sb.Refusal) as e:                 # the sandbox: tests and run go through this one refusal
+        sb.check_program(prog)
+    assert e.value.reason == "service"
+
+
 def test_a_need_outside_the_standard_library_is_pinned_and_running_says_why_enough_cannot_run_it():
     cat, items = doc_of("words")
     items = items + [{"id": "C:dependency/requests", "type": "dependency", "name": "requests", "package": "requests",
