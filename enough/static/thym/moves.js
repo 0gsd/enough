@@ -21,8 +21,12 @@
   // -------------------------------------------------------------------------------------------------------------
 
   const DECLS = {
+    // 0.8: authoring (enough/thym/moves/author.py) and transconception (enough/thym/moves/transconceive.py)
+    add: { gives: ['fabula'], contract: ['authored-source', 'nothing-lost', 'ids-unique', 'fabula-checks', 'provenance'], modifiers: { as: ['requirement', 'decision', 'case', 'interface'], with: ['fabula'] }, since: 1 },
     atem: { asks: true, gives: ['atem'], contract: ['atem-shape', 'span-resolves', 'provenance'], scaffold: 'first-sentence' },
+    author: { asks: true, gives: ['fabula'], contract: ['authored-source', 'fabula-checks', 'provenance'], scaffold: 'catalog-alone', modifiers: { as: ['tool', 'library', 'service'] }, since: 1 },
     band: { gives: ['word'], contract: ['banded'], modifiers: { as: ['list of word'] } },
+    compare: { gives: ['report'], contract: [], modifiers: { with: ['fabula'] }, since: 1 },
     compile: { gives: ['text'], contract: ['byte-exact'] },
     construe: { asks: true, gives: ['fabula'], contract: ['span-resolves', 'no-invention', 'stance-kept', 'coverage', 'terms-grounded', 'nothing-lost', 'fabula-checks', 'provenance'], modifiers: { as: ['figure', 'image', 'allusion', 'voice', 'turn', 'meaning', 'ambiguity'], with: ['fabula'] }, since: 1 },
     context: { gives: ['context'], modifiers: { of: ['text', 'package'] } },
@@ -38,6 +42,7 @@
     folders: { gives: ['list of folder'], modifiers: { of: ['folder'] }, since: 1 },
     gather: { gives: ['same-as-with'], contract: ['nothing-lost', 'ids-unique', 'fabula-checks', 'provenance'], modifiers: { with: ['fabula', 'volume'] }, since: 1 },
     graph: { gives: ['graph'], contract: ['released'], modifiers: { of: ['text', 'package'] } },
+    ground: { gives: ['fabula'], contract: ['ground-cited', 'code-span', 'nothing-lost', 'fabula-checks', 'provenance'], modifiers: { with: ['fabula'] }, since: 1 },
     history: { gives: ['fabula'], contract: ['history-grounded', 'fabula-checks', 'provenance'], modifiers: { with: ['fabula'] }, since: 1 },
     insert: { gives: ['change'], modifiers: { before: ['line'], after: ['line'] }, since: 1 },
     isomorph: { gives: ['morph'], modifiers: { of: ['package'] } },
@@ -60,9 +65,22 @@
     scan: { gives: ['fabula'], contract: ['lines-found', 'scansion-grounded', 'span-resolves', 'fabula-checks', 'provenance'], modifiers: { as: ['rhyme', 'sound', 'recurrence', 'form'], with: ['fabula'] }, since: 1 },
     settle: { asks: true, gives: ['fabula', 'volume'], contract: ['addressed', 'only-the-asked', 'ruled', 'fabula-checks', 'provenance'], scaffold: 'direct', since: 1 },
     survey: { gives: ['fabula'], contract: ['files-found', 'code-span', 'licence-recorded', 'fabula-checks', 'provenance'], since: 1 },
-    tell: { asks: true, gives: ['short'], contract: ['coverage', 'no-invention', 'stance-kept', 'scales-met', 'footer', 'provenance'], scaffold: 'outline', modifiers: { as: ['order', 'code', 'line', 'overview', 'manual'], by: ['order'], with: ['morph'] } },
+    // thym 1's view of entail (0.8): a fabulac entails code, a catem, its cases file, or a layout and a cshort in another
+    // language (`in`); what it gives, its contract and its scaffold change with `as` (and `with` a short), as the rows say
+    tell: { asks: true, gives: ['short'], contract: ['coverage', 'no-invention', 'stance-kept', 'scales-met', 'footer', 'provenance'], scaffold: 'outline',
+      modifiers: { as: ['order', 'code', 'line', 'overview', 'manual', 'cases', 'layout'], by: ['order'], in: ['string'], with: ['morph', 'short'] },
+      givesWhen: [{ as: ['code'], gives: ['folder'] }, { as: ['cases'], gives: ['text'] }, { as: ['layout'], gives: ['short'] }],
+      contractWhen: [
+        { as: ['code'], with: ['short'], contract: ['target-confirmed', 'files-present', 'surface-answered', 'apart', 'footer', 'provenance'] },
+        { as: ['code'], contract: ['parses', 'interfaces-present', 'files-present', 'footer', 'cases-entailed', 'provenance'] },
+        { as: ['layout'], contract: ['target-confirmed', 'surface-answered', 'no-invention', 'footer', 'provenance'] },
+        { as: ['line', 'overview', 'manual'], contract: ['coverage', 'no-invention', 'quotes-held', 'uses-told', 'footer', 'provenance'] },
+        { as: ['cases'], contract: ['cases-whole', 'provenance'] }],
+      scaffoldWhen: [{ as: ['line', 'overview', 'manual'], scaffold: 'uses-outline' }, { as: ['code'], scaffold: null }, { as: ['cases'], scaffold: 'cases-file' }, { as: ['layout'], scaffold: null }] },
     trace: { gives: ['trace'] },
+    uncovered: { gives: ['list of item'], contract: [], modifiers: {}, since: 1 },
     unpack: { gives: ['text'], contract: ['digests'] },
+    weigh: { asks: true, gives: ['fabula'], contract: ['target-weighed', 'no-invention', 'fabula-checks', 'provenance'], modifiers: { in: ['string'] }, since: 1 },
     withhold: { gives: ['nothing'], contract: ['no-mark'], modifiers: { where: ['condition'] } },
     words: { gives: ['number'] },
   };
@@ -102,6 +120,15 @@
     gather: "its contract's fabula-checks run MacroCOSM's lint, which the server holds",
     record: "its contract reads the fabula through MacroCOSM's manifests, which the server holds",
     cut: "its contract's coverage check reads EMF's cover map, which the page does not have yet",
+    // 0.8: the moves that author and transconceive a fabulac (the two that ask a model, author and weigh, are refused
+    // first, as every step that asks is; these reasons stand if a host's declarations ever run them by rules)
+    add: "it writes into an authored fabulac, and its contract's authored-source and fabula-checks read MacroCOSM's manifests, which the server holds",
+    compare: "it reads two fabulacs whole as MacroCOSM's reader loads them (a folder volume or a file), which the server holds",
+    uncovered: "it reads a fabulac's requirements and the cases that check them as MacroCOSM's reader loads them, which the server holds",
+    ground: "it reads a folder's syntax and the language's ground catalogue through the server's engines",
+    author: "it reads a brief, or a starter's bank, through the server's engines; with a brief it asks a model",
+    weigh: "it reads the target language's table through the server's engines, and asks a model",
+    entail: "it asks a model, but for entailing a fabulac as cases, which reads its cases through MacroCOSM's manifests, which the server holds",
   };
 
   // -------------------------------------------------------------------------------------------------------------

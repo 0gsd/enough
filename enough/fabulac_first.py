@@ -167,6 +167,14 @@ def from_starter(kind: str, name: str, *, licence: str | None = None, by: str | 
 # Authoring
 # ---------------------------------------------------------------------------
 
+def folder_there(project_dir: Path, fab: Path) -> None:
+    """A program is begun in a folder that is there; none is made for it. Refused in words (404) otherwise: 0.8, W4-X7
+    (W4-FP found a bare FileNotFoundError from the atomic write, by rules and from a starter alike)."""
+    if not fab.parent.is_dir():
+        raise FirstError(f"there is no folder {_rel(project_dir, fab.parent)}/ to begin {fab.name} in: make the folder "
+                         "first, or begin it in one that is there", 404)
+
+
 def begin(project_dir: Path, rel: str, *, kind: str = "tool", licence: str | None = None, brief: str | None = None,
           by: str | None = None, starter: str | None = None, mode: str = "rules", **kw: Any) -> dict:
     """Begin an authored fabulac, or take one up again. From a starter (`starter: tool | library | service`): the
@@ -175,6 +183,7 @@ def begin(project_dir: Path, rel: str, *, kind: str = "tool", licence: str | Non
     stage). Blocking; `kw` is the job's (`complete`, `runtime`, `progress`, `should_stop`, `now`, …)."""
     project_dir = Path(project_dir)
     fab = fabulac_path(project_dir, rel)
+    folder_there(project_dir, fab)
     if starter:
         if fab.exists():
             raise FirstError(f"{fab.name} is there already; take it up again, or choose another name", 409)
@@ -481,5 +490,5 @@ def stop_all() -> None:
 
 
 __all__ = ["ADD_AS", "FirstError", "KINDS", "LAST_RUNS", "RUNTIME", "STARTERS", "add", "answer", "authored", "begin",
-           "check", "entail", "execute", "fabulac_path", "from_starter", "head", "keep", "let_go", "moved",
+           "check", "entail", "execute", "fabulac_path", "folder_there", "from_starter", "head", "keep", "let_go", "moved",
            "parts_moved", "prepare", "run", "starters", "status", "stop", "stop_all", "take_back", "test"]

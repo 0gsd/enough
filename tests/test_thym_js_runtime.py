@@ -347,3 +347,94 @@ def test_the_poems_programs_are_refused_in_the_page_with_the_reason(program: str
     assert got["stage"] == "plan" and got["check"] == check and words in got["message"], got
     if check == "move":
         assert "FEED's pronunciations, which the server holds" in got["message"]
+
+
+# 0.8 (lane W4-X7): the moves 0.8 added, declared in the page as Python declares them, and each refused there with
+# its reason (the page runs none of them: the deterministic ones need the server's engines or reader, the others ask)
+MOVES_08 = ("add", "author", "compare", "uncovered", "ground", "weigh", "entail")
+PROGRAMS_08 = {
+    "ground": ("takes repo: folder, f: fabula\n  gives g: fabula\n\n  give ground repo with f", ("repo", "f"), "move"),
+    "add": ("takes f: fabula, said: string\n  gives g: fabula\n\n  give add said as requirement with f", ("f", "said"),
+            "move"),
+    "compare": ("takes f: fabula, g: fabula\n  gives r: report\n\n  give compare f with g", ("f", "g"), "move"),
+    "uncovered": ("takes f: fabula\n  gives n: number\n\n  give count (uncovered f)", ("f",), "move"),
+    "weigh": ("takes f: fabula\n  gives g: fabula\n\n  give weigh f in \"go\"", ("f",), "agent-free"),
+    "author": ("gives f: fabula\n\n  give author as tool", (), "agent-free"),
+    "entail-cases": ("takes f: fabula\n  gives c: text\n\n  give entail f as cases", ("f",), "agent-free"),
+    "entail-layout": ("takes f: fabula\n  gives c: short\n\n  give entail f as layout in \"go\"", ("f",), "agent-free"),
+    "entail-code-in": ("takes f: fabula, l: short\n  gives c: folder\n\n  give entail f as code in \"go\" with l",
+                       ("f", "l"), "agent-free"),
+}
+
+
+def _row(d: dict) -> dict:
+    """A declaration as both sides can be compared: what the page reads of it."""
+    out = {k: d[k] for k in ("asks", "scaffold", "gives", "contract", "modifiers") if d.get(k) not in (None, False)}
+    out["since"] = d.get("since", 0)
+    return out
+
+
+def test_the_page_declares_every_move_08_added_as_python_does() -> None:
+    page = _node({"decls": True})
+    py = bundle.declarations(1)
+    for m in MOVES_08:
+        mine = page["decls"].get(m)
+        assert mine is not None, f"the page does not declare {m}"
+        want, got = _row(py[m]), _row(mine)
+        if m == "entail":        # the page keeps `tell` as the object both names read (its `since` is thym 0's)
+            got["since"], want["since"] = 0, 0
+        assert got == want, (m, got, want)
+    assert set(py) <= set(page["decls"]), sorted(set(py) - set(page["decls"]))
+
+
+def test_the_page_carries_entails_rows_by_as_with_cases_entailed() -> None:
+    from enough.thym import registry as _reg
+    from enough.thym import run as _run
+    d = _run._views(_reg.declarations(), 1)["entail"]
+    page = _node({"decls": True})["decls"]["entail"]
+    when = {k: _reg.decl_get(d, k) or _reg.decl_get(d, k.replace("-", "_"))
+            for k in ("gives-when", "contract-when", "scaffold-when")}
+    gives = [(list(w), list(g)) for _m, w, g in when["gives-when"]]
+    assert [(r["as"], r["gives"]) for r in page["givesWhen"]] == gives
+    contract = [(list(w), list(c), list(rest[0]) if rest else None)
+                for _m, w, c, *rest in when["contract-when"]]
+    assert [(r["as"], r["contract"], r.get("with")) for r in page["contractWhen"]] == contract
+    assert page["contractWhen"][1]["as"] == ["code"] and "cases-entailed" in page["contractWhen"][1]["contract"]
+    scaffold = [(list(w), s) for _m, w, s in when["scaffold-when"]]
+    assert [(r["as"], r["scaffold"]) for r in page["scaffoldWhen"]] == scaffold
+
+
+@pytest.mark.parametrize("name", sorted(PROGRAMS_08))
+def test_the_page_refuses_each_move_08_added_with_the_reason(name: str, tmp_path: Path) -> None:
+    from enough.thym import check_file
+    from enough.thym import plan as P
+    body, ins, check = PROGRAMS_08[name]
+    src = f"thym 1\n\nprogram p-{name}\n  why: a test.\n\n  {body}\nend\n"
+    prog = tmp_path / f"{name}.thym"
+    prog.write_text(src, encoding="utf-8")
+    f = tmp_path / "f.fabulac.cosm"
+    f.write_text("oes: fabula/1\nflavour: fabulac\nnodes: []\n", encoding="utf-8")
+    short = tmp_path / "l.md"
+    short.write_text("# a layout\n", encoding="utf-8")
+    (tmp_path / "repo").mkdir()
+    (tmp_path / "repo" / "a.py").write_text("x = 1\n", encoding="utf-8")
+    rows: list[dict] = []
+    for i in ins:
+        if i == "repo":
+            rows.append({"name": i, "type": "folder", "path": str(tmp_path / "repo")})
+        elif i in ("f", "g"):
+            rows.append({"name": i, "type": "fabula", "path": str(f), "sha256": digest_path(f)})
+        elif i == "l":
+            rows.append({"name": i, "type": "short", "path": str(short), "sha256": digest_path(short)})
+        else:
+            rows.append({"name": i, "type": "string", "value": "it counts the words"})
+    plan = P.plan(check_file(prog), rows, program=f"p-{name}")
+    assert not isinstance(plan, Refusal), plan
+    got = _node({"planCheck": {"plan": bundle.jsonable(plan), "program": src}})["refusal"]
+    assert got and got["stage"] == "plan" and got["check"] == check, got
+    if check == "move":
+        reason = _node({"decls": True})["notHere"][name]
+        assert f"the move {name} has no implementation here ({reason}; run it on the server)" in got["message"], got
+        assert "server" in reason
+    else:
+        assert "asks a model" in got["message"] and "agent-free is on" in got["message"], got
