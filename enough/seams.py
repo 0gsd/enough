@@ -46,6 +46,10 @@ PATH_SEAMS: dict[str, str] = {
     "ENOUGH_THYM_ROOT": "thym",
     # The specifications synced from cosmoes.org (0.5.4).
     "ENOUGH_SPECS_ROOT": "specs",
+    # The language library (0.8): its built index, and its synced shelf, pointed at nothing, so no test resolves a
+    # citation against a copy synced into the checkout. A rig that wants a shelf points the source at a fixture.
+    "ENOUGH_LANGUAGES_ROOT": "languages",
+    "ENOUGH_LANGUAGES_SOURCE": "no-languages-source",
 }
 
 # Seams that name a service or a switch, held at a fixed value: no scratch run may reach huggingface.co or

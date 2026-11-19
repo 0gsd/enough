@@ -1,0 +1,10 @@
+Memo 7                                              The Example Society
+                                                          November 2026
+
+Copyright Notice
+
+   Copyright (c) 2026 The Example Society. Made up for the tests.
+
+The Memo
+
+   A memo that may only be passed on unchanged.

@@ -1,0 +1,9 @@
+fetched: 2026-11-18T12:00:00Z
+from: https://example.invalid/archives/example-1.0-docs-text.tar.bz2
+by: the owner, with scripts/fetch_library.py
+archive: example-1.0-docs-text.tar.bz2
+archive-bytes: 880
+archive-sha256: a305c1d8033823b7a40ffbfb3d207b4f1f7d9e413a4b7f5781d353ad747bbc20
+obtained-as: a file the owner already had (example-1.0-docs-text.tar.bz2), said to be the one at the address above
+licence-read: https://example.invalid/licence, read whole by the owner before this run
+stripped: example-1.0-docs-text/

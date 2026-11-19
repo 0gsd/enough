@@ -1,0 +1,5 @@
+The Example Licence
+*******************
+
+Anyone may copy, change and pass on this made-up manual, with this
+notice kept. It exists only for the cosmoes.org library's tests.

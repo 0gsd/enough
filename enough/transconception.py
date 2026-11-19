@@ -20,8 +20,9 @@ The checks, one method each on `_Checks`:
 - `ground-given` (error): every run-time or standard dependency says in plain words what it is `needed-for`; every
   reliance carries `gives` and an `example`.
 - `ground-cited` (error): every reliance on the language or its runtime carries `stated`, a list of
-  `{in, version, at, digest}` and `{nowhere: text}`; a version is a patch of the runtime's minor. Resolving a
-  citation against the language library comes with the library: `resolve_citation` is the one place it will go.
+  `{in, version, at, digest}` and `{nowhere: text}`; a version is a patch of the runtime's minor. Each citation is
+  resolved against the language library when one is synced here (`resolve_citation`, the one place): a section
+  that is not there is an error, a citation that cannot be told (the text not aboard) a warning.
 - `stands-alone` (error): no `summary` or `means` names the source language, its runtime or a dependency, unless a
   reliance says the same without the name (the item is in its `used-by`). Cases, production (R), dependencies,
   reliances and targets are not read: they record what the source was, or say what they rely on.
@@ -130,12 +131,24 @@ def applies(ruling: dict, target_ref: str | None) -> bool:
 
 
 def resolve_citation(entry: dict, library: Any = None) -> tuple[bool | None, str]:
-    """Whether a `stated` entry `{in, version, at, digest}` resolves to a section aboard the language library, or to
-    a pinned text's digest. Returns (True, '') when it does, (False, why) when it does not, (None, why) when it cannot
-    be told. The language library is not aboard in this build (phase 2b brings it, with its index): until then every
-    citation is (None, ...), and ground-cited asks only that each reliance carries `stated`."""
+    """Whether a `stated` entry `{in, version, at, digest}` (with an optional `section-digest`) resolves to a section
+    of a text aboard the language library (`enough.language_library.Library`, synced by `scripts/sync_languages.py`).
+    Returns (True, '') when it does; (False, why) when the text is aboard and the citation is wrong (no such page, or
+    the cited section digest differs); (None, why) when it cannot be told: no library here, the text not aboard (not
+    synced, or only pinned), a text the registry does not have, a page that changed with no `section-digest` to say
+    whether the cited section did, or an id the kept build does not carry on a page that is there. `ground-cited` makes (False, …) an error and (None, …) a warning: the library
+    may not be on a machine, and a fabulac is not wrong for that."""
     if library is None:
         return None, "the language library is not aboard: the citation is carried, not resolved"
+    cite = getattr(library, "cite", None)
+    if callable(cite):
+        got = cite(entry)
+        state, why = got.get("state"), got.get("why") or ""
+        if state == "resolved":
+            return True, ""
+        if state == "missing" or (state == "changed" and entry.get("section-digest")):
+            return False, why
+        return None, why
     find = getattr(library, "find", None)
     if not callable(find):
         return None, "the language library given has no index to look in"
@@ -146,6 +159,16 @@ def resolve_citation(entry: dict, library: Any = None) -> tuple[bool | None, str
     if want and str(getattr(hit, "digest", want)).startswith(str(want)) is False:
         return False, f"{entry.get('at')}: the digest is {getattr(hit, 'digest', '?')}, not {want}"
     return True, ""
+
+
+def local_library() -> Any:
+    """The language library synced on this machine (`enough.language_library.local()`), or None when there is
+    none: what the checks resolve citations against when the caller gives no library."""
+    try:
+        from . import language_library
+        return language_library.local()
+    except Exception:                                   # noqa: BLE001 - a missing or broken library is "not aboard"
+        return None
 
 
 def _minor(v: Any) -> str | None:
@@ -201,7 +224,8 @@ class _Checks:
 
     def __init__(self, vol: mc.Volume, add: Callable[..., None], *, source: Path | None = None,
                  library: Any = None):
-        self.v, self._add, self.library = vol, add, library
+        self.v, self._add = vol, add
+        self.library = library if library is not None else local_library()
         self.items = list(vol.items.values())
         self.by_id = {it.id: it for it in self.items}
         blk = vol.manifest._block("transconception") if vol.manifest is not None else {}
@@ -336,6 +360,7 @@ class _Checks:
             if it.data.get("on") not in ("language", "runtime"):
                 continue
             st = it.data.get("stated")
+            untold: list[tuple[str, str]] = []
             if not isinstance(st, list) or not st:
                 self.add("ground-cited", it, "a reliance on the language or its runtime carries stated: a list of "
                                              "{in, version, at, digest} and {nowhere: text}", "stated")
@@ -355,6 +380,11 @@ class _Checks:
                 ok, why = resolve_citation(e, self.library)
                 if ok is False:
                     self.add("ground-cited", it, why, fld)
+                elif ok is None and self.library is not None:
+                    untold.append((fld, why))
+            if untold:
+                self.add("ground-cited", it, f"{len(untold)} citation(s) carried, not resolved here: "
+                         + "; ".join(sorted({w for _, w in untold})), untold[0][0], severity="warning")
             cb = it.data.get("contradicted-by")
             if cb is not None and not (isinstance(cb, dict) and cb.get("at") and cb.get("says")):
                 self.add("ground-cited", it, "contradicted-by is {at, says, said}", "contradicted-by")

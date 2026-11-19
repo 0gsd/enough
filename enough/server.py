@@ -1514,7 +1514,8 @@ HOME_PATHS: frozenset[str] = frozenset({
     "/api/docs/compile", "/api/docs/inventory",
     "/api/cosm/inline", "/api/cosm/inline/lens",
 })
-HOME_PREFIXES: tuple[str, ...] = ("/api/home/", "/static/")
+# The language library (0.8): read-only, from the copy synced into the install (`/api/library/*`).
+HOME_PREFIXES: tuple[str, ...] = ("/api/home/", "/static/", "/api/library/")
 
 
 class ModeGate:

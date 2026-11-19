@@ -1,0 +1,11 @@
+The Example Manual
+******************
+
+Example is a made-up language. This manual exists only for the
+cosmoes.org library's tests.
+
+
+Contents
+========
+
+* Strings: library/strings.txt

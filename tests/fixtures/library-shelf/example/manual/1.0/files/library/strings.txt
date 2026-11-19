@@ -1,0 +1,50 @@
+Strings
+*******
+
+A string holds text.
+
+
+Making strings
+==============
+
+Write a string between quotes.
+
+class text(value='')
+
+   A piece of text.
+
+   upper()
+
+      Return the text in capitals.
+
+         >>> text('a').upper()
+         'A'
+
+   text.count(sub)
+   text.tally(sub)
+
+      Count how often *sub* occurs.
+
+text.join(parts)
+
+   Join *parts* with the text between them.
+
+
+Lines
+=====
+
++--------+---------+
+| Break  | Meaning |
+|========|=========|
+| "\n"   | line    |
++--------+---------+
+
+Lines end at a line break & never <here>.
+
+   An indented example.
+
+
+Lines
+=====
+
+A second title with the same words.

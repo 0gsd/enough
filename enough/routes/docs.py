@@ -16,6 +16,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
 from .. import docoes as _docoes
+from .. import language_library as _language_library
 from .. import macrocosm as _macrocosm
 from .. import specs as _specs
 from .common import AppContext
@@ -506,5 +507,75 @@ def build_router(ctx: AppContext) -> APIRouter:
             return vol
         return await asyncio.to_thread(lambda: {
             "doc": slug, "lang": telling, "rows": _macrocosm.jsonable(_docoes.inventory(vol))})
+
+    # ------------------------------------------------------------------
+    # The language library (0.8, lane W3-X2c): the texts a reliance's
+    # `stated` cites, as synced into the install by scripts/sync_languages.py
+    # (`enough/language_library.py`). Read-only and home-accessible
+    # (HOME_PREFIXES has /api/library/); the index is built on first use in a
+    # worker thread. A machine with no copy answers every citation with
+    # state `not-aboard`, never an error.
+
+    def _library() -> "_language_library.Library | None":
+        return _language_library.local()
+
+    @router.get("/api/library/status")
+    async def api_library_status() -> dict[str, Any]:
+        """The synced shelf: `{source, index, present, current, problems,
+        texts: [{shelf, text, version, name, what, aboard, here, volume}]}`."""
+        lib = _library()
+        if lib is None:
+            return {"source": str(_language_library.source_dir()), "index": str(_language_library.index_path()),
+                    "present": False, "current": False, "texts": []}
+        return await asyncio.to_thread(lib.status)
+
+    @router.get("/api/library/section")
+    async def api_library_section(in_: str = Query(..., alias="in"), version: str = Query(...),
+                                  at: str = Query(...), digest: str = Query(""),
+                                  section_digest: str = Query("", alias="section-digest")) -> dict[str, Any]:
+        """One citation, opened: a reliance's `stated` as the query
+        (`in`, `version`, `at`, optional `digest` and `section-digest`).
+        Always 200 with `{cited, state, why, text, section}`: `state` is
+        resolved | changed | missing | not-aboard | unknown; `text` is the
+        kept text's notice block (`name, publisher, version, licence {name,
+        url}, copyright, changed, copy, notice, fetched, publisher_page,
+        address, here, …`, null when the registry has no such text);
+        `section` (null unless found) is `{id, page, file, anchor, heading,
+        path, kind, level, lines, sha256, page_sha256, found_by, at, volume,
+        body, parent, parts}`, `body` the section's lines verbatim."""
+        stated = {"in": in_.strip(), "version": version.strip(), "at": at.strip()}
+        if digest.strip():
+            stated["digest"] = digest.strip()
+        if section_digest.strip():
+            stated["section-digest"] = section_digest.strip()
+        if not all(stated[k] for k in ("in", "version", "at")):
+            raise HTTPException(400, "in, version and at are each needed")
+        lib = _library()
+        if lib is None:
+            return {"cited": stated, "state": "not-aboard", "text": None, "section": None,
+                    "why": "no language library is synced here (scripts/sync_languages.py)"}
+        return await asyncio.to_thread(lib.section, stated)
+
+    @router.get("/api/library/volume")
+    async def api_library_volume(shelf: str = Query(...), text: str = Query(...), version: str = Query(...),
+                                 page: str = Query("")) -> dict[str, Any]:
+        """A kept text as a DocOES volume built at runtime: `{doc, id,
+        title, document, nodes}` — without `page` the contents (the notice,
+        then one section per page), with `page` that page's sections, bodies
+        verbatim, each with `cite` (the `stated` that names it) and `sha256`.
+        `document` carries the licence, copyright, change of form and the
+        copy line. 404 for a text not kept here or a page it lacks; 503 when
+        the shelf does not verify."""
+        lib = _library()
+        if lib is None:
+            raise HTTPException(404, "no language library is synced here (scripts/sync_languages.py)")
+        try:
+            cat = await asyncio.to_thread(lib.volume, shelf, text, version, page.strip() or None)
+        except KeyError as e:
+            raise HTTPException(404, str(e.args[0] if e.args else e)) from None
+        except _language_library.LibraryUnavailable as e:
+            raise HTTPException(503, str(e)) from None
+        return {"doc": cat["id"], "id": cat["id"], "title": cat["name"], "oes": cat["oes"],
+                "document": cat["document"], "nodes": cat["nodes"]}
 
     return router

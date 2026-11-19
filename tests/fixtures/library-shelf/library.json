@@ -1,0 +1,101 @@
+{
+  "format": "cosmoes-library/1",
+  "about": "A made-up shelf for the tests: no third party's text. Written by scripts/fetch_library.py from local archives.",
+  "shelves": [
+    {
+      "slug": "example",
+      "title": "Example",
+      "kind": "language",
+      "about": "A made-up language."
+    },
+    {
+      "slug": "memos",
+      "title": "Memos",
+      "kind": "standard",
+      "about": "Made-up memos, passed on unchanged only."
+    }
+  ],
+  "texts": [
+    {
+      "shelf": "example",
+      "text": "manual",
+      "version": "1.0",
+      "name": "The Example Manual",
+      "publisher": "The Example Society",
+      "what": "text",
+      "form": "text",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "The Example Licence (made up)",
+        "url": "https://example.invalid/licence"
+      },
+      "copyright": "Copyright © 2026 The Example Society. All rights reserved.",
+      "publisher_page": "https://example.invalid/manual/1.0/",
+      "from": "https://example.invalid/archives/example-1.0-docs-text.tar.bz2",
+      "obtained": "2026-11-18T12:00:00Z",
+      "files": 4,
+      "digest": "sha256:bf0ffeffb25175aeb07fae7d0a2e8c042fae55f6e1b667966e970270d7fc77d2",
+      "address": "https://cosmoes.org/library/example/manual/1.0/"
+    },
+    {
+      "shelf": "example",
+      "text": "runner",
+      "version": "1",
+      "name": "The Example runner",
+      "publisher": "The Example Society",
+      "what": "implementation",
+      "lane": "open",
+      "aboard": false,
+      "from": "https://example.invalid/runner",
+      "release": "1.0.3",
+      "swhid": null,
+      "digest": null,
+      "note": "Pinned, never copied."
+    },
+    {
+      "shelf": "example",
+      "text": "sheet",
+      "version": "2",
+      "name": "The Example Sheet",
+      "publisher": "The Example Society",
+      "what": "standard",
+      "form": "html",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "The Example Licence (made up)",
+        "url": "https://example.invalid/licence"
+      },
+      "copyright": "Copyright © 2026 The Example Society.\n\nMade up for the tests.",
+      "publisher_page": "https://example.invalid/sheet/2/",
+      "from": "https://example.invalid/sheet/2/",
+      "obtained": "2026-11-18T12:00:00Z",
+      "files": 1,
+      "digest": "sha256:d50c7563ffa3c673c44c0c8ec7c2a344057a00370660a7a0dddc5171d94641a9",
+      "address": "https://cosmoes.org/library/example/sheet/2/"
+    },
+    {
+      "shelf": "memos",
+      "text": "memo",
+      "version": "7",
+      "name": "Memo 7",
+      "publisher": "The Example Society",
+      "what": "standard",
+      "form": "unchanged",
+      "lane": "bound",
+      "aboard": true,
+      "licence": {
+        "name": "The Example Memo Terms (made up): in full and unchanged only",
+        "url": "https://example.invalid/licence"
+      },
+      "copyright": "   Copyright (c) 2026 The Example Society. Made up for the tests.",
+      "publisher_page": "https://example.invalid/memo7",
+      "from": "https://example.invalid/memo7.txt",
+      "obtained": "2026-11-18T12:00:00Z",
+      "files": 1,
+      "digest": "sha256:7d80a5d490734f7b3978418132483334b8680f3f335e343a471e7702463bbd0a",
+      "address": "https://cosmoes.org/library/memos/memo/7/"
+    }
+  ]
+}

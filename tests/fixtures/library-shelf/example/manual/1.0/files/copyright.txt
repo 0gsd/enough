@@ -1,0 +1,6 @@
+Copyright
+*********
+
+Copyright © 2026 The Example Society. All rights reserved.
+
+This notice is made up for the cosmoes.org library's tests.
