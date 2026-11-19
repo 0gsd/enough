@@ -119,7 +119,7 @@ files, 6,000 lines): `tool/` → `tool.fabulac.cosm`. Only when asked:
   `cancel` stops it; `build` again resumes it.
 - `<do>compile</do>` with `<what>` `code` (a cshort and the manual catem) or
   a catem's depth: `line`, `overview`, `manual`.
-- Nothing read or entailed is ever run: a cshort is text to read.
+- An authored fabulac's entailment runs only in the sandbox; a cshort of code the person did not author is read, never run.
 
 A poem can be decompiled in steps too, only when asked: `fabulap`
 `<do>build</do>` with the poem's `<path>` scans it and hears it by rule,

@@ -493,6 +493,8 @@ def build_router(ctx: AppContext) -> APIRouter:
         # the file doesn't exist yet.
         from .. import tools as _tools
         _tools.stash_for_undo(target)
+        from .. import prompt as _prompt
+        content, _stamp_warning = _prompt.stamp_metaparadigm_on_save(target, str(content))
         target.write_text(str(content), encoding="utf-8")
         # convert §4: a twin whose manifest opted into "keep the original in
         # sync" exports itself over the original right after every save. The
