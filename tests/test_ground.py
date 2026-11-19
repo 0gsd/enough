@@ -53,6 +53,16 @@ needs_clones = pytest.mark.skipif(not (CLONES / "vulture" / "vulture").is_dir()
                                   reason="the experiment's clones are not on this machine")
 
 
+def _in_plain_text(path: Path, anchor: str) -> bool:
+    """A citation the plain-text build names by a heading's slug (`2-4-3-f-strings`) or a definition line
+    (`exception BaseException`), where the publisher's HTML has no such id."""
+    from enough import library_index as li
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if li.slug(line) == anchor or line.rstrip().endswith(" " + anchor):
+            return True
+    return False
+
+
 def entries() -> dict[str, dict]:
     return {e["id"]: e for e in L.entries("python")}
 
@@ -199,7 +209,7 @@ def test_every_citation_names_a_page_and_an_anchor_of_the_kept_text_with_its_dig
                                (html / page).read_text(encoding="utf-8", errors="replace"))
             digest, body = pages[page]
             assert (s["in"], s["version"], s["digest"]) == ("python", "3.13.18", digest), (e["id"], s["at"])
-            assert f'id="{anchor}"' in body, (e["id"], s["at"])
+            assert f'id="{anchor}"' in body or _in_plain_text(text / (page[:-5] + ".txt"), anchor), (e["id"], s["at"])
 
 
 # ---------------------------------------------------------------------------
