@@ -462,6 +462,8 @@ pick a program of yours whose only input is the holograph and which ends <code>g
 ### ideas
 - make it again when your holograph changes: the card says when the listed one is out of date.
 - live proofs on two faceplaces make your listing an Allograph+.
+- <strong>by name or tag</strong> finds a listing by its user name, or the one listing a #tag names; <strong>open it</strong> shows its entry.
+- signed in, <strong>every proof your listing holds</strong> lists each one, live, missed or lapsed, with its address and the day it was checked; <strong>remove…</strong> asks before it drops one.
 - section 13.9 of the help center has the allograph and the registry.
 
 ## atem-card

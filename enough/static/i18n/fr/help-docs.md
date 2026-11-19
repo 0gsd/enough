@@ -463,6 +463,8 @@ choisissez un programme à vous dont l’unique entrée est le holograph et qui 
 ### ideas
 - refaites-le quand votre holograph change : la carte dit quand celui qui est inscrit n’est plus à jour.
 - des preuves actives sur deux faceplaces font de votre inscription un Allograph+.
+- <strong>par nom ou étiquette</strong> trouve une inscription par son nom d’utilisateur, ou la seule inscription qu’une #étiquette désigne ; <strong>l’ouvrir</strong> montre sa fiche.
+- connecté, <strong>toutes les preuves de votre inscription</strong> les liste une à une, actives, absentes ou expirées, avec leur adresse et le jour du contrôle ; <strong>retirer…</strong> demande avant d’en abandonner une.
 - la section 13.9 du centre d’aide présente l’allograph et le registre.
 
 ## atem-card

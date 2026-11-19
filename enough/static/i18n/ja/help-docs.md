@@ -462,6 +462,8 @@ path: self/ → self.allograph-<run>.json
 ### ideas
 - holograph が変わったら作り直しましょう：掲載したものが古くなるとカードが伝えます。
 - 二つの faceplace で有効な証明があれば、掲載は Allograph+ になります。
+- <strong>名前かタグで</strong> は、ユーザー名で掲載を、または #タグ が指すただ一つの掲載を見つけます。<strong>開く</strong> でその内容を表示します。
+- サインインしていれば、<strong>あなたの掲載が持つすべての証明</strong> が、有効・見つからず・失効の証明を一つずつ、アドレスと確認した日とともに並べます。<strong>取り消す…</strong> は外す前にたずねます。
 - ヘルプセンターのセクション 13.9 に allograph と登録簿のことがあります。
 
 ## atem-card

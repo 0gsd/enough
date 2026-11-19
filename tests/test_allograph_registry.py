@@ -198,9 +198,14 @@ class FakeRegistry:
     """Plays Connect's registry (14.12) closely enough for the client: nonces per account, signatures verified
     against the listing's key, a listing per tag, proofs, attestations waiting and accepted, bonds, and the device
     flow. `calls` keeps every request as (method, path, body, token). The device flow is asked of Connect's address
-    (`URL`) and everything else of the registry's (`REGISTRY`); the two may be one, as at the uicheck stand-in."""
+    (`URL`) and everything else of the registry's (`REGISTRY`); the two may be one, as at the uicheck stand-in.
+
+    A proof is kept in `proofs` as (tag, faceplace, handle) -> address; its state, while it is not live, in
+    `proof_state` as the same key -> (state, since). `elsewhere` holds tags tied to another Connect account, whose proofs
+    the read refuses with 409."""
 
     TOKEN = "cct_test-token"
+    CHECKED = "2026-11-18"
 
     def __init__(self) -> None:
         self.calls: list = []
@@ -208,6 +213,8 @@ class FakeRegistry:
         self.listings: dict = {}
         self.waiting: dict = {}
         self.proofs: dict = {}
+        self.proof_state: dict = {}
+        self.elsewhere: set = set()
         self.bonds: set = set()
         self.approved = False
         self.faceplaces = [{"faceplace": "harbourboard", "title": "Harbourboard", "handle": "[a-z0-9-]{2,30}",
@@ -252,8 +259,10 @@ class FakeRegistry:
             return self.statement(body, token)
         if method == "DELETE":
             tag = path.rsplit("/", 1)[1]
-            self.listings.pop(tag, None)
+            self.drop(tag)
             return 200, {"withdrawn": True}
+        if path.endswith("/proofs"):
+            return self.held(path.split("/")[-2], token)
         if path.endswith("/waiting"):
             tag = path.split("/")[-2]
             return 200, {"attestations": [{"attestation": d, **s} for d, s in self.waiting.get(tag, {}).items()]}
@@ -265,10 +274,51 @@ class FakeRegistry:
     def entry(self, tag: str) -> dict:
         ls = self.listings[tag]
         st = ls["statement"]
-        return {"entry": "ascribe-entry/0", "tag": tag, "name": st["name"], "kind": st["allograph"]["kind"],
-                "epoch": st["allograph"]["epoch"], "level": "stated",
-                "claims": [dict(c, level="stated", attested=[]) for c in st["allograph"]["expertise"]],
-                "signed": ls}
+        out = {"entry": "ascribe-entry/0", "tag": tag, "name": st["name"], "kind": st["allograph"]["kind"],
+               "epoch": st["allograph"]["epoch"], "level": "stated"}
+        if st.get("dangler"):
+            out["dangler"] = st["dangler"]
+        if out["kind"] == "person":
+            # A public entry counts or names only the live proofs, as the holder's `show` asks (14.11).
+            live = sorted((fp, h, a) for (t, fp, h), a in self.proofs.items()
+                          if t == tag and (t, fp, h) not in self.proof_state)
+            out["plus"] = len({fp for fp, _h, _a in live}) >= 2
+            if live:
+                named = (st.get("show") or {}).get("faceplaces") == "named"
+                out["faceplaces"] = [{"faceplace": fp, "handle": h, "address": a, "checked": self.CHECKED}
+                                     for fp, h, a in live] if named else len(live)
+        out["claims"] = [dict(c, level="stated", attested=[]) for c in st["allograph"]["expertise"]]
+        out["signed"] = ls
+        return out
+
+    def drop(self, tag: str) -> None:
+        """A withdrawn listing is gone with its proofs (14.13)."""
+        self.listings.pop(tag, None)
+        for k in [k for k in self.proofs if k[0] == tag]:
+            self.proofs.pop(k, None)
+            self.proof_state.pop(k, None)
+
+    def held(self, tag: str, token) -> tuple:
+        """`GET .../{tag}/proofs`: the holder's every proof, in every state (14.12)."""
+        if token != self.TOKEN:
+            return 401, {"error": "signed_out", "detail": "Sign in."}
+        if tag not in self.listings:
+            return 404, {"error": "not_listed", "detail": "No listing has this tag."}
+        if tag in self.elsewhere:
+            return 409, {"error": "tag_taken", "detail": "This tag is tied to another account."}
+        if self.listings[tag]["statement"]["allograph"]["kind"] != "person":
+            return 200, {"proofs": [], "plus": False}
+        rows = []
+        for (t, fp, handle), address in sorted(self.proofs.items()):
+            if t != tag:
+                continue
+            state, since = self.proof_state.get((t, fp, handle), ("live", None))
+            row = {"faceplace": fp, "handle": handle, "address": address, "checked": self.CHECKED, "state": state}
+            if since:
+                row["since"] = since
+            rows.append(row)
+        live = {r["faceplace"] for r in rows if r["state"] == "live"}
+        return 200, {"proofs": rows, "plus": len(live) >= 2}
 
     def key_of(self, by: str):
         ls = self.listings.get(by)
@@ -291,15 +341,17 @@ class FakeRegistry:
             self.listings[tag] = signed
             return 200, {"ok": True, "entry": self.entry(tag)}
         if says == "withdraw":
-            self.listings.pop(tag, None)
+            self.drop(tag)
             return 200, {"ok": True}
         if says == "prove":
             if st["address"] != f"https://harbourboard.test/{st['handle']}":
                 return 400, {"error": "bad_address", "detail": "Not an address of that handle."}
             self.proofs[(tag, st["faceplace"], st["handle"])] = st["address"]
+            self.proof_state.pop((tag, st["faceplace"], st["handle"]), None)
             return 200, {"ok": True, "entry": self.entry(tag)}
         if says == "unprove":
             self.proofs.pop((tag, st["faceplace"], st["handle"]), None)
+            self.proof_state.pop((tag, st["faceplace"], st["handle"]), None)
             return 200, {"ok": True}
         if says == "attest":
             self.waiting.setdefault(st["of"], {})[R.attestation_digest(st)] = signed
@@ -448,6 +500,62 @@ def test_every_operation_against_the_stand_in_registry(fake):
     sent = [c for c in fake.calls if c[1] == "/api/v0/allographs/statements"]
     assert all(c[3] == fake.TOKEN for c in sent)
     assert len({c[2]["statement"]["nonce"] for c in sent}) == len(sent)
+
+
+def test_the_holders_proofs_every_one_in_every_state(fake):
+    """`R.proofs`: Connect's holder-only `GET .../{tag}/proofs`, with the account's token; rows kept to their fields,
+    sorted, `since` only beside a proof that is not live; the refusals in plain words with the registry's status."""
+    sess = _signed_in(fake)
+    me = R.key_from_seed(SEED)
+    R.list_allograph(sess, me, name="harbour-baker", allograph=json.loads(SPEC_ALLOGRAPH))
+    assert R.proofs(sess, me.tag) == {"proofs": [], "plus": False}
+    R.prove(sess, me, "harbourboard", "harbour-baker", "https://harbourboard.test/harbour-baker")
+    fake.proofs[(me.tag, "github", "harbour-baker")] = "https://github.com/harbour-baker"
+    fake.proofs[(me.tag, "website", "harbour-baker.example")] = "https://harbour-baker.example/"
+    fake.proof_state[(me.tag, "website", "harbour-baker.example")] = ("lapsed", "2026-11-17")
+    got = R.proofs(sess, me.tag)
+    assert got["plus"] is True
+    assert [(p["faceplace"], p["state"], p.get("since")) for p in got["proofs"]] == [
+        ("github", "live", None), ("harbourboard", "live", None), ("website", "lapsed", "2026-11-17")]
+    assert set(got["proofs"][0]) == {"faceplace", "handle", "address", "checked", "state"}
+    call = fake.calls[-1]
+    assert call == ("GET", f"/api/v0/allographs/{me.tag}/proofs", None, fake.TOKEN)
+    # the pair a row gives is what `unprove` sends
+    lapsed = got["proofs"][2]
+    R.unprove(sess, me, lapsed["faceplace"], lapsed["handle"])
+    assert [p["faceplace"] for p in R.proofs(sess, me.tag)["proofs"]] == ["github", "harbourboard"]
+    # refusals: another account's tag, nothing listed, signed out, not a tag
+    fake.elsewhere.add(me.tag)
+    with pytest.raises(R.RegistryError) as e:
+        R.proofs(sess, me.tag)
+    assert e.value.status == 409 and e.value.code == "tag_taken" and "another Connect account" in str(e.value)
+    with pytest.raises(R.RegistryError) as e:
+        R.proofs(sess, "b" * 12)
+    assert e.value.status == 404 and e.value.code == "not_listed"
+    with pytest.raises(R.RegistryError) as e:
+        R.proofs(R.Session(URL, "cct_revoked"), me.tag)
+    assert e.value.status == 401 and "Sign in to Connect" in str(e.value)
+    n = len(fake.calls)
+    with pytest.raises(R.RegistryError) as e:
+        R.proofs(None, me.tag)
+    assert e.value.code == "signed_out"
+    with pytest.raises(R.RegistryError):
+        R.proofs(sess, "#" + me.tag)
+    assert len(fake.calls) == n                                       # refused before anything was sent
+    # withdrawn, the listing is gone with its proofs
+    fake.elsewhere.clear()
+    R.withdraw(sess, me)
+    assert not any(k[0] == me.tag for k in fake.proofs)
+
+
+def test_an_agents_listing_holds_no_proofs(fake):
+    sess = _signed_in(fake)
+    agent = R.new_key()
+    allo = dict(json.loads(SPEC_ALLOGRAPH), kind="agent")
+    me_tag = R.key_from_seed(SEED).tag
+    fake.listings[agent.tag] = R.sign(R.statement("list", agent.tag, "a" * 26, key=agent.key, name="crumb-bot",
+                                                  allograph=allo, owner=me_tag), agent)
+    assert R.proofs(sess, agent.tag) == {"proofs": [], "plus": False}
 
 
 def test_signed_out_is_refused_before_anything_is_sent(fake):

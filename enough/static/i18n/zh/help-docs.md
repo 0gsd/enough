@@ -462,6 +462,8 @@ path: self/ → self.allograph-<run>.json
 ### ideas
 - holograph 变了就重新生成：登记的那份过时了，卡片会告诉你。
 - 在两个 faceplace 上有有效证明，你的登记就成为 Allograph+。
+- <strong>按名字或标签</strong> 按用户名找登记，或找到某个 #标签 指向的那一个登记；<strong>打开</strong> 显示它的登记内容。
+- 登录后，<strong>你的登记持有的全部证明</strong> 逐一列出每个证明，无论有效、没找到还是已失效，并附上地址和核对的日期；<strong>撤下…</strong> 会先问你再删除。
 - 帮助中心第 13.9 节讲 allograph 和登记处。
 
 ## atem-card

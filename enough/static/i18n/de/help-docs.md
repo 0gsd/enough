@@ -462,6 +462,8 @@ wähl ein Programm von dir, dessen einzige Eingabe der holograph ist und das mit
 ### ideas
 - mach ihn neu, wenn sich dein holograph ändert: die Karte sagt, wann der eingetragene veraltet ist.
 - gültige Nachweise auf zwei faceplaces machen deinen Eintrag zu einem Allograph+.
+- <strong>nach Name oder Tag</strong> findet einen Eintrag über seinen Benutzernamen oder den einen, den ein #Tag benennt; <strong>öffnen</strong> zeigt, was das Register von ihm zeigt.
+- angemeldet listet <strong>jeder Nachweis deines Eintrags</strong> alle einzeln auf, gültig, nicht gefunden oder erloschen, mit Adresse und dem Tag der Prüfung; <strong>entfernen…</strong> fragt, bevor es einen fallen lässt.
 - Abschnitt 13.9 des Hilfezentrums beschreibt den allograph und das Register.
 
 ## atem-card

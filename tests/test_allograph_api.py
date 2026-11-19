@@ -92,8 +92,9 @@ def test_every_sending_route_refuses_plainly_when_not_signed_in(client, fake, pr
                        ("/api/allograph/unbond", {"path": "self", "agent": "b" * 12})]:
         r = client.post(path, json=body)
         assert r.status_code == 401 and "not signed in to Connect" in r.json()["detail"], (path, r.text)
-    r = client.get("/api/allograph/waiting", params={"path": "self"})
-    assert r.status_code == 401
+    for path in ("/api/allograph/waiting", "/api/allograph/proofs"):
+        r = client.get(path, params={"path": "self"})
+        assert r.status_code == 401 and "not signed in to Connect" in r.json()["detail"], (path, r.text)
     assert not any(c[1] == "/api/v0/allographs/statements" for c in fake.calls)       # nothing was sent
     assert R.KEYCHAIN.items == {}                                                     # and no key was made
 
@@ -222,6 +223,69 @@ def test_proofs_attestations_and_bonds_through_the_routes(client, fake, project)
     assert client.post("/api/allograph/bond", json={"path": "self", "agent": agent.tag}).status_code == 200
     assert client.post("/api/allograph/unbond", json={"path": "self", "agent": agent.tag}).status_code == 200
     assert client.get("/api/allograph/faceplaces").json()["faceplaces"][0]["faceplace"] == "harbourboard"
+
+
+def test_the_holder_reads_every_proof_of_the_listing_and_removes_one(client, fake, project):
+    """`GET /api/allograph/proofs`: every proof the listing holds, live or not, from Connect's holder-only route with
+    the stored token; one removed by `unprove` with its row's faceplace and handle; the refusals said with their
+    status (401 signed out, 404 nothing listed under the tag now, 409 tied to another account)."""
+    made = make(client)
+    sign_in(client, fake)
+    r = client.get("/api/allograph/proofs", params={"path": "self"})
+    assert r.status_code == 409 and "nothing of this holograph is listed" in r.json()["detail"]
+    tag = client.post("/api/allograph/list", json={"path": "self", "allograph": made["allograph"],
+                                                   "name": "harbour-baker"}).json()["listing"]["tag"]
+    got = client.get("/api/allograph/proofs", params={"path": "self"}).json()
+    assert got == {"path": "self", "tag": tag, "proofs": [], "plus": False}
+    for handle in ("harbour-baker", "crumb"):
+        r = client.post("/api/allograph/prove", json={"path": "self", "faceplace": "harbourboard", "handle": handle,
+                                                      "address": f"https://harbourboard.test/{handle}"})
+        assert r.status_code == 200, r.text
+    site = (tag, "website", "harbour-baker.example")
+    fake.proofs[site] = "https://harbour-baker.example/.well-known/ascribe-proof.txt"
+    fake.proof_state[site] = ("lapsed", "2026-11-17")
+    fake.proof_state[(tag, "harbourboard", "crumb")] = ("missed", "2026-11-18")
+    got = client.get("/api/allograph/proofs", params={"path": "self"}).json()
+    assert [(p["faceplace"], p["handle"], p["state"], p.get("since")) for p in got["proofs"]] == [
+        ("harbourboard", "crumb", "missed", "2026-11-18"), ("harbourboard", "harbour-baker", "live", None),
+        ("website", "harbour-baker.example", "lapsed", "2026-11-17")]
+    assert got["proofs"][1] == {"faceplace": "harbourboard", "handle": "harbour-baker", "state": "live",
+                                "address": "https://harbourboard.test/harbour-baker", "checked": fake.CHECKED}
+    assert got["plus"] is False
+    asked = [c for c in fake.calls if c[1] == f"/api/v0/allographs/{tag}/proofs"]
+    assert asked and all(c[0] == "GET" and c[3] == fake.TOKEN and c[2] is None for c in asked)
+    # removed by its row's pair, whatever its state
+    row = got["proofs"][2]
+    r = client.post("/api/allograph/unprove", json={"path": "self", "faceplace": row["faceplace"],
+                                                    "handle": row["handle"]})
+    assert r.status_code == 200, r.text
+    left = client.get("/api/allograph/proofs", params={"path": "self"}).json()["proofs"]
+    assert [p["handle"] for p in left] == ["crumb", "harbour-baker"]
+    # tied to another account: the registry's 409, said with its status
+    fake.elsewhere.add(tag)
+    r = client.get("/api/allograph/proofs", params={"path": "self"})
+    assert r.status_code == 409 and "another Connect account" in r.json()["detail"]
+    fake.elsewhere.clear()
+    # withdrawn elsewhere: the registry has nothing under the tag
+    fake.listings.pop(tag)
+    r = client.get("/api/allograph/proofs", params={"path": "self"})
+    assert r.status_code == 404 and "No live listing" in r.json()["detail"]
+    # signed out
+    client.post("/api/connect/sign-out")
+    assert client.get("/api/allograph/proofs", params={"path": "self"}).status_code == 401
+
+
+def test_look_up_by_name_and_by_tag(client, fake, project):
+    made = make(client)
+    sign_in(client, fake)
+    tag = client.post("/api/allograph/list", json={"path": "self", "allograph": made["allograph"],
+                                                   "name": "harbour-baker"}).json()["listing"]["tag"]
+    got = client.get("/api/allograph/entry", params={"name": "harbour-baker"}).json()["entries"]
+    assert [e["tag"] for e in got] == [tag] and got[0]["verified"] is True
+    assert client.get("/api/allograph/entry", params={"name": "nobody-here"}).json() == {"entries": []}
+    assert client.get("/api/allograph/entry", params={"tag": tag}).json()["entry"]["name"] == "harbour-baker"
+    assert client.get("/api/allograph/entry", params={"tag": "b" * 12}).json() == {"entry": None}
+    assert client.get("/api/allograph/entry", params={"name": "H!"}).status_code == 400
 
 
 def test_an_unreachable_connect_is_a_502_in_words(client, monkeypatch):

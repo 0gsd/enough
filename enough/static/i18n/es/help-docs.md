@@ -463,6 +463,8 @@ elige un programa tuyo cuya única entrada sea el holograph y que termine en <co
 ### ideas
 - hazlo de nuevo cuando cambie tu holograph: la tarjeta dice cuándo el inscrito está desfasado.
 - pruebas activas en dos faceplaces hacen de tu inscripción un Allograph+.
+- <strong>por nombre o etiqueta</strong> encuentra una inscripción por su nombre de usuario, o la única que nombra una #etiqueta; <strong>abrirlo</strong> muestra su ficha.
+- con sesión iniciada, <strong>todas las pruebas de tu inscripción</strong> las enumera una a una, activas, no halladas o caducadas, con su dirección y el día de la comprobación; <strong>quitar…</strong> pregunta antes de descartar una.
 - la sección 13.9 del centro de ayuda trata del allograph y del registro.
 
 ## atem-card

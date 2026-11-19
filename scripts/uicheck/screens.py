@@ -132,6 +132,55 @@ DLG_SELF_ASK = "talks/self-ask-{lang}"
 # 0.7 (P4): the holograph that offers work, its holder's program for the allograph (server.ALLOGRAPH_*).
 ALLO_HOLO = "talks/work-self"
 ALLO_PROGRAM = "talks/open-for-work.thym"
+# 0.8 (W4-RP): the holograph's allograph made (once per page), this machine signed in to the stand-in Connect, listed
+# as harbour-baker beside the stand-in's own example, and four proofs put on the stand-in: two live (an Allograph+),
+# one missed at the last check, one lapsed. Every step reads its answer; nothing waits on time.
+ALLO_PROOFS = [
+    {"faceplace": "github", "handle": "harbour-baker", "address": "https://github.com/harbour-baker", "state": "live"},
+    {"faceplace": "harbourboard", "handle": "harbour-baker", "address": "https://harbourboard.test/harbour-baker",
+     "state": "live"},
+    {"faceplace": "mastodon", "handle": "harbour-baker@bakers.example", "address": "https://bakers.example/@harbour-baker",
+     "state": "missed", "since": "2026-11-18"},
+    {"faceplace": "website", "handle": "harbour-baker.example",
+     "address": "https://harbour-baker.example/.well-known/ascribe-proof.txt", "state": "lapsed", "since": "2026-11-17"},
+]
+ALLO_LISTED_JS = """(async () => {
+  const post = async (u, b) => { const r = await fetch(u, {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(b)}); let d = null; try { d = await r.json(); } catch (e) {} return {ok: r.ok, d}; };
+  let made = window.__uicheckAlloMade;
+  if (!made) {
+    const m = await post('/api/ascribe/allograph', {path: %(holo)s, program: %(prog)s});
+    if (!m.ok) throw new Error('the allograph was not made: ' + JSON.stringify(m.d));
+    made = window.__uicheckAlloMade = m.d.allograph;
+  }
+  const st = await (await fetch('/api/connect/status')).json();
+  if (!st.signed_in) {
+    const s = await post('/api/connect/sign-in', {});
+    if (!s.ok) throw new Error('sign-in did not start: ' + JSON.stringify(s.d));
+    let state = '';
+    for (let i = 0; i < 5 && state !== 'signed_in'; i++) state = ((await post('/api/connect/poll', {})).d || {}).state;
+    if (state !== 'signed_in') throw new Error('the stand-in never approved the sign-in');
+  }
+  const l = await post('/api/allograph/list', {path: %(holo)s, allograph: made, name: 'harbour-baker',
+    dangler: 'crumb and crust', show: {faceplaces: 'named', same_name: false}});
+  if (!l.ok) throw new Error('not listed: ' + JSON.stringify(l.d));
+  await fetch(st.url + '/__proofs', {method: 'POST', mode: 'no-cors',
+    body: JSON.stringify({of: l.d.listing.tag, proofs: %(proofs)s})});
+  return true; })()""" % {"holo": json.dumps(ALLO_HOLO), "prog": json.dumps(ALLO_PROGRAM),
+                          "proofs": json.dumps(ALLO_PROOFS)}
+#: The allograph card open on the holograph, its listing and the holder's every proof read.
+ALLO_HELD_READY: Step = ("eval_await", """(async () => {
+  await dlgAlloOpen(%s);
+  for (let i = 0; i < 200 && !(DLG.allo && DLG.allo.held && (DLG.allo.held.error || Array.isArray(DLG.allo.held.proofs))
+       && document.querySelector('#allo-held')); i++) await new Promise((r) => setTimeout(r, 50));
+  return true; })()""" % json.dumps(ALLO_HOLO))
+#: Withdrawn and signed out again, so the next screen or scenario finds the holograph unlisted and Connect signed out.
+ALLO_UNLIST: Step = ("eval_await", """(async () => {
+  try { dlgClose(); } catch (e) {}
+  const post = (u, b) => fetch(u, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(b)});
+  await post('/api/allograph/withdraw', {path: %s});
+  await post('/api/connect/sign-out', {});
+  return true; })()""" % json.dumps(ALLO_HOLO))
 
 Step = tuple[str, str]
 
@@ -1394,6 +1443,37 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="a fabulan in the cosm viewer: questions with the count of the open ones in the toolbar"),
+
+    # --- 0.8 (W4-RP): the allograph card's holder's proofs, and the look-up by name ---
+    Screen("allograph-proofs", "project",
+           setup=(("eval_await", ALLO_LISTED_JS), ALLO_HELD_READY,
+                  ("eval", "document.getElementById('allo-held').scrollIntoView({block: 'start'})"),
+                  ("wait_idle", "")),
+           teardown=(ALLO_UNLIST,) + EXIT_ALL_MODES,
+           note="the allograph card, signed in and listed: every proof the listing holds, live, missed at the "
+                "last check (since a day) and lapsed, each with its address, the day checked and remove…; "
+                "the Allograph+ line; read them again; prove another under it"),
+
+    Screen("allograph-lookup", "project",
+           setup=(("eval_await", ALLO_LISTED_JS), ALLO_HELD_READY,
+                  ("eval_await", """(async () => {
+  const q = document.getElementById('allo-look');
+  q.value = 'harbour-baker';
+  q.dispatchEvent(new Event('input', {bubbles: true}));
+  document.querySelector('[data-dlg="allo-look"]').click();
+  for (let i = 0; i < 200 && !(DLG.allo && Array.isArray(DLG.allo.look.result) && !DLG.allo.busy); i++)
+    await new Promise((r) => setTimeout(r, 50));
+  const i = DLG.allo.look.result.findIndex((e) => e.tag === DLG.allo.listing.tag);
+  const b = document.querySelector('[data-dlg="allo-look-open"][data-allo-i="' + i + '"]');
+  if (b) b.click();
+  for (let k = 0; k < 100 && DLG.allo.look.open !== i; k++) await new Promise((r) => setTimeout(r, 50));
+  document.getElementById('allo-look-box').scrollIntoView({block: 'start'});
+  return true; })()"""),
+                  ("wait_idle", "")),
+           teardown=(ALLO_UNLIST,) + EXIT_ALL_MODES,
+           note="look up by name or tag: harbour-baker answers with two listings, the stand-in's example "
+                "(open it) and this holograph's, opened: its entry with its named faceplaces, each live and "
+                "checked, its claims; then the look-up by need under it"),
 
     # --- 0.5.0, Thym (U1): programs, plans, traces, the run card, readings ---
     Screen("thym-program", "project",

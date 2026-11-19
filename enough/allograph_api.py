@@ -13,12 +13,13 @@ Nothing is sent then. Everything here that sends is the holder's own act, one cl
   allograph.
 - **The listing** (`/api/allograph/...`): `listing` (what this machine knows, the tag, and whether the holograph has
   changed since the listed allograph's run; never asks the registry), `list`, `withdraw`, `proof` (the string to post
-  and the addresses the faceplace accepts), `prove`, `unprove`, `waiting`, `accept`, `remove`, `attest`, `bond`,
-  `unbond`; and the look-ups `search`, `entry`, `faceplaces`, which need no account (14.11).
+  and the addresses the faceplace accepts), `prove`, `unprove`, `proofs` (every proof the listing holds, live or
+  not), `waiting`, `accept`, `remove`, `attest`, `bond`, `unbond`; and the look-ups `search`, `entry` (by tag or by
+  name), `faceplaces`, which need no account (14.11).
 
-Every route that sends a statement, or reads what only the listing's account may (`waiting`), refuses with 401 and
-plain words when this machine is not signed in to Connect. A refusal of the registry's is said in its words with its
-status (a 5xx, or Connect out of reach, as 502). `path` is the holograph, as the dialectic's routes name it.
+Every route that sends a statement, or reads what only the listing's account may (`waiting`, `proofs`), refuses with
+401 and plain words when this machine is not signed in to Connect. A refusal of the registry's is said in its words
+with its status (a 5xx, or Connect out of reach, as 502). `path` is the holograph, as the dialectic's routes name it.
 """
 from __future__ import annotations
 
@@ -284,6 +285,23 @@ def build_router(*, project_dir: Path, jobs: Any = None, catalog_after: Callable
                 if isinstance(r, dict) and isinstance(r.get("statement"), dict) and "attestation" not in r:
                     r["attestation"] = R.attestation_digest(r["statement"])
             return {"path": t.rel, "attestations": rows}
+        return await run(go)
+
+    @router.get("/api/allograph/proofs")
+    async def allograph_proofs(path: str = "") -> dict:
+        """Every faceplace proof the holograph's listing holds, live or not (`R.proofs`): `{path, tag, proofs,
+        plus}`. Only the Connect account the tag is tied to may read it: 401 signed out here, and the registry's 404
+        (nothing listed under the tag now) or 409 (tied to another account) said with their status."""
+        def go() -> dict:
+            t = holograph(path)
+            sess = signed_in()
+            hid = R.hid_of(t.path)
+            key = R.listing_key(hid)
+            rec = R.listing_record(hid) or {}
+            tag = key.tag if key is not None else rec.get("tag")
+            if not tag:
+                raise R.RegistryError("nothing of this holograph is listed from this machine", 409)
+            return {"path": t.rel, "tag": tag, **R.proofs(sess, tag)}
         return await run(go)
 
     def _digest_route(says: str) -> Callable:

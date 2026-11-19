@@ -42,7 +42,7 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       FAB_CSHORT, FAB_LYRIC, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
-                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM,
+                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM, ALLO_LISTED_JS,
                       SCAFFOLD_READY, FAP_FIRST, FAP_RAN)
 
 Scenario = Callable[[Driver], list[str]]
@@ -5377,6 +5377,127 @@ def scenario_allograph_panel(d: Driver) -> list[str]:
     return fails
 
 
+def scenario_allograph_proofs(d: Driver) -> list[str]:
+    """0.8 (W4-RP): the holder's every proof, and the look-up by name, against the stand-in Connect. Listed and signed
+    in (`ALLO_LISTED_JS`: four proofs on the stand-in, two live, one missed, one lapsed), the card lists each with its
+    faceplace, handle, address, state and the day checked, and says Allograph+ → remove… on the lapsed one asks first
+    (nothing is sent: the stand-in still holds four), keep it → remove… again, yes → three left, the lapsed one gone
+    → tied to another account, read them again says so plainly → look up harbour-baker (return in the field): two
+    listings, this one opened with its live faceplaces → a #tag finds the one → signed out, the list asks for the
+    sign-in. Every wait reads the state it needs; none waits on time."""
+    fails: list[str] = []
+    _reset(d)
+    connect = d.js_await("(async () => (await (await fetch('/api/connect/status')).json()).url)()") or ""
+
+    def stand_in(path: str, body: dict) -> None:
+        d.js_await("(async () => { await fetch(%s, {method: 'POST', mode: 'no-cors', body: %s}); return true; })()"
+                   % (json.dumps(connect + path), json.dumps(json.dumps(body))))
+
+    def text(sel: str) -> str:
+        return str(d.js("(document.querySelector(%s) || {}).innerText || ''" % json.dumps(sel)) or "")
+
+    def held_n() -> int:
+        return int(d.js_await("(async () => { const r = await fetch('/api/allograph/proofs?path=' + encodeURIComponent(%s));"
+                              " return r.ok ? (await r.json()).proofs.length : -1; })()" % json.dumps(ALLO_HOLO)) or -1)
+
+    try:
+        d.js_await(ALLO_LISTED_JS, timeout=40.0)
+    except RuntimeError as e:
+        fails.append(f"the holograph could not be made, signed in and listed against the stand-in: {e}")
+        _reset(d)
+        return fails
+    try:
+        d.js_await("(async () => { await dlgAlloOpen(%s); return true; })()" % json.dumps(ALLO_HOLO))
+        if not _wait_js(d, "DLG.allo && DLG.allo.held && Array.isArray(DLG.allo.held.proofs)"
+                           " && document.querySelectorAll('#allo-held li[data-allo-proof]').length === 4", 15000):
+            fails.append("the card did not list the listing's four proofs: " + text("#allo-held"))
+            return fails
+        rows = d.js("Array.from(document.querySelectorAll('#allo-held li[data-allo-proof]')).map((li) => li.innerText)") or []
+        want = [("github", "harbour-baker", "https://github.com/harbour-baker", "allo-state-live"),
+                ("mastodon", "harbour-baker@bakers.example", "https://bakers.example/@harbour-baker", "allo-state-missed"),
+                ("website", "harbour-baker.example", "https://harbour-baker.example/", "allo-state-lapsed")]
+        for fp, handle, addr, cls in want:
+            li = "#allo-held li[data-allo-proof=%s]" % json.dumps(fp + " " + handle)
+            row = text(li)
+            if not (fp in row and handle in row and addr in row and d.js("!!document.querySelector(%s)" % json.dumps(li + " ." + cls))):
+                fails.append(f"the {fp} proof is not shown with its handle, address and state ({cls}): {row!r}")
+        if not any("2026-11-17" in r for r in rows) or not any("2026-11-18" in r for r in rows):
+            fails.append(f"the days checked and since are not shown: {rows!r}")
+        if not d.js("DLG.allo.held.plus === true"):
+            fails.append("two live faceplaces did not make the listing an Allograph+ in the list")
+        lapsed = "#allo-held li[data-allo-proof=%s]" % json.dumps("website harbour-baker.example")
+        # Remove… asks first, on its row; keep it sends nothing.
+        d.click(lapsed + " [data-dlg='allo-held-rm']")
+        if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(lapsed + " [role='alertdialog']"), 5000):
+            fails.append("remove… did not ask first on its row: " + text(lapsed))
+            return fails
+        if "harbour-baker.example" not in text(lapsed + " [role='alertdialog']"):
+            fails.append("the question does not name the proof it removes: " + text(lapsed + " [role='alertdialog']"))
+        if held_n() != 4:
+            fails.append("asking sent something: the stand-in no longer holds four proofs")
+        d.click(lapsed + " [data-dlg='allo-held-no']")
+        if not _wait_js(d, "DLG.allo.heldAsk === null && !document.querySelector('#allo-held [role=\"alertdialog\"]')", 5000):
+            fails.append("keep it did not close the question")
+        d.click(lapsed + " [data-dlg='allo-held-rm']")
+        if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(lapsed + " [data-dlg='allo-held-yes']"), 5000):
+            fails.append("remove… did not ask the second time")
+            return fails
+        d.click(lapsed + " [data-dlg='allo-held-yes']")
+        if not _wait_js(d, "!DLG.allo.busy && DLG.allo.held && Array.isArray(DLG.allo.held.proofs) && DLG.allo.held.proofs.length === 3"
+                           " && !!DLG.allo.done.held", 15000):
+            fails.append("yes, remove it did not leave three proofs: " + text("#allo-held"))
+        elif d.js("!!document.querySelector(%s)" % json.dumps(lapsed)):
+            fails.append("the removed proof is still listed")
+        if held_n() != 3:
+            fails.append("the stand-in does not hold three proofs after the removal")
+        # Tied to another account: said plainly, with nothing else lost.
+        tag = d.js("DLG.allo.listing.tag") or ""
+        stand_in("/__elsewhere", {"tag": tag, "on": True})
+        d.click("#allo-held [data-dlg='allo-held']")
+        if not _wait_js(d, "!DLG.allo.busy && DLG.allo.held && !!DLG.allo.held.error"
+                           " && !!document.querySelector('#allo-held .thym-refusal')", 10000):
+            fails.append("another account's tag was not said plainly: " + text("#allo-held"))
+        elif d.js("!!document.querySelector('#allo-held li[data-allo-proof]')"):
+            fails.append("the not-the-holder answer still shows proofs")
+        stand_in("/__elsewhere", {"tag": tag, "on": False})
+        # Look up by name: return in the field asks the registry.
+        d.focus("#allo-look")
+        d.type_text("harbour-baker")
+        d.key("Enter")
+        if not _wait_js(d, "!DLG.allo.busy && Array.isArray(DLG.allo.look.result) && DLG.allo.look.result.length === 2"
+                           " && document.querySelectorAll('#allo-look-box [data-dlg=\"allo-look-open\"]').length === 2", 10000):
+            fails.append("looking up harbour-baker did not answer with the two listings: " + text("#allo-look-box"))
+        else:
+            i = d.js("DLG.allo.look.result.findIndex((e) => e.tag === %s)" % json.dumps(tag))
+            d.click("#allo-look-box [data-dlg='allo-look-open'][data-allo-i='%s']" % i)
+            if not _wait_js(d, "DLG.allo.look.open === %s && !!document.querySelector('#allo-look-box .allo-entry')" % i, 5000):
+                fails.append("open it did not open the entry")
+            else:
+                entry = text("#allo-look-box .allo-entry")
+                if "#" + tag not in entry or "github" not in entry or "harbourboard" not in entry or "mastodon" in entry:
+                    fails.append(f"the opened entry does not name its live faceplaces (and only those): {entry!r}")
+                if not d.js("document.querySelectorAll('#allo-look-box .allo-entry .allo-state-live').length === 2"):
+                    fails.append("the opened entry's faceplaces do not say live")
+        d.js("(() => { const q = document.getElementById('allo-look'); q.value = '#ts7de32a5bnz';"
+             " q.dispatchEvent(new Event('input', {bubbles: true})); return true; })()")
+        d.click("[data-dlg='allo-look']")
+        if not _wait_js(d, "!DLG.allo.busy && Array.isArray(DLG.allo.look.result) && DLG.allo.look.result.length === 1"
+                           " && DLG.allo.look.result[0].tag === 'ts7de32a5bnz' && DLG.allo.look.open === 0", 10000):
+            fails.append("a #tag did not find its one listing, opened: " + text("#allo-look-box"))
+        # Signed out: the list asks for the sign-in, plainly.
+        d.click("[data-dlg='allo-signout']")
+        if not _wait_js(d, "DLG.allo.connect && DLG.allo.connect.signed_in === false && DLG.allo.held === null"
+                           " && !!document.querySelector('#allo-held .thym-note')", 10000):
+            fails.append("signed out, the proofs list does not ask for the sign-in: " + text("#allo-held"))
+    finally:
+        d.js_await("(async () => { const post = (u, b) => fetch(u, {method: 'POST', headers: {'Content-Type':"
+                   " 'application/json'}, body: JSON.stringify(b)}); try { dlgClose(); } catch (e) {}"
+                   " await post('/api/allograph/withdraw', {path: %s}); await post('/api/connect/sign-out', {});"
+                   " return true; })()" % json.dumps(ALLO_HOLO))
+        _reset(d)
+    return fails
+
+
 # ---------------------------------------------------------------------------
 # 0.8 (W4-FP): the card of an authored fabulac — begin, entail, test
 # ---------------------------------------------------------------------------
@@ -5615,6 +5736,7 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.7: Thym's runtime in the page (P3), the allograph and its registry (P4) ---
     "thym-run-here": scenario_thym_run_here,
     "allograph-panel": scenario_allograph_panel,
+    "allograph-proofs": scenario_allograph_proofs,
     # --- 0.8: the card of an authored fabulac (W4-FP) ---
     "fabulac-first": scenario_fabulac_first,
 }
