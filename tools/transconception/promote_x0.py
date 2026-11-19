@@ -29,7 +29,19 @@ With `--target TARGET_MD SPIKE_VERDICT` (given once per weighed language), the h
 of that language, in the shape MacroCOSM 18.4.9 pins: each `weighed` point named by its number (A7 wrote the keys
 `stewardship` … `can-be-left`, which `enough.transconception.point_number` reads), and the spike's level read from
 the judge's verdict on the spike (`enough.transconception.spike_from_verdict`: only the spike's own cases count), with
-the verdict file's path and sha256. Everything else of the weighing is as A7 wrote it.
+the verdict file's path and sha256. A `provides` row the shape expects a `gap` on and A7 wrote none gets one: the
+rows A7's verdict names in its numbered list of what "must be written or fetched" take that item's words (`named_gaps`),
+and any other row provided by a library, a binding or nothing takes `weigh`'s own rule (`<by>: <what>`). Everything
+else of the weighing is as A7 wrote it.
+
+With `--ground CLONE` (0.8, pins 25), the fabulac is grounded with 0.8's ground catalogue: the move `ground`'s pure
+core (`enough.thym.moves.transconceive.ground_fabula`) over the clone's files read as text, never run, imported or
+installed; the clone must be the tree the fabulac was made from. Each reliance it raises that the fabulac did not hold
+carries the owner's ruling of 2026-11-19 (`kept`, for every target: `GROUND_RULING`), and the transconceiver says it
+ruled them. A7's weighings predate the ground, so each weighed target gains a `provides` row, by `weigh`'s own rules
+from the language's target table (`answered: rules`), for each reliance the ground raised (`ground_rows`); no row A7
+wrote, no point, verdict or condition changes. Grounding holds every `ENOUGH_*` seam at a scratch value first (`_scratch_seams`): nothing reaches the
+network or a person's ~/enough.
 """
 from __future__ import annotations
 
@@ -167,10 +179,48 @@ def hand_weighing(md_text: str) -> dict:
     raise ValueError("no N:target item in a YAML block of the weighing")
 
 
+_NAMED_GAP = re.compile(r"^\d+\. \*\*(.+?)\*\*\s*\(([^)]*)\)", re.M)
+_RELIANCE_REF = re.compile(r"\b[A-Z]-R\d+\b")
+GAP_BY = ("library", "binding", "cannot")      # the rows `weigh` names a gap on when the reply names none
+
+
+def named_gaps(md_text: str) -> dict[str, str]:
+    """The gaps A7's weighing names in its verdict: each numbered item of the `## Verdict` section (`1. **What** (V-R02,
+    V-R27; ...)`), the reliances in its parentheses, its bold words. A verdict with no numbered list names none."""
+    section = md_text.split("## Verdict", 1)[1].split("\n## ", 1)[0] if "## Verdict" in md_text else ""
+    out: dict[str, str] = {}
+    for m in _NAMED_GAP.finditer(section):
+        for ref in _RELIANCE_REF.findall(m.group(2)):
+            out.setdefault(f"C:reliance/{ref}", m.group(1).strip())
+    return out
+
+
+def gaps_in(t: dict, named: dict[str, str]) -> list[str]:
+    """Each `provides` row the shape expects a `gap` on and A7 left without one gets it: A7's own words for a row its
+    verdict names (`<words> (<by>)`), `weigh`'s rule (`<by>: <what>`) for a library, binding or `cannot` row. Returns
+    the rows given one."""
+    given = []
+    for row in t.get("provides") or []:
+        if not isinstance(row, dict) or row.get("gap"):
+            continue
+        if row.get("for") in named:
+            row["gap"] = f"{named[row['for']]} ({row.get('by')})"
+        elif row.get("by") in GAP_BY:
+            row["gap"] = f"{row['by']}: {row.get('what')}"
+        else:
+            continue
+        given.append(str(row["for"]))
+    unknown = sorted(set(named) - {str(r.get("for")) for r in t.get("provides") or [] if isinstance(r, dict)})
+    if unknown:
+        raise ValueError(f"{t['id']}: the verdict names gaps no provides row is for: {', '.join(unknown)}")
+    return given
+
+
 def weighed_in(nodes: list[dict], target: dict, verdict: dict, verdict_digest: str, verdict_rel: str, *,
-               at: str | None) -> dict:
+               at: str | None, named: dict[str, str] | None = None) -> dict:
     """A hand weighing written into the nodes in place of the language's placeholder, in the pinned shape: points by
-    number, the spike's level from the judge's verdict on it. Returns the item written."""
+    number, the spike's level from the judge's verdict on it, a gap on each row the shape expects one on
+    (`gaps_in`). Returns the item written."""
     from enough import transconception as tc
     t = _strings(target, _fix)
     for w in t.get("weighed") or []:
@@ -179,6 +229,7 @@ def weighed_in(nodes: list[dict], target: dict, verdict: dict, verdict_digest: s
             raise ValueError(f"{t['id']}: {w.get('point')!r} is none of the twelve points")
         w["point"] = n
     t["weighed"] = sorted(t.get("weighed") or [], key=lambda w: w["point"])
+    gaps_in(t, named or {})
     t["spike"] = tc.spike_from_verdict(t.get("spike") or {}, verdict, where=verdict_rel, digest=verdict_digest, at=at)
     for i, n in enumerate(nodes):
         if n.get("id") == t["id"]:
@@ -188,6 +239,100 @@ def weighed_in(nodes: list[dict], target: dict, verdict: dict, verdict_digest: s
             return t
     nodes.append(t)
     return t
+
+
+#: The owner's ruling on the reliances 0.8's ground raises in the experiment's fabulacs (enough-dev docs/v080-pins.md
+#: section 25, 2026-11-19, by questionnaire): `kept`, as proposed, for every target.
+GROUND_RULED_ON = "2026-11-19"
+GROUND_RULED_IN = "enough-dev docs/v080-pins.md section 25 (2026-11-19, by questionnaire)"
+GROUND_RULING = {"is": "kept", "by": NEW_MAKER, "on": GROUND_RULED_ON,
+                 "said": "pins 25: the reliances 0.8's ground catalogue raised in the experiment's fabulacs are kept, "
+                         "as proposed, recorded as the owner's"}
+
+
+def _scratch_seams() -> None:
+    """Every ENOUGH_* seam at a scratch value, every behaviour seam removed, as the test suite and tally's maker do:
+    grounding by hand must never reach the network (the language library's fetch) or a person's ~/enough."""
+    import tempfile
+    from enough import seams
+    scratch = Path(tempfile.mkdtemp(prefix="promote-x0-seams-"))
+    for name in seams.BEHAVIOUR_SEAMS:
+        os.environ.pop(name, None)
+    for name, value in seams.scratch_env(scratch, {}).items():
+        if name.startswith("ENOUGH_"):
+            os.environ[name] = value
+
+
+def grounded(doc: dict, root: Path, *, at: str) -> tuple[dict, list[str], dict]:
+    """The fabulac grounded with 0.8's ground catalogue over `root` read as text (the move `ground`'s pure core, as
+    `tests/test_ground.py` calls it), each new reliance ruled as the owner ruled (`GROUND_RULING`). Returns the
+    fabulac, the new reliances' ids, and what the ground found."""
+    from enough import repo_engine as RE
+    from enough.thym import folder as FO
+    from enough.thym.moves import transconceive as TR
+    cat = {k: v for k, v in doc.items() if k != "nodes"}
+    if mc.tree_digest(root)["tree"] != (cat.get("source") or {}).get("tree"):
+        raise ValueError(f"{root} is not the tree the fabulac was made from (source.tree)")
+    f = FO.read(root)
+    uses = {e.path: RE.uses(e.path, f.text(e.path)) for e in f.texts()
+            if e.path.endswith((".py", ".pyi")) and not TR.is_tooling(e.path)}
+    locks = {e.path: RE.locks(e.path, f.text(e.path)) for e in f.texts() if TR._lock_file(e.path)}
+    had = {n["id"] for n in doc["nodes"]}
+    cat2, items, found = TR.ground_fabula(cat, doc["nodes"], uses, RE.catalogue(cat["source"]["language"]),
+                                          locks=locks, swhid=RE.swhid(root),
+                                          run={"program": "ground", "mode": "rules", "at": at,
+                                               "by": "tools/transconception/promote_x0.py --ground (0.8's catalogue, "
+                                                     f"{found_catalogue()})"})
+    new = [it["id"] for it in items if it["id"] not in had]
+    for it in items:
+        if it["id"] in new and it.get("type") == "reliance" and not it.get("ruling"):
+            it["ruling"] = [dict(GROUND_RULING)]
+        if it["id"] == NEW_MAKER:
+            ri = list(it.get("ruled-in") or [])
+            if GROUND_RULED_IN not in ri:
+                it["ruled-in"] = ri + [GROUND_RULED_IN]
+            line = (" On 2026-11-19 the owner ruled the reliances 0.8's ground catalogue raised kept, as proposed "
+                    "(pins 25).")
+            if line.strip() not in str(it.get("summary")):
+                it["summary"] = str(it.get("summary") or "").rstrip() + line
+    return {**cat2, "nodes": items}, new, found
+
+
+GROUND_ROWS_SOURCE = ("rows for the reliances 0.8's ground raised, by `weigh`'s rules from the target table "
+                      "(promote_x0.py --ground, 2026-11-19); every row A7 wrote is as it wrote it")
+
+
+def ground_rows(doc: dict, raised: list[str]) -> dict[str, list[str]]:
+    """A7's hand weighings give a `provides` row for every reliance x0 wrote, and none for those the ground raised
+    after them, which `target-confirmed` asks a row for. Each weighed target gains, for each raised reliance with no
+    row, the row `weigh`'s rules give it from the language's target table (`answered: rules`); nothing A7 wrote is
+    changed, and no point, verdict or condition is weighed again. Returns the rows added, by target."""
+    from enough import transconception as tc
+    from enough.thym.moves import transconceive as TR
+    cat = {k: v for k, v in doc.items() if k != "nodes"}
+    added: dict[str, list[str]] = {}
+    for t in [n for n in doc["nodes"] if n.get("type") == "target" and n.get("verdict")]:
+        language = str(t.get("language") or "")
+        answer = tc.target_table(language)
+        if not answer.get("ok"):
+            continue
+        rows = {r["for"]: r for r in TR.weigh_rules(cat, doc["nodes"], language, answer)["target"]["provides"]}
+        have = {r.get("for") for r in t.get("provides") or [] if isinstance(r, dict)}
+        new = [rows[r] for r in raised if r in rows and r not in have]
+        if not new:
+            continue
+        t["provides"] = list(t.get("provides") or []) + new
+        prov = t.setdefault("provenance", {})
+        if GROUND_ROWS_SOURCE not in (prov.get("sources") or []):
+            prov["sources"] = list(prov.get("sources") or []) + [GROUND_ROWS_SOURCE]
+        added[str(t["id"])] = [r["for"] for r in new]
+    return added
+
+
+def found_catalogue() -> str:
+    from enough import languages as L
+    head = L.catalogue("python")
+    return f"python ground catalogue, {len(L.entries('python'))} entries, version {head.get('version')}"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -200,7 +345,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--cshort", default="told/py-roundtrip/", help="the cshort's path as the x0 fabulac sees it")
     ap.add_argument("--target", nargs=2, action="append", type=Path, default=[], metavar=("TARGET_MD", "SPIKE_VERDICT"),
                     help="a hand weighing (A7's target-<language>.md) and the judge's verdict on its spike")
+    ap.add_argument("--ground", type=Path, default=None, metavar="CLONE",
+                    help="ground with 0.8's catalogue over the clone the fabulac was made from, read as text")
+    ap.add_argument("--ground-at", default="2026-11-19T12:00")
     a = ap.parse_args(argv)
+    if a.ground is not None:
+        _scratch_seams()
     doc = mc.yaml_load(a.fabulac.read_text(encoding="utf-8"))
     raw = a.verdict.read_bytes()
     rel = os.path.relpath(a.verdict.resolve(), a.fabulac.resolve().parent)
@@ -210,10 +360,18 @@ def main(argv: list[str] | None = None) -> int:
         sraw = spike_verdict.read_bytes()
         srel = os.path.relpath(spike_verdict.resolve(), a.fabulac.resolve().parent)
         stamp = _RESULTS_STAMP.search(srel)
-        t = weighed_in(new["nodes"], hand_weighing(md.read_text(encoding="utf-8")), json.loads(sraw),
+        md_text = md.read_text(encoding="utf-8")
+        t = weighed_in(new["nodes"], hand_weighing(md_text), json.loads(sraw),
                        hashlib.sha256(sraw).hexdigest(), srel,
-                       at=f"{stamp.group(1)}T{stamp.group(2)}:{stamp.group(3)}" if stamp else None)
-        print(t["id"], t["verdict"], "spike level", t["spike"]["level"])
+                       at=f"{stamp.group(1)}T{stamp.group(2)}:{stamp.group(3)}" if stamp else None,
+                       named=named_gaps(md_text))
+        print(t["id"], t["verdict"], "spike level", t["spike"]["level"],
+              "gaps", [r["for"] for r in t.get("provides") or [] if r.get("gap")])
+    if a.ground is not None:
+        new, raised, found = grounded(new, a.ground, at=a.ground_at)
+        print("ground:", len(found["entries"]), "entries shown;", len(raised), "new items:", ", ".join(raised))
+        for tid, rows in ground_rows(new, raised).items():
+            print(f"{tid}: {len(rows)} rows by weigh's rules for the reliances the ground raised")
     a.out.write_text(dump(new), encoding="utf-8")
     print(a.out, len(new["nodes"]), "items")
     return 0

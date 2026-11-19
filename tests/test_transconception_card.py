@@ -157,7 +157,7 @@ def test_the_card_says_each_gate_and_each_check(seeded: Path):
     # the open questions keep `ruled` from holding, each named with why (a skipped question blocks the gate)
     assert keep["checks"]["ruled"]["state"] == "fails"
     assert any("asks for its ruling and stands open" in e for e in keep["checks"]["ruled"]["errors"])
-    assert keep["checks"]["stands-alone"]["state"] == "fails"
+    assert keep["checks"]["stands-alone"]["state"] == "holds"         # grounded with 0.8's catalogue (pins 25)
     # no source beside it: what needs it is not measured, and says why
     assert keep["checks"]["nothing-carried"]["state"] == "not measured" and keep["checks"]["nothing-carried"]["why"]
     assert c["source-here"] is False
@@ -181,7 +181,7 @@ def test_the_card_lists_the_rulings_queue(seeded: Path):
 
 def test_the_ground_says_what_came_of_each_citation(seeded: Path):
     g = tc.card(seeded, library=FakeLibrary())["ground"]
-    assert g["library"] is True and len(g["items"]) == 37
+    assert g["library"] is True and len(g["items"]) == 37 + 67      # x0's reliances and assumptions, the ground's
     states = g["states"]
     assert states["fetching"] >= 1 and states["resolved"] >= 1 and states["not-aboard"] >= 1 and states["nowhere"] >= 1
     r01 = next(x for x in g["items"] if x["id"] == "C:reliance/V-R01")

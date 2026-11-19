@@ -449,30 +449,49 @@ def test_the_needs_name_every_reliance_the_experiment_wrote():
 @needs_clones
 @pytest.mark.parametrize("name,needs", [("vulture", VULTURE_NEEDS), ("sloppy-xml-py", SLOPPY_NEEDS)])
 def test_the_survey_raises_on_the_experiments_clones_what_its_writers_needed(name, needs):
+    """The promoted fixtures are grounded (promote_x0.py --ground, pins 25). Taken back to before the ground (its
+    reliances and the source's swhid left out), stands-alone finds W1-X1's list; grounded again from there over the
+    clone, the ground raises what the fixture holds, item for item (the owner's ruling aside); and grounding the
+    fixture once more adds nothing."""
     fab, root = PROMOTED / f"{name}.fabulac.cosm", CLONES / name
     data = mc.yaml_load(fab.read_text(encoding="utf-8"))
     assert mc.tree_digest(root)["tree"] == data["source"]["tree"]          # the clone the fixture was made from
-    before = stands_alone({k: v for k, v in data.items() if k != "nodes"}, data["nodes"])
+    cat = {k: v for k, v in data.items() if k != "nodes"}
+    bare_cat = {**cat, "source": {k: v for k, v in cat["source"].items() if k != "swhid"}}
+    raised = {n["id"] for n in data["nodes"] if str(n["id"]).startswith(("C:reliance/", "P:assumption/"))
+              and isinstance(n.get("entry"), str)}                  # a catalogue entry's (a C:file's is True)
+    bare = [n for n in data["nodes"] if n["id"] not in raised]
+    before = stands_alone(bare_cat, bare)
     assert {i for i, _f, _m in before} == set(STANDS_ALONE_FIXED[name])    # W1-X1's findings, held here too
-    cat, items, grounds = ground(fab, root)
+    f = FO.read(root)
+    locks = {e.path: RE.locks(e.path, f.text(e.path)) for e in f.texts() if TR._lock_file(e.path)}
+    cat2, items, grounds = TR.ground_fabula(bare_cat, bare, uses_of(root), RE.catalogue("python"), locks=locks,
+                                            swhid=RE.swhid(root))
     want = {e for eids in needs.values() for e in eids}
     assert want <= set(grounds["entries"]), sorted(want - set(grounds["entries"]))
     # with ground applied, the items W1-X1 listed no longer fail stands-alone: each is used by the reliance that says it
-    assert stands_alone(cat, items) == []
+    assert stands_alone(cat2, items) == [] and stands_alone(cat, data["nodes"]) == []
     by = {it["id"]: it for it in items}
     for iid, eid in STANDS_ALONE_FIXED[name].items():
         assert iid in by[f"C:reliance/{eid}"]["used-by"], (iid, eid)
+    assert cat2["source"]["swhid"] == cat["source"]["swhid"]
     assert cat["source"]["swhid"]["rev"] == f"swh:1:rev:{data['source']['commit']}"
-    assert TR.cited_problems(cat, items) == []
+    assert TR.cited_problems(cat, data["nodes"]) == []
+    # the fixture's ground items are what the ground raises, the owner's ruling (pins 25) aside
+    held = {n["id"]: {k: v for k, v in n.items() if k != "ruling"} for n in data["nodes"] if n["id"] in raised}
+    assert held == {i: it for i, it in by.items() if i in raised}
+    assert set(by) == {n["id"] for n in data["nodes"]}
+    assert set(held) == {f"C:reliance/{e}" for e in grounds["entries"]} | {
+        i for i in held if i.startswith("P:assumption/")}
     # x0's own reliances and every other item stay as they were
     from enough.thym.moves.edit import _within
-    assert all(_within(o, by[o["id"]]) for o in data["nodes"])
-    # the gate: stands-alone holds now; what still stops ready-to-keep is that the new reliances are not yet ruled
-    vol = volume(cat, items, f"{name}.fabulac.cosm")
-    gate = tc.ready_to_keep(vol, source=root)
-    assert gate["checks"]["stands-alone"]["state"] == "holds", gate["checks"]["stands-alone"]
-    assert gate["checks"]["ground-cited"]["state"] == "holds", gate["checks"]["ground-cited"]
-    assert not gate["holds"] and gate["checks"]["ruled"]["state"] != "holds"
+    assert all(_within(o, by[o["id"]]) for o in bare)
+    # grounded once more, the fixture gains nothing
+    _cat3, again, _ = ground(fab, root)
+    assert again == data["nodes"]
+    # the gate: every check of it holds, the new reliances ruled kept by the owner (pins 25)
+    gate = tc.ready_to_keep(fab, source=root)
+    assert gate["holds"], gate["do-not-hold"]
 
 
 # ---------------------------------------------------------------------------

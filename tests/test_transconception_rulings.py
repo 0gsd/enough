@@ -4,7 +4,7 @@ question blocking gate 1's `ruled`, and the judge's differences come back as que
 enough/dialectic.py, enough/thym/moves/dialectic.py, the banks in defaults/cosm/manifests/fabula.manifest.cosm;
 MacroCOSM OES 18.4.9 and 18.6.6.
 
-The sitting is simulated on the converted vulture fixture (tests/fixtures/fabula/transconception/), no model: its 439
+The sitting is simulated on the converted vulture fixture (tests/fixtures/fabula/transconception/), no model: its 506
 rulings are taken back to what a reading leaves while unruled (a pending entry with its proposal; an item with only a
 bare `kept` has no ruling at all, proposed `kept` by default), the questions are raised, a person's answers are
 written as an answers volume (data), recorded, settled, and every ruling comes back as it was, with gate 1's `ruled`
@@ -157,13 +157,13 @@ def sitting():
 
 def test_one_sitting_rules_the_whole_fabulac(sitting):
     led, was, asked, s = sitting["led"], sitting["was"], sitting["asked"], sitting["settled"]
-    assert len(was) == 219 and sum(len(v) for v in was.values()) == 439
+    assert len(was) == 286 and sum(len(v) for v in was.values()) == 506
     covered = sum(1 + len(q.get("batch") or []) for q in asked)
     needed = 0
     for iid, v in was.items():                                        # a bare kept: one default question; else each
         bare = all(set(x) <= {"is", "by", "on", "said"} and x["is"] == "kept" for x in v)
         needed += 1 if bare and not iid.startswith("P:case/") else len(v)
-    assert covered == needed == 439
+    assert covered == needed == 506
     assert len(asked) < covered / 3                                   # batches: far fewer questions than rulings
     assert len(sitting["rec"].recorded) == len(asked) and not sitting["rec"].refused
     assert len(s.settled) == len(asked) and not s.counters and not s.needs_reading and not s.waiting
@@ -171,7 +171,7 @@ def test_one_sitting_rules_the_whole_fabulac(sitting):
         assert shape(led.item(iid)["ruling"]) == shape(rs), iid
     g = tc.ready_to_keep(led.volume())
     assert g["checks"]["ruled"] == {"state": "holds", "errors": [], "warnings": [], "notes": []}
-    assert lint_errors(led) == sitting["before"]                      # nothing else moved: stands-alone's nine stay
+    assert lint_errors(led) == sitting["before"]                      # nothing else moved
 
 
 def test_the_sitting_writes_only_the_asked_with_the_session_as_provenance(sitting):
@@ -217,13 +217,13 @@ def test_the_riskiest_are_asked_first(sitting):
 def test_a_fresh_fabulac_is_ruled_in_a_handful_of_batches():
     t = twin()
     led = t.ledger
-    assert strip_all(led) == 219
+    assert strip_all(led) == 286
     r = dl.raise_questions(led, at=RAISED)
     asked = ruling_qs(r.questions)
     # one question per kind, every item proposed kept; cases carry no ruling, so none is asked of them
     assert [q["raised"]["from"] for q in asked] == [f"{RULINGS_BANK}/{k}" for k in
                                                      ("interface", "behaviour", "reliance", "setting", "structure")]
-    assert [1 + len(q["batch"]) for q in asked] == [85, 71, 33, 17, 6]
+    assert [1 + len(q["batch"]) for q in asked] == [85, 71, 100, 17, 6]
     first = led.item(asked[0]["about"].partition("#")[0])
     assert first["surface"] in ("command", "format", "stream")       # the riskiest: what a user types or reads
     assert all(q["proposed"] == {"is": "kept"} and q["to"] == "transconceiver" and q["kind"] == "choice"
