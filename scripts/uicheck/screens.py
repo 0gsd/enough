@@ -100,6 +100,15 @@ FAB_TINY = "works/tiny-tool"
 FAB_POEM = "works/rain.md"
 FAB_LETTER = "works/letter.md"
 FAB_LYRIC = "works/lantern-song.txt"            # 0.7 (V2c): a lyric for the fabulap card's build in steps
+# 0.8 (W4-FP): authored fabulacs, seeded by server._seed_fabulac_first() (a tool entailed and in step, the
+# same with a hand edit, one begun from nothing by rules, a service; one entailed copy and one empty
+# folder per language for the scenario).
+FAP_MADE = "made/tally.fabulac.cosm"
+FAP_EDITED = "edited/tally.fabulac.cosm"
+FAP_ASKED = "asked/linecount.fabulac.cosm"
+FAP_SERVED = "served/greet.fabulac.cosm"
+FAP_RAN = "ran-{lang}/tally"
+FAP_FIRST = "first-{lang}"
 # The dialectic (0.6, U1b), seeded by server._seed_dialectic() in talks/: the
 # morning-close guide's fabulan with one open question of every kind, the same
 # with a sitting written and not settled, the same with no questions at all,
@@ -354,6 +363,35 @@ FAB_READY: Step = ("eval_await", """(async () => {
   }
   return true; })()""")
 FAB_CLOSE: Step = ("eval", "(() => { try { fabCardClose(); } catch (e) {} return true; })()")
+#: 0.8 (W4-FP): the card of an authored fabulac has read what it shows (the starters on the begin face,
+#: GET /api/fabulac/status on the authored one) and no request of its own is in flight.
+FAP_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(FAB.open && (FAB.face === 'begin' ? FA.starters !== null
+       : (FA.status !== null && !FA.checking && !FA.sending))); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: A sandbox run's result as the card shows it, recorded from a real run of the seeded tally's tool
+#: (`tally count notes.md` with notes.md handed over), so the screen runs nothing itself.
+FAP_RUN_RESULT: Step = ("eval", """(() => {
+  FA.rresult = {run_id: '20261119-104512-5e1c0d2a', run: '20261119-104512-5e1c0d2a', what: 'tool', exit_code: 0,
+    stdout: '3\\n', stderr: '', stdout_truncated: false, stderr_truncated: false, wall_time: 0.083,
+    stopped_by: null, stopped: null, refused: [], enforced: true, mechanism: 'sandbox-exec',
+    guarantees: {network: 'denied by sandbox-exec',
+      writes: "only in the run's work, home and tmp folders (sandbox-exec)",
+      reads: "only the run folder, the system's libraries and the interpreter's own files (sandbox-exec); file metadata elsewhere stays readable",
+      processes: 'only the interpreter may be started (sandbox-exec)',
+      memory: 'not limited: macOS does not enforce a memory limit, so none is promised',
+      time: '120 s wall clock, 60 s CPU', output: '1000000 bytes kept of each stream',
+      disk: '200000000 bytes in the run folder (measured every 0.2 s), 50000000 bytes in any one file',
+      packages: 'standard-library'},
+    handed_over: ['notes.md'], disk_used: 4096, ok: true, message: 'the tool exited with 0',
+    fabulac: 'made/tally.fabulac.cosm'};
+  FA.args = 'count notes.md'; FA.hand = 'notes.md';
+  fabCardPaint();
+  const g = document.querySelector('#fab-run details.fap-guar'); if (g) g.open = true;
+  document.getElementById('fab-run').scrollIntoView({block: 'start'});
+  return true; })()""")
 #: The cshort / catem viewer has its file (a cshort: its first file's text too).
 FABV_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem'
@@ -1144,6 +1182,58 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
            teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
            note="a catem at depth overview: its depth line, the markdown, its footer"),
+
+    # --- 0.8 (W4-FP): the card of an authored fabulac ---
+    Screen("fabulac-begin", "project",
+           setup=(("eval_await", "(async () => { await fapBeginOpen('made'); return true; })()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="begin a fabulac in made/: tool, library or service (each said in a line), its name and what "
+                "it writes, from a starter (the tool starter's line and its cases) / a brief / nothing, the "
+                "licence and the author, begin (off until a name is given)"),
+
+    Screen("fabulac-authored", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_MADE}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the starter tool entailed and in step: its kind and licence, the interview's six stages, "
+                "add (requirement / decision / case / interface) and check, a head, the model line, entail "
+                "again with seven files in step, run its tests, its arguments, files handed over, its input"),
+
+    Screen("fabulac-interview", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_ASKED}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a tool begun from nothing by rules: the first stage open (5 asked), the two questions shown, "
+                "each with its answer box, send these answers, every question in the questions card"),
+
+    Screen("fabulac-hand-edit", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_EDITED}', 'compile'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY,
+                  ("eval", "document.getElementById('fab-compile').scrollIntoView({block: 'start'})"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="tally/__main__.py changed by hand: its row with write over it / keep it / take it back, what "
+                "the three choices do, entail again off until one is chosen"),
+
+    Screen("fabulac-run-result", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_MADE}', 'run'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, FAP_RUN_RESULT,
+                  ("wait_for", "#fab-run .fap-result"), ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a tool's run in the sandbox (a recorded result, nothing runs here): its message, exit and "
+                "time, the box held it, its output, and what the box promised for the run, opened"),
+
+    Screen("fabulac-service", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_SERVED}', 'run'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY,
+                  ("eval_await", "(async () => { await fapRunGo('tests');"
+                                 " for (let i = 0; i < 100 && !FA.rerror; i++) await new Promise((r) => setTimeout(r, 50));"
+                                 " document.getElementById('fab-run').scrollIntoView({block: 'start'}); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a service entailed: run its tests is refused before anything is copied, in the server's "
+                "sentence (serving comes in a later minor); no arguments or run it for a service"),
 
     # --- 0.6, the fabula round (U1b): the dialectic card, a holograph, its isograph ---
     Screen("dialectic-card", "project",

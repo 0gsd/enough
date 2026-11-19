@@ -43,7 +43,7 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
                       THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM,
-                      SCAFFOLD_READY)
+                      SCAFFOLD_READY, FAP_FIRST, FAP_RAN)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -5377,6 +5377,147 @@ def scenario_allograph_panel(d: Driver) -> list[str]:
     return fails
 
 
+# ---------------------------------------------------------------------------
+# 0.8 (W4-FP): the card of an authored fabulac — begin, entail, test
+# ---------------------------------------------------------------------------
+
+_FAP_OK = ("FAB.open && (FAB.face === 'begin' ? FA.starters !== null"
+           " : (FAB.face === 'authored' && FA.status !== null))")
+# Every POST the page makes, with its headers, and (while `__fapStub` names a route) a recorded answer in
+# place of the server's: the way the other scenarios stand in for a model that is not running here.
+_FAP_WIRE = ("(() => { window.__fapPosts = []; window.__fapStub = null; if (!window.__fapFetch) {"
+             " window.__fapFetch = window.fetch;"
+             " window.fetch = (u, o) => { const url = String(u);"
+             "  if (o && o.method === 'POST') { try { window.__fapPosts.push({url, headers: o.headers || {},"
+             "   body: typeof o.body === 'string' ? o.body : ''}); } catch (e) {} }"
+             "  if (window.__fapStub && url === window.__fapStub.url) {"
+             "   return Promise.resolve(new Response(JSON.stringify(window.__fapStub.answer),"
+             "    {status: 200, headers: {'Content-Type': 'application/json'}})); }"
+             "  return window.__fapFetch(u, o); }; } return true; })()")
+_FAP_UNWIRE = ("(() => { if (window.__fapFetch) { window.fetch = window.__fapFetch; window.__fapFetch = null; }"
+               " window.__fapStub = null; return true; })()")
+
+
+def _fap_menu(d: Driver, path: str) -> list[str]:
+    """The tree's option-click menu on `path`, built from its row as the tree's own handler builds it."""
+    acts = d.js("(() => { const li = document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']');"
+                " if (!li) return null; showTreeContextMenu(40, 40, {kind: li.dataset.kind, path: li.dataset.path,"
+                " name: li.dataset.name, holotype: li.dataset.holotype === '1', emf: li.dataset.emfState || '',"
+                " fabAuthored: li.dataset.fabAuthored === '1', fabTwin: li.dataset.fabTwin || ''});"
+                " return Array.from(document.querySelectorAll('#tree-context-menu .ctx-item')).map((b) => b.dataset.act); })()"
+                % json.dumps(path))
+    return acts or []
+
+
+def scenario_fabulac_first(d: Driver) -> list[str]:
+    """Fabulac-first in the page, once per language. A folder's option-click menu offers "begin a fabulac
+    here…" → the begin face, begin off until a name is typed → a tool from the starter: at once, the card turns
+    to the authored face, the fabulac is on disk, the POST carried the promise header → entail, with a
+    RECORDED model's answer standing in for the route (no model runs in the browser check: the stub answers
+    POST /api/fabulac/entail with a finished job, and the card shows its words) → the seeded entailed copy's
+    tests run in the sandbox for real (macOS sandbox-exec): passed, three ran, the box held them, the header
+    sent → its folder's menu keeps the twin guard: entail again, test and run, what moved, and no "build its
+    fabulac…"."""
+    fails: list[str] = []
+    _reset(d)
+    lang = _dlg_lang(d)
+    first, ran = FAP_FIRST.format(lang=lang), FAP_RAN.format(lang=lang)
+    d.js(_FAP_WIRE)
+    try:
+        d.js("htmx.ajax('GET', '/api/files', {target: '#tree', swap: 'innerHTML'})")
+        _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(first), 10000)
+        acts = _fap_menu(d, first)
+        if "fap-begin" not in acts:
+            fails.append(f"a folder's menu has no \"begin a fabulac here…\": {acts}")
+            d.js("hideTreeContextMenu()")
+            d.js(f"fapBeginOpen({json.dumps(first)})")
+        else:
+            d.click('#tree-context-menu [data-act="fap-begin"]')
+        if not _ready(d, _FAP_OK) or d.js("FAB.face") != "begin":
+            fails.append(f"the begin face did not open: {d.js('FAB.face')}")
+            return fails
+        if not d.js("document.getElementById('fab-go').disabled"):
+            fails.append("begin is offered before the program has a name")
+        if d.js("(document.querySelector('#fab-main input[name=\"fap-way\"]:checked') || {}).value") != "starter":
+            fails.append("the begin face should start from a starter")
+        d.focus("#fap-name")
+        d.type_text("tally")
+        if d.js("document.getElementById('fab-go').disabled"):
+            fails.append("begin stays off with a name typed")
+        d.click("#fab-go")
+        fab = f"{first}/tally.fabulac.cosm"
+        if not _wait_js(d, "FAB.face === 'authored' && FA.status !== null && FA.path === %s" % json.dumps(fab), 20000):
+            fails.append(f"beginning from the starter did not turn the card to {fab}: {d.js('[FAB.face, FA.path, FA.aerror]')}")
+            return fails
+        text = _raw(d, fab) or ""
+        if "kind: authored" not in text or "name: tally" not in text:
+            fails.append(f"{fab} is not an authored fabulac on disk: {text[:160]!r}")
+        st = d.js("(() => ({kind: (FA.status.program || {}).kind, said: (document.querySelector('#fab-main .thym-fits') || {}).textContent || '',"
+                  " entailed: !!(FA.status.entailment && FA.status.entailment.entailed)}))()") or {}
+        if st.get("kind") != "tool" or not st.get("said") or st.get("entailed"):
+            fails.append(f"the authored face should say a tool begun from the starter, not entailed yet: {st}")
+        posts = d.js("window.__fapPosts") or []
+        begin = [x for x in posts if x.get("url") == "/api/fabulac/begin"]
+        if not begin or (begin[-1].get("headers") or {}).get("X-Enough-Api") != "1" or '"starter":"tool"' not in begin[-1].get("body", ""):
+            fails.append(f"begin did not POST the starter with the promise header: {begin}")
+
+        # Entail, the route's answer recorded (a scripted model's run of the seeded tally: 7 files).
+        answer = {"job": {"id": f"uicheck-entail-{lang}", "kind": "fabulac-entail", "state": "done", "path": fab,
+                          "mode": "model", "message": "done",
+                          "result": {"fabulac": fab, "entailed": f"{first}/tally/", "files": 7, "mode": "model",
+                                     "route": "local", "model": "scripted-1",
+                                     "message": "wrote tally/ (7 files) — a recorded model's answer"}}}
+        d.js("window.__fapStub = %s" % json.dumps({"url": "/api/fabulac/entail", "answer": answer}))
+        d.click('#fab-compile button[data-fap="entail"]')
+        if not _wait_js(d, "!!(FA.eresult && FA.eresult.message)", 10000):
+            fails.append(f"the card did not take the entailment's answer: {d.js('[FA.ejob, FA.eerror]')}")
+        d.js("window.__fapStub = null")
+        said = d.js("(document.getElementById('fab-compile') || {}).textContent || ''") or ""
+        if "a recorded model's answer" not in said:
+            fails.append("the card does not show the entailment's words")
+        posts = d.js("window.__fapPosts") or []
+        ent = [x for x in posts if x.get("url") == "/api/fabulac/entail"]
+        if not ent or (ent[-1].get("headers") or {}).get("X-Enough-Api") != "1" or '"route":"local"' not in ent[-1].get("body", ""):
+            fails.append(f"entail did not POST with the promise header and route local: {ent}")
+
+        # Its tests in the sandbox, for real, on the seeded copy entailed by the scripted model.
+        d.js("fabCardClose()")
+        d.js(f"fapOpen({json.dumps(ran + '.fabulac.cosm')}, 'run')")
+        if not _ready(d, _FAP_OK):
+            fails.append("the authored card did not open on the entailed copy")
+            return fails
+        d.click('#fab-run button[data-fap="test"]')
+        if not _wait_js(d, "!!(FA.rresult || FA.rerror)", 90000):
+            fails.append("the tests did not finish in the sandbox")
+            return fails
+        r = d.js("(() => { const r = FA.rresult || {}; return {err: FA.rerror, ok: r.ok, ran: r.ran, enforced: r.enforced,"
+                 " out: (document.querySelector('#fab-run .fap-out') || {}).textContent || '',"
+                 " held: (document.querySelector('#fab-run .fap-held') || {}).className || '',"
+                 " promised: !!document.querySelector('#fab-run details.fap-guar dl dd')}; })()") or {}
+        if r.get("err") or not r.get("ok") or r.get("ran") != 3:
+            fails.append(f"the seeded tally's three tests should pass in the sandbox: {r}")
+        if not r.get("enforced") or "thym-refusal" in r.get("held", ""):
+            fails.append(f"the box should have held the run (macOS sandbox-exec): {r}")
+        if "Ran 3 tests" not in r.get("out", "") or not r.get("promised"):
+            fails.append(f"the card should show the output and what the box promised: {r}")
+        posts = d.js("window.__fapPosts") or []
+        test = [x for x in posts if x.get("url") == "/api/fabulac/test"]
+        if not test or (test[-1].get("headers") or {}).get("X-Enough-Api") != "1":
+            fails.append(f"test did not POST with the promise header: {test}")
+
+        # The twin guard: the folder it entailed is entailed again and run, never built.
+        d.js("fabCardClose()")
+        acts = _fap_menu(d, ran)
+        if not {"fap-entail", "fap-run", "fap-moved"} <= set(acts) or "fab-build" in acts:
+            fails.append(f"an authored fabulac's folder should offer entail, run and what moved, never build: {acts}")
+        d.js("hideTreeContextMenu()")
+    finally:
+        d.js(_FAP_UNWIRE)
+        d.js("(() => { try { hideTreeContextMenu(); fabCardClose(); } catch (e) {} return true; })()")
+        _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -5474,4 +5615,6 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.7: Thym's runtime in the page (P3), the allograph and its registry (P4) ---
     "thym-run-here": scenario_thym_run_here,
     "allograph-panel": scenario_allograph_panel,
+    # --- 0.8: the card of an authored fabulac (W4-FP) ---
+    "fabulac-first": scenario_fabulac_first,
 }
