@@ -449,14 +449,17 @@ def test_the_fabula_manifest():
                                                       "construe",
                                                       # 0.8: authoring a fabulac, thym 1 only (THYM 20.11)
                                                       "author", "add", "compare", "uncovered",
+                                                      # 0.8: running an authored entailment (THYM 20.12)
+                                                      "run",
                                                       # 0.8: a transconception's ground and weighing (THYM 20.10)
                                                       "ground", "weigh"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
     assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:6])
     assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:8])
     assert all(mv["code"].startswith("enough.thym.moves.author:") and mv["since"] == 1 for mv in m.data["moves"][8:12])
+    assert m.data["moves"][12]["code"] == "enough.thym.moves.run_entailment:run" and m.data["moves"][12]["since"] == 1
     assert all(mv["code"].startswith("enough.thym.moves.transconceive:") and mv["since"] == 1
-               for mv in m.data["moves"][12:])
+               for mv in m.data["moves"][13:])
     assert "emf-checks" in m.data["moves"][0]["contract"]
     assert all(m.matches_catalog(n) for n in ("close.md.fabulan.cosm", "rose.txt.fabulap.cosm",
                                                "tool.fabulac.cosm", "close.md.cosm"))
