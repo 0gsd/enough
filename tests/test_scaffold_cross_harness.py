@@ -329,3 +329,10 @@ def test_the_bundle_refuses_private_names(tmp_path):
         builder.refuse_private(stage, ["SKILL.md", "references/x.md"])
     (stage / "references" / "x.md").write_text("fine\n")
     builder.refuse_private(stage, ["SKILL.md", "references/x.md"])
+
+
+def test_the_page_shows_a_box_with_an_empty_plec_as_a_plec_to_write():
+    """A state may hold a box with no plec (a plectrum may not); the page takes it and says what is missing."""
+    page = TEMPLATE.read_text(encoding="utf-8")
+    assert '"[" + (b.plec || "plec to write") + "]"' in page
+    assert "no plec yet" not in page

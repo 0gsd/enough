@@ -390,7 +390,7 @@ var renderBox = function (b, f) {
   var count = el("span", "pl-count", "");
   head.appendChild(count);
   box.appendChild(head);
-  var plec = el("p", "plec", "[" + (b.plec || "no plec yet") + "]");
+  var plec = el("p", "plec", "[" + (b.plec || "plec to write") + "]");
   box.appendChild(plec);
   var slot = null, img = null, href = null;
   if (b.kind === "graphic") {
