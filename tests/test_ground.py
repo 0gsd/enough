@@ -558,3 +558,11 @@ def test_ground_refuses_a_folder_that_is_not_the_one_surveyed(tmp_path):
                                                          "path": str(f.relative_to(tmp_path))}])
     assert not g_run.landed
     assert "is not the folder f was surveyed from" in json.dumps(g_run.records, ensure_ascii=False)
+
+
+def test_the_module_exports_every_lanes_names():
+    """`__all__` is one list that each lane adds to: the ground's names stay in it beside the cases' and the rest."""
+    from enough.thym.moves import transconceive as TC
+    assert {"COPIED", "cited_problems", "ground", "ground_fabula", "shown", "CASES_SCAFFOLD", "entail_cases",
+            "gather_recorded", "weigh", "entail_in"} <= set(TC.__all__)
+    assert all(hasattr(TC, n) for n in TC.__all__)

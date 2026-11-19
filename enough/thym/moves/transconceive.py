@@ -21,8 +21,10 @@ reliance that says the same without the name. The same move pins what can be pin
 Heritage names it, and the commit's revision). A fabulac grounded again gains only what is new: an item it holds
 keeps every field, its `used-by` growing at the end.
 
-Like every move it reads no file and imports nothing outside `enough.thym` and `enough.macrocosm` (the package
-Comprise vendors): it reaches the files and the catalogue through the host's engines (`enough.repo_engine`,
+`ground` reads no file and imports nothing outside `enough.thym` and `enough.macrocosm` (the package Comprise
+vendors). Two moves of the cases below are the exceptions, and read beside their values on disk: `entail f as cases`
+the cases file already beside the fabulac (`_existing_cases`, so that what was recorded is kept), and `gather
+recorded` the recorder's `environment.txt` beside its folder (`_folder_files`). `ground` reaches the files and the catalogue through the host's engines (`enough.repo_engine`,
 recorded, so a replay needs neither the folder nor the catalogue): `syntax.catalogue` once (the language's entry of
 the registry, `enough/languages.py`, and its catalogue whole), `syntax.uses` per file of the language (tooling left
 out; a test file shows only what the tests lean on of a dependency), `syntax.locks` per lock file, `repo.swhid` once.
@@ -769,7 +771,7 @@ def _evidence_stated(output: Value, inputs: dict, node: dict, decl: Any, ctx: An
     return True, ""
 
 
-__all__ = ["CASES_SCAFFOLD", "ENGINE", "entail_cases", "gather_outside", "gather_recorded", "gather_verdict"]
+__all__ += ["CASES_SCAFFOLD", "ENGINE", "entail_cases", "gather_outside", "gather_recorded", "gather_verdict"]
 
 
 # ---- the target (lane W3-X5) ----
