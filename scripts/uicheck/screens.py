@@ -700,6 +700,37 @@ AF_OFF: Step = ("eval_await", "(async () => { try { await agentFreeSet(false); }
                               " headers: {'Content-Type': 'application/json'},"
                               " body: JSON.stringify({agent_free: false})}); }"
                               " return true; })()")
+#: The sidebar's paradigm list (0.8, W3-PP): up to three on. The set is
+#: written through the page's own routes, then the list is re-fetched the way
+#: its poll does it, so the notes are painted by paradigmPaintNotes().
+PARADIGMS_LIST = "#paradigm-list ul.paradigms"
+_PARADIGM_JS = ("const form = (o) => new URLSearchParams(o);"
+                " const set1 = (name) => fetch('/api/paradigm/set', {method: 'POST', body: form({name})});"
+                " const on = (name) => fetch('/api/paradigm/toggle',"
+                " {method: 'POST', body: form({name, on: '1'})});")
+PARADIGMS_TWO: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
+                       " await set1('text-planning'); await on('transcognition');"
+                       " await htmx.ajax('GET', '/api/paradigm',"
+                       " {target: '#paradigm-list', swap: 'innerHTML'});"
+                       " return true; })()")
+#: A paradigm of the project's own (written once; the scratch project keeps
+#: it, as the council screens keep their `.comp`) has no combination text,
+#: so three on with it are composed; a fourth is then refused.
+PARADIGM_OWN = "rness/paradigms/field-notes.md"
+PARADIGMS_COMPOSED: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
+                            f" await fetch('/api/file', {{method: 'POST', body: form({{path: {PARADIGM_OWN!r},"
+                            " content: '---\\nname: field-notes\\ndescription: notes taken in the field\\n---\\n"
+                            "\\n# Field notes\\n\\nWrite down what you see first.\\n'})});"
+                            " await set1('text-planning'); await on('field-notes'); await on('transcognition');"
+                            " await htmx.ajax('POST', '/api/paradigm/toggle', {target: '#paradigm-list',"
+                            " swap: 'innerHTML', values: {name: 'workflow-design', on: '1'}});"
+                            " return true; })()")
+PARADIGMS_RESET: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
+                         " await set1('text-planning');"
+                         " await htmx.ajax('GET', '/api/paradigm',"
+                         " {target: '#paradigm-list', swap: 'innerHTML'});"
+                         " return true; })()")
+
 #: Canon's ingest bar, filled with a url (the confirmation with the most
 #: lines: source, volume, depth, the page cap and the fetch gate) and
 #: submitted. Agent-free, that raises the plain confirmation — nothing is
@@ -728,6 +759,21 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(("click", "#toggle-sidebar"), SIDEBAR_SETTLED, ("wait_idle", "")),
            teardown=(("click", "#toggle-sidebar"), SIDEBAR_SETTLED, ("wait_idle", "")),
            note="the layout the sidebar toggle leaves behind"),
+
+    # --- paradigms, several on (0.8, W3-PP) --------------------------------
+    Screen("paradigms-two", "project",
+           setup=(PARADIGMS_TWO, ("wait_for", PARADIGMS_LIST + '[data-active-count="2"]'),
+                  ("wait_idle", "")),
+           teardown=(PARADIGMS_RESET, ("wait_idle", "")),
+           note="two paradigms on (text-planning + transcognition, their own metaparadigm), "
+                "the third toggleable, the face note under the list"),
+    Screen("paradigms-composed", "project",
+           setup=(PARADIGMS_COMPOSED,
+                  ("wait_for", PARADIGMS_LIST + ' li.paradigm-note[data-paradigm-note="cap"]'),
+                  ("wait_idle", "")),
+           teardown=(PARADIGMS_RESET, ("wait_idle", "")),
+           note="three on with a paradigm of the project's own (no text written for the "
+                "combination: the composed note) and a fourth refused (the cap note)"),
 
     # --- modals -----------------------------------------------------------
     Screen("modal-model", "project",
