@@ -13,8 +13,9 @@ line (its prompt builder is registered here, `reword.prompt`).
   line takes the ending the source uses most.
 - `gather parts with f` gives the `with` fabula or volume with every item of every part in it (a part is a fabula, a
   volume or one item): the `with` volume's items first, then each part's in order; an item already there byte for
-  byte (`made` aside: it says which run wrote the item) is there once, and two different items under one id are both
-  kept, so that `ids-unique` refuses them.
+  byte (`made` aside: it says which run wrote the item) is there once, and two items under one id are one item, merged
+  (`merge_item`: the later adds the fields the earlier lacks); where they say one field otherwise, gather refuses,
+  naming the item and the field (Thym 7.3, `ids-unique`: gather merges before they land).
 
 - `cut` shortens a short by whole sentences, the lightest first, until it fits `to N words` or `to N sentences`. A
   sentence weighs what the heaviest item it says weighs (EMF's salience: critical, high, normal, low), read from the
@@ -590,7 +591,9 @@ def join(ctx: Any, xs: Value, **mods: Any) -> Value:
 
 @implements("say")
 def say(ctx: Any, v: Value, **_: Any) -> Value:
-    """`say n`: a number, a date, a word or a bool as a string (`true`, `false`; a date as YYYY-MM-DD)."""
+    """`say n`: a number, a date, a word or a bool as a string (`true`, `false`; a date in its ISO 8601 form,
+    YYYY-MM-DD, and a date that carries a time, as a timestamp read from YAML does, with its time, as the page's
+    runtime says it too)."""
     p = v.payload if isinstance(v, Value) else v
     if isinstance(p, bool):
         return Value("string", "true" if p else "false")
