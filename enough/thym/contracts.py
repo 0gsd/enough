@@ -22,38 +22,34 @@ from typing import Any
 CHECKS = (
     "span-resolves", "stance-closed", "terms-grounded", "coverage", "no-invention", "stance-kept", "footer",
     "byte-exact", "atem-shape", "length", "span-inside", "whole-sentences", "weight-order", "scale-range",
-    "scale-evidence", "null-pinned", "scales-met", "labelled", "never-source", "default-deny", "no-counts", "banded",
-    "no-mark", "verified-derived", "verified-only-where-derived", "standing-gate", "epoch", "digests", "released",
-    "provenance", "fabula-checks", "flavour", "files-found", "code-span", "licence-recorded", "outline-cited",
-    "fold-grounded", "history-grounded", "parses", "interfaces-present", "files-present", "uses-told", "nothing-lost",
-    "ids-unique", "addressed", "no-duplicate", "only-the-asked", "only-the-changed", "one-line", "nothing-added",
-    "lines-found", "scansion-grounded", "sound-grounded", "form-grounded",
+    "scale-evidence", "null-pinned", "scales-met", "labelled", "never-source", "default-deny", "no-counts",
+    "banded", "no-mark", "verified-derived", "verified-only-where-derived", "standing-gate", "epoch", "digests",
+    "released", "provenance", "fabula-checks", "flavour", "files-found", "code-span", "licence-recorded",
+    "outline-cited", "fold-grounded", "history-grounded", "parses", "interfaces-present", "files-present",
+    "uses-told", "quotes-held", "nothing-lost", "ids-unique", "addressed", "no-duplicate", "only-the-asked",
+    "only-the-changed", "one-line", "nothing-added", "lines-found", "scansion-grounded", "sound-grounded",
+    "form-grounded", "ground-cited", "target-weighed", "target-confirmed", "case-outside", "cases-whole",
+    "source-named", "ruled", "surface-answered", "apart", "evidence-stated", "cases-entailed", "authored-source",
+    "only-authored", "in-sandbox",
 )
 
 # The checks a shipped declaration names ahead of the text: an owner's ruling that section 7.3's table does not hold
 # yet, for the next revision of the specification at cosmoes.org. A test holds each to being no row of the table, so
-# that it leaves this list the day the text takes it.
-#   quotes-held (0.7): every name a catem quotes is in its fabulac (enough/thym/moves/code.py)
-#   cases-whole (0.8): `entail f as cases` gives a whole cases file (enough/thym/moves/transconceive.py)
-#   authored-source (0.8): an authored fabulac's source and items (enough/thym/moves/author.py)
-#   ground-cited (0.8): every reliance on the language or its runtime cites where its gift is written
-#     (enough/thym/moves/transconceive.py)
-#   cases-entailed (0.8): every case of an authored fabulac entailed as a test, or named why not
-#     (enough/thym/moves/authored_code.py)
-#   target-weighed (0.8): a weighing's N:target names its language and version, scores the twelve points with their
-#     evidence, says what provides everything kept, and is `not` when a gate fails (enough/thym/moves/transconceive.py)
-#   target-confirmed, surface-answered, apart (0.8): `entail f as layout in` and `as code in` a language
-#     (enough/thym/moves/transconceive.py)
-# All of them are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
-AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited", "cases-entailed", "target-weighed",
-         "target-confirmed", "surface-answered", "apart")
+# that it leaves this list the day the text takes it. Empty since the 0.8 texts were synced (every check 0.8 built
+# is a row of the bundled 7.3).
+AHEAD: tuple[str, ...] = ()
 
-# The moves a shipped declaration names ahead of the bundled text's 6.3 table (an approved text the bundled copy does
-# not hold yet). A test holds each to being no row of that table, so it leaves this list the day the text is synced.
-#   author, add, compare, uncovered (0.8, Thym 20.11): enough/thym/moves/author.py
-#   ground (0.8, Thym 20.10): `ground repo with f`, enough/thym/moves/transconceive.py
-#   weigh (0.8, Thym 20.10): `weigh f in <language>`, enough/thym/moves/transconceive.py
-AHEAD_MOVES = ("author", "add", "compare", "uncovered", "ground", "weigh")
+# The moves a shipped declaration names ahead of the bundled text's 6.3 table. A test holds each to being no row of
+# that table, so it leaves this list the day the text is synced. Empty since the 0.8 sync.
+AHEAD_MOVES: tuple[str, ...] = ()
+
+# The other way round: rows of the bundled text's 6.3 table that no declaration here builds yet. A test holds each to
+# being undeclared, so it leaves this list the day its move is declared, and the text's blocks that call it are held
+# to being refused as an unknown move until then.
+#   run (0.8, Thym 6.3, 20.12): `run code as tests | tool | service`, with its checks `only-authored` and
+#     `in-sandbox` (7.3); the host's sandbox and its fabulac-first doors, outside this package, run an authored
+#     entailment, but no Thym move does yet
+BEHIND_MOVES: tuple[str, ...] = ("run",)
 
 # A check's old name, read wherever it is written (section 7.3; a `thym 0` view keeps `emf-checks`, ruling 7).
 OLD_NAMES = {"emf-checks": "fabula-checks"}

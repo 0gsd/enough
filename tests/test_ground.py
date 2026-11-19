@@ -498,7 +498,7 @@ def test_ground_is_declared_since_thym_1_with_the_texts_contract():
     g = d["ground"]
     assert g.since == 1 and d.view(0).get("ground") is None and g.owner == "fabula"
     assert list(g.contract) == ["ground-cited", "code-span", "nothing-lost", "fabula-checks", "provenance"]
-    assert "ground-cited" in ct.AHEAD and "ground" in ct.AHEAD_MOVES
+    assert "ground-cited" in ct.CHECKS                                   # a row of the synced 7.3
 
 
 def _run(tmp_path: Path, prog: Path, program: str, rows: list[dict]):

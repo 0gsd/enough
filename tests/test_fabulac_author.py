@@ -28,7 +28,7 @@ from enough.thym import checks as ck
 from enough.thym import declarations as dc
 from enough.thym import enumerate as en
 from enough.thym import plan as pl
-from enough.thym.contracts import AHEAD, AHEAD_MOVES
+from enough.thym.contracts import CHECKS
 from enough.thym.coprocessor import candidate
 from enough.thym.moves import author as AU
 from enough.thym.values import Value
@@ -442,7 +442,7 @@ TEXT_ROWS = {"author": (True, ["authored-source", "fabula-checks", "provenance"]
 
 def test_the_moves_are_declared_as_the_text_s_rows():
     d = dc.load()
-    assert set(TEXT_ROWS) <= set(AHEAD_MOVES) and "authored-source" in AHEAD
+    assert "authored-source" in CHECKS                                  # rows of the synced 6.3 and 7.3
     for name, (asks, contract) in TEXT_ROWS.items():
         v = d[name].view(1)
         assert d[name].since == 1 and d[name].view(0) is None

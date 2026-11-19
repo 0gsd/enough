@@ -443,7 +443,7 @@ def test_weigh_is_declared_since_thym_1_with_the_texts_contract():
     assert w.since == 1 and d.view(0).get("weigh") is None and w.owner == "fabula" and w.asks is True
     assert w.takes == (("fabula",),) and w.gives == ("fabula",) and w.modifiers == {"in": ("string",)}
     assert list(w.contract) == ["target-weighed", "no-invention", "fabula-checks", "provenance"]
-    assert "weigh" in ct.AHEAD_MOVES and "target-weighed" in ct.AHEAD
+    assert "target-weighed" in ct.CHECKS                                # a row of the synced 7.3
     assert C.CHECKS.lookup("no-invention", "move:weigh") is TR._weigh_no_invention
     assert C.CHECKS.lookup("no-invention") is not TR._weigh_no_invention          # every other move keeps its own
 

@@ -58,13 +58,18 @@ def _table_rows() -> list[tuple[str, ...]]:
 def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
     """Each row of 6.3's second table is a real declaration's `thym 1` view: its contract (where the row names one
     list), whether it asks, its scaffold; the three rows that choose by the call are held to their `-when` rules."""
+    from enough.thym.contracts import BEHIND_MOVES
     d = dc.load()
     rows = _table_rows()
-    assert len(rows) == 22                                 # scan and construe since 0.7 (THYM 20.9)
+    assert len(rows) == 29                                 # scan and construe since 0.7 (THYM 20.9); 0.8's seven (20.10-20.12)
+    # a row no declaration builds yet (contracts.BEHIND_MOVES) stays undeclared until it is built
+    assert not set(BEHIND_MOVES) & set(d), "a move now declared: take it out of contracts.BEHIND_MOVES"
+    rows = [r for r in rows if r[0] not in BEHIND_MOVES]
     for name, _sig, asks, contract, scaffold in rows:
         v = d[name].view(1)
         assert v is not None, name
-        assert v.asks is asks.startswith("yes"), name
+        # "with a brief, yes; else no" (author): the declaration asks, and a call with no brief is planned as asking
+        assert v.asks is (asks.startswith("yes") or asks.startswith("with ") and ", yes;" in asks), name
         if "·" not in contract and "as above" not in contract:
             # the contract is the list before any ", with …" (construe's row says which checks it reads for verse)
             assert list(v.contract) == re.findall(r"`([a-z-]+)`", contract.split(", with ")[0]), name
@@ -124,6 +129,9 @@ def _first_name(text: str) -> str:
 @pytest.mark.parametrize("line, text", DRAFT_BLOCKS, ids=[f"L{ln}-{_first_name(b)}" for ln, b in DRAFT_BLOCKS])
 def test_every_thym_1_block_of_the_text_compiles(line, text):
     r = compile_with(text, scratch_decls())
+    from test_thym_spec import refused_as_behind
+    if refused_as_behind(text, r):                         # `run` (Thym 20.12): contracts.BEHIND_MOVES
+        return
     assert not isinstance(r, Refusal), f"the block at line {line} of docs/THYM.md: {r}"
 
 

@@ -33,7 +33,7 @@ from enough.thym import Refusal
 from enough.thym import declarations as dc
 from enough.thym import enumerate as en
 from enough.thym import plan as pl
-from enough.thym.contracts import AHEAD
+from enough.thym.contracts import CHECKS
 from enough.thym.coprocessor import candidate
 from enough.thym.folder import Folder
 from enough.thym.moves import authored_code as AC
@@ -540,7 +540,7 @@ def test_cases_entailed_names_what_is_missing(project: Path):
     assert AC.cases_entailed_problem(cat, items, fab, {"CSHORT.md": "x"}.get) is None
     # and the Thym check: a folder that is no entailment holds with nothing to check
     ok, _why = AC._cases_entailed(Value("folder", Folder("x/", (), "0" * 64)), {}, {}, None, None)
-    assert ok and "cases-entailed" in AHEAD
+    assert ok and "cases-entailed" in CHECKS
 
 
 def test_requirement_cased_warns_in_an_authored_fabulac_only(project: Path):

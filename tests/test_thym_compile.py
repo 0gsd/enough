@@ -149,6 +149,9 @@ def test_bad_program_is_refused_where_it_says(bad):
 @pytest.mark.parametrize("index", range(len(_spec_blocks())))
 def test_every_spec_block_compiles_enumerates_and_plans(index):
     text = _spec_blocks()[index]
+    from test_thym_spec import refused_as_behind
+    if refused_as_behind(text, compile_text(text, volumes={"oes:thym/house": HOUSE})):
+        return                                             # `run` (Thym 20.12): contracts.BEHIND_MOVES
     checked = ok(text, volumes={"oes:thym/house": HOUSE})
     vol = en.enumerate_checked(checked)
     assert en.compile_volume(vol) == text
@@ -623,7 +626,7 @@ def test_declarations_load_from_the_real_manifests():
     assert set(decls) - set(decls.view(0)) == {"survey", "history", "gather", "question", "record", "settle", "lines",
                                                "replace", "drop", "insert", "edit", "reword", "join", "say",
                                                "folders", "propose", "scan", "construe",
-                                               # 0.8, ahead of the bundled text (contracts.AHEAD_MOVES; Thym 20.10, 20.11)
+                                               # 0.8 (Thym 20.10, 20.11; `run`, 20.12, is contracts.BEHIND_MOVES)
                                                "author", "add", "compare", "uncovered", "ground", "weigh"}
     tell = decls["entail"]
     assert tell.owner == "fabula" and tell.asks is True and tell.takes == (("fabula", "item", "volume"),)

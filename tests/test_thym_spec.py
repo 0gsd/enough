@@ -161,6 +161,23 @@ def test_spec_exists_and_has_examples():
     assert len(_thym_blocks()) >= 6
 
 
+def behind_move_called(text: str) -> str | None:
+    """A move of the text no declaration builds yet (contracts.BEHIND_MOVES) that a block calls, or None."""
+    from enough.thym.contracts import BEHIND_MOVES
+    return next((m for m in BEHIND_MOVES if re.search(rf"(?:^\s*give|=)\s+{m}\b", text, re.M)), None)
+
+
+def refused_as_behind(text: str, result) -> bool:
+    """True when the block calls a move the text has and enough does not build yet, and is refused for that alone."""
+    from enough.thym import Refusal
+    move = behind_move_called(text)
+    if move is None:
+        return False
+    assert isinstance(result, Refusal) and result.check == "unknown-move" and f"`{move}`" in result.message, \
+        f"{move} now compiles: take it out of contracts.BEHIND_MOVES ({result})"
+    return True
+
+
 @pytest.mark.parametrize("index", range(len(_cosm_blocks()) if SPEC.is_file() else 0))
 def test_spec_cosm_block_loads_and_lints_clean(index, tmp_path):
     text = _cosm_blocks()[index]
@@ -191,6 +208,8 @@ def test_spec_thym_block_is_a_complete_program(index):
              "nodes": [{"id": "M:morph/rosa", "type": "morph", "name": "rosa", "summary": "The house voice."}]}
     module = parse.parse(text)
     result = module if isinstance(module, Refusal) else check.check(module, volumes={"oes:thym/house": house})
+    if refused_as_behind(text, result):                    # `run` (Thym 20.12): contracts.BEHIND_MOVES
+        return
     assert not isinstance(result, Refusal), f"thym block {index + 1} refused: {result}"
 
 

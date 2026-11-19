@@ -500,7 +500,7 @@ def test_entail_in_a_language_is_declared_with_the_texts_contracts():
     assert list(rules[(("layout",), None)]) == ["target-confirmed", "surface-answered", "no-invention", "footer",
                                                 "provenance"]
     assert "parses" in rules[(("code",), None)]                   # the round trip, in Python, keeps its own
-    assert {"target-confirmed", "surface-answered", "apart"} <= set(ct.AHEAD)
+    assert {"target-confirmed", "surface-answered", "apart"} <= set(ct.CHECKS)
     assert C.CHECKS.lookup("footer", "layout") is TR._layout_footer
     assert C.CHECKS.lookup("no-invention", "layout") is TR._layout_no_invention
 
