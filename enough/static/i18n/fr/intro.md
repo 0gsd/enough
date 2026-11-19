@@ -10,7 +10,7 @@ enough est un système de langage personnel : un endroit pour planifier, lire, �
 
 **Je suis votre readvisor en chef.** Je lis, je planifie, je pose des questions et je corrige à vos côtés, et je ne touche aux fichiers que d'une façon que vous pouvez voir. Activez d'autres readvisors quand vous voulez de la friction ou un second avis, ou installez-en plusieurs dans un conseil et laissez-les débattre d'une question jusqu'à une conclusion.
 
-**Text-planning est la maison.** Dites-moi ce que vous voulez écrire et nous bâtirons un plan ensemble, puis des échafaudages par section que vous remplirez de votre propre prose. D'autres paradigmes couvrent la traduction et la conception de vos propres flux de travail.
+**Text-planning est la maison.** Dites-moi ce que vous voulez écrire et nous bâtirons un plan ensemble, puis des échafaudages par section que vous remplirez de votre propre prose. Activez d'autres paradigmes à côté, jusqu'à trois à la fois : transcognition pour la traduction, ou pour un programme planifié et écrit comme un fabulac ; workflow-design pour fabriquer vos propres paradigmes, readvisors et compétences.
 
 **La référence est locale.** Le dictionnaire donne le sens, le son, l'histoire et la parenté de n'importe quel mot : faites un clic droit sur un mot, ou parcourez-le depuis les préférences ui. Wikisink est une Wikipédia hors ligne. Canon garde les sources que vous rassemblez.
 

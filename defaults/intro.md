@@ -10,7 +10,7 @@ enough is a personal language system: a place to plan, read, write, and translat
 
 **I'm your chief readvisor.** I read, plan, question, and edit alongside you, and I only touch files in ways you can see. Switch on other readvisors when you want friction or a second opinion, or seat several in a council and let them argue a question to a conclusion.
 
-**Text planning is home.** Tell me what you want to write and we will build a plan together, then section scaffolds you fill with your own prose. Other paradigms cover translation and designing your own workflows.
+**Text planning is home.** Tell me what you want to write and we will build a plan together, then section scaffolds you fill with your own prose. Turn other paradigms on beside it, up to three at once: transcognition for translation, or for a program planned and written as a fabulac; workflow-design for making your own paradigms, readvisors, and skills.
 
 **Reference is local.** The dictionary gives any word's meaning, sound, history, and relatives: right-click a word, or browse it from ui preferences. Wikisink is an offline Wikipedia. Canon keeps the sources you collect.
 
