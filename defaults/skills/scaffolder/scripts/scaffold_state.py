@@ -1035,6 +1035,10 @@ def count_line(model: Scaffold) -> str:
 
 def main(argv: list[str]) -> int:
     usage = "usage: scaffold_state.py check|json|write|plectrum FILE"
+    if argv in (["-h"], ["--help"]):
+        print(usage)
+        print(__doc__)
+        return 0
     if len(argv) != 2 or argv[0] not in ("check", "json", "write", "plectrum"):
         print(usage, file=sys.stderr)
         return 2
