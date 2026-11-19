@@ -1,6 +1,6 @@
 thym 1
 
-program decompile-verse
+program decompile-verse-quick
   why: a poem decompiled into its fabula, line by line, with its metre and its rhymes, and a
        question for its author wherever a reading is a guess.
   must: nothing is fetched; the poem is the person's own copy.

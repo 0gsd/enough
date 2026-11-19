@@ -2799,6 +2799,29 @@ def _entry_sets(led: Ledger, frm: str | None) -> dict:
     return {str(k): v for k, v in sets.items() if isinstance(k, str) and k not in _NOT_SET}
 
 
+#: Who answered, as a reading's `whose.by` says it (MacroCOSM OES 18.4.6): the question's `to`, else the author.
+_WHOSE_BY = ("author", "expert", "critic", "reader")
+
+
+def _reading_of_kind(led: Ledger, item: dict, written: tuple, question: dict, sid: str) -> None:
+    """An answer to a bank entry asked of a kind whose answer fills no field of it (the fabulap's `breaks`, about
+    `C:line`, and `stanza`, about `C:part`) writes a `P:reading` through the entry's `writes` (MacroCOSM OES 18.4.6,
+    18.6.6): its `of` names the items of that kind, its `whose` is the answerer's with the session; never a new item
+    of the kind asked about."""
+    if written[1] != "reading":
+        return
+    _bank, e = _bank_entry(led, (question.get("raised") or {}).get("from"))
+    about = (e or {}).get("about")
+    mt = re.match(r"^([A-Z]):([a-z][a-z0-9-]*)$", about) if isinstance(about, str) else None
+    if mt is None or (mt.group(1), mt.group(2)) == tuple(written):
+        return
+    ids = [d["id"] for d in _items_of_kind(led, mt.group(1), mt.group(2))]
+    if ids:
+        item["of"] = ids
+    to = question.get("to")
+    item["whose"] = {"by": to if to in _WHOSE_BY else "author", "session": sid}
+
+
 def _first_words(s: str, n: int = 6) -> str:
     words = re.sub(r"\s+", " ", s).strip().split(" ")
     out = " ".join(words[:n]).rstrip(".,;:!?")
@@ -2889,6 +2912,7 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
             item["stance"] = "hearsay"
         for f, v in _entry_sets(led, ((question or {}).get("raised") or {}).get("from")).items():
             item[f] = copy.deepcopy(v)              # what the answer cannot say: a device's figure (`sets`, 18.6.6)
+        _reading_of_kind(led, item, (mod, k), question or {}, sid)
         for f in required:                          # a field the answer cannot fill stays an open question (ruling 3)
             if f not in item and f not in ("id", "type", "provenance"):
                 item[f] = {"pending": f"what is the {f} of this {k}?"}

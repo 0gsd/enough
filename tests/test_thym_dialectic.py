@@ -1,8 +1,8 @@
 """The dialectic in a program (THYM 22; MacroCOSM OES 18.6): the moves `question`, `record` and `settle`, their checks
 `addressed`, `no-duplicate` and `only-the-asked`, the scaffolds `bank` and `direct`, the prompts, and the three
-shipped programs `decompile-prose`, `decompile-verse-quick` (the program `decompile-verse`, the one-call fabulap of
-Thym 20.5; `decompile-verse.thym` is the five-program full build of 20.9, tests/test_verse_moves.py) and `settle`
-(`settle-the-answers`).
+shipped programs `decompile-prose`, `decompile-verse-quick` (the program `decompile-verse-quick`, the one-call fabulap
+of Thym 20.5, renamed ahead of the synced text: tests/test_thym_shipped.py `RENAMED_AHEAD`; `decompile-verse.thym` is
+the five-program full build of 20.9, tests/test_verse_moves.py) and `settle` (`settle-the-answers`).
 
 The moves reach the dialectic's core only through `ctx.engines["dialectic"]`. The engine is `enough.dialectic.thym_engine()`,
 which the host registers: three functions that take and give plain data, so that a run records them and a replay
@@ -35,6 +35,7 @@ from enough.thym.coprocessor import candidate
 from enough.thym.moves import MoveError
 from enough.thym.moves import dialectic as D
 from enough.thym.values import Value, digest_path, read_value
+from tests.test_thym_shipped import as_the_text_has_it
 
 REPO = Path(__file__).resolve().parents[1]
 FAB = REPO / "tests" / "fixtures" / "fabula"
@@ -505,7 +506,8 @@ def test_a_folder_volume_is_questioned_but_never_written(tmp_path):
 def test_the_shipped_programs_are_the_texts():
     blocks = _text_blocks()
     for name in ("decompile-prose", "decompile-verse", "decompile-verse-quick", "settle"):
-        assert (SHIPPED / f"{name}.thym").read_text(encoding="utf-8") in blocks, name
+        path = SHIPPED / f"{name}.thym"
+        assert as_the_text_has_it(path, path.read_text(encoding="utf-8"), blocks) in blocks, name
     assert (SUITE / "programs" / "settle-the-answers.thym").read_bytes() == (SHIPPED / "settle.thym").read_bytes()
 
 

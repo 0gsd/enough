@@ -3,15 +3,20 @@
 A form is named only when the poem keeps its defining rules (its number of lines and its stanzas' shape), the first of
 the table that it keeps: common metre before ballad stanza. Every rule of the form, defining or not, is listed with
 whether the poem keeps it, and each line or part that breaks one is a departure. A rule over lines or stanzas holds
-when three of four of them keep it (`TOLERANCE`); a count of lines holds exactly. The form's confidence is the share of
-its rules held, at most 0.8. A poem that keeps no form of the table is named by its shape (`two quatrains, rhymed
-aabc defe`); one with neither a metre nor a rhyme scheme is `free verse`, the table's last row.
+when three of four of them keep it (`TOLERANCE`); a count of lines holds exactly. A rule the rules cannot read (a turn
+no reading has placed) is `held: {pending: "…"}`, asked. The form's confidence is the share of its rules held, counted
+over the rules held or broken (a pending rule counts once it is held or broken), at most 0.8. A poem that keeps no
+form of the table is named by its shape (`two quatrains, rhymed aabc defe`); one with neither a metre nor a rhyme
+scheme is `free verse`, the table's last row.
 
 What a form is read from is the fabula's own: each line's syllables and stresses (`C:line`), its parts (`C:part`, a
 line's `part`), the metre (`C:metre`), a turn a model found (`C:device` of figure `turn`); and, from the poem and
-FEED, each line's words (for a line that comes back) and whether two lines' last words rhyme, across stanzas too (a
-villanelle's `aba` and terza rima's chain run from stanza to stanza). The move (`scan … as form`) and its check
-(`form-grounded`) read it the same way, through the same function, `facts`.
+FEED, each line's words (for a line that comes back) and whether two lines' last words rhyme. The form's `scheme` is
+read across the whole poem, a sound that comes back in a later stanza keeping the letter it first had (`Facts.letters`;
+a villanelle `aba aba aba aba aba abaa`, terza rima `aba bcb cdc`), while each `C:line`'s `rhyme` and each `C:rhyme`
+stay stanza-local (`verse.rhyme_scheme`); a rule that runs across stanzas (a villanelle's rhymes, terza rima's chain)
+is read from that scheme (MacroCOSM OES 18.4.6). The move (`scan … as form`) and its check (`form-grounded`) read it
+the same way, through the same function, `facts`.
 
 Pure functions; the pronunciations come in as `verse.feed_pronunciations`' shape.
 """
@@ -225,6 +230,28 @@ def _scheme_whole(pattern: str) -> Callable[[Facts], Result]:
     return rule
 
 
+def _scheme_across(pattern: str) -> Callable[[Facts], Result]:
+    """A rule that runs across stanzas, read from the form's scheme over the whole poem (`Facts.letters`, a sound that
+    comes back keeping its first letter; MacroCOSM OES 18.4.6): the lines `pattern` gives one letter share one letter
+    in the scheme. Held in three of four lines."""
+    pat = pattern.replace(" ", "")
+
+    def rule(f: Facts) -> Result:
+        if f.n != len(pat):
+            return False, []
+        let = f.letters()
+        ok, deps = 0, []
+        for i in range(f.n):
+            a = i + 1
+            mates = [j + 1 for j in range(f.n) if j != i and pat[j] == pat[i]]
+            if let.get(a, "?") != "?" and all(let.get(b) == let[a] for b in mates):
+                ok += 1
+            else:
+                deps.append((_line(a), f"its end does not keep the letter the scheme {pattern} gives it"))
+        return ok / f.n >= TOLERANCE, deps
+    return rule
+
+
 def _scheme_first(pattern: str) -> Callable[[Facts], Result]:
     def rule(f: Facts) -> Result:
         ns = list(range(1, len(pattern) + 1))
@@ -342,13 +369,17 @@ def _terza_tercets(f: Facts) -> Result:
 
 
 def _terza_chain(f: Facts) -> Result:
+    """Each tercet's middle line takes the letter the next tercet's outer lines keep, read from the form's scheme over
+    the whole poem (`aba bcb cdc`)."""
     tercets = [ns for _p, ns in f.parts if len(ns) == 3]
     links = list(zip(tercets, tercets[1:]))
     if not links:
         return False, []
+    let = f.letters()
     good, deps = 0, []
     for a, b in links:
-        if f.rhymes(a[1], b[0]) is True and f.rhymes(a[1], b[2]) is True:
+        mid = let.get(a[1], "?")
+        if mid != "?" and let.get(b[0]) == mid and let.get(b[2]) == mid:
             good += 1
         else:
             deps.append((_line(a[1]), "its middle line does not rhyme with the outer lines of the next tercet"))
@@ -467,7 +498,7 @@ FORMS: list[tuple[str, list[tuple[str, Callable]], list[tuple[str, Callable]]]] 
     ("sonnet", [("fourteen lines", _count(14)), ("of pentameter", _pentameter), ("rhymed", _rhymed)],
      [("a turn", _turn(None))]),
     ("villanelle", [("nineteen lines", _count(19)), ("five tercets and a quatrain", _shape([3, 3, 3, 3, 3, 4]))],
-     [("aba throughout and abaa last", _scheme_whole("aba aba aba aba aba abaa")),
+     [("aba throughout and abaa last", _scheme_across("aba aba aba aba aba abaa")),
       ("line 1 again at lines 6, 12 and 18, and line 3 at 9, 15 and 19",
        _again([(1, 6), (1, 12), (1, 18), (3, 9), (3, 15), (3, 19)]))]),
     ("sestina", [("thirty-nine lines", _count(39)), ("six sestets and a tercet", _shape([6, 6, 6, 6, 6, 6, 3]))],
@@ -560,10 +591,21 @@ def form_of(f: Facts) -> dict | None:
             for at, what in d:
                 if (at, what) not in deps:
                     deps.append((at, what))
-        decided = [r["held"] for r in rules if isinstance(r["held"], bool)]
-        conf = min(FORM_CAP, sum(decided) / len(decided)) if decided else FORM_CAP
-        return {"form": name, "rules": rules, "departures": deps, "confidence": round(conf, 2), "named": True}
+        return {"form": name, "rules": rules, "departures": deps, "confidence": confidence_of(rules), "named": True}
     return {"form": _shape_name(f), "rules": [], "departures": [], "confidence": SHAPE_CONFIDENCE, "named": False}
+
+
+def counted(rules: list) -> list[bool]:
+    """The rules a form's confidence counts: those held or broken (`held` true or false). A rule written
+    `held: {pending: "…"}` counts only once a person's answer, or a reading, has held or broken it (Thym 20.9)."""
+    return [r["held"] for r in rules if isinstance(r, dict) and isinstance(r.get("held"), bool)]
+
+
+def confidence_of(rules: list) -> float:
+    """A named form's confidence: the share of its rules held, counted over the rules held or broken, at most
+    `FORM_CAP` (`FORM_CAP` when none is counted yet)."""
+    decided = counted(rules)
+    return round(min(FORM_CAP, sum(decided) / len(decided)) if decided else FORM_CAP, 2)
 
 
 def form_item(items: list[dict], text: str, pron: V.PronFn, *, source: str) -> dict | None:
@@ -600,4 +642,4 @@ def form_item(items: list[dict], text: str, pron: V.PronFn, *, source: str) -> d
     return it
 
 
-__all__ = ["FORMS", "Facts", "facts", "form_of", "form_item", "TOLERANCE"]
+__all__ = ["FORMS", "Facts", "facts", "form_of", "form_item", "TOLERANCE", "counted", "confidence_of"]
