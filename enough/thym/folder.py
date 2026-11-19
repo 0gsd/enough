@@ -590,8 +590,10 @@ def snapshot_text(folder: Folder, *, id: str, name: str | None = None) -> str:
 
 
 def from_snapshot(mapping: Any, *, path: str | None = None) -> Folder:
-    """A folder from its snapshot's mapping (the caller reads the YAML). Every text must match its file's digest,
-    and the files the digest is over must give the recorded tree; raises `FolderError` otherwise."""
+    """A folder from its snapshot's mapping (the caller reads the YAML). Every text must match its file's digest, every
+    text file must have its text, and the tree digest must be there; raises `FolderError` otherwise. The tree is taken
+    as recorded, not computed again: it is over the reference rule's files (`read`'s `tree_rows`), some of which the
+    folder rule keeps no row of, so the rows cannot give it back."""
     if not isinstance(mapping, dict) or mapping.get("kind") != "folder":
         raise FolderError("the snapshot is not a thym/1 volume of kind folder")
     label = str(path if path is not None else mapping.get("path") or mapping.get("name") or "")
