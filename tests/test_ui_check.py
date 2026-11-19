@@ -346,12 +346,53 @@ def test_every_step_verb_is_one_the_driver_implements():
     # point that returns a promise and settles on its own (compOpenNew) has
     # to be awaited, or the step after it runs against the document the
     # open is about to replace.
+    # `unlink` joined with the paradigm screens (0.8): a teardown taking back
+    # a file its setup wrote, which the page has no route to delete.
     known = {"click", "key", "eval", "eval_await",
-             "wait_for", "wait_gone", "wait_idle"}
+             "wait_for", "wait_gone", "wait_idle", "unlink"}
     for screen in screens.ALL_SCREENS:
         for verb, _arg in tuple(screen.setup) + tuple(screen.teardown):
             assert verb in known, f"{screen.name} uses unknown step {verb!r}"
     assert callable(Driver.run_steps)
+
+
+def test_a_screen_that_writes_a_paradigm_takes_it_back(tmp_path):
+    """paradigms-composed writes a paradigm of the project's own; left behind,
+    it was a fourth row in every later screen's sidebar. Its teardown resets
+    the set first, then removes the file (and an undo stash), and `unlink`
+    never reaches outside the scratch project."""
+    from uicheck.driver import Driver, StepError
+
+    by_name = {s.name: s for s in screens.ALL_SCREENS}
+    teardown = tuple(by_name["paradigms-composed"].teardown)
+    assert teardown.index(screens.PARADIGMS_RESET) < teardown.index(("unlink", screens.PARADIGM_OWN))
+    assert any(screens.PARADIGM_OWN in arg for _v, arg in by_name["paradigms-composed"].setup)
+
+    project = tmp_path / "project"
+    own = project / screens.PARADIGM_OWN
+    own.parent.mkdir(parents=True)
+    own.write_text("x", encoding="utf-8")
+    (own.parent / f".{own.name}.undo").write_text("y", encoding="utf-8")
+    keep = own.parent / "text-planning.md"
+    keep.write_text("z", encoding="utf-8")
+    d = Driver(page=None, base_url="", project=project)  # type: ignore[arg-type]
+    d.run_steps([("unlink", screens.PARADIGM_OWN)], what="t")
+    assert not own.exists() and not (own.parent / f".{own.name}.undo").exists()
+    assert keep.is_file()
+    d.run_steps([("unlink", screens.PARADIGM_OWN)], what="t")   # gone already: fine
+    for bad in ("../outside.md", "/etc/hosts", "."):
+        try:
+            d.unlink(bad)
+        except StepError:
+            pass
+        else:
+            raise AssertionError(f"unlink {bad!r} was not refused")
+    try:
+        Driver(page=None, base_url="").unlink(screens.PARADIGM_OWN)  # type: ignore[arg-type]
+    except StepError:
+        pass
+    else:
+        raise AssertionError("unlink without a scratch project was not refused")
 
 
 def test_the_matrix_covers_the_extremes_and_quick_is_a_subset():

@@ -14,7 +14,7 @@ makes the harness stay useful instead of decaying into a green light nobody
 trusts.
 
 Steps are deliberately tiny and declarative — `click`, `key`, `eval`,
-`wait_for`, `wait_gone`, `wait_idle`, `sleep_frames` — so a screen reads as
+`wait_for`, `wait_gone`, `wait_idle`, `sleep_frames`, `unlink` — so a screen reads as
 a recipe rather than as code, and so a screen that breaks names the step it
 broke on. Anything a step cannot express goes in an `eval`, which calls the
 page's own entry points (`openUIModal()`, `enterGirraphMode(path)`) rather
@@ -713,9 +713,11 @@ PARADIGMS_TWO: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
                        " await htmx.ajax('GET', '/api/paradigm',"
                        " {target: '#paradigm-list', swap: 'innerHTML'});"
                        " return true; })()")
-#: A paradigm of the project's own (written once; the scratch project keeps
-#: it, as the council screens keep their `.comp`) has no combination text,
-#: so three on with it are composed; a fourth is then refused.
+#: A paradigm of the project's own has no combination text, so three on with
+#: it are composed; a fourth is then refused. The file is written by the
+#: setup and taken back by the teardown (`PARADIGM_OWN_GONE`, after the set
+#: is back to text-planning alone), which `one_screen` runs in its `finally`:
+#: left behind, it was a fourth paradigm row in every later screen's sidebar.
 PARADIGM_OWN = "rness/paradigms/field-notes.md"
 PARADIGMS_COMPOSED: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
                             f" await fetch('/api/file', {{method: 'POST', body: form({{path: {PARADIGM_OWN!r},"
@@ -725,6 +727,7 @@ PARADIGMS_COMPOSED: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
                             " await htmx.ajax('POST', '/api/paradigm/toggle', {target: '#paradigm-list',"
                             " swap: 'innerHTML', values: {name: 'workflow-design', on: '1'}});"
                             " return true; })()")
+PARADIGM_OWN_GONE: Step = ("unlink", PARADIGM_OWN)
 PARADIGMS_RESET: Step = ("eval_await", "(async () => { " + _PARADIGM_JS +
                          " await set1('text-planning');"
                          " await htmx.ajax('GET', '/api/paradigm',"
@@ -766,12 +769,12 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_idle", "")),
            teardown=(PARADIGMS_RESET, ("wait_idle", "")),
            note="two paradigms on (text-planning + transcognition, their own metaparadigm), "
-                "the third toggleable, the face note under the list"),
+                "the third toggleable; no face note (the shipped metaparadigm has no face block)"),
     Screen("paradigms-composed", "project",
            setup=(PARADIGMS_COMPOSED,
                   ("wait_for", PARADIGMS_LIST + ' li.paradigm-note[data-paradigm-note="cap"]'),
                   ("wait_idle", "")),
-           teardown=(PARADIGMS_RESET, ("wait_idle", "")),
+           teardown=(PARADIGMS_RESET, PARADIGM_OWN_GONE, ("wait_idle", "")),
            note="three on with a paradigm of the project's own (no text written for the "
                 "combination: the composed note) and a fourth refused (the cap note)"),
 

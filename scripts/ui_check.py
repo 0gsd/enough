@@ -177,7 +177,7 @@ class Run:
         old = self.drivers[mode]
         assert self.browser is not None
         self.browser.close_page(old.page)
-        fresh = Driver(self.browser.new_page(), old.base_url)
+        fresh = Driver(self.browser.new_page(), old.base_url, old.project)
         self.drivers[mode] = fresh
         self.on_tab[mode] = 0
         self.focus(mode)
@@ -526,7 +526,7 @@ def capture_failure_shots(world: ScratchWorld, browser: Browser, run: Run,
         if not items:
             continue
         page = browser.new_page()
-        driver = Driver(page, server.base)
+        driver = Driver(page, server.base, server.project)
         # Exactly one focused page at a time (see `Run.focus`): the matrix's
         # own tabs are done with, so this one takes it for the shot pass.
         for other in run.drivers.values():
@@ -583,8 +583,10 @@ def run_matrix(plan: Plan, *, verbose: bool, shots: bool,
             # per screen would be most of the wall clock; `reset_page()`
             # between screens is what makes reuse safe.
             run.drivers = {
-                "project": Driver(browser.new_page(), world.project_server.base),
-                "home": Driver(browser.new_page(), world.home_server.base),
+                "project": Driver(browser.new_page(), world.project_server.base,
+                                  world.project_server.project),
+                "home": Driver(browser.new_page(), world.home_server.base,
+                               world.home_server.project),
             }
             servers = {"project": world.project_server,
                        "home": world.home_server}
