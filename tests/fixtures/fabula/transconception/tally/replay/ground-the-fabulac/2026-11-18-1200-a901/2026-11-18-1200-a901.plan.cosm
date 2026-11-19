@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2032-f719
+id: thym/2026-11-18-2208-f719
 name: ground-the-fabulac on tally
 program:
   name: ground-the-fabulac
@@ -22,7 +22,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2032-f719
+- id: R:plan/2026-11-18-2208-f719
   type: plan
   name: ground-the-fabulac on tally
   summary: One node, none of which asks the model.

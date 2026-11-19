@@ -6,7 +6,7 @@ program:
   name: settle-the-answers
   sha256: ed2cb780b628c18e0d2b92949cbc4837a784f0f96cf8813132e0d812c4296b0b
 plan:
-  sha256: 612539d57a2e30c1fb01c0f07adbd8113e712cfeba336b33583310a44f59b3d6
+  sha256: 654f3390012dc4773a7eb647594415655eef86d89ace3478f75cf9f232f3c371
 environment:
   enough: unknown
   model: none
@@ -14,14 +14,14 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T12:55:00Z'
-ended: '2026-11-19T01:32:16Z'
+ended: '2026-11-19T03:08:55Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1255-a906
   type: trace
   name: settle-the-answers run 2026-11-18-1255-a906
   summary: 'ran settle-the-answers on tally.4-asked-again.fabulac.cosm, tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm
-    in 45436 s on rules: 2 steps, all checks green'
+    in 51235 s on rules: 2 steps, all checks green'
   records:
   - R:record/1
   - R:record/2
@@ -53,11 +53,11 @@ nodes:
     sha256: 5a70231b083a6b12dd18360025e2f415f477ec2ccfa86595c01ad060a660d55b
     path: inputs/tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm
   - name: f
-    sha256: f5e23e28cef2305315e3dcc63d8b836cf049620ee513148f6c31212605769667
+    sha256: 8c3746fc5a2c05c859cfce796c70f80595d54c6411ced800667e1835db341080
     path: inputs/tally.4-asked-again.fabulac.cosm
   outputs:
   - name: answered
-    sha256: 2cd92b91f63f35c626edecc6c557249675df36a832252333bc8522f0de2e52b3
+    sha256: 1638bc8d0dd37a9e1eea94f39500924172ae00cd0132a704eff4bdce740a7f23
   engine: code
   attempts: 1
   tokens: 0
@@ -85,10 +85,10 @@ nodes:
   move: settle
   inputs:
   - name: answered
-    sha256: 2cd92b91f63f35c626edecc6c557249675df36a832252333bc8522f0de2e52b3
+    sha256: 1638bc8d0dd37a9e1eea94f39500924172ae00cd0132a704eff4bdce740a7f23
   outputs:
   - name: g
-    sha256: 9ad9c3154907857b11b1fcb9b5abecbede8cbc3d3e2d77256124e4b4614923dc
+    sha256: 153dcd570832c4f8c26ed9fd881ee87192711b0caff375b997bdcaf17dd7df77
     path: outputs/g.cosm
   engine: rules
   attempts: 1

@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2032-8b30
+id: thym/2026-11-18-2208-650c
 name: settle-the-answers on tally.2-asked.fabulac.cosm
 program:
   name: settle-the-answers
@@ -9,7 +9,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.2-asked.fabulac.cosm
-  sha256: 7c9b6078ce43edc98407282a5cc6b0123932e0480aeff0f5722b32f264aadc36
+  sha256: 49fc4b101ee2928932308900bae2a7690eafc2b6bdc0a79ba09fe79bbf96ab9c
 - name: said
   type: volume
   path: inputs/tally.2-asked.fabulac.answers-2026-11-18-1230.cosm
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2032-8b30
+- id: R:plan/2026-11-18-2208-650c
   type: plan
   name: settle-the-answers on tally.2-asked.fabulac.cosm
   summary: Two nodes, one of which asks the model.

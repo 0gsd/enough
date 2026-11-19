@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2032-ed92
+id: thym/2026-11-18-2208-56be
 name: entail-in-a-language on tally.fabulac.cosm
 program:
   name: entail-in-a-language
@@ -9,7 +9,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.fabulac.cosm
-  sha256: 837607fd2783767b929a3a61f40ff24bc903a1186e31c1ba4729438b327b7f8b
+  sha256: a94cbb249247e3f20f71077ae19552f2d55d922df362476fefaf043fac3b8bd0
 - name: language
   type: string
   path: inputs/go.txt
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2032-ed92
+- id: R:plan/2026-11-18-2208-56be
   type: plan
   name: entail-in-a-language on tally.fabulac.cosm
   summary: Three nodes, two of which ask the model.

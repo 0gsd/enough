@@ -2882,11 +2882,11 @@ nodes:
   stated:
   - in: python
     version: 3.13.18
-    at: library/string.html#formatspec
+    at: library/string.html#format-specification-mini-language
     digest: b1490c87ba39
   - in: python
     version: 3.13.18
-    at: reference/lexical_analysis.html#formatted-string-literals
+    at: reference/lexical_analysis.html#2-4-3-f-strings
     digest: 26b7f8ab2fcf
   entry: format-spec
   used-by:
@@ -3265,7 +3265,7 @@ nodes:
   stated:
   - in: python
     version: 3.13.18
-    at: builtins/exceptions.html#BaseException.args
+    at: builtins/exceptions.html#BaseException
     digest: fd1dcc489d5c
   entry: error-text
   used-by:
@@ -3893,7 +3893,7 @@ nodes:
   stated:
   - in: python
     version: 3.13.18
-    at: library/os.html#utf8-mode
+    at: library/os.html#python-utf-8-mode
     digest: 7df584c5ef74
   - in: python
     version: 3.13.18

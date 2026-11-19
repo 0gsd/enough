@@ -6,7 +6,7 @@ program:
   name: weigh-a-target
   sha256: fb757555481453574a7724d91e480a8ea31fa7a3819d89ad97a985e420b20ae1
 plan:
-  sha256: cb2e9836e2fa4bc0d0ace98b071293a1cd539aafa6369903d0b82bfdc614ed39
+  sha256: 0e80ea567bdd7702274bdd56c5cea97915863de035dc032d6e5e8812f0d2a590
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T13:10:00Z'
-ended: '2026-11-19T01:32:17Z'
+ended: '2026-11-19T03:08:56Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1310-a908
   type: trace
   name: weigh-a-target run 2026-11-18-1310-a908
-  summary: 'ran weigh-a-target on tally.6-weighed-go.fabulac.cosm, rust.txt in 44537 s on scripted: 1 step, all
+  summary: 'ran weigh-a-target on tally.6-weighed-go.fabulac.cosm, rust.txt in 50336 s on scripted: 1 step, all
     checks green'
   records:
   - R:record/1
@@ -48,14 +48,14 @@ nodes:
   move: weigh
   inputs:
   - name: f
-    sha256: 30376a6fc185e394984ff26b75d62751c2269380eecee0b1a828b81e83284e27
+    sha256: 624b8e471efa1ad0d0cd4e16aa8013d36f853d4fb33c5d7900e8119a248054a9
     path: inputs/tally.6-weighed-go.fabulac.cosm
   - name: language
     sha256: 521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3
     path: inputs/rust.txt
   outputs:
   - name: g
-    sha256: cfc7bf8d722f65fb86a4d765c910ce69a3357fc854644f93fa62c0bcff2f231d
+    sha256: 84aad3cf2a351a0871cad611e20cc8d4747c794cef2251643fc915c61b80e14a
     path: outputs/g.cosm
   engine: model:scripted
   attempts: 1

@@ -1,6 +1,6 @@
 engine: dialectic.thym_settle
 inputs:
-  call: e473b66250255265677fa5f52428e5f140acedfbefc6f297830f96ceab4e2954
+  call: 049e54fe67ae1e1c3b47fa2847598a9bb0f1207b1cbb95150514d394c22361ca
 keys: []
 tokens: 0
 seconds: 0
@@ -782,35 +782,36 @@ output:
     \ a format of fill, alignment, sign, width, grouping, precision and type.\n    A plus sign shows the sign of\
     \ positive numbers too; a width pads to that many code points; a fraction's precision\n    rounds half to even.\n\
     \  example: 1 formatted with a sign is '+1' and -2 is '-2'; 3 right-aligned in width 4 is '   3'.\n  stated:\n\
-    \  - in: python\n    version: 3.13.18\n    at: library/string.html#formatspec\n    digest: b1490c87ba39\n  -\
-    \ in: python\n    version: 3.13.18\n    at: reference/lexical_analysis.html#formatted-string-literals\n    digest:\
-    \ 26b7f8ab2fcf\n  entry: format-spec\n  used-by:\n  - C:interface/tally.cli.main\n  span:\n    file: tally/cli.py\n\
-    \    lines: '54'\n  provenance:\n    mode: derived\n    sources:\n    - tally/cli.py#L54\n    - D:session/session-1\n\
+    \  - in: python\n    version: 3.13.18\n    at: library/string.html#format-specification-mini-language\n    digest:\
+    \ b1490c87ba39\n  - in: python\n    version: 3.13.18\n    at: reference/lexical_analysis.html#2-4-3-f-strings\n\
+    \    digest: 26b7f8ab2fcf\n  entry: format-spec\n  used-by:\n  - C:interface/tally.cli.main\n  span:\n    file:\
+    \ tally/cli.py\n    lines: '54'\n  provenance:\n    mode: derived\n    sources:\n    - tally/cli.py#L54\n  \
+    \  - D:session/session-1\n    confidence: 1\n    state: pending\n    answered:\n      ruling:\n        sources:\n\
+    \        - D:session/session-1\n        confidence: 1\n  made:\n    move: ground\n    run: 2026-11-18-1200-a901\n\
+    \    step: 1\n    node: '1'\n    engine: code\n  ruling:\n  - is: kept\n    by: R:maker/nobody-a-transconceiver-simulated-for-th\n\
+    \    'on': '2026-11-18'\n    said: as proposed\n- id: C:reliance/truth-of-values\n  type: reliance\n  name:\
+    \ which values count as false\n  summary: Where a value is tested as a condition, zero of any kind, empty text,\
+    \ an empty list, map or set, and\n    nothing count as false; everything else counts as true unless it says\
+    \ otherwise.\n  stance: observed\n  'on': language\n  gives: Where a value is tested as a condition, zero of\
+    \ any kind, empty text, an empty list, map or set, and nothing\n    count as false; everything else counts as\
+    \ true unless it says otherwise.\n  example: a line holding only spaces, trimmed, is empty and so false; 0.0\
+    \ is false; a list holding one empty text\n    is true.\n  stated:\n  - in: python\n    version: 3.13.18\n \
+    \   at: builtins/stdtypes.html#truth-value-testing\n    digest: 736b53f803b0\n  entry: truth-of-values\n  used-by:\n\
+    \  - C:interface/tally.cli.main\n  - C:interface/tally.ledger.ledger_path\n  - C:interface/tally.ledger.read\n\
+    \  - C:interface/tally.render.rows\n  - C:interface/tally.render.empty_message\n  span:\n    file: tally/cli.py\n\
+    \    lines: '42'\n  provenance:\n    mode: derived\n    sources:\n    - tally/cli.py#L42\n    - tally/ledger.py#L33\n\
+    \    - tally/ledger.py#L42\n    - tally/render.py#L14\n    - tally/render.py#L29\n    - D:session/session-1\n\
     \    confidence: 1\n    state: pending\n    answered:\n      ruling:\n        sources:\n        - D:session/session-1\n\
     \        confidence: 1\n  made:\n    move: ground\n    run: 2026-11-18-1200-a901\n    step: 1\n    node: '1'\n\
     \    engine: code\n  ruling:\n  - is: kept\n    by: R:maker/nobody-a-transconceiver-simulated-for-th\n    'on':\
-    \ '2026-11-18'\n    said: as proposed\n- id: C:reliance/truth-of-values\n  type: reliance\n  name: which values\
-    \ count as false\n  summary: Where a value is tested as a condition, zero of any kind, empty text, an empty\
-    \ list, map or set, and\n    nothing count as false; everything else counts as true unless it says otherwise.\n\
-    \  stance: observed\n  'on': language\n  gives: Where a value is tested as a condition, zero of any kind, empty\
-    \ text, an empty list, map or set, and nothing\n    count as false; everything else counts as true unless it\
-    \ says otherwise.\n  example: a line holding only spaces, trimmed, is empty and so false; 0.0 is false; a list\
-    \ holding one empty text\n    is true.\n  stated:\n  - in: python\n    version: 3.13.18\n    at: builtins/stdtypes.html#truth-value-testing\n\
-    \    digest: 736b53f803b0\n  entry: truth-of-values\n  used-by:\n  - C:interface/tally.cli.main\n  - C:interface/tally.ledger.ledger_path\n\
-    \  - C:interface/tally.ledger.read\n  - C:interface/tally.render.rows\n  - C:interface/tally.render.empty_message\n\
-    \  span:\n    file: tally/cli.py\n    lines: '42'\n  provenance:\n    mode: derived\n    sources:\n    - tally/cli.py#L42\n\
-    \    - tally/ledger.py#L33\n    - tally/ledger.py#L42\n    - tally/render.py#L14\n    - tally/render.py#L29\n\
-    \    - D:session/session-1\n    confidence: 1\n    state: pending\n    answered:\n      ruling:\n        sources:\n\
-    \        - D:session/session-1\n        confidence: 1\n  made:\n    move: ground\n    run: 2026-11-18-1200-a901\n\
-    \    step: 1\n    node: '1'\n    engine: code\n  ruling:\n  - is: kept\n    by: R:maker/nobody-a-transconceiver-simulated-for-th\n\
-    \    'on': '2026-11-18'\n    said: as proposed\n- id: C:reliance/any-all-stop-early\n  type: reliance\n  name:\
-    \ any and all stop at the first answer\n  summary: Asking whether any of a series holds stops at the first that\
-    \ does; asking whether all hold stops at the\n    first that does not; the rest are never looked at.\n  stance:\
-    \ observed\n  'on': language\n  gives: Asking whether any of a series holds stops at the first that does; asking\
-    \ whether all hold stops at the\n    first that does not; the rest are never looked at. Any of nothing is false\
-    \ and all of nothing is true.\n  example: of handlers checked in order, the second is never examined when the\
-    \ first already answers.\n  stated:\n  - in: python\n    version: 3.13.18\n    at: builtins/functions.html#any\n\
-    \    digest: 216dc071d8fc\n  - in: python\n    version: 3.13.18\n    at: builtins/functions.html#all\n    digest:\
+    \ '2026-11-18'\n    said: as proposed\n- id: C:reliance/any-all-stop-early\n  type: reliance\n  name: any and\
+    \ all stop at the first answer\n  summary: Asking whether any of a series holds stops at the first that does;\
+    \ asking whether all hold stops at the\n    first that does not; the rest are never looked at.\n  stance: observed\n\
+    \  'on': language\n  gives: Asking whether any of a series holds stops at the first that does; asking whether\
+    \ all hold stops at the\n    first that does not; the rest are never looked at. Any of nothing is false and\
+    \ all of nothing is true.\n  example: of handlers checked in order, the second is never examined when the first\
+    \ already answers.\n  stated:\n  - in: python\n    version: 3.13.18\n    at: builtins/functions.html#any\n \
+    \   digest: 216dc071d8fc\n  - in: python\n    version: 3.13.18\n    at: builtins/functions.html#all\n    digest:\
     \ 216dc071d8fc\n  entry: any-all-stop-early\n  used-by:\n  - C:interface/tally.ledger.add\n  span:\n    file:\
     \ tally/ledger.py\n    lines: '64'\n  provenance:\n    mode: derived\n    sources:\n    - tally/ledger.py#L64\n\
     \    - D:session/session-1\n    confidence: 1\n    state: pending\n    answered:\n      ruling:\n        sources:\n\
@@ -917,7 +918,7 @@ output:
     \ when it was raised with\n    none.\n  stance: observed\n  'on': language\n  gives: An error turned into text\
     \ gives its message as it was raised, and the empty text when it was raised with\n    none.\n  example: an error\
     \ raised with 'the ledger is broken' prints as that; one raised with no message prints as nothing.\n  stated:\n\
-    \  - in: python\n    version: 3.13.18\n    at: builtins/exceptions.html#BaseException.args\n    digest: fd1dcc489d5c\n\
+    \  - in: python\n    version: 3.13.18\n    at: builtins/exceptions.html#BaseException\n    digest: fd1dcc489d5c\n\
     \  entry: error-text\n  used-by:\n  - C:interface/tally.cli.main\n  span:\n    file: tally/cli.py\n    lines:\
     \ '55'\n  provenance:\n    mode: derived\n    sources:\n    - tally/cli.py#L55\n    - D:session/session-1\n\
     \    confidence: 1\n    state: pending\n    answered:\n      ruling:\n        sources:\n        - D:session/session-1\n\
@@ -1145,8 +1146,8 @@ output:
     \ encoded as UTF-8 on macOS and wherever the locale asks for UTF-8 or is the plain C locale;\n    elsewhere\
     \ in the locale's encoding, where a character that cannot be encoded stops the program with an error.\n  example:\
     \ a name with an ñ prints as UTF-8 bytes even with LANG=C.\n  stated:\n  - in: python\n    version: 3.13.18\n\
-    \    at: library/os.html#utf8-mode\n    digest: 7df584c5ef74\n  - in: python\n    version: 3.13.18\n    at:\
-    \ library/sys.html#sys.stdout\n    digest: 1fc32ff781c0\n  entry: output-encoding\n  of: C:dependency/python-standard-library\n\
+    \    at: library/os.html#python-utf-8-mode\n    digest: 7df584c5ef74\n  - in: python\n    version: 3.13.18\n\
+    \    at: library/sys.html#sys.stdout\n    digest: 1fc32ff781c0\n  entry: output-encoding\n  of: C:dependency/python-standard-library\n\
     \  used-by:\n  - C:interface/tally.cli.main\n  span:\n    file: tally/cli.py\n    lines: '39'\n  provenance:\n\
     \    mode: derived\n    sources:\n    - tally/cli.py#L39\n    - tally/cli.py#L44\n    - tally/cli.py#L51\n \
     \   - tally/cli.py#L56\n    - D:session/session-1\n    confidence: 1\n    state: pending\n    answered:\n  \

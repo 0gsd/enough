@@ -6,7 +6,7 @@ program:
   name: entail-in-a-language
   sha256: 08fb8200090294cd0168a2267be4601947775e170b03153c8ad4ff05828f8daf
 plan:
-  sha256: da58806553c16423487240479ebce46abae5e7e0bcf256dff74cd20a332eccdc
+  sha256: e8c7236ca06fe2624c9a95f339e3d2a6ce211b063acca8303ab11dfd5d99e58c
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T14:10:00Z'
-ended: '2026-11-19T01:32:25Z'
+ended: '2026-11-19T03:09:04Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1410-a910
   type: trace
   name: entail-in-a-language run 2026-11-18-1410-a910
-  summary: 'ran entail-in-a-language on tally.fabulac.cosm, rust.txt in 40945 s on scripted: 3 steps, all checks
+  summary: 'ran entail-in-a-language on tally.fabulac.cosm, rust.txt in 46744 s on scripted: 3 steps, all checks
     green'
   records:
   - R:record/1
@@ -50,7 +50,7 @@ nodes:
   move: entail
   inputs:
   - name: f
-    sha256: 837607fd2783767b929a3a61f40ff24bc903a1186e31c1ba4729438b327b7f8b
+    sha256: a94cbb249247e3f20f71077ae19552f2d55d922df362476fefaf043fac3b8bd0
     path: inputs/tally.fabulac.cosm
   - name: language
     sha256: 521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3
@@ -114,7 +114,7 @@ nodes:
   move: entail
   inputs:
   - name: f
-    sha256: 837607fd2783767b929a3a61f40ff24bc903a1186e31c1ba4729438b327b7f8b
+    sha256: a94cbb249247e3f20f71077ae19552f2d55d922df362476fefaf043fac3b8bd0
     path: inputs/tally.fabulac.cosm
   - name: language
     sha256: 521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3

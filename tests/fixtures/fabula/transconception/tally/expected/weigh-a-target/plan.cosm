@@ -9,7 +9,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.6-weighed-go.fabulac.cosm
-  sha256: 30376a6fc185e394984ff26b75d62751c2269380eecee0b1a828b81e83284e27
+  sha256: 624b8e471efa1ad0d0cd4e16aa8013d36f853d4fb33c5d7900e8119a248054a9
 - name: language
   type: string
   path: inputs/rust.txt

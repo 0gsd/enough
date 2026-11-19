@@ -6,7 +6,7 @@ program:
   name: hand-out-the-cases
   sha256: 14ead20c176be54733af95f8fbe6e63fd95e067b3f0a305775523c229f9f1501
 plan:
-  sha256: 5c1bf689e8d3d18f114eee4fc2107b7249a74261615d48a09388dd08b6230948
+  sha256: 338b07368903e46362a01e172b9d10ee279319a046b488a3f107a8bc2c7ea6b0
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T12:05:00Z'
-ended: '2026-11-19T01:32:02Z'
+ended: '2026-11-19T03:08:41Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1205-a902
   type: trace
   name: hand-out-the-cases run 2026-11-18-1205-a902
-  summary: 'ran hand-out-the-cases on tally.1-grounded.fabulac.cosm in 48422 s on rules: 1 step, all checks green'
+  summary: 'ran hand-out-the-cases on tally.1-grounded.fabulac.cosm in 54221 s on rules: 1 step, all checks green'
   records:
   - R:record/1
   outcome: landed
@@ -48,7 +48,7 @@ nodes:
   move: entail
   inputs:
   - name: f
-    sha256: a0db1dfea6d3088a7942784f1ef899188c44fcc5c4aa124b79164358c9f7a783
+    sha256: 72df62f6e3c3cf83c0abf87df9712fa772557af8058f2948c31556e0e5548b2d
     path: inputs/tally.1-grounded.fabulac.cosm
   outputs:
   - name: cases

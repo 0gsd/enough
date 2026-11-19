@@ -629,11 +629,11 @@ output:
       stated:
       - in: python
         version: 3.13.18
-        at: library/string.html#formatspec
+        at: library/string.html#format-specification-mini-language
         digest: b1490c87ba39
       - in: python
         version: 3.13.18
-        at: reference/lexical_analysis.html#formatted-string-literals
+        at: reference/lexical_analysis.html#2-4-3-f-strings
         digest: 26b7f8ab2fcf
     - id: percent-format
       'on': language
@@ -945,7 +945,7 @@ output:
       stated:
       - in: python
         version: 3.13.18
-        at: builtins/exceptions.html#BaseException.args
+        at: builtins/exceptions.html#BaseException
         digest: fd1dcc489d5c
     - id: error-kinds
       'on': language
@@ -1442,7 +1442,7 @@ output:
       stated:
       - in: python
         version: 3.13.18
-        at: library/os.html#utf8-mode
+        at: library/os.html#python-utf-8-mode
         digest: 7df584c5ef74
       - in: python
         version: 3.13.18
@@ -2213,15 +2213,7 @@ output:
       stated:
       - in: python
         version: 3.13.18
-        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.text
-        digest: 5e516318a17d
-      - in: python
-        version: 3.13.18
-        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.tail
-        digest: 5e516318a17d
-      - in: python
-        version: 3.13.18
-        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.attrib
+        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element
         digest: 5e516318a17d
     - id: source-parsed
       'on': runtime
@@ -2252,7 +2244,7 @@ output:
         digest: c8e0214fb37f
       - in: python
         version: 3.13.18
-        at: library/ast.html#ast.AST.lineno
+        at: library/ast.html#ast.AST
         digest: c8e0214fb37f
       - nowhere: that a decorated definition's line is its def or class line.
     - id: identifiers-normalised
@@ -2270,7 +2262,7 @@ output:
       stated:
       - in: python
         version: 3.13.18
-        at: reference/lexical_analysis.html#identifiers
+        at: reference/lexical_analysis.html#2-3-identifiers-and-keywords
         digest: 26b7f8ab2fcf
       - in: python
         version: 3.13.18

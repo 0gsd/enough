@@ -9,7 +9,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.4-asked-again.fabulac.cosm
-  sha256: f5e23e28cef2305315e3dcc63d8b836cf049620ee513148f6c31212605769667
+  sha256: 8c3746fc5a2c05c859cfce796c70f80595d54c6411ced800667e1835db341080
 - name: said
   type: volume
   path: inputs/tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm

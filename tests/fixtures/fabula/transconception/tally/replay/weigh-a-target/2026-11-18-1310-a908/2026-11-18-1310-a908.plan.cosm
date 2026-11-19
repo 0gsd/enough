@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2032-3fc6
+id: thym/2026-11-18-2208-bc6a
 name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
 program:
   name: weigh-a-target
@@ -9,7 +9,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.6-weighed-go.fabulac.cosm
-  sha256: 30376a6fc185e394984ff26b75d62751c2269380eecee0b1a828b81e83284e27
+  sha256: 624b8e471efa1ad0d0cd4e16aa8013d36f853d4fb33c5d7900e8119a248054a9
 - name: language
   type: string
   path: inputs/rust.txt
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2032-3fc6
+- id: R:plan/2026-11-18-2208-bc6a
   type: plan
   name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
   summary: One node, one of which asks the model.

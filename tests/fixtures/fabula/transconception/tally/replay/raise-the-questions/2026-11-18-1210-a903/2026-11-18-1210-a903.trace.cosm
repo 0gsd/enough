@@ -6,7 +6,7 @@ program:
   name: raise-the-questions
   sha256: beff2f93ac4620e68b337e8efb81dbb04be935a58f13fb450d4b4b61dd5e67a0
 plan:
-  sha256: 918e90d762399c91d20cee6cbca692419e1590a5a65036a57905a80a43d49e3e
+  sha256: c03ddeab9f063b26345a7cce46d991b3ea47d805fd7137d02adc39ae1dc6e14b
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T12:10:00Z'
-ended: '2026-11-19T01:32:04Z'
+ended: '2026-11-19T03:08:43Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1210-a903
   type: trace
   name: raise-the-questions run 2026-11-18-1210-a903
-  summary: 'ran raise-the-questions on tally.1-grounded.fabulac.cosm in 48124 s on rules: 2 steps, all checks green'
+  summary: 'ran raise-the-questions on tally.1-grounded.fabulac.cosm in 53923 s on rules: 2 steps, all checks green'
   records:
   - R:record/1
   - R:record/2
@@ -49,7 +49,7 @@ nodes:
   move: question
   inputs:
   - name: f
-    sha256: a0db1dfea6d3088a7942784f1ef899188c44fcc5c4aa124b79164358c9f7a783
+    sha256: 72df62f6e3c3cf83c0abf87df9712fa772557af8058f2948c31556e0e5548b2d
     path: inputs/tally.1-grounded.fabulac.cosm
   outputs:
   - name: asked
@@ -84,11 +84,11 @@ nodes:
   - name: asked
     sha256: 82c17ffe0bc98e8b7cc378e257cd0c01c470efa7218be86eb702b89362bdca37
   - name: f
-    sha256: a0db1dfea6d3088a7942784f1ef899188c44fcc5c4aa124b79164358c9f7a783
+    sha256: 72df62f6e3c3cf83c0abf87df9712fa772557af8058f2948c31556e0e5548b2d
     path: inputs/tally.1-grounded.fabulac.cosm
   outputs:
   - name: g
-    sha256: 7c9b6078ce43edc98407282a5cc6b0123932e0480aeff0f5722b32f264aadc36
+    sha256: 49fc4b101ee2928932308900bae2a7690eafc2b6bdc0a79ba09fe79bbf96ab9c
     path: outputs/g.cosm
   engine: code
   attempts: 1
