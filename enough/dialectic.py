@@ -2989,8 +2989,24 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
             return _apply_reread(led, cand, w.index, question or {}, answer, reread, sid, conf, checker)
         set_field(d, fpath, copy.deepcopy(value))
     _provenance_answered(d, fpath, sid, conf)
+    _form_confidence(d, fpath)
     wrote.append(addr)
     return _commit(led, cand, wrote, checker)
+
+
+_RULE_HELD = re.compile(r"^rules\[\d+\]\.held$")
+
+
+def _form_confidence(d: dict, fpath: str) -> None:
+    """A fabulap's `C:form` whose rule a person's answer has just held or broken: its saved `provenance.confidence`
+    is the share of its rules held (`verse_forms.confidence_of`), so it follows the answer instead of keeping the
+    scan's figure (0.8 W4-XF; the card has always recomputed it)."""
+    if not _RULE_HELD.match(fpath) or d.get("type") != "form" or not isinstance(d.get("rules"), list):
+        return
+    prov = d.get("provenance")
+    if isinstance(prov, dict):
+        from . import verse_forms as _vf
+        prov["confidence"] = _vf.confidence_of(d["rules"])
 
 
 #: A hand edit taken back (keeping in step, MacroCOSM OES 18.4.1; `enough/fabulac_entail.py` `take_back`): a choice
