@@ -484,6 +484,20 @@ def test_projection_rules_hold_and_fail(tmp_path):
     assert not ok and "employees is derived" in why
 
 
+def test_a_labelled_domains_fills_identity_as_a_sorted_list(tmp_path):
+    """`emit domains: … marked verified` on a holotype that states no public domain gives `identity.domains` as
+    Comprise's sorted list of hosts, never a plain string (a paratype's `of` is its first domain, not a letter)."""
+    hol = Value("volume", {"oes": "comprise/1", "nodes": []})
+    for said, want in ((Value("string", "https://www.Meadow.example/about"), ["meadow.example"]),
+                       (Value("list", [Value("string", "z.example"), Value("string", "a.example")]),
+                        ["a.example", "z.example"])):
+        ctx = ctx_for(tmp_path, slots={"domains": project.mark(None, said, **{"as": "verified"})})
+        iso = project.project(ctx, hol).payload
+        assert iso["identity"] == {"domains": want}
+        para = project.project(ctx, hol, **{"as": "paratype"}).payload
+        assert para["of"] == want[0]
+
+
 def test_open_house_lands_the_recorded_outputs_byte_for_byte(root, engines):
     t = RUN.run(load("expected/open-house/plan.cosm"), inputs_root=SUITE, root=root,
                 program=SUITE / "expected" / "open-house" / "items.cosm", engines=engines, now=NOW)

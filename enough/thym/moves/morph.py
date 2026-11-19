@@ -159,8 +159,8 @@ def statistics(text: str, *, feed: Any = None, fabula: Value | None = None, exem
     paras: dict[int, int] = {}
     for s in sents:
         paras[s.para] = paras.get(s.para, 0) + 1
-    short = n_words < 300 or len(paras) < 3
-    base = 50 if short else 90
+    little = n_words < 300 or len(paras) < 3          # too little text to be sure: lower confidence
+    base = 50 if little else 90
     out: dict[str, dict] = {}
 
     def put(scale: str, value: int, evidence: list[str], confidence: int, **extra: Any) -> None:

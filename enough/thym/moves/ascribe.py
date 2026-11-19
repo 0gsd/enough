@@ -276,11 +276,15 @@ def _verdict(problems: list[str]) -> tuple[bool, str]:
     return (not problems), "; ".join(problems)
 
 
+def _of_epoch(problem: str) -> bool:
+    """A reader's problem that is `epoch`'s, a missing epoch among them, and so no other check's."""
+    return problem.startswith("epoch ") or problem == "no epoch"
+
+
 @check("default-deny", kind="isograph")
 def _isograph_default_deny(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """The isograph holds only the fields ascribe-isograph/0 names, each in its shape, every entry `stated`."""
-    return _verdict([p for p in _isograph_problems(output, ctx) if "holds a number" not in p
-                     and not p.startswith("epoch ")])
+    return _verdict([p for p in _isograph_problems(output, ctx) if "holds a number" not in p and not _of_epoch(p)])
 
 
 @check("no-counts", kind="isograph")
@@ -292,7 +296,7 @@ def _isograph_no_counts(output: Value, inputs: dict, node: dict, decl: Any, ctx:
 @check("epoch", kind="isograph")
 def _isograph_epoch(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """The isograph names its epoch: a quarter, a month or a week."""
-    return _verdict([p for p in _isograph_problems(output, ctx) if p.startswith("epoch ") or p == "no epoch"])
+    return _verdict([p for p in _isograph_problems(output, ctx) if _of_epoch(p)])
 
 
 # `project … as allograph`, held to `ascribe-allograph/0` (Ascribe 14.6) under the same check names.
@@ -310,8 +314,7 @@ def _allograph_problems(output: Value, ctx: Any) -> list[str]:
 def _allograph_default_deny(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """The allograph holds only the fields ascribe-allograph/0 names, each in its shape, one entry per kind and form,
     in order, every entry `stated`."""
-    return _verdict([p for p in _allograph_problems(output, ctx) if "holds a number" not in p
-                     and not p.startswith("epoch ")])
+    return _verdict([p for p in _allograph_problems(output, ctx) if "holds a number" not in p and not _of_epoch(p)])
 
 
 @check("no-counts", kind="allograph")
@@ -323,7 +326,7 @@ def _allograph_no_counts(output: Value, inputs: dict, node: dict, decl: Any, ctx
 @check("epoch", kind="allograph")
 def _allograph_epoch(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """The allograph names its epoch: a quarter, a month or a week."""
-    return _verdict([p for p in _allograph_problems(output, ctx) if p.startswith("epoch ") or p == "no epoch"])
+    return _verdict([p for p in _allograph_problems(output, ctx) if _of_epoch(p)])
 
 
 __all__ = ["FUNCTIONS", "KINDS", "PROMPTS", "allograph", "isograph", "project", "propose", "propose_messages"]

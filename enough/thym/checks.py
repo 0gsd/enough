@@ -87,8 +87,9 @@ def check(name: str, *, registry: Checks | None = None, kind: str | None = None)
 
 def verdict(name: str, output: Value, inputs: dict, node: dict, decl: Any, ctx: Any = None, *,
             registry: Checks | None = None) -> tuple[bool, str] | Refusal:
-    """One check's verdict, `(ok, why)`; `why` is empty when it holds. A check the registry lacks is a refusal; a
-    check that raises fails, with what it raised. A check implemented for one move (`kind="move:<name>"`, a check
+    """One check's verdict, `(ok, why)`: `why` says why it fails, and when it holds is empty or says how it held
+    (`coverage` gives its map, `length` "no length was asked"), passed through. A check the registry lacks is a
+    refusal; a check that raises fails, with what it raised. A check implemented for one move (`kind="move:<name>"`, a check
     whose sense that move's own text gives, as `weigh` gives `no-invention`'s) is that move's, before any `as` kind."""
     reg = registry or CHECKS
     mv = decl.get("name") if isinstance(decl, dict) else getattr(decl, "name", None)

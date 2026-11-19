@@ -109,10 +109,10 @@ def _checked(path: Path) -> Any:
     if mods is None:
         return None
     parse, check = mods
-    try:
-        text = path.read_bytes().decode("utf-8")
-    except (OSError, UnicodeDecodeError) as e:
-        return Refusal("compile", "parse", f"{path} cannot be read: {e}", file=str(path))
+    from enough.thym import _read          # as check_file and enumerate_file read it: unknown-uri, or parse if not UTF-8
+    text, refused = _read(path)
+    if refused is not None:
+        return refused
     module = parse.parse(text, path=str(path))
     return module if isinstance(module, Refusal) else check.check(module)
 

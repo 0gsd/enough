@@ -353,7 +353,7 @@ def open(sealed: bytes, key_text: str) -> bytes | Refusal:  # noqa: A001 - the A
     except (_Unopened, ValueError):
         return Refusal("run", "sealed", "the sealed package was changed: its manifest does not open")
     files = manifest.get("files") if isinstance(manifest, dict) else None
-    if (manifest.get("bundle") != FORMAT or manifest.get("hid") != enc.get("hid")
+    if (not isinstance(manifest, dict) or manifest.get("bundle") != FORMAT or manifest.get("hid") != enc.get("hid")
             or manifest.get("id") != enc.get("bundle") or not isinstance(files, list) or len(files) != 1):
         return Refusal("run", "sealed", "the manifest is not this package's")
     f = files[0]

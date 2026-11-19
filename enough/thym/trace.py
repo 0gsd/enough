@@ -280,7 +280,7 @@ def show(volume: dict) -> str:
     lines = [str(root_item(volume).get("summary") or volume.get("name") or "a trace")]
     for r in records_of(volume):
         bad = [c.get("name") for c in r.get("checks") or [] if not c.get("ok")]
-        lines.append(f"  {r.get('id'):<14} {str(r.get('move')):<10} {str(r.get('engine')):<16} "
+        lines.append(f"  {str(r.get('id')):<14} {str(r.get('move')):<10} {str(r.get('engine')):<16} "
                      f"{r.get('attempts', 0)} attempt(s) {r.get('seconds', 0)} s"
                      + (f"  failed: {', '.join(map(str, bad))}" if bad else ""))
     return "\n".join(lines)

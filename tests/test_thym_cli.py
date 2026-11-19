@@ -115,6 +115,17 @@ def test_plan_prints_the_models_line_on_this_machine(capsys):
                              "3 model calls, at most 9, on this machine (g40-04)"]
 
 
+def test_check_names_a_program_it_cannot_open_as_check_file_does(tmp_path, capsys):
+    """An unreadable program is `unknown-uri` and one that is not UTF-8 is `parse`, as `check_file` and
+    `enumerate_file` refuse them."""
+    r = cli._checked(tmp_path / "missing.thym")
+    assert isinstance(r, Refusal) and (r.stage, r.check) == ("compile", "unknown-uri")
+    bad = tmp_path / "latin.thym"
+    bad.write_bytes(b"thym 1\n-- caf\xe9\n")
+    r = cli._checked(bad)
+    assert isinstance(r, Refusal) and (r.check, r.message) == ("parse", "latin.thym is not UTF-8")
+
+
 def test_plan_on_the_cloud_says_so_plainly(monkeypatch, capsys):
     gate(monkeypatch, True)
     assert cli.main(["plan", str(PUBLISH), str(INPUTS / "notes.md"), "--model", "cloud"]) == 0

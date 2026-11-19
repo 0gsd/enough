@@ -395,8 +395,8 @@ def members(value: Value) -> list[Value] | None:
 def posix_path(path: Any) -> str:
     """A path as a plan or a trace writes it: with forward slashes whatever system made it (`outputs/out.package.cosm`,
     never `outputs\\out.package.cosm`), so that a run recorded on Windows replays anywhere. A text given on Windows is
-    read as a Windows path; elsewhere a text stands as it is, since a backslash is a letter of a POSIX name. No path
-    stays no path: an empty text is not the folder `.`."""
+    read as a Windows path; elsewhere a text stands as it is, since a backslash is a letter of a POSIX name. An empty
+    text stays empty: it is not the folder `.`. Any other value is said as text (`None` too): callers pass a path."""
     if isinstance(path, PurePath):
         return path.as_posix()
     text = str(path)

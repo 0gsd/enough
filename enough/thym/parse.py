@@ -102,8 +102,9 @@ FEATURES = {
     "since-move": "the move {}, which thym 1 declares",
     "thym1-word": "the word {}, which thym 1 adds",
     "thym1-operand": "{}, which thym 1 allows",
-    "use-thym1": "use of a thym 1 file ({})",
 }
+# A `thym 0` program that uses a `thym 1` file is no feature of this list: the checker refuses it with check `version`
+# itself (`_Checker.names_of_module`), naming the file and the grammar it needs.
 
 #: Words of a grammar's tables whose productions this compiler does not read yet: a file that writes one is refused at
 #: parse, naming what it is. Every `thym 1` production is read, so it is empty.

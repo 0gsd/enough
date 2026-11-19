@@ -252,6 +252,7 @@ class Recording(Engines):
         try:
             out = fn(*args, **kwargs)
         except EngineRefusal:
+            counter.depth -= 1                     # not recorded, but the node's next call is top-level again
             raise
         except Exception as e:  # noqa: BLE001 - recorded, then raised again: a replay raises it at the same place
             counter.depth -= 1

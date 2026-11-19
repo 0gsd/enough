@@ -298,8 +298,8 @@ def numbered_poem(text: str, lay: dict, a: int | None = None, b: int | None = No
 
 
 def brief(items: list[dict], *, most: int = 90) -> str:
-    """The fabulap so far as a model is shown it: one line an item, its id first, the lines (`C:line`) left out but
-    for the ones FEED could not scan."""
+    """The fabulap so far as a model is shown it: one line an item, its id first, every line (`C:line`) left out. A
+    line FEED could not scan is not shown here: its pending `stresses` are asked of the person (Thym 20.9)."""
     rows = []
     for it in items:
         k = item_kind(it)
