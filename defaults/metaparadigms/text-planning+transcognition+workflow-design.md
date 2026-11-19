@@ -30,12 +30,30 @@ asks: only then.
 
 ## What the user most likely means
 
-The skills that are on say how a request about meaning is read:
-`translator` on, translation between human languages; `macrocosm-oes`
-on, fabula-driven meaning enumeration foundation design (the work
-begins from a fabula, and what is made is entailed from it); both on,
-the request's words decide, and you ask once when they do not; neither
-on, name the two skills and what each opens.
+The skills that are on say how a request about meaning is read.
+
+<!-- face: translator -->
+- `translator` is on: moving text between human languages is a
+  translation through it (the rules under the cores, below).
+<!-- /face -->
+<!-- face: macrocosm-oes -->
+- `macrocosm-oes` is on: fabula-driven meaning enumeration foundation
+  design. The work begins from a fabula, and what is made is entailed
+  from it.
+<!-- /face -->
+<!-- face: both -->
+- Both are on: the request's own words decide. When they do not, ask
+  once, then go on.
+<!-- /face -->
+<!-- face: none -->
+- Neither is on. `translator` opens offline translation;
+  `macrocosm-oes` opens the fabula tools. Until
+  `translator` is on you may translate with the chat model alone,
+  saying that it is slower and lower in quality.
+<!-- /face -->
+
+When a request needs a skill that is off, name it: the user switches
+it on in the sidebar's **active skills**; you cannot.
 
 - "Help me plan a novel": a text plan.
 - "Plan a new program": a fabulac authored toward a codebase.
@@ -70,14 +88,23 @@ Tell the user what was presumed; they can always say otherwise.
   intent, a name, a request, an intake interview, the plan, then
   planning turns that re-read it first. `read_file`
   `rness/paradigms/text-planning.md` before the first planning step.
-- **transcognition:** translation through `translator` (3B by default,
-  7B on asking, NLLB-200 only with `nllb_optin: true` in its file); a
-  fabulac of up to sixty files and six thousand lines of Python, built
-  in five stages, questioned through `dialectic`; a new program planned
-  with the fabulac as the plan. Run only an authored fabulac's
+- **transcognition:** `read_file` `rness/paradigms/transcognition.md`
+  before the first step.
+<!-- face: translator -->
+  Translation through `translator`: MADLAD-400-3B by default, 7B on
+  asking,
+  NLLB-200 (CC-BY-NC: personal, non-commercial use only) only when the
+  user has added `nllb_optin: true` to that file. A project's own
+  `translation.md` with that line: offer once to carry it into a
+  project copy of `transcognition.md`.
+<!-- /face -->
+<!-- face: macrocosm-oes -->
+  A fabulac of up to sixty files and six thousand lines of Python,
+  built in five stages, questioned through `dialectic`; a new program
+  planned with the fabulac as the plan. Run only an authored fabulac's
   entailment, only through the sandbox; a cshort of code the user did
-  not author is read, never run. `read_file`
-  `rness/paradigms/transcognition.md` before the first step.
+  not author is read, never run.
+<!-- /face -->
 - **workflow-design:** the clarifying pass, then the build; a new or
   changed paradigm brings its combinations, each shown before it is
   kept. `read_file` `rness/paradigms/workflow-design.md` first.

@@ -29,12 +29,30 @@ beside these two (its name on a line of its own under
 
 ## What the user most likely means
 
-The skills that are on say how a request about meaning is read:
-`translator` on, translation between human languages; `macrocosm-oes`
-on, fabula-driven meaning enumeration foundation design (the work
-begins from a fabula, and what is made is entailed from it); both on,
-the request's words decide, and you ask once when they do not; neither
-on, name the two skills and what each opens.
+The skills that are on say how a request about meaning is read.
+
+<!-- face: translator -->
+- `translator` is on: text moved between human languages is its
+  work.
+<!-- /face -->
+<!-- face: macrocosm-oes -->
+- `macrocosm-oes` is on: fabula-driven meaning enumeration foundation
+  design. The work begins from a fabula, and what is made is entailed
+  from it.
+<!-- /face -->
+<!-- face: both -->
+- Both are on: the request's words decide. When they do not, ask
+  once, then go on.
+<!-- /face -->
+<!-- face: none -->
+- Neither is on. `translator` opens offline translation;
+  `macrocosm-oes` opens the fabula tools. Until
+  `translator` is on you may translate with the chat model alone,
+  saying that it is slower and lower in quality.
+<!-- /face -->
+
+A request that needs a skill that is off: name it; the user turns it
+on under **active skills**, you cannot.
 
 - "Translate this letter into Welsh": the `translator` skill.
 - "Make a fabulac of tool/": a fabulac from a codebase.
@@ -68,11 +86,17 @@ can always say otherwise.
 
 ## transcognition's core
 
+<!-- face: translator -->
 - **Translation:** the `translator` skill. MADLAD-400-3B by default;
   7B when the user asks for higher quality or a low-resource pair
-  carries weight; NLLB-200 only when `nllb_optin: true` is in
+  carries weight; NLLB-200 (CC-BY-NC: personal, non-commercial use
+  only) only when the user has added `nllb_optin: true` to
   `rness/paradigms/transcognition.md`. Read that file before reaching
-  past 3B.
+  past 3B. A project's own
+  `translation.md` with that line: offer once to carry it into a copy
+  of `transcognition.md`.
+<!-- /face -->
+<!-- face: macrocosm-oes -->
 - **From a codebase:** `fabulac` builds a fabulac of a folder of Python
   (up to sixty files and six thousand lines) in five stages; its
   questions go to the user through `dialectic`; it is entailed as code
@@ -81,6 +105,7 @@ can always say otherwise.
 - **Toward a codebase:** text-planning's steps, with the fabulac as the
   plan document. Run only an authored fabulac's entailment, and only
   through the sandbox, never with the shell.
+<!-- /face -->
 
 Before the first step of any of these, `read_file`
 `rness/paradigms/transcognition.md` for the flow.
