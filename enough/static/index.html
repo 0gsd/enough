@@ -2758,6 +2758,222 @@
 
     .comp-journal-head .comp-journal-state { font-style: italic; }
 
+    /* ---------- the scaffold (0.8): frames and plecholders ----------
+       A frame is one page or one slide of the thing being made: a plain
+       sheet lying on the desk, under its boxes. A plecholder (module type
+       `scaffold-box`) is a dashed box: its name, its count and its plec
+       are chrome, and the person's own words are the only thing in it a
+       caret can reach. The four looks are verroes' plecholders page's:
+       empty (dashed), written (solid, the person's mark), over (the
+       target passed), locked (the whole scaffold, tinted). */
+    .comp-module.comp-frame {
+      border-radius: calc(2px / var(--comp-z));
+      box-shadow: 0 calc(3px / var(--comp-z)) calc(14px / var(--comp-z))
+        rgba(0, 0, 0, 0.38);
+    }
+
+    .comp-module.comp-frame .comp-page {
+      padding: 0;
+      cursor: default;
+    }
+
+    /* The frame's place in the order and its name, in the corner: chrome,
+       screen-constant like the page-turn strip, and under the boxes. */
+    .comp-frame-label {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform: scale(calc(1 / var(--comp-z)));
+      transform-origin: 0 0;
+      max-width: 320px;
+      padding: 3px 8px;
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--fg-muted);
+      background: color-mix(in oklab, var(--comp-bg) 70%, transparent);
+      border-bottom-right-radius: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    .comp-module.comp-box {
+      box-shadow: none;
+      border-style: dashed;
+      border-width: calc(1.5px / var(--comp-z));
+      border-color: color-mix(in oklab, var(--comp-fg) 42%, transparent);
+      border-radius: calc(6px / var(--comp-z));
+    }
+
+    .comp-module.comp-box[data-box-state="written"] {
+      border-style: solid;
+      border-color: var(--comp-edge);
+    }
+
+    .comp-module.comp-box[data-box-state="over"] {
+      border-color: var(--accent-error);
+    }
+
+    .comp-module.comp-box[data-box-state="locked"] {
+      border-style: solid;
+      border-color: color-mix(in oklab, var(--comp-fg) 22%, transparent);
+    }
+
+    .comp-box-head {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6em;
+      margin: 0 0 0.35em;
+      font-size: 0.8em;
+      line-height: 1.35;
+    }
+
+    .comp-box-name {
+      font-weight: 700;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .comp-box-fixed {
+      opacity: 0.6;
+      white-space: nowrap;
+    }
+
+    .comp-box-chip {
+      font-size: 0.9em;
+      padding: 0 0.4em;
+      border-radius: 0.3em;
+      background: color-mix(in oklab, var(--accent-tool) 30%, transparent);
+    }
+
+    .comp-box-count {
+      margin-left: auto;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      opacity: 0.65;
+    }
+
+    .comp-module.comp-box[data-box-state="over"] .comp-box-count {
+      color: var(--accent-error);
+      opacity: 1;
+    }
+
+    .comp-module.comp-box[data-box-state="written"] .comp-box-count {
+      opacity: 0.9;
+    }
+
+    /* The plec: what the box has to get across. Bracketed, quieter than the
+       words, and never part of them. */
+    .comp-box-plec {
+      margin: 0 0 0.6em;
+      font-size: 0.8em;
+      line-height: 1.45;
+      opacity: 0.68;
+    }
+
+    /* A graphic box's slot, shaped like the picture it waits for. */
+    .comp-box-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: var(--comp-slot-ratio, 16 / 9);
+      max-height: 70%;
+      margin: 0 0 0.5em;
+      overflow: hidden;
+      font-size: 0.78em;
+      opacity: 0.75;
+      border: calc(1px / var(--comp-z)) dashed
+        color-mix(in oklab, var(--comp-fg) 35%, transparent);
+      border-radius: calc(4px / var(--comp-z));
+    }
+
+    .comp-box-slot.comp-has-img { opacity: 1; border-style: solid; }
+
+    .comp-box-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* The reading view: the thing as it will read, the scaffolding gone.
+       An empty box still shows where it is and what it is called, so a gap
+       never passes for a finished page. */
+    #composure.comp-reading .comp-box-plec,
+    #composure.comp-reading .comp-box-head,
+    #composure.comp-reading .comp-frame-label,
+    #composure.comp-reading .comp-module-pin {
+      display: none;
+    }
+
+    #composure.comp-reading .comp-module.comp-box {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    #composure.comp-reading .comp-module.comp-box[data-box-state="empty"] {
+      border-style: dashed;
+      border-color: color-mix(in oklab, var(--comp-fg) 25%, transparent);
+    }
+
+    #composure.comp-reading .comp-module.comp-box[data-box-state="empty"] .comp-box-head {
+      display: flex;
+      opacity: 0.55;
+    }
+
+    #composure.comp-reading .comp-module.comp-box[data-box-state="empty"] .comp-box-count {
+      display: none;
+    }
+
+    #composure.comp-reading .comp-box-slot:not(.comp-has-img) { opacity: 0.45; }
+
+    /* Locked: the sheets take a faint tint, so a locked scaffold never
+       reads as one you can still type on. */
+    #composure.comp-scaffold-locked .comp-module.comp-frame {
+      background: color-mix(in oklab, var(--comp-bg) 90%, var(--accent-user));
+    }
+
+    /* The scaffold's toolbar tally, as quiet as the save state. */
+    .comp-scaffold-state {
+      flex: 0 0 auto;
+      font-size: 10px;
+      color: var(--fg-muted);
+      white-space: nowrap;
+      padding: 0 3px;
+    }
+
+    #composure.comp-tiny .comp-scaffold-state { display: none; }
+
+    .comp-menu button.on { box-shadow: inset 2px 0 0 var(--accent-user); }
+
+    /* A finding: a comment the check wrote, with the fix it proposes. */
+    .wiki-comment-card.comp-finding .c-fix {
+      margin: 4px 0;
+      font-size: 12px;
+    }
+
+    .wiki-comment-card.comp-finding .c-fix del { opacity: 0.7; }
+
+    .wiki-comment-card.comp-finding .c-fix ins {
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-agent);
+    }
+
+    .wiki-comment-card.comp-finding .c-why {
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      margin: 2px 0 4px;
+    }
+
+    .comp-comment-mark.comp-finding-mark {
+      background: transparent;
+      border-bottom-style: wavy;
+      border-bottom-color: var(--accent-error);
+    }
+
     /* ---------- comments ----------
        The slider is the wikisink panel's twin: same card markup, same CSS
        class names (`.wiki-comment-card` and friends are SHARED, not
@@ -2888,6 +3104,8 @@
     }
 
     #comp-insp-slot input[type="text"],
+    #comp-insp-slot input[type="number"],
+    #comp-insp-slot textarea,
     #comp-insp-slot select {
       width: 100%;
       min-height: 22px;
@@ -2905,6 +3123,21 @@
       color: var(--fg-muted);
       font-size: 10px;
     }
+
+    /* 0.8: the plec field, and the target's number beside its unit. */
+    #comp-insp-slot textarea {
+      resize: vertical;
+      line-height: 1.4;
+      min-height: 52px;
+    }
+
+    #comp-insp-slot .comp-insp-pair {
+      display: flex;
+      gap: 4px;
+    }
+
+    #comp-insp-slot .comp-insp-pair input { flex: 0 0 72px; width: 72px; }
+    #comp-insp-slot .comp-insp-pair select { flex: 1 1 auto; width: auto; min-width: 0; }
 
     /* The picker's own result list — a menu inside the inspector rather
        than a third floating layer to keep track of. */
@@ -18259,6 +18492,30 @@
               <img class="svg-icon" data-icon="comp-file-entry" alt="file this entry" draggable="false">
             </button>
           </span>
+          <!-- 0.8: the scaffold's own controls, shown only while a scaffold
+               (a composure with a `composure:scaffold` block) is on the
+               stage — the reading view, the one lock (unlocking makes the
+               next version as a new file), the check, and what it becomes
+               and is exported as. See the SCAFFOLD block in the JS. -->
+          <span class="comp-group" id="comp-scaffold-group" hidden>
+            <button type="button" class="comp-btn" id="comp-read-btn"
+              title="read it as the finished thing" data-i18n-title="comp.scaffold.read.title">
+              <img class="svg-icon" data-icon="read-eye" alt="reading view" draggable="false">
+            </button>
+            <button type="button" class="comp-btn" id="comp-lock-btn"
+              title="lock this scaffold" data-i18n-title="comp.scaffold.lock.title">
+              <img class="svg-icon" data-icon="wiki-unlocked" alt="lock" draggable="false">
+            </button>
+            <button type="button" class="comp-btn" id="comp-check-btn"
+              title="check the spelling, the grammar and the claims" data-i18n-title="comp.scaffold.check.title">
+              <img class="svg-icon" data-icon="ribbon-check" alt="check" draggable="false">
+            </button>
+            <button type="button" class="comp-btn" id="comp-export-btn"
+              title="what it becomes, and export" data-i18n-title="comp.scaffold.export.title">
+              <img class="svg-icon" data-icon="export-doc" alt="export" draggable="false">
+            </button>
+            <span class="comp-scaffold-state" id="comp-scaffold-state"></span>
+          </span>
           <span class="comp-sep"></span>
           <button type="button" class="comp-btn" id="comp-undo-btn"
             title="undo (cmd+Z)" data-i18n-title="comp.undo.title">
@@ -18507,6 +18764,7 @@
         <div class="comp-menu" id="comp-type-menu" hidden role="menu"></div>
         <div class="comp-menu" id="comp-menu" hidden role="menu"></div>
         <div class="comp-menu" id="comp-ctx-menu" hidden role="menu"></div>
+        <div class="comp-menu" id="comp-scaffold-menu" hidden role="menu"></div>
 
         <div class="composure-wordmark">composure</div>
       </div>
@@ -34581,6 +34839,9 @@
         || e.kind === 'fabulap' ? 'cosm'
         : (e.kind === 'read' ? 'short' : 'atem');
       const dismiss = { label: t('canon.job.dismiss', 'dismiss'), run: () => convertToastClose(id) };
+      // 0.8: a scaffold's check (kind `scaffold`) tells its own progress and
+      // its end, and hands the findings to the composure it read.
+      if (e.kind === 'scaffold') { compScaffoldJobToast(e, snap, id, dismiss); return; }
       // 0.5.0: the run / read card shows its own progress while it is open.
       if (thym && thymPickShowing(e.id)) { convertToastClose(id); return; }
       // 0.6: so does the fabula card.
@@ -47009,6 +47270,16 @@
     const COMP_SCALE_MIN = 0.5;
     const COMP_SCALE_MAX = 6.0;
     const COMP_TYPES = ['text', 'doc', 'wiki', 'weblink', 'webframe', 'image'];
+    // 0.8: the scaffold's two types. Known (they have renderers) but never in
+    // the plain "+" menu: a scaffold's own menu offers them, and a frame is
+    // made with add_frame, never add_module (the backend refuses that).
+    const COMP_SCAFFOLD_TYPES = ['scaffold-box', 'frame'];
+    const COMP_KNOWN_TYPES = COMP_TYPES.concat(COMP_SCAFFOLD_TYPES);
+    // The frame shapes, in world units: US Letter (the format's FULLPORT)
+    // and a 16:9 slide. The backend's FRAME_SHAPES says the same.
+    const COMP_FULLPORT = [816, 1056];
+    const COMP_SLIDE = [1280, 720];
+    const COMP_GRAPHIC_SHAPES = ['16:9', '4:3', '1:1', '3:2', 'portrait', 'landscape', 'square'];
     const COMP_SWATCHES = ['paper', 'yellow', 'pink', 'blue', 'green',
       'orange', 'lilac', 'gray', 'ink', 'clear'];
 
@@ -47078,6 +47349,15 @@
                            //   still in flight belongs to
     };
     window.COMP = COMP;    // the suite drives the canvas through this
+
+    // 0.8: the scaffold's page-side state (see the SCAFFOLD block). Declared
+    // up here, beside COMP, because compSetMode and compIsLocked read it.
+    //   state    GET /api/composure/scaffold's answer (empty boxes, findings,
+    //            the last check, the formats it exports as), or null
+    //   reading  the reading view is on
+    //   job      the canon job entry (canonTrack) of a running check
+    const COMP_SCAFFOLD = { state: null, reading: false, job: null, noticeAt: 0 };
+    window.COMP_SCAFFOLD = COMP_SCAFFOLD;
 
     function compEl(id) { return document.getElementById(id); }
     function compStage() { return compEl('composure'); }
@@ -47753,8 +48033,70 @@
         }
         host.appendChild(compRichToNodes(page ? page.rich : ''));
       },
+      // 0.8: a plecholder. Its name, fixed parts, count and plec are CHROME
+      // (data-comp-chrome + contenteditable="false", the journal header's
+      // two attributes), so none of it is ever read back as the person's
+      // words; page 1's rich text, below them, is the one editable field.
+      // The count and the state are painted by compBoxPaintState once the
+      // host is on its module (compPaintModule).
+      'scaffold-box'(m, page, host) {
+        const f = m.fields || {};
+        const head = compChrome('div', 'comp-box-head');
+        const name = document.createElement('span');
+        name.className = 'comp-box-name';
+        name.textContent = m.title || t('comp.box.untitled', 'a plecholder');
+        head.appendChild(name);
+        const fx = compBoxFixed(m);
+        if (fx.fixed) {
+          const s = document.createElement('span');
+          s.className = 'comp-box-fixed';
+          s.textContent = fx.fixed;
+          head.appendChild(s);
+        }
+        for (const c of fx.chips) {
+          const s = document.createElement('span');
+          s.className = 'comp-box-chip';
+          s.textContent = c;
+          head.appendChild(s);
+        }
+        const count = document.createElement('span');
+        count.className = 'comp-box-count';
+        head.appendChild(count);
+        host.appendChild(head);
+        const plec = compChrome('p', 'comp-box-plec');
+        // "plec" is a ruled word and stays as written in every language.
+        plec.textContent = f.plec ? '[plec: ' + f.plec + ']'
+          : '[' + t('comp.box.noPlec', 'no plec yet: what must this box get across?') + ']';
+        if (f.plec_by === 'person') plec.dataset.by = 'person';
+        host.appendChild(plec);
+        if (f.kind === 'graphic') host.appendChild(compBoxSlot(m));
+        host.appendChild(compRichToNodes(page ? page.rich : ''));
+      },
+      // 0.8: a frame — one page or one slide of the thing. It holds no text
+      // of its own (the format's one empty page); what it shows is its place
+      // in the order and its name.
+      frame(m, page, host) {
+        void page;
+        const f = m.fields || {};
+        const label = compChrome('div', 'comp-frame-label');
+        const i = compFrameOrder().indexOf(m.id);
+        const shape = f.shape === 'slide'
+          ? t('comp.frame.slide', 'slide') : t('comp.frame.page', 'page');
+        label.textContent = (i >= 0 ? (i + 1) + ' · ' : '') + (m.title || shape);
+        host.appendChild(label);
+      },
     };
     window.COMP_MODULE_RENDERERS = COMP_MODULE_RENDERERS;
+
+    // A piece of chrome inside an editable host: kept out of the caret and
+    // out of the saved rich text alike (see compWalkRich).
+    function compChrome(tag, cls) {
+      const el = document.createElement(tag);
+      el.className = cls;
+      el.dataset.compChrome = '1';
+      el.setAttribute('contenteditable', 'false');
+      return el;
+    }
 
     function compModuleTarget(m) {
       const f = m.fields || {};
@@ -47786,6 +48128,8 @@
         case 'weblink': return t('comp.type.weblink', 'a link to the web');
         case 'webframe': return t('comp.type.webframe', 'a cached web page');
         case 'image': return t('comp.type.image', 'an image');
+        case 'scaffold-box': return t('comp.type.box', 'a plecholder');
+        case 'frame': return t('comp.type.frame', 'a frame');
         default: return type || t('comp.type.other', 'a module');
       }
     }
@@ -47808,6 +48152,8 @@
     function compIsLocked(m, page) {
       if (!m) return true;
       if (m.locked) return true;
+      // 0.8: one lock for the whole scaffold — every module on it.
+      if (compScaffoldLocked()) return true;
       const p = page || compCurPage(m);
       return !!(p && (p.locked || p.filed));
     }
@@ -47816,6 +48162,8 @@
     // `data-state`. Five values:
     //   filed     a journal entry that has been filed — a one-way door
     //   statement a council statement (locked because it has a speaker)
+    //   locked-scaffold  a page of a locked scaffold (0.8): the whole
+    //             scaffold is closed, and unlocking makes a new version
     //   locked    locked for some other reason
     //   unsaved   today's journal page, which exists only in this tab until
     //             the first keystroke puts it on disk
@@ -47823,6 +48171,7 @@
     function compPageState(m, page, locked) {
       if (page && page.filed) return 'filed';
       if (m && m.speaker) return 'statement';
+      if (locked && compScaffoldLocked()) return 'locked-scaffold';
       if (locked) return 'locked';
       const j = COMP.journal;
       if (j && j.pending && m && j.module === m.id && page && page.n === j.pending) {
@@ -47846,10 +48195,14 @@
       const page = compCurPage(m);
       const locked = compIsLocked(m, page);
       const bg = (m.known_bg === false) ? 'paper' : (m.bg || 'paper');
+      const sf = m.fields || {};
       el.className = 'comp-module comp-bg-' + (COMP_SWATCHES.includes(bg) ? bg : 'paper')
         + (COMP.sel.includes(m.id) ? ' comp-selected' : '')
-        + (m.w >= 800 && m.h >= 1000 ? ' comp-fullport' : '')
+        + (m.w >= 800 && m.h >= 1000 && !compIsFrame(m) ? ' comp-fullport' : '')
         + (locked ? ' comp-locked' : '')
+        // 0.8: the scaffold's two types (CSS: "the scaffold").
+        + (compIsFrame(m) ? ' comp-frame comp-frame-' + (sf.shape === 'slide' ? 'slide' : 'page') : '')
+        + (compIsBox(m) ? ' comp-box comp-box-' + (sf.kind === 'graphic' ? 'graphic' : 'text') : '')
         // A council's conclusion is the one statement tinted `ink`. Ring
         // it: on a column of twenty statements, "which one is the answer?"
         // should not be a question. (P5c)
@@ -47862,9 +48215,12 @@
       el.style.setProperty('--comp-scale', String(m.scale || 1));
       el.innerHTML = '';
 
-      // A link-in module is a door in view mode (the CSS reads this).
-      if (m.type !== 'text' && m.known_type !== false) el.dataset.link = '1';
+      // A link-in module is a door in view mode (the CSS reads this). A
+      // frame and a plecholder are not doors: they point at nothing.
+      if (m.type !== 'text' && m.known_type !== false
+        && !COMP_SCAFFOLD_TYPES.includes(m.type)) el.dataset.link = '1';
       else delete el.dataset.link;
+      el.dataset.type = m.type;
 
       const host = document.createElement('div');
       host.className = 'comp-page';
@@ -47883,6 +48239,8 @@
       compRendererFor(m)(m, page, host);
       compCouncilDecorate(m, el, host);
       el.appendChild(host);
+      if (compIsBox(m)) compBoxPaintState(el, m, host);
+      else delete el.dataset.boxState;
       compMarkPageComments(m, host);
 
       // The face. Built now, invisible, so the cross-fade at the zoom
@@ -48255,6 +48613,13 @@
         if (onlyId && m.id !== onlyId) continue;
         const el = compModuleEl(m.id);
         if (!el) continue;
+        // A frame is a sheet, not a card: it never turns into a label (its
+        // boxes do), or a zoomed-out deck would be a wall of slide names
+        // drawn under the very boxes that already say them.
+        if (compIsFrame(m)) {
+          if (el.classList.contains('comp-faced')) el.classList.remove('comp-faced');
+          continue;
+        }
         const eff = 16 * (m.scale || 1) * Z;
         const faced = eff < COMP_FACE_PX;
         if (el.classList.contains('comp-faced') !== faced)
@@ -48350,6 +48715,9 @@
       if (COMP.sel.length !== 1) return;
       const m = compModuleById(COMP.sel[0]);
       if (!m || compIsLocked(m)) return;   // engine-owned geometry
+      // A slide is a fixed 16:9 (its shape is its size); a page frame may
+      // be made taller, which is what the backend does to hold its boxes.
+      if (compIsFrame(m) && (m.fields || {}).shape === 'slide') return;
       for (const [name, fx, fy] of COMP_HANDLES) {
         const p = compWorldToStage(m.x + m.w * fx, m.y + m.h * fy);
         const h = document.createElement('div');
@@ -48438,8 +48806,11 @@
           b.classList.toggle('on', !!m && b.dataset.bg === m.bg);
         });
         const locked = !!m && compIsLocked(m);
-        compEl('comp-insp-delpage').disabled = !m || (m.page_count || 1) <= 1 || locked;
-        compEl('comp-insp-addpage').disabled = !m || locked;
+        // A plecholder keeps its words on its one page, and a frame has no
+        // text of its own: neither takes pages.
+        const onePage = !!m && COMP_SCAFFOLD_TYPES.includes(m.type);
+        compEl('comp-insp-delpage').disabled = !m || (m.page_count || 1) <= 1 || locked || onePage;
+        compEl('comp-insp-addpage').disabled = !m || locked || onePage;
         compEl('comp-insp-delete').disabled = !!(m && m.locked);
       }
       compFillInspSlot(m, inkOnly);
@@ -48468,8 +48839,11 @@
     function compFillInspSlot(m, inkOnly) {
       const slot = compEl('comp-insp-slot');
       if (!slot) return;
+      // A box's kind is in the key: a graphic box grows a shape and a
+      // picture field, so changing kind has to rebuild the slot.
       const key = inkOnly ? ('ink:' + COMP.inkSel)
-        : (m ? (m.id + ':' + m.type) : 'many:' + COMP.sel.length);
+        : (m ? (m.id + ':' + m.type + ':' + ((m.fields || {}).kind || '')
+          + ':' + compFrameOrder().length) : 'many:' + COMP.sel.length);
       if (slot.dataset.key === key) {
         if (!slot.contains(document.activeElement)) compSyncInspSlot(m, inkOnly);
         return;
@@ -48485,6 +48859,10 @@
         compBuildWikiPicker(slot, m);
       } else if (m.type === 'weblink' || m.type === 'webframe') {
         compBuildUrlField(slot, m);
+      } else if (compIsBox(m)) {
+        compBuildBoxFields(slot, m);
+      } else if (compIsFrame(m)) {
+        compBuildFrameFields(slot, m);
       }
       if (m.type === 'webframe') {
         const sel = document.createElement('select');
@@ -48530,6 +48908,12 @@
         const v = f[el.dataset.field];
         if (el.value !== (v || '')) el.value = v || '';
       });
+      // 0.8: the scaffold's own fields (compBuildBoxFields).
+      slot.querySelectorAll('[data-sfield]').forEach((el) => {
+        const v = compSFieldValue(m, el.dataset.sfield);
+        if (el.value !== v) el.value = v;
+      });
+      compSyncWrittenBtn(slot, m);
     }
 
     function compBuildInkPalette(slot) {
@@ -48742,6 +49126,10 @@
     }
 
     function compQueue(op, key) {
+      // 0.8: a locked scaffold is sent a view and nothing else (the SCAFFOLD
+      // block's rule 2). The server would refuse the rest — and a refusal
+      // reloads the document under the reader.
+      if (!compOpAllowedNow(op)) { compScaffoldLockedNotice(); return; }
       if (key) {
         const i = COMP.pending.findIndex((p) => p.__k === key);
         if (i !== -1) {
@@ -48789,6 +49177,9 @@
       const o = opts || {};
       clearTimeout(COMP._flushT);
       if (COMP.viewDirty && COMP.path) compQueueViewOp();
+      // Anything queued before the scaffold was locked (the lock came in on
+      // the SSE echo, say) is dropped here rather than refused there.
+      if (compScaffoldLocked()) COMP.pending = COMP.pending.filter(compOpAllowedNow);
       if (!COMP.pending.length) return null;
       if (COMP.saving && !o.beacon) { COMP.again = true; return null; }
       const ops = COMP.pending.map(compStripKey);
@@ -48856,6 +49247,7 @@
     // A batch that must land before we can carry on — add_module needs the
     // server's placement, and the reply's model is the truth.
     async function compCommit(ops, opts) {
+      if (!ops.every(compOpAllowedNow)) { compScaffoldLockedNotice(); return null; }
       await compFlush();
       const body = compBatchBody(ops);
       if (opts && opts.wantModel) body.want_model = true;
@@ -48950,6 +49342,7 @@
     // the inverse through the same door, so the server never learns that
     // anything special happened.
     function compDo(entry) {
+      if (!entry.ops.every(compOpAllowedNow)) { compScaffoldLockedNotice(); return; }
       compApplyOps(entry.ops);
       COMP.undo.push(entry);
       if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
@@ -48958,6 +49351,7 @@
     }
 
     function compUndo() {
+      if (compScaffoldLocked()) { compScaffoldLockedNotice(); return; }
       const e = COMP.undo.pop();
       if (!e) return;
       compApplyOps(e.undo);
@@ -48967,6 +49361,7 @@
     }
 
     function compRedo() {
+      if (compScaffoldLocked()) { compScaffoldLockedNotice(); return; }
       const e = COMP.redo.pop();
       if (!e) return;
       compApplyOps(e.ops);
@@ -48985,6 +49380,7 @@
     // application is what lets undo/redo and dragging feel instant; the
     // server is still the only authority, and a stale reply overwrites us.
     function compApplyOps(ops) {
+      if (!ops.every(compOpAllowedNow)) { compScaffoldLockedNotice(); return; }
       const touched = new Set();
       for (const op of ops) {
         const id = compApplyOpLocal(op);
@@ -48997,13 +49393,14 @@
       compRenderHandles();
       compRenderInspector();
       compRenderInk();
+      if (compScaffold()) compScaffoldTally();
     }
 
     function compApplyOpLocal(op) {
       const mods = (COMP.model && COMP.model.modules) || [];
       if (op.op === 'add_module') {
         const m = {
-          id: op.id, type: op.type || 'text', known_type: COMP_TYPES.includes(op.type || 'text'),
+          id: op.id, type: op.type || 'text', known_type: COMP_KNOWN_TYPES.includes(op.type || 'text'),
           x: op.x || 0, y: op.y || 0, w: op.w || 360, h: op.h || 240,
           z: op.z || (mods.reduce((a, b) => Math.max(a, b.z || 0), 0) + 1),
           bg: op.bg || 'paper', known_bg: true, scale: op.scale || 1,
@@ -49021,12 +49418,57 @@
             }]),
           data: {},
         };
+        // 0.8: a plecholder's own fields ride on its add (an undone delete
+        // comes back with its plec, its target and its frame).
+        compMirrorScaffoldFields(m, op);
         mods.push(m);
+        return m.id;
+      }
+      if (op.op === 'add_frame') {
+        // An undone frame delete. Placed where it was (the snapshot carries
+        // x/y); the backend puts it at `at` in the order and under the rest.
+        const dims = op.shape === 'slide' ? COMP_SLIDE : COMP_FULLPORT;
+        const m = {
+          id: op.id, type: 'frame', known_type: true,
+          x: op.x || 0, y: op.y || 0, w: dims[0], h: dims[1],
+          z: mods.reduce((a, b) => Math.min(a, b.z || 0), 1) - 1,
+          bg: op.bg || 'paper', known_bg: true, scale: 1,
+          title: op.title || '', cur: 1, fields: { shape: op.shape || 'page' },
+          speaker: null, speaker_kind: null, turn: null, locked: false,
+          page_count: 1,
+          pages: [{ n: 1, rich: '', first_line: '', chars: 0, date: null,
+            filed: false, locked: false, data: {} }],
+          data: {},
+        };
+        mods.push(m);
+        const s = compScaffold();
+        if (s) {
+          const order = (s.frames || []).filter((id) => id !== m.id);
+          const at = op.at ? Math.max(0, Math.min(order.length, op.at - 1)) : order.length;
+          order.splice(at, 0, m.id);
+          s.frames = order;
+        }
+        return m.id;
+      }
+      if (op.op === 'reorder_frames') {
+        const s = compScaffold();
+        if (s) s.frames = (op.order || []).slice();
+        for (const id of (op.order || [])) compRefreshModule(id);
+        return null;
+      }
+      if (op.op === 'move_to_frame') {
+        const m = compModuleById(op.id);
+        if (!m) return null;
+        (m.fields || (m.fields = {})).frame = op.frame;
+        if ('x' in op) m.x = op.x;
+        if ('y' in op) m.y = op.y;
         return m.id;
       }
       if (op.op === 'remove_module') {
         const i = mods.findIndex((m) => m.id === op.id);
         if (i !== -1) mods.splice(i, 1);
+        const s = compScaffold();
+        if (s && Array.isArray(s.frames)) s.frames = s.frames.filter((id) => id !== op.id);
         const el = compModuleEl(op.id);
         if (el) el.remove();
         COMP.sel = COMP.sel.filter((s) => s !== op.id);
@@ -49039,6 +49481,7 @@
           if (k in op) m[k] = op[k];
         for (const k of ['bg', 'title', 'type'])
           if (k in op) m[k] = op[k];
+        compMirrorScaffoldFields(m, op);
         return m.id;
       }
       if (op.op === 'set_page') {
@@ -49109,12 +49552,30 @@
     // makes "delete, then undo" give back the same module rather than an
     // empty box in the same place.
     function compSnapshot(m) {
-      return {
+      // 0.8: a frame is never made by add_module (the backend refuses it);
+      // it comes back through add_frame, at its old place in the order.
+      if (compIsFrame(m)) {
+        const out = {
+          op: 'add_frame', id: m.id, shape: (m.fields || {}).shape || 'page',
+          x: m.x, y: m.y, bg: m.bg, title: m.title,
+        };
+        const i = compFrameOrder().indexOf(m.id);
+        if (i >= 0) out.at = i + 1;
+        return out;
+      }
+      const snap = {
         op: 'add_module', id: m.id, type: m.type,
         x: m.x, y: m.y, w: m.w, h: m.h, z: m.z,
         bg: m.bg, scale: m.scale, title: m.title,
         pages: (m.pages || []).map((p) => ({ rich: p.rich || '' })),
       };
+      if (compIsBox(m)) {
+        const f = m.fields || {};
+        for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href']) {
+          if (f[k]) snap[k] = f[k];
+        }
+      }
+      return snap;
     }
 
     // ================================================================
@@ -49171,6 +49632,9 @@
       // the pending card it replaces.
       compCouncilAfterAdopt(model);
       compRenderComments();
+      // 0.8: the scaffold's chrome follows the model (a lock that arrived
+      // on the SSE echo closes the canvas here).
+      compScaffoldChrome();
       if (changedIds && changedIds.length) {
         for (const id of changedIds) if (id !== keepId) compFlashModule(id);
       }
@@ -49236,6 +49700,7 @@
       compEraserCursor(null);
       compUpdateJournalBtn();
       compCouncilReset();
+      compScaffoldReset();
       // Leaving a council gives the readvisor panel back. This is the ONE
       // release, deliberately: leaving the document is the only way to
       // leave a council, and every leaving path goes through here.
@@ -49279,6 +49744,7 @@
       // The form behaviour runs a beat later and fills in the live state;
       // this is what stops a council flashing up as an ordinary plane.
       compCouncilRender();
+      compScaffoldChrome();
     }
 
     // COMP_FORM_BEHAVIORS — what opening a composure of this form DOES.
@@ -49294,7 +49760,15 @@
         compFocusFirstText();
       },
       cards(ctx) { compSetMode(ctx.fresh ? 'edit' : 'view'); compOpenFit(false); },
-      scaffold(ctx) { compSetMode(ctx.fresh ? 'edit' : 'view'); compOpenFit(false); },
+      // 0.8: this entry branches on the `composure:scaffold` block, and
+      // compApplyFormBehavior sends EVERY composure that has one here
+      // (whatever form it was made from: "make this a scaffold" keeps the
+      // form). Without the block — an old scaffold-form composure, or a
+      // council's output, which is one — it is exactly 0.7's behaviour.
+      scaffold(ctx) {
+        if (!compScaffold()) { compSetMode(ctx.fresh ? 'edit' : 'view'); compOpenFit(false); return; }
+        compScaffoldOpen(!!ctx.fresh);
+      },
       // A journal opens on today's page — a fresh one, in memory only,
       // when the last entry is already filed — with the caret in it and
       // the file-entry button live. See the state machine further down.
@@ -49321,7 +49795,8 @@
     window.COMP_FORM_BEHAVIORS = COMP_FORM_BEHAVIORS;
 
     function compApplyFormBehavior(fresh) {
-      const fn = COMP_FORM_BEHAVIORS[COMP.form] || COMP_FORM_BEHAVIORS._default;
+      const fn = compScaffold() ? COMP_FORM_BEHAVIORS.scaffold
+        : (COMP_FORM_BEHAVIORS[COMP.form] || COMP_FORM_BEHAVIORS._default);
       try { fn({ fresh: !!fresh }); } catch (e) { console.warn('composure form behavior', e); }
     }
 
@@ -49420,7 +49895,15 @@
     // ================================================================
 
     function compSetMode(mode) {
-      const next = mode === 'edit' ? 'edit' : 'view';
+      let next = mode === 'edit' ? 'edit' : 'view';
+      // 0.8: a locked scaffold is read, panned, zoomed and commented on,
+      // never edited; writing on means unlocking (a new version).
+      if (next === 'edit' && compScaffoldLocked()) {
+        if (COMP.mode !== 'edit') compScaffoldLockedNotice();
+        next = 'view';
+      }
+      // The reading view is a way of reading: editing leaves it.
+      if (next === 'edit' && COMP_SCAFFOLD.reading) compSetReading(false);
       if (next === COMP.mode) { compRenderInspector(); return; }
       compFlush();                      // a face change is a save point
       COMP.mode = next;
@@ -49518,10 +50001,9 @@
     function compBeginEditing(id, clickEvent) {
       const m = compModuleById(id);
       if (!m || COMP.mode !== 'edit') return;
-      if (m.type !== 'text' && m.known_type !== false) {
-        // Link-in types have no editable body in this lane.
-        if (m.type !== 'text') return;
-      }
+      // Link-in types have no editable body, and a frame has no text of its
+      // own; a plecholder (0.8) takes the person's words like a text card.
+      if (m.type !== 'text' && !compIsBox(m)) return;
       const page = compCurPage(m);
       if (compIsLocked(m, page)) return;      // council statement / filed page
       const el = compModuleEl(id);
@@ -49623,6 +50105,9 @@
       // set_page for a journal page the server had never been told about.
       const plain = rich.replace(/<[^>]*>/g, '').replace(/ /g, ' ').trim();
       if (!plain && !/<hr\b/i.test(rich)) rich = '';
+      // 0.8: a plecholder's count and state move with every keystroke, on
+      // the page alone — no round trip (and no op: the count is not stored).
+      if (compIsBox(m)) compBoxPaintState(el, m, host);
       const page = (m.pages || []).find((p) => p.n === n);
       if (page && page.rich === rich) return;
       if (page) { page.rich = rich; page.chars = rich.length; }
@@ -49657,7 +50142,13 @@
       bar = document.createElement('div');
       bar.className = 'comp-overflow';
       bar.dataset.act = 'overflow';
-      bar.textContent = t('comp.overflow', 'continue on a new page →');
+      // A plecholder keeps its words on one page (the check and the export
+      // read page 1), so its offer is a taller box, made by the person's
+      // click — never a resize the canvas does on its own.
+      const m = compModuleById(COMP.editing.id);
+      bar.textContent = compIsBox(m)
+        ? t('comp.box.taller', 'make this box taller ↓')
+        : t('comp.overflow', 'continue on a new page →');
       el.appendChild(bar);
     }
 
@@ -50072,13 +50563,44 @@
       const w0 = compStageToWorld(stage.x, stage.y);
       COMP.drag = {
         kind: 'move', w0,
-        start: COMP.sel.map((id) => {
+        start: compMoveSet(COMP.sel).map((id) => {
           const mm = compModuleById(id);
-          return mm ? { id, x: mm.x, y: mm.y, locked: compIsLocked(mm) } : null;
+          return mm ? { id, x: mm.x, y: mm.y, locked: compIsLocked(mm),
+            clamp: compBoxClamp(mm, COMP.sel) } : null;
         }).filter(Boolean),
         moved: false,
       };
       compGestureOn();
+    }
+
+    // 0.8: what a move gesture moves. In a scaffold a frame carries its
+    // boxes (the backend moves a frame alone, so the page sends the boxes'
+    // moves in the same batch, AFTER the frame's: frames first here, and
+    // the queue keeps this order).
+    function compMoveSet(sel) {
+      if (!compScaffold()) return sel.slice();
+      const frames = sel.filter((id) => compIsFrame(compModuleById(id)));
+      const out = frames.slice();
+      for (const fid of frames) {
+        for (const b of compBoxesOf(fid)) if (!out.includes(b.id)) out.push(b.id);
+      }
+      for (const id of sel) if (!out.includes(id)) out.push(id);
+      return out;
+    }
+
+    // A box dragged on its own stays on its frame: the rectangle its top-left
+    // may travel in, or null (not a box, or its frame is moving with it).
+    // Moving a box to another frame is the inspector's or the menu's job
+    // (`move_to_frame`), never a drop that silently re-parents it.
+    function compBoxClamp(m, sel) {
+      if (!compIsBox(m)) return null;
+      const f = compFrameOf(m);
+      if (!f || sel.includes(f.id)) return null;
+      return {
+        x0: f.x, y0: f.y,
+        x1: Math.max(f.x, f.x + f.w - m.w),
+        y1: Math.max(f.y, f.y + f.h - m.h),
+      };
     }
 
     function compOnPointerMove(ev) {
@@ -50144,8 +50666,13 @@
           const m = compModuleById(s.id);
           const el = compModuleEl(s.id);
           if (!m || !el) continue;
-          m.x = Math.round((s.x + dx) * 100) / 100;
-          m.y = Math.round((s.y + dy) * 100) / 100;
+          let nx = s.x + dx, ny = s.y + dy;
+          if (s.clamp) {
+            nx = Math.max(s.clamp.x0, Math.min(nx, s.clamp.x1));
+            ny = Math.max(s.clamp.y0, Math.min(ny, s.clamp.y1));
+          }
+          m.x = Math.round(nx * 100) / 100;
+          m.y = Math.round(ny * 100) / 100;
           el.style.left = m.x + 'px';
           el.style.top = m.y + 'px';
         }
@@ -50199,8 +50726,12 @@
         const stage = compEventToStage(ev);
         const a = compStageToWorld(Math.min(d.sx, stage.x), Math.min(d.sy, stage.y));
         const b = compStageToWorld(Math.max(d.sx, stage.x), Math.max(d.sy, stage.y));
+        // A frame lies under everything on it, so a marquee drawn over a few
+        // boxes would always catch it too: a frame is caught only whole.
         const hits = ((COMP.model && COMP.model.modules) || [])
-          .filter((m) => m.x < b.x && m.x + m.w > a.x && m.y < b.y && m.y + m.h > a.y)
+          .filter((m) => (compIsFrame(m)
+            ? (m.x >= a.x && m.x + m.w <= b.x && m.y >= a.y && m.y + m.h <= b.y)
+            : (m.x < b.x && m.x + m.w > a.x && m.y < b.y && m.y + m.h > a.y)))
           .map((m) => m.id);
         compSetSelection(d.additive ? COMP.sel.concat(hits) : hits);
         return;
@@ -50421,6 +50952,7 @@
       const m = compModuleById(id);
       if (!m) return;
       compCommitPage(id);
+      if (compIsBox(m)) { compBoxGrow(m); return; }
       const at = (m.cur || 1) + 1;
       compDo({
         ops: [{ op: 'add_page', module: id, n: at }],
@@ -50432,6 +50964,7 @@
 
     async function compAddModule(type) {
       if (COMP.mode !== 'edit') compSetMode('edit');
+      if (type === 'scaffold-box') { await compAddBox(); return; }
       const id = compNewId('m');
       const mods = (COMP.model && COMP.model.modules) || [];
       // An empty canvas has no median to copy, so the new module is sized
@@ -50456,9 +50989,14 @@
     }
 
     async function compDeleteSelection() {
-      const ids = COMP.sel.slice();
+      if (compScaffoldLocked()) { compScaffoldLockedNotice(); return; }
+      // 0.8: a frame goes with the plecholders on it (the backend refuses to
+      // remove a frame that still holds boxes), boxes first and frames last;
+      // the undo brings the frames back first.
+      const ids = compMoveSet(COMP.sel);
       if (!ids.length) return;
-      const mods = ids.map(compModuleById).filter(Boolean);
+      const mods = ids.map(compModuleById).filter(Boolean)
+        .sort((a, b) => (compIsFrame(a) ? 1 : 0) - (compIsFrame(b) ? 1 : 0));
       if (mods.some((m) => m.locked)) {
         compNotice(t('comp.locked.delete',
           'a council statement belongs to the council — it cannot be deleted here'));
@@ -50478,13 +51016,15 @@
       compEndEditing();
       compDo({
         ops: mods.map((m) => ({ op: 'remove_module', id: m.id })),
-        undo: mods.map((m) => compSnapshot(m)),
+        undo: mods.slice().reverse().map((m) => compSnapshot(m)),
       });
       compSetSelection([]);
     }
 
     function compNudge(dx, dy) {
-      const ids = COMP.sel.filter((id) => {
+      // A frame carries its boxes here too (compMoveSet), and a box alone
+      // stays on its frame (compBoxClamp).
+      const ids = compMoveSet(COMP.sel).filter((id) => {
         const m = compModuleById(id);
         return m && !compIsLocked(m);
       });
@@ -50492,7 +51032,13 @@
       const ops = [], undo = [];
       for (const id of ids) {
         const m = compModuleById(id);
-        ops.push({ op: 'update_module', id, x: Math.round((m.x + dx) * 100) / 100, y: Math.round((m.y + dy) * 100) / 100, __k: 'geo:' + id });
+        const c = compBoxClamp(m, COMP.sel);
+        let nx = m.x + dx, ny = m.y + dy;
+        if (c) {
+          nx = Math.max(c.x0, Math.min(nx, c.x1));
+          ny = Math.max(c.y0, Math.min(ny, c.y1));
+        }
+        ops.push({ op: 'update_module', id, x: Math.round(nx * 100) / 100, y: Math.round(ny * 100) / 100, __k: 'geo:' + id });
         undo.push({ op: 'update_module', id, x: m.x, y: m.y, __k: 'geo:' + id });
       }
       compDo({ ops, undo });
@@ -50573,7 +51119,7 @@
     // The menus
     // ================================================================
 
-    const COMP_MENU_IDS = ['comp-type-menu', 'comp-menu', 'comp-ctx-menu'];
+    const COMP_MENU_IDS = ['comp-type-menu', 'comp-menu', 'comp-ctx-menu', 'comp-scaffold-menu'];
 
     function compCloseMenus() {
       for (const id of COMP_MENU_IDS) {
@@ -50615,6 +51161,30 @@
       menu.innerHTML = '';
       const head = document.createElement('div');
       head.className = 'comp-menu-head';
+      // 0.8: a scaffold holds plecholders on frames and nothing else, so its
+      // "+" offers exactly those two — a box, and a frame of the thing's
+      // shape (a deck's is a slide, a page's or a document's a page).
+      if (compScaffold()) {
+        head.textContent = t('comp.add.scaffoldHead', 'add to this scaffold');
+        menu.appendChild(head);
+        const box = document.createElement('button');
+        box.type = 'button';
+        box.dataset.type = 'scaffold-box';
+        box.textContent = t('comp.add.box', '+ scaffold-box');
+        const bsub = document.createElement('span');
+        bsub.className = 'comp-menu-sub';
+        bsub.textContent = t('comp.add.boxSub', 'a plecholder on the current frame');
+        box.appendChild(bsub);
+        menu.appendChild(box);
+        const slide = compScaffold().thing === 'deck';
+        const fr = document.createElement('button');
+        fr.type = 'button';
+        fr.dataset.frameShape = slide ? 'slide' : 'page';
+        fr.textContent = slide ? t('comp.add.slide', '+ slide') : t('comp.add.page', '+ page');
+        menu.appendChild(fr);
+        compPlaceMenu(menu, btn);
+        return;
+      }
       head.textContent = t('comp.add.head', 'add a module');
       menu.appendChild(head);
       for (const type of COMP_TYPES) {
@@ -50659,6 +51229,21 @@
       settings.dataset.settings = '1';
       settings.textContent = t('comp.menu.settings', 'this composure’s settings…');
       menu.appendChild(settings);
+      // 0.8: nothing becomes a scaffold on its own — an old scaffold-form
+      // composure, or a council's output, opens as it always did — but any
+      // plain one can be made one on a click. Its text cards become
+      // plecholders holding the same words, on one frame.
+      if (compMayMakeScaffold()) {
+        const mk = document.createElement('button');
+        mk.type = 'button';
+        mk.dataset.makeScaffold = '1';
+        mk.textContent = t('comp.menu.makeScaffold', 'make this a scaffold');
+        const sub = document.createElement('span');
+        sub.className = 'comp-menu-sub';
+        sub.textContent = t('comp.menu.makeScaffoldSub', 'its text cards become plecholders, with the same words, on one frame');
+        mk.appendChild(sub);
+        menu.appendChild(mk);
+      }
       menu.appendChild(document.createElement('hr'));
       const head1 = document.createElement('div');
       head1.className = 'comp-menu-head';
@@ -50758,6 +51343,7 @@
     async function compRename() {
       const el = compEl('comp-title');
       if (!el) return;
+      if (compScaffoldLocked()) { compSyncTitleField(); return; }
       const title = (el.value || '').trim();
       if (title === (COMP.title || '')) return;
       COMP.title = title;
@@ -51817,7 +52403,9 @@
       });
       if (!COMP.comments.length) return;
       const n = parseInt(pageEl.dataset.n, 10) || 1;
-      const text = pageEl.textContent || '';
+      // The page's OWN text: chrome (a journal's date, a plecholder's plec
+      // and count) is skipped, so a quote is never found inside it.
+      const text = compPageText(pageEl);
       const wants = compCommentsFor(m.id, n);
       for (const c of wants) {
         const a = c.anchor || {};
@@ -51849,8 +52437,26 @@
       }
     }
 
+    // The text nodes a page's own words are made of: everything but chrome.
+    function compTextWalker(root) {
+      return document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(n) {
+          const p = n.parentNode;
+          return (p && p.closest && p.closest('[data-comp-chrome]'))
+            ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+        },
+      });
+    }
+
+    function compPageText(root) {
+      let s = '';
+      const walker = compTextWalker(root);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) s += n.textContent;
+      return s;
+    }
+
     function compWrapRange(root, start, end, comment) {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const walker = compTextWalker(root);
       let pos = 0, sn = null, so = 0, en = null, eo = 0;
       for (let n = walker.nextNode(); n; n = walker.nextNode()) {
         const len = n.textContent.length;
@@ -51864,7 +52470,9 @@
         range.setStart(sn, so);
         range.setEnd(en, eo);
         const span = document.createElement('span');
-        span.className = 'comp-comment-mark' + (comment.resolved ? ' resolved' : '');
+        const fd = comment.finding;
+        span.className = 'comp-comment-mark' + (comment.resolved ? ' resolved' : '')
+          + (fd && fd.status === 'open' ? ' comp-finding-mark' : '');
         span.dataset.cid = comment.id;
         span.appendChild(range.extractContents());
         range.insertNode(span);
@@ -51926,7 +52534,11 @@
           + '</div>';
         return;
       }
-      list.innerHTML = COMP.comments.map((c) => commentCardHtml(c, {
+      // 0.8: a finding (a comment the check wrote, `by: "check"`) is drawn as
+      // itself — what it found, the fix, why, and accept / decline — and
+      // never with a delete: it stays as the record (compFindingCardHtml).
+      list.innerHTML = COMP.comments.map((c) => (c.finding && c.by === 'check')
+        ? compFindingCardHtml(c) : commentCardHtml(c, {
         stateChip: compCommentStateChip,
         jumpLabel: t('comp.comments.jump', 'jump'),
         jumpTitle: t('comp.comments.jump.title', 'bring this comment’s module into view'),
@@ -51994,7 +52606,7 @@
       if (!modEl || !host.contains(modEl)) return null;
       const quote = live.toString().trim();
       if (!quote) return null;
-      const text = pageEl.textContent || '';
+      const text = compPageText(pageEl);
       const idx = text.indexOf(quote);
       return {
         type: 'quote',
@@ -52070,6 +52682,8 @@
     async function compCommentAction(cid, act, card) {
       const c = COMP.comments.find((x) => x.id === cid);
       if (!c || !COMP.path) return;
+      if (act === 'accept' || act === 'decline') { await compFindingAnswer(c, act); return; }
+      if (act === 'delete' && c.finding) return;    // a finding is the record
       if (act === 'jump') {
         const a = c.anchor || {};
         const m = a.module ? compModuleById(a.module) : null;
@@ -53511,6 +54125,1142 @@
     window.rvRenderSelection = rvRenderSelection;
 
     // ================================================================
+    // 0.8 — THE SCAFFOLD: frames, plecholders, the lock, findings, export
+    // ================================================================
+    //
+    // A scaffold is a plane with a `composure:scaffold` block (the model's
+    // `scaffold`): frames in order (`frame` modules — a page or a slide of the
+    // thing being made: a page, a deck or a document) and on them the
+    // plecholders (`scaffold-box` modules: a plec, a target, and the person's
+    // own words as page 1). The backend is docs/v080-landed-W1-E.md and
+    // -W3-E5.md; this is its page. Three rules hold everywhere below:
+    //
+    //   1. The person's words leave this page as source `ui`, and only as
+    //      that: the readvisor never writes a box's text (it has its own
+    //      tool, scaffold_from_plectrum, and the backend refuses it the rest).
+    //   2. A locked scaffold is sent a view and nothing else. compQueue,
+    //      compCommit, compDo and compApplyOps drop any other op
+    //      (compOpAllowedNow), so no edit, no auto-sized height and no undo
+    //      ever reaches a locked file; the person's one way in is a fix
+    //      accepted from a finding, which has its own route.
+    //   3. An old `form=scaffold` composure — and a council's output, which
+    //      is one — has no block and opens exactly as 0.7 did; "make this a
+    //      scaffold" (the composures menu) converts one on a click.
+
+    function compScaffold() { return (COMP.model && COMP.model.scaffold) || null; }
+    window.compScaffold = compScaffold;
+    function compScaffoldLocked() { const s = compScaffold(); return !!(s && s.locked); }
+    function compIsBox(m) { return !!m && m.type === 'scaffold-box'; }
+    function compIsFrame(m) { return !!m && m.type === 'frame'; }
+
+    // The frames in reading order: the block's own list first, then any
+    // frame it does not name, top to bottom and left to right (the backend's
+    // frame_order, mirrored so a local reorder shows at once).
+    function compFrameOrder() {
+      const frames = ((COMP.model && COMP.model.modules) || []).filter(compIsFrame);
+      const ids = new Set(frames.map((m) => m.id));
+      const s = compScaffold();
+      const out = [];
+      for (const id of ((s && s.frames) || [])) if (ids.has(id) && !out.includes(id)) out.push(id);
+      frames.filter((m) => !out.includes(m.id))
+        .sort((a, b) => (a.y - b.y) || (a.x - b.x) || (a.id < b.id ? -1 : 1))
+        .forEach((m) => out.push(m.id));
+      return out;
+    }
+    window.compFrameOrder = compFrameOrder;
+
+    function compBoxesOf(frameId) {
+      return ((COMP.model && COMP.model.modules) || [])
+        .filter((m) => compIsBox(m) && (m.fields || {}).frame === frameId);
+    }
+
+    function compFrameOf(m) {
+      const fid = m && (m.fields || {}).frame;
+      const f = fid ? compModuleById(fid) : null;
+      return compIsFrame(f) ? f : null;
+    }
+
+    // ---------- a plecholder's words, count and state ----------
+
+    // '140c' → {n: 140, unit: 'c'}; no target (or 0) → n 0.
+    function compBoxTarget(m) {
+      const raw = String((m && (m.fields || {}).target) || '').toLowerCase();
+      const mm = /^(\d{1,6})([cw])$/.exec(raw);
+      return mm ? { n: parseInt(mm[1], 10), unit: mm[2] } : { n: 0, unit: 'c' };
+    }
+
+    // The words under `root` as plain text, a line per block, chrome skipped.
+    function compPlainText(root) {
+      let out = '';
+      const nl = () => { if (out && !out.endsWith('\n')) out += '\n'; };
+      const visit = (node) => {
+        for (const c of node.childNodes) {
+          if (c.nodeType === 3) { out += c.nodeValue; continue; }
+          if (c.nodeType !== 1) continue;
+          if (c.dataset && c.dataset.compChrome) continue;
+          const block = COMP_BLOCK_TAGS.has(c.tagName) || c.tagName === 'BR';
+          if (block) nl();
+          visit(c);
+          if (block) nl();
+        }
+      };
+      visit(root);
+      return out.replace(/ /g, ' ').replace(/[ \t]+\n/g, '\n').trim();
+    }
+
+    function compBoxText(m) {
+      const page = (m.pages || []).find((p) => p.n === 1) || (m.pages || [])[0];
+      const holder = document.createElement('div');
+      holder.appendChild(compRichToNodes(page ? page.rich : ''));
+      return compPlainText(holder);
+    }
+
+    // Characters (a line break counts as one space) or words.
+    function compBoxCount(text, unit) {
+      const s = String(text || '');
+      if (unit === 'w') return s.split(/\s+/).filter(Boolean).length;
+      return s.replace(/\s*\n\s*/g, ' ').length;
+    }
+
+    function compBoxFilled(m, text) {
+      const f = m.fields || {};
+      if (f.kind === 'graphic') return !!f.href;
+      if (text !== undefined) return !!text;
+      // Cheap, for the tally over every box: any text at all in page 1.
+      const page = (m.pages || []).find((p) => p.n === 1) || (m.pages || [])[0];
+      return !!String((page && page.rich) || '').replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;|&#160;|\s/g, '');
+    }
+
+    // What the box looks like now, in one word (`data-box-state`):
+    //   locked  the scaffold is locked
+    //   empty   nothing written (a graphic box: no picture chosen)
+    //   over    past its target
+    //   written the person marked it written (their mark, `state: written`)
+    //   draft   words in it, not marked
+    // `empty` and `over` are the page's to compute (they are never stored).
+    function compBoxStateOf(m, text) {
+      if (compScaffoldLocked()) return 'locked';
+      const f = m.fields || {};
+      if (!compBoxFilled(m, text)) return 'empty';
+      const tg = compBoxTarget(m);
+      if (tg.n && compBoxCount(text, tg.unit) > tg.n) return 'over';
+      return f.state === 'written' ? 'written' : 'draft';
+    }
+
+    function compBoxCountLabel(m, text) {
+      const tg = compBoxTarget(m);
+      const written = (m.fields || {}).state === 'written';
+      if (!tg.n) return written ? '✓' : '';
+      const n = compBoxCount(text, tg.unit);
+      let s = (tg.unit === 'w'
+        ? t('comp.box.countWords', '{n} / {target} words')
+        : t('comp.box.count', '{n} / {target}'))
+        .replace('{n}', String(n)).replace('{target}', String(tg.n));
+      if (n > tg.n) s += ' · ' + t('comp.box.over', '{k} over').replace('{k}', String(n - tg.n));
+      return (written ? '✓ ' : '') + s;
+    }
+
+    // Paint the count and the state onto a box's element. From the live
+    // host while it is being typed in (no round trip), from the model else.
+    function compBoxPaintState(el, m, host) {
+      if (!el || !m) return;
+      const text = host ? compPlainText(host) : compBoxText(m);
+      el.dataset.boxState = compBoxStateOf(m, text);
+      const count = el.querySelector('.comp-box-count');
+      if (count) count.textContent = compBoxCountLabel(m, text);
+      if (host && COMP.editing && COMP.editing.id === m.id) compScaffoldTally();
+    }
+
+    // Fixed parts and chips, when a plectrum carried them (kept on the
+    // module as extra attributes): shown, never part of the words.
+    function compBoxFixed(m) {
+      const d = m.data || {};
+      const fixed = String(d['data-fixed'] || d.fixed || '').trim();
+      const chips = String(d['data-chips'] || d.chips || '').split(/\s+/).filter(Boolean);
+      return { fixed, chips };
+    }
+
+    function compBoxRatio(shape) {
+      const s = String(shape || '16:9');
+      const mm = /^(\d+):(\d+)$/.exec(s);
+      if (mm) return mm[1] + ' / ' + mm[2];
+      if (s === 'portrait') return '3 / 4';
+      if (s === 'landscape') return '4 / 3';
+      return '1 / 1';
+    }
+
+    // A graphic box's slot: the chosen picture, or what shape it waits for.
+    function compBoxSlot(m) {
+      const f = m.fields || {};
+      const slot = compChrome('div', 'comp-box-slot');
+      slot.style.setProperty('--comp-slot-ratio', compBoxRatio(f.shape));
+      if (f.href) {
+        slot.classList.add('comp-has-img');
+        const img = document.createElement('img');
+        img.src = '/api/file/blob?path=' + encodeURIComponent(f.href);
+        img.alt = m.title || f.href;
+        img.draggable = false;
+        slot.appendChild(img);
+      } else {
+        slot.textContent = (f.shape || '16:9') + ' · '
+          + t('comp.box.picture', 'a picture goes here');
+      }
+      return slot;
+    }
+
+    // The words outgrew the box: it grows by the person's click (the offer
+    // compCheckOverflow makes), never by itself. A page frame grows with it
+    // when the box would run off its foot; a slide does not — a slide that
+    // grew would not be a slide.
+    function compBoxGrow(m) {
+      const el = compModuleEl(m.id);
+      const host = el && el.querySelector('.comp-page');
+      if (!el || !host) return;
+      const extra = Math.ceil(host.scrollHeight - host.clientHeight) + 24;
+      if (extra <= 0) return;
+      const ops = [], undo = [];
+      const newH = Math.round((m.h + extra) * 100) / 100;
+      const f = compFrameOf(m);
+      if (f && (f.fields || {}).shape !== 'slide' && m.y + newH > f.y + f.h) {
+        const fh = Math.round((m.y + newH + 48 - f.y) * 100) / 100;
+        ops.push({ op: 'update_module', id: f.id, h: fh, __k: 'geo:' + f.id });
+        undo.push({ op: 'update_module', id: f.id, h: f.h, __k: 'geo:' + f.id });
+        f.h = fh;
+        const fel = compModuleEl(f.id);
+        if (fel) fel.style.height = fh + 'px';
+      }
+      ops.push({ op: 'update_module', id: m.id, h: newH, __k: 'geo:' + m.id });
+      undo.push({ op: 'update_module', id: m.id, h: m.h, __k: 'geo:' + m.id });
+      m.h = newH;
+      el.style.height = newH + 'px';
+      // Geometry only, like the end of a drag: the page under the caret is
+      // not repainted, so the caret stays where it is.
+      for (const op of ops) compQueue(compStripKey(op), op.__k);
+      COMP.undo.push({ ops, undo });
+      if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
+      COMP.redo.length = 0;
+      compUpdateUndoBtns();
+      const bar = el.querySelector('.comp-overflow');
+      if (bar) bar.remove();
+      compRenderHandles();
+      compPlaceInspector();
+    }
+
+    // The local mirror of the scaffold fields an add_module / update_module
+    // carries (the backend derives plec_by from the source: `ui` is the
+    // person, so a plec set here is theirs).
+    function compMirrorScaffoldFields(m, op) {
+      const f = m.fields || (m.fields = {});
+      for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href']) {
+        if (k in op) f[k] = op[k] || null;
+      }
+      if ('plec' in op) f.plec_by = op.plec ? 'person' : null;
+    }
+
+    // ---------- the lock's one rule on this side ----------
+
+    function compOpAllowedNow(op) {
+      if (!compScaffoldLocked()) return true;
+      if (!op || op.op !== 'set_meta') return false;
+      return Object.keys(op).every((k) => k === 'op' || k === 'view' || k === '__k');
+    }
+
+    function compScaffoldLockedNotice() {
+      const now = Date.now();
+      if (now - COMP_SCAFFOLD.noticeAt < 1500) return;
+      COMP_SCAFFOLD.noticeAt = now;
+      const v = (compScaffold() || {}).version || 1;
+      compNotice(t('comp.scaffold.lockedEdit',
+        'this scaffold is locked: nothing in it changes. unlocking makes version {n} as a new file to write on')
+        .replace('{n}', String(v + 1)));
+    }
+
+    // ---------- opening, the chrome, the reading view ----------
+
+    function compScaffoldReset() {
+      COMP_SCAFFOLD.state = null;
+      COMP_SCAFFOLD.job = null;
+      if (COMP_SCAFFOLD.reading) compSetReading(false);
+    }
+
+    function compScaffoldOpen(fresh) {
+      compSetMode(fresh && !compScaffoldLocked() ? 'edit' : 'view');
+      compScaffoldFitFirst();
+      compScaffoldChrome();
+      void compScaffoldLoadState();
+    }
+
+    // Open on the first frame, at its width — a page grown long is read from
+    // its top, not shrunk to a stripe. Never magnified past 100%.
+    function compScaffoldFitFirst() {
+      const f = compModuleById(compFrameOrder()[0]);
+      if (!f) { compOpenFit(false); return; }
+      compFitBox({ x: f.x, y: f.y, w: f.w, h: Math.min(f.h, f.w * 1.3) }, 40, false, 1);
+    }
+
+    function compScaffoldTally() {
+      const chip = compEl('comp-scaffold-state');
+      const s = compScaffold();
+      if (!chip || !s) return;
+      if (s.locked) {
+        chip.textContent = t('comp.scaffold.lockedState', 'locked · version {n}')
+          .replace('{n}', String(s.version || 1));
+        return;
+      }
+      const boxes = ((COMP.model && COMP.model.modules) || []).filter(compIsBox);
+      const live = COMP.editing ? compModuleEl(COMP.editing.id) : null;
+      let filled = 0;
+      for (const b of boxes) {
+        const host = (live && COMP.editing.id === b.id) ? live.querySelector('.comp-page') : null;
+        if (compBoxFilled(b, host ? compPlainText(host) : undefined)) filled++;
+      }
+      chip.textContent = t('comp.scaffold.tally', '{w} of {n} written')
+        .replace('{w}', String(filled)).replace('{n}', String(boxes.length));
+    }
+
+    function compScaffoldChrome() {
+      const stage = compStage();
+      if (!stage) return;
+      const s = compScaffold();
+      const on = !!s;
+      const locked = !!(s && s.locked);
+      stage.classList.toggle('comp-scaffold', on);
+      stage.classList.toggle('comp-scaffold-locked', locked);
+      if (!on && COMP_SCAFFOLD.reading) compSetReading(false);
+      const title = compEl('comp-title');
+      if (title) title.readOnly = locked;
+      const group = compEl('comp-scaffold-group');
+      if (group && group.hidden === on) {
+        group.hidden = !on;
+        compFitToolbar();
+      }
+      if (!on) return;
+      const v = s.version || 1;
+      const lockBtn = compEl('comp-lock-btn');
+      if (lockBtn) {
+        const label = locked
+          ? t('comp.scaffold.unlock.title', 'unlock: makes version {n} as a new file').replace('{n}', String(v + 1))
+          : t('comp.scaffold.lock.title', 'lock this scaffold');
+        lockBtn.title = label;
+        lockBtn.setAttribute('aria-label', label);
+        lockBtn.classList.toggle('on', locked);
+        const img = lockBtn.querySelector('.svg-icon');
+        const want = locked ? 'wiki-locked' : 'wiki-unlocked';
+        if (img && img.dataset.icon !== want) setIcon(img, want);
+      }
+      const running = !!(COMP_SCAFFOLD.job && !COMP_SCAFFOLD.job.terminal);
+      const checkBtn = compEl('comp-check-btn');
+      if (checkBtn) {
+        checkBtn.disabled = !locked;
+        checkBtn.classList.toggle('on', running);
+        const label = running ? t('comp.scaffold.checkCancel', 'cancel the check')
+          : (locked ? t('comp.scaffold.check.title', 'check the spelling, the grammar and the claims')
+            : t('comp.scaffold.checkNeedsLock', 'lock the scaffold first: the check reads what is locked, so its findings stay true'));
+        checkBtn.title = label;
+        checkBtn.setAttribute('aria-label', label);
+      }
+      const readBtn = compEl('comp-read-btn');
+      if (readBtn) {
+        readBtn.classList.toggle('on', COMP_SCAFFOLD.reading);
+        const label = COMP_SCAFFOLD.reading
+          ? t('comp.scaffold.read.off', 'back to the plecholders')
+          : t('comp.scaffold.read.title', 'read it as the finished thing');
+        readBtn.title = label;
+        readBtn.setAttribute('aria-label', label);
+      }
+      compScaffoldTally();
+    }
+    window.compScaffoldChrome = compScaffoldChrome;
+
+    // The reading view: the thing as it will read (CSS: "the reading view"),
+    // in view mode. Locked or not.
+    function compSetReading(on) {
+      const want = !!on && !!compScaffold();
+      COMP_SCAFFOLD.reading = want;
+      const stage = compStage();
+      if (stage) stage.classList.toggle('comp-reading', want);
+      if (want && COMP.mode === 'edit') compSetMode('view');
+      compScaffoldChrome();
+    }
+    window.compSetReading = compSetReading;
+
+    // GET /api/composure/scaffold: the empty boxes, the findings, the last
+    // check, a running check, and the formats it exports as.
+    async function compScaffoldLoadState() {
+      if (!compScaffold() || !COMP.path) { COMP_SCAFFOLD.state = null; return null; }
+      const doc = COMP.docSeq;
+      try {
+        const r = await fetch('/api/composure/scaffold?path=' + encodeURIComponent(COMP.path));
+        const d = await r.json().catch(() => ({}));
+        if (doc !== COMP.docSeq) return null;
+        if (!r.ok) return null;
+        COMP_SCAFFOLD.state = d;
+        // A check that was already running when this opened (another tab,
+        // or before a reload) is followed like one started here.
+        if (d.job && !COMP_SCAFFOLD.job && typeof canonTrack === 'function'
+          && !CANON_TERMINAL.has(d.job.state)) {
+          COMP_SCAFFOLD.job = canonTrack(d.job, { want: 'scaffold', label: compScaffoldLabel() });
+        }
+        compScaffoldChrome();
+        return d;
+      } catch (_e) { return null; }
+    }
+
+    function compScaffoldLabel() {
+      return COMP.title || (COMP.path || '').split('/').pop() || 'scaffold';
+    }
+
+    // ---------- adding a box, a frame; making a scaffold ----------
+
+    // The frame a new box goes on: the selected one (or the selected box's),
+    // else the one under the middle of the view, else the last in order.
+    function compCurrentFrameId() {
+      for (const id of COMP.sel) {
+        const m = compModuleById(id);
+        if (compIsFrame(m)) return m.id;
+        const f = compIsBox(m) ? compFrameOf(m) : null;
+        if (f) return f.id;
+      }
+      const vp = compViewport();
+      const order = compFrameOrder();
+      if (vp) {
+        const c = compStageToWorld(vp.clientWidth / 2, vp.clientHeight / 2);
+        for (const id of order) {
+          const f = compModuleById(id);
+          if (f && c.x >= f.x && c.x <= f.x + f.w && c.y >= f.y && c.y <= f.y + f.h) return id;
+        }
+      }
+      return order[order.length - 1] || null;
+    }
+
+    async function compAddBox() {
+      if (!compScaffold()) return;
+      const id = compNewId('m');
+      const op = { op: 'add_module', type: 'scaffold-box', id };
+      const fid = compCurrentFrameId();
+      if (fid) op.frame = fid;
+      // The backend places it (under the frame's lowest box) and grows a
+      // page frame to hold it; the reply's model is the truth.
+      const data = await compCommit([op], { wantModel: true });
+      if (!data) return;
+      const m = compModuleById(id);
+      if (!m) return;
+      COMP.undo.push({ ops: [compSnapshot(m)], undo: [{ op: 'remove_module', id: m.id }] });
+      if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
+      COMP.redo.length = 0;
+      compUpdateUndoBtns();
+      compSetTool('pointer');
+      compEaseToInclude({ x: m.x, y: m.y, w: m.w, h: m.h });
+      compSetSelection([m.id]);
+      // A new box wants its plec first: the inspector opens on it.
+      const plec = compEl('comp-insp-slot') && compEl('comp-insp-slot').querySelector('[data-sfield="plec"]');
+      if (plec) plec.focus();
+    }
+
+    async function compAddFrame(shape) {
+      if (!compScaffold()) return;
+      if (COMP.mode !== 'edit') compSetMode('edit');
+      const id = compNewId('m');
+      const data = await compCommit([{ op: 'add_frame', id, shape: shape === 'slide' ? 'slide' : 'page' }],
+        { wantModel: true });
+      if (!data) return;
+      const m = compModuleById(id);
+      if (!m) return;
+      COMP.undo.push({ ops: [compSnapshot(m)], undo: [{ op: 'remove_module', id: m.id }] });
+      if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
+      COMP.redo.length = 0;
+      compUpdateUndoBtns();
+      compSetTool('pointer');
+      compEaseToInclude({ x: m.x, y: m.y, w: m.w, h: m.h });
+      compSetSelection([m.id]);
+    }
+
+    function compMayMakeScaffold() {
+      if (compScaffold()) return false;
+      if (COMP.form === 'journal' || COMP.form === 'council') return false;
+      return !((COMP.model && COMP.model.modules) || []).some((m) => m.speaker);
+    }
+
+    // "make this a scaffold": one op, the person's (`ui`). Every plain text
+    // card becomes a plecholder holding the same words, on one frame drawn
+    // around them; nothing else on the plane changes.
+    async function compMakeScaffold() {
+      if (!compMayMakeScaffold()) return;
+      compEndEditing();
+      const data = await compCommit([{ op: 'make_scaffold' }], { wantModel: true });
+      if (!data) return;
+      COMP.undo = [];
+      COMP.redo = [];
+      compUpdateUndoBtns();
+      compSetSelection([]);
+      compScaffoldOpen(false);
+      compNotice(t('comp.scaffold.made',
+        'this is a scaffold now: its text cards are plecholders with the same words. give each a plec, or ask the readvisor to'));
+    }
+
+    // What the scaffold becomes: a page, a deck or a document.
+    async function compScaffoldSetThing(thing) {
+      const s = compScaffold();
+      if (!s || s.locked || s.thing === thing) return;
+      await compCommit([{ op: 'set_scaffold', thing }], { wantModel: true });
+      compScaffoldChrome();
+      void compScaffoldLoadState();
+    }
+
+    // ---------- the inspector ----------
+
+    function compInspHint(slot, text) {
+      const h = document.createElement('div');
+      h.className = 'comp-insp-hint';
+      h.textContent = text;
+      slot.appendChild(h);
+      return h;
+    }
+
+    function compInspSelect(slot, sfield, options, value) {
+      const sel = document.createElement('select');
+      sel.dataset.sfield = sfield;
+      for (const [v, label] of options) {
+        const o = document.createElement('option');
+        o.value = v;
+        o.textContent = label;
+        sel.appendChild(o);
+      }
+      sel.value = value;
+      slot.appendChild(sel);
+      return sel;
+    }
+
+    function compFrameLabel(id) {
+      const f = compModuleById(id);
+      const i = compFrameOrder().indexOf(id);
+      const shape = f && (f.fields || {}).shape === 'slide'
+        ? t('comp.frame.slide', 'slide') : t('comp.frame.page', 'page');
+      return (i + 1) + ' · ' + ((f && f.title) || shape);
+    }
+
+    function compShapeLabel(shape) {
+      switch (shape) {
+        case 'portrait': return t('comp.box.shapePortrait', 'portrait');
+        case 'landscape': return t('comp.box.shapeLandscape', 'landscape');
+        case 'square': return t('comp.box.shapeSquare', 'square');
+        default: return shape;
+      }
+    }
+
+    function compBuildBoxFields(slot, m) {
+      const f = m.fields || {};
+      compInspHint(slot, t('comp.box.nameHint', 'name'));
+      const name = document.createElement('input');
+      name.type = 'text';
+      name.dataset.sfield = 'title';
+      name.maxLength = 200;
+      name.value = m.title || '';
+      name.placeholder = t('comp.box.untitled', 'a plecholder');
+      slot.appendChild(name);
+      compInspHint(slot, t('comp.box.plecHint', 'plec: what this box must get across'));
+      const plec = document.createElement('textarea');
+      plec.rows = 3;
+      plec.dataset.sfield = 'plec';
+      plec.maxLength = 2000;
+      plec.value = f.plec || '';
+      slot.appendChild(plec);
+      if (f.plec && f.plec_by) {
+        compInspHint(slot, f.plec_by === 'person'
+          ? t('comp.box.plecByPerson', 'you set this plec')
+          : t('comp.box.plecByReadvisor', 'the readvisor set this plec; it is yours once you change it'));
+      }
+      compInspHint(slot, t('comp.box.targetHint', 'target'));
+      const tg = compBoxTarget(m);
+      const pair = document.createElement('div');
+      pair.className = 'comp-insp-pair';
+      const num = document.createElement('input');
+      num.type = 'number';
+      num.min = '0';
+      num.max = '999999';
+      num.step = '1';
+      num.dataset.sfield = 'target-n';
+      num.value = tg.n ? String(tg.n) : '';
+      num.setAttribute('aria-label', t('comp.box.targetHint', 'target'));
+      pair.appendChild(num);
+      compInspSelect(pair, 'target-unit', [
+        ['c', t('comp.box.unitC', 'characters')],
+        ['w', t('comp.box.unitW', 'words')],
+      ], tg.unit);
+      slot.appendChild(pair);
+      compInspHint(slot, t('comp.box.kindHint', 'what goes in it'));
+      compInspSelect(slot, 'kind', [
+        ['text', t('comp.box.kindText', 'words')],
+        ['graphic', t('comp.box.kindGraphic', 'a picture')],
+      ], f.kind === 'graphic' ? 'graphic' : 'text');
+      if (f.kind === 'graphic') {
+        compInspHint(slot, t('comp.box.shapeHint', 'its shape'));
+        const shapes = COMP_GRAPHIC_SHAPES.slice();
+        if (f.shape && !shapes.includes(f.shape)) shapes.push(f.shape);
+        compInspSelect(slot, 'shape', shapes.map((s) => [s, compShapeLabel(s)]), f.shape || '16:9');
+        compBuildPicker(slot, m, 'href', true);
+      }
+      const order = compFrameOrder();
+      if (order.length > 1) {
+        compInspHint(slot, t('comp.box.frameHint', 'on the frame'));
+        compInspSelect(slot, 'frame', order.map((id) => [id, compFrameLabel(id)]), f.frame || '');
+      }
+      const row = document.createElement('div');
+      row.className = 'comp-insp-row';
+      const w = document.createElement('button');
+      w.type = 'button';
+      w.className = 'comp-ibtn';
+      w.dataset.sact = 'written';
+      row.appendChild(w);
+      slot.appendChild(row);
+      compSyncWrittenBtn(slot, m);
+    }
+
+    function compSyncWrittenBtn(slot, m) {
+      const b = slot && slot.querySelector('button[data-sact="written"]');
+      if (!b || !m) return;
+      const written = (m.fields || {}).state === 'written';
+      b.textContent = written ? t('comp.box.unmarkWritten', 'not written yet')
+        : t('comp.box.markWritten', 'mark written');
+      b.classList.toggle('on', written);
+    }
+
+    function compBuildFrameFields(slot, m) {
+      const f = m.fields || {};
+      compInspHint(slot, t('comp.box.nameHint', 'name'));
+      const name = document.createElement('input');
+      name.type = 'text';
+      name.dataset.sfield = 'title';
+      name.maxLength = 200;
+      name.value = m.title || '';
+      slot.appendChild(name);
+      compInspHint(slot, t('comp.frame.shapeHint', 'a page or a slide'));
+      compInspSelect(slot, 'shape', [
+        ['page', t('comp.frame.page', 'page')],
+        ['slide', t('comp.frame.slide', 'slide')],
+      ], f.shape === 'slide' ? 'slide' : 'page');
+      const order = compFrameOrder();
+      const i = order.indexOf(m.id);
+      const row = document.createElement('div');
+      row.className = 'comp-insp-row';
+      const label = document.createElement('span');
+      label.className = 'comp-insp-label';
+      label.textContent = t('comp.frame.position', 'frame {i} of {n}')
+        .replace('{i}', String(i + 1)).replace('{n}', String(order.length));
+      row.appendChild(label);
+      for (const [act, glyph, title] of [
+        ['frame-up', '↑', t('comp.frame.up', 'move earlier in the order')],
+        ['frame-down', '↓', t('comp.frame.down', 'move later in the order')]]) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'comp-ibtn';
+        b.dataset.sact = act;
+        b.textContent = glyph;
+        b.title = title;
+        b.setAttribute('aria-label', title);
+        b.disabled = act === 'frame-up' ? i <= 0 : i >= order.length - 1;
+        row.appendChild(b);
+      }
+      slot.appendChild(row);
+    }
+
+    function compSFieldValue(m, name) {
+      const f = m.fields || {};
+      const tg = compBoxTarget(m);
+      switch (name) {
+        case 'title': return m.title || '';
+        case 'plec': return f.plec || '';
+        case 'target-n': return tg.n ? String(tg.n) : '';
+        case 'target-unit': return tg.unit;
+        case 'kind': return f.kind === 'graphic' ? 'graphic' : 'text';
+        case 'shape': return f.shape || (compIsFrame(m) ? 'page' : '16:9');
+        case 'frame': return f.frame || '';
+        default: return '';
+      }
+    }
+
+    function compModField(m, k) {
+      if (['x', 'y', 'w', 'h', 'title', 'bg'].includes(k)) return m[k] === undefined ? '' : m[k];
+      const v = (m.fields || {})[k];
+      return v == null ? '' : v;
+    }
+
+    // One undoable update_module for a set of the scaffold's fields.
+    function compScaffoldPatch(m, patch) {
+      const op = { op: 'update_module', id: m.id };
+      const inv = { op: 'update_module', id: m.id };
+      let any = false;
+      for (const k of Object.keys(patch)) {
+        const before = compModField(m, k);
+        if (before === patch[k]) continue;
+        op[k] = patch[k];
+        inv[k] = before;
+        any = true;
+      }
+      if (!any) return;
+      compDo({ ops: [op], undo: [inv] });
+    }
+
+    function compScaffoldField(id, name, value) {
+      const m = compModuleById(id);
+      if (!m || compScaffoldLocked()) return;
+      const f = m.fields || {};
+      const v = String(value == null ? '' : value);
+      if (name === 'title') { compScaffoldPatch(m, { title: v.trim() }); return; }
+      if (name === 'plec') { compScaffoldPatch(m, { plec: v.replace(/\s+/g, ' ').trim() }); return; }
+      if (name === 'target-n' || name === 'target-unit') {
+        const slot = compEl('comp-insp-slot');
+        const n = parseInt((slot.querySelector('[data-sfield="target-n"]') || {}).value, 10);
+        const unit = (slot.querySelector('[data-sfield="target-unit"]') || {}).value === 'w' ? 'w' : 'c';
+        compScaffoldPatch(m, { target: n > 0 ? Math.min(999999, n) + unit : '' });
+        return;
+      }
+      if (name === 'kind') {
+        compScaffoldPatch(m, v === 'graphic'
+          ? { kind: 'graphic', shape: f.shape || '16:9' }
+          : { kind: 'text', shape: '' });
+        return;
+      }
+      if (name === 'shape') {
+        if (compIsFrame(m)) {
+          const dims = v === 'slide' ? COMP_SLIDE : COMP_FULLPORT;
+          compScaffoldPatch(m, { shape: v === 'slide' ? 'slide' : 'page', w: dims[0], h: dims[1] });
+        } else {
+          compScaffoldPatch(m, { shape: v });
+        }
+        return;
+      }
+      if (name === 'frame' && v && v !== f.frame) void compMoveBoxToFrame(m, v);
+    }
+
+    // A box onto another frame: the backend places it (under that frame's
+    // lowest box); the undo puts it back where it was.
+    async function compMoveBoxToFrame(m, fid) {
+      const before = { frame: (m.fields || {}).frame, x: m.x, y: m.y };
+      const data = await compCommit([{ op: 'move_to_frame', id: m.id, frame: fid }], { wantModel: true });
+      if (!data) return;
+      const now = compModuleById(m.id);
+      if (!now) return;
+      COMP.undo.push({
+        ops: [{ op: 'move_to_frame', id: m.id, frame: fid, x: now.x, y: now.y }],
+        undo: [{ op: 'move_to_frame', id: m.id, frame: before.frame, x: before.x, y: before.y }],
+      });
+      if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
+      COMP.redo.length = 0;
+      compUpdateUndoBtns();
+      compEaseToInclude({ x: now.x, y: now.y, w: now.w, h: now.h });
+    }
+
+    function compFrameStep(id, dir) {
+      const order = compFrameOrder();
+      const i = order.indexOf(id);
+      const j = i + dir;
+      if (i < 0 || j < 0 || j >= order.length) return;
+      const next = order.slice();
+      next[i] = order[j];
+      next[j] = order[i];
+      compDo({ ops: [{ op: 'reorder_frames', order: next }],
+        undo: [{ op: 'reorder_frames', order }] });
+      const slot = compEl('comp-insp-slot');
+      if (slot) delete slot.dataset.key;      // the "frame i of n" row
+      compRenderInspector();
+    }
+
+    // The inspector's and the context menu's scaffold actions, one door.
+    function compScaffoldAct(id, act) {
+      const m = compModuleById(id);
+      if (!m) return;
+      if (act === 'ask') { compScaffoldAsk(m); return; }
+      if (compScaffoldLocked()) { compScaffoldLockedNotice(); return; }
+      if (act === 'written') {
+        const f = m.fields || {};
+        if (f.state !== 'written' && !compBoxFilled(m)) {
+          compNotice(t('comp.box.writtenEmpty', 'there is nothing in this box to mark written yet'));
+          return;
+        }
+        compScaffoldPatch(m, { state: f.state === 'written' ? 'empty' : 'written' });
+        const slot = compEl('comp-insp-slot');
+        if (slot) compSyncWrittenBtn(slot, m);
+        return;
+      }
+      if (act === 'plec') {
+        if (COMP.mode !== 'edit') compSetMode('edit');
+        compSetTool('pointer');
+        compSetSelection([m.id]);
+        const el = compEl('comp-insp-slot') && compEl('comp-insp-slot').querySelector('[data-sfield="plec"]');
+        if (el) { el.focus(); el.select(); }
+        return;
+      }
+      if (act === 'frame-up') { compFrameStep(m.id, -1); return; }
+      if (act === 'frame-down') compFrameStep(m.id, 1);
+    }
+
+    // "ask the readvisor about this box": the box, named, in the composer —
+    // the person says what they want; the readvisor answers in chat and
+    // never writes the box's words (its tool may change the plec).
+    function compScaffoldAsk(m) {
+      const ta = document.getElementById('message');
+      if (!ta) return;
+      const f = m.fields || {};
+      const line = t('comp.box.askLine', 'about the plecholder “{name}” in {doc} (plec: {plec}): ')
+        .replace('{name}', m.title || m.id)
+        .replace('{doc}', compScaffoldLabel())
+        .replace('{plec}', f.plec || '—');
+      ta.value = line + (ta.value || '');
+      if ((document.documentElement.dataset.rv || 'closed') === 'closed') {
+        try { rvSetState('open'); } catch (_e) { /* the panel may be pinned shut */ }
+      }
+      ta.focus();
+      ta.setSelectionRange(line.length, line.length);
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // ---------- the lock, unlocking, the check ----------
+
+    async function compScaffoldLock() {
+      const s = compScaffold();
+      if (!s || s.locked) return;
+      compEndEditing();
+      await compFlush();
+      if (!COMP.path) {
+        compNotice(t('comp.scaffold.lockNoFile', 'nothing is written in this scaffold yet, so there is nothing to lock'));
+        return;
+      }
+      const st = await compScaffoldLoadState();
+      if (!st) return;
+      const empty = st.empty || [];
+      const names = empty.map((id) => { const m = compModuleById(id); return (m && m.title) || id; });
+      const v = s.version || 1;
+      // The person locks with empty boxes only once they are named to them
+      // (the readvisor names them in chat; the page lists them here).
+      let message = t('comp.scaffold.lockMessage',
+        'once locked, nothing in it changes: you can read it, check it, take a fix from a finding and export it. unlocking makes version {n} as a new file, and this one stays as it is.')
+        .replace('{n}', String(v + 1));
+      if (empty.length) {
+        message = t('comp.scaffold.lockEmpty', 'still empty: {names}. they are locked in empty.')
+          .replace('{names}', names.join(', ')) + '\n\n' + message;
+      }
+      const ok = await confirmOverlay({
+        title: t('comp.scaffold.lockTitle', 'lock this scaffold?'),
+        message,
+        lines: true,
+        confirmLabel: t('comp.scaffold.lock', 'lock'),
+      });
+      if (!ok) return;
+      try {
+        const r = await fetch('/api/composure/scaffold/lock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path, empty, base_rev: COMP.rev }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.scaffold.lockFailed', 'the scaffold was not locked')); return; }
+        COMP_SCAFFOLD.state = d;
+        // Nothing done before the lock can be undone into a locked file.
+        COMP.undo = [];
+        COMP.redo = [];
+        compUpdateUndoBtns();
+        compSetSelection([]);
+        compSetMode('view');
+        await compReload();
+        compScaffoldChrome();
+      } catch (_e) {
+        compNotice(t('comp.scaffold.lockFailed', 'the scaffold was not locked'));
+      }
+    }
+    window.compScaffoldLock = compScaffoldLock;
+
+    async function compScaffoldUnlock() {
+      const s = compScaffold();
+      if (!s || !s.locked || !COMP.path) return;
+      const v = s.version || 1;
+      const ok = await confirmOverlay({
+        title: t('comp.scaffold.unlockTitle', 'unlock as version {n}?').replace('{n}', String(v + 1)),
+        message: t('comp.scaffold.unlockMessage',
+          'unlocking writes version {n} as a new file beside this one, with the same words and findings, and opens it. version {m} stays locked, as the record.')
+          .replace('{n}', String(v + 1)).replace('{m}', String(v)),
+        confirmLabel: t('comp.scaffold.unlock', 'unlock'),
+      });
+      if (!ok) return;
+      try {
+        const r = await fetch('/api/composure/scaffold/unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.scaffold.unlockFailed', 'the scaffold was not unlocked')); return; }
+        compRefreshTree();
+        await compOpenPath(d.path);
+        compNotice(t('comp.scaffold.unlocked', 'version {n} is open to write on; version {m} stays locked')
+          .replace('{n}', String(d.version || v + 1)).replace('{m}', String(v)));
+      } catch (_e) {
+        compNotice(t('comp.scaffold.unlockFailed', 'the scaffold was not unlocked'));
+      }
+    }
+
+    async function compScaffoldCheck() {
+      if (!compScaffoldLocked() || !COMP.path) {
+        compNotice(t('comp.scaffold.checkNeedsLock', 'lock the scaffold first: the check reads what is locked, so its findings stay true'));
+        return;
+      }
+      const running = COMP_SCAFFOLD.job && !COMP_SCAFFOLD.job.terminal;
+      try {
+        const r = await fetch('/api/composure/scaffold/check' + (running ? '/cancel' : ''), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.scaffold.checkFailed', 'the check did not start')); return; }
+        if (running) { if (typeof canonOnSnap === 'function') canonOnSnap(d); return; }
+        if (d.job && typeof canonTrack === 'function') {
+          COMP_SCAFFOLD.job = canonTrack(d.job, { want: 'scaffold', label: compScaffoldLabel() });
+        }
+        compScaffoldChrome();
+      } catch (_e) {
+        compNotice(t('comp.scaffold.checkFailed', 'the check did not start'));
+      }
+    }
+
+    // The check's toast, from canonToast (kind `scaffold`): its progress
+    // while it reads, then what it found — and what it could not check,
+    // always said, never passed over.
+    function compScaffoldJobToast(e, snap, id, dismiss) {
+      const icon = 'composure';
+      if (!CANON_TERMINAL.has(snap.state)) {
+        convertToast(id, {
+          state: 'running', icon, square: true, title: e.label,
+          message: snap.message || t('comp.scaffold.checking', 'checking…'),
+          progress: snap.chunks > 0 ? Math.round(100 * Math.max(0, snap.chunk || 0) / snap.chunks) : null,
+          actions: [{ label: t('canon.job.cancel', 'cancel'), run: () => { void canonCancel(e.id); } }],
+        });
+        compScaffoldChrome();
+        return;
+      }
+      if (COMP_SCAFFOLD.job && COMP_SCAFFOLD.job.id === e.id) COMP_SCAFFOLD.job = null;
+      const res = snap.result || {};
+      const here = !!COMP.path && (res.path || snap.path) === COMP.path;
+      if (here) {
+        void compLoadComments();
+        void compScaffoldLoadState();
+      }
+      compScaffoldChrome();
+      if (snap.state === 'done') {
+        const nc = res.not_checked || {};
+        const notes = Object.keys(nc).map((k) => nc[k]).filter(Boolean);
+        const found = (res.findings || []).length || res.added || 0;
+        const message = (res.message || t('comp.scaffold.checked', 'checked: {n} findings').replace('{n}', String(found)))
+          + (notes.length ? ' · ' + t('comp.scaffold.notChecked', 'not checked: {what}')
+            .replace('{what}', notes.join('; ')) : '');
+        const actions = here ? [{ label: t('comp.scaffold.showFindings', 'show the findings'), run: () => {
+          convertToastClose(id); compToggleComments(true);
+        } }, dismiss] : [dismiss];
+        convertToast(id, { state: 'done', icon, square: true, title: e.label, message, actions, ttl: 20000 });
+        return;
+      }
+      convertToast(id, {
+        state: 'failed', icon, square: true, title: e.label,
+        message: snap.state === 'cancelled'
+          ? (snap.message || t('comp.scaffold.checkCancelled', 'the check was cancelled; no finding was written'))
+          : (snap.error || snap.message || t('canon.job.failed', 'that did not work')),
+        ttl: 15000, actions: [dismiss],
+      });
+    }
+
+    // ---------- findings ----------
+
+    function compFindingKindLabel(kind) {
+      switch (kind) {
+        case 'spelling': return t('comp.finding.spelling', 'spelling');
+        case 'grammar': return t('comp.finding.grammar', 'grammar');
+        case 'truth': return t('comp.finding.truth', 'a claim');
+        default: return kind || '';
+      }
+    }
+
+    function compFindingStatusLabel(status) {
+      switch (status) {
+        case 'accepted': return t('comp.finding.accepted', 'fix taken');
+        case 'declined': return t('comp.finding.declined', 'kept as written');
+        case 'cannot be checked': return t('comp.finding.cannot', 'cannot be checked');
+        default: return t('comp.finding.open', 'open');
+      }
+    }
+
+    // A finding's card: the shared `.wiki-comment-card` shell, with what was
+    // found, the fix, why, and its status. Accept only when it is open, has
+    // a fix and a quote; decline only when open. "cannot be checked" is
+    // final and says so — it is never shown as passed. No delete: a finding
+    // is the record. Every interpolation is escaped (an innerHTML sink).
+    function compFindingCardHtml(c) {
+      const fd = c.finding || {};
+      const open = fd.status === 'open';
+      const canAccept = open && fd.fix != null && fd.fix !== '' && !!fd.quote;
+      const kind = '<span class="wiki-state-chip">' + escapeHtml(compFindingKindLabel(fd.kind)) + '</span>';
+      const status = '<span class="wiki-state-chip' + (fd.status === 'cannot be checked' ? ' orphaned' : '')
+        + '">' + escapeHtml(compFindingStatusLabel(fd.status)) + '</span>';
+      // Struck through only when there is a fix to put in its place: a quote
+      // with no fix (a claim that cannot be checked) is quoted, not crossed out.
+      const hasFix = fd.fix != null && fd.fix !== '';
+      const q = escapeHtml(String(fd.quote || '').slice(0, 120));
+      const fix = fd.quote
+        ? '<div class="c-fix">' + (hasFix
+          ? '<del>' + q + '</del> → <ins>' + escapeHtml(String(fd.fix).slice(0, 120)) + '</ins>'
+          : '“' + q + '”') + '</div>'
+        : '';
+      const box = compModuleById(fd.box || (c.anchor || {}).module);
+      const where = box ? '<span>' + escapeHtml(box.title || box.id) + '</span>' : '';
+      const why = fd.why ? '<div class="c-why">' + escapeHtml(fd.why) + '</div>' : '';
+      const body = c.body && !fd.quote ? '<div class="c-body">' + escapeHtml(c.body) + '</div>' : '';
+      let actions = '<button type="button" data-act="jump">↧ '
+        + escapeHtml(t('comp.comments.jump', 'jump')) + '</button>';
+      if (canAccept) {
+        actions += '<button type="button" data-act="accept">'
+          + escapeHtml(t('comp.finding.accept', 'take the fix')) + '</button>';
+      }
+      if (open) {
+        actions += '<button type="button" data-act="decline">'
+          + escapeHtml(t('comp.finding.decline', 'keep my words')) + '</button>';
+      }
+      return '<div class="wiki-comment-card comp-finding' + (open ? '' : ' resolved')
+        + '" data-cid="' + escapeHtml(String(c.id)) + '" data-finding="' + escapeHtml(String(fd.id || '')) + '">'
+        + fix + body + why
+        + '<div class="c-meta">' + kind + status + where + '</div>'
+        + '<div class="c-actions">' + actions + '</div></div>';
+    }
+
+    async function compFindingAnswer(c, act) {
+      const fd = c.finding || {};
+      if (!COMP.path || !fd.id) return;
+      try {
+        const r = await fetch('/api/composure/scaffold/' + (act === 'accept' ? 'accept' : 'decline'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path, finding: fd.id }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.finding.failed', 'that finding was not answered')); return; }
+        // An accepted fix changed the box's words (the one op a locked
+        // scaffold takes, applied by the server): the model, then the marks.
+        if ((d.changed || []).length) await compReload();
+        await compLoadComments();
+        compRenderModules();
+        compRenderComments();
+      } catch (_e) {
+        compNotice(t('comp.finding.failed', 'that finding was not answered'));
+      }
+    }
+
+    // ---------- what it becomes, and export ----------
+
+    const COMP_SCAFFOLD_EXPORTS = { page: ['html', 'pdf'], deck: ['pptx', 'pdf'], document: ['md', 'pdf'] };
+
+    function compThingLabel(thing) {
+      switch (thing) {
+        case 'deck': return t('comp.scaffold.thing.deck', 'a deck');
+        case 'document': return t('comp.scaffold.thing.document', 'a document');
+        default: return t('comp.scaffold.thing.page', 'a page');
+      }
+    }
+
+    function compExportLabel(as) {
+      switch (as) {
+        case 'html': return t('comp.scaffold.as.html', 'a web page (HTML)');
+        case 'pdf': return t('comp.scaffold.as.pdf', 'PDF');
+        case 'pptx': return t('comp.scaffold.as.pptx', 'slides (PPTX)');
+        case 'md': return t('comp.scaffold.as.md', 'Markdown');
+        default: return as;
+      }
+    }
+
+    function compOpenScaffoldMenu() {
+      const menu = compEl('comp-scaffold-menu');
+      const btn = compEl('comp-export-btn');
+      const s = compScaffold();
+      if (!menu || !btn || !s) return;
+      if (!menu.hidden) { menu.hidden = true; return; }
+      compCloseMenus();
+      menu.innerHTML = '';
+      const head = (text) => {
+        const h = document.createElement('div');
+        h.className = 'comp-menu-head';
+        h.textContent = text;
+        menu.appendChild(h);
+      };
+      head(t('comp.scaffold.thingHead', 'it becomes'));
+      for (const thing of ['page', 'deck', 'document']) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.thing = thing;
+        b.textContent = compThingLabel(thing);
+        b.classList.toggle('on', s.thing === thing);
+        b.disabled = !!s.locked;
+        menu.appendChild(b);
+      }
+      menu.appendChild(document.createElement('hr'));
+      head(t('comp.scaffold.exportHead', 'export as'));
+      const formats = (COMP_SCAFFOLD.state && COMP_SCAFFOLD.state.exports)
+        || COMP_SCAFFOLD_EXPORTS[s.thing] || COMP_SCAFFOLD_EXPORTS.page;
+      for (const as of formats) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.export = as;
+        b.textContent = compExportLabel(as);
+        menu.appendChild(b);
+      }
+      const findings = COMP.comments.filter((c) => c.finding && c.by === 'check');
+      if (findings.length) {
+        menu.appendChild(document.createElement('hr'));
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.act = 'findings';
+        b.textContent = t('comp.scaffold.findings', 'findings ({open} open of {n})')
+          .replace('{open}', String(findings.filter((c) => c.finding.status === 'open').length))
+          .replace('{n}', String(findings.length));
+        menu.appendChild(b);
+      }
+      compPlaceMenu(menu, btn);
+    }
+    window.compOpenScaffoldMenu = compOpenScaffoldMenu;
+
+    async function compScaffoldExport(as) {
+      compEndEditing();
+      await compFlush();
+      if (!COMP.path) {
+        compNotice(t('comp.scaffold.exportNoFile', 'nothing is written in this scaffold yet, so there is nothing to export'));
+        return;
+      }
+      compNotice(t('comp.scaffold.exporting', 'exporting as {as}…').replace('{as}', compExportLabel(as)));
+      try {
+        const r = await fetch('/api/composure/scaffold/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path, as }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.scaffold.exportFailed', 'nothing was exported')); return; }
+        // `left_out` names what the thing did not get: {box, name, why}.
+        const left = (d.left_out || []).map((x) => (x && typeof x === 'object')
+          ? (x.name || x.box || '') + (x.why ? ' (' + x.why + ')' : '')
+          : String(x)).filter(Boolean);
+        let msg = t('comp.scaffold.exported', 'wrote {path}').replace('{path}', d.path || '');
+        if (left.length) {
+          msg += ' · ' + t('comp.scaffold.leftOut', 'left out: {names}').replace('{names}', left.join(', '));
+        }
+        if (d.open_findings) {
+          msg += ' · ' + t('comp.scaffold.openFindings', '{n} findings still open')
+            .replace('{n}', String(d.open_findings));
+        }
+        compNotice(msg);
+        compRefreshTree();
+      } catch (_e) {
+        compNotice(t('comp.scaffold.exportFailed', 'nothing was exported'));
+      }
+    }
+
+    // ================================================================
     // Wiring
     // ================================================================
     if (!IS_HOME) (function compInit() {
@@ -53545,6 +55295,8 @@
       compEl('comp-menu-btn').addEventListener('click', compOpenComposuresMenu);
 
       compEl('comp-type-menu').addEventListener('click', (e) => {
+        const fb = e.target.closest('button[data-frame-shape]');
+        if (fb) { compCloseMenus(); void compAddFrame(fb.dataset.frameShape); return; }
         const b = e.target.closest('button[data-type]');
         if (!b) return;
         compCloseMenus();
@@ -53552,6 +55304,9 @@
       });
       compEl('comp-menu').addEventListener('click', (e) => {
         if (e.target.closest('button[data-settings]')) { compOpenSettings(); return; }
+        if (e.target.closest('button[data-make-scaffold]')) {
+          compCloseMenus(); void compMakeScaffold(); return;
+        }
         const save = e.target.closest('button[data-save-form]');
         if (save) { compSaveAsForm(); return; }
         const f = e.target.closest('button[data-form]');
@@ -53562,8 +55317,24 @@
       document.addEventListener('click', (e) => {
         if (!compMenuOpen()) return;
         if (e.target.closest('.comp-menu')) return;
-        if (e.target.closest('#comp-add-btn') || e.target.closest('#comp-menu-btn')) return;
+        if (e.target.closest('#comp-add-btn') || e.target.closest('#comp-menu-btn')
+          || e.target.closest('#comp-export-btn')) return;
         compCloseMenus();
+      });
+
+      // ---- the scaffold (0.8) ----
+      compEl('comp-read-btn').addEventListener('click', () => compSetReading(!COMP_SCAFFOLD.reading));
+      compEl('comp-lock-btn').addEventListener('click', () => {
+        if (compScaffoldLocked()) void compScaffoldUnlock(); else void compScaffoldLock();
+      });
+      compEl('comp-check-btn').addEventListener('click', () => { void compScaffoldCheck(); });
+      compEl('comp-export-btn').addEventListener('click', compOpenScaffoldMenu);
+      compEl('comp-scaffold-menu').addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (!b || b.disabled) return;
+        if (b.dataset.thing) { compCloseMenus(); void compScaffoldSetThing(b.dataset.thing); return; }
+        if (b.dataset.export) { compCloseMenus(); void compScaffoldExport(b.dataset.export); return; }
+        if (b.dataset.act === 'findings') { compCloseMenus(); compToggleComments(true); }
       });
 
       // ---- inspector ----
@@ -53590,7 +55361,7 @@
       vp.addEventListener('dblclick', (e) => {
         const m = compHitModule(e);
         if (!m || COMP.mode !== 'edit') return;
-        if (m.type !== 'text') return;
+        if (m.type !== 'text' && !compIsBox(m)) return;
         e.preventDefault();
         compSetTool('text');
         compSetSelection([m.id], { keepCaret: true });
@@ -53860,6 +55631,8 @@
         } else if (b.dataset.act === 'atem-selection') {
           const sel = compEl('comp-ctx-menu')._atemSel;
           if (sel) void canonAtemSelection(sel, { where: sel.where });
+        } else if (b.dataset.act.indexOf('scaffold-') === 0) {
+          compScaffoldAct(id, b.dataset.act.slice('scaffold-'.length));
         }
       });
 
@@ -53934,7 +55707,11 @@
         const act = e.target.closest('button[data-act="comment"]');
         if (act && COMP.sel.length === 1) {
           compOpenCommentComposer({ type: 'module', module: COMP.sel[0] });
+          return;
         }
+        // 0.8: the scaffold's inspector buttons.
+        const sact = e.target.closest('button[data-sact]');
+        if (sact && COMP.sel.length === 1) compScaffoldAct(COMP.sel[0], sact.dataset.sact);
       });
       compEl('comp-insp-slot').addEventListener('input', (e) => {
         const el = e.target;
@@ -53943,12 +55720,24 @@
       });
       compEl('comp-insp-slot').addEventListener('change', (e) => {
         const el = e.target;
+        if (el.dataset && el.dataset.sfield) {
+          if (COMP.sel.length === 1) compScaffoldField(COMP.sel[0], el.dataset.sfield, el.value);
+          return;
+        }
         if (!el.dataset || !el.dataset.field) return;
         if (COMP.sel.length === 1) compSetField(COMP.sel[0], el.dataset.field, el.value);
       });
       compEl('comp-insp-slot').addEventListener('keydown', (e) => {
         if (e.key !== 'Enter') return;
         const el = e.target;
+        // Enter in a one-line scaffold field saves it; in the plec (a
+        // textarea) shift+Enter is not needed — the plec is one line, so
+        // Enter saves there too.
+        if (el.dataset && el.dataset.sfield) {
+          e.preventDefault();
+          if (COMP.sel.length === 1) compScaffoldField(COMP.sel[0], el.dataset.sfield, el.value);
+          return;
+        }
         if (!el.dataset || !el.dataset.field) return;
         e.preventDefault();
         if (COMP.sel.length === 1) compSetField(COMP.sel[0], el.dataset.field, el.value);
@@ -54048,8 +55837,24 @@
           .insertAdjacentHTML('afterbegin', canonAtemIcon());
       }
       add('comment-module', t('comp.ctx.commentModule', 'comment on this module'));
-      if (m && m.type !== 'text' && m.known_type !== false) {
+      if (m && m.type !== 'text' && m.known_type !== false
+        && !COMP_SCAFFOLD_TYPES.includes(m.type)) {
         add('open', t('comp.ctx.open', 'open what this points at'));
+      }
+      // 0.8: a plecholder's and a frame's own actions. Edits only while the
+      // scaffold is open; asking the readvisor about a box works locked too.
+      if (compIsBox(m)) {
+        if (!compScaffoldLocked()) {
+          const written = (m.fields || {}).state === 'written';
+          add('scaffold-written', written
+            ? t('comp.box.unmarkWritten', 'not written yet')
+            : t('comp.box.markWritten', 'mark written'));
+          add('scaffold-plec', t('comp.box.editPlec', 'edit the plec'));
+        }
+        add('scaffold-ask', t('comp.box.ask', 'ask the readvisor about this box'));
+      } else if (compIsFrame(m) && !compScaffoldLocked() && compFrameOrder().length > 1) {
+        add('scaffold-frame-up', t('comp.frame.up', 'move earlier in the order'));
+        add('scaffold-frame-down', t('comp.frame.down', 'move later in the order'));
       }
       // Positioned against the STAGE, in stage px — the same /UIZ() the
       // rest of the canvas's chrome does.
