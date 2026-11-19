@@ -57,7 +57,24 @@ def _str(dumper, data):
     return dumper.represent_str(data)
 
 
-yaml.add_representer(str, _str, Dumper=mc._Dumper)
+class _Dumper(mc._Dumper):
+    """The reader's dumper, with `_str`: a dumper of the promoter's own, so that importing this file never changes
+    how enough dumps (it once added `_str` to `mc._Dumper` itself; every later dump in the process then quoted those
+    strings, every engine call's digest moved with it, and a recorded run that followed in the same process refused
+    to replay)."""
+
+
+_Dumper.add_representer(str, _str)
+
+
+def dump(mapping: dict) -> str:
+    """`mc.dump` (the declaration key first, never an anchor, a shared structure refused) through `_Dumper`."""
+    mc._refuse_shared(mapping)
+    first = next((k for k in mc.DECLARATION_KEYS if k in mapping), None)
+    if first is not None and next(iter(mapping)) != first:
+        mapping = {first: mapping[first], **{k: v for k, v in mapping.items() if k != first}}
+    return yaml.dump(mapping, Dumper=_Dumper, sort_keys=False, allow_unicode=True, width=110,
+                     default_flow_style=False)
 
 OLD_MAKER, NEW_MAKER = "R:maker/transcoder", "R:maker/transconceiver"
 _MACHINE = re.compile(r"/Users/[^/\s\"']+/|/home/[^/\s\"']+/")
@@ -197,7 +214,7 @@ def main(argv: list[str] | None = None) -> int:
                        hashlib.sha256(sraw).hexdigest(), srel,
                        at=f"{stamp.group(1)}T{stamp.group(2)}:{stamp.group(3)}" if stamp else None)
         print(t["id"], t["verdict"], "spike level", t["spike"]["level"])
-    a.out.write_text(mc.dump(new), encoding="utf-8")
+    a.out.write_text(dump(new), encoding="utf-8")
     print(a.out, len(new["nodes"]), "items")
     return 0
 

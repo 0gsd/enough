@@ -433,6 +433,16 @@ def _promote_module():
     return mod
 
 
+def test_loading_the_converter_leaves_enoughs_dumper_as_it_was():
+    """The converter quotes a string holding a YAML line break with a dumper of its own; enough's dump of the same
+    string is the same before and after the converter is loaded (a recorded run's engine-call digests are dumps)."""
+    data = {"oes": "fabula/1", "said": "one two"}
+    before = M.dump(data)
+    mod = _promote_module()
+    assert M.dump(data) == before
+    assert mod.dump(data) != before and '"one\\Ltwo"' in mod.dump(data)
+
+
 def test_the_converter_maps_the_words_and_the_shapes():
     mod = _promote_module()
     x0 = {"oes": "fabula/1", "macrocosm": "0.5.4", "flavour": "fabulac", "purpose": "transcoding", "id": "fabula/a",
