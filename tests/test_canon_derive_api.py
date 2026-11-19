@@ -182,7 +182,7 @@ def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
     res = snap["result"]
     assert res["twin_path"] == "notes.md.fabulan.cosm" and res["text_path"] == "notes.md"
     assert res["mode"] == "rules" and res["state"] == "fresh" and res["chunks"] == 1
-    assert "scaffold" in snap["message"] and snap["started_at"] and snap["finished_at"]
+    assert "outline" in snap["message"] and snap["started_at"] and snap["finished_at"]
     twin = project / "notes.md.fabulan.cosm"
     assert lint_errors(twin) == []
     doc = macrocosm.yaml_load(twin.read_text(encoding="utf-8"))
