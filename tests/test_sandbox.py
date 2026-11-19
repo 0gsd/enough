@@ -439,3 +439,149 @@ def test_what_is_handed_over_is_read_only(tmp_path):
     assert "/handed/notes.txt" in r.stdout and str(home) not in r.stdout
     assert notes.read_text() == "one two three"
     assert r.handed_over and r.handed_over[0].endswith("/handed/notes.txt")
+
+
+# ---- the second package source: enough's own .venv, for the owner's own code only (checkpoint C) ---------------
+
+def fake_venv(tmp_path: Path, monkeypatch) -> Path:
+    """A stand-in for enough's site-packages: one package, one module, one distribution."""
+    sp = tmp_path / "venv" / "site-packages"
+    (sp / "requests").mkdir(parents=True)
+    (sp / "requests" / "__init__.py").write_text("")
+    (sp / "six.py").write_text("")
+    (sp / "attrs-23.1.0.dist-info").mkdir()
+    (sp / "attrs-23.1.0.dist-info" / "top_level.txt").write_text("attr\nattrs\n")
+    monkeypatch.setattr(sb, "venv_site_packages", lambda: [str(sp)])
+    return sp
+
+
+def test_the_sources_known_and_the_one_offered():
+    assert sb.PACKAGE_SOURCE == "standard-library"
+    assert sb.PACKAGE_SOURCES == {"standard-library", "enough-venv"}
+    assert sb.OFFERED_SOURCES == ("standard-library",)
+    # the default of every door is still the standard library
+    import inspect
+    assert inspect.signature(sb.prepare).parameters["package_source"].default == "standard-library"
+    assert inspect.signature(sb.prepare).parameters["owners_code"].default is False
+
+
+def test_enough_venv_is_refused_by_default(tmp_path, monkeypatch):
+    fake_venv(tmp_path, monkeypatch)
+    d = entailed(tmp_path, "print(1)\n")
+    for kw in ({}, {"owners_code": False}, {"owners_code": "yes"}, {"owners_code": 1}):
+        with pytest.raises(sb.Refusal) as e:
+            sb.prepare(d, source_kind="authored", root=tmp_path / "runs", package_source="enough-venv", **kw)
+        assert e.value.reason == "package-source"
+        assert "only to a round trip of the owner's own code" in e.value.sentence
+    assert not (tmp_path / "runs").exists()
+
+
+def test_an_unknown_source_is_refused(tmp_path):
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(entailed(tmp_path, "print(1)\n"), source_kind="authored", root=tmp_path / "runs",
+                   package_source="thymop-register", owners_code=True)
+    assert e.value.reason == "package-source" and "enough-venv, standard-library" in e.value.sentence
+
+
+def test_owners_code_still_refuses_what_its_source_cannot_meet(tmp_path, monkeypatch):
+    fake_venv(tmp_path, monkeypatch)
+    # the owner's code need not be authored; with the default source it is still the standard library only
+    d = entailed(tmp_path, "import requests\n")
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(d, source_kind="decompiled", root=tmp_path / "runs", owners_code=True)
+    assert e.value.reason == "needs" and "outside the standard library:" in e.value.sentence
+    # with enough's packages lent, what they hold is met (by module and by top_level.txt); the rest is not
+    sb.prepare(d, source_kind="decompiled", root=tmp_path / "runs", owners_code=True, package_source="enough-venv")
+    assert sb.unmet_needs(["requests", "six", "attr", "numpy", "json"], source="enough-venv") == ["numpy"]
+    d2 = entailed(tmp_path / "two", "import numpy\n")
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(d2, source_kind="decompiled", root=tmp_path / "runs", owners_code=True,
+                   package_source="enough-venv")
+    assert "outside the standard library and enough's own packages" in e.value.sentence
+    # declared dependencies: met by an installed distribution, refused otherwise
+    p = sb.Program(name="t", dependencies=("attrs>=23", "Requests-Extra==1"))
+    with pytest.raises(sb.Refusal) as e:
+        sb.check_program(p, source="enough-venv")
+    assert "`Requests-Extra`" in e.value.sentence and "attrs" not in e.value.sentence
+    sb.check_program(sb.Program(name="t", dependencies=("attrs>=23",)), source="enough-venv")
+
+
+def test_without_a_venv_enough_venv_is_refused(tmp_path, monkeypatch):
+    monkeypatch.setattr(sb, "venv_site_packages", lambda: [])
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(entailed(tmp_path, "print(1)\n"), source_kind="authored", root=tmp_path / "runs",
+                   owners_code=True, package_source="enough-venv")
+    assert e.value.reason == "package-source" and "virtual environment" in e.value.sentence
+
+
+def test_the_lent_folders_are_read_only_in_both_boxes(tmp_path, monkeypatch):
+    sp = str(fake_venv(tmp_path, monkeypatch))
+    own = sb.Run(run_id="r", folder=tmp_path / "r", program=sb.Program(name="t"), original=tmp_path,
+                 package_source="enough-venv")
+    plain = sb.Run(run_id="p", folder=tmp_path / "p", program=sb.Program(name="t"), original=tmp_path)
+    prof = sb.macos_profile(own).splitlines()
+    allow = f'(allow file-read* (subpath "{sp}"))'
+    assert allow in prof
+    assert prof.index(allow) > max(i for i, ln in enumerate(prof) if ln.startswith("(deny file-read*"))
+    assert not any(sp in ln for ln in prof if "file-write" in ln)
+    assert sp not in sb.macos_profile(plain)
+    interp = sb.interpreter()
+    a = sb._python_argv(own, ["-m", "t"], sb.Limits(), interp, linux=False)
+    assert a[a.index("--path") + 1] == sp and a.index("--path") < a.index("--")
+    assert "--path" not in sb._python_argv(plain, ["-m", "t"], sb.Limits(), interp, linux=False)
+    la = sb.linux_argv(own, ["-m", "t"], sb.Limits(), "/usr/bin/bwrap", interp)
+    assert ("--ro-bind", sp, sp) in list(zip(la, la[1:], la[2:]))
+    assert ("--bind", sp, sp) not in list(zip(la, la[1:], la[2:]))
+    assert sp not in sb.linux_argv(plain, ["-m", "t"], sb.Limits(), "/usr/bin/bwrap", interp)
+
+
+def test_no_door_passes_owners_code_or_the_venv():
+    """The routes, the tools and the readvisor never reach the second source: only this module names it."""
+    root = Path(sb.__file__).parent
+    for p in root.rglob("*.py"):
+        if p.name == "sandbox.py":
+            continue
+        text = p.read_text(encoding="utf-8", errors="replace")
+        assert "owners_code" not in text and "enough-venv" not in text and "ENOUGH_VENV" not in text, p
+    static = root / "static"
+    if static.is_dir():
+        for p in static.rglob("*"):
+            if p.is_file() and p.suffix in (".html", ".js"):
+                assert "enough-venv" not in p.read_text(encoding="utf-8", errors="replace"), p
+
+
+@needs_mac
+@pytest.mark.skipif(not sb.venv_site_packages(), reason="needs enough's own virtual environment")
+def test_an_owners_code_run_reads_the_venv_and_nothing_more(tmp_path):
+    home = tmp_path / "fakehome"
+    home.mkdir()
+    (home / "secret.txt").write_text("SECRET-KEY-MATERIAL")
+    site = sb.venv_site_packages()[0]
+    d = entailed(tmp_path, f"""
+        import importlib, os, socket
+        yaml = importlib.import_module("yaml")
+        print("YAML", yaml.safe_dump({{"a": 1}}).strip(), "FROM", os.path.dirname(yaml.__file__))
+        for what, f in (("write-venv", lambda: open(os.path.join({site!r}, "planted.py"), "w").write("x")),
+                        ("read-home", lambda: open({str(home / "secret.txt")!r}).read()),
+                        ("net", lambda: socket.create_connection(("127.0.0.1", 9), timeout=2)),
+                        ("enough-by-pth", lambda: importlib.import_module("enough"))):
+            try:
+                print(what, "GOT", f())
+            except Exception as e:
+                print(what, "REFUSED", type(e).__name__)
+    """)
+    run = sb.prepare(d, source_kind="rebuilt", root=tmp_path / "runs", owners_code=True,
+                     package_source="enough-venv")
+    r = sb.run_tool(run, limits=sb.Limits(wall=60, grace=1))
+    assert r.exit_code == 0, r.stderr
+    assert "YAML a: 1 FROM " + site in r.stdout
+    for what in ("write-venv", "read-home", "net", "enough-by-pth"):
+        assert f"{what} REFUSED" in r.stdout, r.stdout
+    assert not os.path.exists(os.path.join(site, "planted.py"))
+    assert "SECRET-KEY-MATERIAL" not in r.stdout + r.stderr
+    assert r.guarantees["packages"].startswith("enough-venv: ") and "nothing fetched" in r.guarantees["packages"]
+    # the same program with the default source: the box does not lend the packages
+    run2 = sb.prepare(d, source_kind="rebuilt", root=tmp_path / "runs", owners_code=True)
+    r2 = sb.run_tool(run2, limits=sb.Limits(wall=60, grace=1))
+    assert "ModuleNotFoundError" in r2.stderr and "YAML" not in r2.stdout
+    assert r2.guarantees["packages"] == "standard-library"
