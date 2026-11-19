@@ -1,0 +1,431 @@
+engine: transconception.standing_weighing
+inputs:
+  call: 136a94fc6bc750a24b3d8cdd2ff7131bd0c330c9507b057dec5013d1262b70c4
+keys: []
+tokens: 0
+seconds: 0
+output:
+- id: N:target/go
+  type: target
+  name: go
+  language: go
+  version: 1.27.4
+  weighed:
+  - point: 1
+    score: 2
+    evidence: one company leads (Google); a published proposal process; releases since 1.0 in 2012; a BSD licence;
+      a second compiler, gccgo. Passes the gate, with that note.
+    answered: rules
+  - point: 2
+    score: 3
+    evidence: The Go Programming Language Specification (CC BY 4.0); two implementations, gc and gccgo.
+    answered: rules
+  - point: 3
+    score: 3
+    evidence: the Go 1 compatibility promise (2012), and since 1.21 the go line in go.mod with GODEBUG settings
+      keeping old behaviour.
+    answered: rules
+  - point: 4
+    score: 2
+    evidence: 'every reliance kept is provided: 32 built-in, 23 written, 1 dropped; none cannot; gaps: C:reliance/argparse-surface'
+    answered: rules
+  - point: 5
+    score: 2
+    evidence: the recorded fake model's reading of point 5
+    answered: model
+  - point: 6
+    score: 2
+    evidence: the recorded fake model's reading of point 6
+    answered: model
+  - point: 7
+    score: 2
+    evidence: memory-safe without the unsafe package; data races are possible in concurrent code; an index out of
+      range panics and a panic exits with status 2, so a program whose uncaught errors exit 1 recovers at its top.
+    answered: rules
+  - point: 8
+    score: 1
+    evidence: 'the type checker and go vet check little of what a fabulac states: kinds are strings or interfaces,
+      with no exhaustive matching. The judge, not the compiler, is the check.'
+    answered: rules
+  - point: 9
+    score: 2
+    evidence: the recorded fake model's reading of point 9
+    answered: model
+  - point: 10
+    score: 2
+    evidence: the recorded fake model's reading of point 10
+    answered: model
+  - point: 11
+    score: 2
+    evidence: the recorded fake model's reading of point 11
+    answered: model
+  - point: 12
+    score: 2
+    evidence: the recorded fake model's reading of point 12
+    answered: model
+  provides:
+  - for: C:interface/command.tally
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.add
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.show
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.undo
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/tally.cli.main
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.ledger_path
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.read
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.add
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.undo
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.totals
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.LedgerError
+    by: written
+    what: the new program's own class
+    answered: rules
+  - for: C:interface/tally.render.rows
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.render.empty_message
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/format.ledger-line
+    by: written
+    what: the new program's own format
+    answered: rules
+  - for: C:behaviour/add
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/undo
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/read
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/show
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/errors
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:reliance/whole-numbers-unbounded
+    by: built-in
+    what: math/big.Int where a number may pass 64 bits
+    note: int is 64 bits and wraps silently; every sum that may grow past it is written on big.Int
+    answered: rules
+  - for: C:reliance/number-from-text
+    by: built-in
+    what: strconv.ParseInt after trimming
+    note: underscores between digits, signs and non-ASCII digits the original accepts are glue to write
+    answered: rules
+  - for: C:reliance/halves-round-to-even
+    by: built-in
+    what: math.RoundToEven
+    answered: rules
+  - for: C:reliance/division-gives-fraction
+    by: built-in
+    what: float64 division after converting both sides
+    answered: rules
+  - for: C:reliance/fractions-are-doubles
+    by: built-in
+    what: float64
+    answered: rules
+  - for: C:reliance/fraction-from-text
+    by: built-in
+    what: strconv.ParseFloat after trimming
+    note: the spellings of infinity and not-a-number, and underscores, as the original reads them, are glue
+    answered: rules
+  - for: C:reliance/number-as-text
+    by: written
+    what: the printed form of a number around strconv.FormatFloat(x, 'g', -1, 64)
+    note: the shortest digits agree; where the form switches to an exponent, how the exponent is spelled, inf and
+      nan, and the trailing .0 are written
+    answered: rules
+  - for: C:reliance/conversions
+    by: written
+    what: each conversion the program makes, with the original's refusals
+    note: Go converts only where told and fails differently
+    answered: rules
+  - for: C:reliance/text-length-in-code-points
+    by: built-in
+    what: utf8.RuneCountInString
+    answered: rules
+  - for: C:reliance/text-order-by-code-point
+    by: built-in
+    what: string comparison
+    note: UTF-8 bytes order as their code points do
+    answered: rules
+  - for: C:reliance/sort-is-stable
+    by: built-in
+    what: sort.SliceStable, slices.SortStableFunc
+    answered: rules
+  - for: C:reliance/what-is-a-space
+    by: written
+    what: unicode.IsSpace with U+001C to U+001F added
+    note: the set is written out
+    answered: rules
+  - for: C:reliance/lines-end-at
+    by: written
+    what: a line splitter ending lines where the original does
+    note: Go splits only where told; \r\n, \r, \v, \f, U+001C to U+001E, U+0085, U+2028 and U+2029 are written
+    answered: rules
+  - for: C:reliance/text-repeated
+    by: built-in
+    what: strings.Repeat
+    answered: rules
+  - for: C:reliance/printed-form
+    by: written
+    what: the original's printed form of texts, lists and maps
+    note: fmt's %v and %q print differently
+    answered: rules
+  - for: C:reliance/format-spec
+    by: written
+    what: the format fields the program uses, over fmt.Sprintf
+    note: fmt's verbs differ in alignment, grouping and rounding
+    answered: rules
+  - for: C:reliance/truth-of-values
+    by: written
+    what: each test of truth written out
+    note: 'Go has no truth of values: a test names what it tests'
+    answered: rules
+  - for: C:reliance/any-all-stop-early
+    by: written
+    what: a loop that returns at the first answer
+    answered: rules
+  - for: C:reliance/map-keeps-order
+    by: written
+    what: a slice of keys kept beside the map
+    note: Go's maps keep no order
+    answered: rules
+  - for: C:reliance/set-members
+    by: built-in
+    what: map[T]struct{}
+    answered: rules
+  - for: C:reliance/set-order-varies
+    by: built-in
+    what: map iteration
+    note: its order varies from run to run as well; only a sort makes it repeatable
+    answered: rules
+  - for: C:reliance/membership-identity-then-equality
+    by: written
+    what: == on values, with the identity cases written
+    note: not-a-number is equal to itself under identity
+    answered: rules
+  - for: C:reliance/records-compare-by-fields
+    by: built-in
+    what: struct ==
+    note: every field must be comparable
+    answered: rules
+  - for: C:reliance/lists-and-zip
+    by: written
+    what: a loop to the shorter length
+    answered: rules
+  - for: C:reliance/uncaught-error
+    by: written
+    what: recover at the top, print a report, exit 1
+    note: a panic exits 2
+    answered: rules
+  - for: C:reliance/error-text
+    by: built-in
+    what: err.Error()
+    answered: rules
+  - for: C:reliance/error-kinds
+    by: built-in
+    what: typed errors with errors.Is and errors.As
+    answered: rules
+  - for: C:reliance/exit-status-from-return
+    by: built-in
+    what: os.Exit
+    answered: rules
+  - for: C:reliance/chained-errors
+    by: built-in
+    what: fmt.Errorf with %w, errors.Unwrap
+    note: the report the original prints of a chain is written
+    answered: rules
+  - for: C:reliance/missing-key-error
+    by: written
+    what: the message naming the key
+    answered: rules
+  - for: C:reliance/program-arguments
+    by: built-in
+    what: os.Args
+    answered: rules
+  - for: C:reliance/argparse-surface
+    by: written
+    what: an option reader with the original's usage line, errors and exit status 2
+    note: the flag package has none of them
+    gap: 'the option reader written (a few hundred lines): usage line, error messages, exit status 2'
+    answered: rules
+  - for: C:reliance/argparse-help
+    by: written
+    what: the help screen, laid out as the original lays it out
+    answered: rules
+  - for: C:reliance/argparse-version
+    by: written
+    what: the version option
+    answered: rules
+  - for: C:reliance/argparse-abbreviation
+    by: written
+    what: unambiguous prefixes of long options, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-negative-numbers
+    by: written
+    what: a negative number taken as a value, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-optional-positional
+    by: written
+    what: an optional value matched once, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-subcommands
+    by: written
+    what: sub-commands, in the option reader
+    answered: rules
+  - for: C:reliance/environment-read
+    by: built-in
+    what: os.LookupEnv
+    answered: rules
+  - for: C:reliance/clock-seconds
+    by: built-in
+    what: time.Now() as seconds since the epoch
+    answered: rules
+  - for: C:reliance/terminal-width
+    by: written
+    what: COLUMNS, else 80
+    note: the terminal's own size needs golang.org/x/term; the original's order is COLUMNS first
+    answered: rules
+  - for: C:reliance/print-line-end
+    by: built-in
+    what: fmt.Println
+    answered: rules
+  - for: C:reliance/output-encoding
+    by: built-in
+    what: UTF-8 bytes written as they are
+    answered: rules
+  - for: C:reliance/json-written
+    by: written
+    what: a JSON writer with the original's spacing, escapes and number forms
+    note: encoding/json escapes <, > and &, writes no spaces and spells numbers its own way
+    answered: rules
+  - for: C:reliance/json-keys-sorted
+    by: built-in
+    what: encoding/json sorts a map's keys
+    answered: rules
+  - for: C:reliance/json-read
+    by: built-in
+    what: encoding/json with a Decoder and UseNumber
+    note: 'the original reads NaN and Infinity and numbers of any size: glue where the program meets them'
+    answered: rules
+  - for: C:reliance/home-and-tilde
+    by: built-in
+    what: os.UserHomeDir
+    note: a leading ~ is expanded by a line of glue
+    answered: rules
+  - for: C:reliance/path-written
+    by: built-in
+    what: path/filepath
+    answered: rules
+  - for: C:reliance/path-kinds
+    by: built-in
+    what: os.Stat, os.Lstat
+    answered: rules
+  - for: C:reliance/make-folders
+    by: built-in
+    what: os.MkdirAll
+    answered: rules
+  - for: C:reliance/file-created-mode
+    by: built-in
+    what: os.OpenFile with 0o666, the umask applied
+    answered: rules
+  - for: C:reliance/newlines-translated
+    by: written
+    what: \r\n and \r read as \n where the original reads text
+    note: Go translates no line ends
+    answered: rules
+  - for: C:reliance/text-decoding-strict
+    by: built-in
+    what: utf8.Valid
+    note: the error the original raises is written
+    answered: rules
+  - for: C:reliance/runtime-version
+    by: built-in
+    what: the go line of go.mod names the release it is built for
+    answered: rules
+  - for: C:reliance/run-as-module
+    by: built-in
+    what: one program, built from its module
+    answered: rules
+  - for: C:reliance/pytest-conventions
+    by: dropped
+    what: 'nothing: go test reads its own names'
+    note: the original's test runner's names mean nothing to the new program
+    answered: rules
+  summary: 'Weighed for a transconception into Go: feasible with 1 named gap.'
+  stance: deduced
+  spike:
+    use: the option reader (C:reliance/argparse-surface), small
+    level: 3
+    where: null
+    cases:
+    - P:case/cli-json-and-error
+    evidence:
+      level: 3
+      against: original
+      cases:
+      - P:case/cli-json-and-error
+      differ:
+        ruled: 0
+        unruled: 0
+      where:
+        file: spikes/go-spike.verdict.json
+        digest: 27eb65e719ce693996312acbab0b5a50307d959971d26fb58bf22245bde88c26
+      at: 2026-11-18T13:30
+  verdict: feasible-with
+  conditions:
+  - 'C:reliance/argparse-surface (the option reader''s errors and messages): the option reader written (a few hundred
+    lines): usage line, error messages, exit status 2'
+  at: '2026-11-18'
+  made:
+    move: weigh
+    in: go
+    run: 2026-11-18-1300-a907
+    engine: rules+model:scripted
+  provenance:
+    mode: derived
+    sources:
+    - defaults/cosm/ground/targets/go.cosm
+    - MacroCOSM OES 18.4.9
+    confidence: 0.7
+    state: known
+- N:target/go

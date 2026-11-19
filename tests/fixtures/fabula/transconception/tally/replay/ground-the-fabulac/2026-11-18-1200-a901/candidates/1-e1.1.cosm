@@ -1,0 +1,2485 @@
+engine: syntax.catalogue
+inputs:
+  call: 2a6065f958fc52a5757029995727256aa927f65c05dc97322225e821486255ef
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language:
+    name: python
+    title: Python
+    runtime: python
+    suffixes:
+    - py
+    - pyi
+  catalogue:
+    ground: ground/1
+    language: python
+    title: The ground of Python
+    version: '3.13'
+    about: What a program written in Python takes from its language, its runtime and its standard library without
+      saying so. Each citation names the Python documentation of the 3.13 series as the language library keeps it
+      (its plain-text build of 3.13.18), by page and the publisher's anchor.
+    texts:
+    - shelf: python
+      text: docs
+      version: '3.13'
+      name: The Python documentation
+      publisher: Python Software Foundation
+      what: text
+      form: text
+      lane: open
+      aboard: false
+      licence:
+        name: PSF License Version 2; examples, recipes and other code in the documentation are also under the Zero-Clause
+          BSD license
+        url: https://docs.python.org/3.13/license.html
+      cited-as: python
+      cited-version: 3.13.18
+    pins:
+    - shelf: python
+      text: cpython
+      version: '3.13'
+      name: CPython
+      publisher: Python Software Foundation
+      what: implementation
+      lane: open
+      aboard: false
+      licence:
+        name: PSF License Version 2
+        url: https://docs.python.org/3.13/license.html
+      from: https://github.com/python/cpython
+      release: null
+      swhid: null
+      digest: null
+    entries:
+    - id: whole-numbers-unbounded
+      'on': language
+      of: means
+      name: whole numbers without limit
+      gives: Whole numbers have no fixed width. Adding, subtracting and multiplying them never overflows and never
+        loses a digit, however large they grow.
+      example: 18446744073709551615 plus 1 is 18446744073709551616, exactly; a total past two to the sixty-third
+        is kept.
+      shows-as:
+      - call: int
+      - annotation: int
+      - method: add_argument
+        kw:
+          type: int
+      usual: kept
+      from:
+      - paper
+      - S-R09
+      - TS 1.11
+      - SW 1.10
+      - SW 1.34
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#numeric-types-int-float-complex
+        digest: 736b53f803b0
+    - id: number-from-text
+      'on': language
+      of: means
+      name: a whole number read from text
+      gives: A whole number is read from text that may have spaces, tabs or line ends around it, a plus or minus
+        sign, single underscores between digits, leading zeros, and the decimal digits of any script, not only 0
+        to 9. Anything else is refused.
+      example: ''' 5_0'', ''+7'', ''007'' and the Arabic-Indic digit seven are read as 50, 7, 7 and 7; ''5__0''
+        and ''1.0'' are refused.'
+      names:
+      - \bint\(\)
+      shows-as:
+      - call: int
+      - method: add_argument
+        kw:
+          type: int
+      usual: kept
+      from:
+      - paper
+      - V-R04
+      - TS 3.14
+      - SW 3.13
+      - TS 1.10
+      - SW 1.9
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#int
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#numeric-types-int-float-complex
+        digest: 736b53f803b0
+    - id: halves-round-to-even
+      'on': language
+      of: means
+      name: halves round to the even neighbour
+      gives: Rounding a number to a whole number takes the nearer whole number, and a number exactly halfway goes
+        to the even one. The result is a whole number.
+      example: 2.5 rounds to 2, 3.5 to 4, and -0.5 to 0.
+      shows-as:
+      - call: round
+      usual: kept
+      from:
+      - paper
+      - TS 3.17
+      - SW 3.19
+      - TS 1.38
+      - SW 1.39
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#round
+        digest: 216dc071d8fc
+    - id: division-gives-fraction
+      'on': language
+      of: means
+      name: dividing gives a fraction
+      gives: Dividing one whole number by another with the plain division sign gives a fractional number, correctly
+        rounded, even when the division is exact.
+      example: 6 divided by 3 is 2.0, not 2; 1 divided by 3 is 0.3333333333333333.
+      shows-as:
+      - form: true-division
+      usual: kept
+      from:
+      - SW 3.19
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#binary-arithmetic-operations
+        digest: 9188471e6a0d
+    - id: division-floors
+      'on': language
+      of: means
+      name: whole-number division rounds down
+      gives: Whole-number division rounds toward minus infinity, not toward zero, and the remainder takes the sign
+        of the divisor.
+      example: -7 divided by 2 in whole numbers is -4, remainder 1.
+      shows-as:
+      - form: floor-division
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#binary-arithmetic-operations
+        digest: 9188471e6a0d
+    - id: fractions-are-doubles
+      'on': language
+      of: means
+      name: fractional numbers are binary doubles
+      gives: A fractional number is a 64-bit binary floating-point number. Not-a-number is unequal to everything,
+        itself included; there is a positive and a negative zero; a literal too large to hold reads as infinity.
+      example: 0.1 plus 0.2 is 0.30000000000000004; 1e400 is infinity.
+      shows-as:
+      - call: float
+      - annotation: float
+      - call: time.time
+      usual: kept
+      from:
+      - V-R10
+      - SW 1.29
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#numeric-types-int-float-complex
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations
+        digest: 783ed86151eb
+    - id: fraction-from-text
+      'on': language
+      of: means
+      name: a fractional number read from text
+      gives: A fractional number is read from text with spaces around it, a sign, underscores between digits, an
+        exponent, and the words nan, inf and infinity in any case.
+      example: ''' -1_0.5e1 '' reads as -105.0; ''Infinity'' reads as infinity.'
+      shows-as:
+      - call: float
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#float
+        digest: 216dc071d8fc
+    - id: number-as-text
+      'on': language
+      of: means
+      name: numbers written as text
+      gives: A whole number is written in decimal digits with a minus sign when negative. A fractional number is
+        written with the fewest digits that read back as the same number, always with a point or an exponent; from
+        1e16 up and below 1e-4 it takes the exponent form, with a sign and at least two digits.
+      example: 1.0 is written 1.0, not 1; 1e16 is written 1e+16; 0.0001 is written 0.0001 and 0.00001 is written
+        1e-05.
+      shows-as:
+      - call: float
+      - annotation: float
+      - call: time.time
+      - call: str
+      - form: f-string
+      usual: kept
+      from:
+      - paper
+      - TS 3.16
+      - SW 3.17
+      - TS 1.20
+      - TS 1.21
+      - SW 1.29
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#repr
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations
+        digest: 783ed86151eb
+      - nowhere: the exact switch to the exponent form (from 1e16 up, below 1e-4) and the two-digit exponent.
+    - id: conversions
+      'on': language
+      of: means
+      name: values converted to a kind
+      gives: Converting a value to a whole number drops a fraction toward zero and takes yes as 1 and no as 0; converting
+        text reads it as a number (see the entries on numbers read from text); converting anything to text gives
+        its printed form. A value that cannot be converted is refused with a value error or a type error.
+      example: a fraction 2.9 converted to a whole number is 2; yes is 1; the text '3' converted is 3; a list is
+        refused.
+      shows-as:
+      - call: int
+      - call: float
+      - call: str
+      - call: bool
+      usual: kept
+      from:
+      - TS 1.22
+      - SW 1.17
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#int
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#float
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#bool
+        digest: 216dc071d8fc
+    - id: value-kinds
+      'on': language
+      of: means
+      name: a value's kind and its name
+      gives: A value's kind can be asked for and compared exactly. Yes and no are a kind of whole number when asked
+        loosely, but not when the kind is compared exactly. A kind's name is its short word (int, str, list, bool,
+        float).
+      example: yes is a whole number when asked loosely; the kind of yes is not the kind of 1; the name of the kind
+        of 1 is int.
+      shows-as:
+      - call: type
+      - call: isinstance
+      usual: kept
+      from:
+      - V-R09
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#type
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#isinstance
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#bool
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#definition.__name__
+        digest: 736b53f803b0
+    - id: text-length-in-code-points
+      'on': language
+      of: means
+      name: text measured in code points
+      gives: The length of a text, and every padding to a width, counts Unicode code points, not bytes, not UTF-16
+        units and not the columns a terminal draws. A wide character or a combining mark counts as one.
+      example: '''café'' is 4 long; padded to 6 it gains two spaces; a name of three CJK ideographs counts 3.'
+      shows-as:
+      - method: ljust
+      - method: rjust
+      - method: center
+      - form: format-width
+      - call: len
+      usual: kept
+      from:
+      - paper
+      - S-R04
+      - TS 3.19
+      - SW 3.22
+      - TS 1.36
+      - SW 1.37
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#text-sequence-type-str
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.ljust
+        digest: 736b53f803b0
+    - id: text-indexed-by-code-point
+      'on': language
+      of: means
+      name: positions in text count code points
+      gives: A position in a text, a slice of it and a match's start and end count Unicode code points from 0. A
+        slice past either end is cut short, never refused; a negative position counts from the end.
+      example: in 'é𝒳x' the x is at position 2; the slice from 1 to 99 of 'abc' is 'bc'.
+      shows-as:
+      - form: slice
+      - method: find
+      - method: rfind
+      - method: start
+      - method: end
+      - method: span
+      usual: kept
+      from:
+      - S-R04
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#text-sequence-type-str
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#common-sequence-operations
+        digest: 736b53f803b0
+    - id: text-order-by-code-point
+      'on': language
+      of: means
+      name: text ordered by code point
+      gives: Texts are ordered by comparing code point by code point, not by any language's alphabet and not by
+        locale, so every capital letter of A to Z comes before every small letter, and a shorter text before a longer
+        one it begins.
+      example: sorted, 'B', 'a', 'é' and 'b' come out as 'B', 'a', 'b', 'é'.
+      names:
+      - \bsorted\(\)
+      shows-as:
+      - call: sorted
+      - method: sort
+      - call: max
+      - call: min
+      usual: kept
+      from:
+      - paper
+      - V-R14
+      - TS 3.20
+      - SW 3.22
+      - TS 1.41
+      - SW 1.35
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#value-comparisons
+        digest: 9188471e6a0d
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#sorted
+        digest: 216dc071d8fc
+    - id: sort-is-stable
+      'on': language
+      of: means
+      name: sorting keeps ties in order
+      gives: Sorting is stable. Things that compare equal under the sort's key keep the order they had before.
+      example: sorted by length, 'bb', 'a', 'c' give 'a', 'c', 'bb'.
+      shows-as:
+      - call: sorted
+      - method: sort
+      usual: kept
+      from:
+      - V-R14
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#sorted
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#list.sort
+        digest: 736b53f803b0
+    - id: what-is-a-space
+      'on': language
+      of: means
+      name: what counts as white space
+      gives: White space is every character Unicode's database classes as a space separator or as a bidirectional
+        space, segment or paragraph separator. That is the ASCII space, tab, line feed, vertical tab, form feed
+        and carriage return, the four information separators U+001C to U+001F, U+0085, U+00A0, U+1680, U+2000 to
+        U+200A, U+2028, U+2029, U+202F, U+205F and U+3000. Trimming, splitting on white space and asking whether
+        a text is white space all use this one set.
+      example: a name of 'tea' followed by U+3000 is trimmed to 'tea'; 'a', U+001F, 'b' holds white space.
+      names:
+      - \bisspace\b
+      - \bstrip\(\)
+      shows-as:
+      - method: strip
+      - method: lstrip
+      - method: rstrip
+      - method: isspace
+      - method: split
+        without:
+        - sep
+      usual: kept
+      from:
+      - paper
+      - V-R17
+      - S-R03
+      - TS 3.18
+      - SW 3.20
+      - TS 1.15
+      - TS 1.25
+      - SW 1.14
+      - SW 1.16
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.isspace
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.strip
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.split
+        digest: 736b53f803b0
+    - id: text-split-on-space
+      'on': language
+      of: means
+      name: text split into words
+      gives: Splitting a text with no separator given splits on runs of white space and drops empty pieces, so a
+        text of only white space gives no words; splitting with a separator keeps every empty piece.
+      example: '''  a  b '' split gives ''a'' and ''b''; ''a,,b'' split at commas gives ''a'', '''' and ''b''.'
+      shows-as:
+      - method: split
+      - method: rsplit
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.split
+        digest: 736b53f803b0
+    - id: lines-end-at
+      'on': language
+      of: means
+      name: where a line ends
+      gives: A text split into lines breaks at line feed, carriage return, carriage return then line feed (one break),
+        line tabulation, form feed, the file, group and record separators U+001C to U+001E, U+0085, U+2028 and U+2029.
+        The breaks are not kept, and a final break does not make an empty last line.
+      example: '''a'', U+2028, ''b'' is two lines; ''a\r\nb\n'' is two lines, ''a'' and ''b''.'
+      names:
+      - \bsplitlines\b
+      shows-as:
+      - method: splitlines
+      usual: kept
+      from:
+      - paper
+      - V-R18
+      - TS 1.24
+      - SW 3.21
+      - SW 1.15
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.splitlines
+        digest: 736b53f803b0
+    - id: text-case-mapping
+      'on': language
+      of: means
+      name: changing the case of text
+      gives: Lower-casing, upper-casing and case folding use Unicode's full mappings, so a character may become
+        several and the length may change; they ignore the locale.
+      example: upper-cased, 'ß' becomes 'SS'; folded, 'ẞ' and 'ss' are equal; 'İ' lower-cased is 'i' and a combining
+        dot.
+      shows-as:
+      - method: lower
+      - method: upper
+      - method: casefold
+      - method: title
+      - method: capitalize
+      usual: kept
+      from:
+      - V-R14
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.lower
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.casefold
+        digest: 736b53f803b0
+    - id: text-replace
+      'on': language
+      of: means
+      name: replacing in text
+      gives: Replacing a piece of text replaces every occurrence, scanning left to right, without overlap, unless
+        a count is given; nothing found leaves the text as it was.
+      example: replacing 'aa' by 'b' in 'aaa' gives 'ba'.
+      shows-as:
+      - method: replace
+      usual: kept
+      from:
+      - S-R11
+      - S-R13
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str.replace
+        digest: 736b53f803b0
+    - id: text-repeated
+      'on': language
+      of: means
+      name: text repeated
+      gives: A text repeated a whole number of times is that many copies joined; zero or a negative number of times
+        gives the empty text, never an error.
+      example: '''#'' three times is ''###''; ''#'' minus two times is ''''.'
+      shows-as:
+      - form: text-repeat
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#common-sequence-operations
+        digest: 736b53f803b0
+    - id: code-points-by-number
+      'on': language
+      of: means
+      name: characters by number
+      gives: A character is made from any number from 0 to 1114111 (U+10FFFF); a larger or negative number is refused
+        with a value error. Text may hold any of them, the null character and lone surrogates (U+D800 to U+DFFF)
+        included.
+      example: number 55296 gives the lone surrogate U+D800, which the text keeps; 1114112 is refused.
+      names:
+      - \bchr\(\)
+      shows-as:
+      - call: chr
+      - call: ord
+      usual: kept
+      from:
+      - S-R09
+      - S-R10
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#chr
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#ord
+        digest: 216dc071d8fc
+    - id: printed-form
+      'on': language
+      of: means
+      name: a value's printed form
+      gives: Any value has a printed form. Text prints as itself; bytes print as b followed by the quoted bytes;
+        a quoted form of text (used in many messages) puts it in single quotes, or double quotes when it holds a
+        single quote and no double one, with backslash escapes for what cannot be shown.
+      example: the bytes of '<r>' print as b'<r>'; the quoted form of x is 'x', of it's is "it's".
+      shows-as:
+      - call: str
+      - call: repr
+      - form: conversion-r
+      - method: add_argument
+        kw:
+        - type
+      usual: kept
+      from:
+      - S-R18
+      - TS 3.5
+      - SW 3.14
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#str
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#repr
+        digest: 216dc071d8fc
+      - nowhere: the rule for choosing single or double quotes in the quoted form of text, and which characters
+          it escapes.
+    - id: format-spec
+      'on': language
+      of: means
+      name: the format of a value written into text
+      gives: A value written into text may carry a format of fill, alignment, sign, width, grouping, precision and
+        type. A plus sign shows the sign of positive numbers too; a width pads to that many code points; a fraction's
+        precision rounds half to even.
+      example: 1 formatted with a sign is '+1' and -2 is '-2'; 3 right-aligned in width 4 is '   3'.
+      shows-as:
+      - form: format-spec
+      - call: format
+      usual: kept
+      from:
+      - TS 3.28
+      - SW 2.25
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/string.html#formatspec
+        digest: b1490c87ba39
+      - in: python
+        version: 3.13.18
+        at: reference/lexical_analysis.html#formatted-string-literals
+        digest: 26b7f8ab2fcf
+    - id: percent-format
+      'on': language
+      of: means
+      name: text formatted with percent fields
+      gives: Text with percent fields (a percent sign, an optional name in brackets, flags, width, precision and
+        a letter) is filled from a value or a map of names; two percent signs give one.
+      example: '''%(n)s items'' filled with n = 3 gives ''3 items''.'
+      shows-as:
+      - form: percent-format
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#printf-style-string-formatting
+        digest: 736b53f803b0
+    - id: format-string-fields
+      'on': runtime
+      of: runtime
+      name: the fields of a format string
+      gives: Brace fields in a format string are found by its grammar, a name followed by attributes and keys, a
+        conversion after an exclamation mark and a format after a colon; two braces are an escaped brace; a malformed
+        string gives no fields and an error.
+      example: '''{a.b[0]!r:>4}'' names the field a; ''{{a}}'' names none.'
+      shows-as:
+      - call: string.Formatter
+      usual: kept
+      from:
+      - V-R21
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/string.html#format-string-syntax
+        digest: b1490c87ba39
+      - in: python
+        version: 3.13.18
+        at: library/string.html#string.Formatter.parse
+        digest: b1490c87ba39
+    - id: truth-of-values
+      'on': language
+      of: means
+      name: which values count as false
+      gives: Where a value is tested as a condition, zero of any kind, empty text, an empty list, map or set, and
+        nothing count as false; everything else counts as true unless it says otherwise.
+      example: a line holding only spaces, trimmed, is empty and so false; 0.0 is false; a list holding one empty
+        text is true.
+      shows-as:
+      - form: truth-test
+      usual: kept
+      from:
+      - V-R10
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#truth-value-testing
+        digest: 736b53f803b0
+    - id: boolean-operators-give-operands
+      'on': language
+      of: means
+      name: and, or give one of their operands
+      gives: '"and" and "or" stop as soon as the answer is known and give the operand that decided it, not a plain
+        yes or no: "a or b" is a when a counts as true, else b.'
+      example: an empty name or 'anonymous' gives 'anonymous'.
+      shows-as:
+      - form: or-default
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#boolean-operations
+        digest: 9188471e6a0d
+    - id: any-all-stop-early
+      'on': language
+      of: means
+      name: any and all stop at the first answer
+      gives: Asking whether any of a series holds stops at the first that does; asking whether all hold stops at
+        the first that does not; the rest are never looked at. Any of nothing is false and all of nothing is true.
+      example: of handlers checked in order, the second is never examined when the first already answers.
+      names:
+      - \bany\(\)
+      shows-as:
+      - call: any
+      - call: all
+      usual: kept
+      from:
+      - V-R11
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#any
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#all
+        digest: 216dc071d8fc
+    - id: map-keeps-order
+      'on': language
+      of: means
+      name: a map of keys to values
+      gives: A map from keys to values holds each key once and keeps the order in which keys were first put in;
+        putting a key in again changes its value and keeps its place; a map built from sorted pairs stays sorted.
+        Looking up a key it does not hold is refused with a key error unless a default is given.
+      example: a="1" b="2" a="3" gives a=3 then b=2; the totals of b, a and c, put in sorted, come back a, b, c.
+      names:
+      - \bdict(?:ionary)?\b
+      shows-as:
+      - form: map
+      - call: dict
+      - annotation: dict
+      usual: kept
+      from:
+      - S-R11
+      - S-R12
+      - SW 1.19
+      - TS 2.10
+      - SW 2.14
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#mapping-types-dict
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#dict.get
+        digest: 736b53f803b0
+    - id: set-members
+      'on': language
+      of: means
+      name: a set holds each value once
+      gives: A set holds each value once, two values that compare equal (and hash alike) being one member; membership
+        is asked in about constant time.
+      example: two findings with the same file, line and name are one finding.
+      shows-as:
+      - form: set
+      - call: set
+      - call: frozenset
+      usual: kept
+      from:
+      - V-R13
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#set-types-set-frozenset
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: reference/datamodel.html#object.__hash__
+        digest: 95b8a5bdc225
+    - id: set-order-varies
+      'on': runtime
+      of: runtime
+      name: the order of a set of texts varies from run to run
+      gives: Going through a set of texts visits them in an order that changes from one run of the program to the
+        next, because the hash of a text is salted afresh at each start; only a sort makes it repeatable.
+      example: the same three names, put in a set and printed, come out in a different order on another run.
+      shows-as:
+      - form: set
+      - call: set
+      - call: frozenset
+      usual: free
+      from:
+      - V-R14
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/datamodel.html#object.__hash__
+        digest: 95b8a5bdc225
+    - id: membership-identity-then-equality
+      'on': language
+      of: means
+      name: membership is identity first, then equality
+      gives: Asking whether a value is among others asks, for each, whether it is that very object, then whether
+        it is equal; the first yes answers.
+      example: a constant compared against a list of constants by membership finds itself even if equality was redefined.
+      shows-as:
+      - form: compare-in
+      usual: kept
+      from:
+      - S-R19
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#membership-test-operations
+        digest: 9188471e6a0d
+    - id: records-compare-by-fields
+      'on': runtime
+      of: runtime
+      name: records equal by their fields
+      gives: A record type declared by its fields is equal to another of the same type when every field is equal;
+        it can be unpacked in field order (when declared as a tuple), may be frozen against change, and fields may
+        have defaults.
+      example: two entries with the same time, name and amount are equal; a frozen entry cannot be changed.
+      names:
+      - \bNamedTuple\b
+      - \bnamedtuple\b
+      - \bdataclass\w*
+      shows-as:
+      - decorator: dataclass
+      - decorator: dataclasses.dataclass
+      - base: NamedTuple
+      - base: typing.NamedTuple
+      - call: collections.namedtuple
+      usual: kept
+      from:
+      - S-R22
+      - TS 2.5
+      - SW 2.8
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/dataclasses.html#dataclasses.dataclass
+        digest: e1a82f4a2d34
+      - in: python
+        version: 3.13.18
+        at: library/typing.html#typing.NamedTuple
+        digest: fdda791ff698
+    - id: lists-and-zip
+      'on': language
+      of: means
+      name: pairing lists stops at the shortest
+      gives: Walking two series in step stops at the end of the shorter one, silently; the largest or smallest of
+        nothing is refused unless a default is given.
+      example: pairing 'a', 'b', 'c' with 1, 2 gives two pairs; the largest of no totals with a default of 0 is
+        0.
+      shows-as:
+      - call: zip
+      - call: max
+        kw:
+        - default
+      - call: min
+        kw:
+        - default
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#zip
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#max
+        digest: 216dc071d8fc
+    - id: generators-lazy
+      'on': language
+      of: means
+      name: a stream does nothing until asked
+      gives: A function that yields its results one at a time checks its arguments when it is called, but runs none
+        of its body until the first result is asked for, and then only as far as the next result.
+      example: an unknown option is refused at the call; a bad input is found only when the first event is asked
+        for.
+      names:
+      - \bgenerator\b
+      - \byield\b
+      shows-as:
+      - form: yield
+      usual: kept
+      from:
+      - S-R21
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#yield-expressions
+        digest: 9188471e6a0d
+      - in: python
+        version: 3.13.18
+        at: reference/expressions.html#calls
+        digest: 9188471e6a0d
+      - nowhere: the wording of the message that refuses an unknown keyword argument.
+    - id: uncaught-error
+      'on': runtime
+      of: runtime
+      name: an error nobody catches
+      gives: An error the program does not catch ends it with exit status 1, after the runtime prints its report
+        of the error (a traceback, the error's kind and message) on standard error.
+      example: a ledger path that is a folder makes the program print a traceback and exit 1.
+      names:
+      - \btraceback\b
+      shows-as:
+      - entry-point: true
+      usual: alike
+      from:
+      - paper
+      - V-R22
+      - TS 3.26
+      - SW 3.25
+      - TS 1.27
+      - SW 1.24
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.excepthook
+        digest: 1fc32ff781c0
+      - nowhere: that an uncaught error ends the process with exit status 1, and the traceback's exact form.
+    - id: error-text
+      'on': language
+      of: means
+      name: an error printed is its message
+      gives: An error turned into text gives its message as it was raised, and the empty text when it was raised
+        with none.
+      example: an error raised with 'the ledger is broken' prints as that; one raised with no message prints as
+        nothing.
+      shows-as:
+      - form: handler-text
+      usual: kept
+      from:
+      - V-R25
+      - TS 2.4
+      - SW 2.6
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/exceptions.html#BaseException.args
+        digest: fd1dcc489d5c
+    - id: error-kinds
+      'on': language
+      of: means
+      name: errors caught by kind
+      gives: A handler catches the kinds of error it names and every kind made from them. A text that is not valid
+        JSON is a kind of value error; a missing key is a key error; a wrong kind of value is usually a type error;
+        a missing file, a folder where a file was wanted and a refused permission are kinds of operating-system
+        error.
+      example: a line that is not JSON and a line missing a field are both caught by one handler naming value and
+        key errors.
+      shows-as:
+      - form: handler
+      usual: kept
+      from:
+      - TS 1.22
+      - SW 1.17
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/exceptions.html#exception-hierarchy
+        digest: fd1dcc489d5c
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.JSONDecodeError
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: reference/compound_stmts.html#the-try-statement
+        digest: 4978b6e97f3d
+    - id: exit-status-from-return
+      'on': runtime
+      of: runtime
+      name: the exit status from a whole number
+      gives: Ending the program with a whole number makes that number its exit status; ending it with nothing is
+        status 0.
+      example: a main step that returns 1 ends the program with status 1.
+      shows-as:
+      - call: sys.exit
+      - call: exit
+      - call: SystemExit
+      usual: kept
+      from:
+      - SW 3.26
+      - TS 2.2
+      - SW 2.2
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.exit
+        digest: 1fc32ff781c0
+    - id: exit-with-message
+      'on': runtime
+      of: runtime
+      name: exiting with a message
+      gives: Ending the program with a message prints the message on standard error, followed by a line end, and
+        exits with status 1.
+      example: 'a missing path prints ''Error: m.py could not be found.'' and exits 1.'
+      shows-as:
+      - call: sys.exit
+        arg0: str
+      usual: kept
+      from:
+      - V-R23
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.exit
+        digest: 1fc32ff781c0
+    - id: exit-status-whole-number
+      'on': runtime
+      of: runtime
+      name: named statuses are whole numbers
+      gives: A status named in an enumeration of whole numbers is that whole number wherever a number is wanted,
+        the exit status included.
+      example: a status named dead code found, valued 3, exits 3.
+      names:
+      - \bIntEnum\b
+      shows-as:
+      - base: IntEnum
+      - base: enum.IntEnum
+      usual: kept
+      from:
+      - V-R33
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/enum.html#enum.IntEnum
+        digest: c29e837b8dbe
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.exit
+        digest: 1fc32ff781c0
+    - id: chained-errors
+      'on': runtime
+      of: runtime
+      name: an error raised from another
+      gives: An error raised while another is handled, or raised from it, keeps the first as its cause; an uncaught
+        one reports both, the cause first.
+      example: a decode error turned into a ledger error prints both, when nobody catches the second.
+      shows-as:
+      - form: raise-from
+      usual: free
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/simple_stmts.html#the-raise-statement
+        digest: cf5e83ddb366
+    - id: optional-library
+      'on': runtime
+      of: runtime
+      name: a library that may be absent
+      gives: Loading a library that is not installed fails with an import error that the program can catch, so a
+        part that needs it can be offered only where it is installed.
+      example: the second tree builder is offered only where its library loads.
+      shows-as:
+      - handler: ImportError
+      - handler: ModuleNotFoundError
+      usual: kept
+      from:
+      - S-R20
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/exceptions.html#ImportError
+        digest: fd1dcc489d5c
+    - id: missing-key-error
+      'on': language
+      of: means
+      name: a missing key's error names the key
+      gives: Looking up a key a map does not hold raises a key error whose text is the key's quoted form.
+      example: looking up 'other' among the tree builders fails with the text 'other' in single quotes.
+      shows-as:
+      - handler: KeyError
+      - form: map-lookup
+      usual: kept
+      from:
+      - S-R20
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/exceptions.html#KeyError
+        digest: fd1dcc489d5c
+      - nowhere: that the key error's message is the key's quoted form.
+    - id: program-arguments
+      'on': runtime
+      of: runtime
+      name: the program's own arguments
+      gives: The program's own arguments are the words it was started with, after its name, as text; bytes that
+        are not valid in the locale's encoding are kept as lone surrogates so that they round-trip.
+      example: started as 'tool add tea 3', the arguments are 'add', 'tea' and '3'.
+      names:
+      - \bsys\.argv\b
+      shows-as:
+      - attr: sys.argv
+      - method: parse_args
+      usual: kept
+      from:
+      - V-R03
+      - SW 3.28
+      - SW 1.50
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.argv
+        digest: 1fc32ff781c0
+      - in: python
+        version: 3.13.18
+        at: library/os.html#file-names-command-line-arguments-and-environment-variables
+        digest: 7df584c5ef74
+    - id: argparse-surface
+      'on': runtime
+      of: runtime
+      name: the option reader's errors and messages
+      gives: 'A refused command line prints the usage line, then "PROG: error: MESSAGE", on standard error and exits
+        with status 2. The messages are fixed phrases: "the following arguments are required: X", "unrecognized
+        arguments: A B", "argument X: invalid choice: ''V'' (choose from a, b)" (the choices unquoted, as 3.13.11
+        was recorded; earlier releases quoted them), "argument X: invalid int value: ''V''", "argument X: ignored
+        explicit argument ''V''", "ambiguous option: --x could match --xa, --xb". Values are shown in their quoted
+        form. A sub-command''s errors name it ("tool add") and print its own usage line; words a sub-command does
+        not take are reported by the top level.'
+      example: 'started with no command, it prints "usage: tally [-h] [--version] {add,show,undo} ..." and "tally:
+        error: the following arguments are required: command" and exits 2.'
+      names:
+      - \bargparse\b
+      shows-as:
+      - call: argparse.ArgumentParser
+      usual: kept
+      from:
+      - paper
+      - V-R03
+      - TS 3.1
+      - TS 3.2
+      - TS 3.3
+      - TS 3.4
+      - TS 3.5
+      - TS 3.6
+      - TS 3.9
+      - SW 3.1
+      - SW 3.2
+      - SW 3.7
+      - SW 3.8
+      - SW 3.11
+      - TS 1.3
+      - TS 1.5
+      - TS 1.8
+      - TS 1.12
+      - SW 1.7
+      - SW 1.44
+      - SW 1.47
+      - SW 1.53
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#argparse.ArgumentParser.error
+        digest: bd7ccccdf95d
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#argparse.ArgumentParser.exit
+        digest: bd7ccccdf95d
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#prog
+        digest: bd7ccccdf95d
+      - nowhere: the exact wording of the option reader's messages and its usage line.
+    - id: argparse-help
+      'on': runtime
+      of: runtime
+      name: the option reader's help screen
+      gives: Asking for help prints, on standard output, the usage line, a blank line, the description, then "positional
+        arguments:" and "options:" with each argument's help, indented two spaces, the help column at the longest
+        invocation plus two (capped at 24), wrapped to the terminal's width; "-h, --help" says "show this help message
+        and exit"; then it exits 0.
+      example: '"tally -h" ends with "--version  show program''s version number and exit", and exits 0.'
+      shows-as:
+      - call: argparse.ArgumentParser
+      usual: alike
+      from:
+      - TS 3.11
+      - TS 3.13
+      - SW 3.3
+      - SW 3.4
+      - TS 1.1
+      - SW 1.1
+      - SW 1.2
+      - SW 1.3
+      - SW 1.52
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#add-help
+        digest: bd7ccccdf95d
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#formatter-class
+        digest: bd7ccccdf95d
+      - nowhere: the help screen's layout, its column widths, and that it wraps to the terminal's width.
+    - id: argparse-version
+      'on': runtime
+      of: runtime
+      name: the version option
+      gives: The version option prints the version text and a line end on standard output and exits 0, as soon as
+        it is met, before any later word is checked.
+      example: '"tally --version add" prints "tally 0.2.0" and exits 0; "tally add tea --version" is refused.'
+      shows-as:
+      - method: add_argument
+        kw:
+          action: version
+      usual: kept
+      from:
+      - TS 3.12
+      - SW 3.4
+      - SW 3.7
+      - TS 1.4
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#action
+        digest: bd7ccccdf95d
+    - id: argparse-abbreviation
+      'on': runtime
+      of: runtime
+      name: long options may be shortened
+      gives: A long option may be given by any prefix that names only one option; a prefix naming several is refused
+        as ambiguous.
+      example: '"--vers" is read as "--version"; "--a" as "--all" when no other option begins so.'
+      shows-as:
+      - call: argparse.ArgumentParser
+        without:
+        - allow_abbrev
+      usual: kept
+      from:
+      - V-R03
+      - TS 3.8
+      - SW 3.10
+      - TS 1.7
+      - SW 1.43
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#allow-abbrev
+        digest: bd7ccccdf95d
+    - id: argparse-negative-numbers
+      'on': runtime
+      of: runtime
+      name: negative numbers are values
+      gives: A word that looks like a negative number (minus then digits, with a point allowed) is taken as a value,
+        not an option, while no option looks like one; a word that holds a space is always a value.
+      example: '"tally add tea -2" adds -2; "tally add tea -1.5" is refused as an invalid whole number.'
+      shows-as:
+      - method: add_argument
+        kw:
+          type: int
+      - method: add_argument
+        kw:
+          type: float
+      usual: kept
+      from:
+      - TS 3.7
+      - SW 3.6
+      - SW 1.48
+      - SW 1.49
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#arguments-containing
+        digest: bd7ccccdf95d
+    - id: argparse-optional-positional
+      'on': runtime
+      of: runtime
+      name: an optional value is matched once
+      gives: Values are matched to the arguments a run of plain words at a time; an optional value (zero or one)
+        is matched in the first run even to nothing, so a plain word after an option in between is an unrecognised
+        argument.
+      example: '"tally add tea --x 3" reports "unrecognized arguments: --x 3".'
+      shows-as:
+      - method: add_argument
+        kw:
+          nargs: '?'
+      usual: alike
+      from:
+      - TS 3.10
+      - SW 3.9
+      - TS 1.9
+      - SW 1.45
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#nargs
+        digest: bd7ccccdf95d
+      - nowhere: that an optional value is matched in the first run of plain words, even to nothing.
+    - id: argparse-subcommands
+      'on': runtime
+      of: runtime
+      name: sub-commands
+      gives: A command made of sub-commands takes every word after the sub-command's name for that sub-command;
+        a missing sub-command, when required, is reported as a required argument under its destination's name; an
+        unknown one is an invalid choice; a first "--" ends the options.
+      example: '"tally frob" reports "argument command: invalid choice: ''frob'' (choose from add, show, undo)",
+        the choices unquoted.'
+      shows-as:
+      - method: add_subparsers
+      usual: kept
+      from:
+      - TS 3.3
+      - SW 3.5
+      - SW 3.7
+      - SW 3.12
+      - TS 1.6
+      - SW 1.46
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/argparse.html#argparse.ArgumentParser.add_subparsers
+        digest: bd7ccccdf95d
+      - nowhere: how a "--" before the sub-command is read, which changed between releases.
+    - id: environment-read
+      'on': runtime
+      of: runtime
+      name: the environment read as text
+      gives: The environment is a map of names to text, read once when the program starts; a name that is not set
+        is absent, which is told apart from one set to the empty text.
+      example: with TALLY_FILE set to the empty text, the variable is present and empty.
+      shows-as:
+      - attr: os.environ
+      - call: os.getenv
+      - call: os.environ.get
+      usual: kept
+      from:
+      - TS 2.6
+      - SW 2.11
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/os.html#os.environ
+        digest: 7df584c5ef74
+    - id: clock-seconds
+      'on': runtime
+      of: runtime
+      name: the time in seconds
+      gives: The time now is a fractional number of seconds since 1970-01-01 at midnight UTC, with as much precision
+        as the system gives (usually below a microsecond).
+      example: a moment in November 2026 reads as about 1794000000.123456.
+      shows-as:
+      - call: time.time
+      usual: alike
+      from:
+      - TS 3.23
+      - SW 3.18
+      - SW 2.13
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/time.html#time.time
+        digest: 1c5e89faf7be
+    - id: local-time
+      'on': platform
+      of: runtime
+      name: dates in the local time zone
+      gives: A date or time made without a zone is in the machine's local time zone, and written by a format whose
+        names of days and months follow the locale.
+      example: the same moment is written as different hours on two machines in different zones.
+      shows-as:
+      - call: datetime.datetime.now
+      - call: time.localtime
+      - call: time.strftime
+      - method: strftime
+      usual: alike
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/datetime.html#datetime.datetime.now
+        digest: 688281afa6bc
+      - in: python
+        version: 3.13.18
+        at: library/time.html#time.strftime
+        digest: 1c5e89faf7be
+    - id: terminal-width
+      'on': platform
+      of: runtime
+      name: the terminal's width
+      gives: The width of the terminal is read from the COLUMNS variable, else from the terminal, else taken as
+        80.
+      example: with COLUMNS set to 40, help is wrapped to 40 columns.
+      shows-as:
+      - call: shutil.get_terminal_size
+      - call: argparse.ArgumentParser
+      usual: free
+      from:
+      - V-R03
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/shutil.html#shutil.get_terminal_size
+        digest: 94ae9e1cf501
+    - id: print-line-end
+      'on': runtime
+      of: runtime
+      name: printing a line
+      gives: Printing writes its values separated by one space and ends with one line feed, on standard output unless
+        another stream is named; the stream is written in order and flushed when the program ends.
+      example: 'printing ''tea: 3'' writes ''tea: 3'' and a line feed; an error printed to the error stream goes
+        there.'
+      shows-as:
+      - call: print
+      usual: kept
+      from:
+      - TS 3.29
+      - SW 3.27
+      - TS 1.43
+      - SW 1.41
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#print
+        digest: 216dc071d8fc
+    - id: output-encoding
+      'on': platform
+      of: runtime
+      name: the encoding of printed text
+      gives: Printed text is encoded as UTF-8 on macOS and wherever the locale asks for UTF-8 or is the plain C
+        locale; elsewhere in the locale's encoding, where a character that cannot be encoded stops the program with
+        an error.
+      example: a name with an ñ prints as UTF-8 bytes even with LANG=C.
+      shows-as:
+      - call: print
+      - attr: sys.stdout
+      - attr: sys.stderr
+      usual: alike
+      from:
+      - V-R32
+      - TS 3.29
+      - SW 3.27
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/os.html#utf8-mode
+        digest: 7df584c5ef74
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.stdout
+        digest: 1fc32ff781c0
+    - id: json-written
+      'on': runtime
+      of: runtime
+      name: JSON as written
+      gives: 'JSON is written on one line with ", " between items and ": " after keys; every character outside ASCII
+        is written as a backslash, u and four lowercase hex digits (a pair of them for a character beyond U+FFFF),
+        and control characters likewise, except the short escapes for quote, backslash, line feed, carriage return,
+        tab, backspace and form feed; numbers are written as in the entry on numbers written as text; not-a-number
+        and the infinities are written NaN, Infinity and -Infinity.'
+      example: 'a name "café" with 3 is written {"café" written as "café": 3}; a time 1.5 is written 1.5.'
+      shows-as:
+      - call: json.dumps
+      - call: json.dump
+      usual: kept
+      from:
+      - paper
+      - TS 3.15
+      - SW 3.15
+      - TS 1.18
+      - TS 1.19
+      - SW 1.30
+      - SW 1.31
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.dumps
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.dump
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: library/json.html#infinite-and-nan-number-values
+        digest: 12e3840498af
+    - id: json-keys-sorted
+      'on': runtime
+      of: runtime
+      name: JSON keys sorted
+      gives: Asked to sort keys, JSON is written with each object's keys in code-point order.
+      example: '{"name": "tea", "at": 1.0, "delta": 3} is written {"at": 1.0, "delta": 3, "name": "tea"}.'
+      shows-as:
+      - call: json.dumps
+        kw:
+        - sort_keys
+      - call: json.dump
+        kw:
+        - sort_keys
+      usual: kept
+      from:
+      - TS 3.15
+      - SW 3.15
+      - SW 2.17
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.dumps
+        digest: 12e3840498af
+    - id: json-read
+      'on': runtime
+      of: runtime
+      name: JSON as read
+      gives: JSON is read with white space (space, tab, line feed, carriage return) allowed around values; a number
+        without a fraction or an exponent becomes a whole number of any size, exactly, any other a fractional number;
+        NaN, Infinity and -Infinity are accepted; a raw control character inside a string is refused; a key given
+        twice keeps its last value; anything else is refused with a decoding error, a kind of value error.
+      example: '{"delta": 99999999999999999999} reads the delta exactly; {"a": 1, "a": 2} reads a = 2; {"at": NaN}
+        is read.'
+      shows-as:
+      - call: json.loads
+      - call: json.load
+      usual: kept
+      from:
+      - paper
+      - TS 3.25
+      - SW 3.16
+      - TS 1.23
+      - SW 1.19
+      - SW 1.20
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.loads
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: library/json.html#infinite-and-nan-number-values
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: library/json.html#repeated-names-within-an-object
+        digest: 12e3840498af
+      - in: python
+        version: 3.13.18
+        at: library/json.html#json.JSONDecodeError
+        digest: 12e3840498af
+    - id: csv-rows
+      'on': runtime
+      of: runtime
+      name: comma-separated rows
+      gives: Rows are written with fields quoted only when they must be, quotes doubled inside, and each row ended
+        by a carriage return and a line feed; rows are read back the same way.
+      example: the fields a, 'b,c' and 'say "hi"' are written a,"b,c","say ""hi""".
+      shows-as:
+      - call: csv.writer
+      - call: csv.reader
+      - call: csv.DictWriter
+      - call: csv.DictReader
+      usual: kept
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/csv.html#csv.writer
+        digest: 963321eeff5f
+      - in: python
+        version: 3.13.18
+        at: library/csv.html#csv.Dialect.lineterminator
+        digest: 963321eeff5f
+    - id: home-and-tilde
+      'on': platform
+      of: runtime
+      name: the home folder and ~
+      gives: The home folder is the HOME variable when it is set, else the account's entry in the system's password
+        database. A path beginning with ~ has it replaced by the home folder (a trailing slash of the home dropped),
+        and ~user by that account's home; a user the system does not know is refused with an error saying the home
+        folder could not be determined.
+      example: with HOME=/home/ann, '~/x' is '/home/ann/x'; '~nobody-here/x' is refused.
+      shows-as:
+      - method: expanduser
+      - call: os.path.expanduser
+      - call: pathlib.Path.home
+      - call: os.path.expandvars
+      usual: kept
+      from:
+      - paper
+      - TS 3.21
+      - SW 3.23
+      - TS 1.28
+      - TS 1.30
+      - SW 1.25
+      - SW 1.26
+      - SW 2.12
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.home
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.expanduser
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/os.path.html#os.path.expanduser
+        digest: 2e5a306b1a37
+    - id: path-written
+      'on': platform
+      of: runtime
+      name: paths written the POSIX way
+      gives: A path is written as text with its parts joined by '/', '.' parts and repeated slashes dropped, no
+        trailing slash, a leading '//' kept, '..' left as it is, and '.' for an empty path; a relative path stays
+        relative.
+      example: '''./a//b/'' is written ''a/b''; '''' is written ''.''.'
+      shows-as:
+      - call: pathlib.Path
+      - call: pathlib.PurePath
+      - call: pathlib.PurePosixPath
+      - annotation: Path
+      usual: kept
+      from:
+      - V-R01
+      - TS 3.22
+      - SW 3.23
+      - TS 1.29
+      - SW 1.27
+      - SW 2.28
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.PurePath
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#general-properties
+        digest: ea319d48765a
+    - id: path-separator
+      'on': platform
+      of: runtime
+      name: the path separator of the platform
+      gives: Paths joined by the platform's rules use '/' on macOS and Linux and '\' on Windows; joining an absolute
+        path drops everything before it.
+      example: joining 'a' and '/b' gives '/b'.
+      shows-as:
+      - call: os.path.join
+      - attr: os.sep
+      usual: alike
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/os.path.html#os.path.join
+        digest: 2e5a306b1a37
+      - in: python
+        version: 3.13.18
+        at: library/os.html#os.sep
+        digest: 7df584c5ef74
+    - id: path-resolved
+      'on': platform
+      of: runtime
+      name: paths made absolute
+      gives: Making a path absolute joins it to the working folder and, when resolved, follows every link and removes
+        '..' parts, so the result names the real file.
+      example: with alias.py linking to real/m.py, the resolved alias.py is the absolute path of real/m.py.
+      shows-as:
+      - method: resolve
+      - method: absolute
+      - call: os.path.abspath
+      - call: os.path.realpath
+      usual: kept
+      from:
+      - V-R15
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.resolve
+        digest: ea319d48765a
+    - id: path-relative
+      'on': platform
+      of: runtime
+      name: paths shown relative to the working folder
+      gives: A path below the working folder can be shown relative to it, by comparing the texts of the two paths
+        part by part; a path not below it cannot, and is refused with a value error.
+      example: in /home/ann, /home/ann/src/m.py is shown as src/m.py; /tmp/x is refused.
+      shows-as:
+      - method: relative_to
+      - call: os.path.relpath
+      - call: pathlib.Path.cwd
+      - call: os.getcwd
+      usual: kept
+      from:
+      - V-R31
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.PurePath.relative_to
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.cwd
+        digest: ea319d48765a
+    - id: path-kinds
+      'on': platform
+      of: runtime
+      name: what a path names
+      gives: A path names a file, a folder, something else, or nothing; a broken link names nothing, so asking whether
+        it exists says no; a path under a file names nothing too.
+      example: a broken link named on the command line is reported as not found.
+      shows-as:
+      - method: exists
+      - method: is_file
+      - method: is_dir
+      - call: os.path.exists
+      - call: os.path.isfile
+      - call: os.path.isdir
+      usual: kept
+      from:
+      - V-R29
+      - SW 1.23
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.exists
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.is_file
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.is_dir
+        digest: ea319d48765a
+    - id: folder-walk
+      'on': platform
+      of: runtime
+      name: walking a folder
+      gives: A folder is walked at any depth in the order the file system gives, hidden folders included and linked
+        folders not entered; each file keeps the path it was found under.
+      example: walking '.', a file reached through a link is named by the link.
+      names:
+      - \brglob\b
+      shows-as:
+      - method: rglob
+      - method: glob
+      - method: walk
+      - call: os.walk
+      - call: glob.glob
+      - call: os.scandir
+      - call: os.listdir
+      - method: iterdir
+      usual: alike
+      from:
+      - V-R15
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.rglob
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.glob
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/os.html#os.walk
+        digest: 7df584c5ef74
+      - nowhere: the order of the walk, which is the file system's.
+    - id: make-folders
+      'on': platform
+      of: runtime
+      name: folders made as needed
+      gives: Making a folder with its parents makes every missing folder on the way; asked not to mind one that
+        exists, it says nothing when the folder is there, but is still refused when a file stands where a folder
+        should.
+      example: a ledger at ~/a/b/x.jsonl makes ~/a and ~/a/b first; a file named ~/a makes it fail.
+      shows-as:
+      - method: mkdir
+      - call: os.makedirs
+      - call: os.mkdir
+      usual: kept
+      from:
+      - TS 3.27
+      - SW 3.24
+      - TS 1.42
+      - SW 1.28
+      - SW 2.22
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pathlib.html#pathlib.Path.mkdir
+        digest: ea319d48765a
+      - in: python
+        version: 3.13.18
+        at: library/os.html#os.makedirs
+        digest: 7df584c5ef74
+    - id: file-created-mode
+      'on': platform
+      of: runtime
+      name: the permissions of a new file
+      gives: A file the program creates gets read and write permission for everyone (0666) less the user's mask,
+        and a new folder 0777 less the mask.
+      example: with a mask of 022, a new ledger is 0644 and a new folder 0755.
+      shows-as:
+      - call: open
+        mode:
+        - w
+        - a
+        - x
+      - method: open
+        mode:
+        - w
+        - a
+        - x
+      - method: write_text
+      - method: mkdir
+      usual: free
+      from:
+      - TS 1.42
+      - SW 1.28
+      - SW 3.24
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/os.html#os.mkdir
+        digest: 7df584c5ef74
+      - nowhere: that a file opened for writing is created with 0666 less the mask.
+    - id: newlines-translated
+      'on': runtime
+      of: runtime
+      name: line ends read and written as text
+      gives: A file read as text turns carriage return and line feed, and a lone carriage return, into a line feed;
+        written as text, a line feed is written as it is on macOS and Linux and as carriage return and line feed
+        on Windows.
+      example: a file holding 'a\r\nb' is read as 'a\nb'.
+      shows-as:
+      - call: open
+      - method: read_text
+      - method: write_text
+      - method: open
+        import: pathlib
+      usual: alike
+      from:
+      - TS 3.24
+      - SW 3.21
+      - TS 1.24
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#open
+        digest: 216dc071d8fc
+      - in: python
+        version: 3.13.18
+        at: library/io.html#io.TextIOWrapper
+        digest: 8261a1a54d06
+    - id: text-decoding-strict
+      'on': runtime
+      of: runtime
+      name: text decoded strictly
+      gives: Text decoded as UTF-8 refuses the first byte sequence that is not valid UTF-8 with a decoding error,
+        a kind of value error, naming the position; a byte-order mark at the start is kept as the character U+FEFF,
+        unless the encoding asked for is the one that drops it.
+      example: a ledger holding the byte 0xE9 alone fails to read; a file beginning with a byte-order mark gives
+        a first line that begins with U+FEFF.
+      shows-as:
+      - method: read_text
+      - method: decode
+      - call: open
+        kw:
+        - encoding
+      - method: open
+        kw:
+        - encoding
+      usual: kept
+      from:
+      - TS 1.26
+      - SW 1.21
+      - SW 1.22
+      - SW 2.23
+      - TS 2.17
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/codecs.html#error-handlers
+        digest: f3b35fcd2d0f
+      - in: python
+        version: 3.13.18
+        at: library/codecs.html#encodings-and-unicode
+        digest: f3b35fcd2d0f
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#bytes.decode
+        digest: 736b53f803b0
+    - id: bytes-decoded
+      'on': runtime
+      of: runtime
+      name: bytes and text are different things
+      gives: Bytes and text are different kinds and are never mixed silently. Bytes become text only by decoding
+        them with a named encoding, which fails on bytes that encoding cannot read; text read from a byte file is
+        decoded once, and a file already read to its end gives nothing more.
+      example: '"<r>é</r>" in Latin-1 bytes, decoded as UTF-8, fails at the é.'
+      names:
+      - \bbytes\b
+      - \bcodecs\b
+      - \bUnicodeDecodeError\b
+      shows-as:
+      - method: decode
+      - annotation: bytes
+      - call: bytes
+      - call: codecs.decode
+      - call: codecs.getreader
+      usual: kept
+      from:
+      - S-R17
+      - S-R18
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#bytes.decode
+        digest: 736b53f803b0
+      - in: python
+        version: 3.13.18
+        at: library/codecs.html#standard-encodings
+        digest: f3b35fcd2d0f
+      - in: python
+        version: 3.13.18
+        at: library/io.html#io.BufferedIOBase.read
+        digest: 8261a1a54d06
+    - id: source-encodings
+      'on': runtime
+      of: runtime
+      name: the encoding of a source file
+      gives: A program file's encoding is a UTF-8 byte-order mark, else a coding comment on its first or second
+        line, else UTF-8; any encoding the runtime knows may be declared; carriage return and line feed, and a lone
+        carriage return, are read as a line feed.
+      example: a file declaring latin-1 whose name holds the byte 0xE9 reads it as é.
+      names:
+      - \btokenize\b
+      shows-as:
+      - call: tokenize.open
+      - call: tokenize.detect_encoding
+      usual: kept
+      from:
+      - V-R24
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/tokenize.html#tokenize.open
+        digest: 9909f187afc9
+      - in: python
+        version: 3.13.18
+        at: library/tokenize.html#tokenize.detect_encoding
+        digest: 9909f187afc9
+      - in: python
+        version: 3.13.18
+        at: reference/lexical_analysis.html#encoding-declarations
+        digest: 26b7f8ab2fcf
+    - id: package-data
+      'on': runtime
+      of: runtime
+      name: files read from inside the installed program
+      gives: A data file shipped inside the installed program is read as bytes by its package and relative name,
+        wherever the program is installed.
+      example: the bundled list for one module is read from inside the program and scanned under its relative name.
+      names:
+      - \bpkgutil\b
+      shows-as:
+      - call: pkgutil.get_data
+      - call: importlib.resources.files
+      - call: importlib.resources.read_text
+      usual: kept
+      from:
+      - V-R28
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/pkgutil.html#pkgutil.get_data
+        digest: 86fc20a5e589
+    - id: glob-patterns
+      'on': runtime
+      of: runtime
+      name: glob patterns
+      gives: In a glob pattern '*' matches any run of characters, '/' included, '?' one character, '[abc]' one of
+        a set and '[!abc]' one not in it; there is no escape character, and the whole text must match.
+      example: '''*/other/*'' matches ''a/other/y.py''; ''[ab]/sub1'' must match the whole path it is given.'
+      names:
+      - \bfnmatch\w*
+      - \bglob\b
+      shows-as:
+      - call: fnmatch.fnmatch
+      - call: fnmatch.fnmatchcase
+      - call: fnmatch.filter
+      - call: fnmatch.translate
+      usual: kept
+      from:
+      - V-R06
+      - V-R07
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/fnmatch.html#module-fnmatch
+        digest: 7d13693a9cde
+    - id: glob-case-per-platform
+      'on': platform
+      of: runtime
+      name: case in glob patterns follows the platform
+      gives: Matching a path with a glob follows the platform's rule for case, case-sensitive on macOS and Linux
+        and case-insensitive on Windows, whatever the program's own words say.
+      example: the pattern 'gen' does not match 'Gen/x.py' on macOS.
+      shows-as:
+      - call: fnmatch.fnmatch
+      - call: fnmatch.filter
+      usual: kept
+      from:
+      - V-R05
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/fnmatch.html#fnmatch.fnmatch
+        digest: 7d13693a9cde
+      - in: python
+        version: 3.13.18
+        at: library/os.path.html#os.path.normcase
+        digest: 2e5a306b1a37
+    - id: glob-case-sensitive
+      'on': runtime
+      of: runtime
+      name: glob patterns matched case for case
+      gives: Matching names with a glob case for case compares exactly, on every platform.
+      example: the decorator pattern '@Route' does not match '@route'.
+      shows-as:
+      - call: fnmatch.fnmatchcase
+      usual: kept
+      from:
+      - V-R07
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/fnmatch.html#fnmatch.fnmatchcase
+        digest: 7d13693a9cde
+    - id: pattern-syntax
+      'on': runtime
+      of: runtime
+      name: text patterns
+      gives: Text patterns have repeats that are greedy unless marked lazy, look-ahead and look-behind, groups and
+        alternation; a search finds the leftmost match, a match anchors at the start or at a given position, and
+        finding all matches goes left to right without overlap.
+      example: the lazy pattern for a comment stops at the first '-->', so '<!-- a -- b -->' is one comment.
+      names:
+      - \bre\.\w+
+      - \bregular expression
+      shows-as:
+      - call: re.compile
+      - call: re.search
+      - call: re.match
+      - call: re.fullmatch
+      - call: re.finditer
+      - call: re.findall
+      - call: re.sub
+      - call: re.split
+      usual: kept
+      from:
+      - V-R16
+      - S-R01
+      - S-R06
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/re.html#regular-expression-syntax
+        digest: 17d3cdde81f1
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.search
+        digest: 17d3cdde81f1
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.finditer
+        digest: 17d3cdde81f1
+    - id: pattern-unicode-classes
+      'on': runtime
+      of: runtime
+      name: word, digit and space in patterns are Unicode's
+      gives: In a text pattern, a word character is any Unicode letter, digit or underscore, a digit any Unicode
+        decimal digit, and white space the set of the entry on white space, unless the pattern is marked ASCII-only.
+      example: a word field named 'naïve' is matched whole; U+3000 is matched as white space.
+      shows-as:
+      - call: re.compile
+        arg0: \w
+      - call: re.compile
+        arg0: \s
+      - call: re.compile
+        arg0: \d
+      - call: re.search
+        arg0: \w
+      - call: re.search
+        arg0: \s
+      - call: re.match
+        arg0: \w
+      - call: re.match
+        arg0: \s
+      - call: re.sub
+        arg0: \s
+      - call: re.findall
+        arg0: \w
+      usual: kept
+      from:
+      - V-R20
+      - S-R02
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/re.html#regular-expression-syntax
+        digest: 17d3cdde81f1
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.ASCII
+        digest: 17d3cdde81f1
+    - id: pattern-flags
+      'on': runtime
+      of: runtime
+      name: pattern flags
+      gives: A pattern may ignore case (by Unicode's simple case folding), let '^' and '$' match at every line,
+        and let '.' match a line feed; without them, '.' stops at a line feed and '$' matches at the end or before
+        a final line feed.
+      example: ignoring case, '# noqa' matches '# NoQA'.
+      shows-as:
+      - attr: re.IGNORECASE
+      - attr: re.I
+      - attr: re.MULTILINE
+      - attr: re.M
+      - attr: re.DOTALL
+      - attr: re.S
+      usual: kept
+      from:
+      - V-R16
+      - S-R01
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.IGNORECASE
+        digest: 17d3cdde81f1
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.MULTILINE
+        digest: 17d3cdde81f1
+      - in: python
+        version: 3.13.18
+        at: library/re.html#re.DOTALL
+        digest: 17d3cdde81f1
+    - id: toml-read
+      'on': runtime
+      of: runtime
+      name: the TOML file read
+      gives: A configuration file is read as TOML 1.0, tables, arrays, true and false, underscores in numbers and
+        escapes in strings, into maps, lists, whole numbers, fractional numbers, text, yes-or-no and dates; a file
+        that is not valid TOML is refused with a decoding error, a kind of value error.
+      example: min_confidence = 1_0 reads as 10; a file holding '[[' is refused.
+      names:
+      - \btomllib\b
+      - \btomli\b
+      shows-as:
+      - call: tomllib.load
+      - call: tomllib.loads
+      - import: tomli
+      - import: toml
+      usual: kept
+      from:
+      - V-R08
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/tomllib.html#module-tomllib
+        digest: 7e6dc3e667df
+      - in: python
+        version: 3.13.18
+        at: library/tomllib.html#conversion-table
+        digest: 7e6dc3e667df
+    - id: html5-entities
+      'on': runtime
+      of: runtime
+      name: the HTML5 named references
+      gives: The named character references of HTML5 are a fixed table of 2,231 names, legacy ones such as amp,
+        lt and copy also without their semicolon, each mapped to one or two characters.
+      example: '''&copy'' reads as ©; ''&notit;'' is no name of the table.'
+      names:
+      - \bhtml\.entities\b
+      - \bhtml5\b
+      shows-as:
+      - attr: html.entities.html5
+      - import: html.entities
+      usual: kept
+      from:
+      - S-R07
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/html.entities.html#html.entities.html5
+        digest: e83ead67b495
+    - id: tree-text-and-tail
+      'on': runtime
+      of: runtime
+      name: an element tree's text and tail
+      gives: In an element tree an element's text is what comes before its first child and each child's tail is
+        what follows it up to the next sibling; attributes keep their order.
+      example: in '<r>a<b/>c</r>', r's text is 'a' and b's tail is 'c'.
+      names:
+      - \bxml\.etree\b
+      - \bElementTree\b
+      - \betree\b
+      shows-as:
+      - import: xml.etree.ElementTree
+      - import: xml.etree
+      usual: kept
+      from:
+      - S-R15
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.text
+        digest: 5e516318a17d
+      - in: python
+        version: 3.13.18
+        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.tail
+        digest: 5e516318a17d
+      - in: python
+        version: 3.13.18
+        at: library/xml.etree.elementtree.html#xml.etree.ElementTree.Element.attrib
+        digest: 5e516318a17d
+    - id: source-parsed
+      'on': runtime
+      of: runtime
+      name: the input language and its lines
+      gives: Program text is read by the grammar of the runtime's own release, no other; every statement and expression
+        carries its first and last line and column; a decorated definition carries the line of its def or class,
+        not of its first decorator.
+      example: the forms of a later release are syntax errors; a function decorated on line 3 and defined on line
+        4 is on line 4.
+      shows-as:
+      - call: ast.parse
+      - call: compile
+        kw:
+        - flags
+      usual: kept
+      from:
+      - V-R02
+      - V-R12
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/grammar.html#full-grammar-specification
+        digest: fe32d00f620e
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.parse
+        digest: c8e0214fb37f
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.AST.lineno
+        digest: c8e0214fb37f
+      - nowhere: that a decorated definition's line is its def or class line.
+    - id: identifiers-normalised
+      'on': runtime
+      of: runtime
+      name: names normalised
+      gives: Names in program text are normalised to Unicode's NFKC form while it is read, so two names that look
+        different may be one, and the name reported is the normalised one.
+      example: a function named with a black-letter H is reported as H; 'ﬁle' is the same name as 'file'.
+      shows-as:
+      - call: ast.parse
+      usual: kept
+      from:
+      - V-R19
+      stated:
+      - in: python
+        version: 3.13.18
+        at: reference/lexical_analysis.html#identifiers
+        digest: 26b7f8ab2fcf
+      - in: python
+        version: 3.13.18
+        at: library/unicodedata.html#unicodedata.normalize
+        digest: 607cc720d0f3
+    - id: parser-messages
+      'on': runtime
+      of: runtime
+      name: the parser's messages
+      gives: A syntax error carries a message, a line and the line's text, all of the runtime's own release; a null
+        byte in the input is a syntax error with no line.
+      example: a file holding a null byte is reported with no line number.
+      shows-as:
+      - call: ast.parse
+        handler: SyntaxError
+      - handler: SyntaxError
+      usual: alike
+      from:
+      - V-R26
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/exceptions.html#SyntaxError
+        digest: fd1dcc489d5c
+      - in: python
+        version: 3.13.18
+        at: whatsnew/3.12.html#other-language-changes
+        digest: e490fac5414f
+      - nowhere: the parser's messages, and that a null-byte syntax error carries no line.
+    - id: type-comments
+      'on': runtime
+      of: runtime
+      name: type comments read as code
+      gives: Asked to, the parser reads type comments as expressions; one that does not parse is an error at the
+        node that carries it.
+      example: a bad type comment on one function stops the reading at that function.
+      shows-as:
+      - call: ast.parse
+        kw:
+        - type_comments
+      usual: kept
+      from:
+      - V-R27
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.parse
+        digest: c8e0214fb37f
+    - id: tree-dump
+      'on': runtime
+      of: runtime
+      name: the parser's tree written out
+      gives: A tree from the parser can be written out as text, each node by its kind and fields.
+      example: a module with one statement is written 'Module(body=[...])'.
+      shows-as:
+      - call: ast.dump
+      usual: free
+      from:
+      - V-R30
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.dump
+        digest: c8e0214fb37f
+      - nowhere: the exact form of the written tree beyond a formatted dump.
+    - id: literal-truth
+      'on': runtime
+      of: runtime
+      name: a literal's value and truth
+      gives: A literal (numbers, text, bytes, nothing, the ellipsis, tuples, lists, maps, sets) can be evaluated
+        without running anything else, a sign on a number included; its truth follows the entry on which values
+        count as false.
+      example: '''-0'' evaluates to 0, which is false; 1e400 evaluates to infinity, which is true.'
+      names:
+      - \bliteral_eval\b
+      shows-as:
+      - call: ast.literal_eval
+      usual: kept
+      from:
+      - V-R10
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.literal_eval
+        digest: c8e0214fb37f
+      - in: python
+        version: 3.13.18
+        at: builtins/stdtypes.html#truth-value-testing
+        digest: 736b53f803b0
+      - nowhere: that a sign on a number is accepted, and that 1e400 reads as infinity.
+    - id: program-tree-nodes
+      'on': runtime
+      of: runtime
+      name: the kinds of a program's tree
+      gives: The parser's tree has one kind of node per construct of the grammar, visited in the order of their
+        fields; return, raise, break and continue end the flow of their block.
+      example: code after a return in the same block is never reached.
+      shows-as:
+      - base: ast.NodeVisitor
+      - base: NodeVisitor
+      - call: ast.walk
+      - call: ast.iter_child_nodes
+      usual: kept
+      from:
+      - V-R12
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/ast.html#ast.NodeVisitor
+        digest: c8e0214fb37f
+      - in: python
+        version: 3.13.18
+        at: reference/simple_stmts.html#the-return-statement
+        digest: cf5e83ddb366
+    - id: runtime-version
+      'on': runtime
+      of: runtime
+      name: the runtime's release
+      gives: The program runs on the release of its runtime it names and on later releases; what it takes from the
+        runtime is that release's behaviour, as this catalogue's citations state it.
+      example: a program declaring 3.10 or later runs on 3.13.
+      names:
+      - \bPython (?:\d+(?:\.\d+)*|it needs|release|version)
+      shows-as:
+      - declared: runtime-version
+      usual: kept
+      from:
+      - TS 2.19
+      - SW 2.1
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/sys.html#sys.version_info
+        digest: 1fc32ff781c0
+    - id: run-as-module
+      'on': runtime
+      of: runtime
+      name: a package run by its name
+      gives: A package with a main file can be run by its name; the main file runs with the package's other modules
+        importable, and its arguments are the words after the package's name.
+      example: running the package tally runs tally's main file with the words after 'tally'.
+      names:
+      - \bpython3? -m\b
+      shows-as:
+      - form: package-main
+      usual: free
+      from:
+      - TS 2.2
+      - SW 2.2
+      - SW 3.26
+      stated:
+      - in: python
+        version: 3.13.18
+        at: library/__main__.html#main-py-in-python-packages
+        digest: e24b0d60cf0e
+    - id: append-is-whole
+      kind: assumption
+      'on': platform
+      of: runtime
+      name: one short append lands whole
+      about: that a short line appended to a file in one write lands whole, never interleaved with another writer's
+        line
+      gives: A short line appended to a file opened for appending is written in one write and lands whole at the
+        end of the file, even when another process appends at the same time.
+      example: two counts added at the same moment give two whole lines, never one broken line.
+      if-false: two writers at once could leave a broken line, which the reader then refuses as not an entry.
+      carries: must
+      shows-as:
+      - call: open
+        mode:
+        - a
+      - method: open
+        mode:
+        - a
+      usual: kept
+      from:
+      - paper
+      - TS 1.44
+      - SW 1.51
+      - SW 3.29
+      stated:
+      - in: python
+        version: 3.13.18
+        at: builtins/functions.html#open
+        digest: 216dc071d8fc
+      - nowhere: that a short appended line is issued as one write and lands whole.
+    - id: pytest-conventions
+      'on': dependency
+      of: pytest
+      name: the test runner's own names
+      gives: The common test runner calls, without being asked, functions named setup_module, teardown_module, setup_function
+        and teardown_function, methods named setup_class, teardown_class, setup_method and teardown_method, functions
+        named test_ and classes named Test in files whose names mark them as tests; a program that reports unused
+        code must not report them.
+      example: a function named setup_module in a file named test_x.py is used, though nothing in the file calls
+        it.
+      names:
+      - \bpytest\b
+      shows-as:
+      - string:
+        - setup_module
+        - teardown_module
+        - setup_function
+        - teardown_function
+        - setup_class
+        - teardown_class
+        - setup_method
+        - teardown_method
+      - import: pytest
+      usual: kept
+      stated:
+      - nowhere: the test runner's own documentation is not kept in the language library.

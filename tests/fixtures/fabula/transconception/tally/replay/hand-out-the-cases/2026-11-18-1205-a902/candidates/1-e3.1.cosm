@@ -1,0 +1,521 @@
+engine: transconception.dump_cases
+inputs:
+  call: f7bb19bf42e7e2d800f12a03e30107d80292f6b26a7afc8c4c3d63eb044147e8
+keys: []
+tokens: 0
+seconds: 0
+output: "{\n \"repo\": \"tally\",\n \"fabulac\": \"fabula/tally\",\n \"source\": {\n  \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n },\n \"drafted\": \"2026-11-05, the migration trial's 53 scenarios (harness/diff.py); written as cases 2026-11-18\
+  \ by tools/transconception/trial_cases.py\",\n \"boundary\": \"argv, the environment (TALLY_FILE, HOME), the files\
+  \ of the case folder (the ledger), stdout, stderr, exit status; working folder = the case folder. The trial's\
+  \ harness set HOME and TALLY_FILE as these cases do; the promoted runner also sets COLUMNS=80, NO_COLOR and PYTHONHASHSEED,\
+  \ which the trial did not.\",\n \"groups\": {\n  \"A ordinary use\": 47,\n  \"B command-line edges\": 24,\n  \"\
+  C numbers\": 25,\n  \"D text\": 34,\n  \"E ledger as found\": 30,\n  \"F at once\": 1\n },\n \"masks\": {\n  \"\
+  written\": [\n   {\n    \"pattern\": \"(\\\"at\\\":\\\\s*)-?\\\\d+(?:\\\\.\\\\d+(?:[eE][+-]?\\\\d+)?|[eE][+-]?\\\
+  \\d+)\",\n    \"to\": \"\\\\1<float>\"\n   },\n   {\n    \"pattern\": \"(\\\"at\\\":\\\\s*)-?\\\\d+\",\n    \"\
+  to\": \"\\\\1<int>\"\n   }\n  ]\n },\n \"cases\": [\n  {\n   \"id\": \"A1\",\n   \"of\": \"command.tally\",\n\
+  \   \"from\": \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"add\",\n     \"pages\",\n\
+  \     \"12\"\n    ],\n    [\n     \"add\",\n     \"pages\",\n     \"-2\"\n    ],\n    [\n     \"show\"\n    ],\n\
+  \    [\n     \"show\",\n     \"--json\"\n    ],\n    [\n     \"undo\"\n    ],\n    [\n     \"show\"\n    ],\n\
+  \    [\n     \"undo\"\n    ],\n    [\n     \"undo\"\n    ],\n    [\n     \"undo\"\n    ],\n    [\n     \"show\"\
+  \n    ],\n    [\n     \"show\",\n     \"--all\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ],\n    [\n\
+  \     \"show\",\n     \"--all\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"A1 add, show, undo, walk back\"\
+  ,\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null,\n     null,\n     null,\n\
+  \     null,\n     null,\n     null,\n     null,\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n\
+  \   \"expect-says\": \"steps 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13: not in the trial's document (both ports\
+  \ agreed with the original, and the report prints only differences); the files it leaves: not in the trial's document.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A2\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n  \
+  \ },\n   \"steps\": [\n    [\n     \"add\",\n     \"a\",\n     \"10\"\n    ],\n    [\n     \"add\",\n     \"bb\"\
+  ,\n     \"1\"\n    ],\n    [\n     \"add\",\n     \"c\",\n     \"1\"\n    ],\n    [\n     \"add\",\n     \"c\"\
+  ,\n     \"-1\"\n    ],\n    [\n     \"show\"\n    ],\n    [\n     \"show\",\n     \"--all\"\n    ]\n   ],\n  \
+  \ \"note\": \"A2 bars scale to the largest\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n  \
+  \   null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3, 4, 5: not\
+  \ in the trial's document (both ports agreed with the original, and the report prints only differences); the files\
+  \ it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A3\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n  \
+  \ },\n   \"steps\": [\n    [\n     \"add\",\n     \"a\",\n     \"-2\"\n    ],\n    [\n     \"show\"\n    ],\n\
+  \    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"A3 a negative total\",\n   \"expect\": {\n\
+  \    \"steps\": [\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2: not in\
+  \ the trial's document (both ports agreed with the original, and the report prints only differences); the files\
+  \ it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A4\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n  \
+  \ },\n   \"steps\": [\n    [\n     \"show\"\n    ],\n    [\n     \"show\",\n     \"--all\"\n    ],\n    [\n  \
+  \   \"show\",\n     \"--json\"\n    ],\n    [\n     \"undo\"\n    ]\n   ],\n   \"note\": \"A4 an empty ledger\"\
+  ,\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0, 1, 2, 3: not in the trial's document (both ports agreed with the original, and the report prints\
+  \ only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A5\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n  \
+  \ },\n   \"steps\": [\n    [\n     \"add\",\n     \"two words\"\n    ],\n    [\n     \"add\",\n     \"tea\",\n\
+  \     \"0\"\n    ],\n    [\n     \"add\",\n     \"\"\n    ],\n    [\n     \"add\",\n     \"   \"\n    ],\n   \
+  \ [\n     \"add\",\n     \" tea \"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"A5 refused names\
+  \ and zero\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null,\n     null,\n\
+  \     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3, 4, 5: not in the trial's document (both ports\
+  \ agreed with the original, and the report prints only differences); the files it leaves: not in the trial's document.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A6\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n  \
+  \ },\n   \"steps\": [\n    [\n     \"add\",\n     \"walks\",\n     \"2\"\n    ],\n    [\n     \"undo\"\n    ],\n\
+  \    [\n     \"add\",\n     \"walks\",\n     \"-3\"\n    ],\n    [\n     \"undo\"\n    ],\n    [\n     \"show\"\
+  ,\n     \"--all\"\n    ]\n   ],\n   \"note\": \"A6 undo says what it undid\",\n   \"expect\": {\n    \"steps\"\
+  : [\n     null,\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1,\
+  \ 2, 3, 4: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A7\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\"\
+  : [\n    [\n     \"--version\"\n    ]\n   ],\n   \"note\": \"A7 version\",\n   \"expect\": {\n    \"steps\": [\n\
+  \     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports agreed with the\
+  \ original, and the report prints only differences); the files it leaves: not in the trial's document.\",\n  \
+  \ \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A8\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": null\n   },\n   \"steps\"\
+  : [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"A8 the default\
+  \ ledger in the home folder\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n   \"\
+  expect-says\": \"steps 0, 1: not in the trial's document (both ports agreed with the original, and the report\
+  \ prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A9\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"   \"\n   },\n   \"steps\"\
+  : [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"A9 a blank\
+  \ TALLY_FILE means the default\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n \
+  \  \"expect-says\": \"steps 0, 1: not in the trial's document (both ports agreed with the original, and the report\
+  \ prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A10\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"~/sub/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\"\
+  : \"A10 a tilde in TALLY_FILE\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n  \
+  \ \"expect-says\": \"steps 0, 1: not in the trial's document (both ports agreed with the original, and the report\
+  \ prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"A11\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"A ordinary use\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/a/b/c.jsonl\"\n\
+  \   },\n   \"steps\": [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"\
+  note\": \"A11 missing parent folders are made\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n\
+  \    ]\n   },\n   \"expect-says\": \"steps 0, 1: not in the trial's document (both ports agreed with the original,\
+  \ and the report prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B1\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    []\n   ],\n   \"note\": \"B1 no command\",\n   \"expect\": {\n    \"steps\": [\n\
+  \     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports agreed with the\
+  \ original, and the report prints only differences); the files it leaves: not in the trial's document.\",\n  \
+  \ \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B2\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"frob\"\n    ]\n   ],\n   \"note\": \"B2 unknown command\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     {\n      \"exit\": 2,\n      \"out\": \"\",\n      \"err\": \"usage: tally [-h] [--version]\
+  \ {add,show,undo} ...\\ntally: error: argument command: invalid choice: 'frob' (choose from add, show, undo)\\\
+  n\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as the trial's report printed\
+  \ it, where a port differed; the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"\
+  source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n   \
+  \ \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B3\",\n   \"of\": \"command.add\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"add\"\n    ]\n   ],\n   \"note\": \"B3 add with no name\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both\
+  \ ports agreed with the original, and the report prints only differences); the files it leaves: not in the trial's\
+  \ document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B4\",\n   \"of\": \"command.add\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"add\",\n     \"tea\",\n     \"1\",\n     \"2\"\n    ]\n   ],\n   \"note\"\
+  : \"B4 add with too many\",\n   \"expect\": {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\":\
+  \ \"steps 0: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B5\",\n   \"of\": \"command.add\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"add\",\n     \"tea\",\n     \"x\"\n    ],\n    [\n     \"add\",\n     \"tea\",\n   \
+  \  \"1.5\"\n    ],\n    [\n     \"add\",\n     \"tea\",\n     \"1e3\"\n    ],\n    [\n     \"add\",\n     \"tea\"\
+  ,\n     \"0x10\"\n    ]\n   ],\n   \"note\": \"B5 a count that is not a whole number\",\n   \"expect\": {\n  \
+  \  \"steps\": [\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1,\
+  \ 2, 3: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B6\",\n   \"of\": \"command.show\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"show\",\n     \"--nope\"\n    ]\n   ],\n   \"note\": \"B6 unknown option\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both\
+  \ ports agreed with the original, and the report prints only differences); the files it leaves: not in the trial's\
+  \ document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B7\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"--help\"\n    ],\n    [\n     \"-h\"\n    ],\n    [\n     \"add\",\n \
+  \    \"--help\"\n    ],\n    [\n     \"show\",\n     \"-h\"\n    ]\n   ],\n   \"note\": \"B7 help\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"usage: tally [-h] [--version] {add,show,undo}\
+  \ ...\\n\\nCount things from the command line.\\n\\npositional arguments:\\n  {add,show,undo}\\n    add      \
+  \      add to a count\\n    show           show every total\\n    undo           cancel the latest add\\n\\noptions:\\\
+  n  -h, --help       show this help messa\",\n      \"err\": \"\",\n      \"cut\": [\n       \"out\"\n      ]\n\
+  \     },\n     {\n      \"exit\": 0,\n      \"out\": \"usage: tally [-h] [--version] {add,show,undo} ...\\n\\\
+  nCount things from the command line.\\n\\npositional arguments:\\n  {add,show,undo}\\n    add            add to\
+  \ a count\\n    show           show every total\\n    undo           cancel the latest add\\n\\noptions:\\n  -h,\
+  \ --help       show this help messa\",\n      \"err\": \"\",\n      \"cut\": [\n       \"out\"\n      ]\n    \
+  \ },\n     {\n      \"exit\": 0,\n      \"out\": \"usage: tally add [-h] name [n]\\n\\npositional arguments:\\\
+  n  name\\n  n\\n\\noptions:\\n  -h, --help  show this help message and exit\\n\",\n      \"err\": \"\"\n     },\n\
+  \     {\n      \"exit\": 0,\n      \"out\": \"usage: tally show [-h] [--all] [--json]\\n\\noptions:\\n  -h, --help\
+  \  show this help message and exit\\n  --all       include totals of 0\\n  --json      print the totals as one\
+  \ JSON object\\n\",\n      \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: the original's\
+  \ result as the trial's report printed it, where a port differed; the files it leaves: not in the trial's document;\
+  \ a value named in `cut` is only the beginning the report printed.\",\n   \"recorded\": {\n    \"source\": {\n\
+  \     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"\
+  the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B8\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\",\n     \"--al\"\n \
+  \   ],\n    [\n     \"show\",\n     \"--j\"\n    ],\n    [\n     \"show\",\n     \"--a\",\n     \"--j\"\n    ]\n\
+  \   ],\n   \"note\": \"B8 shortened options\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n \
+  \    null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: not in the trial's document (both\
+  \ ports agreed with the original, and the report prints only differences); the files it leaves: not in the trial's\
+  \ document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B9\",\n   \"of\": \"command.undo\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"undo\",\n     \"extra\"\n    ]\n   ],\n   \"note\": \"B9 undo with an\
+  \ extra word\",\n   \"expect\": {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not\
+  \ in the trial's document (both ports agreed with the original, and the report prints only differences); the files\
+  \ it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B10\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"add\",\n     \"-5\"\n    ],\n    [\n     \"add\",\n     \"--\",\n    \
+  \ \"-x\",\n     \"2\"\n    ],\n    [\n     \"add\",\n     \"-x\"\n    ],\n    [\n     \"show\",\n     \"--json\"\
+  ,\n     \"--all\"\n    ]\n   ],\n   \"note\": \"B10 names that look like options or numbers\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps\
+  \ 0, 1, 2, 3: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"B11\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\"\
+  ,\n   \"group\": \"B command-line edges\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"--json\",\n     \"show\"\n    ],\n    [\n     \"show\",\n     \"--json\",\n     \"--json\"\
+  \n    ]\n   ],\n   \"note\": \"B11 options before the command\",\n   \"expect\": {\n    \"steps\": [\n     null,\n\
+  \     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1: not in the trial's document (both ports agreed with\
+  \ the original, and the report prints only differences); the files it leaves: not in the trial's document.\",\n\
+  \   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C1\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"add\",\n     \"big\",\n     \"99999999999999999999999\"\n    ],\n    [\n     \"\
+  add\",\n     \"big\",\n     \"1\"\n    ],\n    [\n     \"show\"\n    ],\n    [\n     \"show\",\n     \"--json\"\
+  \n    ]\n   ],\n   \"note\": \"C1 a count past 64 bits\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"\
+  exit\": 0,\n      \"out\": \"big: 99999999999999999999999\\n\",\n      \"err\": \"\"\n     },\n     {\n      \"\
+  exit\": 0,\n      \"out\": \"big: 100000000000000000000000\\n\",\n      \"err\": \"\"\n     },\n     {\n     \
+  \ \"exit\": 0,\n      \"out\": \"big  100000000000000000000000  ##############################\\n\",\n      \"\
+  err\": \"\"\n     },\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"big\\\": 100000000000000000000000}\\n\"\
+  ,\n      \"err\": \"\"\n     }\n    ],\n    \"written\": {\n     \"t.jsonl\": \"{\\\"at\\\": <float>, \\\"delta\\\
+  \": 99999999999999999999999, \\\"name\\\": \\\"big\\\"}\\n{\\\"at\\\": <float>, \\\"delta\\\": 1, \\\"name\\\"\
+  : \\\"big\\\"}\\n\"\n    }\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: the original's result as the trial's\
+  \ report printed it, where a port differed; the files it leaves (t.jsonl): as the report printed the original's.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C2\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"add\",\n     \"tea\",\n     \"+5\"\n    ],\n    [\n     \"add\",\n     \"tea\"\
+  ,\n     \"007\"\n    ],\n    [\n     \"add\",\n     \"tea\",\n     \" 7 \"\n    ],\n    [\n     \"add\",\n   \
+  \  \"tea\",\n     \"1_000\"\n    ],\n    [\n     \"add\",\n     \"tea\",\n     \"٣\"\n    ],\n    [\n     \"add\"\
+  ,\n     \"tea\",\n     \"-0\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"C2\
+  \ spellings of a whole number\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n   \
+  \  null,\n     {\n      \"exit\": 0,\n      \"out\": \"tea: 1022\\n\",\n      \"err\": \"\"\n     },\n     null,\n\
+  \     {\n      \"exit\": 0,\n      \"out\": \"{\\\"tea\\\": 1022}\\n\",\n      \"err\": \"\"\n     }\n    ],\n\
+  \    \"written\": {\n     \"t.jsonl\": \"{\\\"at\\\": <float>, \\\"delta\\\": 5, \\\"name\\\": \\\"tea\\\"}\\\
+  n{\\\"at\\\": <float>, \\\"delta\\\": 7, \\\"name\\\": \\\"tea\\\"}\\n{\\\"at\\\": <float>, \\\"delta\\\": 7,\
+  \ \\\"name\\\": \\\"tea\\\"}\\n{\\\"at\\\": <float>, \\\"delta\\\": 1000, \\\"name\\\": \\\"tea\\\"}\\n{\\\"at\\\
+  \": <float>, \\\"delta\\\": 3, \\\"name\\\": \\\"tea\\\"}\\n\"\n    }\n   },\n   \"expect-says\": \"steps 4, 6:\
+  \ the original's result as the trial's report printed it, where a port differed; steps 0, 1, 2, 3, 5: not in the\
+  \ trial's document (both ports agreed with the original, and the report prints only differences); the files it\
+  \ leaves (t.jsonl): as the report printed the original's.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\"\
+  : \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C3\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n\
+  \    [\n     \"add\",\n     \"top\",\n     \"12\"\n    ],\n    [\n     \"add\",\n     \"one\",\n     \"1\"\n \
+  \   ],\n    [\n     \"add\",\n     \"five\",\n     \"5\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\"\
+  : \"C3 a bar that lands on a half (2.5, 12.5)\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n\
+  \     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: not in the trial's document (both\
+  \ ports agreed with the original, and the report prints only differences); the files it leaves: not in the trial's\
+  \ document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C4\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"add\",\n     \"top\",\n     \"20\"\n    ],\n    [\n     \"add\",\n     \"three\"\
+  ,\n     \"3\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"C4 a bar that lands on a half (4.5)\"\
+  ,\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"\
+  steps 0, 1, 2: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C5\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n\
+  \    [\n     \"add\",\n     \"top\",\n     \"4\"\n    ],\n    [\n     \"add\",\n     \"one\",\n     \"1\"\n  \
+  \  ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"C5 a bar that lands on a half (7.5)\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2: not\
+  \ in the trial's document (both ports agreed with the original, and the report prints only differences); the files\
+  \ it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"C6\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"C numbers\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"add\",\n     \"a\",\n     \"1000\"\n    ],\n    [\n     \"add\",\n     \"b\",\n\
+  \     \"-5\"\n    ],\n    [\n     \"add\",\n     \"c\",\n     \"7\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n\
+  \   \"note\": \"C6 column widths with a minus sign\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n\
+  \     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: not in the trial's document (both\
+  \ ports agreed with the original, and the report prints only differences); the files it leaves: not in the trial's\
+  \ document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"D1\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"D text\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"add\",\n     \"café\"\n    ],\n    [\n     \"add\",\n     \"茶\",\n     \"3\"\n    ],\n\
+  \    [\n     \"add\",\n     \"naïve\",\n     \"2\"\n    ],\n    [\n     \"show\"\n    ],\n    [\n     \"show\"\
+  ,\n     \"--json\"\n    ]\n   ],\n   \"note\": \"D1 names outside ASCII\",\n   \"expect\": {\n    \"steps\": [\n\
+  \     null,\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2,\
+  \ 3, 4: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"D2\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"D text\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n  \
+  \  [\n     \"add\",\n     \"\U0001D4B3\",\n     \"2\"\n    ],\n    [\n     \"add\",\n     \"é\",\n     \"3\"\n\
+  \    ],\n    [\n     \"add\",\n     \"ab\",\n     \"1\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\"\
+  : \"D2 how long is a name\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null\n\
+  \    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3: not in the trial's document (both ports agreed with the\
+  \ original, and the report prints only differences); the files it leaves: not in the trial's document.\",\n  \
+  \ \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"D3\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"D text\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"add\",\n     \"b\"\n    ],\n    [\n     \"add\",\n     \"B\"\n    ],\n    [\n     \"\
+  add\",\n     \"a\"\n    ],\n    [\n     \"add\",\n     \"é\"\n    ],\n    [\n     \"add\",\n     \"~\"\n    ],\n\
+  \    [\n     \"add\",\n     \"～\"\n    ],\n    [\n     \"add\",\n     \"\U0001D4B3\"\n    ],\n    [\n     \"add\"\
+  ,\n     \"Z\"\n    ],\n    [\n     \"add\",\n     \"10\"\n    ],\n    [\n     \"add\",\n     \"9\"\n    ],\n \
+  \   [\n     \"show\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"D3 the order\
+  \ of names\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null,\n     null,\n\
+  \     null,\n     null,\n     null,\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11: not in the trial's document (both ports agreed with the original,\
+  \ and the report prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"D4\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"D text\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"add\",\n     \"a b\"\n    ],\n    [\n     \"add\",\n     \"a\uFEFFb\"\n    ],\n    [\n\
+  \     \"add\",\n     \"a\\u001cb\"\n    ],\n    [\n     \"add\",\n     \" tea \"\n    ],\n    [\n     \"add\"\
+  ,\n     \"tea\\n\"\n    ],\n    [\n     \"add\",\n     \"te\\tea\"\n    ],\n    [\n     \"add\",\n     \"a​b\"\
+  \n    ],\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"D4 what counts as a space\",\n\
+  \   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null,\n     null,\n     null,\n\
+  \     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2, 3, 4, 5, 6, 7: not in the trial's document\
+  \ (both ports agreed with the original, and the report prints only differences); the files it leaves: not in the\
+  \ trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"D5\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"D text\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"add\",\n     \"q\\\"uote\"\n    ],\n    [\n     \"add\",\n     \"back\\\\slash\"\n \
+  \   ],\n    [\n     \"add\",\n     \"a\\u0001b\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ],\n   \
+  \ [\n     \"show\"\n    ]\n   ],\n   \"note\": \"D5 quotes, backslashes, a control character\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null,\n     null,\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0, 1, 2, 3, 4: not in the trial's document (both ports agreed with the original, and the report prints\
+  \ only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E1\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"tea\\\", \\\"delta\\\": 1}\\n\\n   \\n{\\\"at\\\": 2.5, \\\"name\\\": \\\"tea\\\", \\\"delta\\\"\
+  : 2}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"\
+  show\",\n     \"--json\"\n    ],\n    [\n     \"undo\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ]\n\
+  \   ],\n   \"note\": \"E1 blank lines are skipped\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n\
+  \     null\n    ],\n    \"written\": {\n     \"t.jsonl\": \"{\\\"at\\\": <int>, \\\"name\\\": \\\"tea\\\", \\\"\
+  delta\\\": 1}\\n\\n   \\n{\\\"at\\\": <float>, \\\"name\\\": \\\"tea\\\", \\\"delta\\\": 2}\\n{\\\"at\\\": <float>,\
+  \ \\\"delta\\\": -2, \\\"name\\\": \\\"tea\\\", \\\"undoes\\\": 2}\\n\"\n    }\n   },\n   \"expect-says\": \"\
+  steps 0, 1, 2: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves (t.jsonl): as the report printed the original's.\",\n   \"recorded\": {\n    \"source\"\
+  : {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\"\
+  : \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E2\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"tea\\\", \\\"delta\\\": 1}\\nnot json\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"show\"\n    ],\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n  \
+  \   \"undo\"\n    ]\n   ],\n   \"note\": \"E2 a broken line names its number\",\n   \"expect\": {\n    \"steps\"\
+  : [\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2: not in the trial's\
+  \ document (both ports agreed with the original, and the report prints only differences); the files it leaves:\
+  \ not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3a\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"x\\\", \\\"delta\\\": \\\"3\\\"}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3a a count written\
+  \ as text\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"x\\\": 3}\\\
+  n\",\n      \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as the trial's\
+  \ report printed it, where a port differed; the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3b\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"x\\\", \\\"delta\\\": 2.7}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n\
+  \   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3b a count with\
+  \ a fraction\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"x\\\":\
+  \ 2}\\n\",\n      \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as\
+  \ the trial's report printed it, where a port differed; the files it leaves: not in the trial's document.\",\n\
+  \   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3c\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"x\\\", \\\"delta\\\": true}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n\
+  \   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3c a count that\
+  \ is true\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"x\\\": 1}\\\
+  n\",\n      \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as the trial's\
+  \ report printed it, where a port differed; the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3d\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": 5, \\\"delta\\\": 1}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"\
+  steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3d a name that is a number\"\
+  ,\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"5\\\": 1}\\n\",\n   \
+  \   \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as the trial's report\
+  \ printed it, where a port differed; the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n\
+  \    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n\
+  \    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3e\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"x\\\", \\\"delta\\\": 1, \\\"note\\\": \\\"hello\\\"}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\"\
+  : \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\"\
+  : \"E3e extra keys\",\n   \"expect\": {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps\
+  \ 0: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3f\",\n   \"of\": \"command.show\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"name\\\": \\\"\
+  x\\\"}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n   \
+  \  \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3f a missing key\",\n   \"expect\": {\n    \"steps\"\
+  : [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports agreed with\
+  \ the original, and the report prints only differences); the files it leaves: not in the trial's document.\",\n\
+  \   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3g\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": null,\
+  \ \\\"name\\\": \\\"x\\\", \\\"delta\\\": 1}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3g a null time\"\
+  ,\n   \"expect\": {\n    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's\
+  \ document (both ports agreed with the original, and the report prints only differences); the files it leaves:\
+  \ not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3h\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": NaN, \\\
+  \"name\\\": \\\"x\\\", \\\"delta\\\": 1}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n\
+  \   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E3h a time that\
+  \ is NaN\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 0,\n      \"out\": \"{\\\"x\\\": 1}\\\
+  n\",\n      \"err\": \"\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps 0: the original's result as the trial's\
+  \ report printed it, where a port differed; the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3i\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"[1, 2]\\n\"\n   },\n\
+  \   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"\
+  --json\"\n    ]\n   ],\n   \"note\": \"E3i a line that is a list\",\n   \"expect\": {\n    \"steps\": [\n    \
+  \ null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports agreed with the original,\
+  \ and the report prints only differences); the files it leaves: not in the trial's document.\",\n   \"recorded\"\
+  : {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n\
+  \    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E3j\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"x\\\", \\\"delta\\\": 1}\\n{\\\"at\\\": 2, \\\"name\\\": \\\"x\\\", \\\"delta\\\": -1, \\\"undoes\\\
+  \": 7}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n   \
+  \  \"show\",\n     \"--json\"\n    ],\n    [\n     \"undo\"\n    ]\n   ],\n   \"note\": \"E3j an undo of a line\
+  \ that is not there\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0, 1: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E4\",\n   \"of\": \"command.tally\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"name\\\": \\\"\
+  tea\\\", \\\"delta\\\": 1}\\r\\n{\\\"at\\\": 2, \\\"name\\\": \\\"tea\\\", \\\"delta\\\": 2}\\r\\n\"\n   },\n\
+  \   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"\
+  --json\"\n    ],\n    [\n     \"add\",\n     \"tea\"\n    ],\n    [\n     \"show\",\n     \"--json\"\n    ]\n\
+  \   ],\n   \"note\": \"E4 Windows line endings\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null,\n\
+  \     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2: not in the trial's document (both ports agreed\
+  \ with the original, and the report prints only differences); the files it leaves: not in the trial's document.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E5\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"tea\\\", \\\"delta\\\": 1}\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n\
+  \   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ],\n    [\n     \"add\",\n     \"tea\"\n    ],\n\
+  \    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E5 no newline at the end\",\n   \"expect\"\
+  : {\n    \"steps\": [\n     null,\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1, 2: not\
+  \ in the trial's document (both ports agreed with the original, and the report prints only differences); the files\
+  \ it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E6\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"\uFEFF{\\\"at\\\":\
+  \ 1, \\\"name\\\": \\\"tea\\\", \\\"delta\\\": 1}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\
+  \n   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E6 a byte-order\
+  \ mark\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 1,\n      \"out\": \"\",\n      \"err\"\
+  : \"tally: <CASE>/t.jsonl: line 1 is not a tally entry\\n\"\n     }\n    ]\n   },\n   \"expect-says\": \"steps\
+  \ 0: the original's result as the trial's report printed it, where a port differed; the files it leaves: not in\
+  \ the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E7\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": {\n     \"b64\": \"//4K\"\
+  \n    }\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"\
+  show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E7 bytes that are not UTF-8\",\n   \"expect\": {\n    \"\
+  steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports agreed\
+  \ with the original, and the report prints only differences); the files it leaves: not in the trial's document.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E8\",\n   \"of\": \"command.tally\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": {\n     \"dir\": true\n\
+  \    }\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n    [\n     \"show\"\
+  \n    ],\n    [\n     \"add\",\n     \"tea\"\n    ]\n   ],\n   \"note\": \"E8 the ledger is a folder\",\n   \"\
+  expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0, 1: not in the\
+  \ trial's document (both ports agreed with the original, and the report prints only differences); the files it\
+  \ leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E9\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"a\Lb\\\", \\\"delta\\\": 1}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n\
+  \   },\n   \"steps\": [\n    [\n     \"show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"E9 a line separator\
+  \ inside a name\",\n   \"expect\": {\n    \"steps\": [\n     {\n      \"exit\": 1,\n      \"out\": \"\",\n   \
+  \   \"err\": \"tally: <CASE>/t.jsonl: line 1 is not a tally entry\\n\"\n     }\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0: the original's result as the trial's report printed it, where a port differed; the files it leaves:\
+  \ not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"E10\",\n   \"of\": \"command.show\",\n   \"from\"\
+  : \"document\",\n   \"group\": \"E ledger as found\",\n   \"files\": {\n    \"t.jsonl\": \"{\\\"at\\\": 1, \\\"\
+  name\\\": \\\"caf\\\\u00e9\\\", \\\"delta\\\": 1}\\n{\\\"at\\\": 2, \\\"name\\\": \\\"\\\\ud835\\\\udcb3\\\",\
+  \ \\\"delta\\\": 2}\\n\"\n   },\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"steps\": [\n\
+  \    [\n     \"show\",\n     \"--json\"\n    ],\n    [\n     \"show\"\n    ]\n   ],\n   \"note\": \"E10 escaped\
+  \ names read back\",\n   \"expect\": {\n    \"steps\": [\n     null,\n     null\n    ]\n   },\n   \"expect-says\"\
+  : \"steps 0, 1: not in the trial's document (both ports agreed with the original, and the report prints only differences);\
+  \ the files it leaves: not in the trial's document.\",\n   \"recorded\": {\n    \"source\": {\n     \"tree\":\
+  \ \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\n    },\n    \"run\": \"the migration trial\
+  \ of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\",\n    \"python\"\
+  : \"3.13.11\"\n   }\n  },\n  {\n   \"id\": \"F1\",\n   \"of\": \"command.show\",\n   \"from\": \"document\",\n\
+  \   \"group\": \"F at once\",\n   \"env\": {\n    \"TALLY_FILE\": \"<CASE>/t.jsonl\"\n   },\n   \"burst\": {\n\
+  \    \"argv\": [\n     \"add\",\n     \"x\"\n    ],\n    \"times\": 40\n   },\n   \"steps\": [\n    [\n     \"\
+  show\",\n     \"--json\"\n    ]\n   ],\n   \"note\": \"F1 forty adds at the same moment\",\n   \"expect\": {\n\
+  \    \"steps\": [\n     null\n    ]\n   },\n   \"expect-says\": \"steps 0: not in the trial's document (both ports\
+  \ agreed with the original, and the report prints only differences); the files it leaves: not in the trial's document.\"\
+  ,\n   \"recorded\": {\n    \"source\": {\n     \"tree\": \"0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea\"\
+  \n    },\n    \"run\": \"the migration trial of 2026-11-05, harness/diff.py and report.py --detail (docs/fabula-survey-migration-trial.md)\"\
+  ,\n    \"python\": \"3.13.11\"\n   }\n  }\n ],\n \"rulings\": {\n  \"targets\": {}\n }\n}\n"

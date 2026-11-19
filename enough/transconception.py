@@ -1129,9 +1129,13 @@ def source_paths(items: list[Mapping]) -> set[str]:
     return files - boundary_paths(items)
 
 
-def apart_problems(lines: list[str], paths: set[str], source: str | None, length: int) -> list[str]:
+def apart_problems(lines: list[str], paths: set[str], source: str | None, length: int | None = None) -> list[str]:
     """`apart` over the requests of an entailing, one JSON line each: one line per request that carried a span, named
-    a path of the source (as a whole word) or carried a run of the source's own text `length` code points long."""
+    a path of the source (as a whole word) or carried a run of the source's own text `length` code points long
+    (`nothing-carried`'s, by default). A move leaves `length` out: a constant read through `ctx.engines` is not an
+    engine call, so a replay, which answers only calls, could not give it back (found by the tally fixture, W4-X9)."""
+    if length is None:
+        length = int(DEFAULTS.get("nothing-carried", 200))
     out = []
     for i, ln in enumerate(lines):
         if not ln.strip():

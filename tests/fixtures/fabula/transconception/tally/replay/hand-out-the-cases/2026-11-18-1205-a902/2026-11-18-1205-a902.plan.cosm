@@ -1,0 +1,53 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-18-2032-67cb
+name: hand-out-the-cases on tally.1-grounded.fabulac.cosm
+program:
+  name: hand-out-the-cases
+  sha256: 14ead20c176be54733af95f8fbe6e63fd95e067b3f0a305775523c229f9f1501
+inputs:
+- name: f
+  type: fabula
+  path: inputs/tally.1-grounded.fabulac.cosm
+  sha256: a0db1dfea6d3088a7942784f1ef899188c44fcc5c4aa124b79164358c9f7a783
+estimate:
+  steps: 1
+  asks: 1
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-18-2032-67cb
+  type: plan
+  name: hand-out-the-cases on tally.1-grounded.fabulac.cosm
+  summary: One node, one of which asks the model.
+  nodes:
+  - R:node/1
+  asks: 1
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - hand-out-the-cases.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: entail f as cases
+  summary: entail f as cases
+  step:
+    program: hand-out-the-cases
+    n: 1
+  move: entail
+  asks: true
+  takes:
+  - f
+  gives: cases
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 9
+  provenance:
+    mode: derived
+    sources:
+    - hand-out-the-cases.thym#L9
+    confidence: 1

@@ -1,0 +1,11 @@
+engine: repo.swhid
+inputs:
+  call: 2dd1b7f69e4be5e1cac74569bbb162f0d9b228189edcfa6c1cb8ad5d589ad606
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  dir: swh:1:dir:e0360c818b6f33f64b5de76499a39447eb30ec18
+  files: 9
+  bytes: 11325

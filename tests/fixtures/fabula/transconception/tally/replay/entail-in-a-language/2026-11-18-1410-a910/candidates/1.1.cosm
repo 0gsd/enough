@@ -1,0 +1,38 @@
+contract:
+  move: entail
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'the layout of the program in Rust, as one YAML mapping: files (each {path, holds, interfaces: [{id, name}]},
+      in the order they are written), types ([{for, type}]), gaps ([{for, fill}])'
+  checks:
+  - target-confirmed
+  - surface-answered
+  - no-invention
+  - footer
+  - provenance
+inputs:
+  fabulac: 1dc5ae5b68174891b6aa9850aa05ee0d9ae8a20468d9517259951a2dd9e9c0f0
+  name: b01e26d3f5a5130b9d8d821c5a9d61e7c7d86df735f28bdcd6620fc58ac1006e
+  language: d9aa89fdd15ad5c41d9c128feffe9e07dc828b83f85296f7f42bda506821300e
+  suffixes: fbdde0c3a2501fde389e9561a5dd6edd697095294e538caa4519fe67a0a4608a
+  program: d36c230321cb0f0e9e600afeb8b10fb72f26b16105a1076e2cc8bdd6e0a93f0f
+  map: f671e6333d20e258a776bf7e730b9dd4b2c58737a445eae28242b15e7c21ddbc
+  types: 552e423045fcbd949252397b4bee754f0b8f99b1bbbe41edc9b25dbfc81b146a
+  gaps: 30dd031c38d9ba06ece539aafb1566b4407ffd937406b7831d11a17e388b0680
+  conditions: 27c752bb3f43a3cf688dd2735758550e7a790f74218a40a1b4de16897ce0dfd4
+engine: model:scripted
+attempts: 1
+tokens: 10
+seconds: 0
+output: "files:\n- path: Cargo.toml\n  holds: the Rust package\n  interfaces: []\n- path: main.rs\n  holds: the\
+  \ whole program\n  interfaces:\n  - id: C:interface/command.tally\n    name: N_command_tally\n  - id: C:interface/command.add\n\
+  \    name: N_command_add\n  - id: C:interface/command.show\n    name: N_command_show\n  - id: C:interface/command.undo\n\
+  \    name: N_command_undo\n  - id: C:interface/tally.cli.main\n    name: N_tally_cli_main\n  - id: C:interface/tally.ledger.ledger_path\n\
+  \    name: N_tally_ledger_ledger_path\n  - id: C:interface/tally.ledger.read\n    name: N_tally_ledger_read\n\
+  \  - id: C:interface/tally.ledger.add\n    name: N_tally_ledger_add\n  - id: C:interface/tally.ledger.undo\n \
+  \   name: N_tally_ledger_undo\n  - id: C:interface/tally.ledger.totals\n    name: N_tally_ledger_totals\n  - id:\
+  \ C:interface/tally.ledger.LedgerError\n    name: N_tally_ledger_LedgerError\n  - id: C:interface/tally.render.rows\n\
+  \    name: N_tally_render_rows\n  - id: C:interface/tally.render.empty_message\n    name: N_tally_render_empty_message\n\
+  \  - id: C:interface/format.ledger-line\n    name: N_format_ledger_line\ntypes: []\ngaps:\n- for: C:reliance/whole-numbers-unbounded\n\
+  \  fill: written in main.rs\n- for: C:reliance/argparse-surface\n  fill: written in main.rs\nengine: model:scripted\n"

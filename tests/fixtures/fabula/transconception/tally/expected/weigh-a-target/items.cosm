@@ -1,0 +1,82 @@
+oes: thym/1
+kind: program
+id: thym/weigh-a-target
+name: weigh-a-target
+source:
+  path: weigh-a-target.thym
+  sha256: fb757555481453574a7724d91e480a8ea31fa7a3819d89ad97a985e420b20ae1
+  size: 288
+front: 'thym 1
+
+
+  '
+built:
+  at: '2026-11-18T12:00:00Z'
+  by: enough/0.7.0
+nodes:
+- id: P:program/weigh-a-target
+  type: program
+  name: weigh-a-target
+  summary: A language is weighed on the twelve points before anything is entailed into it.
+  why: a language is weighed on the twelve points before anything is entailed into it.
+  must: []
+  decided: []
+  takes:
+  - name: f
+    type: fabula
+  - name: language
+    type: string
+  gives:
+  - name: g
+    type: fabula
+  lines: 3-10
+  order: 1
+  body: "program weigh-a-target\n  why: a language is weighed on the twelve points before anything is entailed into\
+    \ it.\n\n  takes f: fabula, language: string\n  gives g: fabula\n\n  give weigh f in language              \
+    \           -- one N:target, its scores, what it provides, its verdict\nend\n"
+  steps:
+  - P:step/weigh-a-target.1
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym#L3-L10
+    confidence: 1
+- id: P:step/weigh-a-target.1
+  type: step
+  name: give weigh f in language
+  summary: one N:target, its scores, what it provides, its verdict
+  of: P:program/weigh-a-target
+  n: 1
+  text: '  give weigh f in language                         -- one N:target, its scores, what it provides, its verdict'
+  line: 9
+  form: give
+  move: weigh
+  calls:
+  - weigh
+  uses:
+  - f
+  - language
+  asks: true
+  contracts:
+  - P:contract/weigh-a-target.1
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym#L9
+    confidence: 1
+- id: P:contract/weigh-a-target.1
+  type: contract
+  name: weigh
+  summary: What weigh must leave true of what it gives.
+  of: P:step/weigh-a-target.1
+  move: weigh
+  checks:
+  - target-weighed
+  - no-invention
+  - fabula-checks
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym#L9
+    confidence: 1

@@ -1808,7 +1808,7 @@ def entail_code_in(ctx: Any, f: Value, **mods: Any) -> Value:
         line = json.dumps({"request": len(requests) + 1, "writes": p, "entailed": entailed, "inputs": inputs},
                           sort_keys=True)            # ASCII: one request is one line, whatever its text holds
         if entailed == "apart":
-            bad = tc.apart_problems([line], paths, None, tc.nothing_carried)
+            bad = tc.apart_problems([line], paths, None)    # the length is the engine's own: a replay answers calls
             if bad:                      # never sent: a request entailed apart carries nothing of the source
                 raise MoveError(f"the request for {p} would not be apart: {bad[0]}")
         requests.append(line)
@@ -1997,8 +1997,7 @@ def _apart(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tupl
         return False, "requests.jsonl is missing: the requests of an entailment apart are kept with it"
     fab = _in_fabula(output, inputs)
     items = [plain(it) for it in fabula_doc(fab)[1]] if fab is not None else []
-    probs = tc.apart_problems(f.text("requests.jsonl").split("\n"), set(tc.source_paths(items)), None,
-                              tc.nothing_carried)
+    probs = tc.apart_problems(f.text("requests.jsonl").split("\n"), set(tc.source_paths(items)), None)
     return (not probs), ("; ".join(probs[:3]) if probs else "")
 
 

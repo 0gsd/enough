@@ -1,0 +1,30 @@
+engine: syntax.uses
+inputs:
+  call: 32e522a54c99effc4f30cf04a0f22c00304905c8277a6e7f5e33a3f11ebaf62c
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports:
+  - module: sys
+    line: 1
+  - module: .cli
+    line: 3
+  calls:
+  - name: sys.exit
+    method: exit
+    line: 5
+  - name: main
+    line: 5
+  attrs: []
+  annotations: []
+  forms:
+  - form: package-main
+    line: 1
+  decorators: []
+  bases: []
+  handlers: []
+  strings: []
+  entry: 1

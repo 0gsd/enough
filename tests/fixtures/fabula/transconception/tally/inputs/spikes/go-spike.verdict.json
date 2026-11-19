@@ -1,0 +1,15 @@
+{
+ "cshort": "go-spike",
+ "against": "original",
+ "target": "go",
+ "simulated": "simulated for the conformance fixture: there is no Go build of tally and no spike of it; this verdict was written, not judged, so that the path reaches target-confirmed",
+ "steps": {
+  "kept": 0,
+  "agree": 0
+ },
+ "share": 0.0,
+ "passes_95": false,
+ "unruled": 0,
+ "passes": false,
+ "findings": []
+}

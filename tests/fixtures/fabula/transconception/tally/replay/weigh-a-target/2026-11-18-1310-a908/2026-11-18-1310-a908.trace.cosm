@@ -1,0 +1,104 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-18-1310-a908
+name: weigh-a-target run 2026-11-18-1310-a908
+program:
+  name: weigh-a-target
+  sha256: fb757555481453574a7724d91e480a8ea31fa7a3819d89ad97a985e420b20ae1
+plan:
+  sha256: cb2e9836e2fa4bc0d0ace98b071293a1cd539aafa6369903d0b82bfdc614ed39
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-18T13:10:00Z'
+ended: '2026-11-19T01:32:17Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-18-1310-a908
+  type: trace
+  name: weigh-a-target run 2026-11-18-1310-a908
+  summary: 'ran weigh-a-target on tally.6-weighed-go.fabulac.cosm, rust.txt in 44537 s on scripted: 1 step, all
+    checks green'
+  records:
+  - R:record/1
+  outcome: landed
+  inputs_root: .
+  engines:
+  - ascribe
+  - canon
+  - dialectic
+  - docoes
+  - repo
+  - syntax
+  - transconception
+  - verse
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-18-1310-a908.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: weigh f in language
+  summary: model:scripted, 1 attempt, 4 checks green.
+  node: R:node/1
+  move: weigh
+  inputs:
+  - name: f
+    sha256: 30376a6fc185e394984ff26b75d62751c2269380eecee0b1a828b81e83284e27
+    path: inputs/tally.6-weighed-go.fabulac.cosm
+  - name: language
+    sha256: 521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3
+    path: inputs/rust.txt
+  outputs:
+  - name: g
+    sha256: cfc7bf8d722f65fb86a4d765c910ce69a3357fc854644f93fa62c0bcff2f231d
+    path: outputs/g.cosm
+  engine: model:scripted
+  attempts: 1
+  tokens: 10
+  seconds: 0
+  checks:
+  - name: target-weighed
+    ok: true
+    why: ''
+  - name: no-invention
+    ok: true
+    why: ''
+  - name: fabula-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-18-1310-a908.plan.cosm#R:node/1
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: weigh f in language
+  summary: one N:target, its scores, what it provides, its verdict
+  step:
+    program: weigh-a-target
+    n: 1
+  move: weigh
+  asks: true
+  takes:
+  - f
+  - language
+  gives: g
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 9
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym#L9
+    confidence: 1

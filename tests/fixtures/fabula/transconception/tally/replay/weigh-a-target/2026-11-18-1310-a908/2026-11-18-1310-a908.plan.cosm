@@ -1,0 +1,58 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-18-2032-3fc6
+name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
+program:
+  name: weigh-a-target
+  sha256: fb757555481453574a7724d91e480a8ea31fa7a3819d89ad97a985e420b20ae1
+inputs:
+- name: f
+  type: fabula
+  path: inputs/tally.6-weighed-go.fabulac.cosm
+  sha256: 30376a6fc185e394984ff26b75d62751c2269380eecee0b1a828b81e83284e27
+- name: language
+  type: string
+  path: inputs/rust.txt
+  sha256: 521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3
+estimate:
+  steps: 1
+  asks: 1
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-18-2032-3fc6
+  type: plan
+  name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
+  summary: One node, one of which asks the model.
+  nodes:
+  - R:node/1
+  asks: 1
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: weigh f in language
+  summary: one N:target, its scores, what it provides, its verdict
+  step:
+    program: weigh-a-target
+    n: 1
+  move: weigh
+  asks: true
+  takes:
+  - f
+  - language
+  gives: g
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 9
+  provenance:
+    mode: derived
+    sources:
+    - weigh-a-target.thym#L9
+    confidence: 1

@@ -1,0 +1,359 @@
+engine: syntax.uses
+inputs:
+  call: 7c915b577a532c4677da64c99e7b8187fc4abaa28484421ac96006f3b75de1a1
+keys: []
+tokens: 0
+seconds: 0
+output:
+  ok: true
+  language: python
+  imports:
+  - module: __future__
+    line: 6
+  - module: json
+    line: 8
+  - module: os
+    line: 9
+  - module: time
+    line: 10
+  - module: dataclasses
+    line: 11
+  - module: pathlib
+    line: 12
+  calls:
+  - name: dataclasses.dataclass
+    kw:
+    - frozen
+    kwv:
+      frozen: 'True'
+    line: 21
+  - name: env.get
+    method: get
+    arg0: TALLY_FILE
+    kind0: str
+    line: 32
+    in: ledger_path
+  - method: strip
+    line: 32
+    in: ledger_path
+  - method: expanduser
+    line: 33
+    in: ledger_path
+  - name: pathlib.Path.home
+    method: home
+    line: 33
+    in: ledger_path
+  - name: pathlib.Path
+    line: 33
+    in: ledger_path
+  - name: path.exists
+    method: exists
+    line: 38
+    in: read
+  - name: path.read_text
+    method: read_text
+    kw:
+    - encoding
+    kwv:
+      encoding: utf-8
+    line: 41
+    in: read
+  - method: splitlines
+    line: 41
+    in: read
+  - name: enumerate
+    line: 41
+    in: read
+  - name: line.strip
+    method: strip
+    line: 42
+    in: read
+  - name: json.loads
+    method: loads
+    line: 45
+    in: read
+  - name: d.get
+    method: get
+    arg0: undoes
+    kind0: str
+    line: 46
+    in: read
+  - name: out.append
+    method: append
+    line: 46
+    in: read
+  - name: Entry
+    line: 46
+    in: read
+  - name: float
+    line: 46
+    in: read
+  - name: int
+    line: 46
+    in: read
+  - name: str
+    line: 46
+    in: read
+  - name: LedgerError
+    kind0: str
+    line: 48
+    in: read
+  - name: path.parent.mkdir
+    method: mkdir
+    kw:
+    - exist_ok
+    - parents
+    kwv:
+      parents: 'True'
+      exist_ok: 'True'
+    line: 56
+    in: _append
+  - name: path.open
+    method: open
+    kw:
+    - encoding
+    kwv:
+      encoding: utf-8
+    arg0: a
+    kind0: str
+    mode: a
+    line: 57
+    in: _append
+  - name: json.dumps
+    method: dumps
+    kw:
+    - sort_keys
+    kwv:
+      sort_keys: 'True'
+    line: 58
+    in: _append
+  - name: f.write
+    method: write
+    line: 58
+    in: _append
+  - name: name.strip
+    method: strip
+    line: 63
+    in: add
+  - name: c.isspace
+    method: isspace
+    line: 64
+    in: add
+  - name: any
+    line: 64
+    in: add
+  - name: LedgerError
+    arg0: a name is one word, with no spaces
+    kind0: str
+    line: 65
+    in: add
+  - name: LedgerError
+    arg0: adding 0 changes nothing
+    kind0: str
+    line: 67
+    in: add
+  - name: time.time
+    method: time
+    line: 68
+    in: add
+  - name: Entry
+    line: 68
+    in: add
+  - name: _append
+    line: 69
+    in: add
+  - name: read
+    line: 76
+    in: undo
+  - name: len
+    line: 78
+    in: undo
+  - name: range
+    line: 78
+    in: undo
+  - name: Entry
+    kw:
+    - undoes
+    kwv:
+      undoes: n
+    line: 81
+    in: undo
+  - name: time.time
+    method: time
+    line: 81
+    in: undo
+  - name: _append
+    line: 82
+    in: undo
+  - name: out.get
+    method: get
+    line: 91
+    in: totals
+  - name: out.items
+    method: items
+    line: 92
+    in: totals
+  - name: dict
+    line: 92
+    in: totals
+  - name: sorted
+    line: 92
+    in: totals
+  attrs:
+  - name: pathlib.Path
+    line: 29
+    in: ledger_path
+  - name: os.environ
+    line: 31
+    in: ledger_path
+  - name: pathlib.Path
+    line: 36
+    in: read
+  - name: pathlib.Path
+    line: 52
+    in: _append
+  - name: pathlib.Path
+    line: 61
+    in: add
+  - name: pathlib.Path
+    line: 73
+    in: undo
+  annotations:
+  - name: float
+    line: 23
+    in: Entry
+  - name: str
+    line: 24
+    in: Entry
+  - name: int
+    line: 25
+    in: Entry
+  - name: Path
+    line: 29
+    in: ledger_path
+  - name: dict
+    line: 29
+    in: ledger_path
+  - name: Entry
+    line: 36
+    in: read
+  - name: Path
+    line: 36
+    in: read
+  - name: list
+    line: 36
+    in: read
+  - name: Entry
+    line: 52
+    in: _append
+  - name: Path
+    line: 52
+    in: _append
+  - name: Entry
+    line: 61
+    in: add
+  - name: Path
+    line: 61
+    in: add
+  - name: float
+    line: 61
+    in: add
+  - name: int
+    line: 61
+    in: add
+  - name: str
+    line: 61
+    in: add
+  - name: Entry
+    line: 73
+    in: undo
+  - name: Path
+    line: 73
+    in: undo
+  - name: float
+    line: 73
+    in: undo
+  - name: Entry
+    line: 87
+    in: totals
+  - name: dict
+    line: 87
+    in: totals
+  - name: int
+    line: 87
+    in: totals
+  - name: list
+    line: 87
+    in: totals
+  - name: str
+    line: 87
+    in: totals
+  forms:
+  - form: path-join
+    line: 33
+    in: ledger_path
+  - form: truth-test
+    line: 33
+    in: ledger_path
+  - form: truth-test
+    line: 42
+    in: read
+  - form: handler
+    line: 47
+    in: read
+  - form: f-string
+    line: 48
+    in: read
+  - form: raise-from
+    line: 48
+    in: read
+  - form: map
+    line: 53
+    in: _append
+  - form: set
+    line: 77
+    in: undo
+  - form: compare-in
+    line: 80
+    in: undo
+  - form: map
+    line: 89
+    in: totals
+  decorators:
+  - name: dataclasses.dataclass
+    as: dataclass
+    line: 21
+  bases:
+  - name: Exception
+    as: Exception
+    line: 17
+    in: LedgerError
+  handlers:
+  - name: KeyError
+    line: 47
+    in: read
+  - name: TypeError
+    line: 47
+    in: read
+  - name: ValueError
+    line: 47
+    in: read
+  strings:
+  - '
+
+    '
+  - ' is not a tally entry'
+  - $TALLY_FILE when it is set and not empty, else ~/.tally.jsonl.
+  - .tally.jsonl
+  - ': line '
+  - Append one count. A name is one word; a delta may be negative but never 0.
+  - Each name's total, names in alphabetical order.
+  - TALLY_FILE
+  - a
+  - a name is one word, with no spaces
+  - adding 0 changes nothing
+  - at
+  - delta
+  - name
+  - undoes
+  - utf-8

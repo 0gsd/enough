@@ -1,0 +1,47 @@
+contract:
+  move: weigh
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'Weigh one language as the target of a transconception: the program the fabulac states, written again
+      in Go. The rules have answered what they can (answered); answer the rest. Reply with one YAML mapping:
+
+      weighed: one entry for each point in points, {point: <its number>, score: 0 to 3, evidence: <what you know
+      that bears on it, in plain words>}. A score of 0 on a gate means the language cannot be the target.
+
+      provides: one entry for each item in open, {for: <its id>, by: built-in | library | binding | written | cannot
+      | dropped, what: <what gives it in Go>, note: <optional>, gap: <what must be fetched, bound or written at
+      length first; optional>}.
+
+      spike: {use: <the riskiest use, in a sentence: what the program leans on that Go gives least easily>, cases:
+      [<ids of the P:case items that exercise it, from cases>]}.
+
+      conditions: [<anything the new program must do or avoid in Go to keep what is kept, one sentence each>].
+
+      verdict: feasible | feasible-with | not.
+
+      Name only items the fabulac holds. Do not answer a point the rules answered.'
+  checks:
+  - target-weighed
+  - no-invention
+  - fabula-checks
+  - provenance
+inputs:
+  fabulac: b01e26d3f5a5130b9d8d821c5a9d61e7c7d86df735f28bdcd6620fc58ac1006e
+  language: 4cd0e21a9a0795a14ec9aa5f0e7d1abff0492565770e43eafdf1e3e8afed1f33
+  version: b6340a7209dfc9e980e00fa357cb70ef0c3c36703e4461a69d3b4674fd6f264e
+  points: a6bca51d96ab0587a38689c4730d8ae0ece613696a1e0a89edb28a0a5c5c0552
+  answered: 2652f9dfae1f7c6e6a20b5bc08f3423f29abb4d4897a2333470b5472f8f7f71e
+  open: 552e423045fcbd949252397b4bee754f0b8f99b1bbbe41edc9b25dbfc81b146a
+  program: 83ae1e6e903afa5f3ebb66382cf655ee58799720a0dea5af994471d23415a558
+engine: model:scripted
+attempts: 1
+tokens: 10
+seconds: 0
+output: "weighed:\n- point: 5\n  score: 2\n  evidence: the recorded fake model's reading of point 5\n- point: 6\n\
+  \  score: 2\n  evidence: the recorded fake model's reading of point 6\n- point: 9\n  score: 2\n  evidence: the\
+  \ recorded fake model's reading of point 9\n- point: 10\n  score: 2\n  evidence: the recorded fake model's reading\
+  \ of point 10\n- point: 11\n  score: 2\n  evidence: the recorded fake model's reading of point 11\n- point: 12\n\
+  \  score: 2\n  evidence: the recorded fake model's reading of point 12\nprovides: []\nspike:\n  use: the option\
+  \ reader (C:reliance/argparse-surface), small\n  cases:\n  - P:case/cli-json-and-error\nconditions: []\nengine:\
+  \ model:scripted\n"

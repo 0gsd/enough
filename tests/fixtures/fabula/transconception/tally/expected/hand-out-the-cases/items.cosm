@@ -1,0 +1,76 @@
+oes: thym/1
+kind: program
+id: thym/hand-out-the-cases
+name: hand-out-the-cases
+source:
+  path: hand-out-the-cases.thym
+  sha256: 14ead20c176be54733af95f8fbe6e63fd95e067b3f0a305775523c229f9f1501
+  size: 186
+front: 'thym 1
+
+
+  '
+built:
+  at: '2026-11-18T12:00:00Z'
+  by: enough/0.7.0
+nodes:
+- id: P:program/hand-out-the-cases
+  type: program
+  name: hand-out-the-cases
+  summary: The cases that stand outside go to the recorder as data, written by rules.
+  why: the cases that stand outside go to the recorder as data, written by rules.
+  must: []
+  decided: []
+  takes:
+  - name: f
+    type: fabula
+  gives:
+  - name: cases
+    type: text
+  lines: 3-10
+  order: 1
+  body: "program hand-out-the-cases\n  why: the cases that stand outside go to the recorder as data, written by\
+    \ rules.\n\n  takes f: fabula\n  gives cases: text\n\n  give entail f as cases\nend\n"
+  steps:
+  - P:step/hand-out-the-cases.1
+  provenance:
+    mode: derived
+    sources:
+    - hand-out-the-cases.thym#L3-L10
+    confidence: 1
+- id: P:step/hand-out-the-cases.1
+  type: step
+  name: give entail f as cases
+  summary: give entail f as cases
+  of: P:program/hand-out-the-cases
+  n: 1
+  text: '  give entail f as cases'
+  line: 9
+  form: give
+  move: entail
+  calls:
+  - entail
+  uses:
+  - f
+  asks: true
+  contracts:
+  - P:contract/hand-out-the-cases.1
+  provenance:
+    mode: derived
+    sources:
+    - hand-out-the-cases.thym#L9
+    confidence: 1
+- id: P:contract/hand-out-the-cases.1
+  type: contract
+  name: entail
+  summary: What entail must leave true of what it gives.
+  of: P:step/hand-out-the-cases.1
+  move: entail
+  checks:
+  - cases-whole
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - hand-out-the-cases.thym#L9
+    confidence: 1

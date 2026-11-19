@@ -1,0 +1,10 @@
+thym 1
+
+program weigh-a-target
+  why: a language is weighed on the twelve points before anything is entailed into it.
+
+  takes f: fabula, language: string
+  gives g: fabula
+
+  give weigh f in language                         -- one N:target, its scores, what it provides, its verdict
+end
