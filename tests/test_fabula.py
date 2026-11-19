@@ -388,7 +388,8 @@ def test_the_fabula_carries_a_bank_per_flavour():
         ("fabulac-authored", {"flavour": "fabulac", "source": "authored"}, "author", 15),
         # 0.8 (MacroCOSM 18.6.6): a transconception's three banks, asked only of a fabulac whose purpose says so
         ("transconception-standing", {"purpose": "transconception"}, "transconceiver", 8),
-        ("transconception-target", {"purpose": "transconception"}, "transconceiver", 2),
+        # 0.8 phase 5: the target bank's version and conditions, then the twelve points of weighing (MacroCOSM 18.4.9)
+        ("transconception-target", {"purpose": "transconception"}, "transconceiver", 14),
         ("transconception-rulings", {"purpose": "transconception"}, "transconceiver", 6)]
     first = banks[1]["questions"][8]
     assert (first["id"], first["about"], first["kind"], first["to"]) == ("speaker", "C:voice#roles.speaker", "text",
@@ -448,8 +449,8 @@ def test_the_fabula_manifest():
                                                       "construe",
                                                       # 0.8: authoring a fabulac, thym 1 only (THYM 20.11)
                                                       "author", "add", "compare", "uncovered",
-                                                      # 0.8: a transconception's ground (THYM 20.10)
-                                                      "ground"]
+                                                      # 0.8: a transconception's ground and weighing (THYM 20.10)
+                                                      "ground", "weigh"]
     assert all(mv["code"].startswith("enough.thym.moves.emf:") for mv in m.data["moves"][:4])
     assert all(mv["code"].startswith("enough.thym.moves.code:") and mv["since"] == 1 for mv in m.data["moves"][4:6])
     assert all(mv["code"].startswith("enough.thym.moves.verse:") and mv["since"] == 1 for mv in m.data["moves"][6:8])

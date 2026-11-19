@@ -5,8 +5,9 @@ Held here: both promoted fabulacs lint with no error but `stands-alone`'s, an er
 checkpoint A (2026-11-18): vulture names Python, its runtime or a dependency in seven items (nine findings),
 sloppy-xml-py in one; so gate 1 (ready to keep) does not hold for either, and every other check of it holds, as the
 experiment measured by hand (with the sources at hand when this machine has them; without them `nothing-carried` is
-not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust (neither weighing is recorded in the fixture), but since sitting 2 (2026-11-18, the fifth
-allowance `own-types`) `ruled` holds for both targets; a fabulac nobody could rule is kept
+not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust
+for that reason alone: since sitting 2 (2026-11-18, the fifth allowance `own-types`) `ruled` holds for both targets,
+and since phase 5 (A7's weighings written in) `target-confirmed` does too; a fabulac nobody could rule is kept
 unruled; each check, on a small fabulac that passes all of them, made to fail; every other fabula untouched.
 """
 from __future__ import annotations
@@ -99,15 +100,17 @@ def test_ready_to_keep_fails_only_on_stands_alone(fix, clone):
     assert len(g["checks"]["stands-alone"]["errors"]) == len(STANDS_ALONE[fix.name])
 
 
-def test_ready_to_entail_waits_for_the_target_to_be_weighed(vols):
+def test_ready_to_entail_waits_only_for_gate_1(vols):
     """Sitting 2 (2026-11-18) ruled `own-types` onto the closed list: sloppy's 61 Rust rulings that named the
     target's own types now name it (S-I2 became kept at the driver's dump), so `ruled` holds for Rust as for Go.
-    What still fails gate 2 for each: `target-confirmed`, until the weighing (A7's target-go.md and target-rust.md)
-    is recorded in the fixture, and gate 1's `stands-alone`, until the ground lane's reliances stand behind it."""
+    Since phase 5 the fixtures carry A7's hand weighings (target-go.md, target-rust.md) with each spike's level read
+    from O9's verdict on it, so `target-confirmed` holds for both (tests/test_transconception_targets.py). What still
+    fails gate 2 for each is gate 1's `stands-alone`, until the ground lane's reliances stand behind it."""
     for name, language in (("vulture.fabulac.cosm", "go"), ("sloppy-xml-py.fabulac.cosm", "rust")):
         g = tc.ready_to_entail(vols[name], language)
-        assert not g["holds"] and g["do-not-hold"] == ["stands-alone", "target-confirmed"], (name, g["do-not-hold"])
+        assert not g["holds"] and g["do-not-hold"] == ["stands-alone"], (name, g["do-not-hold"])
         assert g["checks"]["ruled"]["state"] == "holds" and g["checks"]["ruled"]["errors"] == []
+        assert g["checks"]["target-confirmed"]["state"] == "holds"
 
 
 def test_sitting_2_is_in_the_sloppy_fixture(vols):

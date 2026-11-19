@@ -23,6 +23,13 @@ What it changes, and nothing else:
   (`steps: {kept, agree}`, `where: {file, digest}`, the digest the verdict file's sha256). Its level is given
   (default 3: the original's own tests passed bar the failures its rulings expect, and the recorded cases judged and
   passing; the experiment's LEDGER, O7).
+
+With `--target TARGET_MD SPIKE_VERDICT` (given once per weighed language), the hand weighing of step A7
+(`_x0/<repo>/target-<language>.md`, its `N:target` in the last YAML block) replaces the fabulac's unweighed placeholder
+of that language, in the shape MacroCOSM 18.4.9 pins: each `weighed` point named by its number (A7 wrote the keys
+`stewardship` … `can-be-left`, which `enough.transconception.point_number` reads), and the spike's level read from
+the judge's verdict on the spike (`enough.transconception.spike_from_verdict`: only the spike's own cases count), with
+the verdict file's path and sha256. Everything else of the weighing is as A7 wrote it.
 """
 from __future__ import annotations
 
@@ -129,6 +136,43 @@ def promote(doc: dict, verdict: dict, verdict_digest: str, verdict_rel: str, *, 
     return out
 
 
+_YAML_BLOCK = re.compile(r"```yaml\n(.*?)```", re.S)
+_RESULTS_STAMP = re.compile(r"(\d{4}-\d{2}-\d{2})-(\d{2})(\d{2})")
+
+
+def hand_weighing(md_text: str) -> dict:
+    """The `N:target` item of a hand weighing (A7's `target-<language>.md`): its last YAML block that is a list of
+    one `N:target`."""
+    for block in reversed(_YAML_BLOCK.findall(md_text)):
+        data = mc.yaml_load(block)
+        if isinstance(data, list) and len(data) == 1 and str(data[0].get("id", "")).startswith("N:target/"):
+            return data[0]
+    raise ValueError("no N:target item in a YAML block of the weighing")
+
+
+def weighed_in(nodes: list[dict], target: dict, verdict: dict, verdict_digest: str, verdict_rel: str, *,
+               at: str | None) -> dict:
+    """A hand weighing written into the nodes in place of the language's placeholder, in the pinned shape: points by
+    number, the spike's level from the judge's verdict on it. Returns the item written."""
+    from enough import transconception as tc
+    t = _strings(target, _fix)
+    for w in t.get("weighed") or []:
+        n = tc.point_number(w.get("point"))
+        if n is None:
+            raise ValueError(f"{t['id']}: {w.get('point')!r} is none of the twelve points")
+        w["point"] = n
+    t["weighed"] = sorted(t.get("weighed") or [], key=lambda w: w["point"])
+    t["spike"] = tc.spike_from_verdict(t.get("spike") or {}, verdict, where=verdict_rel, digest=verdict_digest, at=at)
+    for i, n in enumerate(nodes):
+        if n.get("id") == t["id"]:
+            if "verdict" in n:
+                raise ValueError(f"{t['id']} is weighed already: a later weighing goes beside it, under its own id")
+            nodes[i] = t
+            return t
+    nodes.append(t)
+    return t
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("fabulac", type=Path)
@@ -137,12 +181,22 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--level", type=int, default=3)
     ap.add_argument("--at", default="2026-11-13T10:06")
     ap.add_argument("--cshort", default="told/py-roundtrip/", help="the cshort's path as the x0 fabulac sees it")
+    ap.add_argument("--target", nargs=2, action="append", type=Path, default=[], metavar=("TARGET_MD", "SPIKE_VERDICT"),
+                    help="a hand weighing (A7's target-<language>.md) and the judge's verdict on its spike")
     a = ap.parse_args(argv)
     doc = mc.yaml_load(a.fabulac.read_text(encoding="utf-8"))
     raw = a.verdict.read_bytes()
     rel = os.path.relpath(a.verdict.resolve(), a.fabulac.resolve().parent)
     new = promote(doc, json.loads(raw), hashlib.sha256(raw).hexdigest(), rel, level=a.level, at=a.at,
                   cshort_path=a.cshort)
+    for md, spike_verdict in a.target:
+        sraw = spike_verdict.read_bytes()
+        srel = os.path.relpath(spike_verdict.resolve(), a.fabulac.resolve().parent)
+        stamp = _RESULTS_STAMP.search(srel)
+        t = weighed_in(new["nodes"], hand_weighing(md.read_text(encoding="utf-8")), json.loads(sraw),
+                       hashlib.sha256(sraw).hexdigest(), srel,
+                       at=f"{stamp.group(1)}T{stamp.group(2)}:{stamp.group(3)}" if stamp else None)
+        print(t["id"], t["verdict"], "spike level", t["spike"]["level"])
     a.out.write_text(mc.dump(new), encoding="utf-8")
     print(a.out, len(new["nodes"]), "items")
     return 0

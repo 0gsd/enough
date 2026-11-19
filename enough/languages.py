@@ -14,6 +14,7 @@ here, not a branch elsewhere.
 | `runs` | enough may run an authored entailment in it, in the sandbox only (Thym 20.12) |
 | `target` | it may be weighed (`weigh f in <language>`) and entailed into (`entail f as code in <language>`) |
 | `ground` | its ground catalogue, relative to the repository (`defaults/cosm/ground/<language>.ground.cosm`) |
+| `provides` | its target table, what it provides for each ground entry when a program is entailed into it, and the points of weighing that are facts of the language alone (`defaults/cosm/ground/targets/<language>.cosm`; read by `weigh f in <language>`) |
 | `decompile`, `compile` | the shipped programs (`defaults/thym/`) that build a fabulac of it and entail one into it |
 | `shelf` | its shelf in the language library (cosmoes-site `library/<shelf>/`, `library.json`) |
 | `runtime` | the package name its runtime's `C:dependency` carries (`C:dependency/<runtime>`) |
@@ -62,6 +63,7 @@ class Language:
     shelf: str | None = None
     runtime: str | None = None
     names: re.Pattern | None = field(default=None, compare=False)
+    provides: str | None = None
 
     def owns(self, path: str) -> bool:
         """Whether a file of this name is written in this language, by its suffix."""
@@ -72,14 +74,20 @@ class Language:
     def ground_path(self) -> Path | None:
         return ROOT / self.ground if self.ground else None
 
+    @property
+    def provides_path(self) -> Path | None:
+        return ROOT / self.provides if self.provides else None
+
 
 LANGUAGES: dict[str, Language] = {
     "python": Language(
         name="python", title="Python", suffixes=("py", "pyi"), reads=True, parses=True, runs=True, target=True,
         ground="defaults/cosm/ground/python.ground.cosm", decompile="decompile-python.thym",
         compile="compile-python.thym", shelf="python", runtime="python", names=_PYTHON_NAMES),
-    "go": Language(name="go", title="Go", suffixes=("go",), target=True, shelf="go", runtime="go"),
-    "rust": Language(name="rust", title="Rust", suffixes=("rs",), target=True, shelf="rust", runtime="rust"),
+    "go": Language(name="go", title="Go", suffixes=("go",), target=True, shelf="go", runtime="go",
+                   provides="defaults/cosm/ground/targets/go.cosm"),
+    "rust": Language(name="rust", title="Rust", suffixes=("rs",), target=True, shelf="rust", runtime="rust",
+                     provides="defaults/cosm/ground/targets/rust.cosm"),
 }
 
 
@@ -272,6 +280,89 @@ def lint_catalogue(doc: dict) -> list[str]:
     return out
 
 
+# ---------------------------------------------------------------------------
+# The target tables (MacroCOSM OES 18.4.9, "Weighing a target"; Thym 20.10, `weigh f in <language>`)
+# ---------------------------------------------------------------------------
+
+TARGET_FORMAT = "target/1"
+TARGET_KEYS = ("target", "language", "title", "version", "for", "about", "points", "provides")
+#: How a language gives what a program leans on (the N:target's `provides.by`, MacroCOSM 18.4.2).
+PROVIDED_BY = ("built-in", "library", "binding", "written", "cannot", "dropped")
+ROW_KEYS = ("entry", "by", "what", "note", "gap")
+#: The points of weighing a target table may answer: those that are facts of the language alone (the rest are the
+#: program's, and a model weighs them; point 4 is read from the rows).
+TABLE_POINTS = (1, 2, 3, 7, 8)
+
+
+def provides_table(name: Any, *, path: Path | None = None) -> dict:
+    """A target language's table, read once per process: `{target, language, title, version, for, points,
+    provides}`. A KeyError in plain words for a language that has none."""
+    lang = require(name)
+    p = path or lang.provides_path
+    if p is None:
+        raise KeyError(f"{lang.title} has no target table in this build: nothing says what it provides")
+    return _load(str(p))
+
+
+def lint_provides(doc: dict, source: dict | None = None) -> list[str]:
+    """What is wrong with a target table, one line each; an empty list when nothing is. With `source`, the ground
+    catalogue whose entries the rows answer (the table's `for`): every row names an entry of it, and every entry has
+    a row."""
+    out: list[str] = []
+    if doc.get("target") != TARGET_FORMAT:
+        out.append(f"the head says target: {doc.get('target')!r}, not {TARGET_FORMAT}")
+    lang = get(doc.get("language"))
+    if lang is None or not lang.target:
+        out.append(f"the head names {doc.get('language')!r}, no target of the registry")
+    extra = [k for k in doc if k not in TARGET_KEYS]
+    if extra:
+        out.append(f"the head names fields a table does not: {', '.join(map(str, extra))}")
+    if not isinstance(doc.get("version"), str) or not doc["version"].strip():
+        out.append("the head says which version of the language the table weighs (version)")
+    seen_p: set = set()
+    for i, p in enumerate(doc.get("points") or []):
+        if not isinstance(p, dict) or p.get("point") not in TABLE_POINTS:
+            out.append(f"points[{i}]: a point the table answers is one of {', '.join(map(str, TABLE_POINTS))}")
+            continue
+        if p["point"] in seen_p:
+            out.append(f"points[{i}]: point {p['point']} is given twice")
+        seen_p.add(p["point"])
+        if p.get("score") not in (0, 1, 2, 3) or isinstance(p.get("score"), bool):
+            out.append(f"points[{i}]: a score is a whole number from 0 to 3")
+        if not (isinstance(p.get("evidence"), str) and p["evidence"].strip()):
+            out.append(f"points[{i}]: a score carries its evidence")
+    if seen_p != set(TABLE_POINTS):
+        out.append(f"the table answers points {', '.join(map(str, TABLE_POINTS))}, every one")
+    seen: set[str] = set()
+    for i, r in enumerate(doc.get("provides") or []):
+        if not isinstance(r, dict):
+            out.append(f"provides[{i}]: not a mapping")
+            continue
+        eid = str(r.get("entry") or "")
+        where = f"row {eid or i}"
+        if eid in seen:
+            out.append(f"{where}: the entry has two rows")
+        seen.add(eid)
+        bad = [k for k in r if k not in ROW_KEYS]
+        if bad:
+            out.append(f"{where}: fields a row does not name: {', '.join(map(str, bad))}")
+        if r.get("by") not in PROVIDED_BY:
+            out.append(f"{where}: by is one of {', '.join(PROVIDED_BY)}")
+        if not (isinstance(r.get("what"), str) and r["what"].strip()):
+            out.append(f"{where}: says what provides it")
+        if r.get("by") in ("library", "binding", "cannot") and not r.get("gap"):
+            out.append(f"{where}: a {r['by']} is a gap: gap says what fills it")
+    if source is not None:
+        ids = [str(e.get("id")) for e in source.get("entries") or [] if isinstance(e, dict)]
+        unknown = sorted(seen - set(ids))
+        if unknown:
+            out.append(f"rows for no entry of the {source.get('language')} catalogue: {', '.join(unknown)}")
+        missing = [x for x in ids if x not in seen]
+        if missing:
+            out.append(f"entries with no row: {', '.join(missing)}")
+    return out
+
+
 def catalogue_agrees(doc: dict, library: dict) -> list[str]:
     """Where a catalogue's head disagrees with the language library's registry (cosmoes-site `library/library.json`),
     one line each. A text or pin the registry holds must say what the registry says, field by field; a text the
@@ -300,6 +391,6 @@ def catalogue_agrees(doc: dict, library: dict) -> list[str]:
     return out
 
 
-__all__ = ["DEFAULT", "LANGUAGES", "Language", "catalogue", "catalogue_agrees", "entries", "get", "lint_catalogue",
-           "of_path", "parses", "program", "reading", "reads", "require", "runs", "source_names", "suffixes",
-           "targets"]
+__all__ = ["DEFAULT", "LANGUAGES", "Language", "PROVIDED_BY", "TABLE_POINTS", "catalogue", "catalogue_agrees",
+           "entries", "get", "lint_catalogue", "lint_provides", "of_path", "parses", "program", "provides_table",
+           "reading", "reads", "require", "runs", "source_names", "suffixes", "targets"]

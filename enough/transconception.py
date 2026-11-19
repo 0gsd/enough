@@ -38,8 +38,11 @@ The checks, one method each on `_Checks`:
   does not know is a warning (it blocks only `ready_to_entail` for that target).
 - `round-trip` (error): a cshort in the source language (its `shorts` entry's `target` is the source language's
   `N:target`) stands at the manifest's level (2) or more, by its `evidence`. enough runs nothing: it reads evidence.
-- `target-confirmed` (error, for each target that carries a `verdict`; a note for one not weighed): the verdict is
-  feasible or feasible-with, every reliance kept for it is provided, and its spike reached level 2.
+- `target-confirmed` (error, for each language's latest weighing; a note for a language not weighed): the verdict is
+  feasible or feasible-with; no gate point (1, 4, 5 of the twelve) scored 0; every reliance kept for it is provided,
+  and nothing kept is provided `cannot`; and its spike reached level 2 (`spike_from_verdict` reads that level from
+  the judge's verdict on the spike: enough judges nothing). A later weighing of a language stands beside the earlier
+  ones and is the one read; rulings stay made for the language's first `N:target`.
 - `surface-answered` (error): a cshort in another language has a `CSHORT.md` mapping every interface kept for its
   target to a file and a name, and the name is in the file (not measured without the cshort folder).
 - `apart` (error): a cshort entailed apart: no request of the entailing carried a span, a path of the source or a run
@@ -91,6 +94,40 @@ DEFAULTS = {
     "round-trip-level": 2,
 }
 KEPT = ("kept", "alike", "kept-wrong")
+
+# The twelve points a target language is weighed on (MacroCOSM OES 18.4.9, "Weighing a target"), in the text's order:
+# (number, key, words, gate). A weighing's `weighed` names each by its number (`point: 1`); the keys are the hand
+# weighing's of the experiment (x0 step A7) and read as the same point. The move `weigh` keeps its own copy of this
+# table (enough/thym/moves/transconceive.py, which imports nothing of enough's), and a test holds the two equal.
+POINTS = (
+    (1, "stewardship", "Stewardship that outlives one company", True),
+    (2, "specification", "A written specification, and more than one implementation", False),
+    (3, "old-programs-build", "A promise that old programs keep building", False),
+    (4, "provided", "Everything the program leans on is provided", True),
+    (5, "runs-and-ships", "It runs where it must and ships as it must", True),
+    (6, "fits-shapes", "It fits the program's shapes", False),
+    (7, "safe-by-default", "Safe by default", False),
+    (8, "tools-check", "Its tools can check what the fabulac states", False),
+    (9, "agent-skill", "The writing agent's skill in it", False),
+    (10, "budgets", "It meets the budgets", False),
+    (11, "readable", "People can read it", False),
+    (12, "can-be-left", "It can be left", False),
+)
+GATE_POINTS = tuple(n for n, _k, _w, g in POINTS if g)
+VERDICTS = ("feasible", "feasible-with", "not")
+_POINT_KEYS = {k: n for n, k, _w, _g in POINTS}
+
+
+def point_number(p: Any) -> int | None:
+    """A weighed point's number, 1 to 12, from its number or the experiment's key (`stewardship` is 1)."""
+    if isinstance(p, bool):
+        return None
+    if isinstance(p, int):
+        return p if 1 <= p <= 12 else None
+    if isinstance(p, str):
+        t = p.strip().lower()
+        return int(t) if t.isdigit() and 1 <= int(t) <= 12 else _POINT_KEYS.get(t)
+    return None
 STATEMENTS = ("licence", "lane", "confidential", "programs", "attribution")
 LANES_NEEDING_LEAVE = ("closed",)
 SPIKE_LEVEL = 2
@@ -589,10 +626,30 @@ class _Checks:
                                          f"evidence" + (f" (the best is {best})" if best is not None else ""),
                      "shorts")
 
+    def weighings(self, language: str) -> list[mc.Item]:
+        """The `N:target` items of a language, in the fabula's order: the first is the one rulings are made for."""
+        return [it for it in self.of("N", "target") if it.data.get("language") == language]
+
+    def latest_weighing(self, language: str) -> mc.Item | None:
+        """The weighing of a language that stands: the latest by its `at` of those with a verdict (a later weighing
+        is added beside the earlier ones, never over them), else the first, unweighed."""
+        ws = self.weighings(language)
+        weighed = [it for it in ws if "verdict" in it.data]
+        if weighed:
+            return max(enumerate(weighed), key=lambda p: (str(p[1].data.get("at") or ""), p[0]))[1]
+        return ws[0] if ws else None
+
     def target_confirmed(self, language: str | None = None) -> None:
-        for it in self.of("N", "target"):
-            lang = it.data.get("language")
-            if lang == self.language or (language is not None and lang != language):
+        langs = [language] if language is not None else []
+        if language is None:
+            for it in self.of("N", "target"):
+                lang = it.data.get("language")
+                if isinstance(lang, str) and lang != self.language and lang not in langs:
+                    langs.append(lang)
+        for lang in langs:
+            it = self.latest_weighing(lang)
+            if it is None:
+                self.add("target-confirmed", None, f"no N:target for {lang}")
                 continue
             if "verdict" not in it.data:
                 if language is None:
@@ -602,16 +659,27 @@ class _Checks:
                 continue
             if it.data.get("verdict") not in ("feasible", "feasible-with"):
                 self.add("target-confirmed", it, f"the verdict on {lang} is {it.data.get('verdict')!r}", "verdict")
-            provided = {p.get("for") for p in (it.data.get("provides") or []) if isinstance(p, dict)
-                        and p.get("by") not in ("cannot", None)}
+            weighed = it.data.get("weighed")
+            for w in weighed if isinstance(weighed, list) else []:
+                n = point_number(w.get("point")) if isinstance(w, dict) else None
+                if n in GATE_POINTS and w.get("score") == 0:
+                    self.add("target-confirmed", it, f"point {n}, a gate, scored 0: {lang} is not feasible, whatever "
+                                                     "its other scores", "weighed")
+            rid = self.weighings(lang)[0].id                    # rulings are made for the language's first N:target
+            rows = [p for p in (it.data.get("provides") or []) if isinstance(p, dict)]
+            provided = {p.get("for") for p in rows if p.get("by") not in ("cannot", None)}
+            cannot = {p.get("for") for p in rows if p.get("by") == "cannot"}
             for r in self.of("C", "reliance"):
-                if any(x.get("is") in KEPT and applies(x, it.id) for x in rulings(r.data)) and r.id not in provided:
-                    self.add("target-confirmed", it, f"{lang} provides nothing for {r.id}, which is kept", "provides")
+                if any(x.get("is") in KEPT and applies(x, rid) for x in rulings(r.data)) and r.id not in provided:
+                    self.add("target-confirmed", it, f"{lang} provides nothing for {r.id}, which is kept"
+                             + (" (it says it cannot)" if r.id in cannot else ""), "provides")
+            for k in ("interface", "behaviour"):
+                for x in self.of("C", k):
+                    if x.id in cannot and any(r.get("is") in KEPT and applies(r, rid) for r in rulings(x.data)):
+                        self.add("target-confirmed", it, f"{lang} cannot provide {x.id}, which is kept", "provides")
             sp = it.data.get("spike")
             if not (isinstance(sp, dict) and isinstance(sp.get("level"), int) and sp["level"] >= SPIKE_LEVEL):
                 self.add("target-confirmed", it, f"the spike in {lang} has not reached level {SPIKE_LEVEL}", "spike")
-        if language is not None and not any(it.data.get("language") == language for it in self.of("N", "target")):
-            self.add("target-confirmed", None, f"no N:target for {language}")
 
     def _other_cshorts(self) -> list[dict]:
         src = self.source_target()
@@ -704,6 +772,86 @@ def run_checks(vol: mc.Volume, add: Callable[..., None], *, source: Path | None 
     c = _Checks(vol, add, source=source, library=library)
     c.run()
     return c.unmeasured
+
+
+# ---------------------------------------------------------------------------
+# Targets (phase 5): what a language provides, and a spike's level read from its verdict
+# ---------------------------------------------------------------------------
+
+_X0_RELIANCE = re.compile(r"^[A-Z]+-R\d+[a-z]?$")
+_CASE_REF = re.compile(r"P:case/([A-Za-z0-9_.-]+)")
+
+
+def target_table(language: Any, *, source: Any = None) -> dict:
+    """What `weigh f in <language>` reads by rule, as plain data: `{ok, language: {name, title}, table, for, from}`.
+    `table` is the language's target table (`enough.languages.provides_table`: the points that are facts of the
+    language and one row per ground entry); `for` the source language whose ground catalogue the rows answer; `from`
+    maps each reliance the experiment wrote (`V-R08`) to the entries made from it, so that a reliance written before
+    the ground catalogue (no `entry`) is answered by the rows of its entries. `{ok: false, why}` for a language this
+    build cannot weigh."""
+    lang = _languages.get(language)
+    if lang is None:
+        return {"ok": False, "why": f"{language!r} is no language this build knows ({', '.join(_languages.LANGUAGES)})"}
+    if not lang.target:
+        return {"ok": False, "why": f"{lang.title} is not a language a program is entailed into in this build"}
+    try:
+        table = _languages.provides_table(lang.name)
+    except KeyError as e:
+        return {"ok": False, "why": str(e.args[0]) if e.args else str(e)}
+    src = str(source or table.get("for") or "")
+    frm: dict[str, list[str]] = {}
+    try:
+        entries = _languages.entries(src) if src else []
+    except KeyError:
+        entries = []
+    for e in entries:
+        for x in e.get("from") or []:
+            if isinstance(x, str) and _X0_RELIANCE.match(x.strip()):
+                frm.setdefault(x.strip(), []).append(str(e.get("id")))
+    return {"ok": True, "language": {"name": lang.name, "title": lang.title}, "table": copy.deepcopy(table),
+            "for": src, "from": frm}
+
+
+def spike_cases(spike: Mapping) -> list[str]:
+    """The cases a spike aims at: its `cases`, else every `P:case/...` its `use` names, as written."""
+    got = spike.get("cases")
+    if isinstance(got, list) and got:
+        return [str(c) for c in got]
+    return [f"P:case/{m}" for m in _CASE_REF.findall(str(spike.get("use") or ""))]
+
+
+def _case_hits(ref: str, case: Any) -> bool:
+    bare = str(ref).split("/", 1)[-1]
+    c = str(case or "")
+    return bool(c) and (bare == c or bare.endswith("." + c))
+
+
+def spike_from_verdict(spike: Mapping, verdict: Mapping, *, where: str | None = None, digest: str | None = None,
+                       at: str | None = None) -> dict:
+    """A spike with its level read from the judge's verdict on it (the runner builds and judges the spike outside;
+    enough reads its verdict and runs nothing). Only the spike's own cases count (`spike_cases`): the judge runs every
+    case, and a spike answers only its riskiest use. Level 3 when it built and every step of its cases agrees or
+    differs only where a ruling says so (the cases are recorded: MacroCOSM 18.4.9's third level, for those cases),
+    else 1 (it built). Returns the spike with `level` and `evidence: {level, against, cases, differ: {ruled, unruled},
+    where: {file, digest}, at}`; a CasesError when the spike names no case."""
+    cases = spike_cases(spike)
+    if not cases:
+        raise CasesError("the spike names no case it aims at (spike.cases, or P:case refs in spike.use)")
+    rows = [r for r in differences_from_verdict(verdict) if any(_case_hits(c, r.get("case")) for c in cases)]
+    unruled = [r for r in rows if r.get("needs-ruling")]
+    level = 1 if unruled else 3
+    out = dict(spike)
+    out["level"] = level
+    ev: dict = {"level": level, "against": verdict.get("against", "original"), "cases": cases,
+                "differ": {"ruled": len(rows) - len(unruled), "unruled": len(unruled)}}
+    if where:
+        ev["where"] = {"file": where, **({"digest": digest} if digest else {})}
+    if at:
+        ev["at"] = at
+    if unruled:
+        ev["first"] = f"{unruled[0].get('case')} step {unruled[0].get('step')}: {unruled[0].get('kind')}"
+    out["evidence"] = ev
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1325,7 +1473,8 @@ def thym_engine() -> Any:
         source_marks=_source_marks, case_key=_key, dump_cases=dump_cases, check_cases_doc=check_cases_doc,
         cases_document=cases_document, read_recording=read_recording, gather_recorded=gather_recorded,
         read_verdict=read_verdict, fold_verdict=fold_verdict, cshort_label=_cshort_label,
-        differences_from_verdict=differences_from_verdict, stale_report=stale_report, carry_over=carry_over)
+        differences_from_verdict=differences_from_verdict, stale_report=stale_report, carry_over=carry_over,
+        target_table=target_table, spike_from_verdict=spike_from_verdict)
 
 
 def carry_over(old: Mapping, new: dict, *, at: str | None = None, by: str = "decompile") -> dict:

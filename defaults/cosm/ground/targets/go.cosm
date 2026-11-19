@@ -1,0 +1,133 @@
+# What Go provides when a program is entailed into it (MacroCOSM OES 18.4.9, "Weighing a target"; Thym 20.10,
+# `weigh f in go`). Read by enough/languages.py (`provides_table`); applied by the move `weigh`
+# (enough/thym/moves/transconceive.py), which answers by these rules what they can and asks a model for the rest,
+# every answer marked for the transconceiver's ruling through the target bank.
+#
+# The head: `version`, the release weighed (the toolchain the owner builds with); `for`, the ground catalogue whose
+# entries the rows answer. `points`: the points of weighing that are facts of the language alone (1, 2, 3, 7 and 8),
+# each scored 0 to 3 with its evidence; the rest are the program's, and point 4 is read from the rows. `provides`: one
+# row per entry of the catalogue, `by` (built-in, library, binding, written, cannot, dropped), `what` provides it, a
+# `note`, and `gap` where something must be fetched, bound or written at length before the program can be (a library
+# or binding always is one). Started from lane W1-XP's hand weighing of vulture for Go (x0 step A7, 2026-11-18).
+#
+# Copyright © 2026 Graham Smith. CC BY 4.0, with a patent promise under OWFa 1.0. See defaults/cosm/NOTICE.md.
+target: target/1
+language: go
+title: What Go provides
+version: '1.27.4'
+for: python
+about: >-
+  How Go, its standard library and the modules it is commonly given provide what a program leans on, for each gift the
+  ground catalogue names; and the points of weighing that are facts of Go itself.
+points:
+  - {point: 1, score: 2, evidence: 'one company leads (Google); a published proposal process; releases since 1.0 in 2012; a BSD licence; a second compiler, gccgo. Passes the gate, with that note.'}
+  - {point: 2, score: 3, evidence: 'The Go Programming Language Specification (CC BY 4.0); two implementations, gc and gccgo.'}
+  - {point: 3, score: 3, evidence: 'the Go 1 compatibility promise (2012), and since 1.21 the go line in go.mod with GODEBUG settings keeping old behaviour.'}
+  - {point: 7, score: 2, evidence: 'memory-safe without the unsafe package; data races are possible in concurrent code; an index out of range panics and a panic exits with status 2, so a program whose uncaught errors exit 1 recovers at its top.'}
+  - {point: 8, score: 1, evidence: 'the type checker and go vet check little of what a fabulac states: kinds are strings or interfaces, with no exhaustive matching. The judge, not the compiler, is the check.'}
+provides:
+  # numbers
+  - {entry: whole-numbers-unbounded, by: built-in, what: 'math/big.Int where a number may pass 64 bits', note: 'int is 64 bits and wraps silently; every sum that may grow past it is written on big.Int'}
+  - {entry: number-from-text, by: built-in, what: 'strconv.ParseInt after trimming', note: 'underscores between digits, signs and non-ASCII digits the original accepts are glue to write'}
+  - {entry: halves-round-to-even, by: built-in, what: 'math.RoundToEven'}
+  - {entry: division-gives-fraction, by: built-in, what: 'float64 division after converting both sides'}
+  - {entry: division-floors, by: written, what: 'a floor division of a few lines', note: 'Go''s / and % truncate toward zero'}
+  - {entry: fractions-are-doubles, by: built-in, what: 'float64'}
+  - {entry: fraction-from-text, by: built-in, what: 'strconv.ParseFloat after trimming', note: 'the spellings of infinity and not-a-number, and underscores, as the original reads them, are glue'}
+  - {entry: number-as-text, by: written, what: 'the printed form of a number around strconv.FormatFloat(x, ''g'', -1, 64)', note: 'the shortest digits agree; where the form switches to an exponent, how the exponent is spelled, inf and nan, and the trailing .0 are written'}
+  - {entry: conversions, by: written, what: 'each conversion the program makes, with the original''s refusals', note: 'Go converts only where told and fails differently'}
+  - {entry: value-kinds, by: written, what: 'the kind names the original prints, written as words'}
+  # text
+  - {entry: text-length-in-code-points, by: built-in, what: 'utf8.RuneCountInString'}
+  - {entry: text-indexed-by-code-point, by: built-in, what: '[]rune(s)', note: 'a string indexes bytes; a position the program shows is counted in runes'}
+  - {entry: text-order-by-code-point, by: built-in, what: 'string comparison', note: 'UTF-8 bytes order as their code points do'}
+  - {entry: sort-is-stable, by: built-in, what: 'sort.SliceStable, slices.SortStableFunc'}
+  - {entry: what-is-a-space, by: written, what: 'unicode.IsSpace with U+001C to U+001F added', note: 'the set is written out'}
+  - {entry: text-split-on-space, by: built-in, what: 'strings.FieldsFunc with the written space test'}
+  - {entry: lines-end-at, by: written, what: 'a line splitter ending lines where the original does', note: 'Go splits only where told; \r\n, \r, \v, \f, U+001C to U+001E, U+0085, U+2028 and U+2029 are written'}
+  - {entry: text-case-mapping, by: library, what: 'golang.org/x/text/cases for the full mapping', note: 'strings.ToLower maps rune by rune; the full mapping turns one character into two (İ, ß)', gap: 'golang.org/x/text pinned in go.sum and fetched once, or the few two-character mappings written'}
+  - {entry: text-replace, by: built-in, what: 'strings.Replace, strings.ReplaceAll'}
+  - {entry: text-repeated, by: built-in, what: 'strings.Repeat'}
+  - {entry: code-points-by-number, by: built-in, what: 'rune(n) with utf8.ValidRune', note: 'surrogates are no valid rune'}
+  - {entry: printed-form, by: written, what: 'the original''s printed form of texts, lists and maps', note: 'fmt''s %v and %q print differently'}
+  - {entry: format-spec, by: written, what: 'the format fields the program uses, over fmt.Sprintf', note: 'fmt''s verbs differ in alignment, grouping and rounding'}
+  - {entry: percent-format, by: built-in, what: 'fmt.Sprintf', note: '%d, %s and %f agree in their plain uses; others are written'}
+  - {entry: format-string-fields, by: written, what: 'a reader of brace fields ({name.attr[key]!r:spec}, {{ escapes)'}
+  - {entry: truth-of-values, by: written, what: 'each test of truth written out', note: 'Go has no truth of values: a test names what it tests'}
+  - {entry: boolean-operators-give-operands, by: written, what: 'an if that gives one operand or the other'}
+  - {entry: any-all-stop-early, by: written, what: 'a loop that returns at the first answer'}
+  # collections and records
+  - {entry: map-keeps-order, by: written, what: 'a slice of keys kept beside the map', note: 'Go''s maps keep no order'}
+  - {entry: set-members, by: built-in, what: 'map[T]struct{}'}
+  - {entry: set-order-varies, by: built-in, what: 'map iteration', note: 'its order varies from run to run as well; only a sort makes it repeatable'}
+  - {entry: membership-identity-then-equality, by: written, what: '== on values, with the identity cases written', note: 'not-a-number is equal to itself under identity'}
+  - {entry: records-compare-by-fields, by: built-in, what: 'struct ==', note: 'every field must be comparable'}
+  - {entry: lists-and-zip, by: written, what: 'a loop to the shorter length'}
+  - {entry: generators-lazy, by: built-in, what: 'iter.Seq (since 1.23), or the whole list where the caller reads it all'}
+  # errors and exits
+  - {entry: uncaught-error, by: written, what: 'recover at the top, print a report, exit 1', note: 'a panic exits 2'}
+  - {entry: error-text, by: built-in, what: 'err.Error()'}
+  - {entry: error-kinds, by: built-in, what: 'typed errors with errors.Is and errors.As'}
+  - {entry: exit-status-from-return, by: built-in, what: 'os.Exit'}
+  - {entry: exit-with-message, by: built-in, what: 'fmt.Fprintln(os.Stderr, …) and os.Exit(1)'}
+  - {entry: exit-status-whole-number, by: built-in, what: 'os.Exit'}
+  - {entry: chained-errors, by: built-in, what: 'fmt.Errorf with %w, errors.Unwrap', note: 'the report the original prints of a chain is written'}
+  - {entry: optional-library, by: written, what: 'an interface with the part that needs the library behind it, refused where it is absent'}
+  - {entry: missing-key-error, by: written, what: 'the message naming the key'}
+  # the command line
+  - {entry: program-arguments, by: built-in, what: 'os.Args'}
+  - {entry: argparse-surface, by: written, what: 'an option reader with the original''s usage line, errors and exit status 2', note: 'the flag package has none of them', gap: 'the option reader written (a few hundred lines): usage line, error messages, exit status 2'}
+  - {entry: argparse-help, by: written, what: 'the help screen, laid out as the original lays it out'}
+  - {entry: argparse-version, by: written, what: 'the version option'}
+  - {entry: argparse-abbreviation, by: written, what: 'unambiguous prefixes of long options, in the option reader'}
+  - {entry: argparse-negative-numbers, by: written, what: 'a negative number taken as a value, in the option reader'}
+  - {entry: argparse-optional-positional, by: written, what: 'an optional value matched once, in the option reader'}
+  - {entry: argparse-subcommands, by: written, what: 'sub-commands, in the option reader'}
+  # the platform
+  - {entry: environment-read, by: built-in, what: 'os.LookupEnv'}
+  - {entry: clock-seconds, by: built-in, what: 'time.Now() as seconds since the epoch'}
+  - {entry: local-time, by: built-in, what: 'time.Local', note: 'read from TZ and the system''s zone files'}
+  - {entry: terminal-width, by: written, what: 'COLUMNS, else 80', note: 'the terminal''s own size needs golang.org/x/term; the original''s order is COLUMNS first'}
+  - {entry: print-line-end, by: built-in, what: 'fmt.Println'}
+  - {entry: output-encoding, by: built-in, what: 'UTF-8 bytes written as they are'}
+  - {entry: json-written, by: written, what: 'a JSON writer with the original''s spacing, escapes and number forms', note: 'encoding/json escapes <, > and &, writes no spaces and spells numbers its own way'}
+  - {entry: json-keys-sorted, by: built-in, what: 'encoding/json sorts a map''s keys'}
+  - {entry: json-read, by: built-in, what: 'encoding/json with a Decoder and UseNumber', note: 'the original reads NaN and Infinity and numbers of any size: glue where the program meets them'}
+  - {entry: csv-rows, by: built-in, what: 'encoding/csv', note: 'set UseCRLF where the original writes \r\n'}
+  - {entry: home-and-tilde, by: built-in, what: 'os.UserHomeDir', note: 'a leading ~ is expanded by a line of glue'}
+  - {entry: path-written, by: built-in, what: 'path/filepath'}
+  - {entry: path-separator, by: built-in, what: 'filepath.Separator'}
+  - {entry: path-resolved, by: built-in, what: 'filepath.Abs, filepath.EvalSymlinks'}
+  - {entry: path-relative, by: built-in, what: 'filepath.Rel'}
+  - {entry: path-kinds, by: built-in, what: 'os.Stat, os.Lstat'}
+  - {entry: folder-walk, by: built-in, what: 'filepath.WalkDir', note: 'it does not enter linked folders'}
+  - {entry: make-folders, by: built-in, what: 'os.MkdirAll'}
+  - {entry: file-created-mode, by: built-in, what: 'os.OpenFile with 0o666, the umask applied'}
+  - {entry: newlines-translated, by: written, what: '\r\n and \r read as \n where the original reads text', note: 'Go translates no line ends'}
+  - {entry: text-decoding-strict, by: built-in, what: 'utf8.Valid', note: 'the error the original raises is written'}
+  - {entry: bytes-decoded, by: built-in, what: '[]byte and string', note: 'a Go string may hold any bytes: validity is checked where the original decodes'}
+  - {entry: source-encodings, by: written, what: 'UTF-8 with or without its mark, latin-1, a cp1252 table and the coding line', note: 'golang.org/x/text/encoding/charmap would give the rest'}
+  - {entry: package-data, by: built-in, what: 'embed'}
+  - {entry: glob-patterns, by: written, what: 'a glob where * matches any run, / included', note: 'filepath.Match stops * at / and reads \ as an escape'}
+  - {entry: glob-case-per-platform, by: written, what: 'the glob, folding case where the platform does'}
+  - {entry: glob-case-sensitive, by: written, what: 'the same glob, case for case'}
+  - {entry: pattern-syntax, by: written, what: 'regexp where the pattern is regular; a matcher written where it looks around or refers back', note: 'regexp is RE2: no look-around, no back-references'}
+  - {entry: pattern-unicode-classes, by: written, what: 'Unicode classes written into each pattern (\pL, \pN)', note: 'RE2''s \w, \d and \s are ASCII'}
+  - {entry: pattern-flags, by: built-in, what: 'the (?i), (?m) and (?s) flags of regexp'}
+  # formats the program reads
+  - {entry: toml-read, by: library, what: 'a TOML 1.0 module', note: 'github.com/BurntSushi/toml or github.com/pelletier/go-toml/v2', gap: 'a TOML 1.0 module pinned in go.sum and fetched once, or a reader written for the tables the program reads'}
+  - {entry: html5-entities, by: written, what: 'the table carried as data and looked up as the original does'}
+  - {entry: tree-text-and-tail, by: written, what: 'an element type with its text and tail', note: 'encoding/xml has no tail'}
+  # reading programs
+  - {entry: source-parsed, by: written, what: 'a tokenizer and a parser of the input language''s grammar, with its lines', note: 'no maintained pure-Go parser of it; a binding through cgo is ruled out where the build turns cgo off', gap: 'the parser written, the largest piece (thousands of lines); a spike shows it can be done'}
+  - {entry: identifiers-normalised, by: library, what: 'golang.org/x/text/unicode/norm (NFKC)', note: 'its Unicode tables may be another version than the original''s', gap: 'golang.org/x/text pinned in go.sum and fetched once'}
+  - {entry: parser-messages, by: written, what: 'the parser''s own messages'}
+  - {entry: type-comments, by: written, what: 'type comments read as tokens and parsed alone', note: 'part of the parser'}
+  - {entry: tree-dump, by: written, what: 'a dump of the tree'}
+  - {entry: literal-truth, by: written, what: 'constant folding on the tree'}
+  - {entry: program-tree-nodes, by: written, what: 'the kinds of the tree as Go types'}
+  # the runtime itself
+  - {entry: runtime-version, by: built-in, what: 'the go line of go.mod names the release it is built for'}
+  - {entry: run-as-module, by: built-in, what: 'one program, built from its module'}
+  - {entry: append-is-whole, by: built-in, what: 'os.OpenFile with O_APPEND and one Write per line', note: 'the same assumption as the original''s, made of the platform'}
+  - {entry: pytest-conventions, by: dropped, what: 'nothing: go test reads its own names', note: 'the original''s test runner''s names mean nothing to the new program'}

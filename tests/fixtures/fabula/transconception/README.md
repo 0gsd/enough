@@ -27,11 +27,17 @@ The 0.7 words are mapped (`purpose: transcoding` to `transconception`, the role 
 a path on the recording machine inside a recorded traceback is written from the home folder (`~/`). Everything else
 is as the experiment wrote it. Re-made on 2026-11-18 after the owner's second sitting (`_x0/sitting-2.md`): the
 experiment's generator wrote its rulings in (V-I14 and S-I0 split, S-I2 kept at the driver's dump, S-I6 narrowed to
-the byte-file steps, the allowance `own-types` on 62 Rust rulings). Re-make them with:
+the byte-file steps, the allowance `own-types` on 62 Rust rulings). Since phase 5 (2026-11-18) each also carries the
+hand weighing of its target from step A7 (`_x0/vulture/target-go.md`, `_x0/sloppy-xml-py/target-rust.md`) in place
+of the unweighed placeholder, its points named by number, and its spike's level read from the judge's verdict on the
+spike at O9 (`results/2026-11-18-1819/<repo>/<language>-spike/verdict.json`; only the spike's own cases count).
+Re-make them with:
 
     python tools/transconception/promote_x0.py <_x0>/vulture/vulture.fabulac.cosm \
         <_x0>/results/2026-11-13-1006/vulture/py-roundtrip/verdict.json \
-        tests/fixtures/fabula/transconception/vulture.fabulac.cosm
+        tests/fixtures/fabula/transconception/vulture.fabulac.cosm \
+        --target <_x0>/vulture/target-go.md <_x0>/results/2026-11-18-1819/vulture/go-spike/verdict.json
     python tools/transconception/promote_x0.py <_x0>/sloppy-xml-py/sloppy-xml-py.fabulac.cosm \
         <_x0>/results/2026-11-13-1006/sloppy-xml-py/py-roundtrip/verdict.json \
-        tests/fixtures/fabula/transconception/sloppy-xml-py.fabulac.cosm
+        tests/fixtures/fabula/transconception/sloppy-xml-py.fabulac.cosm \
+        --target <_x0>/sloppy-xml-py/target-rust.md <_x0>/results/2026-11-18-1819/sloppy-xml-py/rust-spike/verdict.json
