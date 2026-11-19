@@ -174,7 +174,9 @@ EXIT_ALL_MODES: tuple[Step, ...] = (
 # was in fact already there. Doing both halves inside one awaited
 # expression removes all three.
 CARDS_READY: Step = ("wait_for", "#comp-modules .comp-module.comp-bg-yellow")
-SCAFFOLD_READY: Step = ("wait_for", "#comp-modules .comp-module.comp-bg-lilac")
+#: 0.8: the scaffold form is one page frame and the `composure:scaffold` block
+#: (0.7's 29 lilac/blue/orange cards are gone), so it is told by its frame.
+SCAFFOLD_READY: Step = ("wait_for", "#comp-modules .comp-module.comp-frame")
 JOURNAL_READY: Step = ("wait_for", ".comp-journal-head")
 #: A council in `setup` has drawn its checklist; that is the last thing the
 #: card waits on (GET /api/council/participants). The wait is done INSIDE the
@@ -665,6 +667,74 @@ COMP_RESET: tuple[Step, ...] = (
     _open("blank"),
     ("wait_idle", ""),
 )
+
+
+#: 0.8: a scaffold with something to look at, in the MODEL only (the way
+#: `composure-links` seeds its cards): the form's one page frame, named, and
+#: four plecholders in their four looks — written (marked by the person),
+#: over its target, empty, and an empty picture slot. Nothing is queued, and
+#: the composure has no path, so the matrix writes no file however often it
+#: runs this.
+SCAFFOLD_FIXTURE: Step = ("eval", """(() => {
+  const pg = (rich) => [{n: 1, rich, first_line: '', chars: rich.length,
+    date: null, filed: false, locked: false, data: {}}];
+  const mk = (id, x, y, w, h, title, fields, rich) => ({id,
+    type: 'scaffold-box', known_type: true, x, y, w, h, z: 1, bg: 'paper',
+    known_bg: true, scale: 1, title, cur: 1, fields, speaker: null,
+    speaker_kind: null, turn: null, locked: false, page_count: 1,
+    pages: pg(rich || ''), data: {}});
+  const frame = COMP.model.modules.find((m) => m.type === 'frame');
+  frame.title = 'Opening';
+  const F = frame.id;
+  const boxes = [
+    mk('mhead', 48, 48, 720, 170, 'Headline', {frame: F, kind: 'text',
+      plec: 'The one promise that holds for a company, a person, a text and a program alike.',
+      plec_by: 'readvisor', target: '60c', state: 'written'},
+      '<p>Take it apart. Recognize what it means. Tell it again.</p>'),
+    mk('mlede', 48, 242, 720, 230, 'Lede', {frame: F, kind: 'text',
+      plec: 'What the thing physically is: plain-text files, on your own machine.',
+      plec_by: 'person', target: '120c', state: 'empty'},
+      '<p>Plain-text files on your own machine that describe a subject completly, and the tools that read them back to you.</p>'),
+    mk('mtake', 48, 496, 348, 220, 'Take it apart', {frame: F, kind: 'text',
+      plec: 'What goes in, in nouns anyone owns.', plec_by: 'readvisor',
+      target: '30w', state: 'empty'}, ''),
+    mk('mpic', 420, 496, 348, 300, 'The picture', {frame: F, kind: 'graphic',
+      shape: '16:9', plec: 'What the picture must show.', plec_by: 'readvisor',
+      state: 'empty'}, ''),
+  ];
+  COMP.model.modules = [frame].concat(boxes);
+  COMP.model.scaffold = {v: 1, thing: 'page', frames: [F],
+    boxes: {[F]: boxes.map((b) => b.id)}, loose: [], locked: null,
+    version: 1, parent: null};
+  compRenderModules(); compScaffoldChrome(); compScaffoldFitFirst();
+  return true; })()""")
+
+#: …and locked, the way the lock leaves it: in the model's block only.
+SCAFFOLD_LOCK: Step = ("eval", "COMP.model.scaffold.locked = {at: "
+                               "'2026-11-19T10:00:00Z', by: 'ui', empty: ['mtake', 'mpic']};"
+                               " compSetMode('view'); compRenderModules(); compScaffoldChrome()")
+
+#: Three findings and one ordinary comment, in the sidecar's shape (W3-E5):
+#: a spelling finding with a fix (open), a grammar one declined, and a claim
+#: that cannot be checked — never shown as passed.
+SCAFFOLD_FINDINGS: Step = ("eval", """(() => {
+  const f = (id, n, box, kind, quote, fix, status, why) => ({id, body: kind + ': ' + quote,
+    created_at: '2026-11-19T10:05:00Z', updated_at: null, resolved: status !== 'open',
+    replies: [], anchor: {type: 'quote', module: box, page: 1, quote, prefix: '', suffix: ''},
+    state: 'anchored', by: 'check', finding: {id: n, box, kind, quote, prefix: '', suffix: '',
+    fix, why, status, version: 1, pass: 'rules', answered_at: null, rev: 3}});
+  COMP.comments = [
+    f('c_fd1', 'f1', 'mlede', 'spelling', 'completly', 'completely', 'open',
+      'FEED does not know this word'),
+    f('c_fd2', 'f2', 'mlede', 'grammar', 'the tools that read', 'tools that read',
+      'declined', 'the article is not needed here'),
+    f('c_fd3', 'f3', 'mhead', 'truth', 'Tell it again.', null, 'cannot be checked',
+      'nothing in the text or the plec says what this rests on'),
+    {id: 'c_plain', body: 'an ordinary comment beside the findings',
+      created_at: '2026-11-19T10:06:00Z', resolved: false, replies: [],
+      anchor: {type: 'module', module: 'mtake'}, state: 'module'},
+  ];
+  compRenderComments(); return true; })()""")
 
 
 # `compOpenNew()` is ASYNC, and a blank composure already has one module —
@@ -1456,9 +1526,55 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(_open("cards", CARDS_READY), ("wait_idle", "")),
            teardown=COMP_RESET),
 
+    # 0.8: the scaffold form is one page frame, opened in edit mode with the
+    # scaffold's own group in the bar (reading, lock, check, export).
     Screen("composure-scaffold", "project",
            setup=(_open("scaffold", SCAFFOLD_READY), ("wait_idle", "")),
-           teardown=COMP_RESET),
+           teardown=COMP_RESET,
+           note="a fresh scaffold: one empty page frame and the scaffold's "
+                "toolbar group"),
+
+    # The scaffolder (0.8): four plecholders in their four looks, one
+    # selected, so the inspector shows the box's own fields (name, plec,
+    # target and unit, kind, mark written).
+    Screen("composure-scaffolder", "project",
+           setup=(_open("scaffold", SCAFFOLD_READY), SCAFFOLD_FIXTURE,
+                  ("eval", "compSetMode('edit'); compSetTool('pointer');"
+                           " compSetSelection(['mlede'])"),
+                  ("wait_for", "#comp-insp-slot [data-sfield='plec']"),
+                  ("wait_idle", "")),
+           teardown=COMP_RESET,
+           note="plecholders written, over, empty and a picture slot; the "
+                "inspector on a box"),
+
+    Screen("composure-scaffolder-reading", "project",
+           setup=(_open("scaffold", SCAFFOLD_READY), SCAFFOLD_FIXTURE,
+                  ("eval", "compSetReading(true)"),
+                  ("wait_for", "#composure.comp-reading"), ("wait_idle", "")),
+           teardown=(("eval", "compSetReading(false)"),) + COMP_RESET,
+           note="the reading view: the plecs and counts gone, an empty box "
+                "still showing where it is"),
+
+    Screen("composure-scaffolder-locked", "project",
+           setup=(_open("scaffold", SCAFFOLD_READY), SCAFFOLD_FIXTURE,
+                  SCAFFOLD_LOCK,
+                  ("wait_for", "#composure.comp-scaffold-locked"),
+                  ("wait_idle", "")),
+           teardown=COMP_RESET,
+           note="a locked scaffold: tinted, read-only, the check live"),
+
+    Screen("composure-scaffolder-findings", "project",
+           setup=(_open("scaffold", SCAFFOLD_READY), SCAFFOLD_FIXTURE,
+                  SCAFFOLD_LOCK,
+                  # The slider first: opening it reloads the sidecar, which
+                  # would wipe the fixture findings (composure-comments' rule).
+                  ("eval", "compToggleComments(true)"), ("wait_idle", ""),
+                  SCAFFOLD_FINDINGS,
+                  ("wait_for", "#comp-comments-list .comp-finding"),
+                  ("wait_idle", "")),
+           teardown=COMP_RESET,
+           note="findings in the comments slider: accept and decline on an "
+                "open one, 'cannot be checked' final"),
 
     Screen("composure-journal", "project",
            setup=(_open("journal", JOURNAL_READY), ("wait_idle", "")),
@@ -1649,8 +1765,10 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=(("eval", "compCloseSettings()"),) + COMP_RESET,
            note="a composure's settings modal, all sections open"),
 
+    # 0.8: on `cards`, now that the scaffold form is one frame (a frame is a
+    # sheet and never turns into a face).
     Screen("composure-faces", "project",
-           setup=(_open("scaffold", SCAFFOLD_READY),
+           setup=(_open("cards", CARDS_READY),
                   ("eval", "COMP.zoomed = true;"
                            " COMP.userZoom = 0.2 / compPanelFactor();"
                            " compApplyView(false)"),
