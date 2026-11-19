@@ -522,8 +522,9 @@ cache.
 | Chief readvisor identity | `rness/AGENT.md` (copied) | `defaults/AGENT.md` | yes — under the generated identity preface |
 | The chief's **name** | — (machine-global) | `defaults/ui-config.json` → `chief_readvisor_name`, default `"Ed"` | yes — interpolated into the preface |
 | Motivation | `rness/MOTIVATION.md` (copied) | `defaults/MOTIVATION.md` | yes |
-| Active paradigm | `rness/active-paradigm` (multipurpose markdown: paradigm name + help-bubbles state — see "What NOT to touch") | seeded by `prompt.seed_multipurpose_file()` | the active paradigm's full file, yes |
-| Paradigms | `rness/paradigms/<name>.md` (symlink) | `defaults/paradigms/<name>.md` | the active one, yes |
+| Active paradigms | `rness/active-paradigm` (multipurpose markdown: one to three paradigm names, one a line, + help-bubbles state — see "What NOT to touch") | seeded by `prompt.seed_multipurpose_file()` | one: the paradigm's full file; two or three: their metaparadigm, or a text composed from each member's lean head (see "Several paradigms at once") |
+| Paradigms | `rness/paradigms/<name>.md` (symlink) | `defaults/paradigms/<name>.md` | the ones on, yes (alone, or through their metaparadigm) |
+| Metaparadigms (0.8) | `rness/metaparadigms/<a+b>.md` (symlink while every member is the link to the same global paradigm; a real file is the project's own; hidden from the tree) | `defaults/metaparadigms/<a+b>.md` | the one for the set that is on, while its fingerprints hold |
 | Skills | `rness/skills/<name>/SKILL.md` (symlink = shipped/trusted; a real dir = untrusted) | `defaults/skills/<name>/SKILL.md` | the toggled-on ones, yes |
 | Skill audits | `rness/io/output/analyzer/audits/<skill>/<YYYY-MM-DD>-audit.md` + `verdict.json` | none — written by `skillaudit.py` or by analyzer's `audit` mode | no |
 | Readvisors | `rness/readvisors/<name>/AGENT.md`+`MOTIVATION.md` — a **symlink** when it came from a global source, a **real dir** when it is this project's own | `defaults/readvisors/<name>/` (shipped) or `~/enough/readvisors/<name>/` (user-global) | the toggled-on ones, yes — combined into one voice under "Active Readvisors" |
@@ -575,8 +576,8 @@ would have switched every readvisor the user had switched on back off.
 `/api/skills`) names any untrusted skill without a matching `pass`
 verdict into `.disabled`. Without it a hand-dropped or readvisor-written
 directory would be live in the system prompt having never passed a
-toggle. Paradigms are different — exactly one is active, named in
-`rness/active-paradigm`.
+toggle. Paradigms are different — one to three are on, named one a line in
+`rness/active-paradigm` (see "Several paradigms at once").
 
 ---
 
@@ -687,8 +688,10 @@ pieces answer it; none changes prompt text.
   trigger, user policies included), the paradigm cut at its
   `LEAN_CUT` marker (`<!-- lean-cut -->`; `text-planning.md` keeps home
   base, routing, posture and "Planning, in brief" above it, the full flow,
-  skeleton and scaffold mode below; a paradigm without the marker rides
-  whole), the composure / girraph / review / wiki / canon / cloud / twins /
+  skeleton and scaffold mode below; transcognition and workflow-design have
+  cuts too since 0.8, and every metaparadigm's head is held to
+  text-planning's by `tests/test_metaparadigms.py`; a paradigm without the
+  marker rides whole), the composure / girraph / review / wiki / canon / cloud / twins /
   keep-going sections as `*_LEAN_INSTRUCTIONS` summaries each marked
   *(guide: X)*, the girraph summary only with a `.girraph` in the project
   (`_girraph_present`, three levels, skipping `rness/`) or the skill on —
@@ -1409,7 +1412,8 @@ project need no switch, and a write into the store rides on the existing
 | `comp_remove_module` | `composure_tools.run_comp_remove_module` | `composure_enabled`; `<confirmed>yes</confirmed>` required, like `remove_node` |
 | `comp_arrange` | `composure_tools.run_comp_arrange` | `composure_enabled`; `<mode>` `grid` \| `column`; the order of `<modules>` is the resulting reading order |
 | `comp_save_as_form` | `composure_tools.run_comp_save_as_form` | `composure_enabled`; writes a reusable form into `rness/composure-forms/` |
-| `composure_from_outline` | `composure_tools.run_composure_from_outline` | `composure_enabled`; one markdown outline → a whole composure, deterministically. The `scaffold` skill teaches the grammar — see "Composures" |
+| `composure_from_outline` | `composure_tools.run_composure_from_outline` | `composure_enabled`; one markdown outline → a whole composure, deterministically. The `scaffolder` skill teaches the grammar — see "Composures" |
+| `scaffold_from_plectrum` | `composure_tools.run_scaffold_from_plectrum` | `composure_enabled` (0.8); `<path>` optional, `<content>` a plectrum. No path, or one that does not exist: creates the file from the `scaffold` form; else updates it. Refuses a state, an outline, a locked scaffold, a composure that is not a scaffold and a plectrum past `MAX_MODULES`, writing nothing. Never writes a box's text. Writes `<slug>.plectrum.md` beside the composure — see "The scaffold" |
 | `install_readvisor` | `readvisor_tools.run_install_readvisor` | **`readvisory_install`** toggle; kebab-case `<name>` ≤ 40 chars, `<scope>` `project`\|`global`, both documents non-empty and ≤ 40 KB, `prompt.readvisor_shape()` clean, the payload scan clean, destination not a symlink, `<replace>yes</replace>` to overwrite |
 | `dict_lookup` | `dictionary_tools.run_dict_lookup` | **no toggle** (it reads). FEED shipped and built — otherwise a sentence saying which ("not bundled", "still being prepared (N%)", "could not be prepared"), never a raise |
 | `dict_add_entry` | `dictionary_tools.run_dict_add_entry` | no toggle; writes `user-dictionary.sqlite` only. `<word>` a–z + `pronunciation` / `pos` / `definition` required; refuses a word FEED already has as a headword; fires `dict_changed` |
@@ -2324,7 +2328,7 @@ defaulting to `scaffold` and validated **at setup**.
 
 `conclusion_framing(output)` appends `_CONCLUSION_SHAPE[kind]` to
 `_CONCLUSION_FRAMING`. The composure shape asks for the outline grammar of
-"`composure_from_outline` and the `scaffold` skill" below and nothing else —
+"`composure_from_outline` and the `scaffolder` skill" below and nothing else —
 no covering note, no code fence — and tells the chief to use `[gap: …]` cards
 for what the council did not settle.
 
@@ -2507,7 +2511,11 @@ like every other document body (`docs/I18N.md` keeps what the readvisors read
 in English). **A failure here is logged and swallowed** — a council whose
 setup succeeded should not 500 because its cover page did not get written.
 
-### `composure_from_outline` and the `scaffold` skill
+### `composure_from_outline` and the `scaffolder` skill
+
+(The skill was `scaffold` until 0.8: `retired_names.SKILLS = {"scaffold": "scaffolder"}`, and
+`skeleton.carry_retired_skills` carries a project's switch before the dangling-link prune; a
+real-folder `scaffold/` is left alone and reported. Tests: `tests/test_scaffolder.py`.)
 
 Small local models are unreliable at long chains of module tool calls — ask
 for fourteen cards and you get nine, two in the wrong group and one a
@@ -2557,6 +2565,60 @@ composure.from_outline(title, form, markdown) -> Composure   # both, in memory
 assert about, with no file and no project. The tool applies the same
 `outline_ops` through `apply_ops`, so the write goes through the one door
 like everything else.
+
+### The scaffold (0.8)
+
+A scaffold is a composure laid out for a thing the person writes every word
+of: a page, a deck or a document. Manual: HELP_CENTER 4.10 and 20.8. Pins:
+`docs/v080-pins.md` section 6 (gitignored).
+
+- **Types and the block.** `MODULE_TYPES` gains `scaffold-box` (`C.BOX`, a
+  plecholder in prose and help) and `frame` (`C.FRAME`; shapes
+  `FRAME_SHAPES = {"page": FULLPORT, "slide": SLIDE}`). A box carries
+  `data-frame`, `data-kind` (`text`|`graphic`), `data-shape`, `data-plec`,
+  `data-plec-by` (derived from the source, never sent), `data-target`
+  (`^(0|[1-9]\d{0,5})[cw]$`), `data-state`; the person's text is page 1. The
+  order of frames and the lock live in `<meta name="composure:scaffold">`
+  (`{v, thing, frames, locked, version, parent}`), kept verbatim on read;
+  `scaffold_view(comp)` is the cleaned view. The scaffold CSS is appended only
+  when a file holds a frame or a box, so every other composure keeps its bytes.
+- **Ops.** `make_scaffold` (`ui` only), `set_scaffold` (`thing` from any
+  source; never `locked`), `add_frame`, `reorder_frames`, `move_to_frame`,
+  `lock_scaffold {empty}` (`ui` only, one way), `accept_fix {module, quote,
+  prefix?, suffix?, fix}` (`ui` only). `_check_writable` refuses a readvisor's
+  `set_page`/`add_page`/`remove_page` on a box, adding a box with text,
+  removing a box with text, changing a type into or out of a box, a box's
+  `state`, `make_scaffold`, and the lock. While locked, `_apply_one` refuses
+  every op from every source before any module rule, except `accept_fix` and a
+  `set_meta` carrying only `view`. `unlock_scaffold(path, project)` writes
+  `<stem>-v<N+1>.comp` beside it and leaves the locked file's bytes alone.
+- **Never converted on open.** An old `form=scaffold` composure, and a
+  council's plane (the same shape), open as 0.7 did; `outline_ops` emits
+  `set_scaffold null` after its removals, so `from_outline` still gives 0.7's
+  plane byte for byte.
+- **The plectrum.** `defaults/skills/scaffolder/scripts/scaffold_state.py`
+  (standard library only; imports nothing of enough) reads and writes a
+  plectrum and the one-file state; `enough/scaffolder.py` is the adapter
+  (`plectrum_ops`, `state_from_composure`, `module_id = "m" + sha1(id)[:15]`, so
+  an updated plectrum finds its boxes with no table).
+- **Check and findings.** `enough/scaffold_check.py`, a Canon job of kind
+  `scaffold`: a rules pass always (FEED's `lookup_many`; names, capitals and
+  addresses skipped; another language marked "not checked for spelling"), and a
+  model pass when one answers (`CONTRACT`: spelling, grammar, claims; a claim
+  is `holds`, `wrong` or `cannot be checked`, the last final). A finding is a
+  comment in `.<name>.comp.comments.json` with `by: "check"` and a `finding`
+  block; it is answered (`answer_finding`), never deleted.
+- **Export.** `enough/scaffold_export.py`: a page as HTML (written directly)
+  or PDF (typst), a deck as PPTX (pandoc) or PDF, a document as Markdown (by
+  rule) or PDF. New names only (`open(…, "xb")`); empty boxes, notes, plecs and
+  frame names never leave.
+- **Routes.** `enough/composure_api.py`, `build_scaffold_router`:
+  `GET /api/composure/scaffold`, `POST …/scaffold/{lock,unlock,check,
+  check/cancel,accept,decline,export}`. `POST /api/composure/ops` answers 403
+  to `source: "readvisor"`: the readvisor's way in is its tools.
+- **Tests.** `tests/test_composure_scaffold.py`, `test_scaffold_lock.py`,
+  `test_scaffold_check.py`, `test_scaffold_export.py`, `test_scaffolder.py`;
+  uicheck screens `composure-scaffolder*` and the scenario of that name.
 
 ---
 
@@ -3860,8 +3922,9 @@ K/P/T items; every item `confidence: 0.3`, `state: pending`, `pending: "a
 model has not read this passage"`; the atem line is the first prose sentence
 cut to 25 words, focus the first two sentences, push and pull open
 questions. The twin says `derived.mode: rules`, the job messages say
-"scaffold", and every UI surface says **"scaffold, no model"** (owner
-decision 8) — never let one pass for a reading.
+"scaffold", and the cosm rail says **"outline, no model"** (owner
+decision 8; `cosm.outline` since 0.8, when "scaffold" became the
+scaffolder's word) — never let one pass for a reading.
 
 **Model mode, per passage** (chunked by heading, then ~1 200-token windows
 with a paragraph of overlap; `max_tokens` = min(4 096, n_ctx − prompt
@@ -4220,7 +4283,7 @@ quiet})` → `POST /api/fabula/derive` (`what: fabula`, `route` always said),
   on the format's section via `COSM_SPEC_SECTION`: comprise 19.1, cosm 18.2, canon 18.3, fabula 18.4, doc 18.5, thym 18.7, ascribe 19.2), outline (`cosmRailToggle`; a sheet when
   narrow), find (`COSM_FIND`, `FIND_BARS.cosm`), the `(?)`
   (`data-help="cosm-viewer"`), mini/full. The rail (`cosmRailHTML`,
-  `cosmChecksHTML`): name, counts or "N items", "scaffold, no model" for a
+  `cosmChecksHTML`): name, counts or "N items", "outline, no model" for a
   rules twin, the URI with a copy button, modules → kinds with counts, the
   checks with every problem, the open questions, the not-run line. The column
   (`cosmBodyHTML`, `cosmCardHTML`, `cosmFieldsHTML`): a fabula's atem
@@ -4907,7 +4970,8 @@ A folder of code is decompiled into a **fabulac** (a fabula of flavour
 `fabulac`), compiled back into a **cshort** (source rebuilt from the
 fabulac) and said at depth as a **catem** (everything a user can do with the
 program). Spec: MacroCOSM OES §18.4.7, THYM §20 (20.6 decompiling, 20.7
-compiling, 20.8 what is never run); pins P7. Files:
+compiling, 20.8 what is never run; since 0.8 also 20.10 transconceiving,
+20.11 authoring, 20.12 running an authored entailment); pins P7. Files:
 [enough/fabulac_job.py](../enough/fabulac_job.py) (the job, the compile, the
 read-only views, their router), `enough/thym/moves/code.py` (the moves),
 [enough/repo_engine.py](../enough/repo_engine.py) (the engines),
@@ -6904,12 +6968,70 @@ asked for a project-local one; the audit is the feature.
 2. Optionally add it to the "Routing to other paradigms" list in
    [defaults/paradigms/text-planning.md](../defaults/paradigms/text-planning.md)
    — the home paradigm is the router that tells the readvisor when to
-   switch — and have the new paradigm switch back by writing
-   `text-planning` to `rness/active-paradigm` when its work is done.
-3. Document the activation rule in the paradigm itself — when to switch
-   in, when to switch out, what skill (if any) it pairs with.
-4. No code changes; paradigm catalog is read from `rness/paradigms/`
-   directly.
+   turn another on beside it — and have the new paradigm take its own
+   line out of `# Active paradigm` in `rness/active-paradigm` when its
+   work is done (`text-planning` goes in if nothing else is left).
+3. Document the activation rule in the paradigm itself — when to turn it
+   on, when to turn it off, what skill (if any) it pairs with, and its
+   faces (`<!-- face: <skill> -->` … `<!-- /face -->`) if a skill changes
+   how it reads a request.
+4. Give it a `<!-- lean-cut -->` whose head is no larger than
+   text-planning's (`tests/test_prompt_weight.py`), and decide which
+   combinations ship a metaparadigm (next section). Otherwise no code
+   changes; the paradigm catalog is read from `rness/paradigms/` directly.
+
+### Several paradigms at once (0.8)
+
+One to three paradigms are on; one is always on. Manual: HELP_CENTER 17
+and 17.4. Pins: `docs/v080-pins.md` section 5 (gitignored).
+
+- **The set.** `# Active paradigm` holds up to three names, one a line; a
+  bare file's non-blank lines are a set, and one line means that one alone.
+  `prompt.get_active_paradigms()` (sorted, filtered to files on disk, with
+  the old fallback chain), `set_active_paradigms()` (raises
+  `ParadigmSetRefused(reason="cap"|"empty")`, sentences in
+  `PARADIGM_REFUSALS`), `toggle_paradigm()`. `get_active_paradigm()` returns
+  the sorted set's first name, for old callers. `set_help_bubbles()` keeps
+  every name. The sidebar rows post `/api/paradigm/toggle` (`name`,
+  `on=0|1`); `/api/paradigm/set` keeps its old meaning, this one alone.
+- **The text that rides.** `choose_paradigm_text`: one name reads
+  `paradigms/<n>.md` under `## Paradigm: x`; two or three read
+  `metaparadigms/<sorted names joined with +>.md` under `## Paradigms: a + b`,
+  but only while `metaparadigm_stale_members` returns nothing; otherwise
+  `_compose_paradigms` puts each member's lean head under ``## From `name` ``
+  (in lean, each held to an even share of `LEAN_HEAD_BUDGET`) and the sidebar
+  says "composed".
+- **Fingerprints.** A metaparadigm's front matter is one key a line:
+  `members:` and `fingerprint.<name>: sha256:<16 hex>` of each member's body
+  (`paradigm_fingerprint`: front matter, the tooltip line and a closing `---`
+  dropped, trailing spaces stripped, blank runs collapsed). Write the head with
+  `metaparadigm_front_matter(paradigms_dir, members)`; a file saved under
+  `rness/metaparadigms/` or `defaults/metaparadigms/` by `write_file` or
+  `POST /api/file` is stamped by `stamp_metaparadigm_on_save`. **Edit a
+  shipped paradigm and restamp every shipped metaparadigm holding it**, or
+  `tests/test_metaparadigms.py` fails (and the combination goes composed for
+  everyone).
+- **Global and project.** `skeleton._populate_metaparadigm_symlinks` (launch
+  and `resync_globals`) links a global combination only while every member is
+  the link to the same global paradigm, prunes a link that dangles or whose
+  members no longer hold, and never touches a real file. A metaparadigm is
+  never wider than its members. `write_file` replaces a global link with the
+  project's own file for paradigms and metaparadigms (`tools._replace_global_link`).
+- **Faces.** `apply_faces(body, enabled)` runs before the lean cut: a
+  `<!-- face: skill -->` block rides while that skill is on; with two face
+  skills on, an "ask once" line unless the text has its own
+  `<!-- face: both -->`; with none, two lines naming the skills unless it has
+  `<!-- face: none -->`. `routes/paradigm_skills._presumed_faces` paints the
+  sidebar's face note.
+- **Renames.** `_RETIRED_PARADIGM = {"default": "text-planning",
+  "translation": "transcognition"}`; `ensure_multipurpose_file` maps each
+  stored name inside a set, unless `rness/paradigms/<old>.md` is a real file
+  (`_kept_retired_paradigm`): a kept copy stays on under its old name, and the
+  catalog adds one line telling the readvisor to offer once to carry the
+  person's changes (an `nllb_optin: true` line) into a copy of the new one.
+- **Tests.** `tests/test_metaparadigms.py`, `tests/test_prompt_weight.py`
+  (every text's lean head against text-planning's), `tests/test_help_highlights.py`;
+  uicheck screens `paradigms-two` and `paradigms-composed`.
 
 **The home paradigm** is `prompt.HOME_PARADIGM = "text-planning"` (0.4.1).
 Until then it was `default`, which text-planning absorbed (routing, output
@@ -7430,11 +7552,12 @@ A list of things that will confuse you if you don't see them coming:
 
 - **The active-paradigm file is multipurpose markdown (0.1.7).**
   `rness/active-paradigm` (filename unchanged, no extension) carries a
-  `# Active paradigm` section (the paradigm name on the first
-  non-heading line) and a `# Help bubbles` section storing `on`/`off`.
-  Read/write ONLY via `prompt.get_active_paradigm()` /
-  `set_active_paradigm()` / `get_help_bubbles()` / `set_help_bubbles()`
-  — `set_*` preserves the other section. Back-compatible: a legacy bare
+  `# Active paradigm` section (one to three paradigm names, one a line,
+  since 0.8) and a `# Help bubbles` section storing `on`/`off`.
+  Read/write ONLY via `prompt.get_active_paradigms()` /
+  `set_active_paradigms()` / `toggle_paradigm()` (or the one-name
+  `get_active_paradigm()` / `set_active_paradigm()`) / `get_help_bubbles()`
+  / `set_help_bubbles()` — `set_*` preserves the other section. Back-compatible: a legacy bare
   one-line file still parses (and a stored `default` is migrated to the
   home paradigm on launch — see "Add a new paradigm"), and every legacy
   help value (the old `all`
@@ -7468,8 +7591,8 @@ A list of things that will confuse you if you don't see them coming:
   `path=` for file ops, `url=` for fetch_url, `command=` for shell,
   `output=` for cloud_pipeline. If you add a tool, decide what the
   attribute should be and add a branch.
-- **Skills are off by default; paradigms are exactly one active at a
-  time; readvisors are individually toggleable.** Three different
+- **Skills are off by default; paradigms are one to three on at a
+  time, never none; readvisors are individually toggleable.** Three different
   on/off patterns for three concepts — don't conflate them. And a
   readvisor's sidebar toggle governs only the *combined* voice of ordinary
   conversation: `prompt.readvisor_identity()` ignores it on purpose,
@@ -7954,7 +8077,9 @@ normally.
    symlinks left over from removed globals. Skills and readvisors
    default-off (added to `.disabled`) — **except a name pruned as dangling
    and re-created in the same pass, which is a heal and keeps its toggle**;
-   paradigms have no off concept, exactly one is active at a time. The
+   paradigms have no `.disabled`: which are on lives in
+   `rness/active-paradigm`, one to three, and
+   `_populate_metaparadigm_symlinks` runs right after them. The
    readvisor populator additionally walks **two** global sources
    (`~/enough/readvisors/` then the install's `defaults/readvisors/`) and
    re-aims managed links — see "Readvisors".

@@ -114,6 +114,9 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # type's name on disk (a token, like a move's name), and a plecholder's
     # count, which is two numbers and a slash in every language.
     "+ scaffold-box", "{n} / {target}",
+    # 0.8 (transconception): the word is kept as written in every language
+    # (docs/I18N.md), so the card's heading is the same everywhere.
+    "transconception",
     "a–z", "z–a",       # the dictionary's sort-direction toggle
 ))
 
@@ -139,6 +142,7 @@ COGNATES: dict[str, frozenset[str]] = {
         "assonance",        # "une assonance" — a sound device (fab.verse.fig.assonance)
         "consonance",       # "une consonance" — likewise (fab.verse.fig.consonance)
         "refrain",          # "un refrain" — a recurrence (fab.verse.fig.refrain)
+        "point",            # "un point" — a weighing's column (fab.tc.points.point, 0.8)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"
