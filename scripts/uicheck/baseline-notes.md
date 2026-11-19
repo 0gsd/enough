@@ -72,7 +72,7 @@ button is the one slot the fold never sheds, and at that size the toolbar's
 fixed part alone is wider than the stage. **The toolbar needs an overflow
 menu for its last slot at large scales.**
 
-## 3. Native checkboxes and radios at 13×13 — 12 entries — **a form-control pass**
+## 3. Native checkboxes and radios at 13×13 — 14 entries — **a form-control pass**
 
 `modal-paginate` ×5 (`#pg-bring-in`, `#pg-headers`, `#pg-page-numbers`, two
 `label.cv-radio>input`), `modal-ui` and `ui-modal-agentfree` (`#ui-help-bubbles` —
@@ -81,7 +81,9 @@ the same ui window, the second time with the agent-free slider on; joined in 0.4
 (`#wiki-flavor-list>label.wiki-flavor>input`), `canon` and `canon-volume`
 (`#cn-ingest-all` — the same ingest bar, once on the volume list and once
 inside a volume; the second screen joined in 0.4.3),
-`modal-broker` (`.broker-toggle`, 14×14).
+`modal-broker` (`.broker-toggle`, 14×14), and `allograph-lookup` ×2 (`#allo-plus`,
+`#allo-attested`: the allograph card's look-up by need, 0.7's checkboxes, first on a
+screen in 0.8 when the look-up by name put the search section in view; joined W4-RP).
 
 These are **the browser's own `<input type=checkbox|radio>` at its default
 size**, not anything enough draws — every one of them is 13×13 because that

@@ -2,6 +2,8 @@
   "_doc": "Accepted pre-existing UI findings, keyed by (screen | class | selector-path[ | second path]) — never by pixel values, so an entry survives a re-layout and dies with the element it names. Regenerate with `uv run python scripts/ui_check.py --update-baseline` and read the diff: a key that disappears means something got fixed (delete it), a key that appears means something new needs a human. The list is a to-do, not an amnesty.",
   "_notes": "EVERY entry below is justified, by family, in scripts/uicheck/baseline-notes.md — what it is, why it is accepted, and which lane should fix it. If you add one, add a paragraph there; if you fix one, delete both in the same change.",
   "accepted": {
+    "allograph-lookup | tiny | #allo-attested": "[tiny] (no text) is only 13x13px",
+    "allograph-lookup | tiny | #allo-plus": "[tiny] (no text) is only 13x13px",
     "canon | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
     "canon-volume | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
     "convert-chip-edit | covered | #convert-chip-edit>button.cc-btn | #edit-linenav": "[covered] 変更を書き出す is covered by #edit-linenav",
