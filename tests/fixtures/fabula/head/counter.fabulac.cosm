@@ -1,0 +1,54 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/counter
+name: counter
+source: {kind: authored, language: python, licence: MIT, at: "2026-11-18"}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+parts:
+  - {uri: oes:fabula/counter-core, path: counter-core.fabulac.cosm, sha256: fef748b1a800c47a4e67bcb2f50ebd4f54b0a1a3ab611a6d85577cc60449c85e}
+  - {uri: oes:fabula/counter-cli, path: counter-cli.fabulac.cosm, sha256: 1e81c30212247a7294249289f3b45fffb4b573ac6ed1f622e434f0f8bb6620bd}
+atem:
+  line: counter counts the lines of a file, told in two parts.
+  focus: its two parts
+  push: a small program to hold the head's checks
+  pull: one interface between the parts
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: The terms counter is offered on.
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: MIT
+  - id: N:aim/count-lines
+    type: aim
+    name: Count the lines of a file
+    summary: counter prints how many lines a text file holds.
+    stance: axiom
+    provenance: {mode: manual, sources: [the fixture's author], confidence: 1}
+  - id: C:component/counter-core
+    type: component
+    name: counter-core
+    summary: The counting, told in its own fabulac.
+    does: counts the lines of a text
+    told-in: oes:fabula/counter-core
+    stance: axiom
+    provenance: {mode: manual, sources: [the fixture's author], confidence: 1}
+  - id: C:component/counter-cli
+    type: component
+    name: counter-cli
+    summary: The command line, told in its own fabulac.
+    does: reads a file and prints its count
+    told-in: oes:fabula/counter-cli
+    stance: axiom
+    provenance: {mode: manual, sources: [the fixture's author], confidence: 1}
+  - id: C:interface/count-lines
+    type: interface
+    name: count_lines
+    summary: "Between the parts: counter-core offers count_lines, counter-cli calls it."
+    surface: function
+    signature: "def count_lines(text: str) -> int"
+    takes:
+      - {name: text, type: str, required: true, means: the text whose lines are counted}
+    stance: axiom
+    provenance: {mode: manual, sources: [the fixture's author], confidence: 1}

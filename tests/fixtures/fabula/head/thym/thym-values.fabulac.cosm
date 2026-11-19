@@ -1,0 +1,59 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/thym-values
+name: "Thym: values, types, folders, check registry"
+source: {path: enough/thym/, kind: folder, language: python, licence: Apache-2.0}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+head: oes:fabula/thym
+atem:
+  line: "Thym: values, types, folders, check registry: a part of Thym, declared from the parts map; not read yet."
+  focus: __init__, types, values, folder, checks
+  push: Thym is over the builder's band
+  pull: no Thym fabulac exists yet
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: "The terms Thym: values, types, folders, check registry is offered on."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: Apache-2.0
+  - id: C:component/thym-values
+    type: component
+    name: "Thym: values, types, folders, check registry"
+    summary: "enough/thym/: __init__, types, values, folder, checks."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/canonical
+    type: interface
+    name: canonical
+    summary: "Offered here: A value's canonical bytes, as Thym digests it (12.6)."
+    surface: function
+    signature: "def canonical(mapping: dict) -> bytes"
+    takes:
+      - {name: mapping, type: dict, required: true}
+    stated-in: oes:fabula/thym/C/interface/canonical
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/value
+    type: interface
+    name: Value
+    summary: "Offered here: A value of a Thym type, with its payload, origin and digest."
+    surface: class
+    signature: class Value
+    stated-in: oes:fabula/thym/C/interface/value
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/check
+    type: interface
+    name: check
+    summary: "Offered here: The check registry: a check registers itself by its name."
+    surface: function
+    signature: "def check(name: str, *, registry: Checks | None = None, kind: str | None = None) -> Callable[[CheckFn], CheckFn]"
+    takes:
+      - {name: name, type: str, required: true}
+      - {name: registry, type: Checks | None, default: null}
+      - {name: kind, type: str | None, default: null}
+    stated-in: oes:fabula/thym/C/interface/check
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}

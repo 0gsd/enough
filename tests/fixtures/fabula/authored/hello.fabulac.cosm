@@ -1,0 +1,107 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/hello
+name: hello
+source:
+  kind: authored
+  language: python
+  licence: MIT
+  by:
+  - R:maker/ada
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: service
+  start:
+  - -m
+  - hello
+  serve:
+    port: 0
+    reach: []
+atem:
+  line: hello, a small program for the tests.
+  focus: what it does
+  push: a person wants it
+  pull: it is small
+nodes:
+- id: R:maker/ada
+  type: maker
+  name: Ada
+  summary: Ada authored hello.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms Ada offers hello on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  identifier: MIT
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.10'
+- id: N:aim/greet
+  type: aim
+  name: Greet
+  summary: hello answers a greeting on a port.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: C:interface/greeting
+  type: interface
+  name: greeting
+  summary: greeting(name) gives the words hello answers with.
+  surface: function
+  signature: 'greeting(name: str) -> str'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1
+- id: P:case/greet-ada
+  type: case
+  name: Greet Ada
+  summary: Ada is greeted by name.
+  of:
+  - C:interface/greeting
+  given:
+    calls: C:interface/greeting
+    arguments:
+      name: Ada
+  expect:
+    value: Hello, Ada.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, by add
+    confidence: 1

@@ -63,8 +63,9 @@ def test_the_real_declarations_are_the_texts_table_of_thym_1_moves():
                                                              "provenance")
     assert dc.chosen(derive, first_type="folder")["contract"] == ("fold-grounded", "atem-shape", "licence-recorded",
                                                                   "fabula-checks", "provenance")
+    # cases-entailed joins `as code` (Thym 6.3's row on v080-texts, 0.8: of a cshort it holds with nothing to check)
     assert dc.chosen(tell, as_word="code")["contract"] == ("parses", "interfaces-present", "files-present", "footer",
-                                                           "provenance")
+                                                           "cases-entailed", "provenance")
     assert dc.chosen(tell, as_word="manual")["contract"] == ("coverage", "no-invention", "quotes-held", "uses-told",
                                                              "footer", "provenance")
     assert dc.chosen(tell, as_word="code")["gives"] == ("folder",)
@@ -155,9 +156,11 @@ def test_every_shipped_program_compiles_plans_and_enumerates(path):
 
 def test_the_shipped_programs_are_the_six_of_the_design_and_the_three_of_0_5_0():
     # author-python (0.8) is Thym 20.11's block on v080-texts, ahead of the bundled text: tests/test_fabulac_author.py
-    # compiles, plans and enumerates it; it joins ROUND when the sync brings 20.11 here
+    # compiles, plans and enumerates it; it joins ROUND when the sync brings 20.11 here. entail-authored-python (0.8)
+    # is Thym 20.7's second block on v080-texts, the same way: tests/test_fabulac_entail.py holds it to the text
     assert sorted(p.stem for p in SHIPPED.glob("*.thym")) == sorted(ROUND + ("open-house", "publish-story",
-                                                                             "read-my-way", "author-python"))
+                                                                             "read-my-way", "author-python",
+                                                                             "entail-authored-python"))
 
 
 def test_the_shipped_programs_plan_as_the_text_says():

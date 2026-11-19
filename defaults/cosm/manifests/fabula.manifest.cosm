@@ -56,8 +56,8 @@ volume:
   single-file: true                                   # identified by its declaration, never by its file name
 
 catalog:
-  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, atem, shorts,
-         catems, nodes]
+  keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, head, parts,
+         atem, shorts, catems, entailed, nodes]
   purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
                                                        # checks and gates of transconception (MacroCOSM OES 18.4.9),
                                                        # written after flavour; enough/transconception.py runs them
@@ -83,6 +83,19 @@ catalog:
                                                                    # service: keeps running and answers on a port
   program-serve-fields: [port, reach]                              # a service's: the port (0: the host chooses) and the
                                                                    # addresses it may reach; served in a later minor
+  entailed-fields: [path, at, run, files, kept]                    # an authored fabulac's last entailment (MacroCOSM OES
+                                                                   # 18.4.1): path, the folder beside it (tally/)
+  entailed-kept-fields: [path, decision]                           # a file changed by hand and kept: decision, the
+                                                                   # N:decision that records the choice (keeping in step,
+                                                                   # enough/fabulac_entail.py)
+  head-form: 'oes:fabula/<database>: a part''s head fabulac, by its URI (MacroCOSM OES 18.4.7); a text field, resolved
+              over the fabulacs the reader knows (enough/fabulac_head.py), not a reference'
+  parts-fields: [uri, path, sha256]                                # a head's parts: the part's URI, its file's path
+                                                                   # relative to the head, that file's sha256 when the
+                                                                   # head last checked it (MacroCOSM OES 18.4.7)
+  entailed-files-fields: [path, sha256, from, brief]               # one per file written: from, refs or rules; brief,
+                                                                   # the sha256 of what it was entailed from
+                                                                   # (enough/thym/moves/authored_code.py brief_digest)
   tree: 'sha256 over the read set: for each file read, sorted by the UTF-8 bytes of its relative path, the bytes of
          <relative path> NUL <lowercase hex sha256 of its bytes> LF (MacroCOSM OES 18.4.1; Thym 20.1 uses the same digest)'
   derived-fields: [at, by, model, route, provider, program, run, mode, completeness, chunks, dropped, runs]
@@ -276,10 +289,10 @@ modules:
              required: [id, type, name, summary, provenance, stance, form]}
       file: {refs: [component], checked: [path, language, holds, length, sha256, entry, stance], flavours: [fabulac],
              required: [id, type, name, summary, provenance, stance, path]}
-      component: {refs: [files, of, exposes, uses], checked: [does, stance], flavours: [fabulac],
+      component: {refs: [files, of, exposes, uses], checked: [does, told-in, stance], flavours: [fabulac],
                   required: [id, type, name, summary, provenance, stance]}
       interface: {refs: [defined-in, ruling.made-for, ruling.by], checked: [surface, signature, takes, gives, raises, exported,
-                  plain, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
+                  plain, stated-in, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
                   closed: {plain.takes.*: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing],
                            plain.gives: [text, whole number, number, yes-or-no, moment, list, map, record, path, bytes, nothing]}}
       structure: {refs: [defined-in, ruling.made-for, ruling.by], checked: [shape, fields, invariants, ruling, stance],
@@ -342,7 +355,9 @@ checks:
   envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, provenance, status, visibility,
              ref-grammar, ref-unresolved, closed-list, pending-shape, catalog-key, flavour, flavour-kind]
   own: [code-span, licence-recorded, question-about, question-shape, session-declared, reading-whose,
-        interface-signature, case-outcome,                # enough/fabula.py (lint_fabula); a generic reader lists them as not run
+        interface-signature, case-outcome, requirement-cased, cases-entailed,   # enough/fabula.py (lint_fabula); a
+        parts-resolve, interfaces-agree,                  # generic reader lists them as not run; the head's two:
+                                                          # enough/fabulac_head.py (MacroCOSM OES 18.4.7, 18.4.8)
         standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover, ruled,
         round-trip, target-confirmed, surface-answered, apart, evidence-stated]
                                                           # the last thirteen: enough/transconception.py, run only on a
@@ -350,7 +365,7 @@ checks:
   contract: 'fabula-checks: the generic checks above and the own checks, with no error; its old name emf-checks is read
              wherever a manifest, a program or a trace says it'
   severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning,
-             cases-cover: warning}               # every other check of transconception is an error (the owner,
+             requirement-cased: warning, cases-cover: warning}               # every other check of transconception is an error (the owner,
                                                  # checkpoint A, 2026-11-18)
 
 # Transconception (MacroCOSM OES 18.4.9): a program carried into another language through its fabulac. The last
@@ -376,6 +391,23 @@ transconception:
     ready-to-entail: [standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover,
                       ruled, round-trip, target-confirmed]
     per-cshort: [surface-answered, apart, evidence-stated]
+
+# A case as data (MacroCOSM OES 18.4.7, "Cases as the judge"): a P:case is runnable when its given and expect are data for
+# one of two surfaces; words stay valid (a prose case: a model step writes its test, marked so). The same fields as a
+# transconception's outside cases (enough/transconception.py case_from_item): one notion of a case. Tests are written
+# from runnable cases by rules (enough/thym/moves/authored_code.py tests_text), never by the model that writes the code.
+# A question about a case's given or expect (its kind text) takes an answer in words or as this data, and refuses data
+# no surface knows (enough/dialectic.py case_field). <CASE> in an argument or a variable is the case's own folder, as the outside harness has it.
+case-surfaces:
+  command:
+    given: [files, env, cwd, steps]                    # files: path -> text; env: name -> value (or nothing: unset)
+    given-step: [arguments, input]                     # arguments: a list of words; input: text on standard input
+    expect: [steps, files]                             # files: path -> text after (or nothing: not there)
+    expect-step: [exit, output, error-output]          # exit is required, a whole number
+  function:
+    given: [calls, arguments]                          # calls: a C:interface id; arguments: parameter -> value
+    expect: [value, raises]                            # one of them; raises: {error, message}
+    raises: [error, message]                           # error: the class's name (or one of its bases'); message exact
 
 open-questions:
   form: '{pending: "<the question>"}'
@@ -431,7 +463,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {as: [code], gives: folder}
         - {as: [cases], gives: text}
       contract-when:
-        - {as: [code], contract: [parses, interfaces-present, files-present, footer, provenance]}
+        - {as: [code], contract: [parses, interfaces-present, files-present, footer, cases-entailed, provenance]}
         - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
         - {as: [cases], contract: [cases-whole, provenance]}
       scaffold-when:                    # code has none: --rules refuses it; cases needs no model, so its scaffold is itself
@@ -550,7 +582,8 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
 # or a kind asks for text or a choice.
 dialectic:
   writes: 'the field or item a question is about, with provenance {mode: dialectic, sources: [D:session/<id>], confidence}'
-  answer-kinds: [text, choice, yes-no, number, date, ref, span]
+  answer-kinds: [text, choice, yes-no, number, date, ref, span]   # a text question about a case's given or expect takes
+                                                                 # words, or data for a surface (case-surfaces below)
   entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, sets, only-with, only-where, at-most, batch,
                  stage, brief]
   banks:
@@ -675,7 +708,7 @@ dialectic:
         - {id: left-out, stage: left-out, about: N, asks: "What will {name} not do, on purpose, for now or for good?", kind: text, why: intent, writes: exclusion, brief: [leaves out, left out, what it leaves out, not doing, out of scope, exclusions, non-goals]}
         - {id: must, stage: left-out, about: N, asks: "What must {name} always do, and what must it never do, whatever a person asks of it? Name one.", kind: text, why: intent, writes: requirement, sets: {force: must}, brief: [requirements, must, always, never, must never]}
         # the cases
-        - {id: case, stage: cases, about: P, asks: "Give one example {name} must get right: what is given (a command and its arguments, or a call), and what is expected back.", kind: text, why: missing, writes: case, sets: {of: {pending: "Which way in, or which use, is this case of? Name it by its id."}, given: {pending: "What is given: the command and its arguments, or the call, and any file it starts with?"}, expect: {pending: "What is expected back: the output, the exit, or the value?"}}, brief: [cases, case, examples, example]}
+        - {id: case, stage: cases, about: P, asks: "Give one example {name} must get right: what is given (a command and its arguments, or a call), and what is expected back.", kind: text, why: missing, writes: case, sets: {of: {pending: "Which way in, or which use, is this case of? Name it by its id."}, given: {pending: "What is given: for a command, its steps (each the arguments and any input) and the files it starts with; for a function, the interface it calls and the value of each argument?"}, expect: {pending: "What is expected back: for a command, each step's exit, output and error output, and the files after; for a function, the value it returns or the error it raises?"}}, brief: [cases, case, examples, example]}
         # the open questions: a requirement the program must meet that no case shows yet (asked once the cases are
         # in), and what is still undecided
         - {id: checked-by, stage: open, about: N:requirement#checked-by, only-where: {force: [must]}, asks: "Which case shows that {name} holds? Name the case by its id.", kind: ref, why: missing}

@@ -1,0 +1,60 @@
+oes: fabula/1
+flavour: fabulac
+id: fabula/thym-code-moves
+name: "Thym: code moves"
+source: {path: enough/thym/, kind: folder, language: python, licence: Apache-2.0}
+derived: {at: "2026-11-18T12:00:00Z", by: person, mode: rules, completeness: outline, chunks: 0}
+head: oes:fabula/thym
+atem:
+  line: "Thym: code moves: a part of Thym, declared from the parts map; not read yet."
+  focus: moves/code
+  push: Thym is over the builder's band
+  pull: no Thym fabulac exists yet
+nodes:
+  - id: R:licence/licence
+    type: licence
+    name: licence
+    summary: "The terms Thym: code moves is offered on."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+    identifier: Apache-2.0
+  - id: C:component/thym-code-moves
+    type: component
+    name: "Thym: code moves"
+    summary: "enough/thym/: moves/code."
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/move-error
+    type: interface
+    name: MoveError
+    summary: "Called here: A move that cannot go on; the runtime refuses the run with its words."
+    surface: class
+    signature: class MoveError(RuntimeError)
+    stated-in: oes:fabula/thym/C/interface/move-error
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/implements
+    type: interface
+    name: implements
+    summary: "Called here: The move registry: a move registers itself by its name on import; the names implemented are the interface, not only the functions."
+    surface: function
+    signature: "def implements(name: str, *, replace: bool = True) -> Callable[[MoveFn], MoveFn]"
+    takes:
+      - {name: name, type: str, required: true}
+      - {name: replace, type: bool, default: true}
+    stated-in: oes:fabula/thym/C/interface/implements
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}
+  - id: C:interface/check
+    type: interface
+    name: check
+    summary: "Called here: The check registry: a check registers itself by its name."
+    surface: function
+    signature: "def check(name: str, *, registry: Checks | None = None, kind: str | None = None) -> Callable[[CheckFn], CheckFn]"
+    takes:
+      - {name: name, type: str, required: true}
+      - {name: registry, type: Checks | None, default: null}
+      - {name: kind, type: str | None, default: null}
+    stated-in: oes:fabula/thym/C/interface/check
+    stance: axiom
+    provenance: {mode: manual, sources: ["the parts map, docs/v080-parts-enough.md"], confidence: 1}

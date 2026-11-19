@@ -70,6 +70,8 @@ S_PREFIX = f"{MODULE}:{SESSION}/"
 
 WHYS = ("missing", "unsure", "ambiguous", "intent", "conflict", "counter")
 ANSWER_KINDS = ("text", "choice", "yes-no", "number", "date", "ref", "span")
+#: A case's two fields (MacroCOSM OES 18.4.7): a text question about one takes words, or data for a surface.
+CASE_FIELDS = ("given", "expect")
 STATES = ("open", "answered", "unknown", "declined", "stale", "withdrawn")
 THROUGH = ("person", "agent")
 RAISED_BY = ("bank", "move", "model", "person")
@@ -2184,6 +2186,9 @@ def check_value(src: Any, spec: dict, value: Any, *, qid: str | None = None) -> 
     kind = spec.get("kind") or "text"
     if kind not in ANSWER_KINDS:
         raise AnswerRefused(f"{kind!r} is not an answer kind ({', '.join(ANSWER_KINDS)})", qid)
+    field = case_field(spec.get("about") or qid)
+    if kind == "text" and field is not None:
+        return _case_answer(field, value, qid)
     if spec.get("many") is True:
         vals = value if isinstance(value, list) else (
             [p.strip() for p in re.split(r"[\n;]+", value) if p.strip()] if isinstance(value, str) else [value])
@@ -2280,6 +2285,35 @@ def _check_one(src: Any, spec: dict, kind: str, v: Any, qid: str | None) -> Any:
             raise AnswerRefused(why, qid)
         return dict(span)
     raise AnswerRefused(f"{kind!r} is not an answer kind", qid)
+
+
+def _case_answer(kind: str, v: Any, qid: str | None) -> Any:
+    """A case's `given` or `expect` (MacroCOSM OES 18.4.7): words, written as text (a prose case), or data for a
+    surface, a command's or a function's; an answer in words that is a mapping written in braces is read as data.
+    Data no surface knows is refused, with what it lacks."""
+    from enough.thym.moves.authored_code import answer_shape
+    if isinstance(v, str) and v.strip().startswith("{"):
+        try:
+            data = mc.yaml_load(v)
+        except Exception:  # noqa: BLE001 - words that only begin with a brace stay words
+            data = None
+        if isinstance(data, dict):
+            v = data
+    if not isinstance(v, (str, dict)):
+        raise AnswerRefused(f"a case's {kind} is words, or data for a command or a function", qid)
+    why = answer_shape(kind, v)
+    if why:
+        raise AnswerRefused(why, qid)
+    return v.strip() if isinstance(v, str) else v
+
+
+def case_field(about: Any) -> str | None:
+    """`given` or `expect` when a question is about that field of a case (`P:case/<slug>#given`), else None: its
+    answer is words, or data for a surface (MacroCOSM OES 18.4.7), though the question's kind is text."""
+    if not isinstance(about, str) or "#" not in about:
+        return None
+    item, _, fpath = about.partition("#")
+    return fpath if fpath in CASE_FIELDS and item.startswith("P:case/") else None
 
 
 def _scalar_text(v: Any) -> str:
@@ -2798,6 +2832,10 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
     cand = led.copy()
     wrote: list[str] = []
 
+    taken = _taken_back(cand, question, w, value if not (unknown or declined) else None, sid, conf)
+    if taken is not None:                           # a hand edit taken back: the item read from the code, or nothing
+        return _commit(led, cand, taken, checker) if taken else Folded()
+
     if w.form == "span":
         if unknown or declined:
             return Folded()
@@ -2907,6 +2945,38 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
     _provenance_answered(d, fpath, sid, conf)
     wrote.append(addr)
     return _commit(led, cand, wrote, checker)
+
+
+#: A hand edit taken back (keeping in step, MacroCOSM OES 18.4.1; `enough/fabulac_entail.py` `take_back`): a choice
+#: question raised from `take-back`, whose `proposed` carries the item read from the edited file. Its answer `take it
+#: back` writes that item (a new one, or over the item of the same id), `stance: observed`; `leave it out` writes nothing.
+TAKE_BACK = "take-back"
+TAKE_IT_BACK = "take it back"
+LEAVE_IT_OUT = "leave it out"
+
+
+def _taken_back(cand: Ledger, question: dict | None, w: Where, value: Any, sid: str, conf: Any) -> list[str] | None:
+    """None when the question is not a take-back's; else the ids written into `cand` ([] for nothing written)."""
+    q = question or {}
+    prop = q.get("proposed")
+    if (q.get("raised") or {}).get("from") != TAKE_BACK or not isinstance(prop, dict) \
+            or not isinstance(prop.get("item"), dict) or w.form not in ("item", "kind", "module"):
+        return None
+    if value != TAKE_IT_BACK:
+        return []
+    item = copy.deepcopy(prop["item"])
+    item["stance"] = "observed"                     # taken back from code: it is how the code is (Thym 20.11)
+    prov = item.get("provenance") if isinstance(item.get("provenance"), dict) else {}
+    sources = [s for s in (prov.get("sources") or []) if isinstance(s, str)]
+    item["provenance"] = {**prov, "mode": prov.get("mode") or "derived",
+                          "sources": sources + ([sid] if sid and sid not in sources else []),
+                          "confidence": conf if conf is not None else prov.get("confidence", 1)}
+    at = next((i for i, d in enumerate(cand.items) if d.get("id") == item.get("id")), None)
+    if at is None:
+        cand.add(item)
+    else:
+        cand.items[at] = item
+    return [str(item["id"])]
 
 
 def _apply_reread(led, cand, index, question, answer, reread, sid, conf, checker) -> Folded:

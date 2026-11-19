@@ -1,0 +1,14 @@
+thym 1
+
+program entail-authored-python
+  why: a fabulac its person authored, entailed as the program they can start: the sources, the tests its
+       cases give, and the pages on running it.
+  must: nothing is fetched or installed; the tests are written by rules, from the cases.
+  decided 2026-11-14: run and serve for an authored fabulac; serving is refused in this edition.
+
+  takes f: fabula
+  gives code: folder, manual: short
+
+  give code: entail f as code                      -- the entailment: sources, tests from the cases, its pages
+  give manual: entail f as manual                  -- the catem at its deepest
+end

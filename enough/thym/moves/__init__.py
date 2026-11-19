@@ -18,7 +18,10 @@ holds that code, one module per subject, as THYM.md 11.2 lays it out:
 - `transconceive`: transconception's cases (THYM 20.10), `entail f as cases`, `gather recorded with f`, `gather
   verdict with f`, and the checks `cases-whole`, `source-named`, `evidence-stated`;
 - `author`: authoring a fabulac (THYM 20.11), `author`, `add`, `compare`, `uncovered`, and the check
-  `authored-source`.
+  `authored-source`;
+- `authored_code`: an authored fabulac entailed as its program (THYM 20.7, `entail-authored-python`), reached from
+  `code`'s `entail … as code` by one dispatch line; the rules writers of its tests, `pyproject.toml`, `RUNNING.md` and
+  `ENTAILED.md`, and the check `cases-entailed`.
 
 Importing any of them imports them all, so every move and every check is registered once (`registry.MOVES`,
 `checks.CHECKS`). The deterministic moves transcode in code and never touch the coprocessor. A move that transcognizes
@@ -685,7 +688,7 @@ def as_list(v: Any) -> list:
 
 # Every module registers its moves and checks when imported; importing one imports them all. `project` stays out: it
 # implements moves a MiniCOSM declares with `code:`, so `load_all` imports it from the sidecar and a host's `code:` wins.
-from enough.thym.moves import author, doc, edit, emf, morph, pack, transconceive, verse  # noqa: E402,F401
+from enough.thym.moves import author, authored_code, doc, edit, emf, morph, pack, transconceive, verse  # noqa: E402,F401
 
 __all__ = ["LADDER", "RANK", "SALIENCE", "CoverMap", "EngineAdapter", "MoveError", "Sentence", "claim_bearing",
            "compose", "cover_map", "engine", "fabula_doc", "fabula_for", "first_input", "fold", "item_kind",

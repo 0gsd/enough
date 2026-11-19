@@ -38,8 +38,10 @@ CHECKS = (
 #   authored-source (0.8): an authored fabulac's source and items (enough/thym/moves/author.py)
 #   ground-cited (0.8): every reliance on the language or its runtime cites where its gift is written
 #     (enough/thym/moves/transconceive.py)
-# All three are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
-AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited")
+#   cases-entailed (0.8): every case of an authored fabulac entailed as a test, or named why not
+#     (enough/thym/moves/authored_code.py)
+# All are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
+AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited", "cases-entailed")
 
 # The moves a shipped declaration names ahead of the bundled text's 6.3 table (an approved text the bundled copy does
 # not hold yet). A test holds each to being no row of that table, so it leaves this list the day the text is synced.
