@@ -204,6 +204,7 @@ def build_router(ctx: AppContext) -> APIRouter:
                               message=f"running {'the tests' if what == 'tests' else run.program.name} in the sandbox",
                               extra={"run": run.run_id, "what": what})
         except Exception as e:  # noqa: BLE001 - CanonJobError carries its status
+            _ff._sb.discard(run)                # never run: its folder goes now
             raise _http(e) from None
         return {"job": snap, "run": run.run_id}
 

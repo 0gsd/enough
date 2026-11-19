@@ -1725,6 +1725,15 @@ def create_app(
             yield
             return
         session.client = httpx.AsyncClient()
+        # 0.8: sandbox run folders a crash or a stopped app left behind, older than a day, are swept (each run's
+        # folder is removed as soon as its result is read; ENOUGH_SANDBOX_KEEP keeps them for debugging).
+        from . import sandbox as _sandbox_sweep
+        try:
+            swept = await asyncio.to_thread(_sandbox_sweep.sweep)
+            if swept:
+                log.info("sandbox: swept %d stale run folder(s)", len(swept))
+        except Exception:  # noqa: BLE001 — never block startup on a sweep
+            log.exception("sandbox: sweeping stale run folders failed")
         # Opening a project is what stamps `last_opened` — and registers it
         # if it predates the registry, which is how an old project first
         # appears on the home screen (home-plan §6).

@@ -624,3 +624,51 @@ def test_an_owners_code_run_reads_the_venv_and_nothing_more(tmp_path):
     r2 = sb.run_tool(run2, limits=sb.Limits(wall=60, grace=1))
     assert "ModuleNotFoundError" in r2.stderr and "YAML" not in r2.stdout
     assert r2.guarantees["packages"] == "standard-library"
+
+
+# ---- run folders: discarded once read, swept when stale, kept on the seam (W5-XF2) ------------------------------
+
+def test_a_run_folder_is_discarded_and_stale_ones_are_swept(tmp_path, monkeypatch):
+    monkeypatch.delenv("ENOUGH_SANDBOX_KEEP", raising=False)
+    root = tmp_path / "runs"
+    run = sb.prepare(entailed(tmp_path, "print('hi')\n"), source_kind="authored", root=root)
+    assert run.folder.is_dir()
+    with sb._LOCK:                                      # still running: kept
+        sb._LIVE[run.run_id] = None
+    try:
+        assert sb.discard(run) is False and run.folder.is_dir()
+    finally:
+        with sb._LOCK:
+            sb._LIVE.pop(run.run_id, None)
+    assert sb.discard(run) is True and not run.folder.exists()
+    # the sweep: run folders older than a day go; a fresh one, a live one and anything not named as a run stay
+    old, fresh, live = "20261101-120000-0000000a", "20261101-120000-0000000b", "20261101-120000-0000000c"
+    for n in (old, fresh, live, "not-a-run"):
+        (root / n / "work").mkdir(parents=True)
+    now = time.time()
+    for n in (old, live, "not-a-run"):
+        os.utime(root / n, (now - 2 * sb.STALE_AFTER, now - 2 * sb.STALE_AFTER))
+    with sb._LOCK:
+        sb._LIVE[live] = None
+    try:
+        assert sb.sweep(root, now=now) == [old]
+    finally:
+        with sb._LOCK:
+            sb._LIVE.pop(live, None)
+    assert sorted(p.name for p in root.iterdir()) == sorted([fresh, live, "not-a-run"])
+    assert sb.sweep(tmp_path / "nowhere") == []
+
+
+def test_the_seam_keeps_run_folders_for_debugging(tmp_path, monkeypatch):
+    root = tmp_path / "runs"
+    run = sb.prepare(entailed(tmp_path, "print('hi')\n"), source_kind="authored", root=root)
+    stale = root / "20261101-120000-0000000a"
+    stale.mkdir()
+    os.utime(stale, (0, 0))
+    monkeypatch.setattr(sb, "KEEP_RUNS", True)
+    assert sb.discard(run) is False and sb.sweep(root) == [] and run.folder.is_dir() and stale.is_dir()
+    monkeypatch.setattr(sb, "KEEP_RUNS", False)
+    monkeypatch.setenv("ENOUGH_SANDBOX_KEEP", "1")
+    assert sb.discard(run) is False and sb.sweep(root) == []
+    monkeypatch.setenv("ENOUGH_SANDBOX_KEEP", "0")
+    assert sb.sweep(root) == [stale.name] and sb.discard(run) is True

@@ -82,6 +82,7 @@ BEHAVIOUR_SEAMS: tuple[str, ...] = (
     "ENOUGH_DESKTOP_LLM_URL",    # shell: the llama-server URL the desktop app hands the backend
     "ENOUGH_VULKAN_ICD_DIRS",    # shell: llama_server.sh's Vulkan driver folders
     "ENOUGH_REPO_URL",           # shell: bootstrap.sh's clone source
+    "ENOUGH_SANDBOX_KEEP",       # sandbox.keeping: keep every sandbox run folder for debugging (no discard, no sweep)
 )
 
 # Variables read under enough/ that are plain flags, naming no path and no service, so they need no seam. Each

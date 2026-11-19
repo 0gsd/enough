@@ -448,6 +448,62 @@ def default_root() -> Path:
     return Path(thym) / "sandbox"
 
 
+#: Run folders are removed once their result is read and the run is over (`discard`), and those left behind (a crash,
+#: a stop of the app) are swept at app start when older than this many seconds (`sweep`).
+STALE_AFTER = 24 * 60 * 60
+#: Set True (or export ENOUGH_SANDBOX_KEEP=1) to keep every run folder for debugging: nothing is discarded or swept.
+KEEP_RUNS = False
+_RUN_ID = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{8}$")
+
+
+def keeping() -> bool:
+    """Whether run folders are kept (the seam `KEEP_RUNS`, or ENOUGH_SANDBOX_KEEP set to anything but 0 or empty)."""
+    return KEEP_RUNS or os.environ.get("ENOUGH_SANDBOX_KEEP", "").strip() not in ("", "0")
+
+
+def discard(run: Run) -> bool:
+    """Remove a run's folder once its result has been read and the run is over; False (nothing removed) while it
+    runs, when folders are kept, or when the folder is not a run folder."""
+    if keeping():
+        return False
+    with _LOCK:
+        if run.run_id in _LIVE:
+            return False
+    folder = Path(run.folder)
+    if not _RUN_ID.match(folder.name) or folder.name != run.run_id or not folder.is_dir() or folder.is_symlink():
+        return False
+    shutil.rmtree(folder, ignore_errors=True)
+    return not folder.exists()
+
+
+def sweep(root: str | os.PathLike | None = None, *, older_than: float = STALE_AFTER,
+          now: float | None = None) -> list[str]:
+    """Remove the run folders under `root` (default `default_root()`) last changed more than `older_than` seconds
+    ago and not running: what a crash or a stopped app left behind. Only folders named as runs are touched. Returns
+    the run ids removed (none when folders are kept)."""
+    if keeping():
+        return []
+    root = Path(root) if root is not None else default_root()
+    if not root.is_dir():
+        return []
+    now = time.time() if now is None else now
+    with _LOCK:
+        live = set(_LIVE)
+    gone: list[str] = []
+    for e in os.scandir(root):
+        if not _RUN_ID.match(e.name) or e.name in live or e.is_symlink() or not e.is_dir(follow_symlinks=False):
+            continue
+        try:
+            age = now - e.stat(follow_symlinks=False).st_mtime
+        except OSError:
+            continue
+        if age > older_than:
+            shutil.rmtree(e.path, ignore_errors=True)
+            if not os.path.exists(e.path):
+                gone.append(e.name)
+    return sorted(gone)
+
+
 def _tree_size(*folders: Path) -> int:
     total = 0
     for f in folders:

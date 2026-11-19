@@ -443,6 +443,7 @@ def execute(project_dir: Path, fab: Path, run: _sb.Run, *, what: str, args: Iter
         raise FirstError(e.sentence, 409) from None
     finally:
         done.set()
+        _sb.discard(run)                # the result is read and the run is over: its folder goes (unless kept)
     out = _summary(what, res)
     out["fabulac"] = _rel(project_dir, fab)
     out["run"] = run.run_id

@@ -466,6 +466,36 @@ def test_stop_stops_a_sandbox_run_through_its_job(client: TestClient, project: P
         assert snap["result"]["stopped_by"] == "request"
 
 
+def test_a_run_s_folder_goes_once_its_result_is_read(project: Path, scripted: None):
+    """W5-XF2: sandbox run folders were never swept; a run's folder is removed once its result is read."""
+    begun(project, "tool")
+    FF.entail(project, "tally", now=NOW)
+    fab, run = FF.prepare(project, "tally", what="tests")
+    assert run.folder.is_dir()
+    if MAC:
+        out = FF.execute(project, fab, run, what="tests")
+        assert out["ok"] and out["run"] == run.run_id
+    else:
+        with pytest.raises(FF.FirstError):
+            FF.execute(project, fab, run, what="tests")
+    assert not run.folder.exists()
+
+
+def test_the_apps_start_sweeps_stale_sandbox_run_folders(project: Path, tmp_path: Path,
+                                                         monkeypatch: pytest.MonkeyPatch):
+    root = sb.default_root()
+    stale, fresh = root / "20261101-120000-0000000a", root / "20261118-120000-0000000b"
+    for d in (stale, fresh):
+        (d / "work").mkdir(parents=True)
+    os.utime(stale, (time.time() - 2 * sb.STALE_AFTER,) * 2)
+    live = tmp_path / "live-models.json"
+    live.write_text(json.dumps({"current": "g40-04"}), encoding="utf-8")
+    monkeypatch.setattr(models, "LIVE_STATE", live)
+    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False)):
+        assert not stale.exists() and fresh.is_dir()
+    FT.configure()
+
+
 def test_the_apps_shutdown_stops_every_sandbox_run(project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     called: list[bool] = []
     monkeypatch.setattr(sb, "stop_all", lambda: called.append(True))
