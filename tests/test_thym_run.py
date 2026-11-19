@@ -744,6 +744,27 @@ def test_cli_check_and_help(capsys):
     assert "conform" in capsys.readouterr().out
 
 
+def test_a_recorded_engine_refusal_leaves_the_next_call_top_level(tmp_path):
+    """An engine call that refuses (`EngineRefusal`) is not recorded, and lowers the node's depth again, so a later
+    call of the same node is still recorded as its own."""
+    from enough.thym.engines import CallCounter, EngineRefusal, Recording
+    counter = CallCounter("3")
+
+    def refuses():
+        raise EngineRefusal(Refusal("run", "replay", "no"))
+    rec = Recording({"x": lambda: 1}, tmp_path, lambda: counter)
+    with pytest.raises(EngineRefusal):
+        rec.call("x", refuses, (), {})
+    assert counter.depth == 0
+    assert rec.call("x", lambda: 7, (), {}) == 7
+    assert [p.name for p in (tmp_path / "candidates").iterdir()] == ["3-e2.1.cosm"]
+
+
+def test_trace_show_reads_a_record_without_an_id():
+    vol = {"nodes": [{"type": "trace", "summary": "ran p"}, {"type": "record", "move": "count", "engine": "code"}]}
+    assert T.show(vol).splitlines()[1].startswith("  None ")
+
+
 def test_conform_reports_the_suite(tmp_path):
     rep = conform.conform(SUITE, root=tmp_path / "conform-root")
     assert rep.lines and rep.summary().startswith("conform: ")
