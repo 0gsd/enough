@@ -306,17 +306,23 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
     code: enough.thym.moves.pack:isomorph_of
     says: the morph a package carries, the author's shared one, or nothing
   # thym 1 only (since: 1; docs/THYM.md, 6.3, 20 to 22): the dialectic's three, the editing moves, and four helpers
-  - name: gather
-    takes: ['list of fabula | list of item']
+  - name: gather                      # a folder or a text: what transconception's outside tools leave (THYM 20.10)
+    takes: ['list of fabula | list of item | folder | text']
     gives: same-as-with
     modifiers: {with: 'fabula | volume'}
     contract: [nothing-lost, ids-unique, fabula-checks, provenance]
+    gives-when:                         # gather recorded with f: a recording folder read into f's cases file
+      - {takes: folder, gives: text}
+    contract-when:                      # gather verdict with f: a verdict read into its cshort's evidence
+      - {takes: folder, contract: [cases-whole, source-named, provenance]}
+      - {takes: text, contract: [evidence-stated, provenance]}
     code: enough.thym.moves.edit:gather
     says: the with volume with every part in it, nothing lost
     since: 1
   - name: question
     takes: ['fabula | volume']
     gives: list of item
+    modifiers: {in: string}             # the target language the rulings are asked for (THYM 6.3, 20.10)
     asks: true
     contract: [addressed, no-duplicate, provenance]
     scaffold: bank
@@ -338,7 +344,7 @@ moves:                                  # the moves thym/1 owns (docs/THYM.md, s
       - {takes: fabula, gives: fabula}
       - {takes: volume, gives: volume}
     asks: true
-    contract: [addressed, only-the-asked, fabula-checks, provenance]
+    contract: [addressed, only-the-asked, ruled, fabula-checks, provenance]
     scaffold: direct
     code: enough.thym.moves.dialectic:settle
     says: every answered question folded into the item it is about

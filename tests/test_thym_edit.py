@@ -543,13 +543,18 @@ def test_the_declarations_are_the_texts_table():
     """THYM 6.3's second table, row by row (and design 3.2's, which `test_thym_shipped` copies as scratch)."""
     d = dc.load().view(1)
     row = {n: (d[n].takes, d[n].gives, dict(d[n].modifiers), d[n].asks, d[n].contract, d[n].scaffold) for n in NEW}
-    assert row["gather"] == ((("list of fabula", "list of item"),), ("same-as-with",), {"with": ("fabula", "volume")},
-                             False, ("nothing-lost", "ids-unique", "fabula-checks", "provenance"), None)
-    assert row["question"] == ((("fabula", "volume"),), ("list of item",), {}, True,
+    # 0.8: a folder (a recorder's record) gives a text, the cases file; a text (a runner's verdict) gives a fabula
+    assert row["gather"] == ((("list of fabula", "list of item", "folder", "text"),), ("same-as-with",),
+                             {"with": ("fabula", "volume")}, False,
+                             ("nothing-lost", "ids-unique", "fabula-checks", "provenance"), None)
+    assert d["gather"].gives_when == (("takes", ("folder",), ("text",)),)
+    assert d["gather"].contract_when == (("takes", ("folder",), ("cases-whole", "source-named", "provenance")),
+                                         ("takes", ("text",), ("evidence-stated", "provenance")))
+    assert row["question"] == ((("fabula", "volume"),), ("list of item",), {"in": ("string",)}, True,
                                ("addressed", "no-duplicate", "provenance"), "bank")
     assert row["record"] == ((("volume",),), ("same-as-in",), {"in": ("fabula", "volume")}, False,
                              ("addressed", "only-the-asked", "provenance"), None)
-    assert row["settle"][3:] == (True, ("addressed", "only-the-asked", "fabula-checks", "provenance"), "direct")
+    assert row["settle"][3:] == (True, ("addressed", "only-the-asked", "ruled", "fabula-checks", "provenance"), "direct")
     assert row["lines"] == ((), ("list of line",), {"of": ("text", "short")}, False, (), None)
     assert row["replace"] == ((("line",),), ("change",), {"with": ("string", "line", "short")}, False, (), None)
     assert row["insert"][2] == {"before": ("line",), "after": ("line",)}

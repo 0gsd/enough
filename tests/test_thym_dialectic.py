@@ -791,3 +791,34 @@ def test_a_request_keeps_an_interface_with_its_behaviours_shows_no_bookkeeping_a
     for sent in asker.sent:
         for q in pend:
             assert q["asks"] in sent["inputs"]["asked"].payload
+
+
+# ---------------------------------------------------------------------------
+# `ruled` in settle's contract (THYM 6.3, 7.3; 0.8)
+# ---------------------------------------------------------------------------
+
+def test_ruled_is_settles_and_its_copy_of_the_needs_is_transconceptions():
+    from enough import transconception as tc
+    from enough.thym import declarations as dc
+    from enough.thym.moves import dialectic as DM
+    assert "ruled" in dc.load()["settle"].view(1).contract
+    assert {k: list(v) for k, v in DM.RULING_NEEDS.items()} == tc.DEFAULTS["ruling-needs"]
+    assert list(DM.ALLOWANCES) == tc.DEFAULTS["allowances"]
+
+
+def test_ruled_holds_a_written_ruling_to_what_its_word_needs():
+    from enough.thym.checks import CHECKS as REG
+    from enough.thym.values import Value
+    fn = REG.lookup("ruled")
+    items = [{"id": "C:interface/a", "type": "interface", "ruling": [{"is": "kept"}]},
+             {"id": "C:behaviour/b", "type": "behaviour", "ruling": [{"pending": "ask"}]},          # not yet: no fault
+             {"id": "C:behaviour/c", "type": "behaviour", "ruling": [{"is": "alike", "allowing": "exit-only"}]}]
+    cat = {"oes": "emf/1", "id": "fabula/x", "name": "x", "purpose": "transconception", "nodes": items}
+    assert fn(Value("fabula", cat), {}, {}, None, None) == (True, "")
+    bad = [*items, {"id": "C:behaviour/d", "type": "behaviour", "ruling": [{"is": "changed"}]},
+           {"id": "C:behaviour/e", "type": "behaviour", "ruling": [{"is": "alike", "allowing": "close-enough"}]}]
+    ok, why = fn(Value("fabula", {**cat, "nodes": bad}), {}, {}, None, None)
+    assert not ok and "C:behaviour/d ruling[0]: a ruling changed says to" in why and "close-enough" in why
+    other = {**cat, "nodes": bad}
+    other.pop("purpose")
+    assert fn(Value("fabula", other), {}, {}, None, None)[0] is True                # any other volume: nothing to check

@@ -120,6 +120,7 @@ nodes:
   checks:
   - addressed
   - only-the-asked
+  - ruled
   - fabula-checks
   - provenance
   provenance:

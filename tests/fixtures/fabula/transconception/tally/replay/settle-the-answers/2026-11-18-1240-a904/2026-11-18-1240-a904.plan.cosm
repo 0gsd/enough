@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2208-650c
+id: thym/2026-11-19-0035-650c
 name: settle-the-answers on tally.2-asked.fabulac.cosm
 program:
   name: settle-the-answers
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2208-650c
+- id: R:plan/2026-11-19-0035-650c
   type: plan
   name: settle-the-answers on tally.2-asked.fabulac.cosm
   summary: Two nodes, one of which asks the model.

@@ -1116,6 +1116,63 @@ def _only_the_asked(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any
     return True, ""
 
 
+
+#: What a ruling's word needs, and the closed list of an `alike`'s allowances (MacroCOSM OES 18.4.2, 18.4.9): the
+#: fabula manifest's `transconception` block as shipped. This module imports nothing of enough's but MacroCOSM, so it
+#: keeps its own copy, read only when the volume carries no manifest; a test holds it to enough's transconception.py.
+RULING_NEEDS = {"alike": ("allowing",), "free": ("because|said",), "kept-wrong": ("because|said",), "changed": ("to",)}
+ALLOWANCES = ("exit-only", "exit-and-stdout", "stderr-said-or-not", "lines-in-any-order", "own-types")
+
+
+def ruling_problems(cat: dict, items: list[dict], block: dict | None = None) -> list[str]:
+    """`ruled` over a fabula as data (THYM 7.3): of a fabulac kept for transconception (`purpose: transconception`),
+    every ruling written (an entry with its word `is`, not a pending one) says what its word needs, `alike` an
+    allowance of the closed list; nothing for any other volume. A ruling not yet written is no fault here: a question
+    about it that stands leaves the item unruled, which the gate reads, not this check."""
+    if not isinstance(cat, dict) or cat.get("purpose") != "transconception":
+        return []
+    blk = block if isinstance(block, dict) else {}
+    needs = blk.get("ruling-needs") if isinstance(blk.get("ruling-needs"), dict) else RULING_NEEDS
+    allowances = set(blk.get("allowances") if isinstance(blk.get("allowances"), list) else ALLOWANCES)
+    out: list[str] = []
+    for it in items:
+        rulings = it.get("ruling") if isinstance(it, dict) else None
+        if isinstance(rulings, dict):
+            rulings = [rulings]
+        if not isinstance(rulings, list):
+            continue
+        for i, x in enumerate(rulings):
+            if not isinstance(x, dict) or "pending" in x or not x.get("is"):
+                continue
+            for k in needs.get(str(x["is"]), ()):
+                alts = str(k).split("|")                      # a|b: either will do
+                if not any(x.get(a) for a in alts):
+                    out.append(f"{it.get('id')} ruling[{i}]: a ruling {x['is']} says {' or '.join(alts)}")
+            if x["is"] == "alike" and x.get("allowing") and x["allowing"] not in allowances:
+                out.append(f"{it.get('id')} ruling[{i}]: {x['allowing']!r} is no allowance of the closed list "
+                           f"({', '.join(sorted(allowances))})")
+    return out
+
+
+@check("ruled")
+def _ruled(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Every ruling written in a fabulac kept for transconception says what its word needs (THYM 7.3; `settle` keeps
+    it, refusing such a write and asking again by a counter question); of any other volume it holds with nothing to
+    check."""
+    cat, items = fabula_doc(output)
+    if cat.get("purpose") != "transconception":
+        return True, "not kept for transconception: nothing to check"
+    p = output.payload if isinstance(output, Value) else None
+    block = None
+    if isinstance(p, mc.Volume) and p.manifest is not None:
+        block = p.manifest._block("transconception") or None
+    problems = ruling_problems(cat, items, block)
+    if problems:
+        more = f" (and {len(problems) - 2} more)" if len(problems) > 2 else ""
+        return False, "; ".join(problems[:2]) + more
+    return True, ""
+
+
 __all__ = ["FLAVOURS", "FUNCTIONS", "PROMPTS", "about_why", "bank", "direct", "only_the_asked", "proposal_problem",
            "question", "question_code_messages", "question_messages", "question_prose_messages",
-           "question_verse_messages", "record", "settle", "settle_messages"]
+           "question_verse_messages", "record", "ruling_problems", "settle", "settle_messages"]
