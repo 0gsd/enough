@@ -566,6 +566,39 @@ def stash_for_undo(target: Path) -> bool:
     return True
 
 
+def _replace_global_link(project_dir: Path, rel: str) -> bool:
+    """`rness/paradigms/<name>.md` and `rness/metaparadigms/<name>.md` only:
+    where a global link sits, remove the link so the write makes the
+    project's own file. True when a link was removed. Every other path keeps
+    the refusal (a write through a link escapes the project)."""
+    p = Path(rel).expanduser()
+    if ".." in p.parts:
+        return False
+    if p.is_absolute():
+        root = project_dir.resolve(strict=False)
+        try:
+            p = p.relative_to(root)
+        except ValueError:
+            try:
+                p = p.relative_to(project_dir)
+            except ValueError:
+                return False
+    if len(p.parts) != 3 or p.parts[0] != "rness" \
+            or p.parts[1] not in ("paradigms", "metaparadigms") or p.suffix != ".md":
+        return False
+    link = project_dir / p
+    if not link.is_symlink():
+        return False
+    if not (link.parent.resolve(strict=False) == (project_dir / "rness" / p.parts[1]).resolve(strict=False)
+            and (project_dir / "rness").resolve(strict=False) == project_dir.resolve(strict=False) / "rness"):
+        return False
+    try:
+        link.unlink()
+    except OSError:
+        return False
+    return True
+
+
 def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("write_file", "", False, "error: missing <path>")
@@ -582,6 +615,7 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         else (project_dir / _raw).resolve(strict=False)
     if (why := _canon.catalog_write_denial(_cand, project_dir)):
         return ToolResult("write_file", call.path, False, why)
+    unlinked = _replace_global_link(project_dir, call.path)
     try:
         # Absolute paths require the stricter file-rw allowlist; relative
         # paths are always project-contained as before.
@@ -612,6 +646,8 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
     body = call.content
     if body.startswith("\n"):
         body = body[1:]
+    from . import prompt as _prompt
+    body, stamp_warning = _prompt.stamp_metaparadigm_on_save(target, body)
     target.parent.mkdir(parents=True, exist_ok=True)
     # Always stash the previous contents so the most recent write can
     # be undone — the user-facing "save or undo?" affordance in
@@ -638,6 +674,11 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
             f"be updated again.",
         )
     note = f" — and exported it over {sync['original']}" if sync else ""
+    if unlinked:
+        note += (" — the global link there is replaced by this project's own "
+                 "copy, holding your text")
+    if stamp_warning:
+        note += " — " + stamp_warning
     return ToolResult(
         "write_file", call.path, True,
         f"ok — wrote {len(body)} bytes to {call.path}{note}",

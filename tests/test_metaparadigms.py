@@ -387,3 +387,75 @@ def test_faces_follow_the_project_s_skills_in_both_profiles(project: Path):
         system = prompt.assemble_system_prompt(project, profile=profile)
         assert "TRANSLATOR-FACE nllb_optin: true" in system, profile
         assert "FABULA-FACE" not in system, profile
+
+
+# --- W3-PF: stamp on save, writing over a link, the SKILL.md sentence -------
+
+def _write(project: Path, rel: str, content: str):
+    from enough import tools
+    return tools.run_write_file(project, tools.ToolCall(name="write_file", path=rel, content=content, command=None, url=None, extra={}, raw="", span=(0, 0)))
+
+
+def _proj(tmp_path: Path) -> Path:
+    proj = tmp_path / "proj"
+    _paradigm(proj / "rness" / "paradigms", "aa", "alpha body")
+    _paradigm(proj / "rness" / "paradigms", "bb", "beta body")
+    return proj
+
+
+def test_write_file_stamps_a_metaparadigm_on_save(tmp_path):
+    proj = _proj(tmp_path)
+    r = _write(proj, "rness/metaparadigms/aa+bb.md", "---\nmembers: aa bb\n---\n\nthe text\n")
+    assert r.ok, r.body
+    saved = (proj / "rness/metaparadigms/aa+bb.md").read_text()
+    want = prompt.metaparadigm_front_matter(proj / "rness" / "paradigms", ["aa", "bb"])
+    assert saved.startswith(want) and "the text" in saved
+    # a stale stamp is refreshed
+    (proj / "rness/paradigms/aa.md").write_text("---\nname: aa\n---\n\nchanged\n")
+    _write(proj, "rness/metaparadigms/aa+bb.md", saved.replace("sha256:", "sha256:0"))
+    again = (proj / "rness/metaparadigms/aa+bb.md").read_text()
+    assert prompt.metaparadigm_stale_members(again, "aa+bb", proj / "rness/paradigms") == []
+
+
+def test_stamp_warns_and_keeps_text_when_a_member_is_missing(tmp_path):
+    proj = _proj(tmp_path)
+    text = "---\nmembers: aa zz\n---\n\nbody\n"
+    r = _write(proj, "rness/metaparadigms/aa+zz.md", text)
+    assert r.ok and "warning" in r.body and "zz" in r.body
+    assert (proj / "rness/metaparadigms/aa+zz.md").read_text() == text
+
+
+def test_the_page_save_stamps_too(tmp_path):
+    proj = _proj(tmp_path)
+    t = proj / "rness/metaparadigms/aa+bb.md"
+    t.parent.mkdir(parents=True)
+    out, warn = prompt.stamp_metaparadigm_on_save(t, "---\nmembers: aa bb\n---\n\nx\n")
+    assert warn is None and "fingerprint.aa: sha256:" in out and "fingerprint.bb: sha256:" in out
+    other = proj / "rness/notes.md"
+    assert prompt.stamp_metaparadigm_on_save(other, "hi") == ("hi", None)
+
+
+def test_write_over_a_link_in_the_two_folders_only(tmp_path):
+    proj = _proj(tmp_path)
+    glob = tmp_path / "glob"
+    glob.mkdir()
+    (glob / "gg.md").write_text("global\n")
+    (proj / "rness" / "metaparadigms").mkdir()
+    for rel in ("rness/paradigms/gg.md", "rness/metaparadigms/aa+bb.md"):
+        (proj / rel).symlink_to(glob / "gg.md")
+        r = _write(proj, rel, "mine\n" if "metap" not in rel else "---\nmembers: aa bb\n---\n\nmine\n")
+        assert r.ok and "replaced" in r.body, r.body
+        assert not (proj / rel).is_symlink() and "mine" in (proj / rel).read_text()
+    assert (glob / "gg.md").read_text() == "global\n"
+    # elsewhere the refusal stays
+    (proj / "rness" / "skills").mkdir()
+    (proj / "rness/skills/s.md").symlink_to(glob / "gg.md")
+    r = _write(proj, "rness/skills/s.md", "x")
+    assert not r.ok and (proj / "rness/skills/s.md").is_symlink()
+    assert (glob / "gg.md").read_text() == "global\n"
+
+
+def test_macrocosm_skill_says_authored_entailment_runs_in_the_sandbox():
+    s = (SHIPPED / "skills" / "macrocosm-oes" / "SKILL.md").read_text()
+    assert "Nothing read or entailed is ever run" not in s
+    assert "sandbox" in s and "did not author is read, never run" in s

@@ -2348,6 +2348,44 @@ def metaparadigm_front_matter(paradigms_dir: Path, members) -> str:
     return "\n".join(lines) + "\n"
 
 
+def stamp_metaparadigm_on_save(target: Path, text: str) -> tuple[str, str | None]:
+    """The save hook for a file under `rness/metaparadigms/` (a project's) or
+    `defaults/metaparadigms/` (the install's): fill in or refresh its
+    `fingerprint.<member>:` lines from the members' current bodies in the
+    sibling `paradigms/` folder. Returns (text, warning). A file whose
+    `members:` line names a paradigm that folder lacks comes back unchanged,
+    with a warning. Any other target comes back unchanged, no warning."""
+    folder = target.parent
+    if (folder.name != "metaparadigms" or folder.parent.name not in ("rness", "defaults")
+            or target.suffix != ".md"):
+        return text, None
+    paradigms_dir = folder.parent / "paradigms"
+    meta, body = _parse_paradigm_frontmatter(text)
+    listed = meta.get("members", "").strip()
+    members = sorted(_dedupe([m for m in re.split(r"[\s,+]+", listed) if m])) if listed \
+        else sorted(_dedupe(target.stem.split("+")))
+    missing = [m for m in members if not (paradigms_dir / f"{m}.md").is_file()]
+    if missing:
+        return text, (f"warning: not stamped: the paradigm(s) {', '.join(missing)} "
+                      f"named in members are not in this project's paradigms; "
+                      f"saved unchanged.")
+    head = metaparadigm_front_matter(paradigms_dir, members)
+    extra: list[str] = []
+    if meta:
+        lines = text.splitlines()
+        end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+        for raw in lines[1:end]:
+            k = raw.split(":", 1)[0].strip()
+            if ":" in raw and k != "members" and not k.startswith("fingerprint."):
+                extra.append(raw)
+    if extra:
+        head = head.rstrip("\n")[:-3] + "\n".join(extra) + "\n---\n"
+    out = head + ("\n" + body if body else "")
+    if text.endswith("\n") and not out.endswith("\n"):
+        out += "\n"
+    return out, None
+
+
 def metaparadigm_stale_members(text: str, stem: str, paradigms_dir: Path) -> list[str]:
     """The members of the metaparadigm `text` (file stem `stem`) whose
     fingerprint does not match the paradigm in `paradigms_dir`, or that are
