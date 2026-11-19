@@ -115,6 +115,14 @@ HTML and PDF, a deck as PPTX and PDF, a document as Markdown and PDF);
 mermaid diagrams; a fabulan or a fabulac; a prompt tailored for another
 creative engine the person names. Never pick the next link for them.
 
+## Outside enough
+
+In Claude Code, claude.ai or any other chat, read
+`references/engines/index.md` first: it picks the engine (an artifact with
+a store, one HTML file from `assets/scaffold.html`, or the chat alone) and
+says what `scripts/export.py` can make there. The lock and the check are in
+`references/lock.md`.
+
 ---
 
 ## A pile of notes: the outline

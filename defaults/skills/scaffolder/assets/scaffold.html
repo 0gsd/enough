@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Scaffold</title>
+<!--
+  The scaffold page: one self-contained file. A harness fills it by replacing
+  the content of ONE block, the script element of type application/json
+  whose id is "scaffold" (it appears once, below), with a scaffold's state
+  (or a plectrum) as JSON, in the shape
+  references/state.md gives "for a program" (scaffold_state.py json FILE, or
+  export.py fill FILE). Nothing else in this file changes.
+  Inside that block, write every "<" as < so the block cannot be closed early.
+
+  It saves to the page's own store when it has one (window.claude, collection
+  "plecs", one doc per box, and the doc "scaffold/state"), else to this
+  browser's localStorage, else nowhere (it says so). It loads no fonts, no
+  scripts, nothing from any network. It never writes into a field on anyone's
+  behalf: a field shows only the person's own words, saved or carried in the
+  state, and a fix the person accepts with a click.
+  The data contract is in references/engines/single-html.md.
+-->
+<style>
+:root {
+  --bg: #f4f5f7; --card: #ffffff; --ink: #16181d; --ink2: #4a4f5a; --ink3: #6f7581; --line: #dfe2e8;
+  --accent: #0a74a8; --warn: #b8005f; --done: #1c7a45; --chip: #ffe36b; --chip-ink: #16181d;
+  --field: #fbfbfc; --fixed: #8a909c; --lock: #5a4fcf;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121419; --card: #1a1d24; --ink: #eef0f4; --ink2: #b6bbc6; --ink3: #8f95a1; --line: #2d323c;
+  --accent: #4fc0f0; --warn: #ff6fbd; --done: #55c98d; --chip: #ffe36b; --chip-ink: #16181d;
+  --field: #14161b; --fixed: #8a909c; --lock: #a79dff; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121419; --card: #1a1d24; --ink: #eef0f4; --ink2: #b6bbc6; --ink3: #8f95a1; --line: #2d323c;
+  --accent: #4fc0f0; --warn: #ff6fbd; --done: #55c98d; --chip: #ffe36b; --chip-ink: #16181d;
+  --field: #14161b; --fixed: #8a909c; --lock: #a79dff; color-scheme: dark }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; overflow-x: hidden; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 20px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 22px; min-width: 0; }
+button { font: inherit; font-size: 14px; font-weight: 500; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--ink3); }
+button:disabled { opacity: .5; cursor: default; }
+button.small { font-size: 12.5px; padding: 3px 9px; border-radius: 6px; }
+button.primary { border-color: var(--accent); color: var(--accent); }
+button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; min-width: 0; }
+
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.mark { font-weight: 800; font-size: 22px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.where { font-family: var(--mono); font-size: 12.5px; color: var(--ink3); }
+.grow { flex: 1 1 auto; }
+.tally { font-size: 13px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.status { font-size: 13px; color: var(--ink3); min-width: 0; }
+.status[data-kind="warn"] { color: var(--warn); }
+.status[data-kind="ok"] { color: var(--done); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.how { font-size: 14px; color: var(--ink2); max-width: 70ch; margin: 0; }
+.banner { border: 1px solid var(--lock); color: var(--ink); background: var(--card); border-radius: 8px; padding: 10px 14px; font-size: 14px; display: grid; gap: 8px; }
+.banner .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty-page { border: 1.5px dashed var(--ink3); border-radius: 8px; padding: 24px; color: var(--ink2); }
+
+.frame { display: grid; gap: 10px; min-width: 0; }
+.frame-name { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink3); margin: 0; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.frame-id { font-family: var(--mono); font-weight: 400; letter-spacing: 0; text-transform: none; }
+.canvas { display: grid; gap: 12px; min-width: 0; }
+.frame[data-shape="slide"] .canvas { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; aspect-ratio: 16 / 9; align-content: start; container-type: inline-size; }
+.frame[data-shape="letter"] .canvas { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 22px; max-width: 760px; }
+.frame[data-notes] .canvas { opacity: .95; }
+.speaker { display: grid; gap: 10px; }
+.row { display: grid; gap: 12px; min-width: 0; }
+.c2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 860px) { .c4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .c3 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .c4, .c2 { grid-template-columns: minmax(0, 1fr); } }
+.frame-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.pl { min-width: 0; background: var(--card); border: 1.5px dashed var(--ink3); border-radius: 8px; padding: 11px 13px 13px; display: grid; gap: 8px; align-content: start; }
+.pl[data-state="draft"] { border-color: var(--ink2); }
+.pl[data-state="written"] { border-style: solid; border-color: var(--done); }
+.pl[data-state="over"] { border-color: var(--warn); }
+.pl[data-state="locked"] { border-style: solid; border-color: var(--line); }
+.pl-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pl-name { font-weight: 700; font-size: 14px; }
+.pl-id { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); }
+.pl-count { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--ink3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pl[data-state="written"] .pl-count { color: var(--done); }
+.pl[data-state="over"] .pl-count { color: var(--warn); }
+.plec { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink2); overflow-wrap: anywhere; }
+.pl textarea { width: 100%; resize: none; overflow: hidden; min-height: 44px; line-height: 1.45; padding: 9px 11px; }
+.pl textarea[readonly] { background: transparent; border-style: dashed; }
+textarea::placeholder, input::placeholder { color: var(--ink3); }
+.slot { border: 1.5px dashed var(--fixed); border-radius: 6px; display: grid; place-items: center; text-align: center; padding: 10px; color: var(--ink3); font-size: 13px; position: relative; overflow: hidden; min-height: 60px; max-height: 340px; }
+.slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slot .shape { font-family: var(--mono); font-size: 12px; }
+.href { width: 100%; font-size: 13px; }
+.out { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fixed { font-size: 13px; color: var(--ink2); border-top: 1px solid var(--line); padding-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.pl-fixed { font-family: var(--mono); font-size: 12px; color: var(--fixed); }
+.chip { font-family: var(--mono); font-size: 12px; background: var(--chip); color: var(--chip-ink); border-radius: 4px; padding: 2px 7px; }
+.box-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.finding { border-left: 3px solid var(--warn); padding: 6px 10px; font-size: 13px; display: grid; gap: 4px; background: var(--field); border-radius: 0 6px 6px 0; }
+.finding[data-status="accepted"], .finding[data-status="declined"] { border-left-color: var(--line); color: var(--ink3); }
+.finding[data-status="cannot be checked"] { border-left-color: var(--lock); }
+.finding .k { font-family: var(--mono); font-size: 11.5px; color: var(--ink3); }
+.finding q { font-family: var(--mono); }
+.finding .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+form.add, form.edit { display: grid; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+form.add label, form.edit label { display: grid; gap: 4px; font-size: 13px; color: var(--ink2); }
+form .line { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+form .line > label { flex: 1 1 140px; }
+#out textarea { width: 100%; min-height: 260px; font-family: var(--mono); font-size: 12.5px; }
+#out { display: grid; gap: 8px; }
+
+/* The reading view: the thing as it will read, the scaffold's own marks put away. */
+body:not(.reading) .out { display: none; }
+.reading .plec, .reading .pl textarea, .reading .pl-count, .reading .how, .reading .pl-head, .reading .frame-name,
+.reading .frame-tools, .reading .box-tools, .reading .findings, .reading .href, .reading form, .reading .tools .edit-only,
+.reading .frame[data-notes], .reading .slot .shape, .reading .slot .who { display: none; }
+.reading .pl { border: 0; background: transparent; padding: 0; }
+.reading .pl[data-empty] { border: 1.5px dashed var(--line); padding: 10px 12px; }
+.reading .pl[data-empty] .pl-head { display: flex; }
+.reading .pl[data-empty] .pl-name { font-weight: 500; color: var(--ink3); }
+.reading .pl[data-empty] .pl-id, .reading .pl[data-empty] .pl-count { display: none; }
+.reading .frame[data-shape="slide"] .canvas { padding: 4%; gap: 2cqw; position: relative; }
+.reading .canvas.placed .row { display: contents; }
+.reading .canvas.placed .pl[data-place] { position: absolute; overflow: hidden; }
+.reading .speaker .pl { font-size: 13px; color: var(--ink3); }
+.reading [data-as="title"] .out { font-weight: 800; font-size: clamp(30px, 6vw, 56px); line-height: 1.05; letter-spacing: -0.02em; }
+.reading [data-as="headline"] .out { font-weight: 800; font-size: clamp(26px, 5vw, 46px); line-height: 1.08; letter-spacing: -0.02em; }
+.reading [data-as="lede"] .out { font-size: clamp(18px, 2.6vw, 23px); color: var(--ink2); max-width: 46ch; }
+.reading [data-as="body"] .out { font-size: 17px; max-width: 68ch; }
+.reading [data-as="step"], .reading [data-as="tile"], .reading [data-as="deck"] { background: var(--card); border: 1px solid var(--line); padding: 16px; }
+.reading [data-as="step"] .pl-head, .reading [data-as="tile"] .pl-head, .reading [data-as="deck"] .pl-head { display: flex; }
+.reading [data-as="step"] .pl-name, .reading [data-as="tile"] .pl-name, .reading [data-as="deck"] .pl-name { font-weight: 800; font-size: 18px; color: var(--ink); }
+.reading [data-as="step"] .pl-id, .reading [data-as="tile"] .pl-id, .reading [data-as="deck"] .pl-id, .reading [data-as="step"] .pl-count, .reading [data-as="tile"] .pl-count, .reading [data-as="deck"] .pl-count { display: none; }
+.reading [data-as="call"] .out { font-weight: 700; font-size: 22px; }
+.reading [data-as="quote"] .out { font-style: italic; font-size: 20px; border-left: 3px solid var(--line); padding-left: 14px; }
+.reading [data-as="caption"] .out { font-size: 13px; color: var(--ink3); }
+.reading .frame[data-shape="slide"] [data-as="title"] .out { font-size: 6cqw; }
+.reading .frame[data-shape="slide"] [data-as="headline"] .out { font-size: 4.6cqw; }
+.reading .frame[data-shape="slide"] [data-as="lede"] .out { font-size: 2.6cqw; }
+.reading .frame[data-shape="slide"] [data-as="body"] .out, .reading .frame[data-shape="slide"] [data-as="step"] .out, .reading .frame[data-shape="slide"] [data-as="tile"] .out { font-size: 2.1cqw; }
+@media (prefers-reduced-motion: no-preference) { .pl { transition: border-color 120ms; } }
+@media print { .bar, .tools, .how, .banner, #out { display: none; } .frame { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <span class="mark" id="title">Scaffold</span>
+    <span class="where" id="where"></span>
+    <span class="grow"></span>
+    <span class="tally" id="tally"></span>
+    <span class="status" id="status" role="status" aria-live="polite">Loading what you wrote…</span>
+  </header>
+  <nav class="tools" aria-label="Scaffold">
+    <button id="mode" type="button" aria-pressed="false">Read it as the thing</button>
+    <button id="add-frame" class="edit-only" type="button">+ page</button>
+    <button id="lock" class="edit-only" type="button">Lock</button>
+    <button id="copy" type="button">Copy everything out</button>
+  </nav>
+  <p class="how" id="how">Each dashed box is a plecholder. The bracketed line is its plec: what that part has to get across. The number is a target, not a wall. Write in your own words; it saves as you type. Grey parts are fixed parts of the thing, not yours to write. A graphic box says what the picture must show and its shape; you supply the picture.</p>
+  <div id="banner"></div>
+  <main id="frames"></main>
+  <div id="add-frame-slot"></div>
+  <section id="out" hidden aria-label="Everything, as one markdown file">
+    <p class="how">This is the whole scaffold as one markdown file, your words included. Hand it to the readvisor, or to another harness, which picks the scaffold up from it.</p>
+    <textarea id="out-text" readonly aria-label="The scaffold as markdown"></textarea>
+    <div class="tools"><button id="out-save" type="button">Save as a file</button><button id="out-close" type="button">Close</button></div>
+  </section>
+</div>
+
+<script type="application/json" id="scaffold">null</script>
+
+<script>
+(function () {
+"use strict";
+
+/* ---- writer:start ----
+   The state's markdown writer (references/state.md), the same form
+   scripts/scaffold_state.py `dumps(model, "scaffold")` writes. Pure: it reads
+   the model and returns a string. A test runs this part alone. */
+var FRONT_KEYS = ["title", "thing", "for", "writes", "next", "shape", "unit", "lang", "aim"];
+var STATE_FRONT_KEYS = ["version", "parent", "locked", "checked"];
+var BOX_KEYS = ["as", "kind", "target", "shape", "row", "col", "place", "fixed", "chips", "plec-by", "state", "href", "plec"];
+var FINDING_KEYS = ["id", "box", "kind", "quote", "prefix", "suffix", "fix", "why", "status", "version"];
+var FINDING_ALWAYS = ["id", "box", "kind", "quote", "status", "version"];
+var ESCAPED = ["quote", "prefix", "suffix", "fix"];
+var plain = function (v) { return v === null || v === undefined ? "" : String(v); }
+var escapeValue = function (v) { return v.replace(/\\/g, "\\\\").replace(/\n/g, "\\n"); }
+var kv = function (k, v) { return plain(v) ? k + ": " + plain(v) : k + ":"; }
+var extras = function (obj) {
+  var out = [], ex = (obj && obj.extra) || {};
+  Object.keys(ex).forEach(function (k) { out.push(ex[k] ? k + ": " + ex[k] : k + ":"); });
+  return out;
+}
+var boxLines = function (box) {
+  var out = ["### " + box.id + " · " + box.name, "", "```plec"];
+  var values = {
+    "as": box.as, "kind": box.kind,
+    "target": (box.kind === "text" || (box.target !== null && box.target !== undefined)) ? box.target : null,
+    "shape": box.shape, "row": box.row, "col": box.col, "place": box.place, "fixed": box.fixed,
+    "chips": box.chips && box.chips.length ? box.chips.join(", ") : null,
+    "plec-by": box.plec_by || "readvisor", "state": box.state, "href": box.href, "plec": box.plec
+  };
+  BOX_KEYS.forEach(function (k) {
+    var v = values[k];
+    if (v === null || v === undefined) return;
+    out.push(kv(k, v));
+  });
+  out = out.concat(extras(box));
+  out.push("```", "");
+  if (box.text) {
+    box.text.split("\n").forEach(function (ln) { out.push(/^\\*#/.test(ln) ? "\\" + ln : ln); });
+    out.push("");
+  }
+  return out;
+}
+var dumpState = function (model) {
+  var meta = model.meta || {}, out = ["---", "scaffold: 1"];
+  FRONT_KEYS.concat(STATE_FRONT_KEYS).forEach(function (k) {
+    var v = meta[k];
+    if (k === "version" && (v === null || v === undefined)) v = 1;
+    out.push(plain(v) ? (k + ": " + plain(v)).replace(/\s+$/, "") : k + ":");
+  });
+  out = out.concat(extras(meta));
+  out.push("---", "", "# " + meta.title, "");
+  (model.frames || []).forEach(function (f) {
+    out.push("## " + f.name, "", "```frame", "id: " + f.id);
+    if (f.shape) out.push("shape: " + f.shape);
+    if (f.copy_of) out.push("copy-of: " + f.copy_of);
+    if (f.copy !== null && f.copy !== undefined) out.push("copy: " + f.copy);
+    out = out.concat(extras(f));
+    out.push("```", "");
+    (f.boxes || []).forEach(function (b) { out = out.concat(boxLines(b)); });
+  });
+  if (model.findings && model.findings.length) {
+    out.push("# Findings", "");
+    model.findings.forEach(function (fd) {
+      out.push("```finding");
+      FINDING_KEYS.forEach(function (k) {
+        var v = fd[k.replace(/-/g, "_")];
+        if ((v === null || v === undefined) && FINDING_ALWAYS.indexOf(k) < 0) return;
+        v = ESCAPED.indexOf(k) >= 0 && v !== null && v !== undefined ? escapeValue(String(v)) : plain(v);
+        out.push(v ? k + ": " + v : k + ":");
+      });
+      out = out.concat(extras(fd));
+      out.push("```", "");
+    });
+  }
+  while (out.length && out[out.length - 1] === "") out.pop();
+  return out.join("\n") + "\n";
+}
+/* ---- writer:end ---- */
+
+var AS_KNOWN = ["title", "headline", "lede", "body", "step", "tile", "deck", "call", "caption", "quote", "speaker", "notes"];
+var block = document.getElementById("scaffold");
+var framesEl = document.getElementById("frames");
+var statusEl = document.getElementById("status"), tallyEl = document.getElementById("tally");
+var bannerEl = document.getElementById("banner");
+var model = null, boxes = {}, prefix = "scaffold:", base = "", db = null, stateTimer = null, stateSaving = false, stateAgain = false;
+
+var el = function (tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== null && text !== undefined) n.textContent = text; return n; }
+var say = function (text, kind) { statusEl.textContent = text; statusEl.dataset.kind = kind || ""; }
+var stamp = function () { return new Date().toISOString().replace(/\.\d+Z$/, "Z"); }
+var slug = function (name) { return String(name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40).replace(/-+$/, ""); }
+var hash = function (s) { var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36) + "." + s.length; }
+var locked = function () { return !!(model && model.meta && model.meta.locked); }
+var isNotes = function (box) { return box.as === "notes"; }
+var frameIsNotes = function (f) { return f.boxes.length > 0 && f.boxes.every(isNotes); }
+var frameShape = function (f) { return f.shape || model.meta.shape || ({ deck: "slide", document: "letter" }[model.meta.thing] || "page"); }
+var unitWord = function (u) { return u === "w" ? "words" : "characters"; }
+var measure = function (text, unit) {
+  if (unit === "w") { var t = text.trim(); return t ? t.split(/\s+/).length : 0; }
+  return Array.from(text).length;
+}
+var target = function (box) {
+  var m = /^(\d+)([cw])$/.exec(box.target || "");
+  return m && m[1] !== "0" ? { n: parseInt(m[1], 10), unit: m[2] } : null;
+}
+var allIds = function () { var s = {}; model.frames.forEach(function (f) { s[f.id] = 1; f.boxes.forEach(function (b) { s[b.id] = 1; }); }); return s; }
+var freeId = function (want) {
+  var ids = allIds(), b = slug(want) || "box", id = b, n = 2;
+  while (ids[id]) { var tail = "-" + n++; id = b.slice(0, 40 - tail.length).replace(/-+$/, "") + tail; }
+  return id;
+}
+
+/* ---- local and store ---- */
+var local = function (key, value) {
+  try {
+    if (value === undefined) return localStorage.getItem(prefix + key);
+    if (value === null) { localStorage.removeItem(prefix + key); return null; }
+    localStorage.setItem(prefix + key, value);
+  } catch (e) { return null; }
+  return null;
+}
+var normalise = function (data) {
+  if (!data || typeof data !== "object") return null;
+  if (data.plectrum !== undefined && data.scaffold === undefined) {
+    data = { scaffold: 1, meta: data.meta, frames: data.frames, findings: data.findings || [] };
+  }
+  data.meta = data.meta || {};
+  if (data.meta.version === null || data.meta.version === undefined) data.meta.version = 1;
+  data.frames = data.frames || [];
+  data.findings = data.findings || [];
+  data.frames.forEach(function (f) { f.boxes = f.boxes || []; f.boxes.forEach(function (b) { if (b.text === undefined || b.text === null) b.text = ""; b.chips = b.chips || []; b.extra = b.extra || {}; }); f.extra = f.extra || {}; });
+  return data;
+}
+
+/* ---- render ---- */
+var render = function () {
+  framesEl.textContent = "";
+  boxes = {};
+  document.title = (model.meta.title || "Scaffold");
+  document.getElementById("title").textContent = model.meta.title || "Scaffold";
+  var thing = model.meta.thing || "page";
+  document.getElementById("where").textContent = thing + " · version " + model.meta.version + (locked() ? " · locked" : "");
+  document.getElementById("add-frame").textContent = thing === "deck" ? "+ slide" : "+ page";
+  document.getElementById("mode").textContent = document.body.classList.contains("reading") ? "Back to the plecholders" : "Read it as the " + thing;
+  model.frames.forEach(function (f, i) { framesEl.appendChild(renderFrame(f, i)); });
+  renderBanner();
+  Object.keys(boxes).forEach(refresh);
+  tally();
+}
+var renderFrame = function (f, index) {
+  var shape = frameShape(f), sec = el("section", "frame");
+  sec.dataset.shape = shape; sec.dataset.id = f.id;
+  if (frameIsNotes(f)) sec.dataset.notes = "1";
+  var h = el("h2", "frame-name", f.name);
+  h.appendChild(el("span", "frame-id", "#" + f.id + " · " + (shape === "slide" ? "slide " : "") + (index + 1) + (frameIsNotes(f) ? " · not part of the thing" : "")));
+  sec.appendChild(h);
+  var canvas = el("div", "canvas"), speaker = el("div", "speaker");
+  var rows = {}, order = [], placed = false;
+  f.boxes.forEach(function (b) {
+    if (shape === "slide" && b.as === "speaker") { speaker.appendChild(renderBox(b, f)); return; }
+    var r = b.row || 1;
+    if (!rows[r]) { rows[r] = []; order.push(r); }
+    rows[r].push(b);
+    if (b.place) placed = true;
+  });
+  order.sort(function (a, b) { return a - b; }).forEach(function (r) {
+    var items = rows[r].slice().sort(function (a, b) { return (a.col || 1) - (b.col || 1); });
+    var n = Math.min(items.length, 4), row = el("div", "row" + (n > 1 ? " c" + n : ""));
+    items.forEach(function (b) { row.appendChild(renderBox(b, f)); });
+    canvas.appendChild(row);
+  });
+  if (placed && shape === "slide") canvas.classList.add("placed");
+  sec.appendChild(canvas);
+  if (speaker.childNodes.length) sec.appendChild(speaker);
+  if (!locked()) {
+    var tools = el("div", "frame-tools");
+    var add = el("button", "small", "+ scaffold-box"); add.type = "button";
+    add.addEventListener("click", function () { openAddBox(sec, f, add); });
+    tools.appendChild(add);
+    if (f.copy_of) {
+      var again = el("button", "small", "+ another like this"); again.type = "button";
+      again.addEventListener("click", function () { addCopy(f); });
+      tools.appendChild(again);
+    }
+    sec.appendChild(tools);
+  }
+  return sec;
+}
+var ratio = function (shape) {
+  var words = { portrait: "3 / 4", landscape: "4 / 3", square: "1 / 1" };
+  if (words[shape]) return words[shape];
+  var m = /^(\d+):(\d+)$/.exec(shape || "16:9");
+  return m ? m[1] + " / " + m[2] : "16 / 9";
+}
+var renderBox = function (b, f) {
+  var box = el("div", "pl");
+  box.dataset.as = AS_KNOWN.indexOf(b.as) >= 0 ? b.as : "body";
+  box.dataset.kind = b.kind; box.dataset.id = b.id;
+  if (b.place) {
+    var p = b.place.split(/\s+/);
+    box.dataset.place = b.place;
+    box.style.setProperty("left", p[0] + "%"); box.style.setProperty("top", p[1] + "%");
+    box.style.setProperty("width", p[2] + "%"); box.style.setProperty("height", p[3] + "%");
+  }
+  var head = el("div", "pl-head");
+  head.appendChild(el("span", "pl-name", b.name));
+  head.appendChild(el("span", "pl-id", b.id));
+  var count = el("span", "pl-count", "");
+  head.appendChild(count);
+  box.appendChild(head);
+  var plec = el("p", "plec", "[" + (b.plec || "no plec yet") + "]");
+  box.appendChild(plec);
+  var slot = null, img = null, href = null;
+  if (b.kind === "graphic") {
+    slot = el("div", "slot");
+    slot.style.aspectRatio = ratio(b.shape);
+    var inner = el("div", "");
+    inner.appendChild(el("div", "shape", "graphic · " + (b.shape || "16:9")));
+    inner.appendChild(el("div", "who", "the person supplies it"));
+    slot.appendChild(inner);
+    img = el("img", ""); img.alt = b.name; img.hidden = true;
+    img.addEventListener("error", function () { img.hidden = true; });
+    img.addEventListener("load", function () { img.hidden = false; });
+    slot.appendChild(img);
+    box.appendChild(slot);
+    href = el("input", "href"); href.type = "text"; href.value = b.href || "";
+    href.placeholder = "Where your picture is: a path beside the state file, or a link";
+    href.setAttribute("aria-label", b.name + ": where the picture is");
+    if (locked()) href.readOnly = true;
+    href.addEventListener("change", function () { b.href = href.value.trim() || null; showImg(); saveStateSoon(); });
+    box.appendChild(href);
+  }
+  var showImg = function () { if (img) { if (b.href && /^(https?:|data:image\/|\.{0,2}\/|[^:]+$)/.test(b.href)) img.src = b.href; else { img.removeAttribute("src"); img.hidden = true; } } }
+  showImg();
+  var ta = el("textarea", "");
+  ta.rows = 2; ta.setAttribute("aria-label", b.name);
+  ta.placeholder = isNotes(b) ? "Your notes to the readvisor" : (b.kind === "graphic" ? "Your caption, if any" : "Your words");
+  if (locked()) ta.readOnly = true;
+  box.appendChild(ta);
+  var out = el("p", "out");
+  box.appendChild(out);
+  if (b.fixed || (b.chips && b.chips.length)) {
+    var fx = el("div", "fixed");
+    if (b.fixed) fx.appendChild(el("span", "pl-fixed", b.fixed));
+    (b.chips || []).forEach(function (c) { fx.appendChild(el("span", "chip", c)); });
+    box.appendChild(fx);
+  }
+  var tools = el("div", "box-tools");
+  if (!locked() && !isNotes(b)) {
+    var mark = el("button", "small", b.state === "written" ? "Written ✓ (undo)" : "Mark written"); mark.type = "button";
+    mark.setAttribute("aria-pressed", b.state === "written" ? "true" : "false");
+    mark.addEventListener("click", function () { b.state = b.state === "written" ? null : "written"; saveStateSoon(); saveText(b.id); render(); });
+    tools.appendChild(mark);
+  }
+  if (!locked()) {
+    var edit = el("button", "small", "Change the plec"); edit.type = "button";
+    edit.addEventListener("click", function () { openEditPlec(box, b, edit); });
+    tools.appendChild(edit);
+  }
+  if (tools.childNodes.length) box.appendChild(tools);
+  var fl = el("div", "findings");
+  model.findings.filter(function (fd) { return fd.box === b.id; }).forEach(function (fd) { fl.appendChild(renderFinding(fd, b)); });
+  if (fl.childNodes.length) box.appendChild(fl);
+  boxes[b.id] = { b: b, f: f, box: box, ta: ta, out: out, count: count, saved: null, saving: false, again: false, timer: null, touched: false };
+  putText(boxes[b.id], b.text || "");
+  ta.addEventListener("input", function () {
+    var x = boxes[b.id];
+    if (locked()) return;
+    x.touched = true; b.text = ta.value; refresh(b.id); tally(); local("plec:" + b.id, ta.value);
+    clearTimeout(x.timer); x.timer = setTimeout(function () { saveText(b.id); }, 900);
+  });
+  ta.addEventListener("blur", function () { var x = boxes[b.id]; if (x.timer) { clearTimeout(x.timer); saveText(b.id); } saveStateSoon(); });
+  return box;
+}
+/* The one place a field's value is set: the person's own words (saved,
+   carried in the state, or a fix the person accepted with a click). */
+var putText = function (x, text) { x.ta.value = text; x.b.text = text; refresh(x.b.id); }
+var refresh = function (id) {
+  var x = boxes[id]; if (!x) return;
+  var b = x.b, text = x.ta.value, t = target(b);
+  x.ta.style.height = "auto"; x.ta.style.height = (x.ta.scrollHeight + 2) + "px";
+  x.out.textContent = text;
+  var has = !!text.trim(), n = t ? measure(text, t.unit) : 0;
+  var state = locked() ? "locked" : !has ? "empty" : (t && n > t.n ? "over" : (b.state === "written" ? "written" : "draft"));
+  x.box.dataset.state = state;
+  if (has) delete x.box.dataset.empty; else x.box.dataset.empty = "1";
+  if (t) {
+    var unit = t.unit === "w" ? "w" : "c", m = measure(text, t.unit);
+    x.count.textContent = m + " / " + t.n + unit + (m > t.n ? " · " + (m - t.n) + " over" : "");
+    x.count.title = m + " of " + t.n + " " + unitWord(t.unit);
+  } else x.count.textContent = b.kind === "graphic" ? "picture" : (isNotes(b) ? "notes" : "");
+}
+var tally = function () {
+  var all = model.frames.reduce(function (a, f) { return a.concat(f.boxes); }, []).filter(function (b) { return !isNotes(b); });
+  var words = all.filter(function (b) { return (b.text || "").trim() || (b.kind === "graphic" && b.href); }).length;
+  var marked = all.filter(function (b) { return b.state === "written"; }).length;
+  tallyEl.textContent = words + " of " + all.length + " have words · " + marked + " marked written";
+}
+
+/* ---- findings: the person accepts or declines; nothing changes until then ---- */
+var renderFinding = function (fd, b) {
+  var d = el("div", "finding"); d.dataset.status = fd.status;
+  d.appendChild(el("span", "k", fd.kind + " · " + fd.id + " · " + fd.status + " · found in version " + fd.version));
+  if (fd.quote) { var q = el("div", ""); q.appendChild(el("q", "", fd.quote)); if (fd.fix) { q.appendChild(document.createTextNode(" → ")); q.appendChild(el("q", "", fd.fix)); } d.appendChild(q); }
+  else if (fd.fix) { d.appendChild(el("div", "", "The whole box → " + fd.fix)); }
+  if (fd.why) d.appendChild(el("div", "", fd.why));
+  if (fd.status === "cannot be checked") d.appendChild(el("div", "k", "Not passed: the check could not confirm this. Your words, your call."));
+  if (fd.status === "open") {
+    var actions = el("div", "actions");
+    if (fd.fix !== null && fd.fix !== undefined && fd.fix !== "") {
+      var yes = el("button", "small primary", "Accept the fix"); yes.type = "button";
+      yes.addEventListener("click", function () { accept(fd, b); });
+      actions.appendChild(yes);
+    }
+    var no = el("button", "small", "Keep my words"); no.type = "button";
+    no.addEventListener("click", function () { fd.status = "declined"; saveStateSoon(); render(); say("Kept your words.", "ok"); });
+    actions.appendChild(no);
+    d.appendChild(actions);
+  }
+  return d;
+}
+var findSpan = function (text, fd) {
+  if (!fd.quote) return { at: 0, len: text.length };
+  var hits = [], i = text.indexOf(fd.quote);
+  while (i >= 0) { hits.push(i); i = text.indexOf(fd.quote, i + 1); }
+  if (hits.length > 1 && (fd.prefix || fd.suffix)) {
+    hits = hits.filter(function (h) {
+      return (!fd.prefix || text.slice(0, h).slice(-fd.prefix.length) === fd.prefix) &&
+             (!fd.suffix || text.slice(h + fd.quote.length).slice(0, fd.suffix.length) === fd.suffix);
+    });
+  }
+  return hits.length === 1 ? { at: hits[0], len: fd.quote.length } : null;
+}
+var accept = function (fd, b) {
+  var x = boxes[b.id], text = x.ta.value, span = findSpan(text, fd);
+  if (!span) { say("The quoted words are not in the box once, exactly; nothing changed. Ask the readvisor to look again.", "warn"); return; }
+  putText(x, text.slice(0, span.at) + fd.fix + text.slice(span.at + span.len));
+  fd.status = "accepted";
+  local("plec:" + b.id, x.ta.value);
+  saveText(b.id); saveStateSoon(); render();
+  say("Fix accepted in “" + b.name + "”.", "ok");
+}
+
+/* ---- adding and changing (never while locked) ---- */
+var boxForm = function (withFrame) {
+  var form = el("form", "add");
+  if (withFrame) {
+    var fl = el("label", "", model.meta.thing === "deck" ? "The slide's name" : "The page's name");
+    var fn = el("input", ""); fn.name = "frame"; fn.required = true; fl.appendChild(fn); form.appendChild(fl);
+    form.appendChild(el("div", "how", "Its first scaffold-box:"));
+  }
+  var nl = el("label", "", "The box's name"); var name = el("input", ""); name.name = "name"; name.required = true; nl.appendChild(name); form.appendChild(nl);
+  var pl = el("label", "", "What it must get across (its plec)"); var plec = el("textarea", ""); plec.name = "plec"; plec.rows = 2; plec.required = true; pl.appendChild(plec); form.appendChild(pl);
+  var line = el("div", "line");
+  var kl = el("label", "", "Kind"); var kind = el("select", ""); kind.name = "kind";
+  ["text", "graphic"].forEach(function (k) { var o = el("option", "", k); o.value = k; kind.appendChild(o); }); kl.appendChild(kind); line.appendChild(kl);
+  var tl = el("label", "", "Target"); var tn = el("input", ""); tn.name = "n"; tn.type = "number"; tn.min = "0"; tn.value = model.meta.unit === "w" || model.meta.thing === "document" ? "150" : "140"; tl.appendChild(tn); line.appendChild(tl);
+  var ul = el("label", "", "Unit"); var unit = el("select", ""); unit.name = "unit";
+  [["c", "characters"], ["w", "words"]].forEach(function (u) { var o = el("option", "", u[1]); o.value = u[0]; unit.appendChild(o); });
+  unit.value = model.meta.unit || (model.meta.thing === "document" ? "w" : "c"); ul.appendChild(unit); line.appendChild(ul);
+  var sl = el("label", "", "Shape (a graphic)"); var shape = el("input", ""); shape.name = "shape"; shape.placeholder = "4:3, 16:9, portrait…"; sl.appendChild(shape); line.appendChild(sl);
+  var al = el("label", "", "What it is"); var as = el("select", ""); as.name = "as";
+  AS_KNOWN.forEach(function (a) { var o = el("option", "", a); o.value = a; as.appendChild(o); }); as.value = "body"; al.appendChild(as); line.appendChild(al);
+  form.appendChild(line);
+  var actions = el("div", "line");
+  var ok = el("button", "primary", "Add it"); ok.type = "submit";
+  var cancel = el("button", "", "Cancel"); cancel.type = "button";
+  actions.appendChild(ok); actions.appendChild(cancel); form.appendChild(actions);
+  cancel.addEventListener("click", function () { form.remove(); });
+  return form;
+}
+var newBox = function (form, frame) {
+  var v = function (k) { return form.elements[k] ? String(form.elements[k].value || "").trim() : ""; };
+  var kind = v("kind") === "graphic" ? "graphic" : "text", n = parseInt(v("n"), 10);
+  var shape = v("shape").toLowerCase();
+  if (kind === "graphic" && !(/^[1-9]\d{0,2}:[1-9]\d{0,2}$/.test(shape) || ["portrait", "landscape", "square"].indexOf(shape) >= 0)) shape = "16:9";
+  var rows = frame ? frame.boxes.map(function (b) { return b.row || 1; }) : [];
+  return {
+    id: freeId(v("name")), name: v("name"), as: v("as") || "body", kind: kind,
+    target: kind === "text" ? (n > 0 ? n + (v("unit") === "w" ? "w" : "c") : "0") : null,
+    shape: kind === "graphic" ? shape : null,
+    row: rows.length ? Math.max.apply(null, rows) + 1 : 1, col: 1, place: null, fixed: null, chips: [],
+    plec_by: "person", state: null, href: null, plec: v("plec").replace(/\s*\n\s*/g, " "), text: "", extra: {}
+  };
+}
+var openAddBox = function (sec, f, button) {
+  var form = boxForm(false);
+  sec.insertBefore(form, button.parentNode);
+  form.elements.name.focus();
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (locked()) return;
+    f.boxes.push(newBox(form, f));
+    saveStateSoon(); render(); say("Box added. It is yours: the plec says what you told it.", "ok");
+  });
+}
+var openAddFrame = function () {
+  if (locked()) return;
+  var slot = document.getElementById("add-frame-slot");
+  slot.textContent = "";
+  var form = boxForm(true);
+  slot.appendChild(form);
+  form.elements.frame.focus();
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = String(form.elements.frame.value || "").trim();
+    var frame = { id: freeId(name || "frame"), name: name, shape: null, copy_of: null, copy: null, extra: {}, boxes: [] };
+    model.frames.splice(insertAt(), 0, frame);
+    frame.boxes.push(newBox(form, frame));
+    slot.textContent = "";
+    saveStateSoon(); render(); say((model.meta.thing === "deck" ? "Slide" : "Page") + " added.", "ok");
+  });
+}
+var insertAt = function () {
+  /* before a closing run of notes frames, so the thing stays together */
+  var i = model.frames.length;
+  while (i > 0 && frameIsNotes(model.frames[i - 1])) i--;
+  return i;
+}
+var addCopy = function (f) {
+  var run = model.frames.filter(function (x) { return x.copy_of === f.copy_of; });
+  var last = run[run.length - 1], next = Math.max.apply(null, run.map(function (x) { return x.copy || 0; })) + 1;
+  var width = String(run.length).length;
+  var pad = function (k) { var s = String(k); while (s.length < width) s = "0" + s; return s; };
+  var swap = function (s) { return String(s).replace(new RegExp("(^|\\D)" + last.copy + "(?!\\d)", "g"), function (m, a) { return a + next; }); };
+  var copy = { id: freeId(f.copy_of + "-" + pad(next)), name: swap(last.name), shape: last.shape, copy_of: last.copy_of, copy: next, extra: JSON.parse(JSON.stringify(last.extra || {})), boxes: [] };
+  var suffix = new RegExp("-0*" + last.copy + "$");
+  last.boxes.forEach(function (b) {
+    var nb = JSON.parse(JSON.stringify(b));
+    nb.id = freeId(b.id.replace(suffix, "") + "-" + pad(next));
+    nb.name = swap(b.name); nb.plec = swap(b.plec || ""); nb.text = ""; nb.state = null; nb.href = null;
+    copy.boxes.push(nb);
+  });
+  model.frames.splice(model.frames.indexOf(last) + 1, 0, copy);
+  saveStateSoon(); render(); say("Added “" + copy.name + "”, empty, with the same boxes.", "ok");
+}
+var openEditPlec = function (box, b, button) {
+  var form = el("form", "edit");
+  var pl = el("label", "", "The plec"); var plec = el("textarea", ""); plec.rows = 3; plec.value = b.plec || ""; pl.appendChild(plec); form.appendChild(pl);
+  var tl = el("label", "", b.kind === "graphic" ? "Shape" : "Target (140c, 300w, 0)"); var t = el("input", ""); t.value = b.kind === "graphic" ? (b.shape || "") : (b.target || ""); tl.appendChild(t); form.appendChild(tl);
+  var actions = el("div", "line"); var ok = el("button", "primary", "Keep this"); ok.type = "submit"; var cancel = el("button", "", "Cancel"); cancel.type = "button";
+  actions.appendChild(ok); actions.appendChild(cancel); form.appendChild(actions);
+  cancel.addEventListener("click", function () { form.remove(); });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (locked()) return;
+    var p = plec.value.replace(/\s*\n\s*/g, " ").trim(), tv = t.value.trim().toLowerCase().replace(/\s+/g, "");
+    if (b.kind === "graphic") { if (/^[1-9]\d{0,2}:[1-9]\d{0,2}$/.test(tv) || ["portrait", "landscape", "square"].indexOf(tv) >= 0) b.shape = tv; }
+    else { var m = /^(0|[1-9]\d{0,5})([cw]?)$/.exec(tv); if (m) b.target = m[1] === "0" ? "0" : m[1] + (m[2] || model.meta.unit || "c"); else if (tv) { say("A target is a number and c or w: 140c, 300w, or 0.", "warn"); return; } }
+    if (p && p !== (b.plec || "")) { b.plec = p; b.plec_by = "person"; }
+    saveStateSoon(); render(); say("The plec is yours now; the readvisor proposes, and does not change it.", "ok");
+  });
+  box.insertBefore(form, button.parentNode.nextSibling);
+}
+
+/* ---- lock: one lock for the whole; read-only; unlocking makes a new version ---- */
+var renderBanner = function () {
+  bannerEl.textContent = "";
+  var lockBtn = document.getElementById("lock"), addBtn = document.getElementById("add-frame");
+  addBtn.hidden = locked();
+  lockBtn.textContent = locked() ? "Unlock (makes version " + (model.meta.version + 1) + ")" : "Lock";
+  document.getElementById("how").hidden = locked();
+  if (!locked()) return;
+  var b = el("div", "banner");
+  var open = model.findings.filter(function (f) { return f.status === "open"; }).length;
+  b.appendChild(el("div", "", "Locked " + model.meta.locked + ", version " + model.meta.version + ". It is read-only. " +
+    (model.meta.checked ? "Checked " + model.meta.checked + ". " + (open ? open + " finding" + (open > 1 ? "s wait" : " waits") + " for your answer: accept a fix, or keep your words." : "No finding waits for you.")
+                        : "Ask the readvisor to check it now: spelling, grammar and truth, box by box. Copy everything out if it cannot read this page's store.")));
+  bannerEl.appendChild(b);
+}
+var confirmLock = false;
+var onLock = function () {
+  var btn = document.getElementById("lock");
+  if (locked()) { unlock(); return; }
+  var empty = [];
+  model.frames.forEach(function (f) { f.boxes.forEach(function (b) { if (!isNotes(b) && !(b.text || "").trim() && !(b.kind === "graphic" && b.href)) empty.push(b.name); }); });
+  if (!confirmLock) {
+    confirmLock = true;
+    btn.textContent = "Lock now";
+    say((empty.length ? "Still empty: " + empty.join(", ") + ". " : "") + "Locking makes it read-only until you unlock it. Press “Lock now” to lock.", empty.length ? "warn" : "");
+    setTimeout(function () { if (confirmLock) { confirmLock = false; renderBanner(); } }, 8000);
+    return;
+  }
+  confirmLock = false;
+  Object.keys(boxes).forEach(function (id) { var x = boxes[id]; if (x.timer) { clearTimeout(x.timer); saveText(id); } x.b.text = x.ta.value; });
+  model.meta.locked = stamp();
+  saveStateSoon(true); render();
+  say("Locked. Ask the readvisor to check it.", "ok");
+}
+var unlock = function () {
+  var old = JSON.parse(JSON.stringify(model)), n = model.meta.version;
+  local("v" + n, JSON.stringify(old));
+  if (db) { try { db.doc("scaffold/v" + n).set({ json: JSON.stringify(old), version: n, updated: stamp() }); } catch (e) { /* kept in this browser */ } }
+  model.meta.parent = n; model.meta.version = n + 1; model.meta.locked = null; model.meta.checked = null;
+  saveStateSoon(true); render();
+  say("Unlocked as version " + model.meta.version + ". Version " + n + " is kept as it was locked.", "ok");
+}
+
+/* ---- saving ---- */
+var snapshot = function () { return JSON.stringify({ json: JSON.stringify(model), base: base, version: model.meta.version, locked: model.meta.locked || null, updated: stamp() }); }
+var saveStateSoon = function (now) {
+  local("state", snapshot());
+  clearTimeout(stateTimer);
+  stateTimer = setTimeout(saveState, now ? 0 : 600);
+}
+var saveState = function () {
+  stateTimer = null;
+  if (!db) return;
+  if (stateSaving) { stateAgain = true; return; }
+  stateSaving = true;
+  Promise.resolve().then(function () { return db.doc("scaffold/state").set(JSON.parse(snapshot())); }).then(function () {
+    stateSaving = false; if (stateAgain) { stateAgain = false; saveState(); } else if (!unsaved()) say("Saved", "ok");
+  }, function (e) { stateSaving = false; stateAgain = false; say("The layout was not saved to the store (" + ((e && e.code) || "error") + "); it is kept in this browser.", "warn"); });
+}
+var unsaved = function () { return Object.keys(boxes).some(function (k) { var x = boxes[k]; return x.saving || x.timer || (db && x.ta.value !== x.saved); }) || stateSaving; }
+var saveText = function (id) {
+  var x = boxes[id]; if (!x) return;
+  x.timer = null;
+  x.b.text = x.ta.value;
+  local("plec:" + id, x.ta.value);
+  if (!db) { say("Kept in this browser only: this page has no store.", "warn"); return; }
+  if (x.saving) { x.again = true; return; }
+  var text = x.ta.value;
+  if (text === x.saved) { if (!unsaved()) say("Saved", "ok"); return; }
+  x.saving = true; say("Saving…");
+  Promise.resolve().then(function () {
+    return db.doc("plecs/" + id).set({ text: text, name: x.b.name, target: x.b.target || "0", chars: Array.from(text).length, words: measure(text, "w"), state: x.b.state || null, updated: stamp() });
+  }).then(function () {
+    x.saved = text; x.saving = false;
+    if (x.again) { x.again = false; saveText(id); } else if (!unsaved()) say("Saved", "ok");
+  }, function (e) {
+    x.saving = false; x.again = false;
+    say("Not saved (" + ((e && e.code) || "error") + "). Your text is still here and in this browser; keep typing to try again.", "warn");
+  });
+}
+
+/* ---- copy everything out ---- */
+var copyOut = function () {
+  Object.keys(boxes).forEach(function (id) { boxes[id].b.text = boxes[id].ta.value; });
+  var md = dumpState(model), box = document.getElementById("out"), ta = document.getElementById("out-text");
+  ta.value = md; box.hidden = false; ta.focus(); ta.select();
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(function () { say("Copied: the whole scaffold, as one markdown file.", "ok"); },
+        function () { say("Selected below: copy it with your keyboard.", "warn"); });
+    } else say("Selected below: copy it with your keyboard.", "warn");
+  } catch (e) { say("Selected below: copy it with your keyboard.", "warn"); }
+}
+var saveFile = function () {
+  try {
+    var md = document.getElementById("out-text").value;
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([md], { type: "text/markdown;charset=utf-8" }));
+    a.download = (slug(model.meta.title) || "scaffold") + (model.meta.version > 1 ? ".v" + model.meta.version : "") + ".scaffold.md";
+    document.body.appendChild(a); a.click(); a.remove();
+  } catch (e) { say("This page cannot save a file here; copy the text instead.", "warn"); }
+}
+
+/* ---- start: the embedded scaffold, then the person's own saved words ---- */
+var adopt = function (snap) {
+  /* A saved layout is used only when it grew from this very page's block;
+     a block the harness rewrote since (a new plectrum) wins, and the person's
+     words still come back box by box. */
+  try { var s = typeof snap === "string" ? JSON.parse(snap) : snap; if (s && s.base === base && s.json) { var m = normalise(JSON.parse(s.json)); if (m) { model = m; return true; } } } catch (e) { /* not ours */ }
+  return false;
+}
+var fromLocal = function () {
+  Object.keys(boxes).forEach(function (id) {
+    var x = boxes[id], v = local("plec:" + id);
+    if (typeof v === "string" && !x.touched && v !== x.ta.value && !locked()) putText(x, v);
+  });
+}
+var start = function () {
+  var raw = block.textContent || "";
+  base = hash(raw.trim());
+  var data = null;
+  try { data = normalise(JSON.parse(raw)); } catch (e) {
+    framesEl.appendChild(el("div", "empty-page", "The scaffold block of this page does not read as JSON (" + e.message + "). The harness writes it; nothing is lost in this browser."));
+    say("No scaffold to show.", "warn"); return;
+  }
+  if (!data) {
+    framesEl.appendChild(el("div", "empty-page", "No scaffold in this page yet. A harness fills this page's JSON block (the script element with id \u201cscaffold\u201d) with a scaffold's state."));
+    say("Waiting for a scaffold.", ""); return;
+  }
+  model = data;
+  prefix = "scaffold:" + (slug(model.meta.title) || "untitled") + ":";
+  adopt(local("state"));
+  render();
+  fromLocal();
+  tally();
+  var settled = false;
+  var timer = setTimeout(function () { if (!settled) { settled = true; say("The store did not answer. What you type is kept in this browser only.", "warn"); } }, 10000);
+  var use = window.claude && window.claude.use ? window.claude.use("db") : Promise.resolve(null);
+  Promise.resolve(use).then(function (got) {
+    if (!got) throw { code: "unavailable" };
+    db = got;
+    return Promise.all([db.collection("scaffold").get(), db.collection("plecs").get()]);
+  }).then(function (got) {
+    if (settled) return;
+    clearTimeout(timer); settled = true;
+    got[0].docs.forEach(function (d) { if (d.id === "state") { if (adopt(d.data())) render(); } });
+    got[1].docs.forEach(function (d) {
+      var x = boxes[d.id], v = (d.data() || {}).text;
+      if (!x || typeof v !== "string") return;
+      x.saved = v;
+      if (!x.touched && v !== x.ta.value) putText(x, v);
+    });
+    tally();
+    if (!locked()) Object.keys(boxes).forEach(function (id) { if (boxes[id].ta.value !== boxes[id].saved) saveText(id); });
+    saveStateSoon();
+    if (!unsaved()) say(got[1].empty ? "Nothing written yet. It saves as you type." : "Saved", got[1].empty ? "" : "ok");
+  }).catch(function () {
+    if (settled) return;
+    clearTimeout(timer); settled = true;
+    say(local("state") === null ? "No store here: what you type is kept in this browser only. Copy everything out to move it." : "Kept in this browser only: the store is not reachable from here.", "warn");
+  });
+}
+
+document.getElementById("mode").addEventListener("click", function () {
+  var on = !document.body.classList.contains("reading");
+  document.body.classList.toggle("reading", on);
+  this.setAttribute("aria-pressed", on ? "true" : "false");
+  if (model) render();
+});
+document.getElementById("add-frame").addEventListener("click", openAddFrame);
+document.getElementById("lock").addEventListener("click", function () { if (model) onLock(); });
+document.getElementById("copy").addEventListener("click", function () { if (model) copyOut(); });
+document.getElementById("out-save").addEventListener("click", saveFile);
+document.getElementById("out-close").addEventListener("click", function () { document.getElementById("out").hidden = true; });
+window.addEventListener("beforeunload", function () { if (model) Object.keys(boxes).forEach(function (id) { if (boxes[id].timer) saveText(id); }); });
+
+window.scaffoldPage = { dump: function () { return model ? dumpState(model) : ""; }, model: function () { return model; } };
+start();
+})();
+</script>
+</body>
+</html>
