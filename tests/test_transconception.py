@@ -5,7 +5,8 @@ Held here: both promoted fabulacs lint with no error but `stands-alone`'s, an er
 checkpoint A (2026-11-18): vulture names Python, its runtime or a dependency in seven items (nine findings),
 sloppy-xml-py in one; so gate 1 (ready to keep) does not hold for either, and every other check of it holds, as the
 experiment measured by hand (with the sources at hand when this machine has them; without them `nothing-carried` is
-not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust (neither is weighed); a fabulac nobody could rule is kept
+not measured and says so). The fixtures tell the truth: the ground catalogue (phase 2) is what fixes them. Gate 2 does not hold for Go or Rust (neither weighing is recorded in the fixture), but since sitting 2 (2026-11-18, the fifth
+allowance `own-types`) `ruled` holds for both targets; a fabulac nobody could rule is kept
 unruled; each check, on a small fabulac that passes all of them, made to fail; every other fabula untouched.
 """
 from __future__ import annotations
@@ -99,11 +100,29 @@ def test_ready_to_keep_fails_only_on_stands_alone(fix, clone):
 
 
 def test_ready_to_entail_waits_for_the_target_to_be_weighed(vols):
-    g = tc.ready_to_entail(vols["vulture.fabulac.cosm"], "go")
-    assert not g["holds"] and "target-confirmed" in g["do-not-hold"] and "ruled" not in g["do-not-hold"]
-    g = tc.ready_to_entail(vols["sloppy-xml-py.fabulac.cosm"], "rust")
-    assert {"target-confirmed", "ruled"} <= set(g["do-not-hold"])      # allowances the judge does not know
-    assert all("judge does not know" in e for e in g["checks"]["ruled"]["errors"])
+    """Sitting 2 (2026-11-18) ruled `own-types` onto the closed list: sloppy's 61 Rust rulings that named the
+    target's own types now name it (S-I2 became kept at the driver's dump), so `ruled` holds for Rust as for Go.
+    What still fails gate 2 for each: `target-confirmed`, until the weighing (A7's target-go.md and target-rust.md)
+    is recorded in the fixture, and gate 1's `stands-alone`, until the ground lane's reliances stand behind it."""
+    for name, language in (("vulture.fabulac.cosm", "go"), ("sloppy-xml-py.fabulac.cosm", "rust")):
+        g = tc.ready_to_entail(vols[name], language)
+        assert not g["holds"] and g["do-not-hold"] == ["stands-alone", "target-confirmed"], (name, g["do-not-hold"])
+        assert g["checks"]["ruled"]["state"] == "holds" and g["checks"]["ruled"]["errors"] == []
+
+
+def test_sitting_2_is_in_the_sloppy_fixture(vols):
+    """The owner's rulings of sitting 2 (fabulac-test-repos/_x0/sitting-2.md), as the converter carried them."""
+    nodes = {it.id: it.data for it in vols["sloppy-xml-py.fabulac.cosm"].items.values()}
+    own = [r for d in nodes.values() for r in tc.rulings(d) if r.get("allowing") == "own-types"]
+    assert len(own) == 62 and all(r["made-for"] == "N:target/rust" and r["is"] == "alike" for r in own)
+    assert not [r for d in nodes.values() for r in tc.rulings(d)
+                if r.get("is") == "alike" and r.get("allowing") not in tc.DEFAULTS["allowances"]]
+    s_i0 = {r.get("about"): r["is"] for r in tc.rulings(nodes["C:interface/x0.S-I0"]) if tc.applies(r, "N:target/rust")}
+    assert s_i0 == {"the driver contract": "kept", "the program's name": "changed"}
+    assert [r["is"] for r in tc.rulings(nodes["C:interface/x0.S-I2"])] == ["kept", "kept"]
+    byte_steps = [r for r in tc.rulings(nodes["C:interface/x0.S-I6"]) if r["is"] == "changed"]
+    assert len(byte_steps) == 4 and all(r["case"] == "P:case/x0.ruled.S-C21" and r["steps"] in ([2], [4])
+                                        for r in byte_steps)
 
 
 def test_cases_cover_reports_the_share_the_experiment_measured(vols):
@@ -306,6 +325,8 @@ def test_an_allowance_the_judge_does_not_know_blocks_only_gate_2(tmp_path):
     assert g["do-not-hold"] == ["ruled"]
     doc2 = copy.deepcopy(doc)
     _node(doc2, "C:behaviour/greet")["ruling"][1]["allowing"] = "exit-only"
+    assert tc.ready_to_entail(_write(tmp_path, doc2), "go")["holds"]
+    _node(doc2, "C:behaviour/greet")["ruling"][1]["allowing"] = "own-types"     # the fifth, ruled at sitting 2
     assert tc.ready_to_entail(_write(tmp_path, doc2), "go")["holds"]
 
 

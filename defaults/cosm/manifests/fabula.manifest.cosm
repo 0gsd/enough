@@ -334,7 +334,7 @@ modules:
       case: {refs: [of, made-for, ruling.made-for, ruling.by], checked: [given, expect, stands, from, allowing, ruling, stance,
              span], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, of, given, expect],
              closed: {stands: [outside, inside], from: [test, document, recorded, ruled],
-                      allowing: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order]}}
+                      allowing: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order, own-types]}}
       assumption: {refs: [relied-by], checked: [about, checked, if-false, relied-by, carries, stance], flavours: [fabulac],
                    required: [id, type, name, summary, provenance, stance, about],
                    closed: {checked: ['yes', 'no'], carries: [must, need-not]}}
@@ -372,8 +372,11 @@ checks:
 # thirteen own checks run only on a fabulac whose catalog says purpose: transconception; the two gates are one function
 # each in enough/transconception.py, reporting which checks hold and which do not.
 transconception:
-  allowances: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order]   # an alike ruling's allowing: the
-                                                                                     # judge's four, extended by ruling
+  allowances: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order, own-types]
+                                        # an alike ruling's allowing: the judge's closed list, extended only by
+                                        # ruling. own-types (sitting 2, 2026-11-18): a value may take the target's own
+                                        # type where the kept interface cannot see the difference; the judge compares
+                                        # exit status, stdout and stderr exactly, as for kept
   ruled-kinds: ['C:interface', 'C:behaviour', 'C:structure', 'C:setting', 'C:reliance']   # each carries a ruling
   ruling-needs: {alike: [allowing], free: [because|said], kept-wrong: [because|said], changed: [to]}
                                         # a|b: either; said (the person's own words at the sitting) stands as the reason
@@ -744,7 +747,7 @@ dialectic:
       for: {purpose: transconception}
       to: transconceiver
       counters:
-        ruled: "That ruling needs one more thing: for alike, which allowance (exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order); for changed, what it is changed to. Which ruling, with it?"
+        ruled: "That ruling needs one more thing: for alike, which allowance (exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order, own-types); for changed, what it is changed to. Which ruling, with it?"
       questions:
         - {id: interface, about: C:interface#ruling, asks: "Must the next program{for} offer {name} exactly as it is? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
         - {id: behaviour, about: C:behaviour#ruling, asks: "Must the next program{for} do exactly this: {name}? Proposed: {proposed}.", kind: choice, options: [as proposed, kept, alike, free, kept-wrong, changed], why: missing, batch: true}
