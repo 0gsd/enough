@@ -139,6 +139,11 @@ DOCUMENTS: dict[str, Document] = {
         bubbles={"en": "enough/static/help-docs.md",
                  **{lang: f"enough/static/i18n/{lang}/help-docs.md" for lang in LANGS[1:]}},
         voice="rosa", version=ENOUGH_VERSION, plain_mentions="distinctive"),
+    # 0.8 (fabulac-first F7): the developers' manual, English only in 0.8 (the help center's 12.8 says so in every
+    # language); a document of its own, bundled like the help center (desktop/src-tauri/build.rs).
+    "developers": Document(
+        "developers", "the enough developers' manual", {"en": "docs/DEVELOPERS.md"},
+        version=ENOUGH_VERSION, plain_mentions="distinctive"),
 }
 
 # A bubble that describes another document: its "section N" names that document's sections (cross-volume).

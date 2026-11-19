@@ -44,12 +44,14 @@ _conf: dict[str, Any] = {}
 
 def configure(*, project_dir: Path | None = None, start: Callable | None = None, build: Callable | None = None,
               compile: Callable | None = None, settle: Callable | None = None, jobs: Any = None,
-              emit: Callable | None = None, verse: Callable | None = None) -> None:
+              emit: Callable | None = None, verse: Callable | None = None, first: Callable | None = None) -> None:
     """Hand the tools the app's job starters and its event sender (`emit(event, data)`, for the `dialectic` event a
-    recorded sitting sends); `configure()` with nothing resets them: tests."""
+    recorded sitting sends); `first(do, body)` is the authored fabulac's (`routes/fabulac.py`'s `router.start`);
+    `configure()` with nothing resets them: tests."""
     _conf.clear()
     _conf.update({k: v for k, v in {"project_dir": project_dir, "start": start, "build": build, "compile": compile,
-                                     "settle": settle, "jobs": jobs, "emit": emit, "verse": verse}.items()
+                                     "settle": settle, "jobs": jobs, "emit": emit, "verse": verse,
+                                     "first": first}.items()
                   if v is not None})
 
 
@@ -216,11 +218,15 @@ def run_fabulac(project_dir: Path, call: Any) -> Any:
     raw = _ct()._tool_path(project_dir, call.path)
     if not _skill_on(project_dir):
         return _skill_off("fabulac", raw)
+    do = (extra.get("do") or "status").strip().lower().replace("_", "-").replace(" ", "-")
+    if do == "starters":
+        return _first_sync(project_dir, raw, do, extra)
     if not raw:
         return _err("fabulac", "", "fabulac needs a <path>: a folder of Python in the project, or its .fabulac.cosm.")
-    do = (extra.get("do") or "status").strip().lower()
     route = (extra.get("model") or "").strip() or None
     body: dict[str, Any] = {"path": raw, **({"route": route} if route else {})}
+    if do in FIRST_DO or (do == "status" and _is_authored(project_dir, raw)):
+        return _run_first(project_dir, raw, do, extra, body)
     try:
         if do == "status":
             folder, _fab = F.target_of(project_dir, raw)
@@ -247,13 +253,147 @@ def run_fabulac(project_dir: Path, call: Any) -> Any:
                 return _err("fabulac", raw, f"no build or compile of {folder.name}/ is running")
             got = {"job": jobs.cancel(jid)}
         else:
-            return _err("fabulac", raw, f"<do> is build, status, compile or cancel, not {do!r}")
+            return _err("fabulac", raw, f"<do> is build, status, compile or cancel (a folder's fabulac), or one of "
+                                        f"{', '.join(FIRST_DO)} (an authored one); not {do!r}")
     except F.BuildError as e:
         return _err("fabulac", raw, str(e))
     if isinstance(got, str):
         return _err("fabulac", raw, got)
     return _result("fabulac", raw, True, _job_line(got) + (". It runs after this turn; ask for its status later."
                                                            if do in ("build", "compile") else ""))
+
+
+# ---------------------------------------------------------------------------
+# fabulac, authored (0.8, fabulac-first F6): the same plain functions as the routes and the command line
+# ---------------------------------------------------------------------------
+
+#: The `<do>` words for an authored fabulac. begin, entail, take-back, test, run and stop start or stop a job (the
+#: routes' code); the rest answer at once.
+FIRST_DO: tuple[str, ...] = ("begin", "add", "check", "entail", "test", "run", "stop", "moved", "keep", "let-go",
+                             "take-back", "head", "parts-moved", "starters")
+_FIRST_JOBS = ("begin", "entail", "take-back", "test", "run", "stop")
+
+
+def _is_authored(project_dir: Path, raw: str) -> bool:
+    from . import fabulac_author_job as AJ
+    from . import fabulac_first as FF
+    try:
+        fab = FF.fabulac_path(project_dir, raw)
+        return fab.is_file() and AJ.is_authored(fab)
+    except Exception:  # noqa: BLE001 - a name that is no fabulac's, or an unreadable file, is not authored
+        return False
+
+
+def _words(v: str | None) -> list[str]:
+    return [w.strip() for w in str(v or "").replace("\n", ",").split(",") if w.strip()]
+
+
+def _run_first(project_dir: Path, raw: str, do: str, extra: dict, body: dict) -> Any:
+    if do not in _FIRST_JOBS:
+        return _first_sync(project_dir, raw, do, extra)
+    import shlex
+    for tag in ("kind", "licence", "brief", "starter", "by", "file"):
+        if (extra.get(tag) or "").strip():
+            body[tag] = extra[tag].strip()
+    if do == "entail" and _words(extra.get("overwrite")):
+        body["overwrite"] = _words(extra.get("overwrite"))
+    if do == "run":
+        try:
+            body["args"] = shlex.split(extra.get("args") or "")
+        except ValueError as e:
+            return _err("fabulac", raw, f"<args> could not be read as a command line: {e}")
+        if extra.get("input"):
+            body["stdin"] = extra["input"]
+        if _words(extra.get("hand")):
+            body["hand_over"] = _words(extra.get("hand"))
+    starter, fn = _conf.get("start"), _conf.get("first")
+    if starter is None or fn is None:
+        return _err("fabulac", raw, "this runs as a job in the reader, and no reader is running here; ask the person "
+                                    "to start it there")
+    try:
+        got = starter(lambda: fn(do, body))
+    except Exception as e:  # noqa: BLE001 - an HTTPException carries the route's words
+        return _err("fabulac", raw, str(getattr(e, "detail", None) or e))
+    if isinstance(got, dict) and isinstance(got.get("job"), dict):
+        tail = {"begin": ". It goes on by itself; <do>status</do> shows the questions it raised.",
+                "entail": ". It runs after this turn; <do>status</do> says what it wrote.",
+                "take-back": ". It runs after this turn; its questions then wait in the fabulac.",
+                "test": ". It runs now in the sandbox; <do>status</do> gives the result.",
+                "run": ". It runs now in the sandbox; <do>status</do> gives the result."}.get(do, "")
+        return _result("fabulac", raw, True, _job_line(got) + tail)
+    return _result("fabulac", raw, True, str((got or {}).get("message") or got))
+
+
+def _status_lines(st: dict) -> list[str]:
+    iv = st.get("interview") or {}
+    prog = st.get("program") or {}
+    lines = [f"{st['fabulac']}: authored {prog.get('kind') or 'program'}; interview "
+             + ("complete" if iv.get("complete") else f"next {iv.get('next')}"
+                + (f", stage {iv['stage']}" if iv.get("stage") else ""))]
+    for q in iv.get("shown") or []:
+        lines.append(f"- {q.get('id')}: {q.get('asks')}")
+    ent = st.get("entailment")
+    if ent:
+        lines.append(f"entailment {ent['folder']}: " + ("in step" if not (ent["tell"] or ent["edited"]) else
+                     "; ".join(f"{k} {', '.join(ent[k][:6])}" for k in ("tell", "edited", "kept") if ent[k])))
+    else:
+        lines.append("not entailed yet")
+    last = st.get("last_run")
+    if last:
+        lines.append(f"last {last.get('what')}: {last.get('message')} (run {last.get('run')})")
+    for j in st.get("jobs") or []:
+        lines.append(_job_line(j))
+    return lines
+
+
+def _first_sync(project_dir: Path, raw: str, do: str, extra: dict) -> Any:
+    from . import fabulac_first as FF
+    try:
+        if do == "starters":
+            lines = [f"{s['kind']}: {s['name']}, {s['line']}" for s in FF.starters()]
+            return _result("fabulac", raw or "", True, "starters (<do>begin</do> with <starter>):\n" + "\n".join(lines))
+        if do == "status":
+            st = FF.status(project_dir, raw)
+            jobs = _conf.get("jobs")
+            if jobs is not None:
+                fab = FF.authored(project_dir, raw)
+                st["jobs"] = [jobs.snapshot(j) for j in (jobs.running_for(k) for k in
+                              (str(fab.resolve()), "run:" + str(fab.resolve()))) if j]
+            return _result("fabulac", raw, True, "\n".join(_status_lines(st)))
+        if do == "add":
+            out = FF.add(project_dir, raw, as_=(extra.get("as") or "").strip(), says=extra.get("says") or "")
+            return _result("fabulac", raw, True, out["message"] + "; what it lacks is asked as a question")
+        if do == "check":
+            out = FF.check(project_dir, raw)
+            lines = [f"{out['fabulac']}: {'no errors' if out['ok'] else str(len(out['errors'])) + ' errors'}, "
+                     f"{len(out['warnings'])} warnings"]
+            lines += [f"- {e}" for e in (out["errors"] + out["warnings"])[:8]]
+            if out["uncovered"]:
+                lines.append("requirements no case shows: " + ", ".join(out["uncovered"]))
+            return _result("fabulac", raw, True, "\n".join(lines))
+        if do == "moved":
+            st = FF.moved(project_dir, raw)
+            if not st["entailed"]:
+                return _result("fabulac", raw, True, f"{st['folder']} is not entailed yet")
+            parts = [f"{k}: {', '.join(st[k])}" for k in ("tell", "edited", "gone", "kept") if st[k]]
+            return _result("fabulac", raw, True, f"{st['folder']} " + ("in step" if not parts else "; ".join(parts))
+                           + (". Edited by hand: the person chooses for each: overwrite, keep, or take back."
+                              if st["edited"] else ""))
+        if do == "keep":
+            out = FF.keep(project_dir, raw, _words(extra.get("file")), because=extra.get("because") or None)
+        elif do == "let-go":
+            out = FF.let_go(project_dir, raw, _words(extra.get("file")))
+        elif do == "head":
+            out = FF.head(project_dir, raw, _words(extra.get("parts")))
+            out["message"] = f"made {out['head']} over {', '.join(out['parts'])}"
+        elif do == "parts-moved":
+            out = FF.parts_moved(project_dir, raw)
+            out["message"] = ("moved: " + ", ".join(out["moved"])) if out["moved"] else "no part moved"
+        else:
+            return _err("fabulac", raw, f"<do> {do!r} is not one of {', '.join(FIRST_DO)}")
+    except FF.FirstError as e:
+        return _err("fabulac", raw, str(e))
+    return _result("fabulac", raw, True, str(out.get("message") or out))
 
 
 # ---------------------------------------------------------------------------
@@ -323,4 +463,4 @@ def register() -> None:
         _t._TRACE_TOGGLE.setdefault(name, "trace_log_enabled")
 
 
-__all__ = ["TOOL_NAMES", "configure", "register", "run_dialectic", "run_fabulac", "run_fabulap"]
+__all__ = ["FIRST_DO", "TOOL_NAMES", "configure", "register", "run_dialectic", "run_fabulac", "run_fabulap"]

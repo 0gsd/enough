@@ -1,0 +1,130 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/greet
+name: greet
+source:
+  kind: authored
+  language: python
+  licence:
+    pending: Under which licence will you offer it?
+  by:
+  - R:maker/author
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: service
+  start:
+  - -m
+  - greet
+  serve:
+    port: 0
+    reach: []
+atem:
+  line: greet answers a greeting on a port of this machine.
+  focus: what it does, and the cases that show it
+  push: a person wants a small program they can read
+  pull: 'it stays small: one thing, done well'
+nodes:
+- id: R:maker/author
+  type: maker
+  name: the author
+  summary: The author authored greet.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms the author offers greet on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.11'
+- id: N:aim/greet
+  type: aim
+  name: Answer a greeting
+  summary: greet answers a name with a greeting.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:use/a-page-asks
+  type: use
+  name: A page asks
+  summary: A page on this machine asks greet for a greeting.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:requirement/plain-words
+  type: requirement
+  name: Plain words
+  summary: The greeting is one plain sentence.
+  force: must
+  checked-by:
+  - P:case/greeting
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: C:interface/greeting
+  type: interface
+  name: greeting
+  summary: greeting(name) gives the words greet answers with.
+  surface: function
+  signature: 'greeting(name: str) -> str'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/greeting
+  type: case
+  name: A greeting
+  summary: greeting('Ada') gives 'Hello, Ada.'
+  of:
+  - C:interface/greeting
+  given:
+    calls: C:interface/greeting
+    arguments:
+      name: Ada
+  expect:
+    value: Hello, Ada.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1

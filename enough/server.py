@@ -1725,6 +1725,15 @@ def create_app(
             yield
             return
         session.client = httpx.AsyncClient()
+        # 0.8: sandbox run folders a crash or a stopped app left behind, older than a day, are swept (each run's
+        # folder is removed as soon as its result is read; ENOUGH_SANDBOX_KEEP keeps them for debugging).
+        from . import sandbox as _sandbox_sweep
+        try:
+            swept = await asyncio.to_thread(_sandbox_sweep.sweep)
+            if swept:
+                log.info("sandbox: swept %d stale run folder(s)", len(swept))
+        except Exception:  # noqa: BLE001 — never block startup on a sweep
+            log.exception("sandbox: sweeping stale run folders failed")
         # Opening a project is what stamps `last_opened` — and registers it
         # if it predates the registry, which is how an old project first
         # appears on the home screen (home-plan §6).
@@ -1804,6 +1813,9 @@ def create_app(
                 await preflight.cancel()
             if supervisor is not None:
                 await supervisor.stop(only_if_owned=True)
+            # 0.8: every run of an authored fabulac's entailment in the sandbox is stopped with the app.
+            from . import sandbox as _sandbox
+            _sandbox.stop_all()
             await session.client.aclose()
 
     app = FastAPI(title="enough", lifespan=lifespan)
@@ -1815,6 +1827,10 @@ def create_app(
     app.mount("/static", _RevalidatingStatic(directory=str(STATIC_DIR)), name="static")
 
     app.add_middleware(ModeGate, home=home)
+    # 0.8: the API promise's header gate (`enough/api_promise.py`): a promised route that starts a run or writes
+    # answers 403 without `X-Enough-Api: 1`.
+    from . import api_promise as _api_promise
+    app.add_middleware(_api_promise.PromiseGate)
     # Home has no model routes to refuse (ModeGate 404s them all).
     if not home:
         app.add_middleware(AgentFreeGate)
@@ -1964,6 +1980,11 @@ def create_app(
     from . import allograph_api as _allograph_api
     app.include_router(_allograph_api.build_router(project_dir=project_dir, jobs=canon_jobs,
                                                    catalog_after=_canon_catalog_after))
+    # 0.8, fabulac-first F6: an authored fabulac's routes (`enough/routes/fabulac.py`, `/api/fabulac/*`), every one in
+    # the API promise; begin, entail and take back are CanonJobs, and the sandbox's test and run too (kind `sandbox`).
+    from .routes import fabulac as _r_fabulac
+    _first_router = _r_fabulac.build_router(ctx)
+    app.include_router(_first_router)
 
     # The names a release has retired (`enough/retired_names.py`): each old path is served by its new path's handler
     # for one release; nothing documents them. The table is empty in 0.7.
@@ -1990,7 +2011,8 @@ def create_app(
         _fabula_tools.configure(project_dir=project_dir, start=_start_from_tool,
                                 build=_fabula_router.start_build, compile=_fabula_router.start_compile,
                                 verse=_fabulap_router.start_build,
-                                settle=_dialectic_router.start_settle, jobs=canon_jobs, emit=_emit_threadsafe)
+                                settle=_dialectic_router.start_settle, jobs=canon_jobs, emit=_emit_threadsafe,
+                                first=_first_router.start)
 
     app.include_router(_r_chat.build_router(ctx))             # /api/chat, /api/stream, /api/broker*, ...
     app.include_router(_r_settings.build_router(ctx))         # /api/ui-config, /api/readvisor/chief

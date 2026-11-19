@@ -331,6 +331,64 @@ def test_a_run_refused_midway_writes_nothing(project, monkeypatch):
     assert r["state"]["stage"] == "ways-in"
 
 
+LINECOUNT_BRIEF = """# linecount
+
+linecount says how many lines a text file holds.
+
+## For whom
+
+People who keep notes in plain text files.
+
+## Ways in
+
+- the command `linecount PATH`
+
+## Leaves out
+
+- It does not count words.
+
+## Must
+
+- It never writes a file.
+"""
+
+
+def test_a_worded_answer_to_an_unsure_question_does_not_loop_at_settle(project):
+    """W5-F7's find: begun from a brief agent-free, "Yes, that is right." to `D:question/ada-unsure` left the job
+    settling for ever ("stopped after 40 steps"): a whole-item answer in words waits for a model to read the item
+    again, and the job kept choosing settle. A plain yes now confirms the item by rules; a correction waits for a
+    model without holding the rest of the interview."""
+    (project / "brief.md").write_text(LINECOUNT_BRIEF, encoding="utf-8")
+    r = A.run_author(project, "linecount", brief="brief.md", licence="MIT", by="Ada", mode="rules",
+                     runtime=runtime(), now=NOW)
+    L = led(project, "linecount")
+    opened = {q["id"] for q in L.questions() if q.get("state") == "open"}
+    assert {"D:question/ada-unsure", "D:question/licence-unsure"} <= opened, opened
+    at = NOW + dt.timedelta(minutes=1)
+    A.answer(project, "linecount", [{"question": "D:question/ada-unsure", "says": "Yes, that is right."},
+                                    {"question": "D:question/licence-unsure",
+                                     "says": "No: the terms are Apache-2.0, not MIT."}], at=at)
+    r = A.run_author(project, "linecount", runtime=runtime(), now=at)
+    assert "stopped after" not in r["message"], r["message"]
+    assert len(r["ran"]) < 5
+    L = led(project, "linecount")
+    ada = L.question("D:question/ada-unsure")
+    assert ada.get("settled") and ada["settled"]["wrote"] == ["R:maker/ada"]
+    maker = next(i for i in L.items if i.get("id") == "R:maker/ada")
+    assert maker["provenance"].get("state") != "pending" and maker["provenance"]["confidence"] == 1
+    assert not L.question("D:question/licence-unsure").get("settled")          # a correction waits for a model
+    assert r["state"]["reading"] == ["D:question/licence-unsure"] and r["state"]["next"] == "answer"
+    assert "wait" in r["message"] and "for a model" in r["message"]
+    assert not any(q.get("about") == "R:maker/ada" and q.get("state") == "open" for q in L.questions())
+
+
+def test_only_a_plain_yes_confirms():
+    assert dl._confirms("Yes, that is right.") and dl._confirms("yes") and dl._confirms("Correct.")
+    assert dl._confirms("Yep, that's right")
+    assert not dl._confirms("Yes, but it was Bob") and not dl._confirms("No") and not dl._confirms("")
+    assert not dl._confirms("It was Bob, yes")
+
+
 def test_with_a_model_the_text_s_program_runs_and_the_model_only_places(project):
     (project / "tally.brief.md").write_text(BRIEF, encoding="utf-8")
     cp = Placer()

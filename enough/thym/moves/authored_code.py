@@ -868,7 +868,9 @@ def running_text(cat: dict, items: list[dict], fab_file: str) -> str:
                    "standard library, and enough's sandbox has the standard library only and installs nothing. Its "
                    "source is entailed and can run elsewhere.")
     elif kind == "service":
-        can.append(f"enough runs its tests in its sandbox. {SERVING_LATER.format(name=name)}")
+        can.append(f"{SERVING_LATER.format(name=name)} Its sandbox refuses a service whole, its tests included: "
+                   "enough authors it, entails it and checks its fabulac, but runs neither its tests nor the "
+                   "service. Run its tests from this folder yourself, as above.")
     elif kind == "library":
         can.append("enough runs its tests in its sandbox; a library has nothing to start.")
     else:

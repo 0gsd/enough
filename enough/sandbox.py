@@ -360,15 +360,70 @@ def check_needs(name: str, names: Iterable[str], *, local: Iterable[str] = (), s
         raise Refusal(needs_sentence(name, unmet, source=source), reason="needs")
 
 
+#: The exceptions an `except` may name for the imports in its `try` to count as optional (the program goes on without
+#: them): a missing module raises ImportError (ModuleNotFoundError is one).
+OPTIONAL_GUARDS = frozenset({"ImportError", "ModuleNotFoundError", "Exception", "BaseException"})
+
+
+def _guards_import(handler: ast.ExceptHandler) -> bool:
+    t = handler.type
+    if t is None:                                       # a bare `except:`
+        return True
+    names = t.elts if isinstance(t, ast.Tuple) else [t]
+    return any((isinstance(n, ast.Name) and n.id in OPTIONAL_GUARDS)
+               or (isinstance(n, ast.Attribute) and n.attr in OPTIONAL_GUARDS) for n in names)
+
+
+def _siblings(d: Path) -> set[str]:
+    """The modules a file in folder `d` can import as siblings: its `.py` files and its folders (packages)."""
+    out: set[str] = set()
+    try:
+        for p in d.iterdir():
+            if p.is_symlink():
+                continue
+            if p.suffix == ".py":
+                out.add(p.stem)
+            elif p.is_dir() and p.name.isidentifier():
+                out.add(p.name)
+    except OSError:
+        pass
+    return out
+
+
+def _hard_imports(tree: ast.AST) -> set[str]:
+    """The top-level names a module imports absolutely, but those inside a `try` whose `except` catches ImportError
+    (an optional import: the program goes on without it)."""
+    found: set[str] = set()
+
+    def visit(node: ast.AST, optional: bool) -> None:
+        if isinstance(node, ast.Import):
+            if not optional:
+                found.update(a.name.split(".")[0] for a in node.names)
+            return
+        if isinstance(node, ast.ImportFrom):
+            if not optional and not node.level and node.module:
+                found.add(node.module.split(".")[0])
+            return
+        if isinstance(node, (ast.Try, getattr(ast, "TryStar", ast.Try))):
+            guarded = optional or any(_guards_import(h) for h in node.handlers)
+            for child in node.body:
+                visit(child, guarded)
+            for child in [*node.handlers, *node.orelse, *node.finalbody]:
+                visit(child, optional)
+            return
+        for child in ast.iter_child_nodes(node):
+            visit(child, optional)
+
+    visit(tree, False)
+    return found
+
+
 def imports_of(folder: str | os.PathLike) -> tuple[set[str], set[str]]:
-    """(top-level names imported absolutely, the folder's own top-level modules), by syntax only (nothing runs)."""
+    """(top-level names imported absolutely and not optionally, the program's own modules), by syntax only (nothing
+    runs). An import inside `try: … except ImportError` is optional and not counted; a module beside the file that
+    imports it (a sibling, anywhere in the folder) is the program's own, as are the folder's top-level modules."""
     folder = Path(folder)
-    local: set[str] = set()
-    for p in folder.iterdir():
-        if p.suffix == ".py":
-            local.add(p.stem)
-        elif p.is_dir() and not p.is_symlink():
-            local.add(p.name)
+    local: set[str] = _siblings(folder)
     for p in folder.glob("tests/*.py"):
         local.add(p.stem)
     found: set[str] = set()
@@ -379,11 +434,10 @@ def imports_of(folder: str | os.PathLike) -> tuple[set[str], set[str]]:
             tree = ast.parse(p.read_text(encoding="utf-8", errors="replace"))
         except SyntaxError:
             continue
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                found.update(a.name.split(".")[0] for a in node.names)
-            elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
-                found.add(node.module.split(".")[0])
+        names = _hard_imports(tree)
+        if p.parent != folder:
+            names -= _siblings(p.parent)
+        found |= names
     return found, local
 
 
@@ -392,6 +446,62 @@ def imports_of(folder: str | os.PathLike) -> tuple[set[str], set[str]]:
 def default_root() -> Path:
     thym = os.environ.get("ENOUGH_THYM_ROOT") or os.path.join(os.path.expanduser("~"), "enough", "thym")
     return Path(thym) / "sandbox"
+
+
+#: Run folders are removed once their result is read and the run is over (`discard`), and those left behind (a crash,
+#: a stop of the app) are swept at app start when older than this many seconds (`sweep`).
+STALE_AFTER = 24 * 60 * 60
+#: Set True (or export ENOUGH_SANDBOX_KEEP=1) to keep every run folder for debugging: nothing is discarded or swept.
+KEEP_RUNS = False
+_RUN_ID = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{8}$")
+
+
+def keeping() -> bool:
+    """Whether run folders are kept (the seam `KEEP_RUNS`, or ENOUGH_SANDBOX_KEEP set to anything but 0 or empty)."""
+    return KEEP_RUNS or os.environ.get("ENOUGH_SANDBOX_KEEP", "").strip() not in ("", "0")
+
+
+def discard(run: Run) -> bool:
+    """Remove a run's folder once its result has been read and the run is over; False (nothing removed) while it
+    runs, when folders are kept, or when the folder is not a run folder."""
+    if keeping():
+        return False
+    with _LOCK:
+        if run.run_id in _LIVE:
+            return False
+    folder = Path(run.folder)
+    if not _RUN_ID.match(folder.name) or folder.name != run.run_id or not folder.is_dir() or folder.is_symlink():
+        return False
+    shutil.rmtree(folder, ignore_errors=True)
+    return not folder.exists()
+
+
+def sweep(root: str | os.PathLike | None = None, *, older_than: float = STALE_AFTER,
+          now: float | None = None) -> list[str]:
+    """Remove the run folders under `root` (default `default_root()`) last changed more than `older_than` seconds
+    ago and not running: what a crash or a stopped app left behind. Only folders named as runs are touched. Returns
+    the run ids removed (none when folders are kept)."""
+    if keeping():
+        return []
+    root = Path(root) if root is not None else default_root()
+    if not root.is_dir():
+        return []
+    now = time.time() if now is None else now
+    with _LOCK:
+        live = set(_LIVE)
+    gone: list[str] = []
+    for e in os.scandir(root):
+        if not _RUN_ID.match(e.name) or e.name in live or e.is_symlink() or not e.is_dir(follow_symlinks=False):
+            continue
+        try:
+            age = now - e.stat(follow_symlinks=False).st_mtime
+        except OSError:
+            continue
+        if age > older_than:
+            shutil.rmtree(e.path, ignore_errors=True)
+            if not os.path.exists(e.path):
+                gone.append(e.name)
+    return sorted(gone)
 
 
 def _tree_size(*folders: Path) -> int:

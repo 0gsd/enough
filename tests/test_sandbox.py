@@ -127,6 +127,39 @@ def test_an_import_outside_the_standard_library_is_refused(tmp_path):
                                 "it here yet. Its source is entailed and can run elsewhere.")
 
 
+def test_optional_and_sibling_imports_are_accepted_and_a_hard_outside_import_is_not(tmp_path):
+    """W4-K2's find: the needs check read every import by syntax, so an optional `try: import dns` and a sibling
+    script's import refused a whole program. An import guarded by `except ImportError` (or a tuple holding it, or
+    a bare except) is optional; a module beside the importing file is the program's own."""
+    d = entailed(tmp_path, """
+        try:
+            import dns
+        except ImportError:
+            dns = None
+        try:
+            import yaml, toml
+        except (ValueError, ModuleNotFoundError):
+            pass
+        import helper
+        from helper import count
+        def main():
+            return 0
+    """)
+    (d / "tally" / "helper.py").write_text("def count():\n    return 1\n")
+    found, local = sb.imports_of(d)
+    assert not {"dns", "yaml", "toml", "helper"} & found, found
+    run = sb.prepare(d, source_kind="authored", root=tmp_path / "runs")      # not refused
+    assert run.program.name == "tally"
+    # still refused: a hard import outside the source, and one only an except of another kind guards
+    (d / "tally" / "more.py").write_text("import requests\ntry:\n    import numpy\nexcept ValueError:\n    pass\n")
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(d, source_kind="authored", root=tmp_path / "runs2")
+    assert e.value.reason == "needs" and "`numpy`, `requests`" in e.value.sentence
+    # an import in the except or else branch is not guarded by the try
+    (d / "tally" / "more.py").write_text("try:\n    pass\nexcept ImportError:\n    import attr\n")
+    assert "attr" in sb.imports_of(d)[0]
+
+
 def test_a_declared_dependency_is_refused(tmp_path):
     d = entailed(tmp_path, "print(1)\n", project='dependencies = ["attrs==23.1.0", "rich>=13"]')
     with pytest.raises(sb.Refusal) as e:
@@ -591,3 +624,51 @@ def test_an_owners_code_run_reads_the_venv_and_nothing_more(tmp_path):
     r2 = sb.run_tool(run2, limits=sb.Limits(wall=60, grace=1))
     assert "ModuleNotFoundError" in r2.stderr and "YAML" not in r2.stdout
     assert r2.guarantees["packages"] == "standard-library"
+
+
+# ---- run folders: discarded once read, swept when stale, kept on the seam (W5-XF2) ------------------------------
+
+def test_a_run_folder_is_discarded_and_stale_ones_are_swept(tmp_path, monkeypatch):
+    monkeypatch.delenv("ENOUGH_SANDBOX_KEEP", raising=False)
+    root = tmp_path / "runs"
+    run = sb.prepare(entailed(tmp_path, "print('hi')\n"), source_kind="authored", root=root)
+    assert run.folder.is_dir()
+    with sb._LOCK:                                      # still running: kept
+        sb._LIVE[run.run_id] = None
+    try:
+        assert sb.discard(run) is False and run.folder.is_dir()
+    finally:
+        with sb._LOCK:
+            sb._LIVE.pop(run.run_id, None)
+    assert sb.discard(run) is True and not run.folder.exists()
+    # the sweep: run folders older than a day go; a fresh one, a live one and anything not named as a run stay
+    old, fresh, live = "20261101-120000-0000000a", "20261101-120000-0000000b", "20261101-120000-0000000c"
+    for n in (old, fresh, live, "not-a-run"):
+        (root / n / "work").mkdir(parents=True)
+    now = time.time()
+    for n in (old, live, "not-a-run"):
+        os.utime(root / n, (now - 2 * sb.STALE_AFTER, now - 2 * sb.STALE_AFTER))
+    with sb._LOCK:
+        sb._LIVE[live] = None
+    try:
+        assert sb.sweep(root, now=now) == [old]
+    finally:
+        with sb._LOCK:
+            sb._LIVE.pop(live, None)
+    assert sorted(p.name for p in root.iterdir()) == sorted([fresh, live, "not-a-run"])
+    assert sb.sweep(tmp_path / "nowhere") == []
+
+
+def test_the_seam_keeps_run_folders_for_debugging(tmp_path, monkeypatch):
+    root = tmp_path / "runs"
+    run = sb.prepare(entailed(tmp_path, "print('hi')\n"), source_kind="authored", root=root)
+    stale = root / "20261101-120000-0000000a"
+    stale.mkdir()
+    os.utime(stale, (0, 0))
+    monkeypatch.setattr(sb, "KEEP_RUNS", True)
+    assert sb.discard(run) is False and sb.sweep(root) == [] and run.folder.is_dir() and stale.is_dir()
+    monkeypatch.setattr(sb, "KEEP_RUNS", False)
+    monkeypatch.setenv("ENOUGH_SANDBOX_KEEP", "1")
+    assert sb.discard(run) is False and sb.sweep(root) == []
+    monkeypatch.setenv("ENOUGH_SANDBOX_KEEP", "0")
+    assert sb.sweep(root) == [stale.name] and sb.discard(run) is True

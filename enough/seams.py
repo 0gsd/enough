@@ -66,6 +66,11 @@ FIXED_SEAMS: dict[str, str] = {
     "ENOUGH_ALLOGRAPH_URL": "http://127.0.0.1:1",
     # The keychain (0.7): held in memory, never the OS keychain, for a listing's key and Connect's token.
     "ENOUGH_KEYCHAIN": "memory",
+    # The fabulac-first doors (0.8): the running enough the Python client talks to (enough_client.py), and the
+    # local model `python -m enough.fabulac` asks: loopback ports nothing listens on, so a scratch run never
+    # reaches a person's live enough or their model.
+    "ENOUGH_URL": "http://127.0.0.1:1",
+    "ENOUGH_LLM_URL": "http://127.0.0.1:1",
 }
 
 # Seams that change behaviour rather than location, cleared: a developer who has one exported would otherwise get
@@ -82,6 +87,7 @@ BEHAVIOUR_SEAMS: tuple[str, ...] = (
     "ENOUGH_DESKTOP_LLM_URL",    # shell: the llama-server URL the desktop app hands the backend
     "ENOUGH_VULKAN_ICD_DIRS",    # shell: llama_server.sh's Vulkan driver folders
     "ENOUGH_REPO_URL",           # shell: bootstrap.sh's clone source
+    "ENOUGH_SANDBOX_KEEP",       # sandbox.keeping: keep every sandbox run folder for debugging (no discard, no sweep)
 )
 
 # Variables read under enough/ that are plain flags, naming no path and no service, so they need no seam. Each

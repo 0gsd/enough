@@ -989,6 +989,8 @@ Every compile is a new file or folder: nothing is overwritten, the fabulac itsel
 
 **Your readvisor.** With the macrocosm-oes skill on, "compile tool's fabulac as code", or "write its catem at depth overview", starts the same compile, after the turn, and never unasked.
 
+**Writing programs of your own.** To write a program fabulac-first — its fabulac authored by you, then the code it entails, judged by its cases — read [the developers' manual](#doc:developers). It is in English for now.
+
 ---
 
 ## 13. MacroCOSM OES

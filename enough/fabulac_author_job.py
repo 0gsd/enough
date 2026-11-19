@@ -123,9 +123,10 @@ def _target(project_dir: Path, fab: Path) -> _dapi.Target:
     return _dapi.target(project_dir, _fj.rel_of(project_dir, fab))
 
 
-def author_state(project_dir: Path, fab: Path) -> dict:
+def author_state(project_dir: Path, fab: Path, *, mode: str = "rules") -> dict:
     """Where an authored fabulac stands, from disk alone: `{fabulac, exists, authored, name, kind, licence, stages:
-    [{stage, n, asked, open, landed}], stage, open, shown, sittings, next, complete}`. `next` is what the job does
+    [{stage, n, asked, open, landed}], stage, open, shown, sittings, reading, next, complete}`; `reading` the answered
+    questions a settle by rules cannot fold (their item must be read again by a model: `mode` other than `model`). `next` is what the job does
     next (`STEPS`): `begin` with no fabulac; `settle` while a sitting beside it is not settled; `answer` while a
     question waits for the person; `raise` while the bank has more to ask; `done` when nothing is left."""
     project_dir = Path(project_dir)
@@ -135,7 +136,8 @@ def author_state(project_dir: Path, fab: Path) -> dict:
     base = {"fabulac": _fj.rel_of(project_dir, fab), "exists": exists, "authored": False, "name": None,
             "kind": None, "licence": None, "stages": [{"stage": s, "n": i + 1, "asked": 0, "open": 0, "landed": False}
                                                       for i, s in enumerate(order)],
-            "stage": None, "open": [], "shown": [], "sittings": 0, "next": "begin", "complete": False}
+            "stage": None, "open": [], "shown": [], "sittings": 0, "reading": [], "next": "begin",
+            "complete": False}
     if not exists:
         return base
     authored = _author.is_authored(doc)
@@ -155,7 +157,13 @@ def author_state(project_dir: Path, fab: Path) -> dict:
         st = _dl.stage_of_question(led, q)
         if st:
             by_stage.setdefault(st, []).append(q)
-    unsettled = _dl.unsettled_questions(led)
+    # Answers a settle by rules cannot fold (a correction in words: the item must be read again, by a model) wait for
+    # one; they hold neither the settle nor the stages after them, or an agent-free job settles them for ever.
+    reading: list[str] = []
+    if mode != "model" and not waiting and any(q.get("state") in _dl.ANSWERED and not q.get("settled")
+                                               for q in led.questions()):
+        reading = [qid for qid, _about, _why in _dl.settle(led.copy()).needs_reading]
+    unsettled = [q for q in _dl.unsettled_questions(led) if q["id"] not in reading]
     more = _dl.raise_questions(led.copy(), rules=True).questions if not unsettled and not waiting else []
     reached = max((order.index(s) for s in by_stage if s in order), default=-1)
     current = None
@@ -170,7 +178,8 @@ def author_state(project_dir: Path, fab: Path) -> dict:
             current = s
     if waiting:
         nxt = "settle"
-    elif any(q.get("state") in _dl.ANSWERED and not q.get("settled") for q in led.questions()):
+    elif any(q.get("state") in _dl.ANSWERED and not q.get("settled") and q["id"] not in reading
+             for q in led.questions()):
         nxt = "settle"
     elif open_q:
         nxt = "answer"
@@ -181,10 +190,10 @@ def author_state(project_dir: Path, fab: Path) -> dict:
         for row in base["stages"]:
             row["landed"] = True
         current = None
-    base.update(stage=current, open=[q["id"] for q in open_q], sittings=len(waiting), next=nxt,
+    base.update(stage=current, open=[q["id"] for q in open_q], sittings=len(waiting), next=nxt, reading=reading,
                 shown=[{"id": q["id"], "asks": q.get("asks"), "kind": q.get("kind"), "hint": q.get("hint"),
                         "stage": _dl.stage_of_question(led, q)} for q in open_q[:SHOWN]],
-                complete=nxt == "done")
+                complete=nxt == "done" and not reading)
     return base
 
 
@@ -379,7 +388,7 @@ def run_author(project_dir: Path, rel: str, *, kind: str = "tool", brief: str | 
     ran: list[dict] = []
     says: list[str] = []
     for _ in range(MAX_STEPS):
-        state = author_state(project_dir, fab)
+        state = author_state(project_dir, fab, mode=mode)
         step = state["next"]
         if step in ("answer", "done"):
             break
@@ -399,9 +408,16 @@ def run_author(project_dir: Path, rel: str, *, kind: str = "tool", brief: str | 
         ran.append(r)
     else:
         says.append(f"stopped after {MAX_STEPS} steps; take it up again")
-    final = author_state(project_dir, fab)
+    final = author_state(project_dir, fab, mode=mode)
+    if final["reading"]:
+        n = len(final["reading"])
+        says.append(f"{n} answer{'s' if n != 1 else ''} wait{'s' if n == 1 else ''} for a model to read "
+                    f"{'its item' if n == 1 else 'their items'} again ({', '.join(final['reading'])}): take it up "
+                    "again with a model, or answer again")
     if final["complete"]:
         msg = f"{fab.name}: every stage of the interview has landed"
+    elif final["next"] == "done":
+        msg = f"{fab.name}: every stage of the interview has landed but what waits for a model"
     elif final["next"] == "answer":
         msg = (f"{fab.name}: {len(final['open'])} question{'s' if len(final['open']) != 1 else ''} wait for you"
                + (f" (stage: {final['stage']})" if final.get("stage") else ""))

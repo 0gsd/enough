@@ -23388,6 +23388,13 @@
       // OES before), pulled from cosmoes.org like the other three.
       'comprise-oes': { icon: 'cosm', unwrap: true, plain: 'all', kind: 'spec',
         stack: () => t('modes.docs.comprise.icon', 'Comprise OES specification') },
+      // 0.8 (fabulac-first F7): the developers' manual, English only for
+      // now (docs.note.english says so in a translated UI); the help
+      // center's 12.8 links to it with `[…](#doc:developers)`.
+      developers: { icon: 'hxc', unwrap: false, plain: 'distinctive',
+        title: () => t('docs.title.developers', 'developers’ manual'),
+        exit: () => t('modes.docs.developers.exit', 'close the developers’ manual'),
+        stack: () => t('modes.docs.developers.icon', 'developers’ manual') },
       // 0.5.0: a Thym program (any `.thym` file; DOCS.prog names it), drawn
       // by DOCS_PROGRAM_DENSITIES in the Thym block.
       program: { icon: 'cosm', unwrap: false, plain: 'all',
@@ -23685,7 +23692,8 @@
         icon: DOCS_DOCS[doc].icon,
         onExit: exitDocsMode,
         iconTitle: DOCS_DOCS[doc].stack(),
-        exitTitle: prog ? t('modes.docs.program.exit', 'close the program')
+        exitTitle: DOCS_DOCS[doc].exit ? DOCS_DOCS[doc].exit()
+          : prog ? t('modes.docs.program.exit', 'close the program')
           : (spec ? t('modes.docs.spec.exit', 'close the specification') : t('modes.docs.help.exit', 'close the help center')),
       });
       applyReviewContrast();
@@ -23744,7 +23752,8 @@
       const doc = DOCS.doc, data = DOCS.data;
       const spec = docsIsSpec(doc);
       setIcon(docsEl('docs-icon'), DOCS_DOCS[doc] ? DOCS_DOCS[doc].icon : 'hxc');
-      docsEl('docs-title').textContent = doc === 'program' ? t('docs.title.program', 'program')
+      docsEl('docs-title').textContent = DOCS_DOCS[doc] && DOCS_DOCS[doc].title ? DOCS_DOCS[doc].title()
+        : doc === 'program' ? t('docs.title.program', 'program')
         : (spec ? t('docs.title.spec', 'specification') : t('docs.title.help', 'help center'));
       let badge = '', badgeTitle = '';
       if (data && doc === 'program') {
@@ -24319,6 +24328,14 @@
       }
       const mark = e.target.closest && e.target.closest('button.docs-mark');
       if (mark) { void docsMarkFlip(mark.dataset.key); return; }
+      // 0.8: a link to another document, `[the developers' manual](#doc:developers)`.
+      const other = e.target.closest && e.target.closest('a[href^="#doc:"]');
+      if (other) {
+        e.preventDefault();
+        const slug = other.getAttribute('href').slice(5);
+        if (DOCS_DOCS[slug] && slug !== 'program') void enterDocsMode({ doc: slug, density: 'short' });
+        return;
+      }
       const go = e.target.closest && e.target.closest('[data-go]');
       if (go) {
         e.preventDefault();

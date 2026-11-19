@@ -558,7 +558,8 @@ def test_the_five_documents():
     """0.5.4: four specifications — the canonical editions published at cosmoes.org, bundled by
     scripts/sync_specs.py with their editions in docs/specs.json — and the help center. Names carry no number; a
     specification's version is its edition, read from specs.json (or a synced state.json), never the grammar's."""
-    assert list(D.DOCUMENTS) == ["macrocosm-oes", "thym", "ascribe", "comprise-oes", "help-center"]
+    assert list(D.DOCUMENTS)[:5] == ["macrocosm-oes", "thym", "ascribe", "comprise-oes", "help-center"]
+    assert list(D.DOCUMENTS)[5:] == ["developers"]                     # 0.8: and the developers' manual
     editions = D.bundled_editions()
     assert set(editions) == {"macrocosm-oes", "thym", "ascribe", "comprise-oes"}
     for slug, name, path in (("macrocosm-oes", "MacroCOSM OES", "docs/MACROCOSM_OES.md"),
@@ -583,6 +584,35 @@ def test_the_five_documents():
     # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
     assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.7.0"
     assert str(mc.default_registry().get("thym").version) == "1"
+
+
+def test_the_developers_manual(built):
+    """0.8 (fabulac-first F7, pins section 4): the developers' manual is docs/DEVELOPERS.md, English only in 0.8,
+    bundled like the help center (desktop/src-tauri/build.rs stages it), shown in the docs viewer (the page knows it
+    and opens it from a `#doc:developers` link), and pointed at from the help center's 12.8 in all six languages. It
+    builds and lints clean, says what 0.8 does not do, and leaves the second worked example's place marked."""
+    d = D.DOCUMENTS["developers"]
+    assert (d.sources, d.spec, d.voice, d.bubbles) == ({"en": "docs/DEVELOPERS.md"}, False, None, {})
+    assert d.version == D.DOCUMENTS["help-center"].version
+    assert D.tellings("developers") == ["en"]
+    assert '"docs/DEVELOPERS.md"' in (REPO / "desktop" / "src-tauri" / "build.rs").read_text(encoding="utf-8")
+    html = (REPO / "enough" / "static" / "index.html").read_text(encoding="utf-8")
+    assert "developers: { icon:" in html and "a[href^=\"#doc:\"]" in html
+    vol = built["vols"][("developers", "en")]
+    assert vol.catalog["id"] == "doc/developers" and vol.catalog["tellings"] == ["en"]
+    rep = D.lint_doc(vol)
+    assert rep.ok, [str(p) for p in rep.errors][:5]
+    numbers = {it.data.get("number") for it in vol.items.values() if it.data.get("type") == "section"}
+    assert {"1", "2", "3", "4", "5", "6"} <= numbers and {"2.12", "6.3", "6.10"} <= numbers
+    text = (REPO / "docs" / "DEVELOPERS.md").read_text(encoding="utf-8")
+    assert "<!-- F8:" in text                                         # the owner's program, the second example
+    for said in ("Serving is specified, not on", "named and pinned, not run here", "read, never run",
+                 "Memory is not limited on macOS"):
+        assert said in text, said
+    for lang in D.LANGS:
+        body = (REPO / D.DOCUMENTS["help-center"].sources[lang]).read_text(encoding="utf-8")
+        section = body[body.index("### 12.8"):body.index("\n## 13.")]
+        assert section.count("](#doc:developers)") == 1, lang
 
 
 def test_the_three_minicosm_specifications_enumerate(built):

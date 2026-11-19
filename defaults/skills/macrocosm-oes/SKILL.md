@@ -120,6 +120,14 @@ files, 6,000 lines): `tool/` → `tool.fabulac.cosm`. Only when asked:
 - `<do>compile</do>` with `<what>` `code` (a cshort and the manual catem) or
   a catem's depth: `line`, `overview`, `manual`.
 - An authored fabulac's entailment runs only in the sandbox; a cshort of code the person did not author is read, never run.
+- An authored fabulac (the person's own program): `<do>begin</do>` with
+  `<kind>` tool, library or service, `<licence>`, `<brief>` (or
+  `<starter>` and a kind: `<do>starters</do>` lists them); again, it takes
+  the interview up. `add` (`<as>` requirement, decision, case or
+  interface; `<says>` their words), `check`, `entail`, `test`, `run`
+  (`<args>`), `stop`, `moved`; for a hand edit `keep`, `let-go` or
+  `take-back` with `<file>`, as the person chooses; `head` (`<parts>`) and
+  `parts-moved` for a program of parts. A service is refused at run.
 
 A poem can be decompiled in steps too, only when asked: `fabulap`
 `<do>build</do>` with the poem's `<path>` scans it and hears it by rule,

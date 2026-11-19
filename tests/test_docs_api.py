@@ -185,6 +185,19 @@ FIXTURE_HELP_DE = """\
 Alle Tastenkürzel stehen auf dem **Spickzettel**. Siehe Abschnitt 1.
 """
 
+FIXTURE_DEV = """\
+# the orchard developers' manual
+
+## 1. A worked example
+
+<!-- atem: one tree, planted from a plan -->
+A **plan** is the tree before it is planted. Section 2 lists every call.
+
+## 2. Reference
+
+Every call, with an example.
+"""
+
 FIXTURE_BUBBLES = """\
 <!-- help bubbles -->
 
@@ -217,6 +230,7 @@ def docs_src(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "docs/ASCRIBE.md": FIXTURE_ASCRIBE,
         "docs/COMPRISE_OES.md": FIXTURE_COMPRISE,
         "docs/HELP_CENTER.md": FIXTURE_HELP_EN,
+        "docs/DEVELOPERS.md": FIXTURE_DEV,
         "enough/static/i18n/de/help-center.md": FIXTURE_HELP_DE,
         "enough/static/help-docs.md": FIXTURE_BUBBLES,
         "enough/static/i18n/de/help-docs.md": FIXTURE_BUBBLES,
@@ -433,6 +447,26 @@ def test_thym_and_ascribe_are_served(docs_src: Path, project: Path, mode: str):
             assert f"{doc}@{version}:section:2" in {x["xref"] for x in rows}
 
 
+@pytest.mark.parametrize("mode", ["project", "home"])
+def test_the_developers_manual_is_served_in_english(docs_src: Path, project: Path, mode: str):
+    """0.8 (fabulac-first F7): the developers' manual is a document of its own, English only in 0.8 (a translated UI
+    gets the English telling and says so), at every density, compiled back byte for byte."""
+    with _client(project, mode) as c:
+        for density in ("atem", "short", "fabula"):
+            r = _docs(c, "developers", density=density)
+            assert r.status_code == 200, (density, r.text)
+            p = r.json()
+            assert (p["doc"], p["lang"], p["requested_lang"]) == ("developers", "en", None)
+        short = _docs(c, "developers", density="short").json()
+        assert {s["number"] for s in short["sections"] if s.get("number")} >= {"1", "2"}
+        for lang in ("de", "fr", "es", "ja", "zh"):
+            r = _docs(c, "developers", lang, density="short")
+            assert r.status_code == 200 and (r.json()["lang"], r.json()["requested_lang"]) == ("en", lang)
+        r = c.post("/api/docs/compile", json={"doc": "developers"})
+        assert r.status_code == 200
+        assert r.json()["markdown"].encode("utf-8") == (docs_src / "docs/DEVELOPERS.md").read_bytes()
+
+
 def test_unknown_documents_languages_and_densities(docs_src: Path, project: Path):
     with _client(project, "home") as c:
         assert _docs(c, "nope").status_code == 404
@@ -619,7 +653,7 @@ def test_the_background_build(docs_src: Path, project: Path):
     import time
     with _client(project, "home") as c:
         r = c.post("/api/docs/build", json={})
-        assert r.status_code == 202 and r.json()["progress"]["total"] == 10     # 4 specs + the help center's 6
+        assert r.status_code == 202 and r.json()["progress"]["total"] == 11     # 4 specs, the help center's 6, developers
         for _ in range(200):
             st = c.get("/api/docs/status").json()
             if not st["building"]:
@@ -628,6 +662,7 @@ def test_the_background_build(docs_src: Path, project: Path):
         rows = {(d["doc"], d["lang"]): d for d in st["documents"]}
         assert rows[("macrocosm-oes", "en")]["fresh"] and rows[("help-center", "de")]["fresh"]
         assert rows[("thym", "en")]["fresh"] and rows[("ascribe", "en")]["fresh"]
+        assert rows[("developers", "en")]["fresh"] and ("developers", "de") not in rows    # English only
         assert not rows[("help-center", "fr")]["built"]                      # no source in this install
         assert st["ready"] is False
 

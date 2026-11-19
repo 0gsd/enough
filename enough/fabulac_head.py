@@ -489,6 +489,16 @@ def _slug(s: str) -> str:
     return out or "part"
 
 
+def maker_ref(by: str) -> tuple[str, str]:
+    """Who made a head, as the reference `source.by` holds and the `R:maker` item it names: `(R:maker/<slug>, name)`.
+    A name (`Ada`) becomes `R:maker/ada`; a reference given whole (`R:maker/ada`) is kept."""
+    raw = str(by).strip()
+    if raw.startswith("R:maker/") and re.fullmatch(r"R:maker/[a-z0-9]+(?:-[a-z0-9]+)*", raw):
+        return raw, raw.split("/", 1)[1]
+    return f"R:maker/{_slug(raw.split('/', 1)[-1] if raw.startswith('R:maker/') else raw)}", \
+        (raw.split("/", 1)[-1] if raw.startswith("R:maker/") else raw)
+
+
 def make_head(head: Path, parts: Iterable[Path], *, name: str | None = None, licence: Any = None,
               by: str | None = None, at: Any = None, interfaces: Iterable[dict] = (),
               does: Mapping[str, str] | None = None) -> dict:
@@ -531,13 +541,14 @@ def make_head(head: Path, parts: Iterable[Path], *, name: str | None = None, lic
         row["sha256"] = _sha(p)
     lic = licence if licence is not None else {"pending": "What licence is the whole program offered under?"}
     src: dict = {"kind": "authored", "language": "python", "licence": lic}
-    if by:
-        src["by"] = [by]
+    maker_id, maker_name = maker_ref(by) if by and str(by).strip() else (None, None)
+    if maker_id:
+        src["by"] = [maker_id]
     src["at"] = day
-    makers = [{"id": by, "type": "maker", "name": by.split("/", 1)[-1], "summary": f"{by} made the head.",
+    makers = [{"id": maker_id, "type": "maker", "name": maker_name, "summary": f"{maker_name} made the head.",
                "capacity": "author", "stance": "axiom",
                "provenance": {"mode": "manual", "sources": ["the head, made from its parts"], "confidence": 1}}] \
-        if by else []
+        if maker_id else []
     nodes = makers + [{"id": "R:licence/licence", "type": "licence", "name": "licence",
                        "summary": f"The terms {name or stem} is offered on.", "stance": "axiom",
                        "provenance": {"mode": "manual", "sources": ["the head, made from its parts"], "confidence": 1},
@@ -555,5 +566,5 @@ def make_head(head: Path, parts: Iterable[Path], *, name: str | None = None, lic
     return {"head": str(head), "uri": me, "parts": [r for _p, r in rows]}
 
 
-__all__ = ["AGREE", "CHECKS", "Fabulacs", "SEVERITY", "STATES", "disagreements", "make_head", "part_folder",
+__all__ = ["AGREE", "CHECKS", "Fabulacs", "SEVERITY", "STATES", "disagreements", "make_head", "maker_ref", "part_folder",
            "parts_moved", "problems", "set_catalog_key", "split_uri", "stamp_parts", "volume_uri", "which_moved"]

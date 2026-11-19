@@ -989,6 +989,8 @@ fabulac 蕴含两类东西，就像任何 fabula 蕴含它的 short 一样。卡
 
 **你的阅问。** macrocosm-oes 技能开着时，说「把 tool 的 fabulac 编译为代码」，或者「写它深度为 overview 的 catem」，就会启动同样的编译，在这一轮之后运行，而且绝不会没人要求就做。
 
+**写你自己的程序。** 想从 fabulac 开始写程序——先由你写出它的 fabulac，再写出它蕴含的代码，由它的用例来评判——请读[开发者手册](#doc:developers)。它目前只有英文版。
+
 ---
 
 ## 13. MacroCOSM OES

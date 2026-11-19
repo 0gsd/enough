@@ -1699,6 +1699,19 @@ def count_conflicts(led: Ledger) -> list[tuple[dict, dict, str, str]]:
     return out
 
 
+#: The words of a plain "yes, that is right" (an answer to an "-unsure" question that changes nothing): the first is
+#: one of `_CONFIRM_FIRST`, every other one of `_CONFIRM_WORDS`. Anything more is a correction, read again.
+_CONFIRM_FIRST = frozenset({"yes", "yeah", "yep", "y", "correct", "right", "true", "exactly", "indeed"})
+_CONFIRM_WORDS = _CONFIRM_FIRST | frozenset({"that", "this", "it", "is", "thats", "its", "that's", "it's", "all",
+                                            "quite", "so", "sure", "fine", "good", "ok", "okay", "as", "said"})
+
+
+def _confirms(text: Any) -> bool:
+    """Whether the person's words only say "yes, that is right" (and nothing that would correct it)."""
+    words = re.findall(r"[a-z']+", str(text or "").lower().replace("’", "'"))
+    return bool(words) and words[0] in _CONFIRM_FIRST and all(w in _CONFIRM_WORDS for w in words)
+
+
 def _unsure(d: dict) -> bool:
     prov = d.get("provenance")
     conf = prov.get("confidence") if isinstance(prov, dict) else d.get("confidence")
@@ -2937,6 +2950,22 @@ def fold(src: Any, about: Any, answer: dict, *, question: dict | None = None, sp
             else:
                 d["provenance"] = {"mode": "dialectic", "sources": [sid], "confidence": 1, "state": NOT_DISCLOSED}
             d.pop("pending", None)
+            wrote.append(d["id"])
+        elif (question or {}).get("why") == "unsure" and _confirms(words or _scalar_text(value)):
+            # "Is this right?" answered "yes, that is right": the item stands as it is, now sure (by rules; a
+            # correction in words is read again, below)
+            prov = d.get("provenance")
+            if not isinstance(prov, dict):
+                prov = {"mode": "dialectic", "sources": []}
+                d["provenance"] = prov
+            if prov.get("state") == "pending":
+                del prov["state"]
+            srcs = prov.get("sources") if isinstance(prov.get("sources"), list) else []
+            if sid not in srcs:
+                srcs.append(sid)
+            prov["sources"] = srcs
+            prov["confidence"] = conf if isinstance(conf, (int, float)) and not isinstance(conf, bool) \
+                and conf >= UNSURE_BELOW else 1
             wrote.append(d["id"])
         else:
             if reread is None:
