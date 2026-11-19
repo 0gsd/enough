@@ -1,6 +1,6 @@
 # The Thym conformance suite
 
-The folder `docs/THYM.md` section 20.3 describes, portable as a folder together with `../cosm/` (MacroCOSM's own
+The folder `docs/THYM.md` section 24.3 describes, portable as a folder together with `../cosm/` (MacroCOSM's own
 corpus, which holds the public sample Holotype `holotypes/meadow` that `open-house` runs on).
 
 | path | what |
@@ -12,12 +12,15 @@ corpus, which holds the public sample Holotype `holotypes/meadow` that `open-hou
 | `expected/<name>/outputs/` | the outputs of deterministic runs, byte for byte (a folder output is a folder here, `outputs/<name>/`, as it lands) (recorded from the first conforming run, then frozen; `conform` runs them with the clock pinned to 2026-11-01T12:00:00Z) |
 | `replay/<name>/<run-id>/` | recorded runs of model-backed programs: plan, trace, candidates; re-run to the recorded outputs. Two of `publish-story` on Qwen3.8-27B, both with their engine calls recorded as `candidates/<node>-e<k>.1.cosm`, so each replays with no dictionary and no engine: `2026-11-01-2148-35b5` (checkpoint A's run, re-recorded on 2026-11-05 under its own id: recorded before engine calls were, it replayed with live engines and stopped matching when the grammar version Canon stamps moved; the id is kept because other fixtures and the UI check copy its package) and `2026-11-02-0843-ff92` (wave 2; its FEED answers re-recorded on 2026-11-05 with the engine's six fields, every other record as it was). Re-record, never hand-edit |
 | `bad/<slug>.thym` | programs that must be refused; the first line says `-- refused: <stage> <check> line <n>` |
+| `canonical/<name>.json` | a mapping, and `canonical/<name>.cosm` the exact bytes of its canonical dump (THYM 12.6): the scalars YAML 1.1 quotes, escapes or folds (`read-back-quoted`, `spaces-and-marks`, `line-breaks`, `escaped`, `folded`), the declaration key moved first (`declaration-first`), the plain values (`values`) and nesting (`nested`). A date, which JSON cannot hold, is not among them: `tests/test_thym_js_runtime.py` keeps its date and moment vectors beside the folder |
 
 **Passing.** A compiler conforms when every program in `programs/` compiles, enumerates to its `expected/items.cosm`,
 compiles back byte for byte, plans to its `expected/plan.cosm`, and every `bad/` program is refused at the stage,
 check and line its first line names. A runtime conforms when every deterministic program's outputs match
-`expected/outputs/` and every `replay/` run re-runs to its recorded outputs. Every block marked `thym` in
-`docs/THYM.md` is also a program of the suite (`tests/test_thym_spec.py` collects them).
+`expected/outputs/` and every `replay/` run re-runs to its recorded outputs. A runtime's canonical dump writes every
+`canonical/<name>.json` as its `canonical/<name>.cosm`, byte for byte (`tests/test_thym_canonical.py` holds the reference
+to them, `tests/test_thym_js_runtime.py` the page). The other blocks marked `thym` in `docs/THYM.md` are not suite
+files: the suite's test compiles them (`tests/test_thym_spec.py` collects them), and runs none.
 
 **Inputs by program.**
 

@@ -1,4 +1,4 @@
-"""The conformance suite runner (docs/THYM.md 20; the folder is `tests/fixtures/thym/`, its README says what passing
+"""The conformance suite runner (docs/THYM.md 24; the folder is `tests/fixtures/thym/`, its README says what passing
 means).
 
 For each program under `programs/`: it compiles, enumerates to `expected/<name>/items.cosm`, compiles back byte for
