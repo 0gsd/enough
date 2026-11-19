@@ -533,6 +533,9 @@ def test_the_lent_folders_are_read_only_in_both_boxes(tmp_path, monkeypatch):
     assert ("--ro-bind", sp, sp) in list(zip(la, la[1:], la[2:]))
     assert ("--bind", sp, sp) not in list(zip(la, la[1:], la[2:]))
     assert sp not in sb.linux_argv(plain, ["-m", "t"], sb.Limits(), "/usr/bin/bwrap", interp)
+    # an interpreter the program starts itself finds the lent folders; a plain run's environment is unchanged
+    assert sb.environment(own)["PYTHONPATH"] == sp
+    assert "PYTHONPATH" not in sb.environment(plain)
 
 
 def test_no_door_passes_owners_code_or_the_venv():
@@ -558,9 +561,12 @@ def test_an_owners_code_run_reads_the_venv_and_nothing_more(tmp_path):
     (home / "secret.txt").write_text("SECRET-KEY-MATERIAL")
     site = sb.venv_site_packages()[0]
     d = entailed(tmp_path, f"""
-        import importlib, os, socket
+        import importlib, os, socket, subprocess, sys
         yaml = importlib.import_module("yaml")
         print("YAML", yaml.safe_dump({{"a": 1}}).strip(), "FROM", os.path.dirname(yaml.__file__))
+        child = subprocess.run([sys.executable, "-c", "import yaml; print('CHILD-YAML')"], capture_output=True,
+                               text=True)
+        print(child.stdout.strip())
         for what, f in (("write-venv", lambda: open(os.path.join({site!r}, "planted.py"), "w").write("x")),
                         ("read-home", lambda: open({str(home / "secret.txt")!r}).read()),
                         ("net", lambda: socket.create_connection(("127.0.0.1", 9), timeout=2)),
@@ -574,7 +580,7 @@ def test_an_owners_code_run_reads_the_venv_and_nothing_more(tmp_path):
                      package_source="enough-venv")
     r = sb.run_tool(run, limits=sb.Limits(wall=60, grace=1))
     assert r.exit_code == 0, r.stderr
-    assert "YAML a: 1 FROM " + site in r.stdout
+    assert "YAML a: 1 FROM " + site in r.stdout and "CHILD-YAML" in r.stdout
     for what in ("write-venv", "read-home", "net", "enough-by-pth"):
         assert f"{what} REFUSED" in r.stdout, r.stdout
     assert not os.path.exists(os.path.join(site, "planted.py"))

@@ -535,10 +535,16 @@ def macos_profile(run: Run, interp: dict[str, Any] | None = None) -> str:
 
 
 def environment(run: Run) -> dict[str, str]:
-    """The whole environment of the program; nothing is inherited."""
-    return {"PATH": "/usr/bin:/bin", "HOME": str(run.sub("home")), "TMPDIR": str(run.sub("tmp")),
-            "LANG": "C.UTF-8", "PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1", "NO_COLOR": "1",
-            "COLUMNS": "80"}
+    """The whole environment of the program; nothing is inherited. With `enough-venv` the lent folders are also on
+    `PYTHONPATH`, so an interpreter the program starts itself (only the interpreter may be started) finds them; the
+    program's own interpreter runs with `-I` and takes them from the launcher instead."""
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(run.sub("home")), "TMPDIR": str(run.sub("tmp")),
+           "LANG": "C.UTF-8", "PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1", "NO_COLOR": "1",
+           "COLUMNS": "80"}
+    lent = lent_packages(run)
+    if lent:
+        env["PYTHONPATH"] = os.pathsep.join(lent)
+    return env
 
 
 def _python_argv(run: Run, inner: Sequence[str], limits: Limits, interp: dict[str, Any], linux: bool) -> list[str]:
