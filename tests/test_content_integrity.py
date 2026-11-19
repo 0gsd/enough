@@ -110,6 +110,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",
     # Symbols, units and single glyphs used as labels.
     "OK", "×", "?", "+", "−", "-", "…", "¶", "W", "C", "⌘", "⇧",
+    # 0.8 (the scaffolder): the owner's button words, `scaffold-box` being the
+    # type's name on disk (a token, like a move's name), and a plecholder's
+    # count, which is two numbers and a slash in every language.
+    "+ scaffold-box", "{n} / {target}",
     "a–z", "z–a",       # the dictionary's sort-direction toggle
 ))
 
@@ -121,6 +125,7 @@ COGNATES: dict[str, frozenset[str]] = {
     "fr": frozenset((
         "attribution", "portrait", "description", "type", "format",
         " page", " pages", "page {n} / {total}", "image · {name}",
+        "page", "+ page",   # "une page": a scaffold's frame shape (0.8), and its "+"
         "image",            # the French noun, spelled the same
         "module",           # likewise — "un module" is the French word
         "modules",          # …and its plural

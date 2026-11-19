@@ -42,7 +42,8 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       FAB_CSHORT, FAB_LYRIC, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
-                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM)
+                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM,
+                      SCAFFOLD_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -859,6 +860,142 @@ def scenario_composure_journal(d: Driver) -> list[str]:
         fails.append(f"an untouched journal wrote a file: {state['path']}")
     if d.js("COMP.pending.length") != 0:
         fails.append("an untouched journal queued an op")
+    _comp_blank(d)
+    _reset(d)
+    return fails
+
+
+#: Every queued op on disk: a flush that finds another in flight only marks
+#: `again` and returns, so wait until nothing is saving and nothing is queued.
+_COMP_SETTLE = """(async () => {
+  for (let i = 0; i < 200; i++) {
+    if (!COMP.saving && !COMP.pending.length) return true;
+    if (!COMP.saving) await compFlush();
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return false; })()"""
+
+
+def _confirm_ok(d: Driver) -> None:
+    d.wait_for("#confirm-overlay:not([hidden])", timeout=8)
+    d.click("#confirm-ok")
+    d.wait_idle()
+
+
+def scenario_composure_scaffolder(d: Driver) -> list[str]:
+    """The scaffolder end to end, against the scratch server (0.8).
+
+    A fresh scaffold offers only a box and a page; a box goes on the frame;
+    its count moves as the person types, with no round trip; the words go
+    out as source `ui`; a frame carries its box when it moves (the frame's
+    op first); the lock closes the canvas — no edit mode, nothing queued,
+    no undo — and unlocking opens version 2 as a new file beside it.
+    """
+    fails: list[str] = []
+    _reset(d)
+    _comp_blank(d)
+    d.js_await("compOpenNew('scaffold')")
+    d.wait_for(SCAFFOLD_READY[1])
+    st = d.js("({path: COMP.path, scaffold: !!compScaffold(), mode: COMP.mode,"
+              " group: !compEl('comp-scaffold-group').hidden,"
+              " frames: compFrameOrder().length})")
+    if not st["scaffold"] or st["frames"] != 1:
+        fails.append(f"the scaffold form did not open as one frame: {st}")
+    if st["path"]:
+        fails.append(f"an untouched scaffold wrote a file: {st['path']}")
+    if st["mode"] != "edit" or not st["group"]:
+        fails.append(f"a fresh scaffold is not in edit mode with its group: {st}")
+    # The "+" offers exactly a box and a frame of the thing's shape.
+    d.js("compOpenTypeMenu()")
+    items = d.js("Array.from(document.querySelectorAll('#comp-type-menu button'))"
+                 ".map((b) => b.dataset.type || ('frame:' + b.dataset.frameShape))")
+    if items != ["scaffold-box", "frame:page"]:
+        fails.append(f"a scaffold's + menu offers {items}, not a box and a page")
+    d.js("compCloseMenus()")
+    # A box: the file is made, the box is on the frame.
+    d.js_await("compAddModule('scaffold-box')")
+    box = d.js("(() => { const m = compModuleById(COMP.sel[0]);"
+               " return m ? {id: m.id, type: m.type, frame: (m.fields || {}).frame,"
+               " path: COMP.path} : null; })()")
+    frame = d.js("compFrameOrder()[0]")
+    if not box or box["type"] != "scaffold-box" or box["frame"] != frame:
+        _comp_blank(d)
+        _reset(d)
+        return fails + [f"+ scaffold-box did not put a box on the frame: {box}"]
+    if not box["path"]:
+        fails.append("adding a box did not write the scaffold")
+    bid = box["id"]
+    # Plec and target through the inspector's own door.
+    d.js(f"(() => {{ const s = compEl('comp-insp-slot');"
+         f" s.querySelector('[data-sfield=\"target-n\"]').value = '10';"
+         f" compScaffoldField('{bid}', 'plec', 'What the box must say.');"
+         f" compScaffoldField('{bid}', 'target-n', '10'); return true; }})()")
+    f = d.js(f"compModuleById('{bid}').fields")
+    if f.get("plec") != "What the box must say." or f.get("target") != "10c":
+        fails.append(f"the inspector did not set the plec and target: {f}")
+    # Typing: the live count and the over state, before any save.
+    d.js(f"compSetTool('text'); compBeginEditing('{bid}', null)")
+    d.js(f"compModuleEl('{bid}').querySelector('.comp-page').focus()")
+    for ch in "more than ten":
+        d.type_text(ch)
+    live = d.js(f"(() => {{ const el = compModuleEl('{bid}');"
+                f" return {{state: el.dataset.boxState,"
+                f" count: el.querySelector('.comp-box-count').textContent}}; }})()")
+    if live["state"] != "over" or "/ 10" not in live["count"]:
+        fails.append(f"the live count did not follow the typing: {live}")
+    if d.js("compBatchBody([]).source") != "ui":
+        fails.append("the page's batches are not sent as the person's (`ui`)")
+    d.js("compEndEditing(); compSetTool('pointer')")
+    d.js_await(_COMP_SETTLE)
+    # A frame move carries its box, the frame's op first.
+    before = d.js(f"(() => {{ const b = compModuleById('{bid}');"
+                  f" const fr = compModuleById('{frame}');"
+                  f" return {{bx: b.x, fx: fr.x}}; }})()")
+    d.js(f"compSetSelection(['{frame}']); compNudge(24, 0)")
+    order = d.js("COMP.pending.map((o) => o.id)")
+    if order[:1] != [frame] or bid not in order:
+        fails.append(f"a frame's move did not carry its box after it: {order}")
+    d.js_await(_COMP_SETTLE)
+    d.js_await("compReload()")
+    after = d.js(f"(() => {{ const b = compModuleById('{bid}');"
+                 f" const fr = compModuleById('{frame}');"
+                 f" return {{bx: b.x, fx: fr.x}}; }})()")
+    if after["fx"] != before["fx"] + 24 or after["bx"] != before["bx"] + 24:
+        fails.append(f"on disk the frame and its box did not move together: "
+                     f"{before} → {after}")
+    # The lock: the confirm, then a closed canvas.
+    d.js("void compScaffoldLock()")
+    _confirm_ok(d)
+    for _ in range(40):
+        if d.js("compScaffoldLocked()"):
+            break
+        d.js_await("new Promise((r) => setTimeout(() => r(true), 100))")
+    locked = d.js("({locked: compScaffoldLocked(), cls: compStage().classList"
+                  ".contains('comp-scaffold-locked'),"
+                  " title: compEl('comp-title').readOnly})")
+    if not locked["locked"] or not locked["cls"] or not locked["title"]:
+        fails.append(f"the lock did not close the scaffold: {locked}")
+    d.js("compSetMode('edit')")
+    if d.js("COMP.mode") != "view":
+        fails.append("a locked scaffold went into edit mode")
+    d.js(f"compDo({{ops: [{{op: 'update_module', id: '{bid}', x: 0}}], undo: []}});"
+         f" compQueue({{op: 'set_page', module: '{bid}', n: 1, rich: '<p>x</p>'}})")
+    if d.js("COMP.pending.filter((o) => o.op !== 'set_meta').length") != 0:
+        fails.append("an edit was queued on a locked scaffold")
+    if d.js("COMP.undo.length") != 0:
+        fails.append("the undo stack survived the lock")
+    # Unlocking makes version 2 as a new file, and opens it.
+    old = d.js("COMP.path")
+    d.js("void compScaffoldUnlock()")
+    _confirm_ok(d)
+    for _ in range(40):
+        if d.js("COMP.path") != old:
+            break
+        d.js_await("new Promise((r) => setTimeout(() => r(true), 100))")
+    nxt = d.js("({path: COMP.path, locked: compScaffoldLocked(),"
+               " version: (compScaffold() || {}).version})")
+    if nxt["path"] == old or nxt["locked"] or nxt["version"] != 2:
+        fails.append(f"unlocking did not open version 2 as a new file: {old} → {nxt}")
     _comp_blank(d)
     _reset(d)
     return fails
@@ -5260,6 +5397,7 @@ SCENARIOS: dict[str, Scenario] = {
     "composure-ink": scenario_composure_ink,
     "composure-search": scenario_composure_search,
     "composure-journal": scenario_composure_journal,
+    "composure-scaffolder": scenario_composure_scaffolder,
     "composure-comments": scenario_composure_comments,
     "composure-selection-shape": scenario_composure_selection_shape,
     "composure-council-pins-panel": scenario_composure_council_pins_panel,

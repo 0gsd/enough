@@ -59,10 +59,10 @@ name: paradigm
 path: rness/active-paradigm
 
 ### what
-the reasoning framework your readvisors are currently working in. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and your chief readvisor also sees a brief catalog of the other available paradigms, so they can suggest (or initiate) a switch when the work would benefit from one.
+the reasoning frameworks your readvisors are working in right now. one paradigm is always on, and up to three can be on together; click ● to turn one on or off. one paradigm alone rides in full in the system prompt every turn; two or three together ride one text written for that combination (a metaparadigm), or, where nobody wrote one, a text enough composes from the opening of each, and the list says so. your chief readvisor also sees a brief catalog of the other available paradigms, so they can suggest (or make) a change when the work would benefit from one.
 
 ### how
-click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. a switch your chief readvisor initiates happens by writing that file too, and takes effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project's <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells your readvisors what the paradigm is for.
+click ● next to a paradigm to turn it on or off for this project. a fourth is refused until you turn one off, and the last one on stays on until you turn another on. the set is recorded in <code>rness/active-paradigm</code>, one name a line; a change your chief readvisor makes happens by writing that file too, and takes effect on the next turn. some paradigms have faces, parts kept only while a skill is on: the note under the list names the face that rides. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project's <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells your readvisors what the paradigm is for.
 
 ### ideas
 - Paradigms available in this project: {{paradigms-list}}
@@ -166,7 +166,7 @@ name: paradigms/
 path: rness/paradigms/
 
 ### what
-the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).
+the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. one is always on and up to three can be on together; two or three together ride a metaparadigm, a text written for that combination, when there is one (see the <strong>paradigm</strong> section at the top of the sidebar to turn them on and off).
 
 ### how
 symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so your chief readvisor knows when to recommend it.

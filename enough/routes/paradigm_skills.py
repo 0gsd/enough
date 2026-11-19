@@ -26,6 +26,29 @@ def build_router(ctx: AppContext) -> APIRouter:
     project_dir = ctx.project_dir
     session = ctx.session
 
+    def _presumed_faces(rness, choice) -> tuple[list[str], list[str]] | None:
+        """The skills the riding text has faces for (`<!-- face: x -->`
+        blocks, prompt.apply_faces) and which of them are on, or None when
+        no face block rides. The text that rides: the one paradigm's file,
+        the set's metaparadigm, or each member's file when composed."""
+        if choice.kind == "composed":
+            rels = [f"paradigms/{n}.md" for n in choice.names]
+        else:
+            rels = [choice.path] if choice.path else []
+        skills: list[str] = []
+        for rel in rels:
+            try:
+                text = (rness / rel).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for m in prompt_mod._FACE_RE.finditer(text):
+                s = m.group(1)
+                if s not in (prompt_mod._FACE_BOTH, prompt_mod._FACE_NONE) and s not in skills:
+                    skills.append(s)
+        if not skills:
+            return None
+        return skills, [s for s in skills if prompt_mod._skill_enabled(rness, s)]
+
     def _paradigm_list_html(refused: str | None = None) -> str:
         """The sidebar's paradigm list (0.8): one toggle per paradigm, up to
         `MAX_ACTIVE_PARADIGMS` on at once. Notes ride as rows of their own
@@ -42,6 +65,7 @@ def build_router(ctx: AppContext) -> APIRouter:
             return '<div class="empty-note">no paradigms in rness/paradigms/</div>'
         choice = prompt_mod.choose_paradigm_text(rness)
         active = set(choice.names)
+        present = {n for n, _d, _t in items}
         rows = []
         for name, desc, tooltip in items:
             is_active = name in active
@@ -54,7 +78,7 @@ def build_router(ctx: AppContext) -> APIRouter:
             tip = _escape_html(tip_text) if tip_text else ""
             vals = json.dumps({"name": name, "on": "0" if is_active else "1"})
             rows.append(
-                f'<li class="paradigm-row {cls}" title="{tip}">'
+                f'<li class="paradigm-row {cls}" data-paradigm="{_attr(name)}" title="{tip}">'
                 f'  <button class="paradigm-toggle" '
                 f'    hx-post="/api/paradigm/toggle" '
                 f"    hx-vals='{_attr(vals)}' "
@@ -64,6 +88,28 @@ def build_router(ctx: AppContext) -> APIRouter:
                 f'  <span class="paradigm-name">{_escape_html(name)}</span>'
                 f'</li>'
             )
+            # 0.8: a retired paradigm the person kept as their own copy
+            # (`translation`, now `transcognition`) stays under its old name.
+            new = prompt_mod._RETIRED_PARADIGM.get(name)
+            if new and new in present and prompt_mod._kept_retired_paradigm(rness, name):
+                rows.append(
+                    '<li class="paradigm-note" data-paradigm-note="kept" '
+                    f'data-paradigm="{_attr(name)}" data-renamed="{_attr(new)}">'
+                    f"{_escape_html(name)} is your own copy, kept under its old "
+                    f"name: the shipped paradigm is now {_escape_html(new)}.</li>")
+        faces = _presumed_faces(rness, choice)
+        if faces:
+            skills, on = faces
+            if len(on) >= 2:
+                note, text = "faces", f"faces: {' + '.join(on)}; the readvisor asks once which"
+            elif on:
+                note, text = "face", f"face: {on[0]}"
+            else:
+                note, text = "noface", f"no face: turn on {' or '.join(skills)} for the part it leans on"
+            rows.append(
+                f'<li class="paradigm-note" data-paradigm-note="{note}" '
+                f'data-faces="{_attr(" ".join(skills))}" '
+                f'data-faces-on="{_attr(" ".join(on))}">{_escape_html(text)}</li>')
         if refused:
             rows.append(
                 f'<li class="paradigm-note" data-paradigm-note="{_attr(refused)}" '
@@ -75,8 +121,12 @@ def build_router(ctx: AppContext) -> APIRouter:
                 '<li class="paradigm-note" data-paradigm-note="composed" '
                 f'data-paradigms="{_attr(" ".join(choice.names))}" '
                 f'data-stale="{_attr(stale)}">'
-                "These paradigms have no text of their own together: enough "
-                "composes one from each.</li>")
+                + ("This combination\u2019s own text was written before "
+                   f"{_escape_html(stale)} changed: enough composes one from each paradigm."
+                   if stale else
+                   "This combination has no text of its own: enough composes "
+                   "one from each paradigm.")
+                + "</li>")
         kind = _attr(choice.kind)
         return (f'<ul class="paradigms" data-paradigm-text="{kind}" '
                 f'data-active-count="{len(choice.names)}">' + "".join(rows) + "</ul>")

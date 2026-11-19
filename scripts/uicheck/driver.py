@@ -157,9 +157,13 @@ class StepError(RuntimeError):
 class Driver:
     """One page, plus the vocabulary the screens and scenarios speak."""
 
-    def __init__(self, page: Page, base_url: str) -> None:
+    def __init__(self, page: Page, base_url: str, project: Path | None = None) -> None:
         self.page = page
         self.base_url = base_url
+        #: The scratch project this page's server serves: the one place the
+        #: `unlink` step may remove a file (a screen's teardown taking back
+        #: what its setup wrote, which the page has no route to delete).
+        self.project = project
 
     # -- page lifecycle -------------------------------------------------
     #: "enough's inline script has finished executing". A `const` is the only
@@ -506,8 +510,24 @@ class Driver:
             self.wait_gone(arg)
         elif verb == "wait_idle":
             self.wait_idle()
+        elif verb == "unlink":
+            self.unlink(arg)
         else:
             raise StepError(f"unknown step verb {verb!r}")
+
+    def unlink(self, rel: str) -> None:
+        """Remove a file a screen's setup wrote into the scratch project (and
+        the `.<name>.undo` stash a second save leaves beside it). Missing is
+        fine; anything that resolves outside the scratch project is refused."""
+        if self.project is None:
+            raise StepError(f"unlink {rel!r}: this page has no scratch project")
+        root = self.project.resolve()
+        target = (self.project / rel).resolve()
+        if not target.is_relative_to(root) or target == root:
+            raise StepError(f"unlink {rel!r}: outside the scratch project")
+        for p in (target, target.parent / f".{target.name}.undo"):
+            if p.is_file() or p.is_symlink():
+                p.unlink()
 
     # -- measurement ----------------------------------------------------
     def measure(self) -> dict:
