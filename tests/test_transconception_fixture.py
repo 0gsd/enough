@@ -240,15 +240,17 @@ def test_tallys_own_fixture_is_beside_it_untouched():
     assert mc.tree_digest(INPUTS / "tally")["tree"] == src["tree"]
 
 
-def test_the_programs_are_the_texts_where_the_bundled_text_has_them():
+def test_the_programs_are_the_bundled_texts_six():
+    """THYM 24.3: the folder's six `thym 1` programs are the text's own, byte for byte under their version line:
+    `ground-the-fabulac`, `hand-out-the-cases`, `weigh-a-target` and `entail-in-a-language` (20.10),
+    `raise-the-questions` (20.6) and `settle-the-answers` (22.4)."""
     thym_md = (MK.REPO / "docs" / "THYM.md").read_text(encoding="utf-8")
-    found = 0
+    assert sorted(MK.PROGRAMS) == ["entail-in-a-language", "ground-the-fabulac", "hand-out-the-cases",
+                                   "raise-the-questions", "settle-the-answers", "weigh-a-target"]
     for name, text in MK.PROGRAMS.items():
+        assert text.startswith("thym 1\n\n"), name
         body = text.split("\n", 2)[2]                   # without its `thym 1` line
-        if f"program {name}\n" in thym_md:
-            assert body in thym_md, name
-            found += 1
-    assert found >= 2                                   # raise-the-questions and settle-the-answers; 20.10's with the sync
+        assert f"program {name}\n" in thym_md and body in thym_md, name
 
 
 # ---------------------------------------------------------------------------
