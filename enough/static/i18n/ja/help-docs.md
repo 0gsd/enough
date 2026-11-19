@@ -404,6 +404,21 @@ path: tally/ · tally/tests/test_cases.py
 - 大きなファイルを任せる前に、自分の小さなファイルを渡してツールを試しましょう。
 - サンドボックスの約束は結果ごとに挙がっています。リストを開いて、何が保持されたか確かめましょう。
 
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+<strong>transconception</strong> のために保存された fabulac のカードです：fabulac を通してほかの言語へ運ばれるプログラムで、読むだけです。二つの<strong>関門</strong>、<strong>保存できる状態</strong>と、対象の言語ごとの<strong>含意できる状態</strong>を、満たしている・いないチェックとその理由とともに示します。<strong>裁定</strong>：そのまま残すもの、違ってよいもの、変えてよいもの、そしてまだ開いているそれについての質問。<strong>基盤</strong>：プログラムがその言語の中で依拠しているものそれぞれと、言語自身のテキストのどこにそう書かれているか。<strong>対象</strong>：十二の観点（うち三つは関門）で見積もった言語ごとの判定、条件、欠け。そして <strong>cshort</strong>：それぞれの対象、ソースから<em>切り離して</em>か<em>並べて</em>含意したか、レイアウト、根拠。
+
+### how
+fabulac の<strong>ビルドとコンパイル…</strong>で開きます。裁定の下の<strong>答える…</strong>で質問が開き、ほかの質問と同じように答えます。飛ばした質問があると関門は閉じたままです。基盤の下では、引用ごとに<strong>言語ライブラリ</strong>のセクションがドキュメントビューアで開きます。テキストがこのマシンにないときは、cosmoes.org から届くあいだ<em>取得中</em>、届かないときは<em>手元にない</em>と表示します。これは警告で、合格ではありません。cshort はどの言語でも読むものです：<strong>読む</strong>と<strong>レイアウト</strong>で開き、ここにはそれを組み立てたり実行したりするものはありません。
+
+### ideas
+- まず関門を読みましょう。満たしていないチェックは、どの項目がなぜかを言います。
+- 依拠を裁定する前に引用を開きましょう。言語自身の言葉がそこにあります。
+- 根拠のない cshort はまだ判定されていません。実行するのは外部の判定役で、enough ではありません。
+
 ## dialectic-card
 name: 質問
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

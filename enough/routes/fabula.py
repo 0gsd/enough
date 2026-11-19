@@ -536,6 +536,25 @@ def build_router(ctx: AppContext) -> APIRouter:
 
         return await asyncio.to_thread(_build)
 
+    @router.get("/api/fabula/transconception")
+    async def api_fabula_transconception(path: str = Query(...)) -> dict[str, Any]:
+        """0.8 (lane W4-X7): the transconception card of a fabulac (`enough.transconception.card`), read only: the two
+        gates with each check held or not and why, the rulings queue, the ground with what came of each citation in
+        the language library, the targets with their twelve points and gaps, and each cshort with its target, apart or
+        beside, its layout and its evidence. Takes the fabulac or the folder it was built from; a fabulac kept for no
+        transconception answers `{transconception: false}`. Nothing is run, built or written."""
+        from .. import fabulac_job as _fj
+        from .. import transconception as _tc
+
+        def _build() -> dict[str, Any]:
+            try:
+                fab = _fj.fabulac_of(Path(project_dir), path)
+            except _fj.BuildError as e:
+                raise HTTPException(e.status, str(e)) from None
+            return {"path": _fj.rel_of(Path(project_dir), fab), **_tc.card(fab)}
+
+        return await asyncio.to_thread(_build)
+
     @router.get("/api/fabula/suggest")
     async def api_fabula_suggest(path: str = Query(...)) -> dict[str, Any]:
         """The flavour suggested for a text (0.6, S2), twin or none: `{path,

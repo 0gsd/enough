@@ -109,6 +109,13 @@ FAP_ASKED = "asked/linecount.fabulac.cosm"
 FAP_SERVED = "served/greet.fabulac.cosm"
 FAP_RAN = "ran-{lang}/tally"
 FAP_FIRST = "first-{lang}"
+# 0.8 (W4-X7): the transconception card, seeded by server._seed_transconception() in transconceive/: the promoted
+# vulture fabulac (open rulings, the ground, python and go targets, a cshort in Go with its layout).
+TC_FABULAC = "transconceive/vulture.fabulac.cosm"
+TC_CSHORT = "transconceive/vulture.cshort-go-2026-11-18-1900/"
+TC_LAYOUT = "transconceive/vulture.layout-go-2026-11-18-1900.md"
+TC_CITE = ("{in: 'python', version: '3.13.18', at: 'library/pathlib.html#pathlib.PurePath', "
+           "digest: 'ea319d48765a'}")
 # The dialectic (0.6, U1b), seeded by server._seed_dialectic() in talks/: the
 # morning-close guide's fabulan with one open question of every kind, the same
 # with a sitting written and not settled, the same with no questions at all,
@@ -233,7 +240,7 @@ COSM_READY: Step = ("eval_await", """(async () => {
 DOCS_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 300 && !document.querySelector(
        '#docs-body .docs-sec h2[id], #docs-body .docs-outline, #docs-body .cosm-card.docs-prism,'
-       + ' #docs-body .ref-error'); i++) {
+       + ' #docs-body .ref-error, #docs-body .lib-doc:not(:has(.atem-spin))'); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
@@ -363,6 +370,12 @@ FAB_READY: Step = ("eval_await", """(async () => {
   }
   return true; })()""")
 FAB_CLOSE: Step = ("eval", "(() => { try { fabCardClose(); } catch (e) {} return true; })()")
+#: 0.8 (W4-X7): the transconception card has read GET /api/fabula/transconception and drawn it.
+TC_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 300 && !document.querySelector('#fab-tc .fab-tc, #fab-tc .thym-refusal'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
 #: 0.8 (W4-FP): the card of an authored fabulac has read what it shows (the starters on the begin face,
 #: GET /api/fabulac/status on the authored one) and no request of its own is in flight.
 FAP_READY: Step = ("eval_await", """(async () => {
@@ -394,7 +407,7 @@ FAP_RUN_RESULT: Step = ("eval", """(() => {
   return true; })()""")
 #: The cshort / catem viewer has its file (a cshort: its first file's text too).
 FABV_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem'
+  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind !== 'cshort'
        || FABV.text !== null || FABV.ferror)))); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
@@ -1223,6 +1236,47 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
            note="a tool's run in the sandbox (a recorded result, nothing runs here): its message, exit and "
                 "time, the box held it, its output, and what the box promised for the run, opened"),
+
+    # --- 0.8 (W4-X7): the transconception card, the library's section, a cshort in Go and its layout ---
+    Screen("fabula-transconception", "project",
+           setup=(("eval_await", f"(async () => {{ await fabFolderOpen('{TC_FABULAC}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, TC_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a fabulac kept for transconception: ready to keep and ready to entail in go, each check held or "
+                "not and why (stands-alone and the open rulings fail, nothing-carried not measured); the rulings "
+                "queue, batched, with answer them…; the ground's count of citations, not aboard here"),
+
+    Screen("fabula-transconception-more", "project",
+           setup=(("eval_await", f"(async () => {{ await fabFolderOpen('{TC_FABULAC}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, TC_READY,
+                  ("eval", "(() => { document.querySelectorAll('#fab-tc details').forEach((d) => { d.open = true; }); "
+                           "const t = document.querySelector('#fab-tc table.fab-tc-points'); "
+                           "if (t) t.scrollIntoView({block: 'start'}); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the same card further down: every reliance with its citations as links (not aboard), the go "
+                "target's twelve points with the three gates marked, its conditions, and the cshorts: the round "
+                "trip judged at level 3, the cshort in Go apart and not judged yet, read and its layout, no run"),
+
+    Screen("docs-library", "project",
+           setup=(("eval_await", f"(async () => {{ await enterDocsMode({{ doc: 'library', cite: {TC_CITE} }}); "
+                                 "return true; })()"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a reliance's citation opened in the docs viewer with no library here: cited as, not aboard said "
+                "plainly, the line that it opens once the text is fetched; densities other than short disabled"),
+
+    Screen("fabula-cshort-go", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{TC_CSHORT}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="a cshort in Go read: the line that enough never runs it, its footer and licence, its files"),
+
+    Screen("fabula-layout-go", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{TC_LAYOUT}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="the layout of the cshort in Go: read, never run; its files and its interfaces' names"),
 
     Screen("fabulac-service", "project",
            setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_SERVED}', 'run'); return true; }})()"),

@@ -9644,6 +9644,198 @@
       overflow-wrap: anywhere;
     }
 
+    /* 0.8 (W4-X7): the transconception card — the gates with each check,
+       the rulings queue, the ground with its citations, the targets' twelve
+       points, the cshorts; all read only. */
+    #fabula-modal #fab-tc:not(:empty) {
+      margin: 10px 0 4px;
+      position: relative;
+    }
+
+    #fabula-modal .fab-tc-gate,
+    #fabula-modal .fab-tc-target {
+      margin: 4px 0 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 0;
+    }
+
+    #fabula-modal .fab-tc-gname {
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+
+    #fabula-modal .fab-tc-says {
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fab-tc-ok { color: var(--fg); }
+    #fabula-modal .fab-tc-no { color: var(--accent-error, #c0392b); }
+
+    #fabula-modal ul.fab-tc-checks,
+    #fabula-modal ul.fab-tc-queue,
+    #fabula-modal ul.fab-tc-ground,
+    #fabula-modal ul.fab-tc-cites {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    #fabula-modal li.fab-tc-check {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fab-tc-cname {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      margin-right: 8px;
+    }
+
+    #fabula-modal .fab-tc-cstate {
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal li.fab-tc-no .fab-tc-cstate,
+    #fabula-modal .fab-tc-st-missing,
+    #fabula-modal .fab-tc-st-changed {
+      color: var(--accent-error, #c0392b);
+    }
+
+    #fabula-modal ul.fab-tc-why {
+      margin: 2px 0 2px 1.2em;
+      padding: 0;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal ul.fab-tc-queue li,
+    #fabula-modal ul.fab-tc-ground > li {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fab-tc-about {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    #fabula-modal .fab-tc-asks,
+    #fabula-modal .fab-tc-gives {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    #fabula-modal details.fab-tc-more > summary {
+      cursor: pointer;
+      font-size: 12px;
+      margin: 2px 0 4px;
+    }
+
+    #fabula-modal button.fab-tc-link {
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent, var(--fg));
+      background: none;
+      border: none;
+      padding: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal table.fab-tc-points {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0;
+      font-size: 11.5px;
+      table-layout: fixed;
+    }
+
+    #fabula-modal table.fab-tc-points th,
+    #fabula-modal table.fab-tc-points td {
+      text-align: left;
+      vertical-align: top;
+      padding: 2px 4px;
+      border-bottom: 1px solid var(--border);
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal table.fab-tc-points th:first-child { width: 1.8em; }
+    #fabula-modal table.fab-tc-points th:nth-child(3) { width: 3.6em; }
+    #fabula-modal table.fab-tc-points th:nth-child(2) { width: 34%; }
+
+    #fabula-modal .fab-tc-gatemark {
+      font-size: 10px;
+      padding: 0 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fab-tc .fab-row {
+      flex-wrap: wrap;
+    }
+
+    /* the language library's section in the docs viewer (W4-X7) */
+    #docs-mode .lib-doc {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 12px 16px 40px;
+    }
+
+    #docs-mode .lib-cited,
+    #docs-mode .lib-meta {
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin: 2px 0;
+      overflow-wrap: anywhere;
+    }
+
+    #docs-mode .lib-copy {
+      font-size: 12.5px;
+      margin: 6px 0 2px;
+    }
+
+    #docs-mode .lib-notice {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+
+    #docs-mode pre.lib-body {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+
+    #docs-mode .lib-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
     /* 0.8 (W4-FP): the card of an authored fabulac — the interview's
        questions, add and check, the entailment's files with a hand edit's
        three choices, and a sandbox run's output and what the box promised. */
@@ -20978,6 +21170,7 @@
       </div>
       <div class="modal-body thym-body" id="fab-body">
         <div id="fab-main"></div>
+        <div id="fab-tc"></div>
         <div id="fab-author"></div>
         <div id="fab-verse"></div>
         <div id="fab-route-box"></div>
@@ -23843,6 +24036,14 @@
       // by DOCS_PROGRAM_DENSITIES in the Thym block.
       program: { icon: 'cosm', unwrap: false, plain: 'all',
         stack: () => t('modes.docs.program.icon', 'a Thym program') },
+      // 0.8 (W4-X7): a section of a text in the language library, the one
+      // a reliance's `stated` cites (DOCS.cite), read through
+      // GET /api/library/section: its notice block and the section as the
+      // publisher wrote it; "fetching" and "not aboard" said plainly.
+      library: { icon: 'hxc', unwrap: false, plain: 'all',
+        title: () => t('docs.title.library', 'language library'),
+        exit: () => t('modes.docs.library.exit', 'close the language library'),
+        stack: () => t('modes.docs.library.icon', 'the language library') },
     };
 
     // Whether a document is one of the specifications (`kind: 'spec'`).
@@ -24006,6 +24207,7 @@
     // for after a short is served from it.
     async function docsLoad(doc, lang, density, seq) {
       if (doc === 'program') return thymProgLoad(DOCS.prog, seq, DOCS.progWhere);
+      if (doc === 'library') return libLoad(DOCS.cite, seq);
       const key = doc + '|' + lang + '|' + density;
       if (DOCS.cache.has(key)) return DOCS.cache.get(key);
       if (density === 'atem' && DOCS.cache.has(doc + '|' + lang + '|short')) {
@@ -24104,6 +24306,7 @@
       if (!ix || anchor == null || anchor === '') return null;
       const a = String(anchor).trim();
       if (DOCS.doc === 'program') return a || null;     // a program's anchors are its item keys
+      if (DOCS.doc === 'library') return null;          // a library section is opened by its citation
       if (/^[STRB]:/.test(a)) return ix.byKey.has(a) ? a : null;
       if (/^(docs|cs|ref)-/.test(a)) return ix.domKey.get(a.replace(/^(cs|ref)-/, 'docs-')) || null;
       const n = a.replace(/^§\s*/, '');
@@ -24119,12 +24322,16 @@
       let doc = DOCS_DOCS[opts.doc] ? opts.doc : 'help-center';
       // A program needs its file; one the viewer is not showing yet is loaded afresh.
       if (doc === 'program' && !(opts.path && window.__thymReady)) doc = 'help-center';
+      if (doc === 'library' && !(opts.cite && opts.cite.in && opts.cite.at)) doc = 'help-center';
+      const citeChanged = doc === 'library' && libKey(opts.cite) !== libKey(DOCS.cite);
+      if (doc === 'library') DOCS.cite = Object.assign({}, opts.cite);
       // 0.6 (U1d): `where` (shipped, project, canon) tells a shipped program
       // from a project file of the same name (S4); left out, as before.
       const progChanged = doc === 'program' && (DOCS.prog !== opts.path || (DOCS.progWhere || null) !== (opts.where || null));
       if (doc === 'program') { DOCS.prog = opts.path; DOCS.progWhere = opts.where || null; }
       const lang = opts.lang || I18N.lang || 'en';
-      const density = opts.density && DOCS_DENSITIES[opts.density] ? opts.density : docsDensityFor(doc);
+      const density = doc === 'library' ? 'short'
+        : (opts.density && DOCS_DENSITIES[opts.density] ? opts.density : docsDensityFor(doc));
       const root = docsEl('docs-mode');
       const wasOpen = root.classList.contains('open');
       if (!wasOpen) DOCS.cache.clear();   // hand edits to a manual show on the next open
@@ -24142,7 +24349,7 @@
       });
       applyReviewContrast();
       const same = wasOpen && DOCS.data && DOCS.doc === doc && DOCS.lang === lang
-        && DOCS.density === density && !progChanged;
+        && DOCS.density === density && !progChanged && !citeChanged;
       if (same) {
         docsPaintChrome();
         const key = docsAnchorKey(opts.anchor);
@@ -24153,6 +24360,106 @@
       await docsShow(doc, lang, density, opts.anchor);
     }
     window.enterDocsMode = enterDocsMode;
+
+    // ---- 0.8 (W4-X7): a section of the language library ----
+    // What a reliance's `stated` cites, opened from the transconception card:
+    // GET /api/library/section (the routes wait up to 2 s; while the text is
+    // being fetched from cosmoes.org the answer says `fetching`, and the
+    // viewer asks again). Offline, or with no library here, it is `not
+    // aboard`, said plainly. The section is the publisher's text, verbatim.
+    function libKey(c) {
+      if (!c) return '';
+      return ['in', 'version', 'at', 'digest', 'section-digest'].map((k) => String(c[k] == null ? '' : c[k])).join('|');
+    }
+
+    async function libLoad(cite, seq) {
+      const key = 'library|' + libKey(cite);
+      if (DOCS.cache.has(key)) return DOCS.cache.get(key);
+      const q = new URLSearchParams();
+      ['in', 'version', 'at', 'digest', 'section-digest'].forEach((k) => { if (cite && cite[k] != null && cite[k] !== '') q.set(k, String(cite[k])); });
+      q.set('wait', '2');
+      for (let tries = 0; ; tries++) {
+        const r = await canonJSON('/api/library/section?' + q.toString());
+        if (seq !== DOCS.seq) return null;
+        if (!r.ok || !r.data) throw new Error(r.error || 'HTTP ' + r.status);
+        const data = Object.assign({ doc: 'library', lang: I18N.lang || 'en' }, r.data);
+        if (data.state === 'fetching' && tries < 30) {
+          libRender(data);
+          await new Promise((res) => setTimeout(res, 1000));
+          if (seq !== DOCS.seq) return null;
+          continue;
+        }
+        if (data.state !== 'fetching') DOCS.cache.set(key, data);
+        return data;
+      }
+    }
+
+    function libStateWord(st) {
+      const w = {
+        resolved: t('fab.tc.cite.resolved', 'found in the library'),
+        fetching: t('fab.tc.cite.fetching', 'fetching'),
+        'not-aboard': t('fab.tc.cite.notAboard', 'not aboard'),
+        changed: t('fab.tc.cite.changed', 'the text changed'),
+        unplaced: t('fab.tc.cite.unplaced', 'not placed in the kept text'),
+        missing: t('fab.tc.cite.missing', 'no such page'),
+        unknown: t('fab.tc.cite.unknown', 'a text the library does not have'),
+      };
+      return w[st] || String(st || '');
+    }
+
+    function libRender(data) {
+      const body = docsEl('docs-body');
+      const cited = data.cited || {};
+      const tx = data.text || null;
+      const sec = data.section || null;
+      let h = '<div class="lib-doc">';
+      h += '<p class="lib-cited">' + cosmEsc(t('docs.lib.cited', 'cited as {cite}').replace('{cite}', () => [cited.in, cited.version, cited.at].filter(Boolean).join(' · '))) + '</p>';
+      if (data.state !== 'resolved') {
+        const quiet = data.state === 'fetching' || data.state === 'not-aboard' || data.state === 'unplaced';
+        h += '<p class="lib-state ' + (quiet ? 'docs-note' : 'ref-error') + '" data-state="' + cosmEsc(String(data.state || '')) + '"><strong>'
+          + cosmEsc(libStateWord(data.state)) + '</strong>' + (data.why ? ': ' + cosmEsc(String(data.why)) : '')
+          + (data.state === 'fetching' ? ' <span class="atem-spin" aria-hidden="true"></span>' : '') + '</p>';
+      }
+      if (tx) {
+        h += '<div class="lib-notice">';
+        if (tx.copy) h += '<p class="lib-copy">' + cosmEsc(String(tx.copy)) + '</p>';
+        const lic = tx.licence || {};
+        const bits = [];
+        if (tx.publisher) bits.push(cosmEsc(String(tx.publisher)));
+        if (lic.name) bits.push(lic.url ? '<a href="' + cosmEsc(String(lic.url)) + '" target="_blank" rel="noopener">' + cosmEsc(String(lic.name)) + '</a>' : cosmEsc(String(lic.name)));
+        if (tx.publisher_page) bits.push('<a href="' + cosmEsc(String(tx.publisher_page)) + '" target="_blank" rel="noopener">' + cosmEsc(t('docs.lib.publisher', 'the publisher’s page')) + '</a>');
+        if (bits.length) h += '<p class="lib-meta">' + bits.join(' · ') + '</p>';
+        if (tx.copyright) h += '<p class="lib-meta">' + cosmEsc(String(tx.copyright)) + '</p>';
+        if (tx.changed) h += '<p class="lib-meta">' + cosmEsc(String(tx.changed)) + '</p>';
+        h += '</div>';
+      }
+      if (sec) {
+        h += '<h1 class="lib-h">' + cosmEsc(String(sec.heading || sec.id || '')) + '</h1>';
+        const path = Array.isArray(sec.path) ? sec.path.join(' › ') : (sec.path ? String(sec.path) : '');
+        if (path) h += '<p class="lib-meta">' + cosmEsc(path) + '</p>';
+        h += '<pre class="lib-body" aria-label="' + cosmEsc(t('docs.lib.body', 'the section, as the publisher wrote it')) + '">' + cosmEsc(String(sec.body || '')) + '</pre>';
+        const nav = [];
+        if (sec.parent && sec.parent.anchor) nav.push('<button type="button" class="thym-btn" data-lib-anchor="' + cosmEsc(String(sec.parent.anchor)) + '">' + cosmEsc(t('docs.lib.parent', 'the section it is in: {heading}').replace('{heading}', () => String(sec.parent.heading || sec.parent.id || ''))) + '</button>');
+        (sec.parts || []).slice(0, 40).forEach((pt) => { if (pt && pt.anchor) nav.push('<button type="button" class="thym-btn" data-lib-anchor="' + cosmEsc(String(pt.anchor)) + '">' + cosmEsc(String(pt.heading || pt.id || '')) + '</button>'); });
+        if (nav.length) h += '<div class="lib-nav">' + nav.join('') + '</div>';
+      } else if (data.state === 'not-aboard' || data.state === 'fetching') {
+        h += '<p class="docs-busy">' + cosmEsc(data.state === 'fetching' ? t('docs.lib.fetching', 'the text is being fetched from cosmoes.org; the section opens here when it arrives')
+          : t('docs.lib.notAboard', 'the text is not aboard this machine: the citation is carried, and opens here once the text is fetched')) + '</p>';
+      }
+      body.innerHTML = h + '</div>';
+      docsEl('docs-toc').innerHTML = '';
+      docsBuildToc();
+      body.scrollTop = 0;
+    }
+
+    // Within the same page: the section it is in, or one of its parts.
+    function libDocClick(e) {
+      const b = e.target.closest && e.target.closest('[data-lib-anchor]');
+      if (!b || !DOCS.data || !DOCS.data.section) return;
+      const page = String(DOCS.data.section.page || String((DOCS.data.cited || {}).at || '').split('#')[0]);
+      const c = DOCS.data.cited || {};
+      void enterDocsMode({ doc: 'library', cite: { in: c.in, version: c.version, at: page + '#' + b.dataset.libAnchor } });
+    }
 
     // The help button (the UI window's, at home too).
     function openHelpCenter() {
@@ -24198,10 +24505,15 @@
       setIcon(docsEl('docs-icon'), DOCS_DOCS[doc] ? DOCS_DOCS[doc].icon : 'hxc');
       docsEl('docs-title').textContent = DOCS_DOCS[doc] && DOCS_DOCS[doc].title ? DOCS_DOCS[doc].title()
         : doc === 'program' ? t('docs.title.program', 'program')
+        : doc === 'library' ? t('docs.title.library', 'language library')
         : (spec ? t('docs.title.spec', 'specification') : t('docs.title.help', 'help center'));
       let badge = '', badgeTitle = '';
       if (data && doc === 'program') {
         badge = String(data.name || '') + (data.rel ? ' · ' + data.rel : '');
+      } else if (data && doc === 'library') {
+        const tx = data.text || {};
+        badge = tx.name ? String(tx.name) + (tx.version ? ' · ' + tx.version : '') : String((data.cited || {}).in || '');
+        badgeTitle = tx.copy ? String(tx.copy) : '';
       } else if (data && spec) {
         // 0.5.4: "<name> · edition <edition>" (names carry no number, the
         // edition is a field, never a "v"), and in the title where the text
@@ -24246,7 +24558,7 @@
         const on = d === DOCS.density;
         b.setAttribute('aria-checked', on ? 'true' : 'false');
         b.tabIndex = on ? 0 : -1;
-        b.disabled = !DOCS_DENSITIES[d];
+        b.disabled = !DOCS_DENSITIES[d] || (doc === 'library' && d !== 'short');
       });
       const root = docsEl('docs-mode');
       root.dataset.doc = doc || '';
@@ -24274,11 +24586,13 @@
     // Load (seq-guarded) and draw one document at one density, then land.
     async function docsShow(doc, lang, density, anchor) {
       const seq = ++DOCS.seq;
-      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog + '|' + (DOCS.progWhere || ''));
+      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog + '|' + (DOCS.progWhere || ''))
+        || (doc === 'library' && DOCS.libShown !== libKey(DOCS.cite));
       DOCS.doc = doc;
       DOCS.lang = lang;
       DOCS.density = density;
       if (doc === 'program') DOCS.progShown = DOCS.prog + '|' + (DOCS.progWhere || '');
+      if (doc === 'library') DOCS.libShown = libKey(DOCS.cite);
       if (docChanged) { DOCS.data = null; DOCS.ix = null; DOCS.at = null; DOCS.back = null; DOCS_FAB.page = null; }
       DOCS_FIND.close({ quiet: true });
       refBackHide(DOCS_CTX);
@@ -24303,6 +24617,7 @@
       DOCS.ix = docsIndex(data);
       docsPaintChrome();
       const key = docsAnchorKey(anchor) || DOCS.at;
+      if (doc === 'library') { libRender(data); return; }
       await (doc === 'program' ? DOCS_PROGRAM_DENSITIES : DOCS_DENSITIES)[density](data, key);
       if (seq !== DOCS.seq) return;
       DOCS_FIND.refresh();
@@ -24314,7 +24629,7 @@
     // Switch density, keeping the reader's place (the section in view at
     // short, the row picked at atem). opts.anchor overrides.
     async function docsSetDensity(density, opts = {}) {
-      if (!DOCS_DENSITIES[density] || !DOCS.doc) return;
+      if (!DOCS_DENSITIES[density] || !DOCS.doc || DOCS.doc === 'library') return;
       docsDensityRemember(DOCS.doc, density);
       if (DOCS.doc === 'program') { if (DOCS.data) DOCS.at = thymDocCurrentKey() || DOCS.at; }
       else if (DOCS.density === 'short' && DOCS.data) DOCS.at = docsCurrentKey() || DOCS.at;
@@ -24415,6 +24730,10 @@
         if (DOCS.density === 'short') DOCS.at = docsCurrentKey() || DOCS.at;
         else if (DOCS.density === 'fabula') DOCS.at = docsFabCurrentKey() || DOCS.at;
         void docsShow(DOCS.doc, I18N.lang, DOCS.density, DOCS.at);
+      } else if (DOCS.doc === 'library') {
+        // The publisher's words stay as written; the labels follow the language.
+        if (DOCS.data) libRender(DOCS.data);
+        docsPaintChrome();
       } else if (DOCS.doc === 'program') {
         // A program is told in its own words; its labels follow the language.
         DOCS.at = thymDocCurrentKey() || DOCS.at;
@@ -24763,6 +25082,7 @@
 
     docsEl('docs-body').addEventListener('click', (e) => {
       if (DOCS.doc === 'program') { thymDocClick(e); return; }
+      if (DOCS.doc === 'library') { libDocClick(e); return; }
       if (DOCS.density === 'fabula') { docsFabClick(e); return; }
       const term = e.target.closest && e.target.closest('a.docs-term');
       if (term) {
@@ -39063,7 +39383,10 @@
     // card (#thym-modal) and the docs viewer's program document.
     const FAB_STAGES = ['survey', 'history', 'read', 'fold', 'question'];
     const FAB_DEPTHS = ['line', 'overview', 'manual'];
-    const FAB_CSHORT_RE = /\.cshort-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\/?$/;
+    // 0.8 (W4-X7): a cshort in another language carries it in its name (`vulture.cshort-go-<stamp>/`)
+    const FAB_CSHORT_RE = /\.cshort-(?:[a-z][a-z0-9+]*-)?\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\/?$/;
+    // and a layout of one, read as a catem is (`vulture.layout-go-<stamp>.md`)
+    const FAB_LAYOUT_RE = /\.layout-[a-z][a-z0-9+]*-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\.md$/i;
     const FAB_CATEM_RE = /\.catem-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\.md$/i;
     const FAB_FABULAC_RE = /\.fabulac\.cosm$/i;
     const fabEl = (id) => document.getElementById(id);
@@ -39261,6 +39584,8 @@
       busy: false, error: null, cerror: null,
       // 0.7 (V2c): a poem decompiled in steps (GET /api/fabula/verse/build)
       verse: null, vjob: null, vsnap: null, vresult: null, verror: null,
+      // 0.8 (W4-X7): a fabulac kept for transconception, its card (GET /api/fabula/transconception)
+      tc: null, tcCites: [],
     };
 
     function fabCardReset(face) {
@@ -39268,12 +39593,12 @@
       Object.assign(FAB, { face, path: null, state: null, flip: false, twin: null, suggested: null, flavour: null,
         target: null, build: null, compiled: null, what: 'code', job: null, snap: null, result: null, cjob: null,
         csnap: null, cresult: null, busy: false, error: null, cerror: null,
-        verse: null, vjob: null, vsnap: null, vresult: null, verror: null });
+        verse: null, vjob: null, vsnap: null, vresult: null, verror: null, tc: null, tcCites: [] });
       fabRouteReset('fab');
       // 0.8 (W4-FP): the authored faces' state
       fabRouteReset('fap');
       fapReset();
-      ['fab-main', 'fab-author', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-run', 'fab-dialectic', 'fab-status'].forEach((id) => {
+      ['fab-main', 'fab-tc', 'fab-author', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-run', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
       });
@@ -39351,6 +39676,8 @@
       await Promise.all([fabBuildLoad(seq), fabGateLoad()]);
       if (seq !== FAB.seq) return;
       await fabCompiledLoad(seq);
+      if (seq !== FAB.seq) return;
+      await fabTcLoad(seq);
       if (seq !== FAB.seq) return;
       fabCardPaint();
     }
@@ -39438,6 +39765,7 @@
       }
       // 0.7 (V2c): verse is decompiled in steps too: the fabulap card
       fabSet(fabEl('fab-verse'), FAB.twin && FAB.flavour === 'fabulap' ? fabVerseHTML() : '');
+      fabSet(fabEl('fab-tc'), '');
       fabSet(fabEl('fab-compile'), '');
       // 0.6 (U1b): the twin of the chosen flavour, when it has one: its questions.
       if (window.__dlgReady) {
@@ -39551,6 +39879,7 @@
         if (FAB.error) h += '<p class="thym-refusal">' + cosmEsc(FAB.error) + '</p>';
       }
       fabSet(fabEl('fab-main'), h);
+      fabSet(fabEl('fab-tc'), b && !b.error && b.exists ? fabTcHTML(FAB.tc) : '');
       fabSet(fabEl('fab-route-box'), b && !b.error ? fabRouteHTML('fab', { ceiling: 'cloud', unit: t('fab.calls.stage', 'model calls a stage') }) : '');
       fabSet(fabEl('fab-compile'), b && !b.error && b.exists ? fabCompileHTML(crunning) : '');
       // 0.6 (U1b): the fabulac's questions, once it exists.
@@ -39615,6 +39944,236 @@
           + (s.exists === false ? '' : '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(rel) + '">' + cosmEsc(t('canon.job.open', 'open')) + '</button>')
           + '</li>';
       }).join('') + '</ul>';
+    }
+
+    // ---- 0.8 (W4-X7): the transconception card ----
+    // A fabulac kept for transconception (`purpose: transconception`) shows,
+    // under its build, what GET /api/fabula/transconception says of it, read
+    // only: the two gates (ready to keep; ready to entail in each target's
+    // language), each check held or not and why; the rulings queue (the
+    // questions about a ruling, batched; they are answered in the dialectic,
+    // as every question is); the ground (each reliance and its `stated`,
+    // every citation a link that opens the library's section in the docs
+    // viewer, with "fetching" and "not aboard" said plainly); the targets
+    // with their twelve points and gaps; and each cshort with its target,
+    // apart or beside, its layout and its evidence. A cshort in another
+    // language is shown and read, never built or run: nothing here offers it.
+    async function fabTcLoad(seq = FAB.seq) {
+      const b = FAB.build;
+      FAB.tc = null;
+      if (!b || b.error || !b.exists || !b.fabulac) return;
+      const r = await canonJSON('/api/fabula/transconception?path=' + encodeURIComponent(b.fabulac));
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FAB.tc = { error: r.error || t('canon.job.failed', 'that did not work') }; return; }
+      FAB.tc = r.data.transconception ? r.data : null;
+    }
+
+    function fabTcStateWord(st) {
+      const w = {
+        holds: t('fab.tc.check.holds', 'holds'), fails: t('fab.tc.check.fails', 'does not hold'),
+        'not measured': t('fab.tc.check.unmeasured', 'not measured'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fabTcCiteWord(st) {
+      const w = {
+        resolved: t('fab.tc.cite.resolved', 'found in the library'),
+        fetching: t('fab.tc.cite.fetching', 'fetching'),
+        'not-aboard': t('fab.tc.cite.notAboard', 'not aboard'),
+        changed: t('fab.tc.cite.changed', 'the text changed'),
+        unplaced: t('fab.tc.cite.unplaced', 'not placed in the kept text'),
+        missing: t('fab.tc.cite.missing', 'no such page'),
+        unknown: t('fab.tc.cite.unknown', 'a text the library does not have'),
+        nowhere: t('fab.tc.cite.nowhere', 'stated in no text'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fabTcVerdictWord(v) {
+      const w = { feasible: t('fab.tc.verdict.feasible', 'feasible'), 'feasible-with': t('fab.tc.verdict.with', 'feasible, with conditions'),
+        not: t('fab.tc.verdict.not', 'not feasible') };
+      return w[v] || t('fab.tc.verdict.none', 'not weighed yet');
+    }
+
+    function fabTcGateHTML(g) {
+      const checks = cosmIsMap(g.checks) ? g.checks : {};
+      const name = g.gate === 'ready-to-keep' ? t('fab.tc.gate.keep', 'ready to keep')
+        : t('fab.tc.gate.entail', 'ready to entail in {language}').replace('{language}', () => String(g.language || ''));
+      const says = g.holds ? t('fab.tc.gate.holds', 'holds') : (g['kept-unruled'] ? t('fab.tc.gate.unruled', 'kept unruled')
+        : t('fab.tc.gate.fails', 'does not hold yet'));
+      let h = '<div class="fab-tc-gate"><div class="fab-row"><span class="fab-tc-gname">' + cosmEsc(name) + '</span>'
+        + '<span class="fab-tc-says ' + (g.holds ? 'fab-tc-ok' : 'fab-tc-no') + '">' + cosmEsc(says) + '</span></div>'
+        + '<ul class="fab-tc-checks">';
+      for (const [n, c] of Object.entries(checks)) {
+        const st = c && c.state;
+        const why = (c.errors && c.errors.length ? c.errors : (c.why ? [c.why] : (c.warnings || []))).slice(0, 3);
+        const more = (c.errors || []).length - why.length;
+        h += '<li class="fab-tc-check fab-tc-' + (st === 'holds' ? 'ok' : (st === 'fails' ? 'no' : 'un')) + '">'
+          + '<span class="fab-tc-cname">' + cosmEsc(n) + '</span><span class="fab-tc-cstate">' + cosmEsc(fabTcStateWord(st)) + '</span>';
+        if (st !== 'holds' && why.length) {
+          h += '<ul class="fab-tc-why">' + why.map((w) => '<li>' + cosmEsc(String(w)) + '</li>').join('')
+            + (more > 0 ? '<li>' + cosmEsc(t('fab.tc.more', 'and {n} more').replace('{n}', String(more))) + '</li>' : '') + '</ul>';
+        }
+        h += '</li>';
+      }
+      return h + '</ul></div>';
+    }
+
+    function fabTcRulingsHTML(r) {
+      const qs = Array.isArray(r.questions) ? r.questions : [];
+      const words = cosmIsMap(r.words) ? r.words : {};
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.rulings.head', 'its rulings')) + '</div>';
+      const made = Object.entries(words).map(([w, n]) => w + ' ' + n).join(' · ');
+      h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.rulings.made', '{n} items to rule, {k} not ruled yet')
+        .replace('{n}', String(r.items || 0)).replace('{k}', String(r.unruled || 0))) + (made ? ' · ' + cosmEsc(made) : '') + '</p>';
+      const open = qs.filter((q) => q.state === 'open' || !q.settled);
+      if (!open.length) return h + '<p class="fab-say">' + cosmEsc(t('fab.tc.rulings.none', 'no ruling waits for an answer')) + '</p>';
+      h += '<ul class="fab-tc-queue">' + open.map((q) => {
+        const p = cosmIsMap(q.proposed) ? q.proposed : {};
+        const bits = [];
+        if (p.is) bits.push(t('fab.tc.rulings.proposed', 'proposed: {ruling}').replace('{ruling}', () => String(p.is) + (p.allowing ? ' (' + p.allowing + ')' : '')));
+        if (p['made-for']) bits.push(t('fab.tc.rulings.for', 'for {target}').replace('{target}', () => String(p['made-for']).replace(/^N:target\//, '')));
+        if (q.batch) bits.push(t('fab.tc.rulings.batch', 'and {n} more items, one answer for all').replace('{n}', String(q.batch)));
+        if (q.state && q.state !== 'open') bits.push(String(q.state));
+        return '<li><span class="fab-tc-about">' + cosmEsc(String(q.about || '')) + '</span>'
+          + (q.asks ? '<span class="fab-tc-asks">' + cosmEsc(String(q.asks)) + '</span>' : '')
+          + '<span class="fab-made-meta">' + cosmEsc(bits.join(' · ')) + '</span></li>';
+      }).join('') + '</ul>';
+      return h + '<div class="fab-row"><span class="fab-say">' + cosmEsc(t('fab.tc.rulings.where', 'answered with the other questions, in the dialectic: a question skipped keeps the gate shut'))
+        + '</span><button type="button" data-fab="tc-rulings">' + cosmEsc(t('dlg.fab.answer', 'answer them…')) + '</button></div>';
+    }
+
+    function fabTcGroundHTML(g) {
+      const items = Array.isArray(g.items) ? g.items : [];
+      const states = cosmIsMap(g.states) ? g.states : {};
+      FAB.tcCites = [];
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.ground.head', 'its ground')) + '</div>';
+      const tally = Object.entries(states).map(([s, n]) => fabTcCiteWord(s) + ' ' + n).join(' · ');
+      h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.ground.count', '{n} things it leans on, each with where its language says so')
+        .replace('{n}', String(items.length))) + (tally ? ' · ' + cosmEsc(tally) : '') + '</p>';
+      if (!g.library) h += '<p class="thym-note">' + cosmEsc(t('fab.tc.ground.noLibrary', 'the language library is not aboard here: each citation is carried, and opens when its text is fetched')) + '</p>';
+      if (!items.length) return h;
+      h += '<details class="fab-tc-more"><summary>' + cosmEsc(t('fab.tc.ground.show', 'show every reliance')) + '</summary><ul class="fab-tc-ground">';
+      for (const it of items) {
+        const cites = (it.stated || []).map((c) => {
+          if (c.state === 'nowhere') {
+            return '<li class="fab-tc-cite"><span class="fab-tc-cstate">' + cosmEsc(fabTcCiteWord('nowhere')) + '</span> '
+              + cosmEsc(String(c.nowhere || '')) + '</li>';
+          }
+          const i = FAB.tcCites.push(c) - 1;
+          return '<li class="fab-tc-cite"><button type="button" class="fab-tc-link" data-fab="tc-cite" data-fab-path="' + i + '" title="'
+            + cosmEsc(t('fab.tc.cite.open', 'open the section in the docs viewer')) + '">' + cosmEsc(String(c.in || '') + ' ' + String(c.version || '') + ' · ' + String(c.at || ''))
+            + '</button> <span class="fab-tc-cstate fab-tc-st-' + cosmEsc(String(c.state || '')) + '">' + cosmEsc(fabTcCiteWord(c.state)) + '</span></li>';
+        }).join('');
+        const rul = (it.rulings || []).map((x) => x.pending ? t('fab.tc.rulings.pending', 'not ruled yet') : String(x.is || '')
+          + (x['made-for'] ? ' (' + String(x['made-for']).replace(/^N:target\//, '') + ')' : '')).join(', ');
+        h += '<li><div class="fab-row"><span class="fab-made-name">' + cosmEsc(String(it.name || it.id)) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc([it.on, it.entry, t('fab.tc.ground.usedBy', 'used by {n}').replace('{n}', String(it['used-by'] || 0)), rul].filter(Boolean).join(' · ')) + '</span></div>'
+          + (it.gives ? '<p class="fab-tc-gives">' + cosmEsc(String(it.gives)) + '</p>' : '')
+          + (cites ? '<ul class="fab-tc-cites">' + cites + '</ul>' : '') + '</li>';
+      }
+      return h + '</ul></details>';
+    }
+
+    function fabTcTargetsHTML(ts) {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.targets.head', 'its targets')) + '</div>';
+      if (!ts.length) return h + '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.none', 'no target language named yet')) + '</p>';
+      for (const tg of ts) {
+        const tags = [];
+        if (tg.source) tags.push(t('fab.tc.targets.source', 'its own language: the round trip'));
+        else if (tg.standing) tags.push(t('fab.tc.targets.standing', 'the weighing that stands'));
+        if (tg.version) tags.push(String(tg.version));
+        h += '<div class="fab-tc-target"><div class="fab-row"><span class="fab-tc-gname">' + cosmEsc(String(tg.language || tg.id)) + '</span>'
+          + '<span class="fab-tc-says ' + (tg.verdict === 'not' ? 'fab-tc-no' : (tg.verdict ? 'fab-tc-ok' : '')) + '">'
+          + cosmEsc(tg.source ? t('fab.tc.verdict.source', 'not weighed: the source language') : fabTcVerdictWord(tg.verdict)) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(tags.join(' · ')) + '</span></div>';
+        if ((tg.points || []).length) {
+          h += '<table class="fab-tc-points"><thead><tr><th>#</th><th>' + cosmEsc(t('fab.tc.points.point', 'point')) + '</th><th>'
+            + cosmEsc(t('fab.tc.points.score', 'score')) + '</th><th>' + cosmEsc(t('fab.tc.points.evidence', 'evidence')) + '</th></tr></thead><tbody>'
+            + tg.points.map((p) => '<tr' + (p.gate ? ' class="fab-tc-gatept"' : '') + '><td>' + p.point + '</td><td>' + cosmEsc(String(p.words || ''))
+              + (p.gate ? ' <span class="fab-tc-gatemark">' + cosmEsc(t('fab.tc.points.gate', 'gate')) + '</span>' : '') + '</td><td>'
+              + (p.score == null ? '–' : cosmEsc(String(p.score)) + '/3') + '</td><td>' + cosmEsc(String(p.ruled || p.evidence || '')) + '</td></tr>').join('')
+            + '</tbody></table>';
+        }
+        const prov = Object.entries(tg.provides || {}).map(([by, n]) => by + ' ' + n).join(' · ');
+        if (prov) h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.provides', 'what it leans on, provided: {list}').replace('{list}', () => prov)) + '</p>';
+        if ((tg.gaps || []).length) {
+          h += '<ul class="fab-tc-why">' + tg.gaps.map((g) => '<li>' + cosmEsc(String(g.for || '') + ': ' + [g.by, g.what, typeof g.gap === 'string' ? g.gap : ''].filter(Boolean).join(' · ')) + '</li>').join('') + '</ul>';
+        } else if (!tg.source && (tg.points || []).length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.noGap', 'no gap named')) + '</p>';
+        }
+        if ((tg.conditions || []).length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.conditions', 'its conditions')) + '</p><ul class="fab-tc-why">'
+            + tg.conditions.map((c) => '<li>' + cosmEsc(String(c)) + '</li>').join('') + '</ul>';
+        }
+        if (tg.spike && tg.spike.level != null) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.spike', 'its spike: evidence level {n}').replace('{n}', String(tg.spike.level))) + '</p>';
+        }
+        if (tg.unweighed && !tg.source) h += '<p class="thym-meta">' + cosmEsc(String(tg.unweighed)) + '</p>';
+        h += '</div>';
+      }
+      return h;
+    }
+
+    function fabTcCshortsHTML(cs) {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.cshorts.head', 'its cshorts')) + '</div>'
+        + '<p class="thym-note">' + cosmEsc(t('fab.tc.cshorts.never', 'a cshort is read, never run; one in another language is shown here and nothing on this page builds or runs it')) + '</p>';
+      if (!cs.length) return h + '<p class="thym-meta">' + cosmEsc(t('fab.made.none', 'nothing yet')) + '</p>';
+      return h + '<ul class="fab-made-list fab-tc-cshorts">' + cs.map((c) => {
+        const rel = String(c.path || '');
+        const bits = [String(c.language || '?')];
+        if (c.target) bits.push(t('fab.tc.cshorts.target', 'for {target}').replace('{target}', () => String(c.target)));
+        bits.push(c.entailed === 'beside' ? t('fab.tc.cshorts.beside', 'beside the source') : t('fab.tc.cshorts.apart', 'apart from the source'));
+        const ev = c.evidence;
+        const evw = ev ? t('fab.tc.cshorts.evidence', 'evidence level {level}: {agree} of {kept} steps agree, against {against}')
+          .replace('{level}', String(ev.level)).replace('{agree}', String(ev.agree == null ? '?' : ev.agree))
+          .replace('{kept}', String(ev.kept == null ? '?' : ev.kept)).replace('{against}', () => String(ev.against || '?'))
+          : t('fab.tc.cshorts.unjudged', 'not judged yet');
+        const lay = c.layout ? (c['layout-there']
+          ? '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(fabTcRel(c.layout)) + '">' + cosmEsc(t('fab.tc.cshorts.layout', 'its layout')) + '</button>'
+          : '<span class="fab-made-meta">' + cosmEsc(t('fab.tc.cshorts.layoutGone', 'its layout is not here')) + '</span>') : '';
+        return '<li><span class="fab-made-name">' + cosmEsc(canonBase(rel.replace(/\/$/, '')) + '/') + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(bits.join(' · ')) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(evw) + '</span>' + lay
+          + (c.there ? '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(fabTcRel(rel)) + '">' + cosmEsc(t('fab.tc.cshorts.read', 'read')) + '</button>'
+            : '<span class="fab-made-meta">' + cosmEsc(t('fab.made.gone', 'not there any more')) + '</span>')
+          + '</li>';
+      }).join('') + '</ul>';
+    }
+
+    // A path the fabulac names (beside it) as the project's.
+    function fabTcRel(p) {
+      const fab = String((FAB.tc && FAB.tc.path) || '');
+      const dir = fab.indexOf('/') >= 0 ? fab.slice(0, fab.lastIndexOf('/') + 1) : '';
+      return dir + String(p || '').replace(/^\.\//, '');
+    }
+
+    function fabTcHTML(tc) {
+      if (!tc) return '';
+      if (tc.error) return '<p class="thym-refusal">' + cosmEsc(tc.error) + '</p>';
+      const gates = cosmIsMap(tc.gates) ? tc.gates : {};
+      let h = '<div class="fab-tc"><div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.head', 'transconception'))
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-transconception"></span></div>'
+        + '<p class="fab-say">' + cosmEsc(t('fab.tc.what', 'kept to carry {name} into another language through its fabulac').replace('{name}', () => String(tc.name || ''))
+          + (tc['ruled-by'] && tc['ruled-by'] !== 'none' ? ' · ' + t('fab.tc.ruledBy', 'ruled by {who}').replace('{who}', () => String(tc['ruled-by'])) : '')
+          + (tc['kept-unruled'] ? ' · ' + t('fab.tc.gate.unruled', 'kept unruled') : '')) + '</p>';
+      if (!tc['source-here']) h += '<p class="thym-note">' + cosmEsc(t('fab.tc.noSource', 'its source is not beside it, so what needs the source is not measured')) + '</p>';
+      h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.gates.head', 'its gates')) + '</div>';
+      if (gates.keep) h += fabTcGateHTML(gates.keep);
+      (gates.entail || []).forEach((g) => { h += fabTcGateHTML(g); });
+      h += fabTcRulingsHTML(cosmIsMap(tc.rulings) ? tc.rulings : {});
+      h += fabTcGroundHTML(cosmIsMap(tc.ground) ? tc.ground : {});
+      h += fabTcTargetsHTML(Array.isArray(tc.targets) ? tc.targets : []);
+      h += fabTcCshortsHTML(Array.isArray(tc.cshorts) ? tc.cshorts : []);
+      return h + '</div>';
+    }
+
+    // A citation opened: the library's section in the docs viewer.
+    function fabTcCite(i) {
+      const c = (FAB.tcCites || [])[Number(i)];
+      if (!c) return;
+      const cite = {};
+      ['in', 'version', 'at', 'digest', 'section-digest'].forEach((k) => { if (c[k] != null) cite[k] = String(c[k]); });
+      void enterDocsMode({ doc: 'library', cite });
     }
 
     // A build's or a compile's progress, in words: stage n of 5 and its
@@ -40060,6 +40619,12 @@
       if (!b) return;
       if (b.dataset.fab === 'compile') void fabCompileGo();
       else if (b.dataset.fab === 'view') void fabViewOpen(b.dataset.fabPath);
+      else if (b.dataset.fab === 'tc-cite') fabTcCite(b.dataset.fabPath);
+      else if (b.dataset.fab === 'tc-rulings') {
+        const p = FAB.tc && FAB.tc.path;
+        fabCardClose();
+        if (p) void dlgOpen(p);
+      }
       else if (b.dataset.fab === 'verse-build') void fabVerseGo(fabVerseResumable(FAB.verse) ? 'resume' : 'build');
       else if (b.dataset.fab === 'verse-restart') void fabVerseGo('restart');
       else if (b.dataset.fab === 'verse-cancel') void fabVerseCancel();
@@ -40099,7 +40664,8 @@
     async function fabViewOpen(path) {
       if (!path) return;
       FABV.seq++;
-      const kind = FAB_CATEM_RE.test(String(path)) ? 'catem' : 'cshort';
+      // 0.8 (W4-X7): a layout of a cshort in another language is markdown read as a catem is
+      const kind = FAB_CATEM_RE.test(String(path)) ? 'catem' : (FAB_LAYOUT_RE.test(String(path)) ? 'layout' : 'cshort');
       Object.assign(FABV, { kind, path: String(path), data: null, file: null, text: null, error: null, ferror: null });
       const m = fabEl('cshort-modal');
       m.classList.remove('hidden');
@@ -40108,7 +40674,7 @@
       applyHelpBubbles();
       fabViewPaint();
       const seq = FABV.seq;
-      const url = kind === 'catem' ? '/api/fabula/catem?path=' : '/api/fabula/cshort?path=';
+      const url = kind !== 'cshort' ? '/api/fabula/catem?path=' : '/api/fabula/cshort?path=';
       const r = await canonJSON(url + encodeURIComponent(FABV.path));
       if (seq !== FABV.seq) return;
       if (!r.ok || !r.data) FABV.error = r.error || t('canon.job.failed', 'that did not work');
@@ -40139,7 +40705,8 @@
     function fabViewPaint() {
       if (!FABV.open) return;
       const d = FABV.data;
-      fabEl('fabv-title').textContent = FABV.kind === 'catem' ? t('fab.view.catem', 'catem') : t('fab.view.cshort', 'cshort');
+      fabEl('fabv-title').textContent = FABV.kind === 'catem' ? t('fab.view.catem', 'catem')
+        : (FABV.kind === 'layout' ? t('fab.view.layout', 'layout') : t('fab.view.cshort', 'cshort'));
       const src = fabEl('fabv-source');
       src.textContent = canonBase(String(FABV.path).replace(/\/$/, '')) + (FABV.kind === 'cshort' ? '/' : '');
       src.title = FABV.path;
@@ -40147,6 +40714,12 @@
       if (FABV.error) { fabSet(body, '<p class="thym-refusal">' + cosmEsc(FABV.error) + '</p>'); return; }
       if (!d) { fabSet(body, '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>'); return; }
       let h = '';
+      if (FABV.kind === 'layout') {
+        h += '<p class="fabv-note">' + cosmEsc(t('fab.view.layoutNote', 'a layout: the files and the names a cshort in another language is written to, entailed by its fabulac; read, never run')) + '</p>';
+        h += '<div class="fabv-pane"><div class="fabv-md">' + renderMarkdown(String(d.text || ''), null).html + '</div></div>';
+        fabSet(body, h);
+        return;
+      }
       if (FABV.kind === 'catem') {
         h += '<p class="fabv-note">' + cosmEsc(d.depth ? t('fab.view.depth', 'a catem at depth {depth}: what a user can do with the program, entailed by its fabulac')
           .replace('{depth}', () => String(d.depth)) : t('fab.view.catemNote', 'a catem: what a user can do with the program, entailed by its fabulac')) + '</p>';

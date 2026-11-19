@@ -405,6 +405,21 @@ donde enough ejecuta la implicación de un fabulac que redactaste: sus pruebas, 
 - entrega un archivo pequeño tuyo y ejecuta la herramienta sobre él antes de confiarle uno grande.
 - las promesas del sandbox se listan bajo cada resultado: abre la lista para ver qué se sostuvo.
 
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+la tarjeta de un fabulac guardado para la <strong>transconception</strong>: un programa llevado a otro lenguaje a través de su fabulac, solo para leer. muestra sus dos <strong>umbrales</strong>, <strong>listo para guardar</strong> y <strong>listo para implicar</strong> en cada lenguaje de destino, con cada comprobación que se cumple o no, y por qué; sus <strong>dictámenes</strong>, lo que debe quedar igual, puede diferir o puede cambiar, y las preguntas sobre ellos aún abiertas; su <strong>fundamento</strong>, cada apoyo en el que el programa se sostiene en su lenguaje, con dónde lo dice el texto del propio lenguaje; sus <strong>destinos</strong>, cada lenguaje sopesado en doce puntos, tres de ellos umbrales, con el veredicto, las condiciones y las lagunas; y sus <strong>cshorts</strong>, cada uno con su destino, implicado <em>aparte</em> de la fuente o <em>al lado</em>, su disposición y su evidencia.
+
+### how
+<strong>construir y compilar…</strong> sobre el fabulac la abre. <strong>responderlas…</strong> bajo sus dictámenes abre las preguntas, que se responden como cualquier pregunta; una pregunta saltada mantiene cerrado el umbral. bajo su fundamento, cada cita abre la sección en el visor de documentos, desde la <strong>biblioteca de lenguajes</strong>: cuando el texto no está en esta máquina dice <em>obteniéndose</em> mientras llega de cosmoes.org, y <em>no a bordo</em> cuando no puede llegar, una advertencia, nunca un aprobado. un cshort, en cualquier lenguaje, se lee: <strong>leer</strong> y <strong>su disposición</strong> lo abren, y nada aquí lo construye ni lo ejecuta.
+
+### ideas
+- lea primero los umbrales: una comprobación que no se cumple dice qué elemento y por qué.
+- abra una cita antes de dictaminar un apoyo: allí están las palabras del propio lenguaje.
+- un cshort sin evidencia aún no está juzgado: lo ejecuta el juez externo, nunca enough.
+
 ## dialectic-card
 name: las preguntas
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

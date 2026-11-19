@@ -490,6 +490,7 @@ def seed_project(project: Path) -> None:
     _seed_fabula(project / FABULA_DIR)
     _seed_dialectic(project / DIALECTIC_DIR)
     _seed_fabulac_first(project)
+    _seed_transconception(project)
 
 
 # 0.8 (W4-FP): authored fabulacs for the authored card, made by enough's own functions
@@ -536,6 +537,27 @@ def _seed_fabulac_first(project: Path) -> None:
                          cwd=str(REPO), env=env, capture_output=True, text=True, timeout=600)
     if out.returncode != 0:
         raise RuntimeError("seeding the authored fabulacs failed:\n" + (out.stdout + out.stderr)[-4000:])
+
+
+# 0.8 (W4-X7): a fabulac kept for transconception, for its card: the promoted vulture fabulac with five rulings
+# open in batched questions and a cshort in Go with its layout (tests/test_transconception_card.seed_card), made in a
+# child process under this run's seams, as the authored fabulacs are.
+TRANSCONCEPTION_DIR = "transconceive"
+TRANSCONCEPTION_SEED = r"""
+import sys
+from pathlib import Path
+from tests.test_transconception_card import seed_card
+seed_card(Path(sys.argv[1]).resolve())
+"""
+
+
+def _seed_transconception(project: Path) -> None:
+    env = build_env(project.parent)
+    env["PYTHONPATH"] = str(REPO)
+    out = subprocess.run([sys.executable, "-c", TRANSCONCEPTION_SEED, str(project / TRANSCONCEPTION_DIR)],
+                         cwd=str(REPO), env=env, capture_output=True, text=True, timeout=300)
+    if out.returncode != 0:
+        raise RuntimeError("seeding the transconception card failed:\n" + (out.stdout + out.stderr)[-4000:])
 
 
 def _seed_dialectic(talks: Path) -> None:

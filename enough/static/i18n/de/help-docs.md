@@ -404,6 +404,21 @@ wo enough die Folgerung eines fabulac ausführt, das du verfasst hast: seine Tes
 - übergib eine kleine eigene Datei und führe das Werkzeug darauf aus, bevor du ihm eine große anvertraust.
 - die Versprechen der Sandbox stehen unter jedem Ergebnis: öffne die Liste, um zu sehen, was gehalten hat.
 
+## fabulac-transconception
+name: Transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+die Karte eines fabulac, der für die <strong>Transconception</strong> bewahrt wird: ein Programm, durch seinen fabulac in eine andere Sprache getragen, nur zum Lesen. sie zeigt seine zwei <strong>Schwellen</strong>, <strong>bereit zum Bewahren</strong> und <strong>bereit zur Folgerung</strong> in jede Zielsprache, mit jeder Prüfung, die hält oder nicht, und warum; seine <strong>Entscheide</strong>, was so bleiben muss, abweichen oder sich ändern darf, und die Fragen dazu, die noch offen sind; seine <strong>Grundlage</strong>, jede Stütze, auf die sich das Programm in seiner Sprache verlässt, mit der Stelle, an der der Text der Sprache es sagt; seine <strong>Ziele</strong>, jede Sprache nach zwölf Punkten abgewogen, drei davon Schwellen, mit Urteil, Bedingungen und Lücken; und seine <strong>cshorts</strong>, jeder mit seinem Ziel, <em>getrennt</em> von der Quelle oder <em>daneben</em> gefolgert, seinem Aufriss und seinem Beleg.
+
+### how
+<strong>bauen und kompilieren …</strong> auf dem fabulac öffnet sie. <strong>beantworten …</strong> unter seinen Entscheiden öffnet die Fragen, beantwortet wie jede Frage; eine übersprungene hält die Schwelle geschlossen. unter seiner Grundlage öffnet jedes Zitat den Abschnitt im Dokumentbetrachter, aus der <strong>Sprachbibliothek</strong>: ist der Text nicht auf diesem Rechner, heißt es <em>wird geholt</em>, solange er von cosmoes.org kommt, und <em>nicht an Bord</em>, wenn er nicht kommen kann, eine Warnung, nie ein Bestehen. ein cshort, in jeder Sprache, wird gelesen: <strong>lesen</strong> und <strong>sein Aufriss</strong> öffnen ihn, und nichts hier baut ihn oder führt ihn aus.
+
+### ideas
+- lies zuerst die Schwellen: eine Prüfung, die nicht hält, nennt den Eintrag und den Grund.
+- öffne ein Zitat, bevor du über eine Stütze entscheidest: dort stehen die Worte der Sprache selbst.
+- ein cshort ohne Beleg ist noch nicht beurteilt: der äußere Richter führt ihn aus, nie enough.
+
 ## dialectic-card
 name: die Fragen
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

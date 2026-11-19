@@ -404,6 +404,21 @@ where enough runs the entailment of a fabulac you authored: its tests, and its t
 - hand over a small file of your own and run the tool on it before you trust it with a big one.
 - the box's promises are listed under each result: open the list to see what held.
 
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+the card of a fabulac kept for <strong>transconception</strong>: a program carried into another language through its fabulac, read only. it shows its two <strong>gates</strong>, <strong>ready to keep</strong> and <strong>ready to entail</strong> in each target language, with every check that holds or does not and why; its <strong>rulings</strong>, what you said must stay as it is, may differ, or may change, and the questions about them still open; its <strong>ground</strong>, each thing the program leans on in its language, with where the language's own text says so; its <strong>targets</strong>, each language weighed on twelve points, three of them gates, with the verdict, the conditions and the gaps; and its <strong>cshorts</strong>, each with its target, entailed <em>apart</em> from the source or <em>beside</em> it, its layout and its evidence.
+
+### how
+<strong>build and compile…</strong> on the fabulac opens it. <strong>answer them…</strong> under its rulings opens the questions, answered as every question is; one you skip keeps the gate shut. under its ground, each citation opens the section in the docs viewer, from the <strong>language library</strong>: when the text is not on this machine it says <em>fetching</em> while it comes from cosmoes.org, and <em>not aboard</em> when it cannot, a warning, never a pass. a cshort, in any language, is read: <strong>read</strong> and <strong>its layout</strong> open it, and nothing here builds or runs it.
+
+### ideas
+- read the gates first: a check that does not hold says which item and why.
+- open a citation before you rule a reliance: the language's own words are there.
+- a cshort with no evidence is not judged yet: the outside judge runs it, never enough.
+
 ## dialectic-card
 name: the questions
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

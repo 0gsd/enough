@@ -919,6 +919,207 @@ def ready_to_entail(volume, language: str, *, source: Path | None = None, librar
 
 
 # ---------------------------------------------------------------------------
+# The card (phase 7): what the page shows of a fabulac kept for transconception, read only
+# ---------------------------------------------------------------------------
+#
+# `card(path)` is the payload of `GET /api/fabula/transconception` (enough/routes/fabula.py): the two gates with each
+# check held or not and why; the rulings queue (the questions about a ruling, batched as the dialectic raised them,
+# answered in the dialectic); the ground (each reliance, its `stated` and what came of each citation in the language
+# library: resolved, fetching, not aboard, ...); the targets with their twelve points and gaps; and each cshort with
+# its target, apart or beside, its layout and its evidence. Nothing here runs, builds or writes anything.
+
+#: How much of an item's words the card carries (it is a card, the cosm viewer has the rest).
+CARD_TEXT = 400
+
+
+def _cut(v: Any, n: int = CARD_TEXT) -> str | None:
+    if not isinstance(v, str):
+        return None
+    s = " ".join(v.split())
+    return s if len(s) <= n else s[: n - 1].rstrip() + "…"
+
+
+def _ruling_rows(data: Mapping) -> list[dict]:
+    out = []
+    for r in rulings(dict(data)):
+        if "pending" in r:
+            out.append({"is": None, "pending": True, "made-for": r.get("made-for")})
+        else:
+            out.append({k: r.get(k) for k in ("is", "made-for", "allowing", "about") if r.get(k) is not None})
+    return out
+
+
+def _citation(st: Any, lib: Any) -> dict:
+    """One `stated` entry as the card shows it: the citation as written, and what came of it here (`state`, `why`)."""
+    if not isinstance(st, Mapping):
+        return {"state": "unknown", "why": "a citation is a mapping {in, version, at, digest} or {nowhere}"}
+    if "nowhere" in st:
+        return {"nowhere": _cut(st.get("nowhere")), "state": "nowhere",
+                "why": "stated in no text: the reliance says what it gives in its own words"}
+    row = {k: st.get(k) for k in ("in", "version", "at", "digest", "section-digest") if st.get(k) is not None}
+    for k in ("version", "digest", "section-digest"):
+        if k in row:
+            row[k] = str(row[k])
+    if lib is None:
+        row.update(state="not-aboard", why="the language library is not aboard here: the citation is carried, "
+                                            "not resolved")
+        return row
+    cite = getattr(lib, "cite", None)
+    try:
+        if callable(cite):
+            got = cite({k: v for k, v in row.items()})
+            row.update(state=got.get("state") or "unknown", why=got.get("why") or "")
+        else:
+            ok, why = resolve_citation(row, lib)
+            row.update(state="resolved" if ok else ("missing" if ok is False else "not-aboard"), why=why)
+    except Exception as e:                                # noqa: BLE001 - a broken library is "not aboard", said
+        row.update(state="not-aboard", why=f"the language library could not be read: {e}")
+    return row
+
+
+def _point_rows(weighed: Any) -> list[dict]:
+    got: dict[int, dict] = {}
+    if isinstance(weighed, list):
+        for w in weighed:
+            if isinstance(w, Mapping):
+                n = point_number(w.get("point"))
+                if n is not None and n not in got:
+                    got[n] = dict(w)
+    rows = []
+    for n, key, words, gate in POINTS:
+        w = got.get(n, {})
+        score = w.get("score")
+        rows.append({"point": n, "key": key, "words": words, "gate": gate,
+                     "score": score if isinstance(score, int) and not isinstance(score, bool) else None,
+                     "evidence": _cut(w.get("evidence")), "ruled": _cut(w.get("ruled")),
+                     "answered": w.get("answered")})
+    return rows
+
+
+def card(fab: Path | str, *, source: Path | None = None, library: Any = None) -> dict:
+    """The transconception card of a fabulac (see above). A fabulac without `purpose: transconception` gives
+    `{transconception: false}` and nothing else."""
+    vol = fab if isinstance(fab, mc.Volume) else mc.load_volume(Path(fab))
+    if not is_transconception(vol):
+        return {"transconception": False, "purpose": vol.catalog.get("purpose")}
+    lib = library if library is not None else local_library()
+    c = _Checks(vol, lambda *a, **k: None, source=source, library=lib)
+    cat = vol.catalog
+    langs: list[str] = []
+    for it in c.of("N", "target"):
+        lang = it.data.get("language")
+        if isinstance(lang, str) and lang != c.language and lang not in langs:
+            langs.append(lang)
+    keep = ready_to_keep(vol, source=source, library=lib)
+    entail = [ready_to_entail(vol, lang, source=source, library=lib) for lang in langs]
+
+    # the rulings queue: the questions about a ruling, open first, each with its batch
+    queue, counts = [], {}
+    for q in c.of("D", "question"):
+        d = q.data
+        about = d.get("about")
+        if not (isinstance(about, str) and about.partition("#")[2] == "ruling"):
+            continue
+        state = str(d.get("state") or "open")
+        counts[state] = counts.get(state, 0) + 1
+        prop = d.get("proposed") if isinstance(d.get("proposed"), Mapping) else {}
+        batch = [a for a in (d.get("batch") or []) if isinstance(a, str)]
+        queue.append({"id": q.id, "about": about.partition("#")[0], "batch": len(batch), "state": state,
+                      "why": d.get("why"), "asks": _cut(d.get("asks")), "to": d.get("to"),
+                      "settled": bool(d.get("settled")),
+                      "proposed": {k: prop.get(k) for k in ("is", "made-for", "about", "allowing") if prop.get(k)}})
+    order = {"open": 0, "answered": 1, "unknown": 2, "declined": 3}
+    queue.sort(key=lambda r: (order.get(r["state"], 9), r["id"]))
+    scope = c.scope()
+    unruled = [it.id for it in scope if not any("pending" not in r and r.get("is") for r in rulings(it.data))
+               or any("pending" in r for r in rulings(it.data))]
+    words: dict[str, int] = {}
+    for it in scope:
+        for r in rulings(it.data):
+            if "pending" not in r and r.get("is"):
+                words[str(r["is"])] = words.get(str(r["is"]), 0) + 1
+
+    # the ground: reliances and assumptions, each citation with what came of it here
+    ground, states = [], {}
+    for it in c.of("C", "reliance") + c.of("P", "assumption"):
+        d = it.data
+        stated = d.get("stated") if isinstance(d.get("stated"), list) else []
+        cites = [_citation(st, lib) for st in stated]
+        for x in cites:
+            states[x["state"]] = states.get(x["state"], 0) + 1
+        used = d.get("used-by") if isinstance(d.get("used-by"), list) else []
+        ground.append({"id": it.id, "kind": it.kind, "name": it.data.get("name"), "on": d.get("on"),
+                       "entry": d.get("entry"), "gives": _cut(d.get("gives") or d.get("about")),
+                       "example": _cut(d.get("example")), "used-by": len(used),
+                       "rulings": _ruling_rows(d), "stated": cites,
+                       "contradicted": bool(d.get("contradicted-by"))})
+
+    # the targets: every weighing, the twelve points, the gaps
+    targets = []
+    for it in c.of("N", "target"):
+        d = it.data
+        lang = d.get("language")
+        standing = c.latest_weighing(lang) if isinstance(lang, str) else None
+        provides = [p for p in (d.get("provides") or []) if isinstance(p, Mapping)]
+        by: dict[str, int] = {}
+        for p in provides:
+            by[str(p.get("by"))] = by.get(str(p.get("by")), 0) + 1
+        gaps = [{"for": p.get("for"), "by": p.get("by"), "what": _cut(p.get("what")),
+                 "gap": _cut(p.get("gap")) if isinstance(p.get("gap"), str) else (p.get("gap") is True or None),
+                 "note": _cut(p.get("note"))}
+                for p in provides if p.get("gap") or p.get("by") == "cannot"]
+        spike = d.get("spike") if isinstance(d.get("spike"), Mapping) else {}
+        conds = d.get("conditions")
+        targets.append({"id": it.id, "language": lang, "version": None if d.get("version") is None
+                        else str(d.get("version")), "source": lang == c.language,
+                        "weighed": isinstance(d.get("weighed"), list), "unweighed": None
+                        if isinstance(d.get("weighed"), list) else _cut(d.get("weighed")),
+                        "standing": standing is not None and standing.id == it.id, "verdict": d.get("verdict"),
+                        "conditions": [_cut(x) for x in conds] if isinstance(conds, list)
+                        else ([_cut(conds)] if isinstance(conds, str) else []),
+                        "points": _point_rows(d.get("weighed")) if isinstance(d.get("weighed"), list) else [],
+                        "provides": by, "gaps": gaps, "at": None if d.get("at") is None else str(d.get("at")),
+                        "spike": {k: (str(spike[k]) if k == "where" else spike[k]) for k in ("level", "use", "where")
+                                  if spike.get(k) is not None}})
+
+    # the cshorts: each with its target, apart or beside, its layout and its evidence; read, never run
+    tlang = {it.id: it.data.get("language") for it in c.of("N", "target")}
+    cshorts = []
+    for e in c.shorts():
+        if e.get("order") not in (None, "code"):
+            continue
+        lang = e.get("language") or tlang.get(e.get("target"))
+        folder = c.cshort_folder(e)
+        layout = e.get("layout") if isinstance(e.get("layout"), str) else None
+        lay_there = bool(layout and vol.root is not None and (vol.root / layout).is_file())
+        ev = e.get("evidence")
+        evd = None
+        if isinstance(ev, Mapping):
+            steps = ev.get("steps") if isinstance(ev.get("steps"), Mapping) else {}
+            where = ev.get("where") if isinstance(ev.get("where"), Mapping) else {}
+            evd = {"level": ev.get("level"), "kept": steps.get("kept"), "agree": steps.get("agree"),
+                   "against": ev.get("against"), "file": where.get("file"),
+                   "digest": None if where.get("digest") is None else str(where.get("digest"))[:12],
+                   "at": None if ev.get("at") is None else str(ev.get("at")), "by": _cut(ev.get("by"))}
+        cshorts.append({"path": e.get("path"), "language": lang, "target": e.get("target"),
+                        "other-language": bool(lang and c.language and lang != c.language),
+                        "entailed": e.get("entailed"), "layout": layout, "layout-there": lay_there,
+                        "there": folder is not None, "at": None if e.get("at") is None else str(e.get("at")),
+                        "by": _cut(e.get("by")), "evidence": evd, "judged": evd is not None})
+    src = c.src
+    return {"transconception": True, "name": cat.get("name"), "language": c.language,
+            "ruled-by": cat.get("ruled-by"), "kept-unruled": kept_unruled(vol),
+            "source": {k: src.get(k) for k in ("path", "language", "licence", "obtained", "origin")
+                       if src.get(k) is not None},
+            "source-here": c.source_root is not None,
+            "gates": {"keep": keep, "entail": entail},
+            "rulings": {"questions": queue, "counts": counts, "unruled": len(unruled), "items": len(scope),
+                        "words": words},
+            "ground": {"items": ground, "states": states, "library": lib is not None},
+            "targets": targets, "cshorts": cshorts}
+
+
+# ---------------------------------------------------------------------------
 # Entailing into another language (phase 6): what the layout and the cshort are read by
 # ---------------------------------------------------------------------------
 #

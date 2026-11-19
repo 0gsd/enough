@@ -70,6 +70,7 @@ JOB_KIND = "fabulac"
 FABULAC_SUFFIX = _fabula_names.suffix("fabulac")              # `.fabulac.cosm`
 CSHORT_MARK = ".cshort-"
 CATEM_MARK = ".catem-"
+LAYOUT_MARK = ".layout-"                 # a layout of a cshort in another language (transconception.LAYOUT_MARK)
 #: The largest file of a cshort read back as text.
 CSHORT_FILE_MAX = 1_000_000
 _STAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?$")
@@ -950,17 +951,21 @@ def cshort_file(project_dir: Path, rel: str, file: str) -> dict:
 
 
 def catem_text(project_dir: Path, rel: str) -> dict:
-    """A catem, read-only: `{path, text, depth, footer}` (the depth read from its footer line)."""
+    """A catem, read-only: `{path, text, depth, footer, kind}` (the depth read from its footer line). 0.8 (W4-X7): a
+    layout (`<name>.layout-<language>-<stamp>.md`, what a cshort in another language is written to) is read the same
+    way, `kind: layout`; both are markdown to read."""
     p = project_path(project_dir, rel)
-    if CATEM_MARK not in p.name or not p.name.endswith(".md"):
+    layout = LAYOUT_MARK in p.name
+    if (CATEM_MARK not in p.name and not layout) or not p.name.endswith(".md"):
         raise BuildError(f"{p.name} is not a catem; a catem is <name>.catem-<stamp>.md")
     if p.is_symlink() or not p.is_file():
-        raise BuildError(f"no such catem: {rel_of(project_dir, p)}", 404)
+        raise BuildError(f"no such {'layout' if layout else 'catem'}: {rel_of(project_dir, p)}", 404)
     text = p.read_text(encoding="utf-8", errors="replace")
     lines = [ln for ln in text.splitlines() if ln.strip()]
     footer = lines[-1] if lines else None
     m = re.search(r"at depth (line|overview|manual)", footer or "")
-    return {"path": rel_of(project_dir, p), "text": text, "depth": m.group(1) if m else None, "footer": footer}
+    return {"path": rel_of(project_dir, p), "text": text, "depth": None if layout else (m.group(1) if m else None),
+            "footer": footer, "kind": "layout" if layout else "catem"}
 
 
 # ---------------------------------------------------------------------------

@@ -404,6 +404,21 @@ enough 运行你撰写的 fabulac 的蕴含的地方：它的测试，以及带�
 - 先交给工具一个你自己的小文件试运行，再把大文件交给它。
 - 沙箱的承诺列在每个结果下面：打开列表，看看哪些守住了。
 
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+为 <strong>transconception</strong> 而保存的 fabulac 的卡片：通过 fabulac 把一个程序带入另一种语言，只供阅读。它显示两道<strong>关口</strong>——<strong>可以保存</strong>，以及对每种目标语言的<strong>可以蕴含</strong>——列出每项检查是否成立及原因；它的<strong>裁定</strong>：哪些必须保持原样、可以不同或可以改变，以及关于它们仍未回答的问题；它的<strong>根基</strong>：程序在其语言中所依托的每一项，并注明该语言自己的文本在何处这样说明；它的<strong>目标</strong>：每种语言按十二个要点权衡（其中三个是关口），附结论、条件和缺口；以及它的 <strong>cshort</strong>：每个都附上目标、是与源码<em>隔开</em>还是<em>并排</em>蕴含、布局和证据。
+
+### how
+在 fabulac 上点<strong>构建与编译…</strong>即可打开。裁定下方的<strong>回答它们…</strong>会打开问题，像回答其他问题一样回答；跳过一个问题，关口就保持关闭。根基下方的每条引用都会在文档查看器中打开<strong>语言文库</strong>里的那一节：文本不在本机时，从 cosmoes.org 获取期间显示<em>正在获取</em>，无法获取时显示<em>不在本机</em>——这是警告，从不算通过。任何语言的 cshort 都只供阅读：<strong>阅读</strong>和<strong>布局</strong>会打开它，这里没有任何东西会构建或运行它。
+
+### ideas
+- 先看关口：不成立的检查会说明是哪一项以及原因。
+- 在裁定一项依托之前先打开引用：那里有语言本身的原话。
+- 没有证据的 cshort 尚未评判：运行它的是外部裁判，从来不是 enough。
+
 ## dialectic-card
 name: 问题
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm

@@ -405,6 +405,21 @@ là où enough exécute l'implication d'un fabulac que vous avez rédigé : ses 
 - confiez un petit fichier à vous et exécutez l'outil dessus avant de lui en confier un gros.
 - les promesses du bac à sable sont listées sous chaque résultat : ouvrez la liste pour voir ce qui a tenu.
 
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+la carte d'un fabulac gardé pour la <strong>transconception</strong> : un programme porté dans un autre langage à travers son fabulac, en lecture seule. elle montre ses deux <strong>seuils</strong>, <strong>prêt à garder</strong> et <strong>prêt à impliquer</strong> dans chaque langage cible, avec chaque vérification qui tient ou non, et pourquoi ; ses <strong>décisions</strong>, ce qui doit rester tel quel, peut différer ou peut changer, et les questions encore ouvertes à leur sujet ; son <strong>fondement</strong>, chaque appui sur lequel le programme compte dans son langage, avec l'endroit où le texte du langage le dit ; ses <strong>cibles</strong>, chaque langage pesé sur douze points, dont trois sont des seuils, avec le verdict, les conditions et les lacunes ; et ses <strong>cshorts</strong>, chacun avec sa cible, impliqué <em>à part</em> de la source ou <em>à côté</em>, son plan de fichiers et sa preuve.
+
+### how
+<strong>construire et compiler…</strong> sur le fabulac l'ouvre. <strong>y répondre…</strong> sous ses décisions ouvre les questions, auxquelles on répond comme à toute question ; une question sautée garde le seuil fermé. sous son fondement, chaque citation ouvre la section dans le lecteur de documents, depuis la <strong>bibliothèque des langages</strong> : quand le texte n'est pas sur cette machine, elle dit <em>en cours de récupération</em> pendant qu'il arrive de cosmoes.org, et <em>pas à bord</em> quand il ne peut pas, un avertissement, jamais une réussite. un cshort, dans tout langage, se lit : <strong>lire</strong> et <strong>son plan de fichiers</strong> l'ouvrent, et rien ici ne le construit ni ne l'exécute.
+
+### ideas
+- lisez d'abord les seuils : une vérification qui ne tient pas dit quel élément et pourquoi.
+- ouvrez une citation avant de décider d'un appui : les mots du langage lui-même y sont.
+- un cshort sans preuve n'est pas encore jugé : c'est le juge extérieur qui l'exécute, jamais enough.
+
 ## dialectic-card
 name: les questions
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
