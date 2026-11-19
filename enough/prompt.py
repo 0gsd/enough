@@ -712,7 +712,11 @@ FABULA_TOOL_INSTRUCTIONS = """\
 or two to the person, then record their words (or `<state>` unknown,
 declined, skip). Never answer for them; `<do>settle</do>` folds answers
 in. `fabulac` `<do>`: build, status, compile (`<what>` code or a depth),
-cancel; `<model>cloud` only when asked. `fabulap` does build, status,
+cancel; `<model>cloud` only when asked. An authored one: begin
+(`<kind>`, `<licence>`, `<brief>` or `<starter>`), add (`<as>`,
+`<says>`), check, entail, test, run (`<args>`), stop, moved, keep,
+let-go, take-back (`<file>`), head (`<parts>`), parts-moved; it runs
+only in the sandbox. `fabulap` does build, status,
 cancel for a poem's `<path>`: scan, hear, then read closely.
 """
 

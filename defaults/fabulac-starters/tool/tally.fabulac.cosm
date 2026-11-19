@@ -1,0 +1,206 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/tally
+name: tally
+source:
+  kind: authored
+  language: python
+  licence:
+    pending: Under which licence will you offer it?
+  by:
+  - R:maker/author
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: tool
+  start:
+  - -m
+  - tally
+atem:
+  line: tally counts the words of a text file, from a terminal.
+  focus: what it does, and the cases that show it
+  push: a person wants a small program they can read
+  pull: 'it stays small: one thing, done well'
+nodes:
+- id: R:maker/author
+  type: maker
+  name: the author
+  summary: The author authored tally.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms the author offers tally on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.11'
+- id: N:aim/count-words
+  type: aim
+  name: Count the words of a file
+  summary: tally prints how many words a text file holds.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:use/count-a-file
+  type: use
+  name: Count a file
+  summary: A person counts the words of one file from a terminal.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:requirement/standard-library
+  type: requirement
+  name: Standard library only
+  summary: tally needs nothing but Python's standard library.
+  force: must
+  checked-by:
+  - P:case/three-words
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:requirement/says-a-missing-file
+  type: requirement
+  name: A missing file is said
+  summary: tally says so when the file is not there, and exits with 2.
+  force: must
+  checked-by:
+  - P:case/missing-file
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: C:interface/command-count
+  type: interface
+  name: tally count PATH
+  summary: 'The command line: tally count PATH prints the number of words in the file at PATH.'
+  surface: command
+  signature: tally count PATH
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: C:interface/count-words
+  type: interface
+  name: count_words
+  summary: 'count_words(text) gives the number of words in text: runs of characters between white space.'
+  surface: function
+  signature: 'count_words(text: str) -> int'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/three-words
+  type: case
+  name: Three words
+  summary: A file holding three words counts 3.
+  of:
+  - C:interface/command-count
+  given:
+    files:
+      notes.md: 'one two three
+
+        '
+    steps:
+    - arguments:
+      - count
+      - notes.md
+  expect:
+    steps:
+    - exit: 0
+      output: '3
+
+        '
+      error-output: ''
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/missing-file
+  type: case
+  name: A missing file
+  summary: A file that is not there is an error, exit 2.
+  of:
+  - C:interface/command-count
+  given:
+    steps:
+    - arguments:
+      - count
+      - gone.md
+  expect:
+    steps:
+    - exit: 2
+      output: ''
+      error-output: 'tally: gone.md: no such file
+
+        '
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/count-function
+  type: case
+  name: The function counts
+  summary: count_words counts runs between white space.
+  of:
+  - C:interface/count-words
+  given:
+    calls: C:interface/count-words
+    arguments:
+      text: 'a b  c
+
+        '
+  expect:
+    value: 3
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1

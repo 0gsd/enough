@@ -1,0 +1,177 @@
+oes: fabula/1
+macrocosm: 0.7.0
+flavour: fabulac
+id: fabula/keyval
+name: keyval
+source:
+  kind: authored
+  language: python
+  licence:
+    pending: Under which licence will you offer it?
+  by:
+  - R:maker/author
+  at: '2026-11-18'
+derived:
+  at: '2026-11-18T12:00:00Z'
+  by: person
+  mode: rules
+  completeness: outline
+  chunks: 0
+program:
+  kind: library
+atem:
+  line: keyval reads and writes lines of key=value.
+  focus: what it does, and the cases that show it
+  push: a person wants a small program they can read
+  pull: 'it stays small: one thing, done well'
+nodes:
+- id: R:maker/author
+  type: maker
+  name: the author
+  summary: The author authored keyval.
+  capacity: author
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: R:licence/licence
+  type: licence
+  name: licence
+  summary: The terms the author offers keyval on.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+- id: C:dependency/python
+  type: dependency
+  name: python
+  summary: Python, the language its entailments are written in, with its standard library.
+  package: python
+  scope: run-time
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the author, in beginning it
+    confidence: 1
+  version: '3.11'
+- id: N:aim/read-pairs
+  type: aim
+  name: Read key=value lines
+  summary: keyval splits a key=value line and joins one again.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:use/settings-file
+  type: use
+  name: A settings file
+  summary: A program reads a settings file of key=value lines.
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: N:requirement/refuses-a-line-without-equals
+  type: requirement
+  name: No '=' is refused
+  summary: A line with no '=' is refused with ValueError.
+  force: must
+  checked-by:
+  - P:case/no-equals
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: C:interface/split-pair
+  type: interface
+  name: split_pair
+  summary: split_pair(line) gives the key and the value of a key=value line, each without the spaces around it.
+  surface: function
+  signature: 'split_pair(line: str) -> list'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: C:interface/join-pair
+  type: interface
+  name: join_pair
+  summary: join_pair(key, value) gives the line key=value.
+  surface: function
+  signature: 'join_pair(key: str, value: str) -> str'
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/split
+  type: case
+  name: Split a line
+  summary: ''' a = b '' splits into a and b.'
+  of:
+  - C:interface/split-pair
+  given:
+    calls: C:interface/split-pair
+    arguments:
+      line: ' a = b '
+  expect:
+    value:
+    - a
+    - b
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/no-equals
+  type: case
+  name: No equals sign
+  summary: A line without '=' raises ValueError.
+  of:
+  - C:interface/split-pair
+  given:
+    calls: C:interface/split-pair
+    arguments:
+      line: nothing here
+  expect:
+    raises:
+      error: ValueError
+      message: no '=' in the line
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
+- id: P:case/join
+  type: case
+  name: Join a pair
+  summary: a and b join as a=b.
+  of:
+  - C:interface/join-pair
+  given:
+    calls: C:interface/join-pair
+    arguments:
+      key: a
+      value: b
+  expect:
+    value: a=b
+  stance: axiom
+  provenance:
+    mode: manual
+    sources:
+    - the starter, for the author to change
+    confidence: 1
