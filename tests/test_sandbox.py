@@ -127,6 +127,39 @@ def test_an_import_outside_the_standard_library_is_refused(tmp_path):
                                 "it here yet. Its source is entailed and can run elsewhere.")
 
 
+def test_optional_and_sibling_imports_are_accepted_and_a_hard_outside_import_is_not(tmp_path):
+    """W4-K2's find: the needs check read every import by syntax, so an optional `try: import dns` and a sibling
+    script's import refused a whole program. An import guarded by `except ImportError` (or a tuple holding it, or
+    a bare except) is optional; a module beside the importing file is the program's own."""
+    d = entailed(tmp_path, """
+        try:
+            import dns
+        except ImportError:
+            dns = None
+        try:
+            import yaml, toml
+        except (ValueError, ModuleNotFoundError):
+            pass
+        import helper
+        from helper import count
+        def main():
+            return 0
+    """)
+    (d / "tally" / "helper.py").write_text("def count():\n    return 1\n")
+    found, local = sb.imports_of(d)
+    assert not {"dns", "yaml", "toml", "helper"} & found, found
+    run = sb.prepare(d, source_kind="authored", root=tmp_path / "runs")      # not refused
+    assert run.program.name == "tally"
+    # still refused: a hard import outside the source, and one only an except of another kind guards
+    (d / "tally" / "more.py").write_text("import requests\ntry:\n    import numpy\nexcept ValueError:\n    pass\n")
+    with pytest.raises(sb.Refusal) as e:
+        sb.prepare(d, source_kind="authored", root=tmp_path / "runs2")
+    assert e.value.reason == "needs" and "`numpy`, `requests`" in e.value.sentence
+    # an import in the except or else branch is not guarded by the try
+    (d / "tally" / "more.py").write_text("try:\n    pass\nexcept ImportError:\n    import attr\n")
+    assert "attr" in sb.imports_of(d)[0]
+
+
 def test_a_declared_dependency_is_refused(tmp_path):
     d = entailed(tmp_path, "print(1)\n", project='dependencies = ["attrs==23.1.0", "rich>=13"]')
     with pytest.raises(sb.Refusal) as e:
