@@ -363,6 +363,23 @@ def test_the_command_line_on_a_starter(project: Path, scripted: None):
         assert code == 1
 
 
+def test_head_by_a_name_writes_a_maker_reference_that_checks(project: Path, scripted: None):
+    """W5-F7's find: `head … --by Ada` wrote `Ada` as a reference, and `check` failed `id-grammar`."""
+    for kind in ("tool", "library"):
+        begun(project, kind)
+    code, out, err = cli(project, "head", "toolbox", "tally", "keyval", "--licence", "MIT", "--by", "Ada")
+    assert code == 0, err
+    d = mc.yaml_load((project / "toolbox.fabulac.cosm").read_text(encoding="utf-8"))
+    assert d["source"]["by"] == ["R:maker/ada"]
+    maker = next(n for n in d["nodes"] if n["id"] == "R:maker/ada")
+    assert maker["type"] == "maker" and maker["name"] == "Ada" and maker["capacity"] == "author"
+    code, out, err = cli(project, "check", "toolbox")
+    assert code == 0 and "id-grammar" not in out + err, out + err
+    from enough import fabulac_head as FH
+    assert FH.maker_ref("R:maker/ada") == ("R:maker/ada", "ada")
+    assert FH.maker_ref("Ada Lovelace") == ("R:maker/ada-lovelace", "Ada Lovelace")
+
+
 def test_python_dash_m_enough_fabulac_is_the_command_line():
     import subprocess
     got = subprocess.run([sys.executable, "-m", "enough.fabulac", "starters"], capture_output=True, text=True,
