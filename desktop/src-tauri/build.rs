@@ -65,6 +65,8 @@ const SNAPSHOT: &[&str] = &[
     // `enough/specs.py`'s launch check read. The single files again; the chapters folder is gone.
     "docs/COMPRISE_OES.md",
     "docs/specs.json",
+    // 0.8: the developers' manual (fabulac-first), English only, read by the docs viewer the same way.
+    "docs/DEVELOPERS.md",
     "enough",
     "defaults",
     "reflib/dict",

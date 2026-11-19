@@ -4915,6 +4915,9 @@ read-only views, their router), `enough/thym/moves/code.py` (the moves),
 `defaults/thym/decompile-python.thym` and `compile-python.thym` (the
 programs). Lane notes: `docs/fabula-landed-T1-code.md`, `-SV.md`.
 
+The other way round, a fabulac the person authors first and enough entails as a program that runs
+in a sandbox, is "Writing programs fabulac-first" below (0.8).
+
 **The band (this edition).** Pure-Python source a person could read in an
 afternoon: up to `code.BAND_FILES` = 60 Python files and `BAND_LINES` =
 6,000 lines, no C extensions, no generated code. `survey` refuses past it
@@ -5117,6 +5120,137 @@ cancel) is in `fabula_tools`.
   are the server's); `construe` asks, so `planCheck` refuses `read-closely` as any asking step.
 - **uicheck** — scenario `fabulap-steps` on `works/lantern-song.txt` (agent-free scan and hear; what is drawn; the
   twin; agent-free off offering read closely).
+
+---
+
+## Writing programs fabulac-first (an authored fabulac, 0.8)
+
+The other way round from "Building a fabulac": the person writes the fabulac first, and enough entails the program
+from it, writes its tests from its cases by rules, and runs them in a sandbox. The person's guide is
+[docs/DEVELOPERS.md](DEVELOPERS.md) (English only in 0.8; a document of its own in the docs viewer, `developers`
+in `docoes.DOCUMENTS`; its section 6 is the reference `tests/test_api_promise.py` holds to the code). Spec:
+MacroCOSM OES §18.4.7 (the authored fabulac, `program`, cases as the judge, the run rule, the head fabulac), THYM
+§20.7 and §20.11 to §20.12; pins section 4 and 17 to 18 of the 0.8 build.
+
+**The rule that governs everything here.** Only an *authored* fabulac (`source.kind: authored`) is ever entailed
+as a program, and only its entailment is ever run, and only through `enough/sandbox.py`. A fabulac decompiled from
+a folder keeps the 0.6 rule: its cshort is read, never run. Every function in `fabulac_first` starts with
+`authored(project, path)`, which 409s anything else ("read, never run"). The readvisor's shell (`run_shell`) is not
+a way in: the paradigm and the skill say to run an entailment only through the `fabulac` tool.
+
+### Where each piece lives
+
+| piece | file | what it holds |
+|---|---|---|
+| the format | `defaults/cosm/manifests/fabula.manifest.cosm` | catalog keys `program`, `entailed`, `head`, `parts`; `source-kind: [text, folder, authored]`; the bank `fabulac-authored` (15 entries, `stage` and `brief` fields); `case-surfaces`; the moves `author`, `add`, `compare`, `uncovered` (`since: 1`); own checks and their severity |
+| the moves | `enough/thym/moves/author.py` | `author`, `add`, `compare`, `uncovered`, `read_brief`, `entry_for_heading`, `make_item`, `uncovered_items`; the check `authored-source` |
+| entailing as code | `enough/thym/moves/authored_code.py` | the case shape (`case_surface`), `plan_sources`, the rules writers (`tests_text`, `pyproject_text`, `running_text`, `entailed_text`), `entail_authored`, `briefs`, `brief_digest`, the check `cases-entailed`, the readings of `files-present`, `interfaces-present`, `footer` on an entailment; `code.py` reaches it through five one-line dispatches |
+| the programs | `defaults/thym/author-python.thym`, `entail-authored-python.thym` | Thym §20.11 and §20.7's second block, byte for byte |
+| the authoring job | `enough/fabulac_author_job.py` | `run_author` (begin → settle → answer → raise → done, one Thym run per step), `author_state`, `answer`, `check`; `JOB_KIND = "fabulac-author"` |
+| entailing, keeping in step | `enough/fabulac_entail.py` | `run_entail` (the host side of `entail f as code`), `land`, `record_entailed`, `step_state`, `hand_edits`, `keep`, `let_go`, `take_back`, `proposals`; `EntailError` (409) |
+| the head | `enough/fabulac_head.py` | `Fabulacs` (the resolver: the folder and three above, plus `parts` paths), `problems` (`parts-resolve`, `interfaces-agree`), `which_moved`, `parts_moved`, `make_head`, `stamp_parts` |
+| the sandbox | `enough/sandbox.py` | `prepare`, `run_tests`, `run_tool`, `stop`, `stop_all`, `Limits`, `Result`, `Refusal`, `PACKAGE_SOURCE`, `SERVING_LATER`; outside `enough/thym/` so Comprise does not inherit a runner (what it does and does not guarantee: `docs/DEVELOPERS.md` section 6.10; say no more than that table) |
+| the plain functions | `enough/fabulac_first.py` | what every door calls: `starters`, `begin`, `answer`, `add`, `check`, `status`, `moved`, `entail`, `keep`, `let_go`, `take_back`, `head`, `parts_moved`, `prepare`, `execute`, `test`, `run`, `stop`, `stop_all`; `FirstError(sentence, status)`; `RUNTIME` (a test's scripted model); `LAST_RUNS` (in memory) |
+| the routes | `enough/routes/fabulac.py` | `/api/fabulac/*`, thin wrappers; jobs for begin, entail, take-back, test, run; `router.start(do, body)` for the tool; `decide_mode` |
+| the promise | `enough/api_promise.py` | `VERSION = 1`, `HEADER = "X-Enough-Api"`, `ROUTES` (the one table), `PromiseGate` (raw ASGI after `ModeGate` in `server.py`) |
+| the command line | `enough/fabulac_cli.py`, `enough/fabulac/{__init__,__main__}.py` | `python -m enough.fabulac`; `build_parser`, `dispatch`, `main`; exit 0 / 1 / 2 |
+| the client | `enough/enough_client.py` | one file, standard library only (tested by AST), copied out by people; `Enough`, `EnoughError`, `CALLS` |
+| the tool | `enough/fabula_tools.py` | `FIRST_DO` (the `<do>` words for an authored fabulac), `_run_first`, `_first_sync`; `configure(first=…)` from `server.py` |
+| the starters | `defaults/fabulac-starters/{tool/tally,library/keyval,service/greet}.fabulac.cosm` | one per kind, each passing its checks |
+| the readvisor's flow | `defaults/paradigms/transcognition.md` (below the cut), `defaults/skills/macrocosm-oes/SKILL.md`, `prompt.FABULA_TOOL_INSTRUCTIONS` | the do-words in a few lines each |
+| the people's guide | `docs/DEVELOPERS.md` | bundled by `desktop/src-tauri/build.rs`; the help center's 12.8 links to it (`#doc:developers`) in six languages |
+
+### The flow, from the inside
+
+1. **begin.** From a starter: `fabulac_first.from_starter` copies the starter's text with its name changed as a whole
+   word (`id`, `program.start`, the command's own words), and the day, `by` and `licence` filled; at once, no job.
+   Otherwise `fabulac_author_job.run_author` runs `author-python.thym`'s program (model mode) or the one-move
+   `begin-the-catalog` program plus `author.read_brief` as a host step (agent-free with a brief: Thym 6.3 gives
+   `author brief` no scaffold, so the host reads the brief by rules and says so). Each step lands the whole file.
+2. **the interview.** `dialectic.raise_questions` raises the bank `fabulac-authored` (chosen by `BANK_FOR`'s
+   `source`) one stage at a time: the next only when nothing is open, answered-unsettled, or unasked. Answers are a
+   sitting beside the fabulac (`dialectic_api.record`); `begin` again settles them (`settle.thym`) and raises what
+   follows. A text question about `P:case/…#given` or `#expect` takes data (`dialectic.case_field`).
+3. **add.** `fabulac_first.add` writes the item with `author.make_item` directly (no Thym run in `derived.runs`), so
+   a case's `given`/`expect` can come as data (`fields`). What is required and not given is `{pending}`.
+4. **check.** `fabulac_author_job.check`: `fabula.lint` (with the own checks `requirement-cased`, `cases-entailed`,
+   `parts-resolve`, `interfaces-agree`), `uncovered`, the source's problems; plus `step_state` once entailed.
+5. **entail.** `fabulac_entail.run_entail` runs `entail-authored-python.thym`. The move asks a model per source
+   (`plan_sources`); the tests, `pyproject.toml`, `RUNNING.md`, `tests/__init__.py` and `ENTAILED.md` are written by
+   rules. `land` writes `<name>/` and records `entailed: {path, at, run, files: [{path, sha256, from, brief}],
+   kept}` just before `nodes:`. Before writing, `hand_edits` refuses on any file whose bytes differ from the record
+   or that is unrecorded, unless named in `overwrite` or kept. The host engine `entailment` (`held()`) hands the move
+   the texts of files in step and kept, so only moved files are asked again.
+6. **test, run.** `fabulac_first.prepare` reads the twin's `source.kind` and calls `sandbox.prepare` on the folder
+   (refusals before any copy: not authored, not entailed, a service, a library run as a tool, needs outside the
+   standard library); `execute` runs `run_tests` or `run_tool` in a job thread whose watcher calls `sandbox.stop`
+   when the job's `should_stop` is set. The lifespan teardown calls `sandbox.stop_all()`.
+7. **keeping in step.** `step_state` compares each recorded file's sha256 and brief with what the fabulac tells now
+   (`authored_code.briefs`): `in step | moved | edited by hand | gone | kept | new`; `tell` = moved, gone, new.
+   `keep` writes `N:decision/kept-by-hand-<file>` (no source's brief: `KEPT_DECISION`), `let_go` retires it and
+   forgets the brief, `take_back` reads the file with `decompile-python.thym`'s `read-every-file` and raises `choice`
+   questions (`take it back | leave it out`, `proposed: {item, file}`) that `dialectic.fold` settles.
+
+### Adding a move
+
+1. Write the function in a module under `enough/thym/moves/` (a new module, not `code.py`), registered on the import
+   line of `enough/thym/moves/__init__.py`. Import only the stdlib, PyYAML and `enough.macrocosm`
+   (`tests/test_thym_run.py` parses the imports).
+2. Declare it in the format's manifest `moves:` (`takes`, `gives`, `modifiers`, `contract`, `code`, `says`,
+   `since: 1` for a `thym 1` move), and in Thym's text (cosmoes-site `specs/`, by the text lane) in the same release.
+3. Until the texts are synced, list it in `enough/thym/contracts.py` `AHEAD_MOVES`, and a new check in `AHEAD`.
+4. A move that asks a model: its prompt builder in a module listed in `thym_host.PROMPT_MODULES`.
+5. Pinned lists to edit, each with a comment: `tests/test_thym_compile.py` (the since-1 set),
+   `tests/test_thym_shipped.py` (since-1 set, `AHEAD_MOVES`), `tests/test_fabula.py` (manifest moves).
+6. The page's JS runtime (`enough/static/thym/`, `moves.js`'s fallback `DECLS`) needs the declaration too, and
+   `NOT_HERE` for a move only the server can make.
+7. Comprise vendors the moves package: its `scripts/refresh_thym.py` must list every new module (today
+   `moves/author.py`, `moves/authored_code.py`, `moves/transconceive.py`; `fabula.py` imports `fabulac_head.py`
+   inside a function).
+8. If people should call it from the doors, add a function to `fabulac_first`, then a route, a CLI command, a client
+   call and a do-word (below), and a row in `docs/DEVELOPERS.md` section 6.6.
+
+### Adding a check
+
+- **A fabula's own check** (it reads a whole volume): a method on `_Own` in `enough/fabula.py` (see `authored()` and
+  `head()`), its name in `OWN_CHECKS` and its level in `SEVERITY`, and in the manifest's own checks list. `SEVERITY`
+  makes it a warning or an error.
+- **A contract check** (it holds a move's answer): register it where the move's module registers its checks (see
+  `authored-source` in `author.py`, `cases-entailed` in `authored_code.py`), name it in the move's `contract:` in
+  the manifest, and in `contracts.AHEAD` until the texts are synced.
+- Add it to `docs/DEVELOPERS.md` section 6.7 (`tests/test_api_promise.py` checks the eight listed there).
+
+### Adding a route to the promise
+
+1. The plain function in `enough/fabulac_first.py` (project folder + project-relative path in, JSON-able out,
+   `FirstError` for a refusal before anything is written).
+2. The route in `enough/routes/fabulac.py` (a thin wrapper; a job through `start(...)` when it blocks).
+3. A row in `api_promise.ROUTES`. Every POST is gated by `X-Enough-Api: 1`. A promised route changes only with a new
+   `VERSION`.
+4. A method in `enough/enough_client.py` and its name in `CALLS`.
+5. A CLI command in `fabulac_cli.build_parser` and `dispatch`, and a do-word in `fabula_tools.FIRST_DO` (with
+   `_FIRST_JOBS` if it starts a job).
+6. Rows in `docs/DEVELOPERS.md` sections 6.2 to 6.5. `tests/test_api_promise.py` fails until the table, the app's
+   routes, the client and the reference agree.
+
+### Adding a starter
+
+A file `defaults/fabulac-starters/<kind>/<name>.fabulac.cosm`, an authored fabulac whose `source.licence` is
+`{pending}` and whose items are axioms with `sources: [the starter, for the author to change]`. It must pass its
+checks with only `licence-recorded` warning, cover every requirement of force *must* with a case, and use its name
+as a whole word wherever a person's name for it should replace it (`from_starter` replaces whole words). `starters()`
+lists every file, kind by kind, but `--starter <kind>` takes the first in name order: a choice among several of a
+kind would need a `--starter` value per name (not built). Update
+`tests/test_fabulac_first.py`'s starter test and `docs/DEVELOPERS.md` section 6.1.
+
+### Tests
+
+`tests/test_fabulac_author.py`, `test_fabulac_entail.py`, `test_fabulac_keeping.py`, `test_fabulac_head.py`,
+`test_fabulac_first.py`, `test_api_promise.py`, `test_sandbox.py`. The model is scripted (`FF.RUNTIME`, or a
+`runtime=` per call; `test_fabulac_first.Model` writes each starter's sources by path). The sandbox tests run for
+real on macOS with `sandbox-exec` and are skipped elsewhere. The developers' manual: `tests/test_docoes.py`
+`test_the_developers_manual` (registered, bundled, the page knows it, lints clean, the help center's 12.8 points at
+it in every language) and `tests/test_docs_api.py` `test_the_developers_manual_is_served_in_english`.
 
 ---
 

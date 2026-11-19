@@ -989,6 +989,8 @@ Jedes Kompilieren ergibt eine neue Datei oder einen neuen Ordner: Nichts wird ü
 
 **Dein Readvisor.** Ist der Skill macrocosm-oes an, startet „kompilier das fabulac von tool als Code“ oder „schreib sein catem in der Tiefe overview“ dasselbe Kompilieren, nach dem Zug, und nie ungefragt.
 
+**Eigene Programme schreiben.** Wie du ein Programm vom fabulac aus schreibst – erst das fabulac, von dir verfasst, dann der Code, der daraus folgt, beurteilt von seinen Fällen –, steht im [Handbuch für Entwickler](#doc:developers). Es gibt es vorerst nur auf Englisch.
+
 ---
 
 ## 13. MacroCOSM OES

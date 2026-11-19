@@ -995,6 +995,8 @@ Chaque compilation donne un nouveau fichier ou un nouveau dossier : rien n'est �
 
 **Votre readvisor.** Avec la compétence macrocosm-oes activée, « compile le fabulac de tool en code », ou « écris son catem à la profondeur overview », lance la même compilation, après le tour, et jamais sans qu'on le demande.
 
+**Écrire vos propres programmes.** Pour écrire un programme en commençant par son fabulac — le fabulac rédigé par vous, puis le code qu'il implique, jugé par ses cas —, lisez [le manuel des développeurs](#doc:developers). Il n'existe qu'en anglais pour l'instant.
+
 ---
 
 ## 13. MacroCOSM OES

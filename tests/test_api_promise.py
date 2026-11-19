@@ -118,7 +118,7 @@ def test_the_gate_leaves_every_other_route_alone():
 
 
 def test_the_reference_table_lists_every_route_word_and_check():
-    ref = (REPO / "docs" / "DEVELOPERS-reference.md").read_text(encoding="utf-8")
+    ref = (REPO / "docs" / "DEVELOPERS.md").read_text(encoding="utf-8")   # its section 6, the reference
     for r in P.ROUTES:
         assert f"`{r.method} {r.path}`" in ref, r.path
     for word in FT.FIRST_DO + ("build", "status", "compile", "cancel"):
