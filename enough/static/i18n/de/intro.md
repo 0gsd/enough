@@ -10,7 +10,7 @@ enough ist ein persönliches Sprachsystem: ein Ort, um Text zu planen, zu lesen,
 
 **Ich bin dein Chef-Readvisor.** Ich lese, plane, frage nach und bearbeite an deiner Seite, und ich fasse Dateien nur so an, dass du es sehen kannst. Schalte andere Readvisors ein, wenn du Reibung oder eine zweite Meinung willst, oder setz mehrere in einen Rat und lass sie eine Frage bis zu einem Ergebnis ausstreiten.
 
-**text-planning ist die Heimat.** Sag mir, was du schreiben willst, und wir bauen gemeinsam einen Plan, danach Gerüste pro Abschnitt, die du mit deiner eigenen Prosa füllst. Andere Paradigmen decken das Übersetzen ab und das Entwerfen eigener Workflows.
+**text-planning ist die Heimat.** Sag mir, was du schreiben willst, und wir bauen gemeinsam einen Plan, danach Gerüste pro Abschnitt, die du mit deiner eigenen Prosa füllst. Schalte andere Paradigmen daneben ein, bis zu drei zugleich: transcognition für das Übersetzen oder für ein Programm, das als fabulac geplant und geschrieben wird; workflow-design, um eigene Paradigmen, Readvisors und Skills zu machen.
 
 **Nachschlagen geht lokal.** Das Wörterbuch nennt zu jedem Wort Bedeutung, Klang, Geschichte und Verwandte: Klick mit rechts auf ein Wort, oder blätter darin über die UI-Einstellungen. Wikisink ist eine Offline-Wikipedia. Canon bewahrt die Quellen auf, die du sammelst.
 
