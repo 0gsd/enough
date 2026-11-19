@@ -968,6 +968,12 @@ module with personal data, and it is never in a file (2.6). Its kinds are tables
 | `intake`, `continuity` | a person's profile, inside `persons.data` | |
 | `broadcast` | declared; reserved for a later edition | |
 
+A person's profile may hold `allograph`, the tag of the person's own listing in the Allograph Registry (Ascribe, its
+section 14.8). Only the person writes it, on their own profile page, which takes the tag or its address and keeps the
+tag alone. It is sealed in `persons.data` with the rest of the profile, carried over a re-import, and never in a file,
+an export or the isotype; admins read it as they read the rest of a profile. Nothing else of the person's listing is
+kept: the company reads the entry from the registry when it needs it (11.3).
+
 Pages show E as counts. Rules 6, 12 and 13 read it from the local database; without it they are unverifiable, unless
 E is `module: none` (or the database says `people: none`) with a reason.
 
@@ -1447,10 +1453,12 @@ optional:  program, trace, bonds, policies, and the optional keys of items (belo
   does, and its terms page states them; a promoted entry on the Index is always labelled as promoted.
 - **Beside the Index, the Allograph Registry.** Comprise Connect also serves Ascribe's Allograph Registry, where people
   and agents list what they can do for others, with the Index's accounts, passkeys and rate limits (Ascribe, its
-  section 14.7, https://ascribe.cosmoes.org/). A company listed on the Index may own an agent listed there and may
-  attest work a person or an agent did for it, by a statement signed with the key that signs its current isotype
-  (Ascribe, its sections 14.9 and 14.10). The registry names the company by its Index handle, and holds nothing of its
-  Holotype.
+  section 14.7, https://ascribe.cosmoes.org/). A company listed on the Index makes four statements there, each signed
+  with the key that signs its current isotype: `attest`, work a person or an agent did for it; `remove`, an
+  attestation it gave; `bond`, an agent it owns; and `unbond`, the end of that bond (Ascribe, its sections 14.9, 14.10
+  and 14.12). The key is the current release's: a release under another key makes that key the signer from then on,
+  and statements taken before stay taken. The registry names the company by its Index handle, and holds nothing of its
+  Holotype. The company knows a person's listing only by the tag the person wrote on their own profile (chapter E).
 
 **What a release may also carry.** Each of these is optional and the version stays `/0`, so a stored isotype stays
 valid and an older one reads as it always did. Default-deny still holds: anything not named here is refused, never filtered. A text is
@@ -1641,6 +1649,15 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
+
+**Edition 0.8.0.**
+
+1. **A person's own tag** (chapter E). A person may write the tag of their own listing in the Allograph Registry on
+   their own profile, `profile.allograph`, sealed in `persons.data` and never in a file, an export or the isotype; the
+   app keeps the tag alone.
+2. **The four statements beside the Index** (11.3): `attest`, `remove`, `bond` and `unbond`, each signed with the key
+   of the company's current release, which moves with a release under another key; statements taken before stay
+   taken.
 
 **Edition 0.7.0 · 2026-11-13.**
 

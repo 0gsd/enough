@@ -880,7 +880,9 @@ cryptograph, and no cryptograph is hosted. A writer makes no token list; a reade
 The bridge between a company and a person is the registry. A company listed on the Comprise Index searches the
 registry as anyone does, by what it needs (section 14.11); it may attest work a person or an agent did for it
 (section 14.9) and may own an agent (section 14.10). It never receives anything of a holograph but the allograph its
-holder listed. What follows a match, a conversation or an isograph handed in private, is the holder's act.
+holder listed. Of a person's listing a company keeps only the tag, and only when the person gave it; it reads the
+entry from the registry when it needs it, and keeps nothing of what it read. What follows a match, a conversation or an
+isograph handed in private, is the holder's act.
 
 ### 14.5 Morphs
 
@@ -956,9 +958,9 @@ named only by an encyclopedia article or in the holder's own words, and no relat
 - **Canonical JSON**, as the isograph's; the release's `sha256` is over those bytes.
 
 **Made again, never edited.** An allograph names the run that made it, and the run names the holograph's state: the
-run's trace records the state of the holograph as the filter kept it, as a digest,
-and that digest is what names the state; the plan's digests of the run's inputs do not
-([Thym](https://thym.cosmoes.org/), its section 17.1). The release record carries the digest of the run's trace
+run records the state of the holograph as the filter kept it, as a digest, in the record of the engine call that
+made the allograph, whose answer names it as `holograph`, and that digest is what names the state; the plan's digests
+of the run's inputs do not ([Thym](https://thym.cosmoes.org/), its section 12.4). The release record carries the digest of the run's trace
 (section 13). When the holograph changes, the holder may run the program again; the new allograph is a new release,
 and it replaces the listed one when the holder lists it. An implementation should tell the holder when their
 holograph has changed since the run their listed allograph names; nothing makes or lists an allograph again by itself.
@@ -1024,7 +1026,9 @@ A statement is sent as `{statement, signature}`, `signature` being Ed25519 over 
 sorted, no space between tokens, UTF-8 without a byte-order mark, and no character escaped that JSON does not require
 escaping), its 64 bytes in standard base64 with padding. A listing's statements verify
 against the listing's key; a company's against the public key of its current isotype release on the Index, the key
-that signs its isotype ([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). A statement is sent by a
+that signs its isotype ([Comprise OES](https://comprise.cosmoes.org/), its section 11.3). That key is the one of the
+company's current release, so when the company releases under another key, the new key signs its statements from then
+on; a statement the registry took before stays taken. A statement is sent by a
 signed-in account of the registry, and the account is never in a statement, an entry or an answer. A company's
 statements are taken only from an account in that company's organization on Comprise Connect. The nonce makes
 every statement good once: a statement sent again, or kept and sent later, is refused, so that no one can bring back a
@@ -1263,8 +1267,8 @@ The registry keeps nothing of a look-up: not its words, not its answer, not who 
 ### 14.12 The registry's operations
 
 A registry speaks JSON over HTTPS. These are its operations, at these paths under its address. The look-ups (by tag, by
-name and by need) and the list of faceplaces need no account. Only `challenge`, `statements`, `waiting` and `DELETE`
-need one.
+name and by need) and the list of faceplaces need no account. Only `challenge`, `statements`, `waiting`, `proofs` and
+`DELETE` need one.
 
 | Operation | Request | Answer |
 |---|---|---|
@@ -1275,6 +1279,7 @@ need one.
 | `POST /api/v0/allographs/search` | `{needs, kind, plus, attested, next}` | `{entries, next}` |
 | `GET /api/v0/allographs/faceplaces` | nothing | `{faceplaces}`: the faceplaces it checks (section 14.9) |
 | `GET /api/v0/allographs/{tag}/waiting` | the account the tag is tied to | `{attestations}`: each `{attestation, statement, signature}` waiting for the holder's word |
+| `GET /api/v0/allographs/{tag}/proofs` | the account the tag is tied to | `{proofs, plus}`: every proof the listing holds, in every state and whatever `show` says, sorted by faceplace and then handle, each `{faceplace, handle, address, checked, state}` with `since` while it is missed or lapsed; `plus`, whether the listing is an Allograph+. An agent's listing answers `{proofs: [], plus: false}` |
 | `DELETE /api/v0/allographs/{tag}` | the account the tag is tied to | `{withdrawn: true}` (section 14.13) |
 
 Each statement, by what it says:
@@ -1316,6 +1321,12 @@ A statement that is refused changes nothing, and is answered with one of these:
 
 A search with a token outside section 14.3's table, or a value that is not a FEED headword, is 400 `bad_need`; a
 `next` the registry did not give is 400 `bad_next`.
+
+`waiting` and `proofs` are the holder's own reads: they take no statement and no nonce, and they are refused to anyone
+but the account the tag is tied to, with the codes a statement meets (`signed_out`, `not_listed`, `tag_taken`). `proofs`
+shows the holder the proofs a public entry may only count, so that the holder can
+choose which to remove with `unprove`. No operation lists the attestations an attester gave: an attester that may want
+to remove one keeps the digest it signed.
 
 ### 14.13 Withdrawal
 
@@ -1441,6 +1452,18 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 ## 17. Changes
 
 <!-- atem: what each edition changed, newest first, one line each -->
+**Edition 0.8.0.** The bridge to Comprise and the registry's operations say what was built.
+
+1. **What a company keeps** (section 14.4): of a person's listing, only the tag the person gave it; it reads the entry
+   live when it needs it.
+2. **The key that signs for a company** (section 14.7) is its current release's, and moves when the company releases
+   under another key; a statement taken before stays taken.
+3. **The holder's proofs** (section 14.12): `GET /api/v0/allographs/{tag}/proofs`, for the account the tag is tied to
+   only, lists every proof the listing holds, in every state, with whether the listing is an Allograph+; an agent's is
+   empty. No operation lists what an attester gave: the attester keeps its own digests.
+4. **The allograph's run** (section 14.6): the holograph's state, as the filter kept it, is recorded in the record of
+   the engine call that made the allograph, as Thym's section 12.4 says, and no longer cites Thym's section 17.1.
+
 **Edition 0.7.0 · 2026-11-13.** The allograph and the Allograph Registry, which replaces Ascribe-Connect.
 
 1. **The allograph** (section 14.6, new): `ascribe-allograph/0`, the holder's public account of what they can do for
