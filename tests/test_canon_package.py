@@ -61,6 +61,16 @@ def test_a_wrong_key_is_refused(single: bytes):
     assert isinstance(r, Refusal) and r.check == "key"
 
 
+def test_a_manifest_that_opens_to_no_object_is_refused_as_sealed(single: bytes, monkeypatch):
+    """A manifest that opens, under the right key, to JSON that is not an object is no manifest of this package: a
+    `sealed` refusal, never a fault of the reader."""
+    monkeypatch.setattr(vault, "canonical_json", lambda _m: b"[1, 2]")
+    sealed, key = vault.seal(single, iterations=FAST)
+    monkeypatch.undo()
+    r = vault.open(sealed, key)
+    assert isinstance(r, Refusal) and (r.check, r.message) == ("sealed", "the manifest is not this package's")
+
+
 def test_one_flipped_byte_is_refused(single: bytes):
     sealed, key = vault.seal(single, iterations=FAST)
     text = sealed.decode("utf-8")
