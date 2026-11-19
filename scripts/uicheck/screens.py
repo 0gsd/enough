@@ -100,6 +100,22 @@ FAB_TINY = "works/tiny-tool"
 FAB_POEM = "works/rain.md"
 FAB_LETTER = "works/letter.md"
 FAB_LYRIC = "works/lantern-song.txt"            # 0.7 (V2c): a lyric for the fabulap card's build in steps
+# 0.8 (W4-FP): authored fabulacs, seeded by server._seed_fabulac_first() (a tool entailed and in step, the
+# same with a hand edit, one begun from nothing by rules, a service; one entailed copy and one empty
+# folder per language for the scenario).
+FAP_MADE = "made/tally.fabulac.cosm"
+FAP_EDITED = "edited/tally.fabulac.cosm"
+FAP_ASKED = "asked/linecount.fabulac.cosm"
+FAP_SERVED = "served/greet.fabulac.cosm"
+FAP_RAN = "ran-{lang}/tally"
+FAP_FIRST = "first-{lang}"
+# 0.8 (W4-X7): the transconception card, seeded by server._seed_transconception() in transconceive/: the promoted
+# vulture fabulac (open rulings, the ground, python and go targets, a cshort in Go with its layout).
+TC_FABULAC = "transconceive/vulture.fabulac.cosm"
+TC_CSHORT = "transconceive/vulture.cshort-go-2026-11-18-1900/"
+TC_LAYOUT = "transconceive/vulture.layout-go-2026-11-18-1900.md"
+TC_CITE = ("{in: 'python', version: '3.13.18', at: 'library/pathlib.html#pathlib.PurePath', "
+           "digest: 'ea319d48765a'}")
 # The dialectic (0.6, U1b), seeded by server._seed_dialectic() in talks/: the
 # morning-close guide's fabulan with one open question of every kind, the same
 # with a sitting written and not settled, the same with no questions at all,
@@ -116,6 +132,55 @@ DLG_SELF_ASK = "talks/self-ask-{lang}"
 # 0.7 (P4): the holograph that offers work, its holder's program for the allograph (server.ALLOGRAPH_*).
 ALLO_HOLO = "talks/work-self"
 ALLO_PROGRAM = "talks/open-for-work.thym"
+# 0.8 (W4-RP): the holograph's allograph made (once per page), this machine signed in to the stand-in Connect, listed
+# as harbour-baker beside the stand-in's own example, and four proofs put on the stand-in: two live (an Allograph+),
+# one missed at the last check, one lapsed. Every step reads its answer; nothing waits on time.
+ALLO_PROOFS = [
+    {"faceplace": "github", "handle": "harbour-baker", "address": "https://github.com/harbour-baker", "state": "live"},
+    {"faceplace": "harbourboard", "handle": "harbour-baker", "address": "https://harbourboard.test/harbour-baker",
+     "state": "live"},
+    {"faceplace": "mastodon", "handle": "harbour-baker@bakers.example", "address": "https://bakers.example/@harbour-baker",
+     "state": "missed", "since": "2026-11-18"},
+    {"faceplace": "website", "handle": "harbour-baker.example",
+     "address": "https://harbour-baker.example/.well-known/ascribe-proof.txt", "state": "lapsed", "since": "2026-11-17"},
+]
+ALLO_LISTED_JS = """(async () => {
+  const post = async (u, b) => { const r = await fetch(u, {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(b)}); let d = null; try { d = await r.json(); } catch (e) {} return {ok: r.ok, d}; };
+  let made = window.__uicheckAlloMade;
+  if (!made) {
+    const m = await post('/api/ascribe/allograph', {path: %(holo)s, program: %(prog)s});
+    if (!m.ok) throw new Error('the allograph was not made: ' + JSON.stringify(m.d));
+    made = window.__uicheckAlloMade = m.d.allograph;
+  }
+  const st = await (await fetch('/api/connect/status')).json();
+  if (!st.signed_in) {
+    const s = await post('/api/connect/sign-in', {});
+    if (!s.ok) throw new Error('sign-in did not start: ' + JSON.stringify(s.d));
+    let state = '';
+    for (let i = 0; i < 5 && state !== 'signed_in'; i++) state = ((await post('/api/connect/poll', {})).d || {}).state;
+    if (state !== 'signed_in') throw new Error('the stand-in never approved the sign-in');
+  }
+  const l = await post('/api/allograph/list', {path: %(holo)s, allograph: made, name: 'harbour-baker',
+    dangler: 'crumb and crust', show: {faceplaces: 'named', same_name: false}});
+  if (!l.ok) throw new Error('not listed: ' + JSON.stringify(l.d));
+  await fetch(st.url + '/__proofs', {method: 'POST', mode: 'no-cors',
+    body: JSON.stringify({of: l.d.listing.tag, proofs: %(proofs)s})});
+  return true; })()""" % {"holo": json.dumps(ALLO_HOLO), "prog": json.dumps(ALLO_PROGRAM),
+                          "proofs": json.dumps(ALLO_PROOFS)}
+#: The allograph card open on the holograph, its listing and the holder's every proof read.
+ALLO_HELD_READY: Step = ("eval_await", """(async () => {
+  await dlgAlloOpen(%s);
+  for (let i = 0; i < 200 && !(DLG.allo && DLG.allo.held && (DLG.allo.held.error || Array.isArray(DLG.allo.held.proofs))
+       && document.querySelector('#allo-held')); i++) await new Promise((r) => setTimeout(r, 50));
+  return true; })()""" % json.dumps(ALLO_HOLO))
+#: Withdrawn and signed out again, so the next screen or scenario finds the holograph unlisted and Connect signed out.
+ALLO_UNLIST: Step = ("eval_await", """(async () => {
+  try { dlgClose(); } catch (e) {}
+  const post = (u, b) => fetch(u, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(b)});
+  await post('/api/allograph/withdraw', {path: %s});
+  await post('/api/connect/sign-out', {});
+  return true; })()""" % json.dumps(ALLO_HOLO))
 
 Step = tuple[str, str]
 
@@ -224,7 +289,7 @@ COSM_READY: Step = ("eval_await", """(async () => {
 DOCS_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 300 && !document.querySelector(
        '#docs-body .docs-sec h2[id], #docs-body .docs-outline, #docs-body .cosm-card.docs-prism,'
-       + ' #docs-body .ref-error'); i++) {
+       + ' #docs-body .ref-error, #docs-body .lib-doc:not(:has(.atem-spin))'); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
@@ -354,9 +419,44 @@ FAB_READY: Step = ("eval_await", """(async () => {
   }
   return true; })()""")
 FAB_CLOSE: Step = ("eval", "(() => { try { fabCardClose(); } catch (e) {} return true; })()")
+#: 0.8 (W4-X7): the transconception card has read GET /api/fabula/transconception and drawn it.
+TC_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 300 && !document.querySelector('#fab-tc .fab-tc, #fab-tc .thym-refusal'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: 0.8 (W4-FP): the card of an authored fabulac has read what it shows (the starters on the begin face,
+#: GET /api/fabulac/status on the authored one) and no request of its own is in flight.
+FAP_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(FAB.open && (FAB.face === 'begin' ? FA.starters !== null
+       : (FA.status !== null && !FA.checking && !FA.sending))); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: A sandbox run's result as the card shows it, recorded from a real run of the seeded tally's tool
+#: (`tally count notes.md` with notes.md handed over), so the screen runs nothing itself.
+FAP_RUN_RESULT: Step = ("eval", """(() => {
+  FA.rresult = {run_id: '20261119-104512-5e1c0d2a', run: '20261119-104512-5e1c0d2a', what: 'tool', exit_code: 0,
+    stdout: '3\\n', stderr: '', stdout_truncated: false, stderr_truncated: false, wall_time: 0.083,
+    stopped_by: null, stopped: null, refused: [], enforced: true, mechanism: 'sandbox-exec',
+    guarantees: {network: 'denied by sandbox-exec',
+      writes: "only in the run's work, home and tmp folders (sandbox-exec)",
+      reads: "only the run folder, the system's libraries and the interpreter's own files (sandbox-exec); file metadata elsewhere stays readable",
+      processes: 'only the interpreter may be started (sandbox-exec)',
+      memory: 'not limited: macOS does not enforce a memory limit, so none is promised',
+      time: '120 s wall clock, 60 s CPU', output: '1000000 bytes kept of each stream',
+      disk: '200000000 bytes in the run folder (measured every 0.2 s), 50000000 bytes in any one file',
+      packages: 'standard-library'},
+    handed_over: ['notes.md'], disk_used: 4096, ok: true, message: 'the tool exited with 0',
+    fabulac: 'made/tally.fabulac.cosm'};
+  FA.args = 'count notes.md'; FA.hand = 'notes.md';
+  fabCardPaint();
+  const g = document.querySelector('#fab-run details.fap-guar'); if (g) g.open = true;
+  document.getElementById('fab-run').scrollIntoView({block: 'start'});
+  return true; })()""")
 #: The cshort / catem viewer has its file (a cshort: its first file's text too).
 FABV_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem'
+  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind !== 'cshort'
        || FABV.text !== null || FABV.ferror)))); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
@@ -1145,6 +1245,99 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
            note="a catem at depth overview: its depth line, the markdown, its footer"),
 
+    # --- 0.8 (W4-FP): the card of an authored fabulac ---
+    Screen("fabulac-begin", "project",
+           setup=(("eval_await", "(async () => { await fapBeginOpen('made'); return true; })()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="begin a fabulac in made/: tool, library or service (each said in a line), its name and what "
+                "it writes, from a starter (the tool starter's line and its cases) / a brief / nothing, the "
+                "licence and the author, begin (off until a name is given)"),
+
+    Screen("fabulac-authored", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_MADE}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the starter tool entailed and in step: its kind and licence, the interview's six stages, "
+                "add (requirement / decision / case / interface) and check, a head, the model line, entail "
+                "again with seven files in step, run its tests, its arguments, files handed over, its input"),
+
+    Screen("fabulac-interview", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_ASKED}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a tool begun from nothing by rules: the first stage open (5 asked), the two questions shown, "
+                "each with its answer box, send these answers, every question in the questions card"),
+
+    Screen("fabulac-hand-edit", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_EDITED}', 'compile'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY,
+                  ("eval", "document.getElementById('fab-compile').scrollIntoView({block: 'start'})"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="tally/__main__.py changed by hand: its row with write over it / keep it / take it back, what "
+                "the three choices do, entail again off until one is chosen"),
+
+    Screen("fabulac-run-result", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_MADE}', 'run'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY, FAP_RUN_RESULT,
+                  ("wait_for", "#fab-run .fap-result"), ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a tool's run in the sandbox (a recorded result, nothing runs here): its message, exit and "
+                "time, the box held it, its output, and what the box promised for the run, opened"),
+
+    # --- 0.8 (W4-X7): the transconception card, the library's section, a cshort in Go and its layout ---
+    Screen("fabula-transconception", "project",
+           setup=(("eval_await", f"(async () => {{ await fabFolderOpen('{TC_FABULAC}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, TC_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a fabulac kept for transconception: ready to keep and ready to entail in go, each check held or "
+                "not and why (stands-alone and the open rulings fail, nothing-carried not measured); the rulings "
+                "queue, batched, with answer them…; the ground's count of citations, not aboard here"),
+
+    Screen("fabula-transconception-more", "project",
+           setup=(("eval_await", f"(async () => {{ await fabFolderOpen('{TC_FABULAC}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, TC_READY,
+                  ("eval", "(() => { document.querySelectorAll('#fab-tc details').forEach((d) => { d.open = true; }); "
+                           "const t = document.querySelector('#fab-tc table.fab-tc-points'); "
+                           "if (t) t.scrollIntoView({block: 'start'}); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the same card further down: every reliance with its citations as links (not aboard), the go "
+                "target's twelve points with the three gates marked, its conditions, and the cshorts: the round "
+                "trip judged at level 3, the cshort in Go apart and not judged yet, read and its layout, no run"),
+
+    Screen("docs-library", "project",
+           setup=(("eval_await", f"(async () => {{ await enterDocsMode({{ doc: 'library', cite: {TC_CITE} }}); "
+                                 "return true; })()"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a reliance's citation opened in the docs viewer with no library here: cited as, not aboard said "
+                "plainly, the line that it opens once the text is fetched; densities other than short disabled"),
+
+    Screen("fabula-cshort-go", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{TC_CSHORT}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="a cshort in Go read: the line that enough never runs it, its footer and licence, its files"),
+
+    Screen("fabula-layout-go", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{TC_LAYOUT}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="the layout of the cshort in Go: read, never run; its files and its interfaces' names"),
+
+    Screen("fabulac-service", "project",
+           setup=(("eval_await", f"(async () => {{ await fapOpen('{FAP_SERVED}', 'run'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAP_READY,
+                  ("eval_await", "(async () => { await fapRunGo('tests');"
+                                 " for (let i = 0; i < 100 && !FA.rerror; i++) await new Promise((r) => setTimeout(r, 50));"
+                                 " document.getElementById('fab-run').scrollIntoView({block: 'start'}); return true; })()"),
+                  ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a service entailed: run its tests is refused before anything is copied, in the server's "
+                "sentence (serving comes in a later minor); no arguments or run it for a service"),
+
     # --- 0.6, the fabula round (U1b): the dialectic card, a holograph, its isograph ---
     Screen("dialectic-card", "project",
            setup=(("eval_await", f"(async () => {{ await dlgOpen('{DLG_KINDS}'); return true; }})()"),
@@ -1250,6 +1443,37 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="a fabulan in the cosm viewer: questions with the count of the open ones in the toolbar"),
+
+    # --- 0.8 (W4-RP): the allograph card's holder's proofs, and the look-up by name ---
+    Screen("allograph-proofs", "project",
+           setup=(("eval_await", ALLO_LISTED_JS), ALLO_HELD_READY,
+                  ("eval", "document.getElementById('allo-held').scrollIntoView({block: 'start'})"),
+                  ("wait_idle", "")),
+           teardown=(ALLO_UNLIST,) + EXIT_ALL_MODES,
+           note="the allograph card, signed in and listed: every proof the listing holds, live, missed at the "
+                "last check (since a day) and lapsed, each with its address, the day checked and remove…; "
+                "the Allograph+ line; read them again; prove another under it"),
+
+    Screen("allograph-lookup", "project",
+           setup=(("eval_await", ALLO_LISTED_JS), ALLO_HELD_READY,
+                  ("eval_await", """(async () => {
+  const q = document.getElementById('allo-look');
+  q.value = 'harbour-baker';
+  q.dispatchEvent(new Event('input', {bubbles: true}));
+  document.querySelector('[data-dlg="allo-look"]').click();
+  for (let i = 0; i < 200 && !(DLG.allo && Array.isArray(DLG.allo.look.result) && !DLG.allo.busy); i++)
+    await new Promise((r) => setTimeout(r, 50));
+  const i = DLG.allo.look.result.findIndex((e) => e.tag === DLG.allo.listing.tag);
+  const b = document.querySelector('[data-dlg="allo-look-open"][data-allo-i="' + i + '"]');
+  if (b) b.click();
+  for (let k = 0; k < 100 && DLG.allo.look.open !== i; k++) await new Promise((r) => setTimeout(r, 50));
+  document.getElementById('allo-look-box').scrollIntoView({block: 'start'});
+  return true; })()"""),
+                  ("wait_idle", "")),
+           teardown=(ALLO_UNLIST,) + EXIT_ALL_MODES,
+           note="look up by name or tag: harbour-baker answers with two listings, the stand-in's example "
+                "(open it) and this holograph's, opened: its entry with its named faceplaces, each live and "
+                "checked, its claims; then the look-up by need under it"),
 
     # --- 0.5.0, Thym (U1): programs, plans, traces, the run card, readings ---
     Screen("thym-program", "project",

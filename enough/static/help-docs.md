@@ -374,6 +374,51 @@ open one from the fabulac card's list, from a toast when a compile lands, or fro
 - set a cshort beside the original and compare: what the fabulac missed is what the cshort lacks.
 - section 12.8 of the help center says what a cshort and a catem are, and why enough never runs a cshort.
 
+## fabulac-author
+name: your fabulac
+path: tally.fabulac.cosm → tally/
+
+### what
+the card of a fabulac <strong>you authored</strong>: the plan of a program you write in enough, every item an axiom in your words. a <strong>tool</strong> is a command a person types, a <strong>library</strong> is functions another program calls, a <strong>service</strong> serves on a port (authored and entailed now; serving comes in a later minor). the card shows the interview stage by stage — what it is for, its ways in, what it needs, what it leaves out, its cases, what is still open — and the one or two questions it asks now. you can add a requirement, a decision, a case or an interface in your own words, and check it. <strong>entail</strong> writes the program, the folder <code>tally/</code> beside it: a model writes each source, and the tests are written from its cases by rules.
+
+### how
+<strong>begin a fabulac here…</strong> on a folder's option-click menu opens the begin face: what it is, its name, and how to begin — from a starter (at once), from a brief you wrote, or from nothing (the interview asks). on a fabulac you authored, <strong>entail and run…</strong> opens this card, in the cosm viewer or the menu; on its folder the menu offers <strong>entail again…</strong>, <strong>test and run…</strong> and <strong>what moved…</strong>, never "build its fabulac…". answer the questions shown and <strong>send these answers</strong>; <strong>go on</strong> settles them and asks the next stage. a case's given and expect written as data become a test. after entailing, the card lists each file that moved or was changed by hand; a file changed by hand waits for your choice: <strong>write over it</strong>, <strong>keep it</strong> (a recorded decision, until you <strong>let it go</strong>), or <strong>take it back</strong> into the fabulac. a <strong>head</strong> names several fabulacs as the parts of one program.
+
+### ideas
+- begin from the tool starter, change its cases to say your program, then entail: the tests come from your cases.
+- check before you entail: it lists the requirements no case shows yet.
+- the developers' manual, in the docs viewer, says every step at every door: the page, the command line and the client.
+
+## fabulac-run
+name: test and run it in the sandbox
+path: tally/ · tally/tests/test_cases.py
+
+### what
+where enough runs the entailment of a fabulac you authored: its tests, and its tool with the arguments you give. it runs a copy of the folder, with no network and Python's standard library only; it writes only in its own folder, and its time, output and disk are limited. on macOS it does not limit memory, and promises nothing about it; on Linux it needs bubblewrap. after each run the card shows what the box did and did not promise for that run, and says plainly when the box did not hold it.
+
+### how
+<strong>run its tests</strong> runs the tests written from its cases; for a tool, give <strong>its arguments</strong>, the <strong>files handed over</strong> (each goes in as a read-only copy) and, if it reads any, <strong>its input</strong>, then <strong>run it</strong>. <strong>stop</strong> ends a run at once. the output is shown as it was kept, the first part only when it is long. a service is refused, in enough's words: serving comes in a later minor. a library has no tool to run; run its tests. nothing here runs a cshort, the code of a program you did not author: that is read, never run.
+
+### ideas
+- run the tests after every entailing: the cases are the judge.
+- hand over a small file of your own and run the tool on it before you trust it with a big one.
+- the box's promises are listed under each result: open the list to see what held.
+
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+the card of a fabulac kept for <strong>transconception</strong>: a program carried into another language through its fabulac, read only. it shows its two <strong>gates</strong>, <strong>ready to keep</strong> and <strong>ready to entail</strong> in each target language, with every check that holds or does not and why; its <strong>rulings</strong>, what you said must stay as it is, may differ, or may change, and the questions about them still open; its <strong>ground</strong>, each thing the program leans on in its language, with where the language's own text says so; its <strong>targets</strong>, each language weighed on twelve points, three of them gates, with the verdict, the conditions and the gaps; and its <strong>cshorts</strong>, each with its target, entailed <em>apart</em> from the source or <em>beside</em> it, its layout and its evidence.
+
+### how
+<strong>build and compile…</strong> on the fabulac opens it. <strong>answer them…</strong> under its rulings opens the questions, answered as every question is; one you skip keeps the gate shut. under its ground, each citation opens the section in the docs viewer, from the <strong>language library</strong>: when the text is not on this machine it says <em>fetching</em> while it comes from cosmoes.org, and <em>not aboard</em> when it cannot, a warning, never a pass. a cshort, in any language, is read: <strong>read</strong> and <strong>its layout</strong> open it, and nothing here builds or runs it.
+
+### ideas
+- read the gates first: a check that does not hold says which item and why.
+- open a citation before you rule a reliance: the language's own words are there.
+- a cshort with no evidence is not judged yet: the outside judge runs it, never enough.
+
 ## dialectic-card
 name: the questions
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
@@ -417,6 +462,8 @@ pick a program of yours whose only input is the holograph and which ends <code>g
 ### ideas
 - make it again when your holograph changes: the card says when the listed one is out of date.
 - live proofs on two faceplaces make your listing an Allograph+.
+- <strong>by name or tag</strong> finds a listing by its user name, or the one listing a #tag names; <strong>open it</strong> shows its entry.
+- signed in, <strong>every proof your listing holds</strong> lists each one, live, missed or lapsed, with its address and the day it was checked; <strong>remove…</strong> asks before it drops one.
 - section 13.9 of the help center has the allograph and the registry.
 
 ## atem-card

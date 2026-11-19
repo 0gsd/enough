@@ -798,6 +798,33 @@ def waiting(sess: Session, tag: str) -> list:
     return list((got or {}).get("attestations") or []) if isinstance(got, dict) else []
 
 
+PROOF_STATES = ("live", "missed", "lapsed")
+
+
+def proofs(sess: Session, tag: str) -> dict:
+    """Every faceplace proof the listing holds, in every state and whatever its `show` says (14.12,
+    `GET .../{tag}/proofs`): `{proofs: [{faceplace, handle, address, checked, state, since?}], plus}`, sorted by
+    faceplace then handle, `since` only while `missed` or `lapsed`. Only the account the tag is tied to may read it:
+    the registry answers 401 `signed_out`, 404 `not_listed` or 409 `tag_taken` otherwise. A proof is removed by the
+    `unprove` statement with its `faceplace` and `handle`."""
+    if not TAG_RE.match(str(tag)):
+        raise RegistryError(f"{tag!r} is not a tag")
+    got = request("GET", need_session(sess).registry, f"{API}/{tag}/proofs", None, sess)
+    rows = got.get("proofs") if isinstance(got, dict) else None
+    out = []
+    for p in rows if isinstance(rows, list) else []:
+        if not isinstance(p, dict) or not p.get("faceplace") or not p.get("handle"):
+            continue
+        row = {k: str(p.get(k) or "") for k in ("faceplace", "handle", "address", "checked")}
+        state = str(p.get("state") or "")
+        row["state"] = state if state in PROOF_STATES else "live"
+        if row["state"] != "live" and p.get("since"):
+            row["since"] = str(p["since"])
+        out.append(row)
+    out.sort(key=lambda r: (r["faceplace"], r["handle"]))
+    return {"proofs": out, "plus": isinstance(got, dict) and got.get("plus") is True}
+
+
 # Look-ups need no account (14.11).
 
 def entry(base: str, tag: str) -> dict | None:
@@ -955,6 +982,6 @@ __all__ = ["ATTEST_AS", "DEFAULT_URL", "KEYCHAIN", "ListingKey", "MemoryKeychain
            "bond", "by_name", "canonical", "challenge", "check_dangler", "check_name", "check_needs",
            "check_statement", "connect_url", "entry", "faceplaces", "forget_listing", "hid_of", "key_from_seed",
            "list_allograph", "listing_key", "listing_record", "listing_status", "load_allograph", "new_key",
-           "normal_handle", "poll_sign_in", "proof_string", "prove", "record_listing", "released_allograph",
+           "normal_handle", "poll_sign_in", "proof_string", "proofs", "prove", "record_listing", "released_allograph",
            "remove", "request", "run_state", "say", "search", "send", "session", "sign", "sign_out", "start_sign_in",
            "statement", "tag_of", "unbond", "unprove", "verify", "waiting", "withdraw", "withdraw_by_account"]

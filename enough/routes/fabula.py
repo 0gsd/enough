@@ -192,11 +192,11 @@ def build_router(ctx: AppContext) -> APIRouter:
             return doing
         if _agent_free_reason(mode, why):
             return f"agent-free: {doing} by rules"
-        return f"no model is answering ({why}); writing a scaffold"
+        return f"no model is answering ({why}); writing an outline"
 
     def _rules_note(why: str) -> str:
         return (" (by rules: agent-free)" if why == _agent_free.REASON
-                else " (a scaffold: no model read it)")
+                else " (an outline: no model read it)")
 
     def _model_complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
         """The engine's `complete`: `llm.complete` at the session's model
@@ -533,6 +533,25 @@ def build_router(ctx: AppContext) -> APIRouter:
                     "twins": {f: {"path": head + p.name, "state": _canon.emf_state(text, p)}
                               for f, p in twins.items()},
                     "suggested": suggested, "cosm": _cosm_payload(vol, twin_rel)}
+
+        return await asyncio.to_thread(_build)
+
+    @router.get("/api/fabula/transconception")
+    async def api_fabula_transconception(path: str = Query(...)) -> dict[str, Any]:
+        """0.8 (lane W4-X7): the transconception card of a fabulac (`enough.transconception.card`), read only: the two
+        gates with each check held or not and why, the rulings queue, the ground with what came of each citation in
+        the language library, the targets with their twelve points and gaps, and each cshort with its target, apart or
+        beside, its layout and its evidence. Takes the fabulac or the folder it was built from; a fabulac kept for no
+        transconception answers `{transconception: false}`. Nothing is run, built or written."""
+        from .. import fabulac_job as _fj
+        from .. import transconception as _tc
+
+        def _build() -> dict[str, Any]:
+            try:
+                fab = _fj.fabulac_of(Path(project_dir), path)
+            except _fj.BuildError as e:
+                raise HTTPException(e.status, str(e)) from None
+            return {"path": _fj.rel_of(Path(project_dir), fab), **_tc.card(fab)}
 
         return await asyncio.to_thread(_build)
 

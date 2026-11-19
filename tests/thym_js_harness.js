@@ -1,6 +1,7 @@
 // Runs Thym's in-page runtime (enough/static/thym/) under node for tests/test_thym_js_runtime.py.
 // Reads one JSON request on stdin: {bundle: <bundle.page_bundle>, runId, now, inputsRoot}, or {dump: <tagged JSON>}
-// to dump a mapping as the runtime does, or {planCheck: {plan, program}} for the page's check before it reads inputs. Writes one JSON answer on stdout: the run's outcome, refusal, trace volume,
+// to dump a mapping as the runtime does, or {planCheck: {plan, program}} for the page's check before it reads inputs, or
+// {decls: true} for the declarations the page knows, the reasons it refuses a move, and the moves it runs. Writes one JSON answer on stdout: the run's outcome, refusal, trace volume,
 // trace text and landed files (base64), or the dump's text.
 'use strict';
 const path = require('path');
@@ -16,6 +17,10 @@ process.stdin.on('end', () => {
   const req = JSON.parse(input);
   if (req.dump !== undefined) {
     process.stdout.write(JSON.stringify({ text: T.dump(T.revive(req.dump)) }));
+    return;
+  }
+  if (req.decls !== undefined) {
+    process.stdout.write(JSON.stringify({ decls: T.DECLS, notHere: T.NOT_HERE, moves: Object.keys(T.MOVES) }));
     return;
   }
   if (req.planCheck !== undefined) {

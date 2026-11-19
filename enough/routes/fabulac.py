@@ -129,6 +129,10 @@ def build_router(ctx: AppContext) -> APIRouter:
     async def start_begin(body: dict) -> dict:
         rel = path_of(body)
         fab = fab_of(rel, must_exist=False)
+        try:
+            _ff.folder_there(project_dir, fab)       # refused before a job starts, in words
+        except _ff.FirstError as e:
+            raise _http(e) from None
         kw = {k: body.get(k) for k in ("licence", "brief", "by") if isinstance(body.get(k), str) and body.get(k)}
         if body.get("starter"):
             return await call(_ff.begin, project_dir, rel, starter=str(body["starter"]), **kw)

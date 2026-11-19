@@ -42,8 +42,8 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       FAB_CSHORT, FAB_LYRIC, FAB_POEM, FAB_TINY, FAB_TOOL,
                       DLG_ANSWER, DLG_KINDS, DLG_SELF_ASK, DLG_SITTING,
                       THYM_BROKEN, THYM_BROKEN_LINE, THYM_TWO, THYM_REPO, THYM_LONG,
-                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM,
-                      SCAFFOLD_READY)
+                      THYM_LIST, THYM_HARVEST, THYM_SAME, THYM_PROGRAM, ALLO_HOLO, ALLO_PROGRAM, ALLO_LISTED_JS,
+                      SCAFFOLD_READY, FAP_FIRST, FAP_RAN)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -5377,6 +5377,268 @@ def scenario_allograph_panel(d: Driver) -> list[str]:
     return fails
 
 
+def scenario_allograph_proofs(d: Driver) -> list[str]:
+    """0.8 (W4-RP): the holder's every proof, and the look-up by name, against the stand-in Connect. Listed and signed
+    in (`ALLO_LISTED_JS`: four proofs on the stand-in, two live, one missed, one lapsed), the card lists each with its
+    faceplace, handle, address, state and the day checked, and says Allograph+ → remove… on the lapsed one asks first
+    (nothing is sent: the stand-in still holds four), keep it → remove… again, yes → three left, the lapsed one gone
+    → tied to another account, read them again says so plainly → look up harbour-baker (return in the field): two
+    listings, this one opened with its live faceplaces → a #tag finds the one → signed out, the list asks for the
+    sign-in. Every wait reads the state it needs; none waits on time."""
+    fails: list[str] = []
+    _reset(d)
+    connect = d.js_await("(async () => (await (await fetch('/api/connect/status')).json()).url)()") or ""
+
+    def stand_in(path: str, body: dict) -> None:
+        d.js_await("(async () => { await fetch(%s, {method: 'POST', mode: 'no-cors', body: %s}); return true; })()"
+                   % (json.dumps(connect + path), json.dumps(json.dumps(body))))
+
+    def text(sel: str) -> str:
+        return str(d.js("(document.querySelector(%s) || {}).innerText || ''" % json.dumps(sel)) or "")
+
+    def held_n() -> int:
+        return int(d.js_await("(async () => { const r = await fetch('/api/allograph/proofs?path=' + encodeURIComponent(%s));"
+                              " return r.ok ? (await r.json()).proofs.length : -1; })()" % json.dumps(ALLO_HOLO)) or -1)
+
+    try:
+        d.js_await(ALLO_LISTED_JS, timeout=40.0)
+    except RuntimeError as e:
+        fails.append(f"the holograph could not be made, signed in and listed against the stand-in: {e}")
+        _reset(d)
+        return fails
+    try:
+        d.js_await("(async () => { await dlgAlloOpen(%s); return true; })()" % json.dumps(ALLO_HOLO))
+        if not _wait_js(d, "DLG.allo && DLG.allo.held && Array.isArray(DLG.allo.held.proofs)"
+                           " && document.querySelectorAll('#allo-held li[data-allo-proof]').length === 4", 15000):
+            fails.append("the card did not list the listing's four proofs: " + text("#allo-held"))
+            return fails
+        rows = d.js("Array.from(document.querySelectorAll('#allo-held li[data-allo-proof]')).map((li) => li.innerText)") or []
+        want = [("github", "harbour-baker", "https://github.com/harbour-baker", "allo-state-live"),
+                ("mastodon", "harbour-baker@bakers.example", "https://bakers.example/@harbour-baker", "allo-state-missed"),
+                ("website", "harbour-baker.example", "https://harbour-baker.example/", "allo-state-lapsed")]
+        for fp, handle, addr, cls in want:
+            li = "#allo-held li[data-allo-proof=%s]" % json.dumps(fp + " " + handle)
+            row = text(li)
+            if not (fp in row and handle in row and addr in row and d.js("!!document.querySelector(%s)" % json.dumps(li + " ." + cls))):
+                fails.append(f"the {fp} proof is not shown with its handle, address and state ({cls}): {row!r}")
+        if not any("2026-11-17" in r for r in rows) or not any("2026-11-18" in r for r in rows):
+            fails.append(f"the days checked and since are not shown: {rows!r}")
+        if not d.js("DLG.allo.held.plus === true"):
+            fails.append("two live faceplaces did not make the listing an Allograph+ in the list")
+        lapsed = "#allo-held li[data-allo-proof=%s]" % json.dumps("website harbour-baker.example")
+        # Remove… asks first, on its row; keep it sends nothing.
+        d.click(lapsed + " [data-dlg='allo-held-rm']")
+        if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(lapsed + " [role='alertdialog']"), 5000):
+            fails.append("remove… did not ask first on its row: " + text(lapsed))
+            return fails
+        if "harbour-baker.example" not in text(lapsed + " [role='alertdialog']"):
+            fails.append("the question does not name the proof it removes: " + text(lapsed + " [role='alertdialog']"))
+        if held_n() != 4:
+            fails.append("asking sent something: the stand-in no longer holds four proofs")
+        d.click(lapsed + " [data-dlg='allo-held-no']")
+        if not _wait_js(d, "DLG.allo.heldAsk === null && !document.querySelector('#allo-held [role=\"alertdialog\"]')", 5000):
+            fails.append("keep it did not close the question")
+        d.click(lapsed + " [data-dlg='allo-held-rm']")
+        if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(lapsed + " [data-dlg='allo-held-yes']"), 5000):
+            fails.append("remove… did not ask the second time")
+            return fails
+        d.click(lapsed + " [data-dlg='allo-held-yes']")
+        if not _wait_js(d, "!DLG.allo.busy && DLG.allo.held && Array.isArray(DLG.allo.held.proofs) && DLG.allo.held.proofs.length === 3"
+                           " && !!DLG.allo.done.held", 15000):
+            fails.append("yes, remove it did not leave three proofs: " + text("#allo-held"))
+        elif d.js("!!document.querySelector(%s)" % json.dumps(lapsed)):
+            fails.append("the removed proof is still listed")
+        if held_n() != 3:
+            fails.append("the stand-in does not hold three proofs after the removal")
+        # Tied to another account: said plainly, with nothing else lost.
+        tag = d.js("DLG.allo.listing.tag") or ""
+        stand_in("/__elsewhere", {"tag": tag, "on": True})
+        d.click("#allo-held [data-dlg='allo-held']")
+        if not _wait_js(d, "!DLG.allo.busy && DLG.allo.held && !!DLG.allo.held.error"
+                           " && !!document.querySelector('#allo-held .thym-refusal')", 10000):
+            fails.append("another account's tag was not said plainly: " + text("#allo-held"))
+        elif d.js("!!document.querySelector('#allo-held li[data-allo-proof]')"):
+            fails.append("the not-the-holder answer still shows proofs")
+        stand_in("/__elsewhere", {"tag": tag, "on": False})
+        # Look up by name: return in the field asks the registry.
+        d.focus("#allo-look")
+        d.type_text("harbour-baker")
+        d.key("Enter")
+        if not _wait_js(d, "!DLG.allo.busy && Array.isArray(DLG.allo.look.result) && DLG.allo.look.result.length === 2"
+                           " && document.querySelectorAll('#allo-look-box [data-dlg=\"allo-look-open\"]').length === 2", 10000):
+            fails.append("looking up harbour-baker did not answer with the two listings: " + text("#allo-look-box"))
+        else:
+            i = d.js("DLG.allo.look.result.findIndex((e) => e.tag === %s)" % json.dumps(tag))
+            d.click("#allo-look-box [data-dlg='allo-look-open'][data-allo-i='%s']" % i)
+            if not _wait_js(d, "DLG.allo.look.open === %s && !!document.querySelector('#allo-look-box .allo-entry')" % i, 5000):
+                fails.append("open it did not open the entry")
+            else:
+                entry = text("#allo-look-box .allo-entry")
+                if "#" + tag not in entry or "github" not in entry or "harbourboard" not in entry or "mastodon" in entry:
+                    fails.append(f"the opened entry does not name its live faceplaces (and only those): {entry!r}")
+                if not d.js("document.querySelectorAll('#allo-look-box .allo-entry .allo-state-live').length === 2"):
+                    fails.append("the opened entry's faceplaces do not say live")
+        d.js("(() => { const q = document.getElementById('allo-look'); q.value = '#ts7de32a5bnz';"
+             " q.dispatchEvent(new Event('input', {bubbles: true})); return true; })()")
+        d.click("[data-dlg='allo-look']")
+        if not _wait_js(d, "!DLG.allo.busy && Array.isArray(DLG.allo.look.result) && DLG.allo.look.result.length === 1"
+                           " && DLG.allo.look.result[0].tag === 'ts7de32a5bnz' && DLG.allo.look.open === 0", 10000):
+            fails.append("a #tag did not find its one listing, opened: " + text("#allo-look-box"))
+        # Signed out: the list asks for the sign-in, plainly.
+        d.click("[data-dlg='allo-signout']")
+        if not _wait_js(d, "DLG.allo.connect && DLG.allo.connect.signed_in === false && DLG.allo.held === null"
+                           " && !!document.querySelector('#allo-held .thym-note')", 10000):
+            fails.append("signed out, the proofs list does not ask for the sign-in: " + text("#allo-held"))
+    finally:
+        d.js_await("(async () => { const post = (u, b) => fetch(u, {method: 'POST', headers: {'Content-Type':"
+                   " 'application/json'}, body: JSON.stringify(b)}); try { dlgClose(); } catch (e) {}"
+                   " await post('/api/allograph/withdraw', {path: %s}); await post('/api/connect/sign-out', {});"
+                   " return true; })()" % json.dumps(ALLO_HOLO))
+        _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
+# 0.8 (W4-FP): the card of an authored fabulac — begin, entail, test
+# ---------------------------------------------------------------------------
+
+_FAP_OK = ("FAB.open && (FAB.face === 'begin' ? FA.starters !== null"
+           " : (FAB.face === 'authored' && FA.status !== null))")
+# Every POST the page makes, with its headers, and (while `__fapStub` names a route) a recorded answer in
+# place of the server's: the way the other scenarios stand in for a model that is not running here.
+_FAP_WIRE = ("(() => { window.__fapPosts = []; window.__fapStub = null; if (!window.__fapFetch) {"
+             " window.__fapFetch = window.fetch;"
+             " window.fetch = (u, o) => { const url = String(u);"
+             "  if (o && o.method === 'POST') { try { window.__fapPosts.push({url, headers: o.headers || {},"
+             "   body: typeof o.body === 'string' ? o.body : ''}); } catch (e) {} }"
+             "  if (window.__fapStub && url === window.__fapStub.url) {"
+             "   return Promise.resolve(new Response(JSON.stringify(window.__fapStub.answer),"
+             "    {status: 200, headers: {'Content-Type': 'application/json'}})); }"
+             "  return window.__fapFetch(u, o); }; } return true; })()")
+_FAP_UNWIRE = ("(() => { if (window.__fapFetch) { window.fetch = window.__fapFetch; window.__fapFetch = null; }"
+               " window.__fapStub = null; return true; })()")
+
+
+def _fap_menu(d: Driver, path: str) -> list[str]:
+    """The tree's option-click menu on `path`, built from its row as the tree's own handler builds it."""
+    acts = d.js("(() => { const li = document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']');"
+                " if (!li) return null; showTreeContextMenu(40, 40, {kind: li.dataset.kind, path: li.dataset.path,"
+                " name: li.dataset.name, holotype: li.dataset.holotype === '1', emf: li.dataset.emfState || '',"
+                " fabAuthored: li.dataset.fabAuthored === '1', fabTwin: li.dataset.fabTwin || ''});"
+                " return Array.from(document.querySelectorAll('#tree-context-menu .ctx-item')).map((b) => b.dataset.act); })()"
+                % json.dumps(path))
+    return acts or []
+
+
+def scenario_fabulac_first(d: Driver) -> list[str]:
+    """Fabulac-first in the page, once per language. A folder's option-click menu offers "begin a fabulac
+    here…" → the begin face, begin off until a name is typed → a tool from the starter: at once, the card turns
+    to the authored face, the fabulac is on disk, the POST carried the promise header → entail, with a
+    RECORDED model's answer standing in for the route (no model runs in the browser check: the stub answers
+    POST /api/fabulac/entail with a finished job, and the card shows its words) → the seeded entailed copy's
+    tests run in the sandbox for real (macOS sandbox-exec): passed, three ran, the box held them, the header
+    sent → its folder's menu keeps the twin guard: entail again, test and run, what moved, and no "build its
+    fabulac…"."""
+    fails: list[str] = []
+    _reset(d)
+    lang = _dlg_lang(d)
+    first, ran = FAP_FIRST.format(lang=lang), FAP_RAN.format(lang=lang)
+    d.js(_FAP_WIRE)
+    try:
+        d.js("htmx.ajax('GET', '/api/files', {target: '#tree', swap: 'innerHTML'})")
+        _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(first), 10000)
+        acts = _fap_menu(d, first)
+        if "fap-begin" not in acts:
+            fails.append(f"a folder's menu has no \"begin a fabulac here…\": {acts}")
+            d.js("hideTreeContextMenu()")
+            d.js(f"fapBeginOpen({json.dumps(first)})")
+        else:
+            d.click('#tree-context-menu [data-act="fap-begin"]')
+        if not _ready(d, _FAP_OK) or d.js("FAB.face") != "begin":
+            fails.append(f"the begin face did not open: {d.js('FAB.face')}")
+            return fails
+        if not d.js("document.getElementById('fab-go').disabled"):
+            fails.append("begin is offered before the program has a name")
+        if d.js("(document.querySelector('#fab-main input[name=\"fap-way\"]:checked') || {}).value") != "starter":
+            fails.append("the begin face should start from a starter")
+        d.focus("#fap-name")
+        d.type_text("tally")
+        if d.js("document.getElementById('fab-go').disabled"):
+            fails.append("begin stays off with a name typed")
+        d.click("#fab-go")
+        fab = f"{first}/tally.fabulac.cosm"
+        if not _wait_js(d, "FAB.face === 'authored' && FA.status !== null && FA.path === %s" % json.dumps(fab), 20000):
+            fails.append(f"beginning from the starter did not turn the card to {fab}: {d.js('[FAB.face, FA.path, FA.aerror]')}")
+            return fails
+        text = _raw(d, fab) or ""
+        if "kind: authored" not in text or "name: tally" not in text:
+            fails.append(f"{fab} is not an authored fabulac on disk: {text[:160]!r}")
+        st = d.js("(() => ({kind: (FA.status.program || {}).kind, said: (document.querySelector('#fab-main .thym-fits') || {}).textContent || '',"
+                  " entailed: !!(FA.status.entailment && FA.status.entailment.entailed)}))()") or {}
+        if st.get("kind") != "tool" or not st.get("said") or st.get("entailed"):
+            fails.append(f"the authored face should say a tool begun from the starter, not entailed yet: {st}")
+        posts = d.js("window.__fapPosts") or []
+        begin = [x for x in posts if x.get("url") == "/api/fabulac/begin"]
+        if not begin or (begin[-1].get("headers") or {}).get("X-Enough-Api") != "1" or '"starter":"tool"' not in begin[-1].get("body", ""):
+            fails.append(f"begin did not POST the starter with the promise header: {begin}")
+
+        # Entail, the route's answer recorded (a scripted model's run of the seeded tally: 7 files).
+        answer = {"job": {"id": f"uicheck-entail-{lang}", "kind": "fabulac-entail", "state": "done", "path": fab,
+                          "mode": "model", "message": "done",
+                          "result": {"fabulac": fab, "entailed": f"{first}/tally/", "files": 7, "mode": "model",
+                                     "route": "local", "model": "scripted-1",
+                                     "message": "wrote tally/ (7 files) — a recorded model's answer"}}}
+        d.js("window.__fapStub = %s" % json.dumps({"url": "/api/fabulac/entail", "answer": answer}))
+        d.click('#fab-compile button[data-fap="entail"]')
+        if not _wait_js(d, "!!(FA.eresult && FA.eresult.message)", 10000):
+            fails.append(f"the card did not take the entailment's answer: {d.js('[FA.ejob, FA.eerror]')}")
+        d.js("window.__fapStub = null")
+        said = d.js("(document.getElementById('fab-compile') || {}).textContent || ''") or ""
+        if "a recorded model's answer" not in said:
+            fails.append("the card does not show the entailment's words")
+        posts = d.js("window.__fapPosts") or []
+        ent = [x for x in posts if x.get("url") == "/api/fabulac/entail"]
+        if not ent or (ent[-1].get("headers") or {}).get("X-Enough-Api") != "1" or '"route":"local"' not in ent[-1].get("body", ""):
+            fails.append(f"entail did not POST with the promise header and route local: {ent}")
+
+        # Its tests in the sandbox, for real, on the seeded copy entailed by the scripted model.
+        d.js("fabCardClose()")
+        d.js(f"fapOpen({json.dumps(ran + '.fabulac.cosm')}, 'run')")
+        if not _ready(d, _FAP_OK):
+            fails.append("the authored card did not open on the entailed copy")
+            return fails
+        d.click('#fab-run button[data-fap="test"]')
+        if not _wait_js(d, "!!(FA.rresult || FA.rerror)", 90000):
+            fails.append("the tests did not finish in the sandbox")
+            return fails
+        r = d.js("(() => { const r = FA.rresult || {}; return {err: FA.rerror, ok: r.ok, ran: r.ran, enforced: r.enforced,"
+                 " out: (document.querySelector('#fab-run .fap-out') || {}).textContent || '',"
+                 " held: (document.querySelector('#fab-run .fap-held') || {}).className || '',"
+                 " promised: !!document.querySelector('#fab-run details.fap-guar dl dd')}; })()") or {}
+        if r.get("err") or not r.get("ok") or r.get("ran") != 3:
+            fails.append(f"the seeded tally's three tests should pass in the sandbox: {r}")
+        if not r.get("enforced") or "thym-refusal" in r.get("held", ""):
+            fails.append(f"the box should have held the run (macOS sandbox-exec): {r}")
+        if "Ran 3 tests" not in r.get("out", "") or not r.get("promised"):
+            fails.append(f"the card should show the output and what the box promised: {r}")
+        posts = d.js("window.__fapPosts") or []
+        test = [x for x in posts if x.get("url") == "/api/fabulac/test"]
+        if not test or (test[-1].get("headers") or {}).get("X-Enough-Api") != "1":
+            fails.append(f"test did not POST with the promise header: {test}")
+
+        # The twin guard: the folder it entailed is entailed again and run, never built.
+        d.js("fabCardClose()")
+        acts = _fap_menu(d, ran)
+        if not {"fap-entail", "fap-run", "fap-moved"} <= set(acts) or "fab-build" in acts:
+            fails.append(f"an authored fabulac's folder should offer entail, run and what moved, never build: {acts}")
+        d.js("hideTreeContextMenu()")
+    finally:
+        d.js(_FAP_UNWIRE)
+        d.js("(() => { try { hideTreeContextMenu(); fabCardClose(); } catch (e) {} return true; })()")
+        _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -5474,4 +5736,7 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.7: Thym's runtime in the page (P3), the allograph and its registry (P4) ---
     "thym-run-here": scenario_thym_run_here,
     "allograph-panel": scenario_allograph_panel,
+    "allograph-proofs": scenario_allograph_proofs,
+    # --- 0.8: the card of an authored fabulac (W4-FP) ---
+    "fabulac-first": scenario_fabulac_first,
 }

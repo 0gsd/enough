@@ -489,6 +489,75 @@ def seed_project(project: Path) -> None:
     _seed_thym(emf)
     _seed_fabula(project / FABULA_DIR)
     _seed_dialectic(project / DIALECTIC_DIR)
+    _seed_fabulac_first(project)
+    _seed_transconception(project)
+
+
+# 0.8 (W4-FP): authored fabulacs for the authored card, made by enough's own functions
+# (`enough.fabulac_first`) in a child process under this run's seams (`build_env`), so the
+# Thym runs that make them land in the scratch dir, never in ~/enough. Entailing asks the
+# scripted model of tests/test_fabulac_first.py (a recorded model: each source by its path):
+# - `made/tally`: the tool starter, licence MIT, entailed, in step;
+# - `edited/tally`: the same, with its `tally/__main__.py` changed by hand afterwards;
+# - `asked/linecount`: a tool begun from nothing by rules: the interview's first stage open;
+# - `served/greet`: the service starter, entailed (its tests are refused: serving is later);
+# - `ran-<lang>/tally`: one entailed copy per language, whose tests the scenario runs in the sandbox;
+# - `first-<lang>/`: an empty folder per language, where the scenario begins a tool from the starter.
+FABULAC_FIRST_SEED = r"""
+import sys
+from pathlib import Path
+from enough import fabulac_first as FF
+from tests.test_fabulac_first import runtime
+proj = Path(sys.argv[1]).resolve()
+langs = sys.argv[2].split(",")
+def made(rel, kind="tool", entail=True):
+    (proj / rel).parent.mkdir(parents=True, exist_ok=True)
+    FF.begin(proj, rel, starter=kind, licence="MIT", by="Ada")
+    if entail:
+        FF.entail(proj, rel, runtime=runtime())
+made("made/tally")
+made("edited/tally")
+main = proj / "edited" / "tally" / "tally" / "__main__.py"
+main.write_text(main.read_text(encoding="utf-8") + "\n# counted by hand on the train\n", encoding="utf-8")
+made("served/greet", "service")
+(proj / "asked").mkdir(parents=True, exist_ok=True)
+FF.begin(proj, "asked/linecount", kind="tool", mode="rules")
+for lang in langs:
+    made(f"ran-{lang}/tally")
+    (proj / f"first-{lang}").mkdir(parents=True, exist_ok=True)
+    (proj / f"first-{lang}" / "notes.md").write_text("one two three\n", encoding="utf-8")
+"""
+
+
+def _seed_fabulac_first(project: Path) -> None:
+    """The authored fabulacs (see FABULAC_FIRST_SEED), made in a child process under the scratch seams."""
+    env = build_env(project.parent)
+    env["PYTHONPATH"] = str(REPO)
+    out = subprocess.run([sys.executable, "-c", FABULAC_FIRST_SEED, str(project), ",".join(DIALECTIC_LANGS)],
+                         cwd=str(REPO), env=env, capture_output=True, text=True, timeout=600)
+    if out.returncode != 0:
+        raise RuntimeError("seeding the authored fabulacs failed:\n" + (out.stdout + out.stderr)[-4000:])
+
+
+# 0.8 (W4-X7): a fabulac kept for transconception, for its card: the promoted vulture fabulac with five rulings
+# open in batched questions and a cshort in Go with its layout (tests/test_transconception_card.seed_card), made in a
+# child process under this run's seams, as the authored fabulacs are.
+TRANSCONCEPTION_DIR = "transconceive"
+TRANSCONCEPTION_SEED = r"""
+import sys
+from pathlib import Path
+from tests.test_transconception_card import seed_card
+seed_card(Path(sys.argv[1]).resolve())
+"""
+
+
+def _seed_transconception(project: Path) -> None:
+    env = build_env(project.parent)
+    env["PYTHONPATH"] = str(REPO)
+    out = subprocess.run([sys.executable, "-c", TRANSCONCEPTION_SEED, str(project / TRANSCONCEPTION_DIR)],
+                         cwd=str(REPO), env=env, capture_output=True, text=True, timeout=300)
+    if out.returncode != 0:
+        raise RuntimeError("seeding the transconception card failed:\n" + (out.stdout + out.stderr)[-4000:])
 
 
 def _seed_dialectic(talks: Path) -> None:

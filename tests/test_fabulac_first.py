@@ -316,6 +316,20 @@ def test_begin_by_rules_runs_the_authoring_job(project: Path):
     assert out["waiting"] and out["state"]["next"] == "answer"
 
 
+def test_begin_into_a_missing_folder_is_refused_with_a_sentence(project: Path, client: TestClient):
+    """0.8 (W4-X7; W4-FP found it): by rules or from a starter, a folder that is not there is refused in words (404),
+    never a bare FileNotFoundError, and nothing is made."""
+    for kw in (dict(kind="tool", mode="rules"), dict(starter="tool")):
+        with pytest.raises(FF.FirstError) as e:
+            FF.begin(project, "not-yet/linecount", now=NOW, **kw)
+        assert e.value.status == 404, kw
+        assert str(e.value) == ("there is no folder not-yet/ to begin linecount.fabulac.cosm in: make the folder "
+                                "first, or begin it in one that is there")
+    assert not (project / "not-yet").exists()
+    r = client.post("/api/fabulac/begin", json={"path": "not-yet/linecount", "mode": "rules"})
+    assert r.status_code == 404 and "there is no folder not-yet/" in r.json()["detail"], r.text
+
+
 @needs_box
 def test_a_starter_tools_entailed_tests_and_the_tool_run_in_the_sandbox(project: Path, scripted: None):
     begun(project, "tool")

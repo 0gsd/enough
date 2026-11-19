@@ -10,7 +10,11 @@ address only, `allograph_registry.normalize_url`). Two things are added for the 
 - the device flow approves itself at the second poll, so a sign-in shows its code once and then completes;
 - one listing is there from the start, the text's own example (`harbour-baker`, *bread, slowly*, `#ts7de32a5bnz`),
   so a search and a look-up by tag have something to find; and `POST /__attest {of}` makes that listing attest the
-  first claim of the listing `of`, so an attestation waits for its holder.
+  first claim of the listing `of`, so an attestation waits for its holder;
+- 0.8 (W4-RP): the holder's proofs read (`GET .../{tag}/proofs`) is `FakeRegistry`'s; `POST /__proofs {of, proofs}`
+  puts the listing `of`'s proofs as given (each `{faceplace, handle, address, state?, since?}`), so the list shows a
+  live, a missed and a lapsed one, and `POST /__elsewhere {tag, on}` ties a tag to another account (the read's 409)
+  or unties it.
 
 Nothing here touches the OS keychain or the network beyond its own port; it holds everything in memory and is gone
 when it stops.
@@ -87,7 +91,34 @@ class StandInConnect:
         self.fake.waiting.setdefault(of, {})[digest] = R.sign(st, self._example_key)
         return digest
 
+    def put_proofs(self, of: str, rows: list) -> int:
+        """The listing `of`'s proofs, replaced by `rows`; the number kept."""
+        for k in [k for k in self.fake.proofs if k[0] == of]:
+            self.fake.proofs.pop(k, None)
+            self.fake.proof_state.pop(k, None)
+        for r in rows:
+            if not isinstance(r, dict) or not r.get("faceplace") or not r.get("handle"):
+                continue
+            k = (of, str(r["faceplace"]), str(r["handle"]))
+            self.fake.proofs[k] = str(r.get("address") or "")
+            if r.get("state") in ("missed", "lapsed"):
+                self.fake.proof_state[k] = (r["state"], str(r.get("since") or self.fake.CHECKED))
+        return len([k for k in self.fake.proofs if k[0] == of])
+
     def _answer(self, method: str, path: str, body: Any, token: str | None) -> tuple[int, Any]:
+        if path == "/__proofs":
+            of = str((body or {}).get("of") or "")
+            if of not in self.fake.listings:
+                return 404, {"error": "not_listed", "detail": "No listing."}
+            rows = (body or {}).get("proofs")
+            return 200, {"proofs": self.put_proofs(of, rows if isinstance(rows, list) else [])}
+        if path == "/__elsewhere":
+            tag = str((body or {}).get("tag") or "")
+            if (body or {}).get("on", True):
+                self.fake.elsewhere.add(tag)
+            else:
+                self.fake.elsewhere.discard(tag)
+            return 200, {"elsewhere": sorted(self.fake.elsewhere)}
         if path == "/__attest":
             of = str((body or {}).get("of") or "")
             if of not in self.fake.listings:

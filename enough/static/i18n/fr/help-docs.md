@@ -375,6 +375,51 @@ ouvrez-en un depuis la liste de la carte du fabulac, depuis une notification qua
 - posez un cshort à côté de l'original et comparez : ce qui manque au fabulac manque au cshort.
 - la section 12.8 du centre d'aide dit ce que sont un cshort et un catem, et pourquoi enough n'exécute jamais un cshort.
 
+## fabulac-author
+name: votre fabulac
+path: tally.fabulac.cosm → tally/
+
+### what
+la carte d'un fabulac <strong>que vous avez rédigé</strong> : le plan d'un programme que vous écrivez dans enough, chaque élément un axiome avec vos mots. un <strong>outil</strong> est une commande que l'on tape, une <strong>bibliothèque</strong> des fonctions qu'un autre programme appelle, un <strong>service</strong> sert sur un port (rédigé et impliqué dès maintenant ; le service viendra dans une version mineure ultérieure). la carte montre l'entretien étape par étape — à quoi il sert, ses entrées, ce dont il a besoin, ce qu'il laisse de côté, ses cas, ce qui reste ouvert — et la ou les deux questions qu'il pose maintenant. vous pouvez y ajouter une exigence, une décision, un cas ou une interface avec vos propres mots, et le vérifier. <strong>impliquer</strong> écrit le programme, le dossier <code>tally/</code> à côté : un modèle écrit chaque source, et les tests sont écrits à partir de ses cas, par des règles.
+
+### how
+<strong>commencer un fabulac ici…</strong> dans le menu option-clic d'un dossier ouvre la face pour commencer : ce que c'est, son nom, et comment commencer — à partir d'un modèle de départ (tout de suite), d'un brief que vous avez écrit, ou de rien (l'entretien demande). sur un fabulac que vous avez rédigé, <strong>impliquer et exécuter…</strong> ouvre cette carte, dans la visionneuse cosm ou le menu ; sur son dossier, le menu propose <strong>impliquer à nouveau…</strong>, <strong>tester et exécuter…</strong> et <strong>ce qui a bougé…</strong>, jamais « construire son fabulac… ». répondez aux questions montrées et <strong>envoyez ces réponses</strong> ; <strong>continuer</strong> les intègre et pose l'étape suivante. le given et l'expect d'un cas écrits sous forme de données deviennent un test. après l'implication, la carte liste chaque fichier qui a bougé ou a été modifié à la main ; un fichier modifié à la main attend votre choix : <strong>l'écraser</strong>, <strong>le garder</strong> (une décision enregistrée, jusqu'à ce que vous <strong>le libériez</strong>), ou <strong>le reprendre</strong> dans le fabulac. une <strong>tête</strong> nomme plusieurs fabulacs comme les parties d'un même programme.
+
+### ideas
+- commencez à partir du modèle de départ d'outil, changez ses cas pour qu'ils disent votre programme, puis impliquez : les tests viennent de vos cas.
+- vérifiez avant d'impliquer : la vérification liste les exigences qu'aucun cas ne montre encore.
+- le manuel des développeurs, dans la visionneuse de documents, dit chaque étape à chaque porte : la page, la ligne de commande et le client.
+
+## fabulac-run
+name: le tester et l'exécuter dans le bac à sable
+path: tally/ · tally/tests/test_cases.py
+
+### what
+là où enough exécute l'implication d'un fabulac que vous avez rédigé : ses tests, et son outil avec les arguments que vous donnez. il exécute une copie du dossier, sans réseau et avec la seule bibliothèque standard de Python ; il n'écrit que dans son propre dossier, et son temps, sa sortie et son disque sont limités. sous macOS, il ne limite pas la mémoire et ne promet rien à son sujet ; sous Linux, il lui faut bubblewrap. après chaque exécution, la carte montre ce que le bac à sable a promis pour elle et ce qu'il n'a pas promis, et dit clairement quand il ne l'a pas tenue.
+
+### how
+<strong>exécuter ses tests</strong> exécute les tests écrits à partir de ses cas ; pour un outil, donnez <strong>ses arguments</strong>, les <strong>fichiers confiés</strong> (chacun entre comme une copie en lecture seule) et, s'il en lit une, <strong>son entrée</strong>, puis <strong>l'exécuter</strong>. <strong>arrêter</strong> met fin à une exécution aussitôt. la sortie est montrée telle qu'elle a été gardée, seulement le début quand elle est longue. un service est refusé, avec les mots d'enough : le service viendra dans une version mineure ultérieure. une bibliothèque n'a pas d'outil à exécuter ; exécutez ses tests. rien ici n'exécute un cshort, le code d'un programme que vous n'avez pas rédigé : il se lit, et ne s'exécute jamais.
+
+### ideas
+- exécutez les tests après chaque implication : les cas sont le juge.
+- confiez un petit fichier à vous et exécutez l'outil dessus avant de lui en confier un gros.
+- les promesses du bac à sable sont listées sous chaque résultat : ouvrez la liste pour voir ce qui a tenu.
+
+## fabulac-transconception
+name: transconception
+path: vulture.fabulac.cosm → vulture.cshort-go-…/
+
+### what
+la carte d'un fabulac gardé pour la <strong>transconception</strong> : un programme porté dans un autre langage à travers son fabulac, en lecture seule. elle montre ses deux <strong>seuils</strong>, <strong>prêt à garder</strong> et <strong>prêt à impliquer</strong> dans chaque langage cible, avec chaque vérification qui tient ou non, et pourquoi ; ses <strong>décisions</strong>, ce qui doit rester tel quel, peut différer ou peut changer, et les questions encore ouvertes à leur sujet ; son <strong>fondement</strong>, chaque appui sur lequel le programme compte dans son langage, avec l'endroit où le texte du langage le dit ; ses <strong>cibles</strong>, chaque langage pesé sur douze points, dont trois sont des seuils, avec le verdict, les conditions et les lacunes ; et ses <strong>cshorts</strong>, chacun avec sa cible, impliqué <em>à part</em> de la source ou <em>à côté</em>, son plan de fichiers et sa preuve.
+
+### how
+<strong>construire et compiler…</strong> sur le fabulac l'ouvre. <strong>y répondre…</strong> sous ses décisions ouvre les questions, auxquelles on répond comme à toute question ; une question sautée garde le seuil fermé. sous son fondement, chaque citation ouvre la section dans le lecteur de documents, depuis la <strong>bibliothèque des langages</strong> : quand le texte n'est pas sur cette machine, elle dit <em>en cours de récupération</em> pendant qu'il arrive de cosmoes.org, et <em>pas à bord</em> quand il ne peut pas, un avertissement, jamais une réussite. un cshort, dans tout langage, se lit : <strong>lire</strong> et <strong>son plan de fichiers</strong> l'ouvrent, et rien ici ne le construit ni ne l'exécute.
+
+### ideas
+- lisez d'abord les seuils : une vérification qui ne tient pas dit quel élément et pourquoi.
+- ouvrez une citation avant de décider d'un appui : les mots du langage lui-même y sont.
+- un cshort sans preuve n'est pas encore jugé : c'est le juge extérieur qui l'exécute, jamais enough.
+
 ## dialectic-card
 name: les questions
 path: notes.md.fabulan.cosm → notes.md.fabulan.answers-2026-11-05-1200.cosm
@@ -418,6 +463,8 @@ choisissez un programme à vous dont l’unique entrée est le holograph et qui 
 ### ideas
 - refaites-le quand votre holograph change : la carte dit quand celui qui est inscrit n’est plus à jour.
 - des preuves actives sur deux faceplaces font de votre inscription un Allograph+.
+- <strong>par nom ou étiquette</strong> trouve une inscription par son nom d’utilisateur, ou la seule inscription qu’une #étiquette désigne ; <strong>l’ouvrir</strong> montre sa fiche.
+- connecté, <strong>toutes les preuves de votre inscription</strong> les liste une à une, actives, absentes ou expirées, avec leur adresse et le jour du contrôle ; <strong>retirer…</strong> demande avant d’en abandonner une.
 - la section 13.9 du centre d’aide présente l’allograph et le registre.
 
 ## atem-card

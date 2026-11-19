@@ -9644,6 +9644,354 @@
       overflow-wrap: anywhere;
     }
 
+    /* 0.8 (W4-X7): the transconception card — the gates with each check,
+       the rulings queue, the ground with its citations, the targets' twelve
+       points, the cshorts; all read only. */
+    #fabula-modal #fab-tc:not(:empty) {
+      margin: 10px 0 4px;
+      position: relative;
+    }
+
+    #fabula-modal .fab-tc-gate,
+    #fabula-modal .fab-tc-target {
+      margin: 4px 0 8px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 0;
+    }
+
+    #fabula-modal .fab-tc-gname {
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+
+    #fabula-modal .fab-tc-says {
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fab-tc-ok { color: var(--fg); }
+    #fabula-modal .fab-tc-no { color: var(--accent-error, #c0392b); }
+
+    #fabula-modal ul.fab-tc-checks,
+    #fabula-modal ul.fab-tc-queue,
+    #fabula-modal ul.fab-tc-ground,
+    #fabula-modal ul.fab-tc-cites {
+      list-style: none;
+      margin: 4px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    #fabula-modal li.fab-tc-check {
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fab-tc-cname {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      margin-right: 8px;
+    }
+
+    #fabula-modal .fab-tc-cstate {
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal li.fab-tc-no .fab-tc-cstate,
+    #fabula-modal .fab-tc-st-missing,
+    #fabula-modal .fab-tc-st-changed {
+      color: var(--accent-error, #c0392b);
+    }
+
+    #fabula-modal ul.fab-tc-why {
+      margin: 2px 0 2px 1.2em;
+      padding: 0;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal ul.fab-tc-queue li,
+    #fabula-modal ul.fab-tc-ground > li {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fab-tc-about {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+    }
+
+    #fabula-modal .fab-tc-asks,
+    #fabula-modal .fab-tc-gives {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    #fabula-modal details.fab-tc-more > summary {
+      cursor: pointer;
+      font-size: 12px;
+      margin: 2px 0 4px;
+    }
+
+    #fabula-modal button.fab-tc-link {
+      font: inherit;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent, var(--fg));
+      background: none;
+      border: none;
+      padding: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      text-align: left;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal table.fab-tc-points {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0;
+      font-size: 11.5px;
+      table-layout: fixed;
+    }
+
+    #fabula-modal table.fab-tc-points th,
+    #fabula-modal table.fab-tc-points td {
+      text-align: left;
+      vertical-align: top;
+      padding: 2px 4px;
+      border-bottom: 1px solid var(--border);
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal table.fab-tc-points th:first-child { width: 1.8em; }
+    #fabula-modal table.fab-tc-points th:nth-child(3) { width: 3.6em; }
+    #fabula-modal table.fab-tc-points th:nth-child(2) { width: 34%; }
+
+    #fabula-modal .fab-tc-gatemark {
+      font-size: 10px;
+      padding: 0 4px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fab-tc .fab-row {
+      flex-wrap: wrap;
+    }
+
+    #fabula-modal ul.fab-tc-cshorts li .fab-tc-acts {
+      grid-column: 2;
+      grid-row: 1 / span 3;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* the language library's section in the docs viewer (W4-X7) */
+    #docs-mode .lib-doc {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 12px 16px 40px;
+    }
+
+    #docs-mode .lib-cited,
+    #docs-mode .lib-meta {
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin: 2px 0;
+      overflow-wrap: anywhere;
+    }
+
+    #docs-mode .lib-copy {
+      font-size: 12.5px;
+      margin: 6px 0 2px;
+    }
+
+    #docs-mode .lib-notice {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+
+    #docs-mode pre.lib-body {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin: 8px 0;
+    }
+
+    #docs-mode .lib-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    /* 0.8 (W4-FP): the card of an authored fabulac — the interview's
+       questions, add and check, the entailment's files with a hand edit's
+       three choices, and a sandbox run's output and what the box promised. */
+    #fabula-modal #fab-author:not(:empty),
+    #fabula-modal #fab-run:not(:empty) {
+      margin: 10px 0 4px;
+      position: relative;
+    }
+
+    #fabula-modal .fap-help {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    #fabula-modal .fap-field label {
+      flex: 0 0 9.5em;
+    }
+
+    #fabula-modal textarea.fap-text {
+      box-sizing: border-box;
+      width: 100%;
+      margin: 4px 0;
+      font: inherit;
+      font-size: 12.5px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 7px;
+      resize: vertical;
+    }
+
+    #fabula-modal textarea.fap-mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    #fabula-modal .fap-as {
+      margin: 4px 0;
+    }
+
+    #fabula-modal .fap-qs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #fabula-modal .fap-q {
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    #fabula-modal .fap-q-asks {
+      display: block;
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal .fap-case label {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal ul.fap-files li {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    #fabula-modal ul.fap-files .fap-choices {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    #fabula-modal ul.fap-files .fap-choices button,
+    #fabula-modal ul.fap-files .fap-choices label {
+      font-size: 11.5px;
+    }
+
+    #fabula-modal ul.fap-files li.st-edited-by-hand {
+      border-color: var(--accent-tool);
+    }
+
+    #fabula-modal ul.fap-list {
+      margin: 2px 0 4px;
+      padding-left: 18px;
+      font-size: 11.5px;
+      overflow-wrap: anywhere;
+    }
+
+    #fabula-modal details.fap-instep,
+    #fabula-modal details.fap-stdin,
+    #fabula-modal details.fap-guar {
+      margin: 6px 0;
+      font-size: 12px;
+    }
+
+    #fabula-modal details summary {
+      cursor: pointer;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fap-out-h {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal pre.fap-out {
+      max-height: 16em;
+      overflow: auto;
+      margin: 2px 0 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+
+    #fabula-modal .fap-guar dl {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 2px 10px;
+      margin: 4px 0;
+      font-size: 11.5px;
+    }
+
+    #fabula-modal .fap-guar dt {
+      color: var(--fg-muted);
+    }
+
+    #fabula-modal .fap-guar dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
     /* 0.7 (V2c): the fabulap card, a poem decompiled in steps — scan,
        hear, read closely — and what they found: the form and its rules,
        each device's cue and senses, a lyric's parts and its hook. */
@@ -10004,6 +10352,29 @@
     #dialectic-modal input.allo-proof {
       font-family: var(--font-mono);
     }
+    /* 0.8: the holder's every proof, and the look-up by name or tag. */
+    #dialectic-modal :is(ul.allo-held-list, ul.allo-look-list) {
+      list-style: none;
+      padding-left: 0;
+    }
+    #dialectic-modal :is(ul.allo-held-list, ul.allo-look-list) > li {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    #dialectic-modal .allo-state {
+      font-size: 11px;
+      padding: 0 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    #dialectic-modal .allo-state-live { color: var(--accent-tool); border-color: currentColor; }
+    #dialectic-modal :is(.allo-state-missed, .allo-state-lapsed) { color: var(--fg-muted); }
+    #dialectic-modal .allo-addr code { overflow-wrap: anywhere; }
+    #dialectic-modal :is(.allo-held, .allo-look) { margin-bottom: 6px; }
     #dialectic-modal fieldset.allo-fs {
       display: flex;
       flex-direction: column;
@@ -19293,6 +19664,9 @@
           <button type="button" class="cosm-tool-btn" id="cosm-fab-btn" hidden onclick="fabFolderOpen(COSM.path)"
             title="this fabulac's build, stage by stage, and what it compiles into" data-i18n-title="fab.cosm.title"
             data-i18n="fab.cosm.label">build and compile…</button>
+          <button type="button" class="cosm-tool-btn" id="cosm-fap-btn" hidden onclick="fapOpen(COSM.path)"
+            title="this fabulac you authored: its interview, entailing it, its tests and its tool in the sandbox"
+            data-i18n-title="fap.cosm.title" data-i18n="fap.cosm.label">entail and run…</button>
           <button type="button" class="cosm-tool-btn" id="cosm-dlg-btn" hidden onclick="dlgOpen(COSM.path)"
             title="what this volume asks of a person: answer its questions, settle the answers"
             data-i18n-title="dlg.cosm.title"><span data-i18n="dlg.cosm.label">questions</span><span
@@ -20829,9 +21203,12 @@
       </div>
       <div class="modal-body thym-body" id="fab-body">
         <div id="fab-main"></div>
+        <div id="fab-tc"></div>
+        <div id="fab-author"></div>
         <div id="fab-verse"></div>
         <div id="fab-route-box"></div>
         <div id="fab-compile"></div>
+        <div id="fab-run"></div>
         <div id="fab-dialectic"></div>
         <div class="thym-status" id="fab-status" role="status" hidden></div>
       </div>
@@ -23692,6 +24069,14 @@
       // by DOCS_PROGRAM_DENSITIES in the Thym block.
       program: { icon: 'cosm', unwrap: false, plain: 'all',
         stack: () => t('modes.docs.program.icon', 'a Thym program') },
+      // 0.8 (W4-X7): a section of a text in the language library, the one
+      // a reliance's `stated` cites (DOCS.cite), read through
+      // GET /api/library/section: its notice block and the section as the
+      // publisher wrote it; "fetching" and "not aboard" said plainly.
+      library: { icon: 'hxc', unwrap: false, plain: 'all',
+        title: () => t('docs.title.library', 'language library'),
+        exit: () => t('modes.docs.library.exit', 'close the language library'),
+        stack: () => t('modes.docs.library.icon', 'the language library') },
     };
 
     // Whether a document is one of the specifications (`kind: 'spec'`).
@@ -23855,6 +24240,7 @@
     // for after a short is served from it.
     async function docsLoad(doc, lang, density, seq) {
       if (doc === 'program') return thymProgLoad(DOCS.prog, seq, DOCS.progWhere);
+      if (doc === 'library') return libLoad(DOCS.cite, seq);
       const key = doc + '|' + lang + '|' + density;
       if (DOCS.cache.has(key)) return DOCS.cache.get(key);
       if (density === 'atem' && DOCS.cache.has(doc + '|' + lang + '|short')) {
@@ -23953,6 +24339,7 @@
       if (!ix || anchor == null || anchor === '') return null;
       const a = String(anchor).trim();
       if (DOCS.doc === 'program') return a || null;     // a program's anchors are its item keys
+      if (DOCS.doc === 'library') return null;          // a library section is opened by its citation
       if (/^[STRB]:/.test(a)) return ix.byKey.has(a) ? a : null;
       if (/^(docs|cs|ref)-/.test(a)) return ix.domKey.get(a.replace(/^(cs|ref)-/, 'docs-')) || null;
       const n = a.replace(/^§\s*/, '');
@@ -23968,12 +24355,16 @@
       let doc = DOCS_DOCS[opts.doc] ? opts.doc : 'help-center';
       // A program needs its file; one the viewer is not showing yet is loaded afresh.
       if (doc === 'program' && !(opts.path && window.__thymReady)) doc = 'help-center';
+      if (doc === 'library' && !(opts.cite && opts.cite.in && opts.cite.at)) doc = 'help-center';
+      const citeChanged = doc === 'library' && libKey(opts.cite) !== libKey(DOCS.cite);
+      if (doc === 'library') DOCS.cite = Object.assign({}, opts.cite);
       // 0.6 (U1d): `where` (shipped, project, canon) tells a shipped program
       // from a project file of the same name (S4); left out, as before.
       const progChanged = doc === 'program' && (DOCS.prog !== opts.path || (DOCS.progWhere || null) !== (opts.where || null));
       if (doc === 'program') { DOCS.prog = opts.path; DOCS.progWhere = opts.where || null; }
       const lang = opts.lang || I18N.lang || 'en';
-      const density = opts.density && DOCS_DENSITIES[opts.density] ? opts.density : docsDensityFor(doc);
+      const density = doc === 'library' ? 'short'
+        : (opts.density && DOCS_DENSITIES[opts.density] ? opts.density : docsDensityFor(doc));
       const root = docsEl('docs-mode');
       const wasOpen = root.classList.contains('open');
       if (!wasOpen) DOCS.cache.clear();   // hand edits to a manual show on the next open
@@ -23991,7 +24382,7 @@
       });
       applyReviewContrast();
       const same = wasOpen && DOCS.data && DOCS.doc === doc && DOCS.lang === lang
-        && DOCS.density === density && !progChanged;
+        && DOCS.density === density && !progChanged && !citeChanged;
       if (same) {
         docsPaintChrome();
         const key = docsAnchorKey(opts.anchor);
@@ -24002,6 +24393,106 @@
       await docsShow(doc, lang, density, opts.anchor);
     }
     window.enterDocsMode = enterDocsMode;
+
+    // ---- 0.8 (W4-X7): a section of the language library ----
+    // What a reliance's `stated` cites, opened from the transconception card:
+    // GET /api/library/section (the routes wait up to 2 s; while the text is
+    // being fetched from cosmoes.org the answer says `fetching`, and the
+    // viewer asks again). Offline, or with no library here, it is `not
+    // aboard`, said plainly. The section is the publisher's text, verbatim.
+    function libKey(c) {
+      if (!c) return '';
+      return ['in', 'version', 'at', 'digest', 'section-digest'].map((k) => String(c[k] == null ? '' : c[k])).join('|');
+    }
+
+    async function libLoad(cite, seq) {
+      const key = 'library|' + libKey(cite);
+      if (DOCS.cache.has(key)) return DOCS.cache.get(key);
+      const q = new URLSearchParams();
+      ['in', 'version', 'at', 'digest', 'section-digest'].forEach((k) => { if (cite && cite[k] != null && cite[k] !== '') q.set(k, String(cite[k])); });
+      q.set('wait', '2');
+      for (let tries = 0; ; tries++) {
+        const r = await canonJSON('/api/library/section?' + q.toString());
+        if (seq !== DOCS.seq) return null;
+        if (!r.ok || !r.data) throw new Error(r.error || 'HTTP ' + r.status);
+        const data = Object.assign({ doc: 'library', lang: I18N.lang || 'en' }, r.data);
+        if (data.state === 'fetching' && tries < 30) {
+          libRender(data);
+          await new Promise((res) => setTimeout(res, 1000));
+          if (seq !== DOCS.seq) return null;
+          continue;
+        }
+        if (data.state !== 'fetching') DOCS.cache.set(key, data);
+        return data;
+      }
+    }
+
+    function libStateWord(st) {
+      const w = {
+        resolved: t('fab.tc.cite.resolved', 'found in the library'),
+        fetching: t('fab.tc.cite.fetching', 'fetching'),
+        'not-aboard': t('fab.tc.cite.notAboard', 'not aboard'),
+        changed: t('fab.tc.cite.changed', 'the text changed'),
+        unplaced: t('fab.tc.cite.unplaced', 'not placed in the kept text'),
+        missing: t('fab.tc.cite.missing', 'no such page'),
+        unknown: t('fab.tc.cite.unknown', 'a text the library does not have'),
+      };
+      return w[st] || String(st || '');
+    }
+
+    function libRender(data) {
+      const body = docsEl('docs-body');
+      const cited = data.cited || {};
+      const tx = data.text || null;
+      const sec = data.section || null;
+      let h = '<div class="lib-doc">';
+      h += '<p class="lib-cited">' + cosmEsc(t('docs.lib.cited', 'cited as {cite}').replace('{cite}', () => [cited.in, cited.version, cited.at].filter(Boolean).join(' · '))) + '</p>';
+      if (data.state !== 'resolved') {
+        const quiet = data.state === 'fetching' || data.state === 'not-aboard' || data.state === 'unplaced';
+        h += '<p class="lib-state ' + (quiet ? 'docs-note' : 'ref-error') + '" data-state="' + cosmEsc(String(data.state || '')) + '"><strong>'
+          + cosmEsc(libStateWord(data.state)) + '</strong>' + (data.why ? ': ' + cosmEsc(String(data.why)) : '')
+          + (data.state === 'fetching' ? ' <span class="atem-spin" aria-hidden="true"></span>' : '') + '</p>';
+      }
+      if (tx) {
+        h += '<div class="lib-notice">';
+        if (tx.copy) h += '<p class="lib-copy">' + cosmEsc(String(tx.copy)) + '</p>';
+        const lic = tx.licence || {};
+        const bits = [];
+        if (tx.publisher) bits.push(cosmEsc(String(tx.publisher)));
+        if (lic.name) bits.push(lic.url ? '<a href="' + cosmEsc(String(lic.url)) + '" target="_blank" rel="noopener">' + cosmEsc(String(lic.name)) + '</a>' : cosmEsc(String(lic.name)));
+        if (tx.publisher_page) bits.push('<a href="' + cosmEsc(String(tx.publisher_page)) + '" target="_blank" rel="noopener">' + cosmEsc(t('docs.lib.publisher', 'the publisher’s page')) + '</a>');
+        if (bits.length) h += '<p class="lib-meta">' + bits.join(' · ') + '</p>';
+        if (tx.copyright) h += '<p class="lib-meta">' + cosmEsc(String(tx.copyright)) + '</p>';
+        if (tx.changed) h += '<p class="lib-meta">' + cosmEsc(String(tx.changed)) + '</p>';
+        h += '</div>';
+      }
+      if (sec) {
+        h += '<h1 class="lib-h">' + cosmEsc(String(sec.heading || sec.id || '')) + '</h1>';
+        const path = Array.isArray(sec.path) ? sec.path.join(' › ') : (sec.path ? String(sec.path) : '');
+        if (path) h += '<p class="lib-meta">' + cosmEsc(path) + '</p>';
+        h += '<pre class="lib-body" aria-label="' + cosmEsc(t('docs.lib.body', 'the section, as the publisher wrote it')) + '">' + cosmEsc(String(sec.body || '')) + '</pre>';
+        const nav = [];
+        if (sec.parent && sec.parent.anchor) nav.push('<button type="button" class="thym-btn" data-lib-anchor="' + cosmEsc(String(sec.parent.anchor)) + '">' + cosmEsc(t('docs.lib.parent', 'the section it is in: {heading}').replace('{heading}', () => String(sec.parent.heading || sec.parent.id || ''))) + '</button>');
+        (sec.parts || []).slice(0, 40).forEach((pt) => { if (pt && pt.anchor) nav.push('<button type="button" class="thym-btn" data-lib-anchor="' + cosmEsc(String(pt.anchor)) + '">' + cosmEsc(String(pt.heading || pt.id || '')) + '</button>'); });
+        if (nav.length) h += '<div class="lib-nav">' + nav.join('') + '</div>';
+      } else if (data.state === 'not-aboard' || data.state === 'fetching') {
+        h += '<p class="docs-busy">' + cosmEsc(data.state === 'fetching' ? t('docs.lib.fetching', 'the text is being fetched from cosmoes.org; the section opens here when it arrives')
+          : t('docs.lib.notAboard', 'the text is not aboard this machine: the citation is carried, and opens here once the text is fetched')) + '</p>';
+      }
+      body.innerHTML = h + '</div>';
+      docsEl('docs-toc').innerHTML = '';
+      docsBuildToc();
+      body.scrollTop = 0;
+    }
+
+    // Within the same page: the section it is in, or one of its parts.
+    function libDocClick(e) {
+      const b = e.target.closest && e.target.closest('[data-lib-anchor]');
+      if (!b || !DOCS.data || !DOCS.data.section) return;
+      const page = String(DOCS.data.section.page || String((DOCS.data.cited || {}).at || '').split('#')[0]);
+      const c = DOCS.data.cited || {};
+      void enterDocsMode({ doc: 'library', cite: { in: c.in, version: c.version, at: page + '#' + b.dataset.libAnchor } });
+    }
 
     // The help button (the UI window's, at home too).
     function openHelpCenter() {
@@ -24047,10 +24538,15 @@
       setIcon(docsEl('docs-icon'), DOCS_DOCS[doc] ? DOCS_DOCS[doc].icon : 'hxc');
       docsEl('docs-title').textContent = DOCS_DOCS[doc] && DOCS_DOCS[doc].title ? DOCS_DOCS[doc].title()
         : doc === 'program' ? t('docs.title.program', 'program')
+        : doc === 'library' ? t('docs.title.library', 'language library')
         : (spec ? t('docs.title.spec', 'specification') : t('docs.title.help', 'help center'));
       let badge = '', badgeTitle = '';
       if (data && doc === 'program') {
         badge = String(data.name || '') + (data.rel ? ' · ' + data.rel : '');
+      } else if (data && doc === 'library') {
+        const tx = data.text || {};
+        badge = tx.name ? String(tx.name) + (tx.version ? ' · ' + tx.version : '') : String((data.cited || {}).in || '');
+        badgeTitle = tx.copy ? String(tx.copy) : '';
       } else if (data && spec) {
         // 0.5.4: "<name> · edition <edition>" (names carry no number, the
         // edition is a field, never a "v"), and in the title where the text
@@ -24095,7 +24591,7 @@
         const on = d === DOCS.density;
         b.setAttribute('aria-checked', on ? 'true' : 'false');
         b.tabIndex = on ? 0 : -1;
-        b.disabled = !DOCS_DENSITIES[d];
+        b.disabled = !DOCS_DENSITIES[d] || (doc === 'library' && d !== 'short');
       });
       const root = docsEl('docs-mode');
       root.dataset.doc = doc || '';
@@ -24123,11 +24619,13 @@
     // Load (seq-guarded) and draw one document at one density, then land.
     async function docsShow(doc, lang, density, anchor) {
       const seq = ++DOCS.seq;
-      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog + '|' + (DOCS.progWhere || ''));
+      const docChanged = DOCS.doc !== doc || DOCS.lang !== lang || (doc === 'program' && DOCS.progShown !== DOCS.prog + '|' + (DOCS.progWhere || ''))
+        || (doc === 'library' && DOCS.libShown !== libKey(DOCS.cite));
       DOCS.doc = doc;
       DOCS.lang = lang;
       DOCS.density = density;
       if (doc === 'program') DOCS.progShown = DOCS.prog + '|' + (DOCS.progWhere || '');
+      if (doc === 'library') DOCS.libShown = libKey(DOCS.cite);
       if (docChanged) { DOCS.data = null; DOCS.ix = null; DOCS.at = null; DOCS.back = null; DOCS_FAB.page = null; }
       DOCS_FIND.close({ quiet: true });
       refBackHide(DOCS_CTX);
@@ -24152,6 +24650,7 @@
       DOCS.ix = docsIndex(data);
       docsPaintChrome();
       const key = docsAnchorKey(anchor) || DOCS.at;
+      if (doc === 'library') { libRender(data); return; }
       await (doc === 'program' ? DOCS_PROGRAM_DENSITIES : DOCS_DENSITIES)[density](data, key);
       if (seq !== DOCS.seq) return;
       DOCS_FIND.refresh();
@@ -24163,7 +24662,7 @@
     // Switch density, keeping the reader's place (the section in view at
     // short, the row picked at atem). opts.anchor overrides.
     async function docsSetDensity(density, opts = {}) {
-      if (!DOCS_DENSITIES[density] || !DOCS.doc) return;
+      if (!DOCS_DENSITIES[density] || !DOCS.doc || DOCS.doc === 'library') return;
       docsDensityRemember(DOCS.doc, density);
       if (DOCS.doc === 'program') { if (DOCS.data) DOCS.at = thymDocCurrentKey() || DOCS.at; }
       else if (DOCS.density === 'short' && DOCS.data) DOCS.at = docsCurrentKey() || DOCS.at;
@@ -24264,6 +24763,10 @@
         if (DOCS.density === 'short') DOCS.at = docsCurrentKey() || DOCS.at;
         else if (DOCS.density === 'fabula') DOCS.at = docsFabCurrentKey() || DOCS.at;
         void docsShow(DOCS.doc, I18N.lang, DOCS.density, DOCS.at);
+      } else if (DOCS.doc === 'library') {
+        // The publisher's words stay as written; the labels follow the language.
+        if (DOCS.data) libRender(DOCS.data);
+        docsPaintChrome();
       } else if (DOCS.doc === 'program') {
         // A program is told in its own words; its labels follow the language.
         DOCS.at = thymDocCurrentKey() || DOCS.at;
@@ -24612,6 +25115,7 @@
 
     docsEl('docs-body').addEventListener('click', (e) => {
       if (DOCS.doc === 'program') { thymDocClick(e); return; }
+      if (DOCS.doc === 'library') { libDocClick(e); return; }
       if (DOCS.density === 'fabula') { docsFabClick(e); return; }
       const term = e.target.closest && e.target.closest('a.docs-term');
       if (term) {
@@ -33539,6 +34043,7 @@
       cosmEl('cosm-lens').hidden = true;
       cosmEl('cosm-about-btn').hidden = true;
       cosmEl('cosm-fab-btn').hidden = true;
+      cosmEl('cosm-fap-btn').hidden = true;
       cosmEl('cosm-dlg-btn').hidden = true;
       cosmEl('cosm-iso-btn').hidden = true;
       cosmEl('cosm-allo-btn').hidden = true;
@@ -33611,6 +34116,11 @@
       cosmEl('cosm-about-btn').hidden = refused || !COSM_SPEC_SECTION[data.minicosm];
       // 0.6 (U1a): a fabulac in the project offers its build and its compiles.
       cosmEl('cosm-fab-btn').hidden = !(window.__fabReady && !refused && !IS_HOME && fabIsFabulac(COSM.path, data));
+      // 0.8 (W4-FP): a fabulac the person authored is entailed and run, never built from a folder.
+      const fapAuthored = !cosmEl('cosm-fab-btn').hidden && cosmIsMap((data.catalog || {}).source)
+        && data.catalog.source.kind === 'authored';
+      cosmEl('cosm-fap-btn').hidden = !fapAuthored;
+      if (fapAuthored) cosmEl('cosm-fab-btn').hidden = true;
       // 0.6 (U1b): any volume of the project: its questions (with a count of
       // the open ones), and a holograph's isograph.
       if (window.__dlgReady) dlgCosmPaint(data);
@@ -34754,6 +35264,8 @@
       if (e.want === 'fabulac' && window.__fabReady) fabJobOnSnap(e, snap);
       // 0.7 (V2c): a poem's build in steps that the fabula card follows.
       if (e.want === 'fabulap' && window.__fabReady) fabVerseOnSnap(e, snap);
+      // 0.8 (W4-FP): an authored fabulac's authoring, entailing or sandbox run.
+      if (e.want === 'fabulac-first' && window.__fabReady) fapJobOnSnap(e, snap);
       // 0.6 (U1b): a settle the dialectic card follows.
       if (e.want === 'dialectic' && window.__dlgReady) dlgJobOnSnap(e, snap);
       if (end) {
@@ -34774,6 +35286,8 @@
       if (snap && (snap.kind === 'thym' || snap.kind === 'read')) { if (window.__thymReady) thymAfterWrite(snap); return; }
       // 0.6 (U1b): answers settled into a volume.
       if (snap && snap.kind === 'dialectic') { if (window.__dlgReady) dlgAfterWrite(snap); return; }
+      // 0.8 (W4-FP): an authored fabulac written, or its entailment (a sandbox run writes nothing of the project).
+      if (snap && (snap.kind === 'fabulac-author' || snap.kind === 'fabulac-entail')) { if (window.__fabReady) fapAfterWrite(snap); return; }
       const wrote = snap.kind === 'emf' || snap.kind === 'pin' || snap.kind === 'compile' || snap.kind === 'fabulac'
         || snap.kind === 'fabulap' || (snap.kind === 'atem' && res.written);
       if (!wrote) return;
@@ -34810,7 +35324,7 @@
           if (snap.mode === 'rules' && snap.reason === 'agent-free') {
             return t('canon.agentFree', 'agent-free: a rules reading, no model');
           }
-          return snap.mode === 'rules' ? t('canon.phase.rules', 'no model is running: writing a scaffold')
+          return snap.mode === 'rules' ? t('canon.phase.rules', 'no model is running: writing an outline')
             : t('canon.phase.starting', 'starting…');
         case 'lexicon': return t('canon.phase.lexicon', 'finding the words it leans on');
         case 'reading':
@@ -34842,6 +35356,11 @@
       // 0.8: a scaffold's check (kind `scaffold`) tells its own progress and
       // its end, and hands the findings to the composure it read.
       if (e.kind === 'scaffold') { compScaffoldJobToast(e, snap, id, dismiss); return; }
+      // 0.8 (W4-FP): an authored fabulac's jobs tell their own progress and end.
+      if ((e.kind === 'fabulac-author' || e.kind === 'fabulac-entail' || e.kind === 'sandbox') && window.__fabReady) {
+        fapToast(e, snap, id, dismiss);
+        return;
+      }
       // 0.5.0: the run / read card shows its own progress while it is open.
       if (thym && thymPickShowing(e.id)) { convertToastClose(id); return; }
       // 0.6: so does the fabula card.
@@ -34892,7 +35411,7 @@
           message = res.mode === 'rules'
             ? (res.reason === 'agent-free'
               ? t('canon.job.emfAgentFree', 'fabula written — agent-free: a rules reading, no model')
-              : t('canon.job.emfRules', 'fabula written — a scaffold: no model was running'))
+              : t('canon.job.emfRules', 'fabula written — an outline: no model was running'))
             : t('canon.job.emf', 'fabula written: {n} items').replace('{n}', String(res.items == null ? '?' : res.items));
           if (!(emfFaceOn() && canonSame(EMF_FACE.text, res.text_path || e.path))) {
             actions = [{ label: t('canon.job.show', 'show'), run: () => {
@@ -34978,6 +35497,8 @@
         : busy.kind === 'fabulac' ? t('fab.busy.build', 'building the fabulac of {name}').replace('{name}', () => name)
         : busy.kind === 'fabulap' ? t('fab.verse.busy', 'decompiling {name} in steps').replace('{name}', () => name)
         : busy.kind === 'dialectic' ? t('dlg.busy', 'settling the answers into {name}').replace('{name}', () => name)
+        : busy.kind === 'fabulac-author' ? t('fap.busy.author', 'authoring {name}').replace('{name}', () => name)
+        : busy.kind === 'fabulac-entail' ? t('fap.busy.entail', 'entailing {name}').replace('{name}', () => name)
         : (busy.kind === 'compile' ? t('canon.busy.compile', 'compiling {name}').replace('{name}', () => name)
           : (busy.kind === 'thym' ? t('thym.busy.run', 'running a program on {name}').replace('{name}', () => name)
             : (busy.kind === 'read' ? t('thym.busy.read', 'reading {name} through a morph').replace('{name}', () => name)
@@ -35408,7 +35929,7 @@
           'agent-free: a rules reading, no model')) + '</p>';
       } else if (res.mode === 'rules') {
         h += '<p class="atem-note">' + cosmEsc(t('atem.card.scaffold',
-          'scaffold — no model was running, so push and pull are still open questions')) + '</p>';
+          'outline — no model was running, so push and pull are still open questions')) + '</p>';
       }
       body.innerHTML = h;
       show('atem-cancel', false);
@@ -38895,7 +39416,10 @@
     // card (#thym-modal) and the docs viewer's program document.
     const FAB_STAGES = ['survey', 'history', 'read', 'fold', 'question'];
     const FAB_DEPTHS = ['line', 'overview', 'manual'];
-    const FAB_CSHORT_RE = /\.cshort-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\/?$/;
+    // 0.8 (W4-X7): a cshort in another language carries it in its name (`vulture.cshort-go-<stamp>/`)
+    const FAB_CSHORT_RE = /\.cshort-(?:[a-z][a-z0-9+]*-)?\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\/?$/;
+    // and a layout of one, read as a catem is (`vulture.layout-go-<stamp>.md`)
+    const FAB_LAYOUT_RE = /\.layout-[a-z][a-z0-9+]*-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\.md$/i;
     const FAB_CATEM_RE = /\.catem-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\.md$/i;
     const FAB_FABULAC_RE = /\.fabulac\.cosm$/i;
     const fabEl = (id) => document.getElementById(id);
@@ -38912,6 +39436,9 @@
         else if (a.name) again = 'input[name="' + CSS.escape(a.name) + '"][value="' + CSS.escape(a.value) + '"]';
         else if (a.dataset && a.dataset.fab) again = '[data-fab="' + CSS.escape(a.dataset.fab) + '"]'
           + (a.dataset.fabPath ? '[data-fab-path="' + CSS.escape(a.dataset.fabPath) + '"]' : '');
+        else if (a.dataset && a.dataset.fap) again = '[data-fap="' + CSS.escape(a.dataset.fap) + '"]'
+          + (a.dataset.fapPath ? '[data-fap-path="' + CSS.escape(a.dataset.fapPath) + '"]' : '');
+        else if (a.dataset && a.dataset.fapQ) again = '[data-fap-q="' + CSS.escape(a.dataset.fapQ) + '"]';
       }
       el.innerHTML = html;
       el._fabHtml = html;
@@ -39090,6 +39617,8 @@
       busy: false, error: null, cerror: null,
       // 0.7 (V2c): a poem decompiled in steps (GET /api/fabula/verse/build)
       verse: null, vjob: null, vsnap: null, vresult: null, verror: null,
+      // 0.8 (W4-X7): a fabulac kept for transconception, its card (GET /api/fabula/transconception)
+      tc: null, tcCites: [],
     };
 
     function fabCardReset(face) {
@@ -39097,9 +39626,12 @@
       Object.assign(FAB, { face, path: null, state: null, flip: false, twin: null, suggested: null, flavour: null,
         target: null, build: null, compiled: null, what: 'code', job: null, snap: null, result: null, cjob: null,
         csnap: null, cresult: null, busy: false, error: null, cerror: null,
-        verse: null, vjob: null, vsnap: null, vresult: null, verror: null });
+        verse: null, vjob: null, vsnap: null, vresult: null, verror: null, tc: null, tcCites: [] });
       fabRouteReset('fab');
-      ['fab-main', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-dialectic', 'fab-status'].forEach((id) => {
+      // 0.8 (W4-FP): the authored faces' state
+      fabRouteReset('fap');
+      fapReset();
+      ['fab-main', 'fab-tc', 'fab-author', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-run', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
       });
@@ -39120,7 +39652,7 @@
       m.setAttribute('aria-hidden', 'true');
       FAB.open = false;
       // A build or a compile still running carries on in a toast.
-      [FAB.job, FAB.cjob, FAB.vjob].forEach((id) => {
+      [FAB.job, FAB.cjob, FAB.vjob, FA.ajob, FA.ejob, FA.rjob].forEach((id) => {
         const e = id && id !== 'pending' ? CANON.jobs.get(id) : null;
         if (e && !e.terminal) { e.want = 'toast'; canonToast(e, e.snap || { state: 'running', kind: e.kind }); }
       });
@@ -39128,7 +39660,7 @@
     }
     window.fabCardClose = fabCardClose;
 
-    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id)); }
+    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id || fapShowing(id))); }
 
     // "decompile" on a text: the card's text face.
     async function fabDecompileOpen(path, state, opts = {}) {
@@ -39164,6 +39696,11 @@
     // "build its fabulac…" on a folder, "build and compile…" on a fabulac.
     async function fabFolderOpen(path) {
       if (IS_HOME || !path) return;
+      // 0.8 (W4-FP): a fabulac the person authored (or its entailment's folder) is entailed and run, not built.
+      const asked = String(path).replace(/\/+$/, '');
+      const twin = FAB_FABULAC_RE.test(asked) ? asked : asked + '.fabulac.cosm';
+      const probe = await canonJSON('/api/fabulac/status?path=' + encodeURIComponent(twin));
+      if (probe.ok && probe.data) { await fapOpen(twin, FAB_FABULAC_RE.test(asked) ? null : 'compile'); return; }
       fabCardReset('folder');
       FAB.target = String(path).replace(/\/+$/, '');
       fabCardOpenModal();
@@ -39172,6 +39709,8 @@
       await Promise.all([fabBuildLoad(seq), fabGateLoad()]);
       if (seq !== FAB.seq) return;
       await fabCompiledLoad(seq);
+      if (seq !== FAB.seq) return;
+      await fabTcLoad(seq);
       if (seq !== FAB.seq) return;
       fabCardPaint();
     }
@@ -39204,6 +39743,7 @@
 
     function fabCardPaint() {
       if (!FAB.open) return;
+      if (FAB.face === 'begin' || FAB.face === 'authored') { fapPaint(); return; }
       const text = FAB.face === 'text';
       fabEl('fab-title').textContent = text ? t('fab.title.decompile', 'decompile…') : t('fab.title.fabulac', 'the fabulac');
       const src = fabEl('fab-source');
@@ -39258,6 +39798,7 @@
       }
       // 0.7 (V2c): verse is decompiled in steps too: the fabulap card
       fabSet(fabEl('fab-verse'), FAB.twin && FAB.flavour === 'fabulap' ? fabVerseHTML() : '');
+      fabSet(fabEl('fab-tc'), '');
       fabSet(fabEl('fab-compile'), '');
       // 0.6 (U1b): the twin of the chosen flavour, when it has one: its questions.
       if (window.__dlgReady) {
@@ -39371,6 +39912,7 @@
         if (FAB.error) h += '<p class="thym-refusal">' + cosmEsc(FAB.error) + '</p>';
       }
       fabSet(fabEl('fab-main'), h);
+      fabSet(fabEl('fab-tc'), b && !b.error && b.exists ? fabTcHTML(FAB.tc) : '');
       fabSet(fabEl('fab-route-box'), b && !b.error ? fabRouteHTML('fab', { ceiling: 'cloud', unit: t('fab.calls.stage', 'model calls a stage') }) : '');
       fabSet(fabEl('fab-compile'), b && !b.error && b.exists ? fabCompileHTML(crunning) : '');
       // 0.6 (U1b): the fabulac's questions, once it exists.
@@ -39435,6 +39977,236 @@
           + (s.exists === false ? '' : '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(rel) + '">' + cosmEsc(t('canon.job.open', 'open')) + '</button>')
           + '</li>';
       }).join('') + '</ul>';
+    }
+
+    // ---- 0.8 (W4-X7): the transconception card ----
+    // A fabulac kept for transconception (`purpose: transconception`) shows,
+    // under its build, what GET /api/fabula/transconception says of it, read
+    // only: the two gates (ready to keep; ready to entail in each target's
+    // language), each check held or not and why; the rulings queue (the
+    // questions about a ruling, batched; they are answered in the dialectic,
+    // as every question is); the ground (each reliance and its `stated`,
+    // every citation a link that opens the library's section in the docs
+    // viewer, with "fetching" and "not aboard" said plainly); the targets
+    // with their twelve points and gaps; and each cshort with its target,
+    // apart or beside, its layout and its evidence. A cshort in another
+    // language is shown and read, never built or run: nothing here offers it.
+    async function fabTcLoad(seq = FAB.seq) {
+      const b = FAB.build;
+      FAB.tc = null;
+      if (!b || b.error || !b.exists || !b.fabulac) return;
+      const r = await canonJSON('/api/fabula/transconception?path=' + encodeURIComponent(b.fabulac));
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FAB.tc = { error: r.error || t('canon.job.failed', 'that did not work') }; return; }
+      FAB.tc = r.data.transconception ? r.data : null;
+    }
+
+    function fabTcStateWord(st) {
+      const w = {
+        holds: t('fab.tc.check.holds', 'holds'), fails: t('fab.tc.check.fails', 'does not hold'),
+        'not measured': t('fab.tc.check.unmeasured', 'not measured'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fabTcCiteWord(st) {
+      const w = {
+        resolved: t('fab.tc.cite.resolved', 'found in the library'),
+        fetching: t('fab.tc.cite.fetching', 'fetching'),
+        'not-aboard': t('fab.tc.cite.notAboard', 'not aboard'),
+        changed: t('fab.tc.cite.changed', 'the text changed'),
+        unplaced: t('fab.tc.cite.unplaced', 'not placed in the kept text'),
+        missing: t('fab.tc.cite.missing', 'no such page'),
+        unknown: t('fab.tc.cite.unknown', 'a text the library does not have'),
+        nowhere: t('fab.tc.cite.nowhere', 'stated in no text'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fabTcVerdictWord(v) {
+      const w = { feasible: t('fab.tc.verdict.feasible', 'feasible'), 'feasible-with': t('fab.tc.verdict.with', 'feasible, with conditions'),
+        not: t('fab.tc.verdict.not', 'not feasible') };
+      return w[v] || t('fab.tc.verdict.none', 'not weighed yet');
+    }
+
+    function fabTcGateHTML(g) {
+      const checks = cosmIsMap(g.checks) ? g.checks : {};
+      const name = g.gate === 'ready-to-keep' ? t('fab.tc.gate.keep', 'ready to keep')
+        : t('fab.tc.gate.entail', 'ready to entail in {language}').replace('{language}', () => String(g.language || ''));
+      const says = g.holds ? t('fab.tc.gate.holds', 'holds') : (g['kept-unruled'] ? t('fab.tc.gate.unruled', 'kept unruled')
+        : t('fab.tc.gate.fails', 'does not hold yet'));
+      let h = '<div class="fab-tc-gate"><div class="fab-row"><span class="fab-tc-gname">' + cosmEsc(name) + '</span>'
+        + '<span class="fab-tc-says ' + (g.holds ? 'fab-tc-ok' : 'fab-tc-no') + '">' + cosmEsc(says) + '</span></div>'
+        + '<ul class="fab-tc-checks">';
+      for (const [n, c] of Object.entries(checks)) {
+        const st = c && c.state;
+        const why = (c.errors && c.errors.length ? c.errors : (c.why ? [c.why] : (c.warnings || []))).slice(0, 3);
+        const more = (c.errors || []).length - why.length;
+        h += '<li class="fab-tc-check fab-tc-' + (st === 'holds' ? 'ok' : (st === 'fails' ? 'no' : 'un')) + '">'
+          + '<span class="fab-tc-cname">' + cosmEsc(n) + '</span><span class="fab-tc-cstate">' + cosmEsc(fabTcStateWord(st)) + '</span>';
+        if (st !== 'holds' && why.length) {
+          h += '<ul class="fab-tc-why">' + why.map((w) => '<li>' + cosmEsc(String(w)) + '</li>').join('')
+            + (more > 0 ? '<li>' + cosmEsc(t('fab.tc.more', 'and {n} more').replace('{n}', String(more))) + '</li>' : '') + '</ul>';
+        }
+        h += '</li>';
+      }
+      return h + '</ul></div>';
+    }
+
+    function fabTcRulingsHTML(r) {
+      const qs = Array.isArray(r.questions) ? r.questions : [];
+      const words = cosmIsMap(r.words) ? r.words : {};
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.rulings.head', 'its rulings')) + '</div>';
+      const made = Object.entries(words).map(([w, n]) => w + ' ' + n).join(' · ');
+      h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.rulings.made', '{n} items to rule, {k} not ruled yet')
+        .replace('{n}', String(r.items || 0)).replace('{k}', String(r.unruled || 0))) + (made ? ' · ' + cosmEsc(made) : '') + '</p>';
+      const open = qs.filter((q) => q.state === 'open' || !q.settled);
+      if (!open.length) return h + '<p class="fab-say">' + cosmEsc(t('fab.tc.rulings.none', 'no ruling waits for an answer')) + '</p>';
+      h += '<ul class="fab-tc-queue">' + open.map((q) => {
+        const p = cosmIsMap(q.proposed) ? q.proposed : {};
+        const bits = [];
+        if (p.is) bits.push(t('fab.tc.rulings.proposed', 'proposed: {ruling}').replace('{ruling}', () => String(p.is) + (p.allowing ? ' (' + p.allowing + ')' : '')));
+        if (p['made-for']) bits.push(t('fab.tc.rulings.for', 'for {target}').replace('{target}', () => String(p['made-for']).replace(/^N:target\//, '')));
+        if (q.batch) bits.push(t('fab.tc.rulings.batch', 'and {n} more items, one answer for all').replace('{n}', String(q.batch)));
+        if (q.state && q.state !== 'open') bits.push(String(q.state));
+        return '<li><span class="fab-tc-about">' + cosmEsc(String(q.about || '')) + '</span>'
+          + (q.asks ? '<span class="fab-tc-asks">' + cosmEsc(String(q.asks)) + '</span>' : '')
+          + '<span class="fab-made-meta">' + cosmEsc(bits.join(' · ')) + '</span></li>';
+      }).join('') + '</ul>';
+      return h + '<div class="fab-row"><span class="fab-say">' + cosmEsc(t('fab.tc.rulings.where', 'answered with the other questions, in the dialectic: a question skipped keeps the gate shut'))
+        + '</span><button type="button" data-fab="tc-rulings">' + cosmEsc(t('dlg.fab.answer', 'answer them…')) + '</button></div>';
+    }
+
+    function fabTcGroundHTML(g) {
+      const items = Array.isArray(g.items) ? g.items : [];
+      const states = cosmIsMap(g.states) ? g.states : {};
+      FAB.tcCites = [];
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.ground.head', 'its ground')) + '</div>';
+      const tally = Object.entries(states).map(([s, n]) => fabTcCiteWord(s) + ' ' + n).join(' · ');
+      h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.ground.count', '{n} things it leans on, each with where its language says so')
+        .replace('{n}', String(items.length))) + (tally ? ' · ' + cosmEsc(tally) : '') + '</p>';
+      if (!g.library) h += '<p class="thym-note">' + cosmEsc(t('fab.tc.ground.noLibrary', 'the language library is not aboard here: each citation is carried, and opens when its text is fetched')) + '</p>';
+      if (!items.length) return h;
+      h += '<details class="fab-tc-more"><summary>' + cosmEsc(t('fab.tc.ground.show', 'show every reliance')) + '</summary><ul class="fab-tc-ground">';
+      for (const it of items) {
+        const cites = (it.stated || []).map((c) => {
+          if (c.state === 'nowhere') {
+            return '<li class="fab-tc-cite"><span class="fab-tc-cstate">' + cosmEsc(fabTcCiteWord('nowhere')) + '</span> '
+              + cosmEsc(String(c.nowhere || '')) + '</li>';
+          }
+          const i = FAB.tcCites.push(c) - 1;
+          return '<li class="fab-tc-cite"><button type="button" class="fab-tc-link" data-fab="tc-cite" data-fab-path="' + i + '" title="'
+            + cosmEsc(t('fab.tc.cite.open', 'open the section in the docs viewer')) + '">' + cosmEsc(String(c.in || '') + ' ' + String(c.version || '') + ' · ' + String(c.at || ''))
+            + '</button> <span class="fab-tc-cstate fab-tc-st-' + cosmEsc(String(c.state || '')) + '">' + cosmEsc(fabTcCiteWord(c.state)) + '</span></li>';
+        }).join('');
+        const rul = (it.rulings || []).map((x) => x.pending ? t('fab.tc.rulings.pending', 'not ruled yet') : String(x.is || '')
+          + (x['made-for'] ? ' (' + String(x['made-for']).replace(/^N:target\//, '') + ')' : '')).join(', ');
+        h += '<li><div class="fab-row"><span class="fab-made-name">' + cosmEsc(String(it.name || it.id)) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc([it.on, it.entry, t('fab.tc.ground.usedBy', 'used by {n}').replace('{n}', String(it['used-by'] || 0)), rul].filter(Boolean).join(' · ')) + '</span></div>'
+          + (it.gives ? '<p class="fab-tc-gives">' + cosmEsc(String(it.gives)) + '</p>' : '')
+          + (cites ? '<ul class="fab-tc-cites">' + cites + '</ul>' : '') + '</li>';
+      }
+      return h + '</ul></details>';
+    }
+
+    function fabTcTargetsHTML(ts) {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.targets.head', 'its targets')) + '</div>';
+      if (!ts.length) return h + '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.none', 'no target language named yet')) + '</p>';
+      for (const tg of ts) {
+        const tags = [];
+        if (tg.source) tags.push(t('fab.tc.targets.source', 'its own language: the round trip'));
+        else if (tg.standing) tags.push(t('fab.tc.targets.standing', 'the weighing that stands'));
+        if (tg.version) tags.push(String(tg.version));
+        h += '<div class="fab-tc-target"><div class="fab-row"><span class="fab-tc-gname">' + cosmEsc(String(tg.language || tg.id)) + '</span>'
+          + '<span class="fab-tc-says ' + (tg.verdict === 'not' ? 'fab-tc-no' : (tg.verdict ? 'fab-tc-ok' : '')) + '">'
+          + cosmEsc(tg.source ? t('fab.tc.verdict.source', 'not weighed: the source language') : fabTcVerdictWord(tg.verdict)) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(tags.join(' · ')) + '</span></div>';
+        if ((tg.points || []).length) {
+          h += '<table class="fab-tc-points"><thead><tr><th>#</th><th>' + cosmEsc(t('fab.tc.points.point', 'point')) + '</th><th>'
+            + cosmEsc(t('fab.tc.points.score', 'score')) + '</th><th>' + cosmEsc(t('fab.tc.points.evidence', 'evidence')) + '</th></tr></thead><tbody>'
+            + tg.points.map((p) => '<tr' + (p.gate ? ' class="fab-tc-gatept"' : '') + '><td>' + p.point + '</td><td>' + cosmEsc(String(p.words || ''))
+              + (p.gate ? ' <span class="fab-tc-gatemark">' + cosmEsc(t('fab.tc.points.gate', 'gate')) + '</span>' : '') + '</td><td>'
+              + (p.score == null ? '–' : cosmEsc(String(p.score)) + '/3') + '</td><td>' + cosmEsc(String(p.ruled || p.evidence || '')) + '</td></tr>').join('')
+            + '</tbody></table>';
+        }
+        const prov = Object.entries(tg.provides || {}).map(([by, n]) => by + ' ' + n).join(' · ');
+        if (prov) h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.provides', 'what it leans on, provided: {list}').replace('{list}', () => prov)) + '</p>';
+        if ((tg.gaps || []).length) {
+          h += '<ul class="fab-tc-why">' + tg.gaps.map((g) => '<li>' + cosmEsc(String(g.for || '') + ': ' + [g.by, g.what, typeof g.gap === 'string' ? g.gap : ''].filter(Boolean).join(' · ')) + '</li>').join('') + '</ul>';
+        } else if (!tg.source && (tg.points || []).length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.noGap', 'no gap named')) + '</p>';
+        }
+        if ((tg.conditions || []).length) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.conditions', 'its conditions')) + '</p><ul class="fab-tc-why">'
+            + tg.conditions.map((c) => '<li>' + cosmEsc(String(c)) + '</li>').join('') + '</ul>';
+        }
+        if (tg.spike && tg.spike.level != null) {
+          h += '<p class="thym-meta">' + cosmEsc(t('fab.tc.targets.spike', 'its spike: evidence level {n}').replace('{n}', String(tg.spike.level))) + '</p>';
+        }
+        if (tg.unweighed && !tg.source) h += '<p class="thym-meta">' + cosmEsc(String(tg.unweighed)) + '</p>';
+        h += '</div>';
+      }
+      return h;
+    }
+
+    function fabTcCshortsHTML(cs) {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.cshorts.head', 'its cshorts')) + '</div>'
+        + '<p class="thym-note">' + cosmEsc(t('fab.tc.cshorts.never', 'a cshort is read, never run; one in another language is shown here and nothing on this page builds or runs it')) + '</p>';
+      if (!cs.length) return h + '<p class="thym-meta">' + cosmEsc(t('fab.made.none', 'nothing yet')) + '</p>';
+      return h + '<ul class="fab-made-list fab-tc-cshorts">' + cs.map((c) => {
+        const rel = String(c.path || '');
+        const bits = [String(c.language || '?')];
+        if (c.target) bits.push(t('fab.tc.cshorts.target', 'for {target}').replace('{target}', () => String(c.target)));
+        bits.push(c.entailed === 'beside' ? t('fab.tc.cshorts.beside', 'beside the source') : t('fab.tc.cshorts.apart', 'apart from the source'));
+        const ev = c.evidence;
+        const evw = ev ? t('fab.tc.cshorts.evidence', 'evidence level {level}: {agree} of {kept} steps agree, against {against}')
+          .replace('{level}', String(ev.level)).replace('{agree}', String(ev.agree == null ? '?' : ev.agree))
+          .replace('{kept}', String(ev.kept == null ? '?' : ev.kept)).replace('{against}', () => String(ev.against || '?'))
+          : t('fab.tc.cshorts.unjudged', 'not judged yet');
+        const lay = c.layout ? (c['layout-there']
+          ? '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(fabTcRel(c.layout)) + '">' + cosmEsc(t('fab.tc.cshorts.layout', 'its layout')) + '</button>'
+          : '<span class="fab-made-meta">' + cosmEsc(t('fab.tc.cshorts.layoutGone', 'its layout is not here')) + '</span>') : '';
+        return '<li><span class="fab-made-name">' + cosmEsc(canonBase(rel.replace(/\/$/, '')) + '/') + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(bits.join(' · ')) + '</span>'
+          + '<span class="fab-made-meta">' + cosmEsc(evw) + '</span><span class="fab-tc-acts">' + lay
+          + (c.there ? '<button type="button" data-fab="view" data-fab-path="' + cosmEsc(fabTcRel(rel)) + '">' + cosmEsc(t('fab.tc.cshorts.read', 'read')) + '</button>'
+            : '<span class="fab-made-meta">' + cosmEsc(t('fab.made.gone', 'not there any more')) + '</span>')
+          + '</span></li>';
+      }).join('') + '</ul>';
+    }
+
+    // A path the fabulac names (beside it) as the project's.
+    function fabTcRel(p) {
+      const fab = String((FAB.tc && FAB.tc.path) || '');
+      const dir = fab.indexOf('/') >= 0 ? fab.slice(0, fab.lastIndexOf('/') + 1) : '';
+      return dir + String(p || '').replace(/^\.\//, '');
+    }
+
+    function fabTcHTML(tc) {
+      if (!tc) return '';
+      if (tc.error) return '<p class="thym-refusal">' + cosmEsc(tc.error) + '</p>';
+      const gates = cosmIsMap(tc.gates) ? tc.gates : {};
+      let h = '<div class="fab-tc"><div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.head', 'transconception'))
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-transconception"></span></div>'
+        + '<p class="fab-say">' + cosmEsc(t('fab.tc.what', 'kept to carry {name} into another language through its fabulac').replace('{name}', () => String(tc.name || ''))
+          + (tc['ruled-by'] && tc['ruled-by'] !== 'none' ? ' · ' + t('fab.tc.ruledBy', 'ruled by {who}').replace('{who}', () => String(tc['ruled-by'])) : '')
+          + (tc['kept-unruled'] ? ' · ' + t('fab.tc.gate.unruled', 'kept unruled') : '')) + '</p>';
+      if (!tc['source-here']) h += '<p class="thym-note">' + cosmEsc(t('fab.tc.noSource', 'its source is not beside it, so what needs the source is not measured')) + '</p>';
+      h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fab.tc.gates.head', 'its gates')) + '</div>';
+      if (gates.keep) h += fabTcGateHTML(gates.keep);
+      (gates.entail || []).forEach((g) => { h += fabTcGateHTML(g); });
+      h += fabTcRulingsHTML(cosmIsMap(tc.rulings) ? tc.rulings : {});
+      h += fabTcGroundHTML(cosmIsMap(tc.ground) ? tc.ground : {});
+      h += fabTcTargetsHTML(Array.isArray(tc.targets) ? tc.targets : []);
+      h += fabTcCshortsHTML(Array.isArray(tc.cshorts) ? tc.cshorts : []);
+      return h + '</div>';
+    }
+
+    // A citation opened: the library's section in the docs viewer.
+    function fabTcCite(i) {
+      const c = (FAB.tcCites || [])[Number(i)];
+      if (!c) return;
+      const cite = {};
+      ['in', 'version', 'at', 'digest', 'section-digest'].forEach((k) => { if (c[k] != null) cite[k] = String(c[k]); });
+      void enterDocsMode({ doc: 'library', cite });
     }
 
     // A build's or a compile's progress, in words: stage n of 5 and its
@@ -39880,21 +40652,33 @@
       if (!b) return;
       if (b.dataset.fab === 'compile') void fabCompileGo();
       else if (b.dataset.fab === 'view') void fabViewOpen(b.dataset.fabPath);
+      else if (b.dataset.fab === 'tc-cite') fabTcCite(b.dataset.fabPath);
+      else if (b.dataset.fab === 'tc-rulings') {
+        const p = FAB.tc && FAB.tc.path;
+        fabCardClose();
+        if (p) void dlgOpen(p);
+      }
       else if (b.dataset.fab === 'verse-build') void fabVerseGo(fabVerseResumable(FAB.verse) ? 'resume' : 'build');
       else if (b.dataset.fab === 'verse-restart') void fabVerseGo('restart');
       else if (b.dataset.fab === 'verse-cancel') void fabVerseCancel();
     });
     fabEl('fab-go').addEventListener('click', () => {
       if (FAB.face === 'text') { void fabDecompileGo(); return; }
+      if (FAB.face === 'begin') { void fapBeginGo(); return; }
+      if (FAB.face === 'authored') return;
       void fabBuildGo(fabResumable(FAB.build) ? 'resume' : 'build');
     });
     fabEl('fab-restart').addEventListener('click', () => { void fabBuildGo('restart'); });
     fabEl('fab-open').addEventListener('click', () => {
-      const f = FAB.build && FAB.build.fabulac;
+      const f = FAB.face === 'authored' ? FA.path : (FAB.build && FAB.build.fabulac);
       fabCardClose();
       if (f && !(COSM.path && canonSame(COSM.path, f) && cosmEl('cosm-mode').classList.contains('open'))) void enterCosmMode(f);
     });
-    fabEl('fab-cancel-job').addEventListener('click', () => { void fabCancelGo(); });
+    fabEl('fab-cancel-job').addEventListener('click', () => {
+      if (FAB.face === 'begin') { if (FA.ajob && FA.ajob !== 'pending') void canonCancel(FA.ajob); return; }
+      if (FAB.face === 'authored') { void fapStopGo(); return; }
+      void fabCancelGo();
+    });
     fabEl('fab-close').addEventListener('click', fabCardClose);
     // Esc closes the card (capture, like the run card's, so it wins over the mode-stack ladder).
     document.addEventListener('keydown', (e) => {
@@ -39913,7 +40697,8 @@
     async function fabViewOpen(path) {
       if (!path) return;
       FABV.seq++;
-      const kind = FAB_CATEM_RE.test(String(path)) ? 'catem' : 'cshort';
+      // 0.8 (W4-X7): a layout of a cshort in another language is markdown read as a catem is
+      const kind = FAB_CATEM_RE.test(String(path)) ? 'catem' : (FAB_LAYOUT_RE.test(String(path)) ? 'layout' : 'cshort');
       Object.assign(FABV, { kind, path: String(path), data: null, file: null, text: null, error: null, ferror: null });
       const m = fabEl('cshort-modal');
       m.classList.remove('hidden');
@@ -39922,7 +40707,7 @@
       applyHelpBubbles();
       fabViewPaint();
       const seq = FABV.seq;
-      const url = kind === 'catem' ? '/api/fabula/catem?path=' : '/api/fabula/cshort?path=';
+      const url = kind !== 'cshort' ? '/api/fabula/catem?path=' : '/api/fabula/cshort?path=';
       const r = await canonJSON(url + encodeURIComponent(FABV.path));
       if (seq !== FABV.seq) return;
       if (!r.ok || !r.data) FABV.error = r.error || t('canon.job.failed', 'that did not work');
@@ -39953,7 +40738,8 @@
     function fabViewPaint() {
       if (!FABV.open) return;
       const d = FABV.data;
-      fabEl('fabv-title').textContent = FABV.kind === 'catem' ? t('fab.view.catem', 'catem') : t('fab.view.cshort', 'cshort');
+      fabEl('fabv-title').textContent = FABV.kind === 'catem' ? t('fab.view.catem', 'catem')
+        : (FABV.kind === 'layout' ? t('fab.view.layout', 'layout') : t('fab.view.cshort', 'cshort'));
       const src = fabEl('fabv-source');
       src.textContent = canonBase(String(FABV.path).replace(/\/$/, '')) + (FABV.kind === 'cshort' ? '/' : '');
       src.title = FABV.path;
@@ -39961,6 +40747,12 @@
       if (FABV.error) { fabSet(body, '<p class="thym-refusal">' + cosmEsc(FABV.error) + '</p>'); return; }
       if (!d) { fabSet(body, '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>'); return; }
       let h = '';
+      if (FABV.kind === 'layout') {
+        h += '<p class="fabv-note">' + cosmEsc(t('fab.view.layoutNote', 'a layout: the files and the names a cshort in another language is written to, entailed by its fabulac; read, never run')) + '</p>';
+        h += '<div class="fabv-pane"><div class="fabv-md">' + renderMarkdown(String(d.text || ''), null).html + '</div></div>';
+        fabSet(body, h);
+        return;
+      }
       if (FABV.kind === 'catem') {
         h += '<p class="fabv-note">' + cosmEsc(d.depth ? t('fab.view.depth', 'a catem at depth {depth}: what a user can do with the program, entailed by its fabulac')
           .replace('{depth}', () => String(d.depth)) : t('fab.view.catemNote', 'a catem: what a user can do with the program, entailed by its fabulac')) + '</p>';
@@ -40011,6 +40803,850 @@
       fabViewClose();
     }, true);
 
+    // ---- 0.8 (W4-FP): the card of an AUTHORED fabulac ----
+    // Two more faces of the fabula card, over the routes of fabulac-first
+    // (`/api/fabulac/*`, enough/routes/fabulac.py; docs/DEVELOPERS.md):
+    // `begin` makes a new authored fabulac (from a starter, a brief or
+    // nothing; a tool, a library or a service), and `authored` is where one
+    // stands: the interview's stages and the questions shown, add a
+    // requirement / decision / case / interface, check, entail (the folder
+    // beside it), what moved and every hand edit with its three choices
+    // (write over it, keep it, take it back), a head and its parts, and its
+    // tests and its tool run in the sandbox, with Stop, the output capped
+    // and what the box did and did not promise. Every POST sends the
+    // promise header (`X-Enough-Api: 1`, enough/api_promise.py): it is the
+    // gate those routes keep. Only an authored fabulac's entailment runs
+    // here; a cshort of code the person did not author is read, never run,
+    // and nothing on this card offers to run one.
+    const FAP_KINDS = ['tool', 'library', 'service'];
+    const FAP_ADD = ['requirement', 'decision', 'case', 'interface'];
+    const FAP_OUT_MAX = 20000;                   // characters of a stream the card shows
+    const FAP_SIMPLE = new Set(['text', 'number', 'date']);
+    const FAP_HEADER = 'X-Enough-Api';
+    const FA = {};
+
+    function fapReset() {
+      Object.assign(FA, {
+        // the begin face
+        where: '', name: '', kind: 'tool', way: 'starter', brief: '', licence: '', by: '', starters: null,
+        // the authored face
+        path: null, status: null, parts: null, focus: null, error: null,
+        answers: {}, sending: false, aerrorQ: null,
+        addAs: 'requirement', addSays: '', addGiven: '', addExpect: '', added: null, addError: null, adding: false,
+        check: null, checking: false,
+        overwrite: new Set(), fileBusy: null, fileNote: null, fileError: null,
+        headName: '', headParts: '', head: null, headError: null,
+        args: '', stdin: '', hand: '',
+        // jobs: a = begin / go on, e = entail / take back, r = a sandbox run
+        ajob: null, asnap: null, aresult: null, aerror: null,
+        ejob: null, esnap: null, eresult: null, eerror: null,
+        rjob: null, rsnap: null, rresult: null, rerror: null, rwhat: null,
+      });
+    }
+    fapReset();
+
+    // Every POST to /api/fabulac/* carries the promise header.
+    function fapPost(url, body) {
+      return canonJSON(url, { method: 'POST', headers: { 'Content-Type': 'application/json', [FAP_HEADER]: '1' },
+        body: JSON.stringify(body) });
+    }
+    function fapIsKind(kind) { return kind === 'fabulac-author' || kind === 'fabulac-entail' || kind === 'sandbox'; }
+    function fapName() { return canonBase(String(FA.path || '')); }
+    function fapDir(p) { const s = String(p || ''); const i = s.lastIndexOf('/'); return i < 0 ? '' : s.slice(0, i); }
+    function fapRunning(s) {
+      const id = FA[s + 'job'], snap = FA[s + 'snap'];
+      return !!(id && (id === 'pending' || !snap || !CANON_TERMINAL.has(snap.state)));
+    }
+    function fapSlot(kind) { return kind === 'sandbox' ? 'r' : (kind === 'fabulac-entail' ? 'e' : 'a'); }
+    function fapShowing(id) { return !!(id && (FA.ajob === id || FA.ejob === id || FA.rjob === id)); }
+
+    // Follow a job of this fabulac on the card (and in a toast once it closes).
+    function fapFollow(job, label) {
+      if (!job || !job.id) return;
+      const s = fapSlot(job.kind);
+      if (!FA[s + 'job'] || FA[s + 'job'] === 'pending') {
+        FA[s + 'job'] = job.id;
+        FA[s + 'snap'] = job;
+        if (s === 'r') FA.rwhat = job.what || FA.rwhat;
+      }
+      const e = CANON.jobs.get(job.id);
+      if (e) e.want = 'fabulac-first';
+      else canonTrack(job, { want: 'fabulac-first', label: label || fapName(), writes: job.kind !== 'sandbox' });
+    }
+
+    // "begin a fabulac here…": the begin face, the new fabulac to go in `where`.
+    async function fapBeginOpen(where) {
+      if (IS_HOME) return;
+      fabCardReset('begin');
+      FA.where = String(where || '').replace(/\/+$/, '');
+      fabCardOpenModal();
+      fabCardPaint();
+      const seq = FAB.seq;
+      const [st] = await Promise.all([canonJSON('/api/fabulac/starters'), fabGateLoad()]);
+      if (seq !== FAB.seq) return;
+      FA.starters = st.ok && st.data && Array.isArray(st.data.starters) ? st.data.starters : [];
+      if (!st.ok) FA.error = st.error;
+      fabCardPaint();
+      const n = fabEl('fap-name');
+      if (n) n.focus({ preventScroll: true });
+    }
+    window.fapBeginOpen = fapBeginOpen;
+
+    // An authored fabulac's card; `focus` brings a section into view
+    // ('entail' or 'run', from the entailment folder's menu).
+    async function fapOpen(fab, focus) {
+      if (IS_HOME || !fab) return;
+      fabCardReset('authored');
+      FA.path = String(fab);
+      FA.focus = focus || null;
+      fabCardOpenModal();
+      fabCardPaint();
+      const seq = FAB.seq;
+      await Promise.all([fapLoad(seq), fabGateLoad()]);
+      if (seq !== FAB.seq) return;
+      fabCardPaint();
+      const sec = FA.focus && fabEl(FA.focus === 'run' ? 'fab-run' : 'fab-compile');
+      if (sec) sec.scrollIntoView({ block: 'nearest' });
+    }
+    window.fapOpen = fapOpen;
+
+    // GET /api/fabulac/status is the card's one read (and parts-moved, for a head).
+    async function fapLoad(seq = FAB.seq) {
+      const q = encodeURIComponent(FA.path);
+      const [r, pm] = await Promise.all([canonJSON('/api/fabulac/status?path=' + q),
+        canonJSON('/api/fabulac/parts-moved?path=' + q)]);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.status = { error: r.error || t('canon.job.failed', 'that did not work') }; return; }
+      FA.status = r.data;
+      FA.parts = pm.ok && pm.data && Array.isArray(pm.data.parts) && pm.data.parts.length ? pm.data : null;
+      (Array.isArray(r.data.jobs) ? r.data.jobs : []).forEach((j) => { if (j && !CANON_TERMINAL.has(j.state)) fapFollow(j); });
+    }
+
+    function fapReload() {
+      const seq = FAB.seq;
+      void fapLoad(seq).then(() => { if (seq === FAB.seq) fabCardPaint(); });
+    }
+
+    // ---- words ----
+    function fapKindWords(kind) {
+      const w = {
+        tool: t('fap.kind.tool', 'a tool: a command a person types'),
+        library: t('fap.kind.library', 'a library: functions another program calls'),
+        service: t('fap.kind.service', 'a service: a program that serves on a port (authored and entailed now; serving comes in a later minor)'),
+      };
+      return w[kind] || t('fap.kind.none', 'no program of its own: a head over parts, or its kind not said yet');
+    }
+    function fapKindName(kind) {
+      return { tool: t('fap.kind.tool.name', 'a tool'), library: t('fap.kind.library.name', 'a library'),
+        service: t('fap.kind.service.name', 'a service') }[kind] || String(kind || '');
+    }
+    function fapAddName(a) {
+      return { requirement: t('fap.add.requirement', 'a requirement'), decision: t('fap.add.decision', 'a decision'),
+        case: t('fap.add.case', 'a case'), interface: t('fap.add.interface', 'an interface') }[a] || String(a || '');
+    }
+    function fapStageWord(s) {
+      const w = {
+        for: t('fap.stage.for', 'what it is for'), 'ways-in': t('fap.stage.waysIn', 'its ways in'),
+        needs: t('fap.stage.needs', 'what it needs'), 'left-out': t('fap.stage.leftOut', 'what it leaves out'),
+        cases: t('fap.stage.cases', 'its cases'), open: t('fap.stage.open', 'what is still open'),
+      };
+      return w[s] || String(s || '');
+    }
+    function fapFileWord(st) {
+      const w = {
+        'in step': t('fap.file.inStep', 'in step'), moved: t('fap.file.moved', 'its fabulac moved: entailing again tells it'),
+        'edited by hand': t('fap.file.edited', 'changed by hand'), gone: t('fap.file.gone', 'not there any more: entailing again tells it'),
+        kept: t('fap.file.kept', 'kept as changed by hand'), new: t('fap.file.new', 'new: the fabulac tells it now'),
+      };
+      return w[st] || String(st || '');
+    }
+    function fapProgressText(snap) {
+      const s = snap || {};
+      if (s.state === 'queued' || s.phase === 'waiting') return t('canon.phase.waiting', 'waiting for the model');
+      if (s.state === 'cancelling') return t('canon.phase.cancelling', 'cancelling…');
+      if (s.kind === 'sandbox') {
+        return s.what === 'tests' ? t('fap.run.testing', 'running its tests in the sandbox…')
+          : t('fap.run.running', 'running it in the sandbox…');
+      }
+      if (s.kind === 'fabulac-entail') return t('fap.entail.running', 'entailing: a model writes each source; the tests are written from its cases by rules');
+      return t('fap.author.running', 'authoring: settling the answers, then asking what follows');
+    }
+
+    // ---- painting ----
+    function fapPaint() {
+      const begin = FAB.face === 'begin';
+      fabEl('fab-title').textContent = begin ? t('fap.title.begin', 'begin a fabulac') : t('fab.title.fabulac', 'the fabulac');
+      const src = fabEl('fab-source');
+      src.textContent = begin ? (FA.where ? FA.where + '/' : t('fap.begin.top', 'the project’s top folder')) : fapName();
+      src.title = (begin ? FA.where : FA.path) || '';
+      fabSet(fabEl('fab-verse'), '');
+      fabSet(fabEl('fab-dialectic'), '');
+      if (begin) fapBeginPaint(); else fapAuthoredPaint();
+    }
+
+    function fapRadios(name, labelled, rows, chosen) {
+      return '<div class="thym-list" role="radiogroup" aria-labelledby="' + labelled + '">'
+        + rows.map(([v, label, why]) => '<label class="thym-opt"><input type="radio" name="' + name + '" value="' + cosmEsc(v) + '"'
+          + (chosen === v ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name">' + cosmEsc(label)
+          + '</span></span>' + (why ? '<span class="thym-opt-meta">' + cosmEsc(why) + '</span>' : '') + '</label>').join('') + '</div>';
+    }
+
+    function fapField(id, label, value, opts = {}) {
+      const ph = opts.placeholder ? ' placeholder="' + cosmEsc(opts.placeholder) + '"' : '';
+      return '<div class="thym-row fap-field"><label for="' + id + '">' + cosmEsc(label) + '</label>'
+        + '<input type="text" id="' + id + '" value="' + cosmEsc(value || '') + '"' + ph + ' spellcheck="false" autocomplete="off"></div>';
+    }
+
+    function fapBeginValid() {
+      const name = FA.name.trim();
+      return !!name && !/[\\/]/.test(name) && !/\s/.test(name) && (FA.way !== 'brief' || !!FA.brief.trim());
+    }
+
+    function fapBeginPaint() {
+      const running = fapRunning('a');
+      let h = '';
+      if (FA.starters === null) {
+        h = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else {
+        const starter = (FA.starters || []).find((s) => s && s.kind === FA.kind) || null;
+        h += '<div class="thym-sec-h dict-sc" id="fap-kind-h">' + cosmEsc(t('fap.begin.kind', 'what it is')) + '</div>'
+          + fapRadios('fap-kind', 'fap-kind-h', FAP_KINDS.map((k) => [k, fapKindName(k), fapKindWords(k)]), FA.kind);
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.begin.name', 'its name')) + '</div>'
+          + fapField('fap-name', t('fap.begin.nameLabel', 'name'), FA.name, { placeholder: 'tally' });
+        const nm = FA.name.trim() || '…';
+        h += '<p class="thym-meta" id="fap-writes">' + cosmEsc(t('fap.begin.writes', 'writes {fabulac}; entailing it writes the folder {folder} beside it')
+          .replace('{fabulac}', () => (FA.where ? FA.where + '/' : '') + nm + '.fabulac.cosm').replace('{folder}', () => nm + '/')) + '</p>';
+        const starterWhy = starter
+          ? t('fap.way.starter.why', 'begins as {name}, the starter for {kind}, under your name: {line} ({n} cases)')
+            .replace('{kind}', () => fapKindName(FA.kind)).replace('{name}', () => String(starter.name || ''))
+            .replace('{line}', () => String(starter.line || '')).replace('{n}', () => String((starter.cases || []).length))
+          : t('fap.way.starter.none', 'no starter of this kind is installed');
+        h += '<div class="thym-sec-h dict-sc" id="fap-way-h">' + cosmEsc(t('fap.begin.way', 'begin it')) + '</div>'
+          + fapRadios('fap-way', 'fap-way-h', [
+            ['starter', t('fap.way.starter', 'from a starter'), starterWhy],
+            ['brief', t('fap.way.brief', 'from a brief'), t('fap.way.brief.why', 'a markdown text you wrote: its sections are read by rules, and a model only places what they cannot')],
+            ['nothing', t('fap.way.nothing', 'from nothing'), t('fap.way.nothing.why', 'the interview asks what it is for, its ways in, what it needs, what it leaves out, its cases and what is still open, a stage at a time')],
+          ], FA.way);
+        if (FA.way === 'brief') h += fapField('fap-brief', t('fap.begin.brief', 'the brief'), FA.brief, { placeholder: 'brief.md' });
+        h += fapField('fap-licence', t('fap.begin.licence', 'licence'), FA.licence, { placeholder: 'MIT' })
+          + fapField('fap-by', t('fap.begin.by', 'authored by'), FA.by, { placeholder: t('fap.begin.byHint', 'your name') });
+        h += '<p class="thym-note">' + cosmEsc(t('fap.begin.yours', 'what you write here is yours: every item is an axiom, in your words. The licence is the one you offer it under; left empty, the interview asks for it.')) + '</p>';
+        if (running) {
+          h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.asnap)) + '</span></p>';
+        }
+        if (FA.aerror || FA.error) h += '<p class="thym-refusal">' + cosmEsc(FA.aerror || FA.error) + '</p>';
+      }
+      fabSet(fabEl('fab-main'), h);
+      ['fab-author', 'fab-compile', 'fab-run'].forEach((id) => fabSet(fabEl(id), ''));
+      fabSet(fabEl('fab-route-box'), FA.starters !== null && FA.way !== 'starter' ? fabRouteHTML('fap') : '');
+      fabStatusPaint('');
+      const go = fabEl('fab-go');
+      go.hidden = false;
+      go.textContent = t('fap.begin.go', 'begin');
+      go.disabled = running || FA.starters === null || !fapBeginValid();
+      fabEl('fab-restart').hidden = true;
+      fabEl('fab-open').hidden = true;
+      fabEl('fab-cancel-job').hidden = !running || FA.ajob === 'pending';
+    }
+
+    function fapAuthoredPaint() {
+      const st = FA.status;
+      const arun = fapRunning('a'), erun = fapRunning('e'), rrun = fapRunning('r');
+      let h = '';
+      if (!st) {
+        h = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else if (st.error) {
+        h = '<p class="thym-refusal">' + cosmEsc(st.error) + '</p>';
+      } else {
+        h = fapInterviewHTML(st, arun);
+      }
+      fabSet(fabEl('fab-main'), h);
+      const ok = !!(st && !st.error);
+      fabSet(fabEl('fab-author'), ok ? fapAddHTML() + fapHeadHTML() : '');
+      fabSet(fabEl('fab-route-box'), ok ? fabRouteHTML('fap') : '');
+      fabSet(fabEl('fab-compile'), ok ? fapEntailHTML(st, erun) : '');
+      fabSet(fabEl('fab-run'), ok ? fapRunHTML(st, rrun) : '');
+      fabStatusPaint('');
+      fabEl('fab-go').hidden = true;
+      fabEl('fab-restart').hidden = true;
+      fabEl('fab-open').hidden = !ok;
+      fabEl('fab-cancel-job').hidden = !((arun && FA.ajob !== 'pending') || (erun && FA.ejob !== 'pending'));
+      applyHelpBubbles();
+    }
+
+    // The interview: its stages, what is next, the questions shown (one or two).
+    function fapInterviewHTML(st, arun) {
+      const iv = cosmIsMap(st.interview) ? st.interview : {};
+      const prog = cosmIsMap(st.program) ? st.program : {};
+      let h = '<p class="fab-say fap-kind">' + cosmEsc(fapKindWords(prog.kind)) + '</p>';
+      const lic = iv.licence;
+      h += '<p class="thym-meta">' + cosmEsc(typeof lic === 'string' && lic
+        ? t('fap.licence', 'offered under {licence}').replace('{licence}', () => lic)
+        : t('fap.licence.pending', 'no licence given yet: the interview asks for one')) + '</p>';
+      h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.interview.head', 'the interview, stage by stage')) + '</div>';
+      const rows = Array.isArray(iv.stages) ? iv.stages : [];
+      h += '<ol class="fab-stages fap-stages">' + rows.map((s) => {
+        const now = !s.landed && iv.stage === s.stage;
+        const cls = s.landed ? 'landed' : (now ? 'running' : '');
+        const mark = s.landed ? '✓' : (now ? '▸' : '·');
+        const meta = s.landed ? t('fap.stage.landed', 'answered')
+          : (s.asked ? t('fap.stage.asked', '{asked} asked, {open} open').replace('{asked}', String(s.asked)).replace('{open}', String(s.open || 0))
+            : (now ? t('fap.stage.now', 'asked next') : t('fab.stage.waits', 'waits')));
+        return '<li class="' + cls + '"><span class="fab-mark" aria-hidden="true">' + mark + '</span>'
+          + '<span class="fab-stage-name">' + cosmEsc(s.n + '. ' + fapStageWord(s.stage)) + '</span>'
+          + '<span class="fab-stage-meta">' + cosmEsc(meta) + '</span></li>';
+      }).join('') + '</ol>';
+      const open = Array.isArray(iv.open) ? iv.open.length : 0;
+      const next = {
+        settle: t('fap.next.settle', 'answers wait to be settled into the fabulac: go on settles them, then asks what follows'),
+        answer: t('fap.next.answer', '{n} questions wait for you, a stage at a time').replace('{n}', String(open)),
+        raise: t('fap.next.raise', 'nothing waits in this stage: go on asks the next one'),
+        done: t('fap.next.done', 'the interview is done: nothing waits'),
+        begin: t('fap.next.begin', 'not begun'),
+      }[iv.next] || '';
+      if (next) h += '<p class="fab-say">' + cosmEsc(next) + '</p>';
+      const reading = Array.isArray(iv.reading) ? iv.reading.length : 0;
+      if (reading) {
+        h += '<p class="thym-note">' + cosmEsc(t('fap.next.reading', '{n} answers wait for a model to read their items again: answer again with a plain yes, or go on with a model')
+          .replace('{n}', String(reading))) + '</p>';
+      }
+      const shown = Array.isArray(iv.shown) ? iv.shown.filter(cosmIsMap) : [];
+      if (shown.length) {
+        h += '<div class="fap-qs">' + shown.map((q) => {
+          const id = String(q.id || '');
+          const inp = 'fap-q-' + id.replace(/[^A-Za-z0-9_-]/g, '-');
+          let x = '<div class="fap-q"><label class="fap-q-asks" for="' + inp + '">' + cosmEsc(String(q.asks || id)) + '</label>';
+          if (q.hint) x += '<p class="thym-meta">' + cosmEsc(String(q.hint)) + '</p>';
+          if (FAP_SIMPLE.has(String(q.kind || 'text'))) {
+            x += '<textarea id="' + inp + '" class="fap-text" rows="2" data-fap-q="' + cosmEsc(id) + '"' + (arun ? ' disabled' : '') + '>'
+              + cosmEsc(FA.answers[id] || '') + '</textarea>';
+          } else {
+            x += '<p class="thym-meta">' + cosmEsc(t('fap.q.card', 'this one is answered in the questions card')) + '</p>';
+          }
+          return x + '</div>';
+        }).join('') + '</div>';
+      }
+      const typed = shown.some((q) => FAP_SIMPLE.has(String(q.kind || 'text')) && String(FA.answers[q.id] || '').trim());
+      h += '<div class="fab-row">';
+      if (shown.length) {
+        h += '<button type="button" data-fap="answer"' + (!typed || arun || FA.sending ? ' disabled' : '') + '>'
+          + cosmEsc(t('fap.q.send', 'send these answers')) + '</button>';
+      }
+      if (open || reading) h += '<button type="button" data-fap="questions">' + cosmEsc(t('fap.q.all', 'every question, in the questions card…')) + '</button>';
+      if (iv.next === 'settle' || iv.next === 'raise') {
+        h += '<button type="button" data-fap="go-on"' + (arun ? ' disabled' : '') + '>' + cosmEsc(t('fap.goOn', 'go on')) + '</button>';
+      }
+      h += '</div>';
+      if (arun) h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.asnap)) + '</span></p>';
+      else if (FA.aresult && FA.aresult.message) h += '<p class="thym-fits">' + cosmEsc(String(FA.aresult.message)) + '</p>';
+      if (FA.aerror) h += '<p class="thym-refusal">' + cosmEsc(FA.aerror) + '</p>';
+      if (FA.aerrorQ) h += '<p class="thym-refusal">' + cosmEsc(FA.aerrorQ) + '</p>';
+      return h;
+    }
+
+    // Add an item in the person's words, and check.
+    function fapAddHTML() {
+      let h = '<div class="thym-sec-h dict-sc" id="fap-add-h">' + cosmEsc(t('fap.add.head', 'add to it, in your words')) + '</div>'
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-author"></span>';
+      h += '<div class="fab-route fap-as" role="radiogroup" aria-labelledby="fap-add-h">' + FAP_ADD.map((a) => '<label class="fab-rt"><input type="radio" name="fap-as" value="' + a + '"'
+        + (FA.addAs === a ? ' checked' : '') + '><span>' + cosmEsc(fapAddName(a)) + '</span></label>').join('') + '</div>';
+      h += '<textarea id="fap-says" class="fap-text" rows="2" aria-labelledby="fap-add-h" placeholder="' + cosmEsc(t('fap.add.says', 'one sentence, as you would say it')) + '">'
+        + cosmEsc(FA.addSays) + '</textarea>';
+      if (FA.addAs === 'case') {
+        h += '<div class="fap-case"><label for="fap-given">' + cosmEsc(t('fap.add.given', 'given')) + '</label>'
+          + '<textarea id="fap-given" class="fap-text fap-mono" rows="2" placeholder="{&quot;calls&quot;: &quot;C:interface/…&quot;, &quot;arguments&quot;: {}}">' + cosmEsc(FA.addGiven) + '</textarea>'
+          + '<label for="fap-expect">' + cosmEsc(t('fap.add.expect', 'expect')) + '</label>'
+          + '<textarea id="fap-expect" class="fap-text fap-mono" rows="2" placeholder="{&quot;value&quot;: 3}">' + cosmEsc(FA.addExpect) + '</textarea></div>'
+          + '<p class="thym-meta">' + cosmEsc(t('fap.add.caseNote', 'given and expect as data become a test, written by rules; in words, the case stays prose; left empty, the interview asks')) + '</p>';
+      }
+      h += '<div class="fab-row"><button type="button" data-fap="add"' + (FA.adding || !FA.addSays.trim() ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.add.go', 'add')) + '</button><button type="button" data-fap="check"' + (FA.checking ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.check.go', 'check it')) + '</button></div>';
+      if (FA.added) h += '<p class="thym-fits">' + cosmEsc(String(FA.added)) + '</p>';
+      if (FA.addError) h += '<p class="thym-refusal">' + cosmEsc(FA.addError) + '</p>';
+      const c = FA.check;
+      if (c && c.error) h += '<p class="thym-refusal">' + cosmEsc(c.error) + '</p>';
+      else if (c) {
+        const list = (xs) => '<ul class="fap-list">' + xs.map((x) => '<li>' + cosmEsc(typeof x === 'string' ? x : JSON.stringify(x)) + '</li>').join('') + '</ul>';
+        const errs = Array.isArray(c.errors) ? c.errors : [], warns = Array.isArray(c.warnings) ? c.warnings : [];
+        const unc = Array.isArray(c.uncovered) ? c.uncovered : [], src = Array.isArray(c.source) ? c.source : [];
+        h += '<p class="' + (c.ok && !src.length ? 'thym-fits' : 'thym-refusal') + '">' + cosmEsc(c.ok && !src.length
+          ? t('fap.check.ok', 'its checks pass') : t('fap.check.bad', 'its checks found what must change before it is entailed')) + '</p>';
+        if (errs.length) h += list(errs);
+        if (src.length) h += list(src);
+        if (warns.length) h += '<p class="thym-meta">' + cosmEsc(t('fap.check.warnings', 'warnings:')) + '</p>' + list(warns);
+        if (unc.length) h += '<p class="thym-note">' + cosmEsc(t('fap.check.uncovered', 'requirements no case shows yet: {list}').replace('{list}', () => unc.join(', '))) + '</p>';
+      }
+      return h;
+    }
+
+    // A head names fabulacs as parts of one program and states the interfaces between them once.
+    function fapHeadHTML() {
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.head.head', 'a head and its parts')) + '</div>';
+      const pm = FA.parts;
+      if (pm) {
+        const moved = new Set(Array.isArray(pm.moved) ? pm.moved : []);
+        h += '<ul class="fab-made-list fap-parts">' + pm.parts.filter(cosmIsMap).map((p) => {
+          const word = moved.has(p.uri) ? t('fap.head.moved', 'moved since the head last read it') : t('fap.head.inStep', 'in step with the head');
+          return '<li><span class="fab-made-name">' + cosmEsc(String(p.path || p.uri || '')) + '</span><span class="fab-made-meta">'
+            + cosmEsc(String(p.uri || '') + ' · ' + word) + '</span></li>';
+        }).join('') + '</ul>';
+        return h;
+      }
+      h += '<p class="thym-meta">' + cosmEsc(t('fap.head.what', 'a head names fabulacs as the parts of one program, and states the interfaces between them once')) + '</p>'
+        + fapField('fap-head-name', t('fap.head.name', 'the head’s name'), FA.headName, { placeholder: 'suite' })
+        + fapField('fap-head-parts', t('fap.head.parts', 'its other parts'), FA.headParts, { placeholder: 'counter-core, counter-cli' })
+        + '<div class="fab-row"><button type="button" data-fap="head"' + (!FA.headName.trim() ? ' disabled' : '') + '>'
+        + cosmEsc(t('fap.head.go', 'make a head over this and them')) + '</button></div>';
+      if (FA.head) h += '<p class="thym-fits">' + cosmEsc(t('fap.head.made', 'wrote {head}, over {parts}').replace('{head}', () => String(FA.head.head || ''))
+        .replace('{parts}', () => (FA.head.parts || []).join(', '))) + '</p>';
+      if (FA.headError) h += '<p class="thym-refusal">' + cosmEsc(FA.headError) + '</p>';
+      return h;
+    }
+
+    // Entail it: the folder beside it, what moved, and each hand edit's three choices.
+    function fapEntailHTML(st, erun) {
+      const ent = cosmIsMap(st.entailment) ? st.entailment : null;
+      const folder = ent && ent.folder ? String(ent.folder) : (String(st.name || fapName().replace(/\.fabulac\.cosm$/i, '')) + '/');
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.entail.head', 'entail it')) + '</div>';
+      h += '<p class="thym-note">' + cosmEsc(t('fap.entail.rule', 'its entailment is the folder {folder} beside it. Only the entailment of a fabulac you authored runs, and only in the sandbox; a cshort of code you did not author is read, never run.')
+        .replace('{folder}', () => folder)) + '</p>';
+      const files = ent && Array.isArray(ent.files) ? ent.files.filter(cosmIsMap) : [];
+      const edited = files.filter((f) => f.state === 'edited by hand');
+      if (!ent || !ent.entailed) {
+        h += '<p class="fab-say">' + cosmEsc(t('fap.entail.none', 'not entailed yet')) + '</p>';
+      } else {
+        const n = (k) => (Array.isArray(ent[k]) ? ent[k].length : 0);
+        const bits = [];
+        if (n('moved')) bits.push(t('fap.entail.nMoved', '{n} moved').replace('{n}', String(n('moved'))));
+        if (n('edited')) bits.push(t('fap.entail.nEdited', '{n} changed by hand').replace('{n}', String(n('edited'))));
+        if (n('gone')) bits.push(t('fap.entail.nGone', '{n} gone').replace('{n}', String(n('gone'))));
+        if (n('new')) bits.push(t('fap.entail.nNew', '{n} new').replace('{n}', String(n('new'))));
+        if (n('kept')) bits.push(t('fap.entail.nKept', '{n} kept').replace('{n}', String(n('kept'))));
+        h += '<p class="fab-say">' + cosmEsc(bits.length ? t('fap.entail.since', 'since the last entailing: {what}').replace('{what}', () => bits.join(', '))
+          : t('fap.entail.inStep', 'in step: every file is as the last entailing wrote it')) + '</p>';
+        const base = (fapDir(FA.path) ? fapDir(FA.path) + '/' : '') + folder.replace(/\/?$/, '/');
+        const row = (f) => {
+          const p = String(f.path || '');
+          let x = '<li class="fap-file st-' + cosmEsc(String(f.state || '').replace(/\s+/g, '-')) + '"><span class="fab-made-name">' + cosmEsc(p) + '</span>'
+            + '<button type="button" data-fap="file" data-fap-path="' + cosmEsc(base + p) + '"' + (f.state === 'gone' ? ' disabled' : '') + '>'
+            + cosmEsc(t('canon.job.open', 'open')) + '</button>'
+            + '<span class="fab-made-meta">' + cosmEsc(fapFileWord(f.state)) + '</span>';
+          if (f.state === 'edited by hand') {
+            const busy = FA.fileBusy === p || erun;
+            x += '<span class="fap-choices"><label class="fap-over"><input type="checkbox" data-fap-over="' + cosmEsc(p) + '"' + (FA.overwrite.has(p) ? ' checked' : '') + '>'
+              + cosmEsc(t('fap.edit.over', 'write over it')) + '</label>'
+              + '<button type="button" data-fap="keep" data-fap-path="' + cosmEsc(p) + '"' + (busy ? ' disabled' : '') + '>' + cosmEsc(t('fap.edit.keep', 'keep it')) + '</button>'
+              + '<button type="button" data-fap="take-back" data-fap-path="' + cosmEsc(p) + '"' + (busy ? ' disabled' : '') + '>' + cosmEsc(t('fap.edit.back', 'take it back')) + '</button></span>';
+          } else if (f.state === 'kept') {
+            x += '<span class="fap-choices"><button type="button" data-fap="let-go" data-fap-path="' + cosmEsc(p) + '"' + (FA.fileBusy === p ? ' disabled' : '') + '>'
+              + cosmEsc(t('fap.edit.letGo', 'let it go')) + '</button></span>';
+          }
+          return x + '</li>';
+        };
+        const odd = files.filter((f) => f.state !== 'in step'), even = files.filter((f) => f.state === 'in step');
+        if (odd.length) h += '<ul class="fab-made-list fap-files">' + odd.map(row).join('') + '</ul>';
+        if (edited.length) {
+          h += '<p class="thym-note">' + cosmEsc(t('fap.edit.choices', 'a file changed by hand stops the next entailing until you choose: write over it, keep it (a recorded decision; it is never written again until you let it go), or take it back into the fabulac (a model reads it, and you answer what it proposes)')) + '</p>';
+        }
+        if (even.length) {
+          h += '<details class="fap-instep"><summary>' + cosmEsc(t('fap.entail.files', '{n} files in step').replace('{n}', String(even.length))) + '</summary>'
+            + '<ul class="fab-made-list fap-files">' + even.map(row).join('') + '</ul></details>';
+        }
+      }
+      if (FA.fileNote) h += '<p class="thym-fits">' + cosmEsc(FA.fileNote) + '</p>';
+      if (FA.fileError) h += '<p class="thym-refusal">' + cosmEsc(FA.fileError) + '</p>';
+      const blocked = edited.some((f) => !FA.overwrite.has(String(f.path)));
+      h += '<div class="fab-row"><button type="button" data-fap="entail"' + (erun || blocked ? ' disabled' : '') + '>'
+        + cosmEsc(ent && ent.entailed ? t('fap.entail.again', 'entail again') : t('fap.entail.go', 'entail')) + '</button></div>';
+      if (ent && ent.entailed) h += '<p class="thym-meta">' + cosmEsc(t('fap.entail.againWhy', 'entailing again asks a model only for the files whose part of the fabulac moved')) + '</p>';
+      if (blocked) h += '<p class="thym-meta">' + cosmEsc(t('fap.entail.blocked', 'choose for each file changed by hand first')) + '</p>';
+      if (erun) h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(FA.esnap)) + '</span></p>';
+      else if (FA.eresult && FA.eresult.message) h += '<p class="thym-fits">' + cosmEsc(String(FA.eresult.message)) + '</p>';
+      if (FA.eerror) h += '<p class="thym-refusal">' + cosmEsc(FA.eerror) + '</p>';
+      return h;
+    }
+
+    // Test and run it in the sandbox; Stop; the output, capped; what the box promised.
+    function fapRunHTML(st, rrun) {
+      const prog = cosmIsMap(st.program) ? st.program : {};
+      let h = '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fap.run.head', 'test and run it in the sandbox')) + '</div>'
+        + '<span class="mode-help-anchor fap-help" data-help="fabulac-run"></span>';
+      h += '<p class="thym-note">' + cosmEsc(t('fap.box.line', 'the sandbox runs a copy of the entailment with no network and Python’s standard library only; it writes only in its own folder, and its time, output and disk are limited. On macOS it does not limit memory, and promises nothing about it.')) + '</p>';
+      h += '<div class="fab-row"><button type="button" data-fap="test"' + (rrun ? ' disabled' : '') + '>' + cosmEsc(t('fap.run.test', 'run its tests')) + '</button>';
+      if (rrun) h += '<button type="button" data-fap="stop" class="fap-stop">' + cosmEsc(t('fap.run.stop', 'stop')) + '</button>';
+      h += '</div>';
+      if (prog.kind === 'tool') {
+        h += fapField('fap-args', t('fap.run.args', 'its arguments'), FA.args, { placeholder: 'count notes.md' })
+          + fapField('fap-hand', t('fap.run.hand', 'files handed over'), FA.hand, { placeholder: 'notes.md' })
+          + '<p class="thym-meta">' + cosmEsc(t('fap.run.handWhy', 'paths from the project’s top folder, separated by commas; each goes in as a read-only copy, and an argument naming one reaches that copy')) + '</p>'
+          + '<details class="fap-stdin"' + (FA.stdin ? ' open' : '') + '><summary>' + cosmEsc(t('fap.run.stdin', 'its input')) + '</summary>'
+          + '<textarea id="fap-stdin" class="fap-text fap-mono" rows="3" aria-label="' + cosmEsc(t('fap.run.stdin', 'its input')) + '">' + cosmEsc(FA.stdin) + '</textarea></details>'
+          + '<div class="fab-row"><button type="button" data-fap="run"' + (rrun ? ' disabled' : '') + '>' + cosmEsc(t('fap.run.go', 'run it')) + '</button></div>';
+      }
+      if (rrun) {
+        h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fapProgressText(Object.assign({ kind: 'sandbox', what: FA.rwhat }, FA.rsnap || {}))) + '</span></p>';
+      }
+      if (FA.rerror) h += '<p class="thym-refusal">' + cosmEsc(FA.rerror) + '</p>';
+      const res = FA.rresult || (!rrun && !FA.rerror && cosmIsMap(st.last_run) ? st.last_run : null);
+      if (res && !rrun) h += fapResultHTML(res, !FA.rresult);
+      return h;
+    }
+
+    function fapStream(label, text, cut) {
+      const s = String(text || '');
+      if (!s) return '';
+      const shown = s.length > FAP_OUT_MAX ? s.slice(0, FAP_OUT_MAX) : s;
+      let h = '<div class="fap-out-h">' + cosmEsc(label) + '</div><pre class="fap-out" tabindex="0">' + cosmEsc(shown) + '</pre>';
+      if (s.length > FAP_OUT_MAX) h += '<p class="thym-meta">' + cosmEsc(t('fap.out.capped', 'the first {n} characters are shown here').replace('{n}', FAP_OUT_MAX.toLocaleString(I18N.lang))) + '</p>';
+      if (cut) h += '<p class="thym-meta">' + cosmEsc(t('fap.out.truncated', 'the sandbox kept only the first part of this stream: a run past its output limit is stopped')) + '</p>';
+      return h;
+    }
+
+    function fapResultHTML(r, last) {
+      const ok = !!r.ok;
+      let h = '<div class="fap-result">';
+      if (last) h += '<p class="thym-meta">' + cosmEsc(t('fap.run.last', 'the last run')) + '</p>';
+      h += '<p class="' + (ok ? 'thym-fits' : 'thym-refusal') + ' fap-said">' + cosmEsc(String(r.message || '')) + '</p>';
+      const bits = [];
+      if (r.what === 'tests' && r.ran != null) bits.push(t('fap.run.ran', '{n} tests ran').replace('{n}', String(r.ran)));
+      if (r.exit_code != null) bits.push(t('fap.run.exit', 'exit {code}').replace('{code}', String(r.exit_code)));
+      if (r.wall_time != null) bits.push(t('fap.run.time', '{s} seconds').replace('{s}', Number(r.wall_time).toLocaleString(I18N.lang, { maximumFractionDigits: 2 })));
+      if (bits.length) h += '<p class="thym-meta">' + cosmEsc(bits.join(' · ')) + '</p>';
+      h += '<p class="' + (r.enforced ? 'thym-meta' : 'thym-refusal') + ' fap-held">' + cosmEsc(r.enforced
+        ? t('fap.box.held', 'the box held this run')
+        : t('fap.box.notHeld', 'the box did not hold this run: nothing it promises was enforced')) + '</p>';
+      h += fapStream(t('fap.out.stdout', 'its output'), r.stdout, r.stdout_truncated);
+      h += fapStream(t('fap.out.stderr', 'its error output'), r.stderr, r.stderr_truncated);
+      const refused = Array.isArray(r.refused) ? r.refused : [];
+      if (refused.length) h += '<p class="thym-meta">' + cosmEsc(t('fap.box.refused', 'what the box refused:')) + '</p><ul class="fap-list">'
+        + refused.map((x) => '<li>' + cosmEsc(String(x)) + '</li>').join('') + '</ul>';
+      const g = cosmIsMap(r.guarantees) ? r.guarantees : null;
+      if (g) {
+        const words = {
+          network: t('fap.box.network', 'network'), writes: t('fap.box.writes', 'writes'), reads: t('fap.box.reads', 'reads'),
+          processes: t('fap.box.processes', 'processes'), memory: t('fap.box.memory', 'memory'), time: t('fap.box.time', 'time'),
+          output: t('fap.box.output', 'output'), disk: t('fap.box.disk', 'disk'), packages: t('fap.box.packages', 'packages'),
+        };
+        h += '<details class="fap-guar"><summary>' + cosmEsc(t('fap.box.promised', 'what the box promised for this run, and what not')) + '</summary><dl>'
+          + Object.keys(g).map((k) => '<dt>' + cosmEsc(words[k] || k) + '</dt><dd>' + cosmEsc(String(g[k])) + '</dd>').join('')
+          + '</dl><p class="thym-meta">' + cosmEsc(t('fap.box.mechanism', 'held by {mechanism}').replace('{mechanism}', () => String(r.mechanism || '?'))) + '</p></details>';
+      }
+      return h + '</div>';
+    }
+
+    // ---- acting ----
+    async function fapBeginGo() {
+      if (!fapBeginValid() || fapRunning('a')) return;
+      const name = FA.name.trim();
+      const body = { path: (FA.where ? FA.where + '/' : '') + name, kind: FA.kind };
+      if (FA.licence.trim()) body.licence = FA.licence.trim();
+      if (FA.by.trim()) body.by = FA.by.trim();
+      if (FA.way === 'starter') body.starter = FA.kind;
+      else {
+        fabRouteBody('fap', body);
+        if (FA.way === 'brief') body.brief = FA.brief.trim();
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { ajob: 'pending', asnap: null, aresult: null, aerror: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/begin', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.ajob = null; FA.aerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      if (r.data.job) {
+        FA.ajob = r.data.job.id;
+        FA.asnap = r.data.job;
+        canonTrack(r.data.job, { want: 'fabulac-first', label: name + '.fabulac.cosm', writes: true });
+        fabCardPaint();
+        return;
+      }
+      // From a starter: at once, not a job.
+      const res = r.data;
+      fapAfterWrite({ result: res });
+      await fapOpen(res.fabulac || body.path + '.fabulac.cosm');
+      FA.aresult = res;
+      fabCardPaint();
+    }
+
+    async function fapAuthorGo() {
+      if (fapRunning('a') || !FA.path) return;
+      const body = fabRouteBody('fap', { path: FA.path });
+      const seq = FAB.seq;
+      Object.assign(FA, { ajob: 'pending', asnap: null, aresult: null, aerror: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/begin', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { FA.ajob = null; FA.aerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.ajob = null;
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    async function fapAnswerGo() {
+      const st = FA.status, iv = st && cosmIsMap(st.interview) ? st.interview : {};
+      const answers = (Array.isArray(iv.shown) ? iv.shown : []).filter((q) => q && FAP_SIMPLE.has(String(q.kind || 'text')))
+        .map((q) => ({ question: q.id, says: String(FA.answers[q.id] || '').trim() })).filter((a) => a.says);
+      if (!answers.length || FA.sending) return;
+      const seq = FAB.seq;
+      Object.assign(FA, { sending: true, aerrorQ: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/answer', { path: FA.path, answers });
+      if (seq !== FAB.seq) return;
+      FA.sending = false;
+      if (!r.ok) { FA.aerrorQ = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      const refused = r.data && Array.isArray(r.data.refused) ? r.data.refused : [];
+      answers.forEach((a) => { if (!refused.some((x) => cosmIsMap(x) && x.question === a.question)) delete FA.answers[a.question]; });
+      if (refused.length) FA.aerrorQ = refused.map((x) => (cosmIsMap(x) ? (x.why || x.message || x.question) : String(x))).join(' · ');
+      // Settled and the next stage raised by the authoring job, as "go on" does.
+      await fapAuthorGo();
+    }
+
+    async function fapAddGo() {
+      const says = FA.addSays.trim();
+      if (!says || FA.adding) return;
+      const body = { path: FA.path, as: FA.addAs, says };
+      if (FA.addAs === 'case') {
+        const fields = {};
+        const data = (s) => { const x = s.trim(); if (!x) return undefined; if (x[0] === '{') { try { return JSON.parse(x); } catch (_e) { /* words */ } } return x; };
+        const g = data(FA.addGiven), e = data(FA.addExpect);
+        if (g !== undefined) fields.given = g;
+        if (e !== undefined) fields.expect = e;
+        if (Object.keys(fields).length) body.fields = fields;
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { adding: true, added: null, addError: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/add', body);
+      if (seq !== FAB.seq) return;
+      FA.adding = false;
+      if (!r.ok || !r.data) { FA.addError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      Object.assign(FA, { added: String(r.data.message || r.data.added || ''), addSays: '', addGiven: '', addExpect: '', check: null });
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fapReload();
+    }
+
+    async function fapCheckGo() {
+      if (FA.checking) return;
+      const seq = FAB.seq;
+      FA.checking = true;
+      fabCardPaint();
+      const r = await canonJSON('/api/fabulac/check?path=' + encodeURIComponent(FA.path));
+      if (seq !== FAB.seq) return;
+      FA.checking = false;
+      FA.check = r.ok && r.data ? r.data : { error: r.error || t('canon.job.failed', 'that did not work') };
+      fabCardPaint();
+    }
+
+    async function fapEntailGo() {
+      if (fapRunning('e')) return;
+      const body = fabRouteBody('fap', { path: FA.path });
+      if (FA.overwrite.size) body.overwrite = Array.from(FA.overwrite);
+      const seq = FAB.seq;
+      Object.assign(FA, { ejob: 'pending', esnap: null, eresult: null, eerror: null, fileNote: null, fileError: null });
+      fabCardPaint();
+      const r = await fapPost('/api/fabulac/entail', body);
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data || !r.data.job) { FA.ejob = null; FA.eerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.ejob = null;
+      FA.overwrite.clear();
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    async function fapFileGo(what, file) {
+      if (!file || FA.fileBusy) return;
+      const seq = FAB.seq;
+      Object.assign(FA, { fileBusy: file, fileNote: null, fileError: null });
+      fabCardPaint();
+      if (what === 'take-back') {
+        const r = await fapPost('/api/fabulac/take-back', fabRouteBody('fap', { path: FA.path, file }));
+        if (seq !== FAB.seq) return;
+        FA.fileBusy = null;
+        if (!r.ok || !r.data || !r.data.job) { FA.fileError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+        fapFollow(r.data.job, fapName());
+        fabCardPaint();
+        return;
+      }
+      const url = what === 'keep' ? '/api/fabulac/keep' : '/api/fabulac/let-go';
+      const r = await fapPost(url, { path: FA.path, files: [file] });
+      if (seq !== FAB.seq) return;
+      FA.fileBusy = null;
+      if (!r.ok || !r.data) { FA.fileError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.overwrite.delete(file);
+      FA.fileNote = String(r.data.message || '');
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fapReload();
+    }
+
+    function fapArgs(s) {
+      const out = [];
+      const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
+      let m;
+      while ((m = re.exec(String(s || '')))) out.push(m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3]));
+      return out;
+    }
+
+    async function fapRunGo(what) {
+      if (fapRunning('r')) return;
+      const body = { path: FA.path };
+      if (what === 'tool') {
+        body.args = fapArgs(FA.args);
+        const hand = FA.hand.split(',').map((x) => x.trim()).filter(Boolean);
+        if (hand.length) body.hand_over = hand;
+        if (FA.stdin) body.stdin = FA.stdin;
+      }
+      const seq = FAB.seq;
+      Object.assign(FA, { rjob: 'pending', rsnap: null, rresult: null, rerror: null, rwhat: what === 'tool' ? 'tool' : 'tests' });
+      fabCardPaint();
+      const r = await fapPost(what === 'tool' ? '/api/fabulac/run' : '/api/fabulac/test', body);
+      if (seq !== FAB.seq) return;
+      // A service, a library run as a tool, a fabulac not entailed: refused before anything is copied, in the server's words.
+      if (!r.ok || !r.data || !r.data.job) { FA.rjob = null; FA.rerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.rjob = null;
+      fapFollow(r.data.job, fapName());
+      fabCardPaint();
+    }
+
+    // Stop: what of it is running (a sandbox run, a job), through its own route.
+    async function fapStopGo() {
+      if (!FA.path) return;
+      const r = await fapPost('/api/fabulac/stop', { path: FA.path });
+      if (r.ok && r.data && Array.isArray(r.data.stopped)) r.data.stopped.forEach((s) => canonOnSnap(s));
+      else if (!r.ok && FAB.open && r.status !== 409) { FA.rerror = r.error; fabCardPaint(); }
+    }
+
+    async function fapHeadGo() {
+      const name = FA.headName.trim();
+      if (!name) return;
+      const dir = fapDir(FA.path);
+      const at = (p) => (p.indexOf('/') < 0 && dir ? dir + '/' + p : p);
+      const parts = [FA.path].concat(FA.headParts.split(',').map((x) => x.trim()).filter(Boolean).map(at));
+      const seq = FAB.seq;
+      Object.assign(FA, { head: null, headError: null });
+      const r = await fapPost('/api/fabulac/head', { path: at(name), parts });
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FA.headError = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      FA.head = r.data;
+      fapAfterWrite({ result: { fabulac: FA.path } });
+      fabCardPaint();
+    }
+
+    // Every snapshot of a job the card follows (canonApply, `want: 'fabulac-first'`).
+    function fapJobOnSnap(e, snap) {
+      if (!FAB.open || (FAB.face !== 'authored' && FAB.face !== 'begin')) return;
+      const s = ['a', 'e', 'r'].find((k) => FA[k + 'job'] === e.id);
+      if (!s) return;
+      FA[s + 'snap'] = snap;
+      if (CANON_TERMINAL.has(snap.state)) {
+        const done = snap.state === 'done';
+        FA[s + 'job'] = null;
+        FA[s + 'result'] = done ? (snap.result || {}) : null;
+        FA[s + 'error'] = done ? null : (snap.state === 'cancelled' ? t('fap.job.stopped', 'stopped')
+          : (snap.message || snap.error || t('canon.job.failed', 'that did not work')));
+        if (FAB.face === 'begin') {
+          const fab = done && snap.result && snap.result.fabulac;
+          if (fab) { const res = snap.result; void fapOpen(fab).then(() => { FA.aresult = res; fabCardPaint(); }); return; }
+          fabCardPaint();
+          return;
+        }
+        fapReload();
+      }
+      fabCardPaint();
+    }
+
+    // A finished job of an authored fabulac, as a toast when the card is not showing it.
+    function fapToast(e, snap, id, dismiss) {
+      if (FAB.open && fapShowing(e.id)) { convertToastClose(id); return; }
+      const icon = 'cosm';
+      if (!CANON_TERMINAL.has(snap.state)) {
+        convertToast(id, { state: 'running', icon, square: true, title: e.label, message: fapProgressText(Object.assign({ kind: e.kind }, snap)),
+          progress: null, actions: [{ label: t('canon.job.cancel', 'cancel'), run: () => { void canonCancel(e.id); } }] });
+        return;
+      }
+      const res = snap.result || {};
+      const fab = res.fabulac || e.path;
+      const open = { label: t('canon.job.open', 'open'), run: () => { convertToastClose(id); void fapOpen(fab, e.kind === 'sandbox' ? 'run' : null); } };
+      if (snap.state === 'done') {
+        const ok = e.kind !== 'sandbox' || !!res.ok;
+        convertToast(id, { state: ok ? 'done' : 'failed', icon, square: true, title: e.label,
+          message: String(res.message || t('fap.job.done', 'done')), actions: fab ? [open, dismiss] : [dismiss], ttl: 15000 });
+        return;
+      }
+      convertToast(id, { state: 'failed', icon, square: true, title: e.label,
+        message: snap.state === 'cancelled' ? t('fap.job.stopped', 'stopped') : (snap.message || snap.error || t('canon.job.failed', 'that did not work')),
+        ttl: 15000, actions: [dismiss] });
+    }
+
+    // A fabulac or its entailment was written: the tree, Canon and an open viewer catch up.
+    function fapAfterWrite(snap) {
+      const res = (snap && snap.result) || {};
+      if (document.getElementById('canon-mode')?.classList.contains('open')) cnLoadTree();
+      if (!IS_HOME) htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      const fab = res.fabulac || (snap && snap.path);
+      if (fab && COSM.path && canonSame(COSM.path, fab) && cosmEl('cosm-mode').classList.contains('open')) cosmLoad(COSM.path);
+    }
+
+    // -- its controls --
+    fabEl('fab-body').addEventListener('change', (e) => {
+      if (FAB.face !== 'begin' && FAB.face !== 'authored') return;
+      if (fabRouteOnEvent(e, 'fap', () => fabCardPaint())) return;
+      const n = e.target.name;
+      if (n === 'fap-kind' && FAP_KINDS.includes(e.target.value)) { FA.kind = e.target.value; fabCardPaint(); return; }
+      if (n === 'fap-way') { FA.way = e.target.value; fabCardPaint(); return; }
+      if (n === 'fap-as' && FAP_ADD.includes(e.target.value)) { FA.addAs = e.target.value; fabCardPaint(); return; }
+      if (e.target.dataset && e.target.dataset.fapOver) {
+        if (e.target.checked) FA.overwrite.add(e.target.dataset.fapOver); else FA.overwrite.delete(e.target.dataset.fapOver);
+        fabCardPaint();
+      }
+    });
+    fabEl('fab-body').addEventListener('input', (e) => {
+      if (FAB.face !== 'begin' && FAB.face !== 'authored') return;
+      const el = e.target;
+      const map = { 'fap-name': 'name', 'fap-brief': 'brief', 'fap-licence': 'licence', 'fap-by': 'by', 'fap-says': 'addSays',
+        'fap-given': 'addGiven', 'fap-expect': 'addExpect', 'fap-head-name': 'headName', 'fap-head-parts': 'headParts',
+        'fap-args': 'args', 'fap-hand': 'hand', 'fap-stdin': 'stdin' };
+      if (map[el.id]) FA[map[el.id]] = el.value;
+      else if (el.dataset && el.dataset.fapQ) FA.answers[el.dataset.fapQ] = el.value;
+      else return;
+      // Only what a keystroke changes: the begin button, the line of what it writes, add, send, head.
+      if (FAB.face === 'begin') {
+        fabEl('fab-go').disabled = fapRunning('a') || !fapBeginValid();
+        const w = fabEl('fap-writes');
+        if (w) {
+          const nm = FA.name.trim() || '…';
+          w.textContent = t('fap.begin.writes', 'writes {fabulac}; entailing it writes the folder {folder} beside it')
+            .replace('{fabulac}', () => (FA.where ? FA.where + '/' : '') + nm + '.fabulac.cosm').replace('{folder}', () => nm + '/');
+        }
+        return;
+      }
+      const set = (sel, off) => { const b = fabEl('fab-body').querySelector(sel); if (b) b.disabled = off; };
+      set('button[data-fap="add"]', FA.adding || !FA.addSays.trim());
+      set('button[data-fap="head"]', !FA.headName.trim());
+      const iv = FA.status && cosmIsMap(FA.status.interview) ? FA.status.interview : {};
+      set('button[data-fap="answer"]', FA.sending || fapRunning('a') || !(iv.shown || []).some((q) => q && String(FA.answers[q.id] || '').trim()));
+    });
+    fabEl('fab-body').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-fap]');
+      if (!b || b.disabled) return;
+      const p = b.dataset.fapPath;
+      switch (b.dataset.fap) {
+        case 'answer': void fapAnswerGo(); break;
+        case 'go-on': void fapAuthorGo(); break;
+        case 'questions': { const f = FA.path; fabCardClose(); if (window.__dlgReady) void dlgOpen(f); break; }
+        case 'add': void fapAddGo(); break;
+        case 'check': void fapCheckGo(); break;
+        case 'head': void fapHeadGo(); break;
+        case 'entail': void fapEntailGo(); break;
+        case 'keep': case 'let-go': case 'take-back': void fapFileGo(b.dataset.fap, p); break;
+        case 'file': fabCardClose(); openReadEdit(p, { size: 'full', face: 'read' }); break;
+        case 'test': void fapRunGo('tests'); break;
+        case 'run': void fapRunGo('tool'); break;
+        case 'stop': void fapStopGo(); break;
+        default: break;
+      }
+    });
+    window.fapOnSnap = fapJobOnSnap;
+
     // ---- the cosm viewer's rail: who made a fabula; a fabulac's licence ----
     function fabMadeHTML(cat) {
       const d = cosmIsMap(cat.derived) ? cat.derived : null;
@@ -40033,6 +41669,13 @@
       }
       const src = cosmIsMap(cat.source) ? cat.source : null;
       const lic = src ? src.licence : undefined;
+      // 0.8 (W4-FP): an authored fabulac's licence is the one its author offers it under.
+      if (src && src.kind === 'authored') {
+        h += '<div class="fab-licence' + (typeof lic === 'string' && lic ? '' : ' pending') + '">' + cosmEsc(typeof lic === 'string' && lic
+          ? t('fap.licence', 'offered under {licence}').replace('{licence}', () => lic)
+          : t('fap.licence.pending', 'no licence given yet: the interview asks for one')) + '</div>';
+        return h;
+      }
       if (cosmIsMap(lic) && lic.pending !== undefined) {
         h += '<div class="fab-licence pending">' + cosmEsc(t('fab.licence.pending', 'no licence was found in the source, so none is recorded: {why}')
           .replace('{why}', () => String(lic.pending || ''))) + '</div>';
@@ -40043,20 +41686,33 @@
     }
 
     // ---- menus and the tree ----
-    function fabMenuItems(path, isDir, holotype) {
+    function fabMenuItems(path, isDir, holotype, target) {
       if (IS_HOME || !path) return '';
       const p = String(path);
       const item = (act, label) => '<button type="button" class="ctx-item" data-act="' + act + '">' + escapeHtml(label) + '</button>';
       if (isDir) {
         if (FAB_CSHORT_RE.test(p)) return item('fab-view', t('fab.menu.cshort', 'read the cshort'));
         if (holotype || /^rness(\/|$)/.test(p) || /\.thym$/i.test(p)) return '';
-        return item('fab-build', t('fab.menu.build', 'build its fabulac…'));
+        // 0.8 (W4-FP, the twin guard): a folder whose fabulac is authored is
+        // that fabulac's entailment: it is entailed again and run, never
+        // decompiled into a fabulac of its own.
+        if (target && target.fabTwin) {
+          return item('fap-entail', t('fap.menu.entail', 'entail again…')) + item('fap-run', t('fap.menu.run', 'test and run…'))
+            + item('fap-moved', t('fap.menu.moved', 'what moved…'));
+        }
+        return item('fab-build', t('fab.menu.build', 'build its fabulac…')) + item('fap-begin', t('fap.menu.begin', 'begin a fabulac here…'));
       }
+      if (FAB_FABULAC_RE.test(p) && target && target.fabAuthored) return item('fap-open', t('fap.cosm.label', 'entail and run…'));
       if (FAB_FABULAC_RE.test(p)) return item('fab-build', t('fab.cosm.label', 'build and compile…'));
       if (FAB_CATEM_RE.test(p)) return item('fab-view', t('fab.menu.catem', 'read the catem'));
       return '';
     }
     function fabMenuRun(act, path) {
+      const twin = String(path || '').replace(/\/+$/, '') + '.fabulac.cosm';
+      if (act === 'fap-begin') { void fapBeginOpen(path); return true; }
+      if (act === 'fap-open') { void fapOpen(path); return true; }
+      if (act === 'fap-entail' || act === 'fap-moved') { void fapOpen(twin, 'compile'); return true; }
+      if (act === 'fap-run') { void fapOpen(twin, 'run'); return true; }
       if (act === 'fab-build') { void fabFolderOpen(path); return true; }
       if (act === 'fab-view') { void fabViewOpen(path); return true; }
       return false;
@@ -40077,6 +41733,17 @@
         tag.textContent = t('fab.tag.old', 'old twin');
         tag.title = t('fab.tag.old.title', 'an old-named twin, kept as an ordinary file: the twin of {text} is {twin}')
           .replace('{text}', () => canonBase(text)).replace('{twin}', () => canonBase(twin));
+        row.appendChild(tag);
+      });
+      // 0.8 (W4-FP): the folder an authored fabulac entailed.
+      tree.querySelectorAll('li.dir[data-fab-twin]').forEach((li) => {
+        const row = li.querySelector(':scope > .dir-row');
+        if (!row || row.querySelector('.tree-fab-tag')) return;
+        const tag = document.createElement('span');
+        tag.className = 'tree-fab-tag';
+        tag.textContent = t('fap.tag.entailment', 'entailment');
+        tag.title = t('fap.tag.entailment.title', 'the entailment of {fabulac}, a fabulac you authored: it runs only in the sandbox')
+          .replace('{fabulac}', () => canonBase(li.dataset.fabTwin || ''));
         row.appendChild(tag);
       });
       tree.querySelectorAll('li.dir[data-path]').forEach((li) => {
@@ -40906,6 +42573,13 @@
       }
       fabRouteOnEvent(e, 'dlg', () => { dlgSet('dlg-settle', dlgSettleHTML()); });
     });
+    // 0.8: return in the allograph's look-up field looks it up, as its button does.
+    dlgEl('dlg-body').addEventListener('keydown', (e) => {
+      if (DLG.face !== 'allo' || e.key !== 'Enter' || e.isComposing || !e.target || e.target.id !== 'allo-look') return;
+      e.preventDefault();
+      const b = dlgEl('dlg-main').querySelector('button[data-dlg="allo-look"]');
+      if (b && !b.disabled) void dlgAlloAct('allo-look', b);
+    });
     dlgEl('dlg-body').addEventListener('click', (e) => {
       const b = e.target.closest('button[data-dlg]');
       if (!b || b.disabled) return;
@@ -41074,6 +42748,10 @@
         at: { of: '', entry: null, claims: [], as: 'client', epoch: dlgAlloEpochNow(), named: false },
         agent: '',
         search: { needs: [{ about: 'skill', value: '' }], kind: '', plus: false, attested: false, result: null, next: null },
+        // 0.8: every proof the listing holds (the holder's own read), the row whose removal is being asked about,
+        // and a look-up by user name or #tag.
+        held: null, heldAsk: null,
+        look: { q: '', result: null, open: null },
       };
     }
     DLG.allo = null;
@@ -41104,6 +42782,8 @@
       }
       await Promise.all([dlgAlloListing(seq), dlgAlloConnect(seq)]);
       if (seq !== DLG.seq) return;
+      if (A.held == null && dlgAlloHeldWanted()) A.held = await dlgAlloHeldLoad();
+      if (seq !== DLG.seq) return;
       dlgAlloPaint();
       const first = dlgEl('dlg-main').querySelector('input:checked, input, button:not([disabled])');
       if (first) first.focus({ preventScroll: true });
@@ -41128,14 +42808,34 @@
       if (seq !== DLG.seq || A !== DLG.allo) return;
       A.listing = r.ok && r.data ? r.data : { error: dlgAlloErr(r) };
       if (r.ok && r.data && r.data.listed && r.data.tag) {
-        const [e, w] = await Promise.all([dlgAlloEntryLoad(r.data.tag), A.connect && A.connect.signed_in ? dlgAlloWaitingLoad() : null]);
+        const [e, w, p] = await Promise.all([dlgAlloEntryLoad(r.data.tag), A.connect && A.connect.signed_in ? dlgAlloWaitingLoad() : null,
+          dlgAlloHeldWanted() ? dlgAlloHeldLoad() : null]);
         if (seq !== DLG.seq || A !== DLG.allo) return;
         A.entry = e;
         if (w) A.waiting = w;
+        A.held = p;
+        A.heldAsk = null;
       } else {
         A.entry = null;
         A.waiting = null;
+        A.held = null;
+        A.heldAsk = null;
       }
+    }
+
+    // 0.8: every proof the listing holds, live or not, read from Connect with this machine's sign-in; only the
+    // account the listing's tag is tied to may read it. Asked for when a person's listing is listed and signed in.
+    function dlgAlloHeldWanted() {
+      const A = DLG.allo;
+      return !!(A && A.listing && A.listing.listed && A.connect && A.connect.signed_in && dlgAlloSubject() === 'person');
+    }
+    async function dlgAlloHeldLoad() {
+      const r = await canonJSON('/api/allograph/proofs?path=' + encodeURIComponent(DLG.vol || DLG.path));
+      if (r.ok && r.data) return { proofs: Array.isArray(r.data.proofs) ? r.data.proofs.filter(cosmIsMap) : [], plus: r.data.plus === true };
+      // Not the holder, or nothing listed under the tag now, is said plainly; signed out asks for the sign-in.
+      if (r.status === 409) return { error: t('allo.held.notHolder', 'this machine is signed in to another Connect account than the one that listed it: only that account sees its proofs') };
+      if (r.status === 404) return { error: t('allo.held.notListed', 'the registry lists nothing under this tag now') };
+      return { error: dlgAlloErr(r) };
     }
 
     async function dlgAlloEntryLoad(tag) {
@@ -41401,7 +43101,9 @@
       }
       if (Array.isArray(e.faceplaces) && e.faceplaces.length) {
         h += '<ul class="allo-claims">' + e.faceplaces.filter(cosmIsMap).map((f) => '<li><code>' + cosmEsc(String(f.faceplace || '')) + '</code> '
-          + cosmEsc(String(f.handle || '')) + (f.checked ? ' <span class="thym-meta-i">' + cosmEsc(t('allo.entry.checked', 'checked {day}').replace('{day}', () => String(f.checked))) + '</span>' : '') + '</li>').join('') + '</ul>';
+          // A public entry names only live proofs (14.11).
+          + cosmEsc(String(f.handle || '')) + ' <span class="allo-state allo-state-live">' + cosmEsc(t('allo.state.live', 'live')) + '</span>'
+          + (f.checked ? ' <span class="thym-meta-i">' + cosmEsc(t('allo.entry.checked', 'checked {day}').replace('{day}', () => String(f.checked))) + '</span>' : '') + '</li>').join('') + '</ul>';
       }
       const claims = Array.isArray(e.claims) ? e.claims.filter(cosmIsMap) : [];
       if (claims.length) {
@@ -41421,6 +43123,8 @@
       const A = DLG.allo;
       const P = A.pf;
       let h = '<p class="thym-note">' + cosmEsc(t('allo.proof.what', 'prove that you hold an account somewhere public by posting a short code there; live proofs on two or more faceplaces make your listing an Allograph+.')) + '</p>';
+      h += dlgAlloHeldHTML();
+      h += '<div class="thym-sec-h dict-sc" id="allo-newproof-h">' + cosmEsc(t('allo.held.new', 'prove another')) + '</div>';
       if (A.faceplaces == null) h += dlgAlloBtn('allo-fp-load', t('allo.proof.load', 'the faceplaces the registry checks…'), { disabled: !!A.busy });
       else if (A.faceplaces.error) h += '<p class="thym-refusal">' + cosmEsc(A.faceplaces.error) + '</p>';
       else {
@@ -41452,6 +43156,56 @@
       }
       if (A.busy === 'proof') h += dlgAlloWait(t('allo.sending', 'sending it to the registry…'));
       return dlgAlloSec('proofs', t('allo.proof.head', 'faceplace proofs'), h + dlgAlloErrHTML('proof') + dlgAlloDoneHTML('proof'));
+    }
+
+    // 5a. (0.8) Every proof the listing holds, in every state, whatever the listing shows of them: each with its
+    // faceplace, handle, address, state and the day it was last checked, and removed only after asking.
+    function dlgAlloHeldHTML() {
+      const A = DLG.allo;
+      const H = A.held;
+      const signed = !!(A.connect && A.connect.signed_in);
+      let h = '';
+      if (!signed) {
+        h = '<p class="thym-note">' + cosmEsc(t('allo.held.signedOut', 'sign in to Connect to see every proof your listing holds, live or not: only the account that listed it can.')) + '</p>';
+      } else if (H == null) {
+        h = A.busy === 'held' ? dlgAlloWait(t('allo.search.busy', 'asking the registry…'))
+          : '<div class="fab-row">' + dlgAlloBtn('allo-held', t('allo.held.load', 'show every proof your listing holds…'), { disabled: !!A.busy }) + '</div>';
+      } else if (H.error) {
+        h = '<p class="thym-refusal" role="alert">' + cosmEsc(H.error) + '</p>'
+          + '<div class="fab-row">' + dlgAlloBtn('allo-held', t('allo.held.again', 'read them again'), { disabled: !!A.busy }) + '</div>';
+      } else {
+        const rows = H.proofs;
+        h = '<p class="thym-meta">' + cosmEsc(H.plus ? t('allo.held.plus', 'your listing is an Allograph+: live proofs on two or more faceplaces')
+          : t('allo.held.notPlus', 'not an Allograph+ yet: that takes live proofs on two or more faceplaces')) + '</p>';
+        if (!rows.length) h += '<p class="thym-note">' + cosmEsc(t('allo.held.none', 'your listing holds no proof yet')) + '</p>';
+        else {
+          const word = { live: t('allo.state.live', 'live'), missed: t('allo.state.missed', 'missed at the last check'), lapsed: t('allo.state.lapsed', 'lapsed') };
+          h += '<ul class="allo-claims allo-held-list" aria-labelledby="allo-held-h">' + rows.map((p, i) => {
+            const fp = String(p.faceplace || ''), handle = String(p.handle || '');
+            const st = word[p.state] ? p.state : 'live';
+            let li = '<li data-allo-proof="' + cosmEsc(fp + ' ' + handle) + '"><span><code>' + cosmEsc(fp) + '</code> ' + cosmEsc(handle)
+              + ' <span class="allo-state allo-state-' + st + '">' + cosmEsc(word[st]) + (p.since ? ' ' + cosmEsc(t('allo.held.since', 'since {day}').replace('{day}', () => String(p.since))) : '') + '</span>'
+              + (p.checked ? ' <span class="thym-meta-i">' + cosmEsc(t('allo.entry.checked', 'checked {day}').replace('{day}', () => String(p.checked))) + '</span>' : '') + '</span>'
+              + (p.address ? '<span class="thym-plan-sub allo-addr"><code>' + cosmEsc(String(p.address)) + '</code></span>' : '');
+            if (A.heldAsk === i) {
+              li += '<div class="dlg-holo" role="alertdialog" aria-labelledby="allo-held-q"><p id="allo-held-q">'
+                + cosmEsc(t('allo.held.q', 'remove the proof of {handle} on {faceplace}? the registry drops it at once, live or not; to have it back, post the string again and ask the registry to read it.')
+                  .replace('{handle}', () => handle).replace('{faceplace}', () => fp)) + '</p>'
+                + '<div class="fab-row">' + dlgAlloBtn('allo-held-yes', t('allo.held.yes', 'yes, remove it'), { disabled: !!A.busy })
+                + dlgAlloBtn('allo-held-no', t('allo.held.no', 'keep it')) + '</div></div>';
+            } else {
+              li += '<span class="fab-row">' + dlgAlloBtn('allo-held-rm', t('allo.held.remove', 'remove…'), { disabled: !!A.busy,
+                extra: ' data-allo-i="' + i + '" aria-label="' + cosmEsc(t('allo.held.removeAria', 'remove the proof of {handle} on {faceplace}…')
+                  .replace('{handle}', () => handle).replace('{faceplace}', () => fp)) + '"' }) + '</span>';
+            }
+            return li + '</li>';
+          }).join('') + '</ul>';
+        }
+        h += '<div class="fab-row">' + dlgAlloBtn('allo-held', t('allo.held.again', 'read them again'), { disabled: !!A.busy }) + '</div>';
+        if (A.busy === 'held') h += dlgAlloWait(t('allo.sending', 'sending it to the registry…'));
+      }
+      return '<div class="allo-held" id="allo-held"><div class="thym-sec-h dict-sc" id="allo-held-h">' + cosmEsc(t('allo.held.head', 'every proof your listing holds')) + '</div>'
+        + h + dlgAlloErrHTML('held') + dlgAlloDoneHTML('held') + '</div>';
     }
 
     // 6. Attestations waiting for the holder's word.
@@ -41527,7 +43281,9 @@
       const S = A.search;
       const about = [['experience', t('allo.about.experience', 'experience')], ['skill', t('allo.about.skill', 'skill')],
         ['understanding', t('allo.about.understanding', 'understanding')], ['form', t('allo.about.form', 'any kind')]];
-      let h = '<p class="thym-note">' + cosmEsc(t('allo.search.what', 'find who offers what someone needs, by FEED words: every need must match one of a listing’s claims. no account is needed, and the registry keeps nothing of a look-up.')) + '</p>';
+      let h = dlgAlloLookHTML();
+      h += '<div class="thym-sec-h dict-sc" id="allo-byneed-h">' + cosmEsc(t('allo.look.byNeed', 'by what someone needs')) + '</div>';
+      h += '<p class="thym-note">' + cosmEsc(t('allo.search.what', 'find who offers what someone needs, by FEED words: every need must match one of a listing’s claims. no account is needed, and the registry keeps nothing of a look-up.')) + '</p>';
       h += S.needs.map((n, i) => '<div class="dlg-row"><select class="dlg-in dlg-num" data-allo-need-about="' + i + '" aria-label="' + cosmEsc(t('allo.search.about', 'what kind of claim')) + '">'
         + about.map(([v, l]) => '<option value="' + v + '"' + (n.about === v ? ' selected' : '') + '>' + cosmEsc(l) + '</option>').join('') + '</select>'
         + '<input class="dlg-in" id="allo-need-' + i + '" data-allo-need-value="' + i + '" value="' + cosmEsc(n.value) + '" autocomplete="off" spellcheck="false" aria-label="'
@@ -41548,6 +43304,37 @@
         if (S.next) h += '<div class="fab-row">' + dlgAlloBtn('allo-search-more', t('allo.search.more', 'more'), { disabled: A.busy === 'search' }) + '</div>';
       }
       return dlgAlloSec('search', t('allo.search.head', 'look people up'), h + dlgAlloErrHTML('search'));
+    }
+
+    // 9a. (0.8) Look one up by user name or #tag (Ascribe 14.11): the listings that answer, each opened to its entry.
+    function dlgAlloLookHTML() {
+      const A = DLG.allo;
+      const L = A.look;
+      let h = '<div class="allo-look" id="allo-look-box"><div class="thym-sec-h dict-sc" id="allo-look-h">' + cosmEsc(t('allo.look.head', 'by name or tag')) + '</div>'
+        + '<p class="thym-note" id="allo-look-hint">' + cosmEsc(t('allo.look.what', 'a user name finds every listing that carries it; a #tag finds the one listing it names.')) + '</p>'
+        + '<div class="dlg-row"><input class="dlg-in" id="allo-look" data-allo="look.q" value="' + cosmEsc(L.q) + '" maxlength="33" autocomplete="off" spellcheck="false"'
+        + ' aria-labelledby="allo-look-h" aria-describedby="allo-look-hint" placeholder="harbour-baker · #ts7de32a5bnz">'
+        + dlgAlloBtn('allo-look', t('allo.attest.look', 'look it up'), { disabled: !L.q.trim() || A.busy === 'look' }) + '</div>';
+      if (A.busy === 'look') h += dlgAlloWait(t('allo.search.busy', 'asking the registry…'));
+      h += dlgAlloErrHTML('look');
+      if (Array.isArray(L.result)) {
+        if (!L.result.length) h += '<p class="thym-note">' + cosmEsc(t('allo.look.none', 'no listing answers to that name or tag')) + '</p>';
+        else {
+          h += '<ul class="allo-claims allo-look-list" aria-labelledby="allo-look-h">' + L.result.map((e, i) => {
+            if (L.open === i) {
+              return '<li class="allo-look-open">' + dlgAlloEntryHTML(e)
+                + '<span class="fab-row">' + dlgAlloBtn('allo-look-open', t('allo.look.close', 'close it'), { extra: ' data-allo-i="' + i + '"' }) + '</span></li>';
+            }
+            const bits = [String(e.kind || '')];
+            if (e.plus === true) bits.push('Allograph+');
+            if (e.verified === false) bits.push(t('allo.entry.unverified', 'its signature does not check'));
+            return '<li><span class="allo-listed"><code>' + cosmEsc(String(e.name || '')) + '</code>' + (e.dangler ? ' <em>' + cosmEsc(String(e.dangler)) + '</em>' : '')
+              + ' <code>#' + cosmEsc(String(e.tag || '')) + '</code></span><span class="thym-plan-sub">' + cosmEsc(bits.filter(Boolean).join(' · ')) + '</span>'
+              + '<span class="fab-row">' + dlgAlloBtn('allo-look-open', t('allo.look.open', 'open it'), { extra: ' data-allo-i="' + i + '"' }) + '</span></li>';
+          }).join('') + '</ul>';
+        }
+      }
+      return h + '</div>';
     }
 
     // Every field keeps its value in the face's state as it is typed; nothing repaints while typing.
@@ -41589,6 +43376,8 @@
       set('allo-attest', A.at.claims.length > 0 && !!A.at.epoch.trim());
       set('allo-bond', !!A.agent.trim());
       set('allo-unbond', !!A.agent.trim());
+      const lb = dlgEl('dlg-main').querySelector('button[data-dlg="allo-look"]');
+      if (lb) lb.disabled = !A.look.q.trim() || A.busy === 'look';
       const sb = dlgEl('dlg-main').querySelector('button[data-dlg="allo-search"]');
       if (sb) sb.disabled = !A.search.needs.some((n) => n.value.trim()) || A.busy === 'search';
     }
@@ -41684,7 +43473,7 @@
         const r = await dlgAlloStep('connect', 'signout', () => canonPost('/api/connect/sign-out', {}));
         if (!r) return;
         await dlgAlloConnect(seq);
-        A.waiting = null;
+        Object.assign(A, { waiting: null, held: null, heldAsk: null });
         dlgAlloPaint();
         return;
       }
@@ -41750,8 +43539,91 @@
           A.done.proof = act === 'allo-prove' ? t('allo.proof.found', 'the registry found it: the proof is live') : t('allo.proof.removed', 'the proof is removed');
           if (act === 'allo-unprove') A.proof = null;
           A.entry = await dlgAlloEntryLoad(A.listing && A.listing.tag);
+          if (A.held && !A.held.error) { A.held = await dlgAlloHeldLoad(); A.heldAsk = null; }
         }
         dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-held') {
+        A.busy = 'held';
+        A.errs.held = null;
+        A.done.held = null;
+        dlgAlloPaint();
+        const got = await dlgAlloHeldLoad();
+        if (seq !== DLG.seq || A !== DLG.allo) return;
+        Object.assign(A, { busy: null, held: got, heldAsk: null });
+        dlgAlloPaint();
+        return;
+      }
+      // Removing a proof asks first, on its own row; nothing is sent until "yes, remove it".
+      if (act === 'allo-held-rm') {
+        A.heldAsk = Number(b && b.dataset.alloI);
+        A.done.held = null;
+        dlgAlloPaint();
+        const no = dlgEl('dlg-main').querySelector('[data-dlg="allo-held-no"]');
+        if (no) no.focus();
+        return;
+      }
+      if (act === 'allo-held-no') {
+        const i = A.heldAsk;
+        A.heldAsk = null;
+        dlgAlloPaint();
+        const back = dlgEl('dlg-main').querySelector('[data-dlg="allo-held-rm"][data-allo-i="' + i + '"]');
+        if (back) back.focus();
+        return;
+      }
+      if (act === 'allo-held-yes') {
+        const p = A.held && Array.isArray(A.held.proofs) ? A.held.proofs[A.heldAsk] : null;
+        A.heldAsk = null;
+        if (!p) { dlgAlloPaint(); return; }
+        const r = await dlgAlloStep('held', 'held', () => canonPost('/api/allograph/unprove', { path, faceplace: String(p.faceplace), handle: String(p.handle) }));
+        if (!r) return;
+        if (r.ok) {
+          A.done.held = t('allo.proof.removed', 'the proof is removed');
+          const [held, e] = await Promise.all([dlgAlloHeldLoad(), dlgAlloEntryLoad(A.listing && A.listing.tag)]);
+          if (seq !== DLG.seq || A !== DLG.allo) return;
+          A.held = held;
+          A.entry = e;
+        }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-look') {
+        const L = A.look;
+        const q = L.q.trim().toLowerCase();
+        const tag = q.replace(/^#/, '');
+        const isTag = /^[a-z2-7]{12}$/.test(tag);
+        const isName = !q.startsWith('#') && q.length >= 2 && q.length <= 32 && /^[a-z](?:[.-]?[a-z0-9])*$/.test(q);
+        A.errs.look = null;
+        if (!isTag && !isName) {
+          A.errs.look = t('allo.look.bad', 'that is neither a user name nor a tag: a name is 2 to 32 of a–z, 0–9, . and -, beginning with a letter; a tag is # and twelve letters and digits');
+          L.result = null;
+          dlgAlloPaint();
+          return;
+        }
+        // Twelve letters and digits may be a tag or a name: both are asked, and each listing shown once.
+        const r = await dlgAlloStep('look', 'look', async () => {
+          const [byTag, byName] = await Promise.all([isTag ? canonJSON('/api/allograph/entry?tag=' + encodeURIComponent(tag)) : null,
+            isName ? canonJSON('/api/allograph/entry?name=' + encodeURIComponent(q)) : null]);
+          const bad = [byTag, byName].find((x) => x && !x.ok);
+          if (bad) return bad;
+          const got = [];
+          if (byTag && byTag.data && cosmIsMap(byTag.data.entry)) got.push(byTag.data.entry);
+          const named = byName && byName.data && Array.isArray(byName.data.entries) ? byName.data.entries.filter(cosmIsMap) : [];
+          named.forEach((e) => { if (!got.some((g) => g.tag === e.tag)) got.push(e); });
+          return { ok: true, data: got };
+        });
+        if (!r) return;
+        if (r.ok) { L.result = r.data; L.open = r.data.length === 1 ? 0 : null; }
+        dlgAlloPaint();
+        return;
+      }
+      if (act === 'allo-look-open') {
+        const i = Number(b && b.dataset.alloI);
+        A.look.open = A.look.open === i ? null : i;
+        dlgAlloPaint();
+        const el = dlgEl('dlg-main').querySelector('[data-dlg="allo-look-open"][data-allo-i="' + i + '"]');
+        if (el) el.focus({ preventScroll: true });
         return;
       }
       if (act === 'allo-waiting') {
@@ -42648,7 +44520,7 @@
       const thymMenu = window.__thymReady ? thymOtherMenuItems(target.path, target.kind === 'dir') : '';
       if (thymMenu) items.push(thymMenu + '<div class="ctx-sep"></div>');
       // 0.6 (U1a): a folder builds its fabulac; a fabulac, a cshort and a catem open as what they are.
-      const fabMenu = window.__fabReady ? fabMenuItems(target.path, target.kind === 'dir', target.holotype) : '';
+      const fabMenu = window.__fabReady ? fabMenuItems(target.path, target.kind === 'dir', target.holotype, target) : '';
       if (fabMenu) items.push(fabMenu + '<div class="ctx-sep"></div>');
       if (target.kind === 'dir') {
         items.push('<button type="button" class="ctx-item" data-act="new-folder">' + t('menu.tree.newFolder', 'new subfolder') + '</button>');
@@ -42697,6 +44569,9 @@
           cosm: /\.cosm$/i.test(li.dataset.path || ''),
           holotype: li.dataset.holotype === '1',
           emf: li.dataset.emfState || '',
+          // 0.8 (W4-FP): an authored fabulac, and the folder that is its entailment
+          fabAuthored: li.dataset.fabAuthored === '1',
+          fabTwin: li.dataset.fabTwin || '',
         });
       }, true);   // <-- capture phase
     })();
