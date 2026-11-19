@@ -601,14 +601,19 @@ def test_the_sse_event_fires_on_every_batch(project: Path):
             "path": REL, "create": True, "form": "blank", "title": "Plane",
             "ops": [{"op": "set_meta", "title": "Plane"}]}).json()
         second = c.post("/api/composure/ops", json={
-            "path": REL, "base_rev": created["rev"], "source": "readvisor",
+            "path": REL, "base_rev": created["rev"], "source": "enough",
             "ops": [{"op": "add_module", "type": "text"}]}).json()
+        # 0.8: the readvisor writes through its tools, never this door.
+        refused = c.post("/api/composure/ops", json={
+            "path": REL, "source": "readvisor",
+            "ops": [{"op": "add_module", "type": "text"}]})
+        assert refused.status_code == 403 and "readvisor" in refused.json()["detail"]
 
     assert [e for e, _ in seen] == [composure_api.EVENT] * 2
     assert seen[0][1] == {"path": REL, "rev": 1, "changed": [],
                           "source": "ui", "created": True}
     assert seen[1][1] == {"path": REL, "rev": 2, "changed": second["changed"],
-                          "source": "readvisor", "created": False}
+                          "source": "enough", "created": False}
 
 
 def test_model_is_json_serializable_end_to_end(client: TestClient):

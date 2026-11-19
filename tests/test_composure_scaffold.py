@@ -343,14 +343,17 @@ def test_frame_ops_need_a_scaffold(tmp_path: Path):
 
 
 def test_the_meta_block_stores_lock_version_and_parent(scaf: Path):
-    ops(scaf, {"op": "set_scaffold", "locked": True, "version": 2,
+    # 0.8 (E5): the lock has its own doors (lock_scaffold; unlocking makes a
+    # new file), so set_scaffold keeps only the version and the parent.
+    ops(scaf, {"op": "set_scaffold", "version": 2,
                "parent": "rness/io/composure/s-v1.comp"})
+    with pytest.raises(ComposureError, match="lock_scaffold"):
+        ops(scaf, {"op": "set_scaffold", "locked": True})
+    ops(scaf, {"op": "lock_scaffold"})
     view = C.scaffold_view(C.load(scaf))
     assert view["locked"]["by"] == "ui" and view["locked"]["at"]
     assert (view["version"], view["parent"]) == (2, "rness/io/composure/s-v1.comp")
-    ops(scaf, {"op": "set_scaffold", "locked": False})
-    assert C.scaffold_view(C.load(scaf))["locked"] is None
-    with pytest.raises(ComposureError, match="stays a scaffold"):
+    with pytest.raises(ComposureError, match="locked"):
         ops(scaf, {"op": "set_scaffold", "scaffold": None})
 
 

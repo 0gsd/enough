@@ -354,11 +354,16 @@ def _rows(boxes: list[C.Module]) -> dict[str, tuple[int, int]]:
     return out
 
 
-def state_from_composure(comp: C.Composure, plectrum: Any | None = None) -> Any:
+def state_from_composure(comp: C.Composure, plectrum: Any | None = None,
+                         comments: dict[str, Any] | None = None) -> Any:
     """The scaffold's one-file state from a composure, with what the composure has no field for
     taken from the plectrum beside it. Frames in order, each frame's boxes by row and column, the
     person's text as markdown, their `written` marks, the version and the lock. A box no frame
-    holds, and a frame with no box, are left out and named in `warnings`."""
+    holds, and a frame with no box, are left out and named in `warnings`.
+
+    `comments` is the composure's sidecar (`C.load_comments`): its findings become the state's
+    `# Findings` (each about the state's id for its box), and its last check's time `checked`. A
+    finding about a box the state leaves out is named in `warnings`."""
     S = state_module()
     view = C.scaffold_view(comp)
     if view is None:
@@ -376,9 +381,12 @@ def state_from_composure(comp: C.Composure, plectrum: Any | None = None) -> Any:
     meta["parent"] = view["version"] - 1 if view["version"] > 1 else None
     locked = (view.get("locked") or {}).get("at")
     meta["locked"] = locked if locked and S.is_stamp(locked) else None
-    meta["checked"] = base.get("checked")
+    stamp = (comments or {}).get("check") if isinstance((comments or {}).get("check"), dict) else None
+    checked = stamp.get("at") if stamp else base.get("checked")
+    meta["checked"] = checked if checked and S.is_stamp(str(checked)) else None
     meta["extra"] = dict(base.get("extra") or {})
     model = S.Scaffold(kind="scaffold", meta=meta)
+    state_ids: dict[str, str] = {}
     for i, fid in enumerate(view["frames"], start=1):
         fm = comp.module(fid)
         pf = pframes.get(fid)
@@ -397,6 +405,7 @@ def state_from_composure(comp: C.Composure, plectrum: Any | None = None) -> Any:
         places = _rows(held)
         for m in sorted(held, key=lambda m: places[m.id]):
             pb = pboxes.get(m.id) or {}
+            state_ids[m.id] = pb.get("id") or m.id
             kind = m.kind or "text"
             row, col = places[m.id]
             page = m.pages[0].rich if m.pages else ""
@@ -415,10 +424,38 @@ def state_from_composure(comp: C.Composure, plectrum: Any | None = None) -> Any:
         model.frames.append(frame)
     for bid in view.get("loose") or []:
         model.warnings.append(f"box {bid} sits on no frame and is left out of the state.")
+    for c in (comments or {}).get("comments") or []:
+        f = c.get("finding") if isinstance(c, dict) else None
+        if not isinstance(f, dict):
+            continue
+        if f.get("box") not in state_ids:
+            model.warnings.append(f"finding {f.get('id')} is about box {f.get('box')}, which the state "
+                                  "leaves out, so the finding is left out too.")
+            continue
+        model.findings.append({
+            "id": f.get("id"), "box": state_ids[f["box"]], "kind": f.get("kind"),
+            "quote": f.get("quote") or None, "prefix": f.get("prefix") or None,
+            "suffix": f.get("suffix") or None, "fix": f.get("fix"), "why": f.get("why") or None,
+            "status": f.get("status"), "version": int(f.get("version") or 1), "extra": {}})
     problems = S.validate(model)
     if problems:
         raise S.StateError(problems[0])
     return model
+
+
+def findings_from_state(model: Any, comp: C.Composure) -> list[dict[str, Any]]:
+    """The state's `# Findings` as the sidecar's findings: each about its box's module id on `comp`
+    (a plectrum id maps through `module_id`; a box the state names by its module id stays so). The
+    fields the sidecar adds when a finding lands (`pass`, `answered_at`) are not in a state."""
+    out: list[dict[str, Any]] = []
+    for f in model.findings:
+        box = str(f.get("box") or "")
+        mid = box if comp.module(box) is not None else module_id(box)
+        out.append({"id": f.get("id"), "box": mid, "kind": f.get("kind"),
+                    "quote": f.get("quote") or "", "prefix": f.get("prefix") or "",
+                    "suffix": f.get("suffix") or "", "fix": f.get("fix"), "why": f.get("why"),
+                    "status": f.get("status"), "version": int(f.get("version") or 1)})
+    return out
 
 
 def plectrum_from_composure(comp: C.Composure, plectrum: Any | None = None) -> str:
@@ -428,7 +465,8 @@ def plectrum_from_composure(comp: C.Composure, plectrum: Any | None = None) -> s
 
 
 __all__ = [
-    "PLECTRUM_SUFFIX", "Plan", "composure_target", "frame_shape", "loads", "module_id",
+    "PLECTRUM_SUFFIX", "Plan", "composure_target", "findings_from_state", "frame_shape", "loads",
+    "module_id",
     "plectrum_from_composure", "plectrum_ops", "plectrum_path", "state_from_composure",
     "state_module",
 ]

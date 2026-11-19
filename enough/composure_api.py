@@ -312,6 +312,8 @@ def build_router(
             raise HTTPException(
                 400, f"unknown source {source!r}; one of "
                      f"{', '.join(comp_core.SOURCES)}")
+        if source == "readvisor":  # the readvisor writes through its tools, never this door (survey 6.8)
+            raise HTTPException(403, "source readvisor is not taken here: the readvisor changes a composure through its tools")
         base_rev = body.get("base_rev")
         try:
             result = await asyncio.to_thread(
@@ -546,6 +548,244 @@ def build_router(
             comp_core.delete_comment(target, id, _rel(target))
         except KeyError:
             raise HTTPException(404, f"no comment {id!r}") from None
+        except ComposureError as e:
+            raise HTTPException(409, str(e)) from None
         return {"ok": True, "id": id}
+
+    return router
+
+
+# ---------------------------------------------------------------------------
+# The scaffold's lock, check, findings and export (0.8, E5 and E6)
+# ---------------------------------------------------------------------------
+
+def build_scaffold_router(
+    *,
+    project_dir: Path,
+    resolve_path: Resolve,
+    emit: Emit,
+    jobs: Any = None,
+    canon_mode: Callable[..., Awaitable[tuple[str, str]]] | None = None,
+    start_job: Callable[..., dict] | None = None,
+    model_complete: Callable[..., Any] | None = None,
+    llm_url: str | None = None,
+) -> APIRouter:
+    """`/api/composure/scaffold*`: the scaffold's state, lock, unlock, check (a CanonJob of kind `scaffold`, started
+    as the fabulap's build is), check cancel, accept, decline and export. Mounted after the canon jobs exist, so it
+    is its own router beside `build_router`; without `jobs`/`start_job` (a test's three lambdas) the check routes
+    answer 503 and everything else works.
+
+    Every body carries `path` (a project-relative `.comp`). The person is the only source here: these are the
+    page's buttons, and the readvisor has no tool for any of them."""
+    from . import scaffold_check as _check
+    from . import scaffold_export as _export
+
+    router = APIRouter()
+
+    def _target(path: str) -> Path:
+        rel = (path or "").strip()
+        if not rel or not rel.endswith(comp_core.SUFFIX):
+            raise HTTPException(400, f"not a composure path: {rel!r} must end in {comp_core.SUFFIX}")
+        target = resolve_path(rel)
+        if not target.is_file():
+            raise HTTPException(404, f"no composure at {rel}")
+        return target
+
+    def _rel(target: Path) -> str:
+        try:
+            return str(target.resolve().relative_to(project_dir.resolve())).replace(os.sep, "/")
+        except ValueError:
+            return target.name
+
+    async def _body(request: Request) -> dict[str, Any]:
+        try:
+            data = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected a json body") from None
+        return data if isinstance(data, dict) else {}
+
+    def _job_for(target: Path) -> str | None:
+        return jobs.running_for(str(target.resolve())) if jobs is not None else None
+
+    def _state(target: Path) -> dict[str, Any]:
+        comp = comp_core.load(target)
+        view = comp_core.scaffold_view(comp)
+        if view is None:
+            raise ComposureError(f"{target.name} is not a scaffold")
+        rel = _rel(target)
+        doc = comp_core.load_comments(target, rel)
+        job_id = _job_for(target)
+        return {
+            "path": rel, "rev": comp.rev, "scaffold": view, "locked": comp_core.scaffold_locked(comp),
+            "empty": comp_core.empty_boxes(comp), "findings": comp_core.list_findings(target, rel),
+            "check": doc.get("check"), "job": jobs.snapshot(job_id) if job_id else None,
+            "exports": list(_export.FORMATS[view["thing"]]),
+        }
+
+    async def _announce(rel: str, rev: int, changed: list[str], **more: Any) -> None:
+        await emit(EVENT, {"path": rel, "rev": rev, "changed": changed, "source": "ui", "created": False, **more})
+
+    @router.get("/api/composure/scaffold")
+    async def api_scaffold_state(path: str = Query(...)) -> dict[str, Any]:
+        """The scaffold as its page needs it: the view, whether it is locked, the empty boxes (what the readvisor
+        names before a lock), the findings, the last check, a running check job, and the formats it exports as."""
+        target = _target(path)
+        try:
+            return await asyncio.to_thread(_state, target)
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @router.post("/api/composure/scaffold/lock")
+    async def api_scaffold_lock(request: Request) -> dict[str, Any]:
+        """`{path, empty?: [box ids the person was shown], base_rev?}` → the state, locked. Refused (400) while an
+        empty box is not in `empty`, naming it."""
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        rel = _rel(target)
+        base_rev = body.get("base_rev")
+        try:
+            result = await asyncio.to_thread(
+                comp_core.apply_ops, target, int(base_rev) if base_rev is not None else None,
+                [{"op": "lock_scaffold", "empty": body.get("empty") or []}], source="ui",
+                project_dir=project_dir, rel_path=rel)
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+        await _announce(rel, result.rev, result.changed, scaffold="locked")
+        return await asyncio.to_thread(_state, target)
+
+    @router.post("/api/composure/scaffold/unlock")
+    async def api_scaffold_unlock(request: Request) -> dict[str, Any]:
+        """`{path}` → `{path: the new version's path, parent, version, state}`. The locked file stays as it is."""
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        if _job_for(target):
+            raise HTTPException(409, "the check is running on this scaffold; wait for it, or cancel it")
+        try:
+            dest, comp = await asyncio.to_thread(comp_core.unlock_scaffold, target, project_dir)
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+        rel = _rel(dest)
+        await emit(EVENT, {"path": rel, "rev": comp.rev, "changed": [], "source": "ui", "created": True})
+        return {"path": rel, "parent": _rel(target), "version": (comp.scaffold or {}).get("version"),
+                "state": await asyncio.to_thread(_state, dest)}
+
+    def _complete_for(route: str) -> Callable[..., Any] | None:
+        from . import llm as _llm
+        from . import thym_host as _host
+        if route == "local" and _llm._current_slot() != "opro-api":
+            return model_complete
+        return _host.route_complete(route, llm_url=llm_url, project_dir=project_dir)
+
+    @router.post("/api/composure/scaffold/check")
+    async def api_scaffold_check(request: Request) -> dict[str, Any]:
+        """`{path, mode?: auto|model|rules, route?: local|cloud}` → `{job}`: the check as a CanonJob of kind
+        `scaffold`, keyed by the composure. Agent-free, or no model answering, runs the rules pass and says so.
+        409 when the scaffold is not locked or a check is already running on it."""
+        if jobs is None or start_job is None or canon_mode is None:
+            raise HTTPException(503, "the check needs the job runner, which this server was built without")
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        rel = _rel(target)
+        try:
+            await asyncio.to_thread(_check.target_of, target)
+        except _check.CheckError as e:
+            raise HTTPException(e.status, str(e)) from None
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+        want = str(body.get("mode") or "auto").strip().lower()
+        if want not in ("auto", "model", "rules"):
+            raise HTTPException(400, "mode is auto, model or rules")
+        route = str(body.get("route") or "local").strip().lower()
+        if route not in ("local", "cloud"):
+            raise HTTPException(400, f"route is local or cloud, not {route!r}")
+        if want == "rules":
+            mode, why = "rules", ""
+        else:
+            try:
+                mode, why = await canon_mode(route)
+            except TypeError:
+                mode, why = await canon_mode()
+            if want == "model" and mode != "model":
+                raise HTTPException(409, f"no model is answering ({why})")
+        complete = _complete_for(route) if mode == "model" else None
+
+        def work(ctx: Any) -> dict[str, Any]:
+            return _check.run_check(target, rel, mode=mode, why=why, complete=complete,
+                                    progress=lambda f: ctx.progress(f), check=ctx.check)
+
+        on_cloud = " on the cloud" if mode == "model" and route == "cloud" else ""
+        return start_job(kind=_check.JOB_KIND, path=rel, mode=mode, why=why, work=work,
+                         key=str(target.resolve()), doing=f"checking {target.name}{on_cloud}")
+
+    @router.post("/api/composure/scaffold/check/cancel")
+    async def api_scaffold_check_cancel(request: Request) -> dict[str, Any]:
+        """`{path}` → the job's snapshot, cancelling: the box being read finishes, then it stops, and no finding is
+        written. 409 when no check is running on it."""
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        job_id = _job_for(target)
+        if not job_id:
+            raise HTTPException(409, f"no check of {target.name} is running")
+        try:
+            return jobs.cancel(job_id)
+        except Exception as e:  # noqa: BLE001 - CanonJobError carries its status
+            raise HTTPException(getattr(e, "status", 409), str(e)) from None
+
+    async def _answer(request: Request, answer: str) -> dict[str, Any]:
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        rel = _rel(target)
+        fid = str(body.get("finding") or "").strip()
+        if not fid:
+            raise HTTPException(400, "which finding? send 'finding': its id (f1, f2, …)")
+        try:
+            finding, result = await asyncio.to_thread(
+                comp_core.answer_finding, target, fid, answer, doc_rel=rel, project_dir=project_dir)
+        except KeyError:
+            raise HTTPException(404, f"no finding {fid!r} on {rel}") from None
+        except ComposureError as e:
+            raise HTTPException(409, str(e)) from None
+        if result is not None:
+            await _announce(rel, result.rev, result.changed, finding=fid)
+            return {"finding": finding, "rev": result.rev, "changed": result.changed}
+        comp = await asyncio.to_thread(comp_core.load, target)
+        await _announce(rel, comp.rev, [], finding=fid)
+        return {"finding": finding, "rev": comp.rev, "changed": []}
+
+    @router.post("/api/composure/scaffold/accept")
+    async def api_scaffold_accept(request: Request) -> dict[str, Any]:
+        """`{path, finding}` → `{finding, rev, changed}`: the fix applied as the person to the quoted span only
+        (the one change a locked scaffold takes), and recorded on the finding. 409 when the finding is answered
+        already, cannot be checked, has no fix, or its span is gone, stands twice or crosses formatting."""
+        return await _answer(request, "accept")
+
+    @router.post("/api/composure/scaffold/decline")
+    async def api_scaffold_decline(request: Request) -> dict[str, Any]:
+        """`{path, finding}` → `{finding, rev, changed: []}`: the person keeps their words; recorded."""
+        return await _answer(request, "decline")
+
+    @router.post("/api/composure/scaffold/export")
+    async def api_scaffold_export(request: Request) -> dict[str, Any]:
+        """`{path, as: html|pdf|pptx|md, reference?: a project-relative .pptx}` → `{written, path, as, thing,
+        bytes, pages?, left_out, locked, open_findings}`: a new file beside the composure, never one written over.
+        `as` must be one of the thing's formats (a page: html, pdf; a deck: pptx, pdf; a document: md, pdf)."""
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        reference = None
+        if body.get("reference"):
+            reference = resolve_path(str(body["reference"]))
+            if reference.suffix.lower() != ".pptx":
+                raise HTTPException(400, "a reference deck is a .pptx")
+        try:
+            out = await asyncio.to_thread(_export.export, target, str(body.get("as") or ""),
+                                          project_dir=project_dir, reference=reference)
+        except _export.ExportError as e:
+            raise HTTPException(e.status, str(e)) from None
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+        out["path"] = _rel(Path(out["path"]))
+        out["open_findings"] = sum(1 for f in comp_core.list_findings(target, _rel(target))
+                                   if f.get("status") == "open")
+        return out
 
     return router
