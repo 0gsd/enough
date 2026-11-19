@@ -72,11 +72,22 @@ a program that leaves its process group before it is stopped escapes `killpg` (o
 The package source
 ------------------
 
-`PACKAGE_SOURCE` is the one place that names where a program's packages come from. In 0.8 it is
-`"standard-library"`: the sandbox fetches nothing, and `unmet_needs` names what a program asks for outside Python's
-own standard library (`sys.stdlib_module_names`). The Thymop Register (`thymop-snake-harness`) will be a second
-value; the install step it brings runs before the run, into `<run>/venv`, under a profile that allows the network
-for that step only, and the run itself has the network denied again.
+`PACKAGE_SOURCE` is the default and the one value the page and the readvisor can ask for (`OFFERED_SOURCES`):
+`"standard-library"`. The sandbox fetches nothing, and `unmet_needs` names what a program asks for outside Python's
+own standard library (`sys.stdlib_module_names`). `PACKAGE_SOURCES` holds every value this module knows:
+
+- `"standard-library"`: the default, above.
+- `"enough-venv"` (the owner's ruling at checkpoint C, 2026-11-18): the run also reads the `site-packages` of the
+  virtual environment enough itself runs in (`venv_site_packages`), read-only, added to the end of `sys.path` by the
+  launcher with no `.pth` file read (so an editable install of enough there is not followed); nothing is fetched or
+  installed, and writes there stay denied. It is accepted only when the caller says, with `owners_code=True`, that
+  the run's source is the owner's own code (a round trip of enough's or Comprise's own parts, pins section 9). No
+  route passes `owners_code`, and a fabulac's own fields cannot set it: a person's authored program stays standard
+  library only.
+
+The Thymop Register (`thymop-snake-harness`) will be a third value; the install step it brings runs before the run,
+into `<run>/venv`, under a profile that allows the network for that step only, and the run itself has the network
+denied again.
 
 Serving (specified; switched on in a later minor, tracker `fabulac-h5`)
 -----------------------------------------------------------------------
@@ -117,12 +128,18 @@ import tomllib
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
-PACKAGE_SOURCE = "standard-library"
+PACKAGE_SOURCE = "standard-library"                     # the default
+ENOUGH_VENV = "enough-venv"                             # the owner's own code only (owners_code=True)
+PACKAGE_SOURCES = frozenset({PACKAGE_SOURCE, ENOUGH_VENV})
+OFFERED_SOURCES = (PACKAGE_SOURCE,)                     # all the page and the readvisor may ask for
 
 SERVING_LATER = ("{name} is a service. enough authors and entails services, but serving comes in a later minor: "
                  "enough cannot serve it here yet. Its source is entailed and can run elsewhere.")
 NOT_AUTHORED = ("{name} was not authored in enough, so its code is read, never run (the rule for a cshort of code "
                 "you did not author).")
+OWNERS_ONLY = ("{name} asks for enough's own packages ({source}); those are lent only to a round trip of the owner's "
+               "own code, so enough will not run it with them.")
+UNKNOWN_SOURCE = "enough knows no package source called {source!r}; it knows {known}."
 POLL = 0.05            # seconds between looks at the clock, the output and the stop flag
 DISK_POLL = 0.2        # seconds between measurements of the run folder
 
@@ -168,6 +185,7 @@ class Run:
     folder: Path
     program: Program
     original: Path
+    package_source: str = PACKAGE_SOURCE
 
     @property
     def work(self) -> Path:
@@ -238,8 +256,8 @@ def read_program(folder: str | os.PathLike) -> Program:
     return program_from_block(str(project.get("name") or folder.name), block, project)
 
 
-def check_program(program: Program) -> None:
-    """Refuse what this minor does not run: a service, a newer Python, a need outside the standard library."""
+def check_program(program: Program, *, source: str = PACKAGE_SOURCE) -> None:
+    """Refuse what this minor does not run: a service, a newer Python, a need the package source cannot meet."""
     if program.kind == "service":
         raise Refusal(SERVING_LATER.format(name=program.name), reason="service")
     floor = re.fullmatch(r"\s*>=\s*(\d+)\.(\d+)(?:\.\d+)?\s*", program.requires_python or "")
@@ -248,16 +266,78 @@ def check_program(program: Program) -> None:
                       f"{sys.version_info[0]}.{sys.version_info[1]}, so it cannot run it here.", reason="python")
     if program.dependencies:
         names = [re.split(r"[\s<>=!~;\[(@]", d.strip(), maxsplit=1)[0] for d in program.dependencies]
-        raise Refusal(needs_sentence(program.name, names), reason="needs")
+        if source == ENOUGH_VENV:
+            have = venv_distributions()
+            names = [n for n in names if _norm(n) not in have]
+            if not names:
+                return
+        raise Refusal(needs_sentence(program.name, names, source=source), reason="needs")
 
 
 # ---- the package source -----------------------------------------------------------------------------------------
 
-def unmet_needs(names: Iterable[str], *, local: Iterable[str] = ()) -> list[str]:
-    """The names among `names` (module names; dotted is fine) that PACKAGE_SOURCE cannot provide."""
-    if PACKAGE_SOURCE != "standard-library":  # the register's value arrives with thymop-snake-harness
-        raise NotImplementedError(f"package source {PACKAGE_SOURCE!r}")
+def check_source(source: str, *, owners_code: bool = False, name: str = "This program") -> None:
+    """Refuse a package source this module does not know, and `enough-venv` for anything but the owner's own code."""
+    if source not in PACKAGE_SOURCES:
+        raise Refusal(UNKNOWN_SOURCE.format(source=source, known=", ".join(sorted(PACKAGE_SOURCES))),
+                      reason="package-source")
+    if source == ENOUGH_VENV and owners_code is not True:
+        raise Refusal(OWNERS_ONLY.format(name=name, source=source), reason="package-source")
+
+
+def venv_site_packages() -> list[str]:
+    """The site-packages folders of the virtual environment enough runs in (resolved), or [] outside one."""
+    if os.path.realpath(sys.prefix) == os.path.realpath(sys.base_prefix):
+        return []
+    v = {"base": sys.prefix, "platbase": sys.prefix}
+    out: list[str] = []
+    for key in ("purelib", "platlib"):
+        p = os.path.realpath(sysconfig.get_paths(vars=v)[key])
+        if os.path.isdir(p) and p not in out:
+            out.append(p)
+    return out
+
+
+def _norm(name: str) -> str:
+    return re.sub(r"[-_.]+", "_", name).lower()
+
+
+def venv_modules() -> set[str]:
+    """The top-level module names enough's own site-packages holds: folders, modules, extension modules, and what
+    each distribution's `top_level.txt` names. Read as a listing; nothing is imported."""
+    out: set[str] = set()
+    for sp in venv_site_packages():
+        for e in os.scandir(sp):
+            n = e.name
+            if n.endswith((".dist-info", ".egg-info")):
+                tl = os.path.join(e.path, "top_level.txt")
+                if os.path.isfile(tl):
+                    with open(tl, encoding="utf-8", errors="replace") as fh:
+                        out.update(x.strip().split("/")[0] for x in fh if x.strip())
+            elif n.endswith((".py", ".so", ".pyd")):
+                out.add(n.split(".")[0])
+            elif e.is_dir() and n.isidentifier():
+                out.add(n)
+    return out
+
+
+def venv_distributions() -> set[str]:
+    """The distribution names (normalised) installed in enough's own site-packages."""
+    out: set[str] = set()
+    for sp in venv_site_packages():
+        for e in os.scandir(sp):
+            if e.name.endswith(".dist-info"):
+                out.add(_norm(e.name[:-len(".dist-info")].rsplit("-", 1)[0]))
+    return out
+
+
+def unmet_needs(names: Iterable[str], *, local: Iterable[str] = (), source: str = PACKAGE_SOURCE) -> list[str]:
+    """The names among `names` (module names; dotted is fine) that the package source cannot provide."""
+    if source not in PACKAGE_SOURCES:  # the register's value arrives with thymop-snake-harness
+        raise NotImplementedError(f"package source {source!r}")
     own = set(sys.stdlib_module_names) | {"__future__"} | set(local)
+    if source == ENOUGH_VENV:
+        own |= venv_modules()
     out: list[str] = []
     for n in names:
         top = str(n).split(".")[0].strip()
@@ -266,17 +346,18 @@ def unmet_needs(names: Iterable[str], *, local: Iterable[str] = ()) -> list[str]
     return sorted(out)
 
 
-def needs_sentence(name: str, unmet: Sequence[str]) -> str:
+def needs_sentence(name: str, unmet: Sequence[str], *, source: str = PACKAGE_SOURCE) -> str:
     listed = ", ".join(f"`{u}`" for u in unmet)
     which = "which is" if len(unmet) == 1 else "which are"
-    return (f"{name} needs {listed}, {which} outside the standard library: enough cannot run it here yet. Its source "
+    where = "the standard library" if source == PACKAGE_SOURCE else "the standard library and enough's own packages"
+    return (f"{name} needs {listed}, {which} outside {where}: enough cannot run it here yet. Its source "
             "is entailed and can run elsewhere.")
 
 
-def check_needs(name: str, names: Iterable[str], *, local: Iterable[str] = ()) -> None:
-    unmet = unmet_needs(names, local=local)
+def check_needs(name: str, names: Iterable[str], *, local: Iterable[str] = (), source: str = PACKAGE_SOURCE) -> None:
+    unmet = unmet_needs(names, local=local, source=source)
     if unmet:
-        raise Refusal(needs_sentence(name, unmet), reason="needs")
+        raise Refusal(needs_sentence(name, unmet, source=source), reason="needs")
 
 
 def imports_of(folder: str | os.PathLike) -> tuple[set[str], set[str]]:
@@ -326,18 +407,27 @@ def _tree_size(*folders: Path) -> int:
 
 
 def prepare(entailed: str | os.PathLike, *, source_kind: str, root: str | os.PathLike | None = None,
-            program: Program | None = None, limits: Limits = Limits()) -> Run:
-    """A run folder holding a copy of the entailed folder. Refuses before copying anything it will not run."""
+            program: Program | None = None, limits: Limits = Limits(), package_source: str = PACKAGE_SOURCE,
+            owners_code: bool = False) -> Run:
+    """A run folder holding a copy of the entailed folder. Refuses before copying anything it will not run.
+
+    `owners_code=True` is the caller's word that the source is the owner's own code (a round trip of one of enough's
+    or Comprise's parts, rebuilt from its fabulac): such a run need not be authored, and it alone may take the
+    package source `enough-venv`. The routes never pass it."""
     entailed = Path(entailed)
     name = program.name if program else entailed.name
-    if source_kind != "authored":                       # the first check: read, never run
+    if source_kind != "authored" and owners_code is not True:   # the first check: read, never run
         raise Refusal(NOT_AUTHORED.format(name=name), reason="not-authored")
+    check_source(package_source, owners_code=owners_code, name=name)
+    if package_source == ENOUGH_VENV and not venv_site_packages():
+        raise Refusal("enough is not running in a virtual environment of its own, so it has no packages of its own "
+                      "to lend this run.", reason="package-source")
     if not entailed.is_dir():
         raise Refusal(f"There is no folder {entailed} to run.", reason="missing")
     program = program or read_program(entailed)
-    check_program(program)
+    check_program(program, source=package_source)
     found, local = imports_of(entailed)
-    check_needs(program.name, found, local=local)
+    check_needs(program.name, found, local=local, source=package_source)
     if _tree_size(entailed) > limits.disk:
         raise Refusal(f"{program.name} is larger than the run's disk limit ({limits.disk} bytes).", reason="disk")
     machinery()                                         # refuse now on a platform with no box
@@ -352,7 +442,7 @@ def prepare(entailed: str | os.PathLike, *, source_kind: str, root: str | os.Pat
     shutil.copytree(entailed, folder / "work", symlinks=True, ignore_dangling_symlinks=True,
                     ignore=shutil.ignore_patterns("__pycache__", ".git"))
     (folder / "box" / "launch.py").write_text(_LAUNCHER, encoding="utf-8")
-    return Run(run_id=run_id, folder=folder, program=program, original=entailed)
+    return Run(run_id=run_id, folder=folder, program=program, original=entailed, package_source=package_source)
 
 
 # ---- the mechanism ----------------------------------------------------------------------------------------------
@@ -408,6 +498,11 @@ def _q(p: str | Path) -> str:
     return '"' + str(p).replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
+def lent_packages(run: Run) -> list[str]:
+    """The site-packages folders this run reads (read-only): none but for `enough-venv`."""
+    return venv_site_packages() if run.package_source == ENOUGH_VENV else []
+
+
 def macos_profile(run: Run, interp: dict[str, Any] | None = None) -> str:
     """The sandbox-exec profile for one run. In SBPL the later rule wins."""
     interp = interp or interpreter()
@@ -429,6 +524,9 @@ def macos_profile(run: Run, interp: dict[str, Any] | None = None) -> str:
     ]
     if interp["hidden"]:
         lines.append("(deny file-read* " + " ".join(f"(subpath {_q(p)})" for p in interp["hidden"]) + ")")
+    lent = lent_packages(run)
+    if lent:                                            # enough-venv: read-only (every write above stays denied)
+        lines.append("(allow file-read* " + " ".join(f"(subpath {_q(p)})" for p in lent) + ")")
     lines += [
         "(deny process-exec*)",
         f"(allow process-exec* (literal {_q(exe)}) (literal {_q(framework_exe)}))",
@@ -437,10 +535,16 @@ def macos_profile(run: Run, interp: dict[str, Any] | None = None) -> str:
 
 
 def environment(run: Run) -> dict[str, str]:
-    """The whole environment of the program; nothing is inherited."""
-    return {"PATH": "/usr/bin:/bin", "HOME": str(run.sub("home")), "TMPDIR": str(run.sub("tmp")),
-            "LANG": "C.UTF-8", "PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1", "NO_COLOR": "1",
-            "COLUMNS": "80"}
+    """The whole environment of the program; nothing is inherited. With `enough-venv` the lent folders are also on
+    `PYTHONPATH`, so an interpreter the program starts itself (only the interpreter may be started) finds them; the
+    program's own interpreter runs with `-I` and takes them from the launcher instead."""
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(run.sub("home")), "TMPDIR": str(run.sub("tmp")),
+           "LANG": "C.UTF-8", "PYTHONHASHSEED": "0", "PYTHONDONTWRITEBYTECODE": "1", "NO_COLOR": "1",
+           "COLUMNS": "80"}
+    lent = lent_packages(run)
+    if lent:
+        env["PYTHONPATH"] = os.pathsep.join(lent)
+    return env
 
 
 def _python_argv(run: Run, inner: Sequence[str], limits: Limits, interp: dict[str, Any], linux: bool) -> list[str]:
@@ -449,6 +553,9 @@ def _python_argv(run: Run, inner: Sequence[str], limits: Limits, interp: dict[st
             "--nofile", str(limits.nofile)]
     if linux:
         argv += ["--as", str(limits.memory)]
+    lent = lent_packages(run)
+    if lent:
+        argv += ["--path", os.pathsep.join(lent)]
     return argv + ["--", *inner]
 
 
@@ -464,6 +571,8 @@ def linux_argv(run: Run, inner: Sequence[str], limits: Limits, bwrap: str,
         argv += ["--ro-bind", p, p]
     for p in interp["hidden"]:
         argv += ["--tmpfs", p]
+    for p in lent_packages(run):
+        argv += ["--ro-bind", p, p]
     argv += ["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--bind", f, f]
     for sub in ("box", "out", "handed"):
         argv += ["--ro-bind", str(run.sub(sub)), str(run.sub(sub))]
@@ -471,6 +580,13 @@ def linux_argv(run: Run, inner: Sequence[str], limits: Limits, bwrap: str,
     for k, v in environment(run).items():
         argv += ["--setenv", k, v]
     return argv + _python_argv(run, inner, limits, interp, linux=True)
+
+
+def _packages_words(run: Run) -> str:
+    if run.package_source == ENOUGH_VENV:
+        return (f"{ENOUGH_VENV}: the standard library and enough's own site-packages, read-only "
+                f"({', '.join(lent_packages(run))}); nothing fetched or installed")
+    return run.package_source
 
 
 def build_command(run: Run, inner: Sequence[str], limits: Limits = Limits()) -> tuple[list[str], str, dict]:
@@ -491,7 +607,7 @@ def build_command(run: Run, inner: Sequence[str], limits: Limits = Limits()) -> 
              "output": f"{limits.output} bytes kept of each stream",
              "disk": f"{limits.disk} bytes in the run folder (measured every {DISK_POLL:g} s), "
                      f"{limits.fsize} bytes in any one file",
-             "packages": PACKAGE_SOURCE}
+             "packages": _packages_words(run)}
     else:
         argv = linux_argv(run, inner, limits, path, interp)
         g = {"network": "denied by bubblewrap (a network namespace of its own: loopback only)",
@@ -504,7 +620,7 @@ def build_command(run: Run, inner: Sequence[str], limits: Limits = Limits()) -> 
              "output": f"{limits.output} bytes kept of each stream",
              "disk": f"{limits.disk} bytes in the run folder (measured every {DISK_POLL:g} s), "
                      f"{limits.fsize} bytes in any one file",
-             "packages": PACKAGE_SOURCE}
+             "packages": _packages_words(run)}
     return argv, mech, g
 
 
@@ -673,7 +789,7 @@ def _execute(run: Run, what: str, inner: Sequence[str], stdin: bytes, limits: Li
 
 def run_tests(run: Run, *, limits: Limits = Limits()) -> Result:
     """The entailed tests (`tests/`), with `python -m unittest` inside the box."""
-    check_program(run.program)
+    check_program(run.program, source=run.package_source)
     if not (run.work / "tests").is_dir():
         raise Refusal(f"{run.program.name} has no tests folder to run.", reason="no-tests")
     inner = ["-m", "unittest", "discover", "-s", "tests", "-t", ".", "-v"]
@@ -685,7 +801,7 @@ def run_tool(run: Run, argv: Sequence[str] = (), *, stdin: bytes = b"",
     """The tool itself: its `start` plus `argv`. What the person hands over is copied into handed/ (read-only), and
     an argument that names a handed-over path exactly is rewritten to the copy's path."""
     prog = run.program
-    check_program(prog)
+    check_program(prog, source=run.package_source)
     if prog.kind != "tool":
         raise Refusal(f"{prog.name} is a {prog.kind}, not a tool: there is nothing to start; run its tests instead.",
                       reason="kind")
@@ -735,6 +851,8 @@ def main(argv):
     work = opts["work"]
     os.chdir(work)
     sys.path.insert(0, work)
+    if opts.get("path"):   # enough-venv: lent site-packages, last, with no .pth file read
+        sys.path.extend(p for p in opts["path"].split(os.pathsep) if p)
     if inner[0] == "-m":
         sys.argv = ["python -m " + inner[1]] + inner[2:]
         runpy.run_module(inner[1], run_name="__main__", alter_sys=True)
