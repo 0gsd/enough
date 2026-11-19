@@ -240,7 +240,12 @@ def project(ctx: Any, h: Value, **mods: Any) -> Value:
             shape[slot] = word
         elif slot == "markets":
             markets |= {fold(x) for x in as_list(word) if isinstance(x, str) and not _DIGIT.search(x)}
-        elif slot in IDENTITY_SLOTS and slot not in ident and isinstance(word, str) and slot != "founded":
+        elif slot == "domains" and slot not in ident:        # Comprise's identity.domains is a sorted list
+            doms = {d for x in as_list(word) if isinstance(x, str) and _plain(x) for d in [_domain(x)] if d}
+            if doms:
+                ident[slot] = sorted(doms)
+        elif slot in IDENTITY_SLOTS and slot not in ident and isinstance(word, str) and slot not in ("founded",
+                                                                                                    "domains"):
             ident[slot] = word
     if markets:
         shape["markets"] = sorted(markets, key=lambda s: (s.lower(), s))[:MAX_MARKETS]
