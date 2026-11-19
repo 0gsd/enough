@@ -493,6 +493,17 @@ def test_filing_a_journal_page_makes_it_permanently_read_only(tmp_path: Path):
     assert len(C.load(path).module(mid).pages) == 2
 
 
+def test_a_module_holding_a_filed_page_cannot_be_removed(tmp_path: Path):
+    path = tmp_path / "journal.comp"
+    C.save(path, C.new_composure("journal", "Journal"))
+    mid = C.load(path).modules[0].id
+    ops(path, {"op": "set_page", "module": mid, "n": 1, "markdown": "today"})
+    ops(path, {"op": "file_page", "module": mid, "n": 1, "date": "2026-09-17"})
+    with pytest.raises(ComposureError, match="filed page"):
+        ops(path, {"op": "remove_module", "id": mid})
+    assert C.load(path).module(mid).pages[0].filed
+
+
 def test_council_statements_are_engine_owned(comp_path: Path):
     mid = ops(comp_path, {"op": "add_module", "type": "text",
                           "speaker": "Ed", "turn": "1"}).changed[0]
