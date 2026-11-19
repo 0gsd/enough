@@ -1,6 +1,8 @@
 """The moves of a transconception (Thym 20.10; MacroCOSM OES 18.4.9), each `since: 1`: the ground (lane W2-X2)
 and the cases (lane W2-X4) of the 0.8 build, joined by the conductor. The two parts follow in that order, each with
-its own account below; the target (`weigh f in <language>`, lane W3-X5) follows them, its account in its comments.
+its own account below; the target (`weigh f in <language>`, lane W3-X5) follows them, its account in its comments,
+and then entailing into a language (`entail f as layout in <language>`, `entail f as code in <language> with layout`,
+lane W3-X6), its account in its comments.
 
 
 This module holds `ground` (lane W2-X2 of the 0.8 build); the cases moves (`entail f as cases`, `gather recorded`,
@@ -735,7 +737,7 @@ def _source_named(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
 
 @check("evidence-stated")
 def _evidence_stated(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """The cshort the verdict judged carries evidence: its level (1 to 4), its counts (agree no more than kept),
+    """The cshort the verdict judged carries evidence: its level (0 to 6), its counts (agree no more than kept),
     and the verdict file's digest, which is the digest of the verdict gathered."""
     tc = _tc(ctx)
     cat = output.mapping() if isinstance(output, Value) else None
@@ -750,13 +752,13 @@ def _evidence_stated(output: Value, inputs: dict, node: dict, decl: Any, ctx: An
             return False, str(e)
         digest = hashlib.sha256(verdict.bytes()).hexdigest()
     rows = [e for e in cat.get("shorts") or [] if isinstance(e, dict) and isinstance(e.get("evidence"), dict)
-            and (label is None or tc.cshort_label(e) == label)]
+            and (label is None or tc.cshort_label(e) == label)]       # `evidence: []` is not written yet
     if not rows:
         return False, f"no cshort {label} carries evidence" if label else "no cshort carries evidence"
     ev = rows[-1]["evidence"]
     lv, st, wh = ev.get("level"), ev.get("steps"), ev.get("where")
-    if not (isinstance(lv, int) and 1 <= lv <= 4):
-        return False, "evidence.level is 1 to 4"
+    if not (isinstance(lv, int) and 0 <= lv <= 6):                 # MacroCOSM 18.4.9's seven levels
+        return False, "evidence.level is 0 to 6"
     if not (isinstance(st, dict) and isinstance(st.get("kept"), int) and isinstance(st.get("agree"), int)
             and 0 <= st["agree"] <= st["kept"]):
         return False, "evidence.steps is {kept, agree}, agree no more than kept"
@@ -1311,3 +1313,728 @@ def _weigh_no_invention(output: Value, inputs: dict, node: dict, decl: Any, ctx:
 
 
 __all__ += ["TARGET_POINTS", "parse_weigh", "weigh", "weigh_finish", "weigh_rules", "weighed_problems"]
+
+
+# ---- entailing into a language (lane W3-X6) ----
+
+from enough.thym.folder import Folder  # noqa: E402  (the entailing part's own, beside the target part)
+from enough.thym.moves import entailment_of, short_value, utc_day  # noqa: E402
+from enough.thym.moves.code import _yaml, fabulac_file, folder_of_texts, licence_line  # noqa: E402
+#
+# **`entail f as layout in <language>`** (Thym 6.3, 20.10; MacroCOSM OES 18.4.9), fabula -> short, asks once: the
+# files of the program to be, in the order they are written, what each holds, the name each kept interface takes
+# there, the target's own type for each item ruled `alike` with `own-types`, and what fills each gap the standing
+# weighing names. A model proposes it as YAML; rules check it against the fabulac's kept interfaces (every one in a
+# file, under a name; only items the fabulac holds) and write the short, which the host saves beside the fabulac as
+# `<name>.layout-<language>-<stamp>.md`. Its footer is its last line: `*a layout of F, in Go, compiled on DAY by WHO*`.
+#
+# **`entail f as code in <language> with layout`**, fabula and short -> folder, asks once per file the layout names:
+# the cshort, `<name>.cshort-<language>-<stamp>/` once the host lands it. Apart by default: each request carries the
+# fabulac (spans, source paths, provenance and the R, D and H modules left out) and the layout, and nothing of the
+# source; every request is kept in `requests.jsonl`, so that `apart` can be measured. Beside only where MacroCOSM OES
+# permits it (the person's own code, or a source in the open lane) and only when the person asked, which a host says
+# by giving the engine the source (`enough.transconception.thym_engine(beside=…)`): a program cannot ask for it, and a
+# closed or bound lane is refused. Rules write `CSHORT.md` (the footer first, as every cshort's; the files with their
+# sha256; the interface table `surface-answered` reads; the licence line last), `NOTES.md` (what the fabulac left
+# unsaid: each file's guesses, as its writer wrote them down), `NOTICE` (the licence notice and credit of the source)
+# and `requests.jsonl`. The cshort's entry for `shorts` rides on the value (`origin.entry`): `target`, `layout`,
+# `entailed`, and `evidence: []`, since a cshort's evidence is read from the judge's verdict (`gather verdict with
+# f`), never claimed. `parses` is not in the contract: the host reads no other language; whether the cshort builds is
+# the outside runner's first level.
+#
+# Both open with `target-confirmed` for the language (gate 2's last check): refused, before a model is asked, until the
+# language is weighed, feasible, and its spike has stood.
+
+IN_STEPS = ("layout", "code-in")
+#: The files rules write into a cshort in another language: never asked of a model, never named by a layout.
+RULE_FILES = ("CSHORT.md", "NOTES.md", "NOTICE", "requests.jsonl")
+#: What an item carries that names the source rather than the program: left out of a request entailed apart.
+APART_DROP = ("span", "spans", "provenance", "defined-in", "files", "path", "file", "lines", "made", "stated",
+              "contradicted-by", "first-line", "set-in", "worksheet-id", "digest", "sha256")
+#: The modules a request entailed apart leaves out: who made the source, its dialectic, its history.
+APART_SKIP = ("R", "D", "H")
+_APART_KINDS_SKIP = ("file", "component", "change", "release", "phase", "event", "question")
+_LAYOUT_FOOT = re.compile(r"^\*a layout of (?P<f>\S.*?), in (?P<lang>[^,]+), compiled on (?P<day>\d{4}-\d{2}-\d{2}) "
+                          r"by (?P<who>.+)\*$")
+_ORIGINAL = "a file of the original"
+
+
+def _in_language(mods: dict, what: str) -> str:
+    language = _word(mods.get("in"))
+    if language is None:
+        raise MoveError(f"{what} names the language: entail f as layout in go, entail f as code in go with layout")
+    return language
+
+
+def _transconception(f: Any, what: str) -> tuple[dict, list[dict]]:
+    cat, items = _fabula(f, f"{what} entails a fabulac kept for transconception")
+    _need_fabulac(cat, "f", f"{what} entails a fabulac")
+    if cat.get("purpose") != "transconception":
+        raise MoveError(f"f is not kept for transconception (its catalog says no purpose: transconception): {what} "
+                        "entails a transconception")
+    return cat, items
+
+
+def _confirmed(ctx: Any, cat: dict, items: list[dict], language: str, what: str) -> tuple[Any, dict, dict, str]:
+    """The engine, the language, the standing weighing and the id rulings are made for; a MoveError when the
+    language is the source's own (the round trip is `entail f as code`), unknown, or not confirmed."""
+    tc = _tc(ctx)
+    src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
+    if language == str(src.get("language") or "").lower():
+        raise MoveError(f"{language} is f's own language: its round trip is entail f as code, with no layout")
+    info = tc.language_info(language)
+    if not info.get("ok"):
+        raise MoveError(info.get("why") or f"{language} is no language this build knows")
+    if not info.get("target"):
+        raise MoveError(f"{info['title']} is not a language a program is entailed into in this build")
+    probs = tc.target_confirmed_problems(cat, items, language)
+    if probs:
+        raise MoveError(f"{what} in {language} waits for gate 2's target-confirmed: {probs[0]}"
+                        + (f" (and {len(probs) - 1} more)" if len(probs) > 1 else ""))
+    latest, rref = tc.standing_weighing(items, language)
+    return tc, info, latest or {}, str(rref)
+
+
+def _for_target(d: dict, rref: str) -> list[dict]:
+    """An item's rulings that hold for the target, as a writer reads them."""
+    keep = ("is", "allowing", "because", "to", "about", "steps", "said")
+    return [{k: x[k] for k in keep if k in x} for x in _rulings_of(d) if x.get("made-for") in (None, rref)]
+
+
+def _scrub(v: Any, paths: set[str]) -> Any:
+    if isinstance(v, str):
+        for p in sorted(paths, key=len, reverse=True):
+            if p:
+                v = re.sub(rf"(?<![A-Za-z0-9_]){re.escape(p)}(?![A-Za-z0-9_])", _ORIGINAL, v)
+        return v
+    if isinstance(v, dict):
+        return {k: _scrub(x, paths) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_scrub(x, paths) for x in v]
+    return v
+
+
+def apart_view(d: dict, rref: str, paths: set[str]) -> dict:
+    """An item as a request entailed apart carries it: without what names the source (spans, paths, provenance,
+    citations), its rulings only those for the target, and any path of the source in its words said as "a file of the
+    original"."""
+    out = {k: v for k, v in d.items() if k not in APART_DROP and k != "ruling"}
+    r = _for_target(d, rref)
+    if r:
+        out["ruling"] = r
+    return _scrub(out, paths)
+
+
+def _skipped(d: dict) -> bool:
+    iid = str(d.get("id") or "")
+    return iid[:1] in APART_SKIP or item_kind(d) in _APART_KINDS_SKIP
+
+
+def _must_map(tc: Any, items: list[dict], rref: str) -> list[dict]:
+    """The interfaces a layout and a cshort answer: kept or alike for the target, or not ruled for it yet (proposed
+    kept, as the weighing read them)."""
+    return [d for d in items if item_kind(d) == "interface" and tc.surface_kept(d, rref, unruled=True)]
+
+
+def _own_types(items: list[dict], rref: str) -> list[dict]:
+    return [d for d in items if any(x.get("is") == "alike" and x.get("allowing") == "own-types"
+                                    for x in _for_target(d, rref))]
+
+
+def _gaps(latest: dict, by: dict[str, dict], rref: str) -> list[dict]:
+    """The standing weighing's gaps, for what is not ruled free: `{for, name, by, what, gap}`."""
+    out = []
+    for r in latest.get("provides") or []:
+        if isinstance(r, dict) and r.get("gap") and ruled_state(by.get(str(r.get("for")), {}), rref) != "free":
+            out.append({"for": r.get("for"), "name": by.get(str(r.get("for")), {}).get("name"), "by": r.get("by"),
+                        "what": r.get("what"), "gap": r.get("gap")})
+    return out
+
+
+def _brief_item(d: dict, rref: str, paths: set[str]) -> dict:
+    keep = ("id", "name", "summary", "surface", "signature", "takes", "gives", "raises", "fails", "plain", "means",
+            "does", "when", "edges", "errors", "of", "key", "default", "kind", "fields")
+    v = apart_view(d, rref, paths)
+    return {k: v[k] for k in list(keep) + ["ruling"] if k in v}
+
+
+def layout_inputs(cat: dict, items: list[dict], *, language: dict, latest: dict, rref: str, paths: set[str],
+                  must: list[dict]) -> dict:
+    """The layout request's inputs, as plain strings: the program (its atem and what it holds, apart), the interfaces
+    to map, the items that take the target's own types, the gaps and the weighing's conditions."""
+    by = {str(d.get("id")): d for d in items}
+    program = {"atem": _scrub(cat.get("atem") or {}, paths),
+               "interfaces": [_brief_item(d, rref, paths) for d in must],
+               "structures": [_brief_item(d, rref, paths) for d in items if item_kind(d) == "structure"
+                              and not _skipped(d)],
+               "settings": [_brief_item(d, rref, paths) for d in items if item_kind(d) == "setting"][:60],
+               "dependencies": [{k: d.get(k) for k in ("id", "name", "needed-for", "scope") if d.get(k)}
+                                for d in items if item_kind(d) == "dependency"]}
+    types = [{"for": d["id"], "name": d.get("name"), "ruling": _for_target(d, rref)} for d in _own_types(items, rref)]
+    gaps = _gaps(latest, by, rref)
+    return {"fabulac": "layout", "name": str(cat.get("name") or "the program"), "language": language["title"],
+            "suffixes": ", ".join("." + s for s in language.get("suffixes") or []),
+            "program": _yaml(_scrub(program, paths)),
+            "map": "\n".join(f"- {d['id']}: {d.get('name') or ''}" for d in must),
+            "types": _yaml(types) if types else "(none)", "gaps": _yaml(gaps) if gaps else "(none)",
+            "conditions": _yaml(list(latest.get("conditions") or [])) if latest.get("conditions") else "(none)"}
+
+
+def _rel_ok(p: Any) -> bool:
+    return (isinstance(p, str) and bool(p) and p.strip() == p and not p.startswith(("/", "\\"))
+            and ".." not in p.split("/") and "\\" not in p and p not in RULE_FILES and not p.endswith("/"))
+
+
+def parse_layout(out: Any, *, must: list[str], types: list[str], gaps: list[str], ids: set[str],
+                 suffixes: list[str]) -> dict:
+    """A model's layout read and checked by rules: `{files: [{path, holds, interfaces: [{id, name}]}], types: [{for,
+    type}], gaps: [{for, fill}]}`. A ValueError (asked again) for a file named twice or outside the cshort, a file the
+    rules write, no file in the language, an interface to map that no file holds, an id the fabulac lacks, an own type
+    or a gap left unanswered."""
+    data = answer_mapping(out)
+    files_in = data.get("files")
+    if not isinstance(files_in, list) or not files_in:
+        raise ValueError("files: the files of the program to be, in the order they are written")
+    files: list[dict] = []
+    seen: set[str] = set()
+    where: dict[str, list[str]] = {}
+    for i, f in enumerate(files_in):
+        if not isinstance(f, dict) or not _rel_ok(f.get("path")):
+            raise ValueError(f"files[{i}]: a path inside the program, not one of {', '.join(RULE_FILES)}")
+        p = f["path"]
+        if p in seen:
+            raise ValueError(f"{p} is named twice")
+        seen.add(p)
+        ifs = []
+        for x in f.get("interfaces") or []:
+            if not (isinstance(x, dict) and isinstance(x.get("id"), str) and isinstance(x.get("name"), str)
+                    and x["name"].strip()):
+                raise ValueError(f"{p}: each interface it holds is {{id, name}}")
+            if x["id"] not in ids:
+                raise ValueError(f"{p} holds {x['id']}, which the fabulac does not hold")
+            ifs.append({"id": x["id"], "name": x["name"].strip()})
+            where.setdefault(x["id"], []).append(p)
+        holds = f.get("holds")
+        files.append({"path": p, "holds": holds.strip() if isinstance(holds, str) and holds.strip() else "",
+                      "interfaces": ifs})
+    if suffixes and not any(p.rsplit(".", 1)[-1] in suffixes for p in seen if "." in p):
+        raise ValueError(f"no file is in the language: none ends in .{', .'.join(suffixes)}")
+    missing = [m for m in must if m not in where]
+    if missing:
+        raise ValueError(f"no file holds {', '.join(missing[:5])}" + (f" (and {len(missing) - 5} more)"
+                                                                      if len(missing) > 5 else ""))
+
+    def pairs(key: str, val: str, want: list[str]) -> list[dict]:
+        got: dict[str, str] = {}
+        for x in data.get(key) or []:
+            if not isinstance(x, dict):
+                continue
+            if x.get("for") not in ids:
+                raise ValueError(f"{key} names {x.get('for')!r}, which the fabulac does not hold")
+            if isinstance(x.get(val), str) and x[val].strip():
+                got[str(x["for"])] = x[val].strip()
+        left = [w for w in want if w not in got]
+        if left:
+            raise ValueError(f"{key}: no {val} for {', '.join(left[:5])}")
+        return [{"for": k, val: v} for k, v in got.items()]
+    return {"files": files, "types": pairs("types", "type", types), "gaps": pairs("gaps", "fill", gaps)}
+
+
+def _cell(s: Any) -> str:
+    return str(s or "").replace("\n", " ").replace("|", "\\|").strip()
+
+
+def layout_text(layout: dict, *, name: str, fabulac: str, language: str, day: str, who: str) -> str:
+    """The layout short (Thym 20.10): its files in the order they are written, its interface table (the plain form
+    `surface-answered` reads), the own types, the gaps, and its footer last."""
+    out = [f"# {name} in {language}: the layout", "",
+           f"A layout of {fabulac} for its transconception into {language}: the files of the program to be, in the "
+           "order they are written, what each holds, and the name each kept interface takes there. Written from the "
+           "fabulac alone.", "", "## Files, in the order they are written", "", "| # | file | holds |",
+           "|---|---|---|"]
+    out += [f"| {i} | {_cell(f['path'])} | {_cell(f['holds'])} |" for i, f in enumerate(layout["files"], 1)]
+    out += ["", "## Interfaces", "", "| interface | file | name |", "|---|---|---|"]
+    out += [f"| {x['id']} | {_cell(f['path'])} | {_cell(x['name'])} |" for f in layout["files"]
+            for x in f["interfaces"]]
+    if layout.get("types"):
+        out += ["", "## The target's own types", "", "| item | type |", "|---|---|"]
+        out += [f"| {t['for']} | {_cell(t['type'])} |" for t in layout["types"]]
+    if layout.get("gaps"):
+        out += ["", "## Gaps, and what fills each", "", "| gap | fill |", "|---|---|"]
+        out += [f"| {g['for']} | {_cell(g['fill'])} |" for g in layout["gaps"]]
+    out += ["", f"*a layout of {fabulac}, in {language}, compiled on {day} by {who}*"]
+    return "\n".join(out) + "\n"
+
+
+def _table_cells(line: str) -> list[str] | None:
+    s = line.strip()
+    if not (s.startswith("|") and s.endswith("|") and len(s) > 1):
+        return None
+    parts = re.split(r"(?<!\\)\|", s[1:-1])
+    return [p.replace("\\|", "|").strip() for p in parts]
+
+
+def read_layout(text: str) -> dict:
+    """A layout short read back (from this run or from its file): `{files, types, gaps, fabulac, language, day,
+    who}`; a MoveError for a text that is no layout."""
+    lines = text.replace("\r\n", "\n").split("\n")
+    section, files, where, types, gaps = "", [], {}, [], []
+    for ln in lines:
+        if ln.startswith("## "):
+            section = ln[3:].strip().lower()
+            continue
+        cells = _table_cells(ln)
+        if cells is None or all(re.fullmatch(r":?-{3,}:?", c) for c in cells) \
+                or cells[0] in ("#", "interface", "item", "gap"):
+            continue
+        if section.startswith("files") and len(cells) >= 3:
+            files.append({"path": cells[1], "holds": cells[2], "interfaces": []})
+        elif section == "interfaces" and len(cells) >= 3:
+            where.setdefault(cells[1], []).append({"id": cells[0], "name": cells[2]})
+        elif section.startswith("the target") and len(cells) >= 2:
+            types.append({"for": cells[0], "type": cells[1]})
+        elif section.startswith("gaps") and len(cells) >= 2:
+            gaps.append({"for": cells[0], "fill": cells[1]})
+    for f in files:
+        f["interfaces"] = where.get(f["path"], [])
+    foot = next((ln.strip() for ln in reversed(lines) if ln.strip()), "")
+    m = _LAYOUT_FOOT.match(foot)
+    if not files or m is None:
+        raise MoveError("the layout is no layout: it names no file, or its last line is not a layout's footer")
+    return {"files": files, "types": types, "gaps": gaps, "fabulac": m.group("f"), "language": m.group("lang"),
+            "day": m.group("day"), "who": m.group("who")}
+
+
+def entail_layout(ctx: Any, f: Value, **mods: Any) -> Request:
+    """`entail f as layout in <language>`: the layout short, a model's proposal checked by rules."""
+    language = _in_language(mods, "entail … as layout")
+    cat, items = _transconception(f, "entail … as layout")
+    tc, info, latest, rref = _confirmed(ctx, cat, items, language, "entail … as layout")
+    paths = set(tc.source_paths(items))
+    must = _must_map(tc, items, rref)
+    inputs = layout_inputs(cat, items, language=info, latest=latest, rref=rref, paths=paths, must=must)
+    by = {str(d.get("id")): d for d in items}
+    want = {"must": [d["id"] for d in must], "types": [d["id"] for d in _own_types(items, rref)],
+            "gaps": [str(g["for"]) for g in _gaps(latest, by, rref)], "ids": set(by), "suffixes": info["suffixes"]}
+    fab_name = fabulac_file(cat, f)
+
+    def parse(out: Any) -> Value:
+        layout = parse_layout(out, **want)
+        who = model_of(answer_mapping(out)) or "a model"
+        text = layout_text(layout, name=str(cat.get("name") or "the program"), fabulac=fab_name,
+                           language=info["title"], day=utc_day(ctx), who=who)
+        return short_value(text, fabula=f, order="layout",
+                           layout={"language": language, "rulings-for": rref, "weighing": latest.get("id"),
+                                   "request": inputs, **layout})
+    says = (f"the layout of the program in {info['title']}, as one YAML mapping: files (each {{path, holds, "
+            "interfaces: [{id, name}]}, in the order they are written), types ([{for, type}]), gaps ([{for, fill}])")
+    return Request(contract={"schema": {"format": "yaml", "stamp": "engine", "says": says}, "repair": []},
+                   inputs={k: Value("string", v) for k, v in inputs.items()}, parse=parse)
+
+
+def _layout_of(w: Any) -> dict:
+    if not isinstance(w, Value) or w.type not in ("short", "text", "string"):
+        raise MoveError("entail … as code in a language takes its layout with it: entail f as code in go with "
+                        "layout, the short entail f as layout in go gave")
+    return read_layout(w.text())
+
+
+def _refs_of(d: dict) -> list[str]:
+    out: list[str] = []
+    for k in ("of", "used-by", "relied-by", "about", "shown-by"):
+        v = d.get(k)
+        for x in (v if isinstance(v, list) else [v]):
+            if isinstance(x, str):
+                out.append(x.split("#", 1)[0])
+    return out
+
+
+def file_brief(items: list[dict], layout: dict, path: str, *, rref: str, paths: set[str], latest: dict) -> dict:
+    """What one file's request carries, apart (what made the experiment's writers succeed, x0 step A8): the
+    interfaces the layout puts in it, with their rulings for the target; the behaviours, structures and settings about
+    them; the reliances they lean on with what the standing weighing says provides each; the cases about them, which
+    are the judge; the own types and gaps the layout gives; and the names the layout gives in the other files."""
+    by = {str(d.get("id")): d for d in items}
+    mine = next((f for f in layout["files"] if f["path"] == path), {"interfaces": []})
+    ids = [x["id"] for x in mine["interfaces"]]
+    near = set(ids)
+    about = [d for d in items if item_kind(d) in ("behaviour", "structure", "setting", "requirement")
+             and not _skipped(d) and set(_refs_of(d)) & near]
+    near |= {str(d.get("id")) for d in about}
+    leaned = [d for d in items if item_kind(d) in ("reliance", "assumption") and set(_refs_of(d)) & near]
+    rows = {str(r.get("for")): r for r in latest.get("provides") or [] if isinstance(r, dict)}
+    cases = [d for d in items if item_kind(d) == "case" and set(_refs_of(d)) & set(ids)]
+    lean = []
+    for d in leaned:
+        row = {k: v for k, v in apart_view(d, rref, paths).items() if k in ("id", "name", "gives", "example", "ruling")}
+        if d["id"] in rows:
+            row["provided"] = {k: rows[d["id"]][k] for k in ("by", "what", "note", "gap") if k in rows[d["id"]]}
+        lean.append(row)
+    leaned_ids = {str(d.get("id")) for d in leaned}
+    out: dict = {
+        "file": {"path": path, "holds": mine.get("holds") or ""},
+        "interfaces": [{**_brief_item(by[x["id"]], rref, paths), "takes the name": x["name"]}
+                       for x in mine["interfaces"] if x["id"] in by],
+        "about them": [_brief_item(d, rref, paths) for d in about],
+        "they lean on": lean,
+        "the cases, which are the judge": [_scrub({k: v for k, v in d.items() if k in ("id", "name", "of", "given",
+                                                                                       "expect", "allowing", "stands")},
+                                                  paths) for d in cases],
+        "own types": [t for t in layout.get("types") or [] if t["for"] in near],
+        "gaps": [g for g in layout.get("gaps") or [] if g["for"] in near or g["for"] in leaned_ids],
+        "elsewhere": [{"file": f["path"], "names": [x["name"] for x in f["interfaces"]]}
+                      for f in layout["files"] if f["path"] != path]}
+    return {k: v for k, v in out.items() if v not in ([], "", None)}
+
+
+_NOTES_HEAD = re.compile(r"^#{1,3}\s*notes\b.*$", re.I | re.M)
+
+
+def file_and_notes(out: Any) -> tuple[str, list[str]]:
+    """A writer's reply read: the file (its one fenced block, or the whole reply) and its notes (the bullets under a
+    `## Notes` line after the block): what the fabulac left unsaid and what the writer chose."""
+    s = out if isinstance(out, str) else (_yaml(out) if isinstance(out, dict) else str(out or ""))
+    s = s.replace("\r\n", "\n")
+    m = re.search(r"```[A-Za-z0-9_+.-]*\n(.*?)\n?```", s, re.S)
+    body, rest = (m.group(1), s[m.end():]) if m else (s, "")
+    if not m:
+        h = _NOTES_HEAD.search(s)
+        if h:
+            body, rest = s[:h.start()], s[h.start():]
+    notes: list[str] = []
+    h = _NOTES_HEAD.search(rest)
+    if h:
+        for ln in rest[h.end():].split("\n"):
+            t = ln.strip()
+            if t.startswith(("- ", "* ")):
+                notes.append(t[2:].strip())
+            elif t and notes and not t.startswith("#"):
+                notes[-1] += " " + t
+    return body.rstrip("\n") + "\n", notes
+
+
+def notice_text(cat: dict, items: list[dict], *, name: str, language: str, entailed: str, day: str) -> str:
+    """`NOTICE`: the credit and the licence notice of the source, as MacroCOSM OES 18.4.9 asks a transconception to
+    carry them: what it is a transconception of, under which terms, by whom, and what was read."""
+    src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
+    lic = [d for d in items if item_kind(d) == "licence"]
+    holders = [str(d.get("holder")) for d in lic if d.get("holder")]
+    ident = ", ".join(str(d.get("identifier") or d.get("name")) for d in lic) or str(src.get("licence") or "")
+    who = ", ".join(dict.fromkeys(holders)) or "its makers"
+    of = str(src.get("name") or cat.get("name") or name)
+    out = [f"{name}, in {language}, is a transconception of {of}" + (f" ({src['commit']})" if src.get("commit") else "")
+           + f", by {who}, carried through its fabulac.", "",
+           f"The source is under the {ident} licence." if ident else "The source's licence is not recorded.",
+           ("It was written from the fabulac and its layout alone: no line of the source was read."
+            if entailed == "apart" else "It was written from the fabulac and its layout, the source read beside them; "
+            "no line of the source is copied.")]
+    for d in lic:
+        if d.get("year") or d.get("holder"):
+            out += ["", " ".join(x for x in ("Copyright (c)", str(d.get("year") or ""), str(d.get("holder") or ""))
+                                 if x)]
+        notice = d.get("notice")
+        if isinstance(notice, str) and notice.strip():
+            out += ["", notice.strip()]
+    out += ["", f"Entailed on {day}."]
+    return "\n".join(out) + "\n"
+
+
+def cshort_in_md(*, fabulac: str, language: str, day: str, who: str, name: str, entailed: str, layout_name: str,
+                 files: list[tuple[str, str, str]], rows: list[tuple[str, str, str]], licence: str) -> str:
+    """`CSHORT.md` of a cshort in another language: the footer first (MacroCOSM OES 18.4.7), what it is, the files
+    with their sha256, the interface table (`surface-answered`), and the licence line last."""
+    how = "from the fabulac and its layout alone" if entailed == "apart" else "the source read beside the fabulac"
+    out = [f"*a cshort of {fabulac}, in {language}, compiled on {day} by {who}; never run*", "",
+           f"{name} in {language}: a transconception, entailed {entailed} ({how}), laid out by {layout_name}. Never "
+           "built or run here: building and judging it is the outside runner's. What the fabulac left unsaid, and "
+           "what was chosen, is in NOTES.md; the source's licence notice and credit in NOTICE.", "",
+           "| file | holds | sha256 |", "|---|---|---|"]
+    out += [f"| {p} | {_cell(h)} | {sha} |" for p, h, sha in files]
+    out += ["", "## Every kept interface, mapped", "", "| interface | file | name |", "|---|---|---|"]
+    out += [f"| {i} | {_cell(p)} | {_cell(n)} |" for i, p, n in rows]
+    out += ["", licence]
+    return "\n".join(out) + "\n"
+
+
+def entail_code_in(ctx: Any, f: Value, **mods: Any) -> Value:
+    """`entail f as code in <language> with layout`: the cshort, one request per file the layout names, apart unless
+    the host gives the source beside (the person asked, and MacroCOSM OES permits it)."""
+    language = _in_language(mods, "entail … as code")
+    cat, items = _transconception(f, "entail … as code in a language")
+    tc, info, latest, rref = _confirmed(ctx, cat, items, language, "entail … as code")
+    w = mods.get("with")
+    layout = _layout_of(w)
+    fab_name = fabulac_file(cat, f)
+    if layout["fabulac"] != fab_name:
+        raise MoveError(f"the layout is of {layout['fabulac']}, not {fab_name}")
+    if layout["language"] != info["title"]:
+        raise MoveError(f"the layout is in {layout['language']}, not {info['title']}")
+    beside = getattr(tc, "beside", None)
+    beside_files = beside() if callable(beside) else None
+    entailed = "apart"
+    if beside_files is not None:
+        ok, why = tc.beside_allowed(cat, items)
+        if not ok:
+            raise MoveError(f"entailing beside the source is refused: {why}")
+        entailed = "beside"
+    paths = set(tc.source_paths(items))
+    name = str(cat.get("name") or "the program")
+    order = [x["path"] for x in layout["files"]]
+    prev = getattr(ctx, "previous", None)
+    texts: dict[str, str] = {}
+    notes: dict[str, list[str]] = {}
+    requests: list[str] = []
+    meta: dict = {}
+    if isinstance(prev, Value) and isinstance(prev.payload, Folder):
+        texts = {p: prev.payload.text(p) for p in order if prev.payload.entry(p) is not None}
+        meta = dict((prev.origin or {}).get("cshort") or {})
+        notes = {k: list(v) for k, v in (meta.pop("notes", None) or {}).items()}
+        if prev.payload.entry("requests.jsonl") is not None:
+            requests = [ln for ln in prev.payload.text("requests.jsonl").split("\n") if ln.strip()]
+    failed = getattr(ctx, "failed", None) or []
+    redo = {p for p in order if any(p in str(x.get("why") or "") for x in failed if isinstance(x, dict))} \
+        if texts else set(order)
+    if texts and not redo:
+        redo = set(order)
+    layout_md = _scrub(w.text(), paths)
+    for p in order:
+        if p not in redo and p in texts:
+            continue
+        brief = file_brief(items, layout, p, rref=rref, paths=paths, latest=latest)
+        inputs = {"fabulac": "code-in", "name": name, "language": info["title"], "path": p, "layout": layout_md,
+                  "brief": _yaml(brief), "entailed": entailed}
+        if entailed == "beside":
+            inputs["source"] = "\n\n".join(f"--- {k} ---\n{v}" for k, v in sorted(beside_files.items()))
+        line = json.dumps({"request": len(requests) + 1, "writes": p, "entailed": entailed, "inputs": inputs},
+                          sort_keys=True)            # ASCII: one request is one line, whatever its text holds
+        if entailed == "apart":
+            bad = tc.apart_problems([line], paths, None, tc.nothing_carried)
+            if bad:                      # never sent: a request entailed apart carries nothing of the source
+                raise MoveError(f"the request for {p} would not be apart: {bad[0]}")
+        requests.append(line)
+        cand = ctx.ask({"schema": {"format": "markdown", "says": f"the whole of {p} in one fenced block, then what "
+                                                                 "you chose where the fabulac is silent, under ## Notes"}},
+                       {k: Value("string", v) for k, v in inputs.items()})
+        texts[p], notes[p] = file_and_notes(cand.get("output") if isinstance(cand, dict) else None)
+        eng = str(cand.get("engine") or "") if isinstance(cand, dict) else ""
+        if eng.startswith("model:") and eng[6:] not in ("", "unknown"):
+            meta.setdefault("model", eng[6:])
+    who = str(meta.get("model") or "a model")
+    day = utc_day(ctx)
+    wp = getattr(w, "path", None)
+    layout_name = Path(wp).name if wp is not None else f"its layout of {layout['day']}"
+    rows = [(x["id"], fl["path"], x["name"]) for fl in layout["files"] for x in fl["interfaces"]]
+    out = {p: texts[p] for p in order}
+    out["NOTICE"] = notice_text(cat, items, name=name, language=info["title"], entailed=entailed, day=day)
+    nb = [f"# What the fabulac left unsaid: {name} in {info['title']}", "",
+          "Each file's writer wrote down here what the fabulac and its layout did not say, and what it chose: a guess "
+          "is never silent.", ""]
+    for p in order:
+        nb += [f"## {p}", ""] + ([f"- {n}" for n in notes.get(p) or []] or ["- nothing left unsaid, by its writer"])
+        nb += [""]
+    if layout.get("gaps"):
+        nb += ["## The weighing's gaps, as the layout fills them", ""]
+        nb += [f"- {g['for']}: {g['fill']}" for g in layout["gaps"]] + [""]
+    out["NOTES.md"] = "\n".join(nb).rstrip("\n") + "\n"
+    out["requests.jsonl"] = "\n".join(requests) + "\n"
+    holds = {fl["path"]: fl["holds"] for fl in layout["files"]}
+    shas = [(p, holds.get(p, {"NOTICE": "the source's licence notice and credit",
+                              "NOTES.md": "what the fabulac left unsaid"}.get(p, "")),
+             hashlib.sha256(out[p].encode("utf-8")).hexdigest()) for p in order + ["NOTICE", "NOTES.md"]]
+    out["CSHORT.md"] = cshort_in_md(fabulac=fab_name, language=info["title"], day=day, who=who, name=name,
+                                    entailed=entailed, layout_name=layout_name, files=shas, rows=rows,
+                                    licence=licence_line(cat))
+    stem = fab_name[: -len(".fabulac.cosm")] if fab_name.endswith(".fabulac.cosm") else fab_name
+    folder = folder_of_texts(f"{stem}.cshort-{language}/", out)
+    entry = {"path": f"{stem}.cshort-{language}/", "order": "code", "language": language, "target": rref,
+             "layout": layout_name, "entailed": entailed, "evidence": [], "files": len(order)}
+    return Value("folder", folder, origin={"cshort": {**meta, "language": language, "in": info["title"],
+                                                      "entailed": entailed, "day": day, "rulings-for": rref,
+                                                      "notes": notes},
+                                           "entry": entry})
+
+
+def is_in_language(mods: dict) -> bool:
+    """Whether an `entail` call is a transconception's into another language: `as layout`, or `as code` with `in`."""
+    v = mods.get("in")
+    named = v is not None and not (isinstance(v, Value) and v.is_nothing)
+    return mods.get("as") == "layout" or (mods.get("as") == "code" and named)
+
+
+def refuse_stray(mods: dict) -> None:
+    """`in` a language belongs to `as layout` and `as code`, and a layout (a short) goes `with` `as code in` only:
+    anywhere else they are refused, never ignored."""
+    v = mods.get("in")
+    if v is not None and not (isinstance(v, Value) and v.is_nothing):
+        raise MoveError("entail … in a language takes as layout or as code")
+    w = mods.get("with")
+    if isinstance(w, Value) and w.type == "short":
+        raise MoveError("entail … with a short takes it as the layout of entail f as code in a language")
+
+
+def entail_in(ctx: Any, x: Value, **mods: Any) -> Any:
+    """`entail f as layout in <language>` and `entail f as code in <language> with layout` (`emf.entail` hands them
+    here)."""
+    if mods.get("as") == "layout":
+        return entail_layout(ctx, x, **mods)
+    return entail_code_in(ctx, x, **mods)
+
+
+def entail_in_scaffold(ctx: Any, x: Value, **mods: Any) -> Any:
+    raise MoveError("entail … in a language has no scaffold: only a model lays out and writes a program in another "
+                    "language, so a run with --rules cannot entail it")
+
+
+# ---- their checks ----
+
+def _out_language(output: Value, node: dict) -> str | None:
+    o = (output.origin or {}) if isinstance(output, Value) else {}
+    lang = ((o.get("cshort") or {}).get("language") or ((o.get("entailment") or {}).get("layout") or {}).get("language"))
+    if isinstance(lang, str):
+        return lang
+    m = (node or {}).get("modifiers") if isinstance(node, dict) else None
+    return _word(m.get("in")) if isinstance(m, dict) else None
+
+
+def _in_fabula(output: Value, inputs: dict) -> Value | None:
+    for v in inputs.values():
+        if isinstance(v, Value) and v.type == "fabula":
+            return v
+    t = entailment_of(output)
+    return t.get("fabula") if t and isinstance(t.get("fabula"), Value) else None
+
+
+def is_cshort_in_language(output: Value) -> bool:
+    """A folder this module's `entail … as code in` gave, or one whose `CSHORT.md` footer names another language
+    than Python (what `files-present` and `footer` hand here)."""
+    if not isinstance(output, Value) or not isinstance(output.payload, Folder):
+        return False
+    if ((output.origin or {}).get("cshort") or {}).get("in"):
+        return True
+    f = output.payload
+    if f.entry("CSHORT.md") is None:
+        return False
+    first = next((ln for ln in f.text("CSHORT.md").split("\n") if ln.strip()), "")
+    m = re.match(r"^\*a cshort of .+?, in ([^,]+), compiled on ", first)
+    return bool(m) and m.group(1).strip().lower() != "python"
+
+
+def files_present_in(f: Folder) -> tuple[bool, str]:
+    """`files-present` of a cshort in another language (Thym 7.3): every file its layout names, with `CSHORT.md`,
+    and the digests `CSHORT.md` lists are the files'."""
+    if f.entry("CSHORT.md") is None:
+        return False, "CSHORT.md is missing"
+    md = f.text("CSHORT.md")
+    listed = re.findall(r"^\| (.+?) \| .*? \| ([0-9a-f]{64}) \|$", md, re.M)
+    if not listed:
+        return False, "CSHORT.md lists no file"
+    for p, sha in listed:
+        e = f.entry(p)
+        if e is None:
+            return False, f"CSHORT.md lists {p}, which is not there"
+        if e.sha256 != sha:
+            return False, f"CSHORT.md lists {p} with another sha256 than the file's"
+    named = {r[1] for r in re.findall(r"^\| (C:interface/\S+) \| (.+?) \| .+? \|$", md, re.M)}
+    missing = sorted(p for p in named if f.entry(p) is None)
+    if missing:
+        return False, f"{', '.join(missing[:3])} {'is' if len(missing) == 1 else 'are'} missing"
+    return True, ""
+
+
+@check("target-confirmed")
+def _target_confirmed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Gate 2's last check, the first of an entailment into a language (Thym 20.10; MacroCOSM OES 18.4.9): the
+    language's standing weighing is feasible, no gate point scored 0, every reliance kept is provided, and its spike
+    stood at level 2."""
+    fab = _in_fabula(output, inputs)
+    lang = _out_language(output, node)
+    if fab is None or not lang:
+        return False, "no fabulac and language to confirm the target of"
+    cat, items = fabula_doc(fab)
+    probs = _tc(ctx).target_confirmed_problems({k: plain(v) for k, v in cat.items() if k != "nodes"},
+                                               [plain(it) for it in items], lang)
+    return (not probs), ("; ".join(probs[:3]) if probs else "")
+
+
+@check("surface-answered")
+def _surface_answered(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Of a cshort in another language, in place of `interfaces-present`: `CSHORT.md` maps every interface ruled kept
+    or alike (or not yet ruled for the target) to a file and a name, and the name is in that file. Of a layout: the
+    layout maps each such interface to one of its own files and a name (MacroCOSM OES 18.4.9; Thym 7.3)."""
+    tc = _tc(ctx)
+    fab = _in_fabula(output, inputs)
+    if fab is None:
+        return False, "no fabulac to read the kept interfaces of"
+    items = [plain(it) for it in fabula_doc(fab)[1]]
+    lang = _out_language(output, node)
+    rref = tc.standing_weighing(items, lang)[1] if lang else None
+    if isinstance(output.payload, Folder):
+        f = output.payload
+        if f.entry("CSHORT.md") is None:
+            return False, "CSHORT.md is missing"
+        probs = tc.surface_problems(items, rref, f.text("CSHORT.md"), unruled=True,
+                                    file_text=lambda p: f.text(p) if f.entry(p) is not None else None)
+    else:
+        lay = read_layout(output.text())
+        probs = tc.surface_problems(items, rref, output.text(), unruled=True, files={x["path"] for x in lay["files"]})
+    if probs:
+        return False, "; ".join(f"{i}: {w}" for i, w in probs[:3]) + (f" (and {len(probs) - 3} more)"
+                                                                      if len(probs) > 3 else "")
+    return True, ""
+
+
+@check("apart")
+def _apart(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Of a cshort entailed apart: no request of the entailment carried a span, a source path or the source's text
+    (`requests.jsonl`, kept in the cshort). A cshort entailed beside holds it with nothing to check."""
+    tc = _tc(ctx)
+    if not isinstance(output, Value) or not isinstance(output.payload, Folder):
+        return False, "the output is not a cshort"
+    f = output.payload
+    if ((output.origin or {}).get("cshort") or {}).get("entailed") == "beside":
+        return True, ""                         # entailed beside the source, as the person asked: nothing to check
+    if f.entry("requests.jsonl") is None:
+        return False, "requests.jsonl is missing: the requests of an entailment apart are kept with it"
+    fab = _in_fabula(output, inputs)
+    items = [plain(it) for it in fabula_doc(fab)[1]] if fab is not None else []
+    probs = tc.apart_problems(f.text("requests.jsonl").split("\n"), set(tc.source_paths(items)), None,
+                              tc.nothing_carried)
+    return (not probs), ("; ".join(probs[:3]) if probs else "")
+
+
+@check("footer", kind="layout")
+def _layout_footer(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """A layout ends with its footer: `*a layout of F, in Go, compiled on DAY by WHO*`, F the fabulac's file, DAY
+    the run's day in UTC."""
+    lines = [ln.strip() for ln in output.text().replace("\r\n", "\n").split("\n") if ln.strip()]
+    m = _LAYOUT_FOOT.match(lines[-1]) if lines else None
+    if not m:
+        return False, f"the last line is not a layout's footer: {lines[-1][:80] if lines else ''}"
+    fab = _in_fabula(output, inputs)
+    if fab is not None:
+        cat, _items = fabula_doc(fab)
+        want = fabulac_file({k: plain(v) for k, v in cat.items() if k != "nodes"}, fab)
+        if m.group("f") != want:
+            return False, f"the footer names {m.group('f')}, not {want}"
+    if m.group("day") != utc_day(ctx):
+        return False, f"the footer's day is {m.group('day')}, the run's {utc_day(ctx)}"
+    return True, ""
+
+
+@check("no-invention", kind="layout")
+def _layout_no_invention(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """`no-invention` as a layout holds it: every id it names is an item of the fabulac. Its file names and the names
+    it gives are the new program's to choose; the program's own items are what it may not invent."""
+    fab = _in_fabula(output, inputs)
+    if fab is None:
+        return False, "no fabula to look the layout up in"
+    ids = {str(plain(it).get("id")) for it in fabula_doc(fab)[1]}
+    bad = sorted({x for x in _IDS.findall(output.text()) if x not in ids})
+    if bad:
+        return False, f"the layout names {', '.join(bad[:3])}, which the fabulac does not hold"
+    return True, ""
+
+
+__all__ += ["IN_STEPS", "RULE_FILES", "apart_view", "entail_code_in", "entail_in", "entail_in_scaffold", "refuse_stray",
+            "entail_layout", "file_and_notes", "file_brief", "files_present_in", "is_cshort_in_language",
+            "is_in_language", "layout_text", "parse_layout", "read_layout"]

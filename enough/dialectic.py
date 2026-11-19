@@ -1269,20 +1269,41 @@ def proposal_words(p: dict) -> str:
     return w
 
 
+def _weighings(led: "Ledger", language: str) -> list[dict]:
+    return [d for d in led.items if isinstance(d, dict) and d.get("type") == "target" and isinstance(d.get("id"), str)
+            and str(d.get("language") or "").lower() == language.lower()]
+
+
 def target_ref(src: Any, target: str | None) -> str | None:
-    """The `N:target` a call names: an id that resolves, or a language some `N:target` is weighed for (`go`).
-    Raises DialecticError for a target the fabulac does not hold (weigh it first)."""
+    """The `N:target` a call names: an id that resolves, or a language some `N:target` is weighed for (`go`), read as
+    the weighing that stands: the latest by its `at` of those with a verdict (a later weighing is added beside the
+    earlier ones, never over them; MacroCOSM 18.4.9), else the first. So the target bank asks the points of the
+    weighing that stands. Raises DialecticError for a target the fabulac does not hold (weigh it first)."""
     if target is None:
         return None
     led = ledger_of(src)
     hit = led.item(target) if ":" in target else None
     if hit is not None and hit.get("type") == "target":
         return hit["id"]
-    for d in led.items:
-        if isinstance(d, dict) and d.get("type") == "target" and isinstance(d.get("id"), str) \
-                and str(d.get("language") or "").lower() == target.lower():
-            return d["id"]
-    raise DialecticError(f"no N:target for {target} in this fabulac: weigh it first")
+    ws = _weighings(led, target)
+    if not ws:
+        raise DialecticError(f"no N:target for {target} in this fabulac: weigh it first")
+    weighed = [(i, d) for i, d in enumerate(ws) if "verdict" in d]
+    if weighed:
+        return max(weighed, key=lambda p: (str(p[1].get("at") or ""), p[0]))[1]["id"]
+    return ws[0]["id"]
+
+
+def rulings_ref(src: Any, target: str | None) -> str | None:
+    """The `N:target` rulings for a target are made for: the language's first, whichever weighing stands (a
+    re-weighing does not move the rulings already made). An id names its language's first."""
+    tref = target_ref(src, target)
+    if tref is None:
+        return None
+    led = ledger_of(src)
+    lang = str((led.item(tref) or {}).get("language") or "")
+    ws = _weighings(led, lang) if lang else []
+    return ws[0]["id"] if ws else tref
 
 
 def _target_word(led: "Ledger", ref: str | None) -> str:
@@ -1425,7 +1446,7 @@ def conflicts_from_verdict(src: Any, verdict: Any, *, target: str | None = None,
     out = Raised()
     vt = target or verdict.get("target")
     try:
-        tref = target_ref(led, vt) if vt else None
+        tref = rulings_ref(led, vt) if vt else None           # rulings are made for the language's first target
     except DialecticError:
         tref = None
     standing = {(_about_key(a), _scope({"made-for": (q.get("proposed") or {}).get("made-for")}))
@@ -1877,7 +1898,8 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
     when = now(at)
     out = Raised()
     taken = led.ids()
-    tref = target_ref(led, target)
+    tref = target_ref(led, target)                      # the weighing that stands: its points are the bank's
+    rref = rulings_ref(led, target)                     # the target rulings are made for: the language's first
     standing = [q for q in led.questions() if q.get("state") not in ENDED]
 
     def keys_of(q: dict) -> list[tuple]:
@@ -1957,7 +1979,7 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                 else:
                     pool = _items_of_kind(led, module, kind or None)
                 if sep and fpath == RULING_FIELD:
-                    _raise_rulings(led, e, frm, raised, why, pool, (only_with, at_most, only_where), tref, taken,
+                    _raise_rulings(led, e, frm, raised, why, pool, (only_with, at_most, only_where), rref, taken,
                                    who, add, by_from, out)
                     continue
                 cands = []

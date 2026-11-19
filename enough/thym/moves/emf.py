@@ -322,6 +322,8 @@ def entail(ctx: Any, x: Value, **mods: Any) -> Request:
     catem's depths are the fabulac's (`code.py`, THYM 20.7); `as cases` is transconception's (`transconceive.py`)."""
     if mods.get("as") == "cases":
         return transconceive.entail_cases(ctx, x, **mods)
+    if transconceive.is_in_language(mods): return transconceive.entail_in(ctx, x, **mods)  # noqa: E701 - 0.8
+    transconceive.refuse_stray(mods)                    # `in` or a layout `with` on any other entail
     branch = _code.entail_branch(ctx, x, mods)
     if branch is not None:
         return branch
@@ -352,6 +354,7 @@ def entail_outline(ctx: Any, x: Value, **mods: Any) -> Value:
     `uses-outline`, and `as code` has no scaffold (`code.py`); `as cases` needs no model, and is its own scaffold."""
     if mods.get("as") == "cases":
         return transconceive.entail_cases(ctx, x, **mods)
+    if transconceive.is_in_language(mods): return transconceive.entail_in_scaffold(ctx, x, **mods)  # noqa: E701
     branch = _code.entail_scaffold_branch(ctx, x, mods)
     if branch is not None:
         return branch

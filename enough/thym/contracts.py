@@ -42,8 +42,11 @@ CHECKS = (
 #     (enough/thym/moves/authored_code.py)
 #   target-weighed (0.8): a weighing's N:target names its language and version, scores the twelve points with their
 #     evidence, says what provides everything kept, and is `not` when a gate fails (enough/thym/moves/transconceive.py)
+#   target-confirmed, surface-answered, apart (0.8): `entail f as layout in` and `as code in` a language
+#     (enough/thym/moves/transconceive.py)
 # All of them are in the text's 7.3 on cosmoes-site v080-texts, here until the sync brings it into docs/THYM.md.
-AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited", "cases-entailed", "target-weighed")
+AHEAD = ("quotes-held", "cases-whole", "authored-source", "ground-cited", "cases-entailed", "target-weighed",
+         "target-confirmed", "surface-answered", "apart")
 
 # The moves a shipped declaration names ahead of the bundled text's 6.3 table (an approved text the bundled copy does
 # not hold yet). A test holds each to being no row of that table, so it leaves this list the day the text is synced.
