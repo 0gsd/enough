@@ -405,7 +405,9 @@ def test_thym_moves_lists_what_a_program_of_a_version_may_use(project: Path):
     lines = r.body.splitlines()
     assert lines[0].startswith("the moves a thym 1 program may use (")
     tell = next(ln for ln in lines if ln.startswith("- entail "))
-    assert tell.startswith("- entail <fabula | item | volume") and "[with <morph>] gives short" in tell, tell
+    # 0.8 (W3-X6): `in` a language and `with` a layout, for a transconception (Thym 6.3's row on v080-texts)
+    assert tell.startswith("- entail <fabula | item | volume") and "[in <string>] [with <morph | short>] gives short" \
+        in tell, tell
     assert "; asks a model, scaffold outline; contract coverage, no-invention" in tell, tell
     assert "- context of <text | package> gives context; asks nothing." in r.body
     assert [ln.split(" ", 2)[1] for ln in lines[1:]] == [d.name for d in TT.listed_moves(1)], \

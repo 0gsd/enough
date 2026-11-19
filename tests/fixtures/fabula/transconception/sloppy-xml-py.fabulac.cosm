@@ -10133,26 +10133,158 @@ nodes:
 - id: N:target/rust
   type: target
   name: rust
-  summary: 'A transconception of sloppy-xml-py into rust: the target named for this repository in sitting 1; weighed
-    in step A7.'
+  summary: sloppy-xml-py weighed for a transconception into Rust; feasible with the standard library alone (the
+    patterns written as matchers, the HTML5 table carried as data).
   stance: observed
   language: rust
-  weighed: not yet (step A7)
+  version: 1.97.1
+  edition: '2021'
   program: sloppy-cases
   library: sloppy-xml
+  weighed:
+  - point: 1
+    score: 3
+    evidence: the Rust Foundation since 2021 and the project's teams and RFC process; stable releases every six
+      weeks since 1.0 in 2015
+  - point: 2
+    score: 2
+    evidence: the Rust Reference and the Ferrocene Language Specification, neither complete; one production compiler,
+      others partial
+  - point: 3
+    score: 3
+    evidence: the 1.0 stability promise and editions
+  - point: 4
+    score: 3
+    evidence: 'every kept reliance provided: 8 built-in, 10 written, no crate, none cannot'
+  - point: 5
+    score: 3
+    evidence: one program and one library on macOS arm64, Linux, Windows; links with the system C linker
+  - point: 6
+    score: 3
+    evidence: a scan over code points, a stack, an ordered list of pairs, events as an enum; the lone surrogate
+      ruled changed
+  - point: 7
+    score: 3
+    evidence: memory-safe without unsafe; the spike uses none
+  - point: 8
+    score: 2
+    evidence: exhaustive matching on event kinds and strategies; field types; the judge checks positions and texts
+  - point: 9
+    score: 2
+    evidence: not measured at the weighing (no run); provisional; measure at O8 and O9
+  - point: 10
+    score: 2
+    evidence: no budget stated; 30 seconds a step allowed; linear scan; to be timed at O8
+  - point: 11
+    score: 2
+    evidence: about 1,400 lines in the spike, 2,000 in all
+  - point: 12
+    score: 3
+    evidence: standard library only; the fabulac stays the source
+  provides:
+  - for: C:reliance/S-R01
+    by: written
+    what: seventeen hand-written matchers with the patterns' outcomes
+    note: the riskiest use; spike told/rust-spike
+  - for: C:reliance/S-R02
+    by: written
+    what: 'the white-space set written out: Unicode white space plus U+001C to U+001F'
+  - for: C:reliance/S-R03
+    by: built-in
+    what: str::trim_matches with that set
+  - for: C:reliance/S-R04
+    by: built-in
+    what: the text as a vector of char; the context window written
+    note: where each error's position is taken is not stated in the fabulac
+  - for: C:reliance/S-R06
+    by: built-in
+    what: char::is_ascii_alphanumeric
+  - for: C:reliance/S-R07
+    by: written
+    what: the pinned version's HTML5 table carried as data, looked up as written then with ;
+  - for: C:reliance/S-R09
+    by: written
+    what: a digit-count check then u64::from_str_radix; past U+10FFFF kept as written
+    note: 'the lost # ruled changed'
+  - for: C:reliance/S-R10
+    by: built-in
+    what: char::from_u32, U+FFFD for a surrogate
+    note: ruled changed
+  - for: C:reliance/S-R11
+    by: written
+    what: the control characters and the eight typographic fixes in order
+  - for: C:reliance/S-R12
+    by: written
+    what: a vector of pairs replaced in place
+  - for: C:reliance/S-R13
+    by: built-in
+    what: str::find and String::replace_range
+  - for: C:reliance/S-R15
+    by: written
+    what: an element type with tag, attributes, text, tail, children
+    note: alike in Rust's own types
+  - for: C:reliance/S-R17
+    by: written
+    what: latin-1 when UTF-8 fails
+    note: ruled changed
+  - for: C:reliance/S-R18
+    by: written
+    what: bytes where text is expected refused
+    note: ruled changed
+  - for: C:reliance/S-R19
+    by: built-in
+    what: an enum; CUSTOM as STRICT, AGGRESSIVE as LENIENT
+  - for: C:reliance/S-R20
+    by: written
+    what: a second, lxml-like builder in Rust's own types
+    note: alike; an unknown name refused, exit only
+  - for: C:reliance/S-R21
+    by: built-in
+    what: an Iterator, or the whole list
+    note: alike, exit only
+  - for: C:reliance/S-R22
+    by: built-in
+    what: an enum with named fields
+    note: alike
+  spike:
+    use: the patterns (C:reliance/S-R01) on P:case/x0.S-C05 and P:case/x0.S-C06
+    level: 3
+    where: _x0/sloppy-xml-py/told/rust-spike/
+    judged-by: O8 (x0.sh build and judge, label rust-spike)
+    evidence:
+      level: 3
+      against: original
+      cases:
+      - P:case/x0.S-C05
+      - P:case/x0.S-C06
+      differ:
+        ruled: 2
+        unruled: 0
+      where:
+        file: ../results/2026-11-18-1819/sloppy-xml-py/rust-spike/verdict.json
+        digest: 7aba17502f2d84f86e10016adb636cc99762930f540b0ae810b04a344f987817
+      at: 2026-11-18T18:19
+  verdict: feasible
+  conditions:
+  - the spike agrees on S-C05 and on S-C06 step 0 at O8 (spike level 2 or better on its cases)
+  at: '2026-11-18'
+  by: R:maker/agent-w1-xp
+  made:
+    move: weigh
+    in: rust
+    by-hand: true
+    step: A7
+    run: x0-A7-2026-11-18
+    engine: model:claude-opus-5-5
   provenance:
     mode: manual
     confidence: 1
     sources:
-    - docs/v070-x0-worksheets/sloppy-xml-py.md
+    - _x0/sloppy-xml-py/sloppy-xml-py.fabulac.cosm
     - _x0/sitting-1.md
-    - _x0/results/2026-11-13-0858/sloppy-xml-py/recorded.json
+    - _x0/sloppy-xml-py/rulings.json
+    - orangepaper "Transcoding through the fabulac", tab The paper, "Choosing the target"
     state: known
-  made:
-    move: hand
-    run: x0-A4-2026-11-13
-    step: A4
-    engine: model:claude-opus-5-5
 - id: C:interface/x0.S-I0
   type: interface
   name: the driver contract

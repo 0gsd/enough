@@ -3256,6 +3256,7 @@ def _files_present(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
     if f is None:
         return False, "the output is not a folder"
     if _ac().is_entailment(f): return _ac().files_present(f, cat, items, fab)  # noqa: E701 - an authored entailment
+    if _tr().is_cshort_in_language(output): return _tr().files_present_in(f)  # noqa: E701 - in another language
     want, _rest = rebuilt(items)
     want = [str(x["path"]) for x in want]
     pack = packaging_file(cat, items, fabulac_file(cat, fab))[0] if fab is not None else None
@@ -3471,6 +3472,12 @@ def _ac() -> Any:
     """An authored fabulac's entailment (`authored_code.py`, 0.8), reached by one dispatch line in each place."""
     from enough.thym.moves import authored_code
     return authored_code
+
+
+def _tr() -> Any:
+    """Transconception's moves (`transconceive.py`, 0.8): a cshort in another language, by one dispatch line."""
+    from enough.thym.moves import transconceive
+    return transconceive
 
 
 def entail_branch(ctx: Any, x: Value, mods: dict) -> Any:

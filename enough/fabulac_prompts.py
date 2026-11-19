@@ -7,7 +7,9 @@ Four steps ask a model, and each request names its step in the input `fabulac`:
 - `fold`: the whole program read from the fabulac so far and its own documents (`derive repo with f`): aims,
   audiences, uses, requirements, decisions, exclusions, influences, occasions, and the atem (`parse_fold`);
 - `code` and `readme`: one file of the cshort written from the fabulac alone (`entail f as code`);
-- `catem`: what a user can do, at depth `overview` or `manual` (`entail f as overview|manual`).
+- `catem`: what a user can do, at depth `overview` or `manual` (`entail f as overview|manual`);
+- `layout` and `code-in`: a transconception's layout and files in another language (`entail f as layout in go`,
+  `entail f as code in go with layout`), in `enough/transconception_prompts.py`.
 
 The detail they ask for is MacroCOSM OES 18.4.7's "how much detail is enough": everything a user or a caller can
 observe, exactly (signatures, parameters with their types and defaults, what is returned, every error with the words a
@@ -289,6 +291,14 @@ def catem_messages(contract: dict, inputs: dict) -> list[dict]:
 BUILDERS: dict[str, Callable[[dict, dict], list[dict]]] = {
     "read": read_messages, "fold": fold_messages, "code": code_messages, "readme": code_messages,
     "catem": catem_messages}
+
+
+# A transconception's two steps into another language (`layout`, `code-in`), kept in their own file so this one stays
+# small: `enough/transconception_prompts.py`.
+from enough import transconception_prompts as _tcp  # noqa: E402
+
+STEPS = STEPS + _tcp.STEPS
+BUILDERS.update(_tcp.BUILDERS)
 
 
 def messages(contract: dict, inputs: dict) -> list[dict] | None:

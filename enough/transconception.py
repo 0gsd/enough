@@ -38,14 +38,23 @@ The checks, one method each on `_Checks`:
   does not know is a warning (it blocks only `ready_to_entail` for that target).
 - `round-trip` (error): a cshort in the source language (its `shorts` entry's `target` is the source language's
   `N:target`) stands at the manifest's level (2) or more, by its `evidence`. enough runs nothing: it reads evidence.
-- `target-confirmed` (error, for each target that carries a `verdict`; a note for one not weighed): the verdict is
-  feasible or feasible-with, every reliance kept for it is provided, and its spike reached level 2.
+- `target-confirmed` (error, for each language's latest weighing; a note for a language not weighed): the verdict is
+  feasible or feasible-with; no gate point (1, 4, 5 of the twelve) scored 0; every reliance kept for it is provided,
+  and nothing kept is provided `cannot`; and its spike reached level 2 (`spike_from_verdict` reads that level from
+  the judge's verdict on the spike: enough judges nothing). A later weighing of a language stands beside the earlier
+  ones and is the one read; rulings stay made for the language's first `N:target`.
 - `surface-answered` (error): a cshort in another language has a `CSHORT.md` mapping every interface kept for its
   target to a file and a name, and the name is in the file (not measured without the cshort folder).
 - `apart` (error): a cshort entailed apart: no request of the entailing carried a span, a path of the source or a run
   of its text (read from `<cshort>/requests.jsonl`, which the entailing keeps; not measured without it).
-- `evidence-stated` (error): a `shorts` entry's `evidence` carries its level, its counts and the verdict file's
-  digest, and the file, when at hand, has that digest.
+- `evidence-stated` (error): a `shorts` entry's `evidence` carries its level (0 to 6), its counts and the verdict
+  file's digest, and the file, when at hand, has that digest; `evidence: []` is not written yet (a cshort's evidence is
+  read from the judge's verdict, never claimed by the move that entails it).
+
+Entailing into another language (phase 6; after the gates): the readers `surface-answered` and `apart` share with
+Thym's checks of the same names (`read_surface`, `surface_problems`, `apart_problems`), whether a source may be read
+beside its fabulac (`beside_allowed`), the names a layout and a cshort take beside the fabulac (`entailed_names`) and
+a host's landing of them with the cshort's entry (`land_in_language`).
 
 The cases (phase 4; the end of this module): the cases file a fabulac's catalog names (`cases: <folder>.cases.json`,
 the shape of the experiment's harness, `tools/transconception/harness.py`), made from the fabulac's outside `P:case`
@@ -91,9 +100,45 @@ DEFAULTS = {
     "round-trip-level": 2,
 }
 KEPT = ("kept", "alike", "kept-wrong")
+
+# The twelve points a target language is weighed on (MacroCOSM OES 18.4.9, "Weighing a target"), in the text's order:
+# (number, key, words, gate). A weighing's `weighed` names each by its number (`point: 1`); the keys are the hand
+# weighing's of the experiment (x0 step A7) and read as the same point. The move `weigh` keeps its own copy of this
+# table (enough/thym/moves/transconceive.py, which imports nothing of enough's), and a test holds the two equal.
+POINTS = (
+    (1, "stewardship", "Stewardship that outlives one company", True),
+    (2, "specification", "A written specification, and more than one implementation", False),
+    (3, "old-programs-build", "A promise that old programs keep building", False),
+    (4, "provided", "Everything the program leans on is provided", True),
+    (5, "runs-and-ships", "It runs where it must and ships as it must", True),
+    (6, "fits-shapes", "It fits the program's shapes", False),
+    (7, "safe-by-default", "Safe by default", False),
+    (8, "tools-check", "Its tools can check what the fabulac states", False),
+    (9, "agent-skill", "The writing agent's skill in it", False),
+    (10, "budgets", "It meets the budgets", False),
+    (11, "readable", "People can read it", False),
+    (12, "can-be-left", "It can be left", False),
+)
+GATE_POINTS = tuple(n for n, _k, _w, g in POINTS if g)
+VERDICTS = ("feasible", "feasible-with", "not")
+_POINT_KEYS = {k: n for n, k, _w, _g in POINTS}
+
+
+def point_number(p: Any) -> int | None:
+    """A weighed point's number, 1 to 12, from its number or the experiment's key (`stewardship` is 1)."""
+    if isinstance(p, bool):
+        return None
+    if isinstance(p, int):
+        return p if 1 <= p <= 12 else None
+    if isinstance(p, str):
+        t = p.strip().lower()
+        return int(t) if t.isdigit() and 1 <= int(t) <= 12 else _POINT_KEYS.get(t)
+    return None
 STATEMENTS = ("licence", "lane", "confidential", "programs", "attribution")
 LANES_NEEDING_LEAVE = ("closed",)
 SPIKE_LEVEL = 2
+#: The evidence levels, 0 (entailed) to 6 (proven, for stated parts): MacroCOSM 18.4.9's seven.
+EVIDENCE_TOP = 6
 SOURCE_SUFFIXES = (".py", ".md", ".toml", ".txt", ".cfg", ".rst", ".yml", ".yaml", ".in", "")
 
 # The names a text uses when it names a source language, its runtime or its standard library, by language: the
@@ -589,10 +634,30 @@ class _Checks:
                                          f"evidence" + (f" (the best is {best})" if best is not None else ""),
                      "shorts")
 
+    def weighings(self, language: str) -> list[mc.Item]:
+        """The `N:target` items of a language, in the fabula's order: the first is the one rulings are made for."""
+        return [it for it in self.of("N", "target") if it.data.get("language") == language]
+
+    def latest_weighing(self, language: str) -> mc.Item | None:
+        """The weighing of a language that stands: the latest by its `at` of those with a verdict (a later weighing
+        is added beside the earlier ones, never over them), else the first, unweighed."""
+        ws = self.weighings(language)
+        weighed = [it for it in ws if "verdict" in it.data]
+        if weighed:
+            return max(enumerate(weighed), key=lambda p: (str(p[1].data.get("at") or ""), p[0]))[1]
+        return ws[0] if ws else None
+
     def target_confirmed(self, language: str | None = None) -> None:
-        for it in self.of("N", "target"):
-            lang = it.data.get("language")
-            if lang == self.language or (language is not None and lang != language):
+        langs = [language] if language is not None else []
+        if language is None:
+            for it in self.of("N", "target"):
+                lang = it.data.get("language")
+                if isinstance(lang, str) and lang != self.language and lang not in langs:
+                    langs.append(lang)
+        for lang in langs:
+            it = self.latest_weighing(lang)
+            if it is None:
+                self.add("target-confirmed", None, f"no N:target for {lang}")
                 continue
             if "verdict" not in it.data:
                 if language is None:
@@ -602,16 +667,27 @@ class _Checks:
                 continue
             if it.data.get("verdict") not in ("feasible", "feasible-with"):
                 self.add("target-confirmed", it, f"the verdict on {lang} is {it.data.get('verdict')!r}", "verdict")
-            provided = {p.get("for") for p in (it.data.get("provides") or []) if isinstance(p, dict)
-                        and p.get("by") not in ("cannot", None)}
+            weighed = it.data.get("weighed")
+            for w in weighed if isinstance(weighed, list) else []:
+                n = point_number(w.get("point")) if isinstance(w, dict) else None
+                if n in GATE_POINTS and w.get("score") == 0:
+                    self.add("target-confirmed", it, f"point {n}, a gate, scored 0: {lang} is not feasible, whatever "
+                                                     "its other scores", "weighed")
+            rid = self.weighings(lang)[0].id                    # rulings are made for the language's first N:target
+            rows = [p for p in (it.data.get("provides") or []) if isinstance(p, dict)]
+            provided = {p.get("for") for p in rows if p.get("by") not in ("cannot", None)}
+            cannot = {p.get("for") for p in rows if p.get("by") == "cannot"}
             for r in self.of("C", "reliance"):
-                if any(x.get("is") in KEPT and applies(x, it.id) for x in rulings(r.data)) and r.id not in provided:
-                    self.add("target-confirmed", it, f"{lang} provides nothing for {r.id}, which is kept", "provides")
+                if any(x.get("is") in KEPT and applies(x, rid) for x in rulings(r.data)) and r.id not in provided:
+                    self.add("target-confirmed", it, f"{lang} provides nothing for {r.id}, which is kept"
+                             + (" (it says it cannot)" if r.id in cannot else ""), "provides")
+            for k in ("interface", "behaviour"):
+                for x in self.of("C", k):
+                    if x.id in cannot and any(r.get("is") in KEPT and applies(r, rid) for r in rulings(x.data)):
+                        self.add("target-confirmed", it, f"{lang} cannot provide {x.id}, which is kept", "provides")
             sp = it.data.get("spike")
             if not (isinstance(sp, dict) and isinstance(sp.get("level"), int) and sp["level"] >= SPIKE_LEVEL):
                 self.add("target-confirmed", it, f"the spike in {lang} has not reached level {SPIKE_LEVEL}", "spike")
-        if language is not None and not any(it.data.get("language") == language for it in self.of("N", "target")):
-            self.add("target-confirmed", None, f"no N:target for {language}")
 
     def _other_cshorts(self) -> list[dict]:
         src = self.source_target()
@@ -623,24 +699,21 @@ class _Checks:
             if d is None or not (d / "CSHORT.md").is_file():
                 self.unmeasured["surface-answered"] = f"{e.get('path')}: the cshort's CSHORT.md is not at hand"
                 continue
-            rows = {}
-            for ln in (d / "CSHORT.md").read_text(encoding="utf-8").splitlines():
-                cells = [c.strip().strip("`") for c in ln.strip().strip("|").split("|")]
-                if len(cells) >= 3 and cells[0].startswith("C:interface/"):
-                    rows[cells[0]] = (cells[1], cells[2])
-            for it in self.of("C", "interface"):
-                if not any(r.get("is") in ("kept", "alike") and applies(r, e["target"]) for r in rulings(it.data)):
-                    continue
-                row = rows.get(it.id)
-                if row is None:
-                    self.add("surface-answered", it, f"{e.get('path')}: CSHORT.md maps it to no file and name")
-                    continue
-                f = d / row[0]
-                if not f.is_file() or row[1] not in f.read_text(encoding="utf-8", errors="replace"):
-                    self.add("surface-answered", it, f"{e.get('path')}: {row[1]} is not in {row[0]}")
+            nodes = [{"id": it.id, **it.data} for it in self.items]
+
+            def file_text(rel: str, d: Path = d) -> str | None:
+                f = (d / rel).resolve()
+                if not f.is_file() or d.resolve() not in f.parents:
+                    return None
+                return f.read_text(encoding="utf-8", errors="replace")
+            for iid, why in surface_problems(nodes, e["target"], (d / "CSHORT.md").read_text(encoding="utf-8"),
+                                             file_text=file_text):
+                self.add("surface-answered", self.by_id.get(iid), f"{e.get('path')}: CSHORT.md {why}"
+                         if why.startswith("maps") else f"{e.get('path')}: {why}")
 
     def apart(self) -> None:
-        files, n, src = self.file_paths(), int(self.cfg["nothing-carried"]), None
+        n, src = int(self.cfg["nothing-carried"]), None
+        paths = source_paths([{"id": it.id, **it.data} for it in self.items])
         for e in self._other_cshorts():
             if e.get("entailed") != "apart":
                 continue
@@ -650,35 +723,22 @@ class _Checks:
                 self.unmeasured["apart"] = f"{e.get('path')}: the entailing's requests are not at hand"
                 continue
             src = src if src is not None else (self.source() or "")
-            for i, ln in enumerate(req.read_text(encoding="utf-8").splitlines()):
-                text = ln
-                try:
-                    text = json.dumps(json.loads(ln), ensure_ascii=False)
-                except ValueError:
-                    pass
-                why = None
-                if re.search(r'"span"\s*:', text) or re.search(r'"file"\s*:\s*"[^"]+"\s*,\s*"lines"', text):
-                    why = "carried a span"
-                elif any(f and f in text for f in files):
-                    why = "named a path of the source"
-                elif src and longest_carried(text, src, n):
-                    why = "carried the source's own text"
-                if why:
-                    self.add("apart", None, f"{e.get('path')}: request {i + 1} {why}", "shorts")
+            for why in apart_problems(req.read_text(encoding="utf-8").split("\n"), paths, src, n):
+                self.add("apart", None, f"{e.get('path')}: {why}", "shorts")
 
     def evidence_stated(self) -> None:
         for e in self.shorts():
             ev = e.get("evidence")
-            if ev is None:
-                continue
+            if ev is None or ev == []:          # not written yet: a cshort's evidence is read from a verdict, never
+                continue                        # claimed by the move that entails it (`evidence: []`)
             where = f"shorts ({e.get('path')})"
             if not isinstance(ev, dict):
                 self.add("evidence-stated", None, f"{where}: evidence is {{level, steps, against, inputs, where, at, by}}",
                          "shorts")
                 continue
             lv, st, wh = ev.get("level"), ev.get("steps"), ev.get("where")
-            if not (isinstance(lv, int) and 1 <= lv <= 4):
-                self.add("evidence-stated", None, f"{where}: evidence.level is 1 to 4", "shorts")
+            if not (isinstance(lv, int) and 0 <= lv <= EVIDENCE_TOP):
+                self.add("evidence-stated", None, f"{where}: evidence.level is 0 to {EVIDENCE_TOP}", "shorts")
             if not (isinstance(st, dict) and isinstance(st.get("kept"), int) and isinstance(st.get("agree"), int)
                     and 0 <= st["agree"] <= st["kept"]):
                 self.add("evidence-stated", None, f"{where}: evidence.steps is {{kept, agree}}, agree no more than kept",
@@ -704,6 +764,86 @@ def run_checks(vol: mc.Volume, add: Callable[..., None], *, source: Path | None 
     c = _Checks(vol, add, source=source, library=library)
     c.run()
     return c.unmeasured
+
+
+# ---------------------------------------------------------------------------
+# Targets (phase 5): what a language provides, and a spike's level read from its verdict
+# ---------------------------------------------------------------------------
+
+_X0_RELIANCE = re.compile(r"^[A-Z]+-R\d+[a-z]?$")
+_CASE_REF = re.compile(r"P:case/([A-Za-z0-9_.-]+)")
+
+
+def target_table(language: Any, *, source: Any = None) -> dict:
+    """What `weigh f in <language>` reads by rule, as plain data: `{ok, language: {name, title}, table, for, from}`.
+    `table` is the language's target table (`enough.languages.provides_table`: the points that are facts of the
+    language and one row per ground entry); `for` the source language whose ground catalogue the rows answer; `from`
+    maps each reliance the experiment wrote (`V-R08`) to the entries made from it, so that a reliance written before
+    the ground catalogue (no `entry`) is answered by the rows of its entries. `{ok: false, why}` for a language this
+    build cannot weigh."""
+    lang = _languages.get(language)
+    if lang is None:
+        return {"ok": False, "why": f"{language!r} is no language this build knows ({', '.join(_languages.LANGUAGES)})"}
+    if not lang.target:
+        return {"ok": False, "why": f"{lang.title} is not a language a program is entailed into in this build"}
+    try:
+        table = _languages.provides_table(lang.name)
+    except KeyError as e:
+        return {"ok": False, "why": str(e.args[0]) if e.args else str(e)}
+    src = str(source or table.get("for") or "")
+    frm: dict[str, list[str]] = {}
+    try:
+        entries = _languages.entries(src) if src else []
+    except KeyError:
+        entries = []
+    for e in entries:
+        for x in e.get("from") or []:
+            if isinstance(x, str) and _X0_RELIANCE.match(x.strip()):
+                frm.setdefault(x.strip(), []).append(str(e.get("id")))
+    return {"ok": True, "language": {"name": lang.name, "title": lang.title}, "table": copy.deepcopy(table),
+            "for": src, "from": frm}
+
+
+def spike_cases(spike: Mapping) -> list[str]:
+    """The cases a spike aims at: its `cases`, else every `P:case/...` its `use` names, as written."""
+    got = spike.get("cases")
+    if isinstance(got, list) and got:
+        return [str(c) for c in got]
+    return [f"P:case/{m}" for m in _CASE_REF.findall(str(spike.get("use") or ""))]
+
+
+def _case_hits(ref: str, case: Any) -> bool:
+    bare = str(ref).split("/", 1)[-1]
+    c = str(case or "")
+    return bool(c) and (bare == c or bare.endswith("." + c))
+
+
+def spike_from_verdict(spike: Mapping, verdict: Mapping, *, where: str | None = None, digest: str | None = None,
+                       at: str | None = None) -> dict:
+    """A spike with its level read from the judge's verdict on it (the runner builds and judges the spike outside;
+    enough reads its verdict and runs nothing). Only the spike's own cases count (`spike_cases`): the judge runs every
+    case, and a spike answers only its riskiest use. Level 3 when it built and every step of its cases agrees or
+    differs only where a ruling says so (the cases are recorded: MacroCOSM 18.4.9's third level, for those cases),
+    else 1 (it built). Returns the spike with `level` and `evidence: {level, against, cases, differ: {ruled, unruled},
+    where: {file, digest}, at}`; a CasesError when the spike names no case."""
+    cases = spike_cases(spike)
+    if not cases:
+        raise CasesError("the spike names no case it aims at (spike.cases, or P:case refs in spike.use)")
+    rows = [r for r in differences_from_verdict(verdict) if any(_case_hits(c, r.get("case")) for c in cases)]
+    unruled = [r for r in rows if r.get("needs-ruling")]
+    level = 1 if unruled else 3
+    out = dict(spike)
+    out["level"] = level
+    ev: dict = {"level": level, "against": verdict.get("against", "original"), "cases": cases,
+                "differ": {"ruled": len(rows) - len(unruled), "unruled": len(unruled)}}
+    if where:
+        ev["where"] = {"file": where, **({"digest": digest} if digest else {})}
+    if at:
+        ev["at"] = at
+    if unruled:
+        ev["first"] = f"{unruled[0].get('case')} step {unruled[0].get('step')}: {unruled[0].get('kind')}"
+    out["evidence"] = ev
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -776,6 +916,350 @@ def ready_to_entail(volume, language: str, *, source: Path | None = None, librar
     else:
         g["says"] = f"ready to entail in {language}" if g["holds"] else f"not ready to entail in {language}"
     return {"gate": "ready-to-entail", "language": language, **g}
+
+
+# ---------------------------------------------------------------------------
+# Entailing into another language (phase 6): what the layout and the cshort are read by
+# ---------------------------------------------------------------------------
+#
+# `surface-answered` reads a markdown table: a row names one or more interfaces in its first cell (`C:interface/<id>`,
+# or the experiment's worksheet id, `V-I1 the report`, for an item that carries `worksheet-id`), and the columns its
+# header calls `file` and `name` say where each lives. The rows enough writes are the plain form, `| C:interface/<id>
+# | <file> | <name> |`; the experiment's four cshorts (x0 step A8) wrote richer cells (several files, several
+# names, `TreeBuilder` "and its eight methods"), read by the same rule. A row answers its interfaces when one of its
+# names is in one of its files, as a whole word: the name a language writes for a method (`func (v *vulture)
+# report`) is its last part (`(*vulture).report` is `report`). A layout's rows are checked the same way, but for
+# the file's text: a layout names files to be, and each must be one of its own.
+#
+# `apart` reads `requests.jsonl`, one JSON line per request the entailing made: no line carries a span, a path of the
+# source (a file named by an interface, as `pyproject.toml` a program reads, is its boundary, not its source) or a
+# run of the source's text as long as `nothing-carried`'s.
+
+LAYOUT_MARK = ".layout-"
+SURFACE_KEPT = ("kept", "alike")
+_WORKSHEET = re.compile(r"(?<![\w-])([A-Z]{1,3}-I\d+[a-z]?)(?![\w-])")
+_IFACE_REF = re.compile(r"C:interface/[A-Za-z0-9_.:-]*[A-Za-z0-9_]")
+_TICKS = re.compile(r"`([^`]+)`")
+_IDENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+
+
+def _cells(line: str) -> list[str] | None:
+    s = line.strip()
+    if not (s.startswith("|") and s.endswith("|") and len(s) > 1):
+        return None
+    out, cur, i = [], "", 1
+    while i < len(s) - 1:
+        ch = s[i]
+        if ch == "\\" and i + 1 < len(s) - 1 and s[i + 1] == "|":
+            cur, i = cur + "|", i + 2
+            continue
+        if ch == "|":
+            out.append(cur.strip())
+            cur = ""
+        else:
+            cur += ch
+        i += 1
+    out.append(cur.strip())
+    return out
+
+
+def _is_rule(cells: list[str]) -> bool:
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", c.replace(" ", "")) for c in cells)
+
+
+def read_surface(md: str) -> list[dict]:
+    """The interface rows of a markdown text: `{cell, files, names}` for each row of a table whose header has a
+    `file` column and a `name` column (`names`, `name(s)`), or, with no header, a row whose first cell names
+    `C:interface/…` in three cells (the plain form). `cell` is the first cell as written; `files` the paths of the file
+    cell (backticked, or split on commas); `names` the names of the name cell (backticked spans, or split on commas)."""
+    rows: list[dict] = []
+    lines = md.replace("\r\n", "\n").split("\n")
+    cols: tuple[int, int] | None = None
+    for i, ln in enumerate(lines):
+        cells = _cells(ln)
+        if cells is None:
+            cols = None
+            continue
+        nxt = _cells(lines[i + 1]) if i + 1 < len(lines) else None
+        if nxt is not None and _is_rule(nxt):            # a header
+            low = [c.lower() for c in cells]
+            fc = next((k for k, c in enumerate(low) if c.strip("` ") in ("file", "files", "file(s)")), None)
+            nc = next((k for k, c in enumerate(low) if k > 0 and c.strip("` ").startswith("name")), None)
+            cols = (fc, nc) if fc is not None and nc is not None and fc > 0 else None
+            continue
+        if _is_rule(cells):
+            continue
+        if cols is not None and len(cells) > max(cols):
+            fcell, ncell = cells[cols[0]], cells[cols[1]]
+        elif cols is None and len(cells) >= 3 and cells[0].strip("`").startswith("C:interface/"):
+            fcell, ncell = cells[1], cells[2]
+        else:
+            continue
+        files = _TICKS.findall(fcell) or [p.strip() for p in fcell.split(",") if p.strip()]
+        names = _TICKS.findall(ncell) or [p.strip() for p in ncell.split(",") if p.strip()]
+        rows.append({"cell": cells[0], "files": [f.strip() for f in files if f.strip() and f.strip() != "—"],
+                     "names": [n.strip() for n in names if n.strip()]})
+    return rows
+
+
+def _row_ids(cell: str, interfaces: Mapping[str, Mapping], worksheet: Mapping[str, str]) -> list[str]:
+    """The interfaces a row's first cell names: its `C:interface/…` refs; the experiment's worksheet ids; for an
+    interface followed by `and its … methods`, every interface one dot below it; and a backticked `.name` or `name`
+    after an interface, its member of that name."""
+    ids: list[str] = []
+    refs = _IFACE_REF.findall(cell)
+    for r in refs:
+        if r in interfaces and r not in ids:
+            ids.append(r)
+    for w in _WORKSHEET.findall(cell):
+        iid = worksheet.get(w)
+        if iid and iid not in ids:
+            ids.append(iid)
+    heads = [r for r in refs if r in interfaces]
+    for h in heads:
+        kids = [k for k in interfaces if k.startswith(h + ".") and "." not in k[len(h) + 1:]]
+        if re.search(r"\bits\b[^|]*\bmethods\b", cell):
+            ids += [k for k in kids if k not in ids]
+        for t in _TICKS.findall(cell):
+            m = f"{h}.{t.strip().lstrip('.')}"
+            if m in interfaces and m not in ids:
+                ids.append(m)
+    return ids
+
+
+def principal_name(span: str) -> str | None:
+    """The identifier a name stands for in its file: `(*vulture).report` is `report`, `item.whitelistLine` is
+    `whitelistLine`, `TreeBuilder::{a, b}` is `TreeBuilder`, `stream_parse(XmlInput) -> Events` is `stream_parse`."""
+    s = re.sub(r"^\(\s*\*?\s*[A-Za-z_]\w*\s*\)\s*\.", "", span.strip())
+    s = re.split(r"[(\s<{=\[]|(?<!:):(?!:)", s, maxsplit=1)[0]
+    parts = [p for p in re.split(r"\.|::", s) if p]
+    for p in reversed(parts):
+        m = _IDENT.fullmatch(p.strip())
+        if m:
+            return m.group(0)
+    got = [x for x in _IDENT.findall(span) if len(x) >= 3]
+    return got[0] if got else None
+
+
+def _word_in(name: str, text: str) -> bool:
+    return re.search(rf"(?<![A-Za-z0-9_]){re.escape(name)}(?![A-Za-z0-9_])", text) is not None
+
+
+def _ruled_as(item: Mapping) -> list[str]:
+    """The worksheet interfaces an item's rulings say it is ruled as (`because: as V-I4`, the experiment's sitting's
+    words): the same boundary, so a row that answers that one answers this one."""
+    out = []
+    for r in rulings(dict(item)):
+        m = re.match(r"\s*as\s+([A-Z]{1,3}-I\d+[a-z]?)\b", str(r.get("because") or ""))
+        if m and m.group(1) not in out:
+            out.append(m.group(1))
+    return out
+
+
+def surface_kept(item: Mapping, target_ref: str | None, *, unruled: bool = False) -> bool:
+    """Whether an interface must be answered for a target: a `kept` or `alike` ruling holds for it (MacroCOSM 18.4.9);
+    with `unruled`, also one no ruling holds for yet (proposed kept, as a weighing reads it)."""
+    rs = [r for r in rulings(dict(item)) if "pending" not in r and r.get("is")]
+    hold = [r for r in rs if applies(r, target_ref)]
+    if any(r.get("is") in SURFACE_KEPT for r in hold):
+        return True
+    return unruled and not hold
+
+
+def surface_problems(items: list[Mapping], target_ref: str | None, md: str, *,
+                     file_text: Callable[[str], str | None] | None = None, files: Any = None,
+                     unruled: bool = False) -> list[tuple[str, str]]:
+    """`surface-answered` over a markdown text (a cshort's `CSHORT.md`, or a layout): `(interface id, why)` for each
+    interface kept or alike for the target (and unruled, with `unruled`) that no row maps to a file and a name; with
+    `file_text`, a row whose names are none of them in its files; with `files` (a layout's own), a row whose file is
+    not one of them."""
+    ifaces = {str(d.get("id")): d for d in items if str(d.get("id", "")).startswith("C:interface/")}
+    worksheet = {str(d["worksheet-id"]): i for i, d in ifaces.items() if isinstance(d.get("worksheet-id"), str)}
+    rows: dict[str, list[dict]] = {}
+    for r in read_surface(md):
+        for iid in _row_ids(r["cell"], ifaces, worksheet):
+            rows.setdefault(iid, []).append(r)
+    out: list[tuple[str, str]] = []
+    cache: dict[str, str | None] = {}
+
+    def text_of(p: str) -> str | None:
+        if p not in cache:
+            cache[p] = file_text(p) if file_text is not None else None
+        return cache[p]
+    for iid, d in ifaces.items():
+        if not surface_kept(d, target_ref, unruled=unruled):
+            continue
+        got = [r for r in rows.get(iid, []) if r["files"] and r["names"]]
+        if not got:                         # ruled "as V-I4": the same boundary, answered where that one is
+            got = [r for w in _ruled_as(d) for r in rows.get(worksheet.get(w, ""), []) if r["files"] and r["names"]]
+        if not got:
+            out.append((iid, "maps it to no file and name"))
+            continue
+        if files is not None:
+            bad = [f for r in got for f in r["files"] if f not in files]
+            if bad and all(any(f not in files for f in r["files"]) for r in got):
+                out.append((iid, f"maps it to {bad[0]}, which is no file of the layout"))
+            continue
+        if file_text is None:
+            continue
+        ok = False
+        for r in got:
+            texts = [t for t in (text_of(f) for f in r["files"]) if t is not None]
+            if any(n and any(_word_in(n, t) for t in texts) for n in (principal_name(x) for x in r["names"])):
+                ok = True
+                break
+        if not ok:
+            r = got[0]
+            out.append((iid, f"{', '.join(r['names'][:3])} is not in {', '.join(r['files'][:3])}"))
+    return out
+
+
+def boundary_paths(items: list[Mapping]) -> set[str]:
+    """The source's file paths an interface names (a file the program reads, as `pyproject.toml`): its boundary."""
+    words = " ".join(str(d.get(k) or "") for d in items if str(d.get("id", "")).startswith("C:interface/")
+                     for k in ("name", "signature", "summary"))
+    return {str(d.get("path")) for d in items if str(d.get("id", "")).startswith("C:file/")
+            and isinstance(d.get("path"), str) and _word_in(str(d["path"]), words)}
+
+
+def source_paths(items: list[Mapping]) -> set[str]:
+    """The source's file paths a request entailed apart may not name: every `C:file` path but the boundary's."""
+    files = {str(d["path"]) for d in items if str(d.get("id", "")).startswith("C:file/")
+             and isinstance(d.get("path"), str) and d["path"].strip()}
+    return files - boundary_paths(items)
+
+
+def apart_problems(lines: list[str], paths: set[str], source: str | None, length: int) -> list[str]:
+    """`apart` over the requests of an entailing, one JSON line each: one line per request that carried a span, named
+    a path of the source (as a whole word) or carried a run of the source's own text `length` code points long."""
+    out = []
+    for i, ln in enumerate(lines):
+        if not ln.strip():
+            continue
+        text = ln
+        try:
+            text = json.dumps(json.loads(ln), ensure_ascii=False)
+        except ValueError:
+            pass
+        why = None
+        if re.search(r'"span"\s*:', text) or re.search(r'"file"\s*:\s*"[^"]+"\s*,\s*"lines"', text):
+            why = "carried a span"
+        elif any(p and _word_in(p, text) for p in paths):
+            why = "named a path of the source"
+        elif source and longest_carried(text, source, length):
+            why = "carried the source's own text"
+        if why:
+            out.append(f"request {i + 1} {why}")
+    return out
+
+
+def beside_allowed(cat: Mapping, items: list[Mapping]) -> tuple[bool, str]:
+    """Whether a source may be read beside its fabulac while entailing (MacroCOSM 18.4.9): a person's own code
+    (`source.obtained: own`) or a source in the open lane; never a bound or closed one, whatever leave it has (the
+    leave lets it be transconceived, apart)."""
+    src = cat.get("source") if isinstance(cat.get("source"), Mapping) else {}
+    if src.get("obtained") == "own":
+        return True, "the person's own code"
+    lanes = [str(d.get("lane")) for d in items if str(d.get("id", "")).startswith("R:licence/") and d.get("lane")]
+    if lanes and all(x == "open" for x in lanes):
+        return True, "a source in the open lane"
+    if "closed" in lanes:
+        leave = any(d.get("leave") for d in items if str(d.get("id", "")).startswith("R:licence/"))
+        return False, ("a source in the closed lane is entailed apart only" + ("" if leave else
+                       ", and only with its holder's leave, which is not recorded"))
+    if "bound" in lanes:
+        return False, "a source in the bound lane is entailed apart only"
+    return False, "no licence records its lane, and the source is not the person's own: it is entailed apart"
+
+
+def doc_volume(cat: Mapping, items: list[Mapping], name: str = "f.fabulac.cosm") -> mc.Volume:
+    return mc.load_volume_text(mc.dump({**{k: v for k, v in cat.items() if k != "nodes"}, "nodes": list(items)}),
+                               filename=name)
+
+
+def target_confirmed_problems(cat: Mapping, items: list[Mapping], language: str) -> list[str]:
+    """`target-confirmed` for one language over a fabula as data: the problems, none when it holds."""
+    vol = doc_volume(cat, items)
+    out: list[str] = []
+    c = _Checks(vol, lambda check, it, msg, fld=None, *, severity=None: out.append(msg)
+                if (severity or "error") == "error" else None, library=False)
+    c.target_confirmed(language)
+    return out
+
+
+def standing_weighing(items: list[Mapping], language: str) -> tuple[dict | None, str | None]:
+    """The weighing of a language that stands (the latest, by `at`, of those with a verdict), and the id rulings are
+    made for (the language's first `N:target`)."""
+    ws = [d for d in items if str(d.get("id", "")).startswith("N:target/")
+          and str(d.get("language") or "").lower() == language]
+    if not ws:
+        return None, None
+    weighed = [(i, d) for i, d in enumerate(ws) if "verdict" in d]
+    latest = max(weighed, key=lambda p: (str(p[1].get("at") or ""), p[0]))[1] if weighed else ws[0]
+    return dict(latest), str(ws[0]["id"])
+
+
+def language_info(name: Any) -> dict:
+    """What the moves need of a language: `{ok, name, title, suffixes, target, parses}`, or `{ok: false, why}`."""
+    lang = _languages.get(name)
+    if lang is None:
+        return {"ok": False, "why": f"{name!r} is no language this build knows ({', '.join(_languages.LANGUAGES)})"}
+    return {"ok": True, "name": lang.name, "title": lang.title, "suffixes": list(lang.suffixes),
+            "target": bool(lang.target), "parses": bool(lang.parses)}
+
+
+def entailed_names(fabulac_file: str, language: str, stamp: str) -> dict:
+    """Where a layout and a cshort in a language land beside their fabulac (Thym 20.10; pins section 2):
+    `<name>.layout-<language>-<stamp>.md` and `<name>.cshort-<language>-<stamp>/`."""
+    name = Path(fabulac_file).name
+    for suf in (".fabulac.cosm", ".cosm"):
+        if name.endswith(suf):
+            name = name[: -len(suf)]
+            break
+    return {"layout": f"{name}{LAYOUT_MARK}{language}-{stamp}.md", "cshort": f"{name}.cshort-{language}-{stamp}/"}
+
+
+def land_in_language(fab: Path, *, language: str, stamp: str, layout: str | None = None,
+                     cshort: Mapping[str, str] | None = None, entry: Mapping | None = None) -> dict:
+    """A host's landing of a layout and a cshort in a language beside their fabulac, and the cshort's entry recorded
+    in its `shorts` (the entry the move made: `path`, `target`, `layout`, `entailed`, `evidence: []`, …), its `path`
+    and `layout` set to where they landed. Writes files and nothing else; runs nothing. Returns the paths written."""
+    from .fabulac_job import record_entry, write_atomic   # the job's own writer: one entry, appended
+    names = entailed_names(fab.name, language, stamp)
+    out: dict = {}
+    if layout is not None:
+        lp = fab.parent / names["layout"]
+        if lp.exists():
+            raise FileExistsError(f"{lp.name} is there already")
+        lp.write_text(layout, encoding="utf-8")
+        out["layout"] = lp.name
+    if cshort is not None:
+        d = fab.parent / names["cshort"].rstrip("/")
+        if d.exists():
+            raise FileExistsError(f"{d.name}/ is there already")
+        for rel, text in cshort.items():
+            p = d / rel
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(text, encoding="utf-8")
+        out["cshort"] = names["cshort"]
+        if entry is not None:
+            e = dict(entry)
+            e["path"] = names["cshort"]
+            if layout is not None or e.get("layout"):
+                e["layout"] = out.get("layout") or e.get("layout")
+            from .canon_derive import _flow_entry   # the job writes scalars; `evidence: []` is written as a list
+            bare = {k: v for k, v in e.items() if k != "evidence"}
+            text = record_entry(fab.read_text(encoding="utf-8"), "shorts", bare)
+            if "evidence" in e:
+                flow = _flow_entry(bare)
+                at = text.rfind(flow)
+                text = text[:at] + flow[:-1] + ", evidence: " + json.dumps(e["evidence"]) + "}" + \
+                    text[at + len(flow):]
+                if (mc.yaml_load(text).get("shorts") or [{}])[-1].get("evidence") != e["evidence"]:
+                    raise ValueError("the cshort's entry did not read back with its evidence")
+            write_atomic(fab, text)
+            out["entry"] = e
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1315,17 +1799,43 @@ def stale_report(catalog: Mapping, nodes: list[dict], cases: Mapping | None = No
     return out
 
 
-def thym_engine() -> Any:
+def thym_engine(*, beside: Path | None = None) -> Any:
     """What Thym's transconception moves (`enough/thym/moves/transconceive.py`) reach as `ctx.engines
     ["transconception"]` (`enough.thym_host.SIBLING_ENGINES`): the cases functions of this module. A move imports only
-    Thym and the reader, so that a host without this module (Comprise's) refuses the moves by name, never on import."""
+    Thym and the reader, so that a host without this module (Comprise's) refuses the moves by name, never on import.
+
+    `beside` is the source folder when the person has asked to entail beside it (Thym 20.10: a host does that only
+    when the person asks, and a program cannot): the engine's `beside()` then reads the source's files as text for
+    `entail f as code in <language>`, and gives None otherwise (entailed apart)."""
     from types import SimpleNamespace
+    root = Path(beside) if beside is not None else None
+
+    def beside_files() -> dict[str, str] | None:
+        if root is None:
+            return None
+        if not root.is_dir():
+            raise FileNotFoundError(f"the source to entail beside is not at hand: {root}")
+        out: dict[str, str] = {}
+        for f in sorted(root.rglob("*")):
+            rel = f.relative_to(root).as_posix()
+            if f.is_file() and not f.is_symlink() and not any(part.startswith(".") for part in f.relative_to(root).parts) \
+                    and f.suffix in SOURCE_SUFFIXES and f.stat().st_size <= 1_000_000:
+                out[rel] = f.read_text(encoding="utf-8", errors="replace")
+        return out
+    beside = beside_files
     return SimpleNamespace(
         CasesError=CasesError, Recording=Recording, cases_name=cases_name, source_of=source_of, freshness=freshness,
         source_marks=_source_marks, case_key=_key, dump_cases=dump_cases, check_cases_doc=check_cases_doc,
         cases_document=cases_document, read_recording=read_recording, gather_recorded=gather_recorded,
         read_verdict=read_verdict, fold_verdict=fold_verdict, cshort_label=_cshort_label,
-        differences_from_verdict=differences_from_verdict, stale_report=stale_report, carry_over=carry_over)
+        differences_from_verdict=differences_from_verdict, stale_report=stale_report, carry_over=carry_over,
+        target_table=target_table, spike_from_verdict=spike_from_verdict,
+        # phase 6: entailing into another language (the layout and the cshort; their checks)
+        language_info=language_info, standing_weighing=standing_weighing, read_surface=read_surface,
+        surface_problems=surface_problems, surface_kept=surface_kept, source_paths=source_paths,
+        apart_problems=apart_problems, beside_allowed=beside_allowed, entailed_names=entailed_names,
+        target_confirmed_problems=target_confirmed_problems, nothing_carried=int(DEFAULTS.get("nothing-carried", 200)),
+        beside=beside)
 
 
 def carry_over(old: Mapping, new: dict, *, at: str | None = None, by: str = "decompile") -> dict:
