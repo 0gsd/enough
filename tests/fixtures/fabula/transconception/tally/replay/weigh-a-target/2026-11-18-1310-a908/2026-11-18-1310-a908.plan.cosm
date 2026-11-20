@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2208-bc6a
+id: thym/2026-11-20-0952-bc6a
 name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
 program:
   name: weigh-a-target
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2208-bc6a
+- id: R:plan/2026-11-20-0952-bc6a
   type: plan
   name: weigh-a-target on tally.6-weighed-go.fabulac.cosm
   summary: One node, one of which asks the model.

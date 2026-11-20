@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2208-56be
+id: thym/2026-11-20-0952-56be
 name: entail-in-a-language on tally.fabulac.cosm
 program:
   name: entail-in-a-language
@@ -20,7 +20,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2208-56be
+- id: R:plan/2026-11-20-0952-56be
   type: plan
   name: entail-in-a-language on tally.fabulac.cosm
   summary: Three nodes, two of which ask the model.

@@ -1,8 +1,8 @@
 # MacroCOSM OES
 
-*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://macro.cosmoes.org/*
+*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://macro.cosmoes.org/*
 
-*This edition describes grammar version 0.7.0; files written under 0.6.0, 0.5.4, 0.0.2 and 0.0.1 are read unchanged.*
+*This edition describes grammar version 0.8.0; files written under 0.7.0, 0.6.0, 0.5.4, 0.0.2 and 0.0.1 are read unchanged.*
 
 MacroCOSM OES is an OES: a shared grammar and the core built into it. The grammar says how a domain is enumerated as
 plain-text `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is
@@ -97,6 +97,7 @@ one learned.
 | MacroCOSM OES 0.5.4 | 2026-11-03 | the canonical edition, published at https://macro.cosmoes.org/ with the MiniCOSM specifications at their own homes; the grammar unchanged, and files written under 0.0.2 read unchanged | `macrocosm: 0.5.4` (reserved) |
 | MacroCOSM OES 0.6.0 | 2026-11-06 | an OES with a core: five built-ins (`cosm`, `canon`, `fabula`, `doc`, `thym`) and two MiniCOSMs, `comprise/1` and `ascribe/1` (sections 18 and 19); the fabula, in three flavours, in place of EMF, whose `emf/1` is read as an old spelling; the dialectic, module D, which every format inherits (section 18.6); in the grammar, `minicosm` is `format`, a declaration may have old spellings, and a reference may be an address; files written under 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.6.0` (reserved), `oes: fabula/1`, `core: true` |
 | MacroCOSM OES 0.7.0 | 2026-11-13 | entailment, the step every density is made by and what it makes, named in the core (section 18.1); the fabulap built in full along eight axes, by Thym's helper moves `scan` and `construe` (section 18.4.6); Ascribe's second projection, the allograph, listed in the Allograph Registry (sections 16 and 19.2); in the grammar, the fabula's kind `C:form`, the fields `cue`, `senses` and `intended` of `C:device`, and `completeness: outline` for a fabulap; files written under 0.6.0, 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.7.0` (reserved), `C:form` |
+| MacroCOSM OES 0.8.0 | 2026-11-20 | the fabulac authored first, its entailment a program a person can start, judged by its cases and run only in a sandbox (sections 18.1 and 18.4.7); the head fabulac over parts and their interfaces (section 18.4.8); transconception, a program carried into another language through its fabulac, with its ground cited to the language library (section 18.4.9); in the grammar, the kinds `N:target`, `C:reliance` and `P:assumption`, the field `ruling`, the catalog's `purpose`, `written-for`, `ruled-by`, `cases`, `entailed`, `parts` and `head`, and the `authored` source; files written under 0.7.0, 0.6.0, 0.5.4, 0.0.2 and 0.0.1 read unchanged | `macrocosm: 0.8.0` (reserved), `N:target`, `C:reliance`, `P:assumption` |
 
 The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES is
 published at https://comprise.cosmoes.org/, and the map of the family, which named the three scales, is the front page
@@ -412,7 +413,7 @@ A legacy key and an old spelling are never errors. A reader keeps them.
 
 ### 5.6 The reserved key `macrocosm:`
 
-A catalog or a manifest may carry `macrocosm: 0.7.0` (or an earlier `0.6.0`, `0.5.4`, `0.0.2` or `0.0.1`), after its
+A catalog or a manifest may carry `macrocosm: 0.8.0` (or an earlier `0.7.0`, `0.6.0`, `0.5.4`, `0.0.2` or `0.0.1`), after its
 declaration. Readers keep the key and ignore it. It is reserved for the day the grammar itself needs a version test;
 until then no reader refuses a file for what it says, and no writer is required to write it.
 
@@ -1264,7 +1265,7 @@ Saving and signing are Comprise's; the generic reader does neither, and treats a
 outside the model.
 
 Three other things carry versions, and none of them is a saved version: a format carries its major in the
-declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.7.0, in the
+declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.8.0, in the
 reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (section 11.3).
 
 ---
@@ -4804,7 +4805,7 @@ disagreement stands as a rule of its own.
 Each entry records what changed in the text or the grammar, newest first. Where an implementation and this text
 disagreed and one was corrected, the entry says which.
 
-**Edition 0.8.0 · (the day of its release).** A program can be written fabulac first, and carried into another
+**Edition 0.8.0 · 2026-11-20.** A program can be written fabulac first, and carried into another
 language through its fabulac.
 
 1. **The authored fabulac** (sections 18.1, 18.4, 18.4.1 and 18.4.7, a new term). A fabulac may come before the

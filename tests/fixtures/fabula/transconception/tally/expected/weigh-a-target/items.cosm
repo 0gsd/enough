@@ -12,7 +12,7 @@ front: 'thym 1
   '
 built:
   at: '2026-11-18T12:00:00Z'
-  by: enough/0.7.0
+  by: enough/0.8.0
 nodes:
 - id: P:program/weigh-a-target
   type: program

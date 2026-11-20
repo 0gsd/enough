@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2208-bc60
+id: thym/2026-11-20-0951-bc60
 name: raise-the-questions on tally.1-grounded.fabulac.cosm
 program:
   name: raise-the-questions
@@ -16,7 +16,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2208-bc60
+- id: R:plan/2026-11-20-0951-bc60
   type: plan
   name: raise-the-questions on tally.1-grounded.fabulac.cosm
   summary: Two nodes, one of which asks the model.

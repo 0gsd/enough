@@ -1,6 +1,6 @@
 # Ascribe
 
-*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://ascribe.cosmoes.org/*
+*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://ascribe.cosmoes.org/*
 
 *This edition describes the `ascribe/1` MiniCOSM: the declaration every holograph carries.*
 
@@ -1452,7 +1452,7 @@ one that is wrong, and the Changes appendix (section 17) records which was corre
 ## 17. Changes
 
 <!-- atem: what each edition changed, newest first, one line each -->
-**Edition 0.8.0.** The bridge to Comprise and the registry's operations say what was built.
+**Edition 0.8.0 · 2026-11-20.** The bridge to Comprise and the registry's operations say what was built.
 
 1. **What a company keeps** (section 14.4): of a person's listing, only the tag the person gave it; it reads the entry
    live when it needs it.

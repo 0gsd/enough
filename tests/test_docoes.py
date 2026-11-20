@@ -365,18 +365,18 @@ def test_the_spec_terms_and_decisions(built):
     assert vol.item("T:term/stance") is None or vol.item("T:term/stance").data["defined_in"].startswith("S:section/")
     assert "T:term/kind" in vol.item("S:section/7.4").data["mentions"]
     # The decisions come from the "Changes" section — every item of every edition's list, numbered through the
-    # section, each carrying its edition and date: 8 for 0.7.0, 15 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27 old ones under 0.0.1.
-    # The 0.8 texts' nine for the coming edition are headed "Edition 0.8.0 · (the day of its release)", a head the
-    # reader takes no edition from until the release writes the day: edition None, no date, until then.
+    # section, each carrying its edition and date: 9 for 0.8.0, 8 for 0.7.0, 15 for 0.6.0, 8 for 0.5.4, 3 for 0.0.2, the 27
+    # old ones under 0.0.1. (Before the release wrote its day, 0.8.0's head read "(the day of its release)", and the reader
+    # took no edition from it.)
     decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
     assert len(decisions) == 70
     assert decisions[-1].data["name"] == "All rights reserved for the specification and the manifests;"
     assert decisions[44].data["name"] == "A document is enumerated in its own grammar"
-    assert Counter(d.data.get("edition") for d in decisions) == {None: 9, "0.7.0": 8, "0.6.0": 15, "0.5.4": 8,
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.8.0": 9, "0.7.0": 8, "0.6.0": 15, "0.5.4": 8,
                                                                  "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first.get("edition"), first.get("dated")) == \
-        ("S:decision/1", "The authored fabulac", None, None)
+        ("S:decision/1", "The authored fabulac", "0.8.0", "2026-11-20")
     entail = decisions[9].data
     assert (entail["id"], entail["name"], entail["edition"], entail["dated"]) == \
         ("S:decision/10", "Entailment", "0.7.0", "2026-11-13")
@@ -588,7 +588,7 @@ def test_the_five_documents():
     assert D.DOCUMENTS["macrocosm-oes"].xref == {"§": "", "README §": "", "P.": ""}
     assert D.DOCUMENTS["comprise-oes"].own_p and D.DOCUMENTS["comprise-oes"].xref == {"§": ""}
     # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
-    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.7.0"
+    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.8.0"
     assert str(mc.default_registry().get("thym").version) == "1"
 
 

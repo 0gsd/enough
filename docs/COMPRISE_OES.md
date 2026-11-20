@@ -1,6 +1,6 @@
 # Comprise OES
 
-*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://comprise.cosmoes.org/*
+*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://comprise.cosmoes.org/*
 
 *This edition describes the `comprise/1` MiniCOSM: a catalog declaring `oes: comprise/1`, with P files headed
 `cosm: 0.3`, the isotype `comprise-isotype/0`, the outside chart `comprise-paratype/0`, the backup `comprise-bundle/0`,
@@ -1650,7 +1650,7 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
 
-**Edition 0.8.0.**
+**Edition 0.8.0 · 2026-11-20.**
 
 1. **A person's own tag** (chapter E). A person may write the tag of their own listing in the Allograph Registry on
    their own profile, `profile.allograph`, sealed in `persons.data` and never in a file, an export or the isotype; the

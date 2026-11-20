@@ -6,7 +6,7 @@ program:
   name: hand-out-the-cases
   sha256: 14ead20c176be54733af95f8fbe6e63fd95e067b3f0a305775523c229f9f1501
 plan:
-  sha256: 338b07368903e46362a01e172b9d10ee279319a046b488a3f107a8bc2c7ea6b0
+  sha256: 1834fb33b882351e4bf65da4635da295d9fe1f7e4927734ea45446f68bbc562f
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T12:05:00Z'
-ended: '2026-11-19T03:08:41Z'
+ended: '2026-11-20T14:51:51Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1205-a902
   type: trace
   name: hand-out-the-cases run 2026-11-18-1205-a902
-  summary: 'ran hand-out-the-cases on tally.1-grounded.fabulac.cosm in 54221 s on rules: 1 step, all checks green'
+  summary: 'ran hand-out-the-cases on tally.1-grounded.fabulac.cosm in 182811 s on rules: 1 step, all checks green'
   records:
   - R:record/1
   outcome: landed
@@ -32,6 +32,7 @@ nodes:
   - dialectic
   - docoes
   - repo
+  - sandbox
   - syntax
   - transconception
   - verse

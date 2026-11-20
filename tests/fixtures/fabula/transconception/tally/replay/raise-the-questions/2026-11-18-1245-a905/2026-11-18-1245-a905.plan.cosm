@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-18-2208-aac2
+id: thym/2026-11-20-0951-aac2
 name: raise-the-questions on tally.3-settled.fabulac.cosm
 program:
   name: raise-the-questions
@@ -16,7 +16,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-18-2208-aac2
+- id: R:plan/2026-11-20-0951-aac2
   type: plan
   name: raise-the-questions on tally.3-settled.fabulac.cosm
   summary: Two nodes, one of which asks the model.

@@ -3,7 +3,7 @@
     "language": "es",
     "label": "Español",
     "role": "translated chrome strings",
-    "source": "en @ 0.7.0"
+    "source": "en @ 0.8.0"
   },
   "strings": {
     "agentmode.agent": "agente",

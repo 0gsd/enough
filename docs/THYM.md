@@ -1,6 +1,6 @@
 # Thym
 
-*Edition 0.7.0 · revised 2026-11-13 · cosmoes.org home: https://thym.cosmoes.org/*
+*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://thym.cosmoes.org/*
 
 *This edition describes the `thym/1` built-in and defines the language in two grammars; a program's version line, `thym 0` or `thym 1`, names the grammar it is written in.*
 
@@ -3223,7 +3223,7 @@ section it touched.
 
 <!-- atem: what each edition changed, newest first -->
 
-**Edition 0.8.0.** The text says what a second runtime needs, as the reference runtime does it; no behaviour changed
+**Edition 0.8.0 · 2026-11-20.** The text says what a second runtime needs, as the reference runtime does it; no behaviour changed
 but by the three rulings of item 15.
 
 1. **`quotes-held` is a check of section 7.3**, the owner's ruling of 0.7: every name a catem quotes in a code span is

@@ -6,7 +6,7 @@ program:
   name: entail-in-a-language
   sha256: 08fb8200090294cd0168a2267be4601947775e170b03153c8ad4ff05828f8daf
 plan:
-  sha256: e8c7236ca06fe2624c9a95f339e3d2a6ce211b063acca8303ab11dfd5d99e58c
+  sha256: ddf9b5d3f24b813492571aeb806637f5bb417317b523d0b8467a466fc38727e2
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-18T14:10:00Z'
-ended: '2026-11-19T03:09:04Z'
+ended: '2026-11-20T14:52:11Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-18-1410-a910
   type: trace
   name: entail-in-a-language run 2026-11-18-1410-a910
-  summary: 'ran entail-in-a-language on tally.fabulac.cosm, rust.txt in 46744 s on scripted: 3 steps, all checks
+  summary: 'ran entail-in-a-language on tally.fabulac.cosm, rust.txt in 175331 s on scripted: 3 steps, all checks
     green'
   records:
   - R:record/1
@@ -34,6 +34,7 @@ nodes:
   - dialectic
   - docoes
   - repo
+  - sandbox
   - syntax
   - transconception
   - verse

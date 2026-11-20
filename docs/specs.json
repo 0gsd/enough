@@ -1,8 +1,8 @@
 {
   "source": "cosmoes-site",
-  "commit": "5066d74",
+  "commit": "4e9475f",
   "dirty": false,
-  "synced": "2026-11-19",
+  "synced": "2026-11-20",
   "client": {
     "path": "enough/cosmoes_client.py",
     "source": "client/cosmoes_client.py",
@@ -14,58 +14,58 @@
       "slug": "macrocosm-oes",
       "file": "macrocosm-oes.md",
       "name": "MacroCOSM OES",
-      "edition": "0.7.0",
+      "edition": "0.8.0",
       "describes": {
-        "macrocosm": "0.7.0"
+        "macrocosm": "0.8.0"
       },
       "host": "macro.cosmoes.org",
-      "revised": "2026-11-13",
+      "revised": "2026-11-20",
       "reference": true,
       "path": "docs/MACROCOSM_OES.md",
       "source": "specs/macrocosm-oes.md",
-      "sha256": "d730162725a4776213baf9d7bd729cf3407439a822eccd407a4d886b2fbfb57c"
+      "sha256": "210fe4fa3ef2fa7e9b87191568665c3fd771cded47d7503add4787f22b746149"
     },
     {
       "slug": "thym",
       "file": "thym.md",
       "name": "Thym",
-      "edition": "0.7.0",
+      "edition": "0.8.0",
       "describes": {
         "thym": "1"
       },
       "host": "thym.cosmoes.org",
-      "revised": "2026-11-13",
+      "revised": "2026-11-20",
       "path": "docs/THYM.md",
       "source": "specs/thym.md",
-      "sha256": "7836a8f19a569257cbf70b136ce3be04c760e0e0a4765bdf4bacb8e9d70828e9"
+      "sha256": "8f2cd08511fb28d38c63253a52225397f1ca4819c84f401c1415d8ced1219f8f"
     },
     {
       "slug": "ascribe",
       "file": "ascribe.md",
       "name": "Ascribe",
-      "edition": "0.7.0",
+      "edition": "0.8.0",
       "describes": {
         "ascribe": "1"
       },
       "host": "ascribe.cosmoes.org",
-      "revised": "2026-11-13",
+      "revised": "2026-11-20",
       "path": "docs/ASCRIBE.md",
       "source": "specs/ascribe.md",
-      "sha256": "0754b846868015ee15e8c3fc0baefdc2d00d9bcff700ae8d7a784935a8360f28"
+      "sha256": "0c2c5e3bf4d7d8287a6be429ca833e6b592bf43cf3d1fadb518232b341544c17"
     },
     {
       "slug": "comprise-oes",
       "file": "comprise-oes.md",
       "name": "Comprise OES",
-      "edition": "0.7.0",
+      "edition": "0.8.0",
       "describes": {
         "comprise": "1"
       },
       "host": "comprise.cosmoes.org",
-      "revised": "2026-11-13",
+      "revised": "2026-11-20",
       "path": "docs/COMPRISE_OES.md",
       "source": "specs/comprise-oes.md",
-      "sha256": "017320844675e1e2525d02efe913651e3e6dbe16e14c88a7621b5289f2e24397"
+      "sha256": "e9ad9fadfdbfd7812e6bb1cfb7abc184116b308239ce70e76e8d045518a896a7"
     }
   ]
 }
