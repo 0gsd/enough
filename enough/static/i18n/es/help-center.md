@@ -1213,7 +1213,7 @@ Cada tarjeta termina con **grafo a su alrededor**: el elemento y sus vecinos, a 
 - **Thym** se pronuncia *THIGH-m*, como el inglés *thigh* con una *m* al final, por *thymos*, la palabra de los griegos — y de Francis Fukuyama — para la parte del alma que quiere ser reconocida; *time*, en inglés, también sirve, si le echas un poco de aire a la T. No es un acrónimo. Nombra el re-conocimiento: un texto conocido de nuevo en otra densidad, una empresa conocida de nuevo en público, una persona conocida de nuevo sin nombre.
 - **holomorfo** e **isomorfo** toman prestados los prefijos de la familia: *holo-*, el todo, guardado en privado por su sujeto, como un Holotype; *iso-*, un igual, liberado para compartirse, como un isotype. Un *morfo* es una forma, y la figura que toma un texto.
 
-*La especificación de MacroCOSM OES es © 2026 Graham Smith, todos los derechos reservados.*
+*La especificación de MacroCOSM OES es © 2026 Graham Smith, publicada bajo CC BY 4.0.*
 
 ### 13.4 Thym: programas que mueven el significado
 

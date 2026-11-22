@@ -1214,7 +1214,7 @@ In der Fabula durchsucht **suchen** die Karten, die auf der Seite vor dir gezeic
 - **Thym** spricht man *THIGH-m*, wie das englische *thigh* mit einem *m* am Ende, nach *thymos*, dem Wort der Griechen — und Francis Fukuyamas — für den Teil der Seele, der anerkannt werden will; das englische *time* tut es auch, wenn du beim T ein wenig hauchst. Es ist kein Akronym. Es benennt ein Wieder-Erkennen: ein Text, in einer anderen Dichte wiedererkannt, eine Firma, öffentlich wiedererkannt, ein Mensch, ohne Namen wiedererkannt.
 - **Holomorph** und **Isomorph** borgen die Vorsilben der Familie: *holo-*, das Ganze, von seinem Gegenstand privat gehalten, wie ein Holotype; *iso-*, ein Gleiches, zum Teilen freigegeben, wie ein Isotype. Ein *Morph* ist eine Form, und die Gestalt, die ein Text annimmt.
 
-*Die MacroCOSM-OES-Spezifikation ist © 2026 Graham Smith, alle Rechte vorbehalten.*
+*Die MacroCOSM-OES-Spezifikation ist © 2026 Graham Smith, veröffentlicht unter CC BY 4.0.*
 
 ### 13.4 Thym: Programme, die Bedeutung bewegen
 

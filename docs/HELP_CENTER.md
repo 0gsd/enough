@@ -1213,7 +1213,7 @@ Every card ends with **graph around this**: the item and its neighbours, one ste
 - **Thym** is said *THIGH-m*, like *thigh* with an *m* on the end, after *thymos*, the Greeks' word — and Francis Fukuyama's — for the part of the soul that wants to be recognized; *time* will do too, if you breathe on the T. It isn't an acronym. It names re-cognition: a text known again at another density, a company known again in public, a person known again without a name.
 - **holomorph** and **isomorph** borrow the family's prefixes: *holo-*, the whole, kept private by its subject, as a Holotype is; *iso-*, an equal, released to be shared, as an isotype is. A *morph* is a form, and the shape a text takes.
 
-*The MacroCOSM OES specification is © 2026 Graham Smith, all rights reserved.*
+*The MacroCOSM OES specification is © 2026 Graham Smith, published under CC BY 4.0.*
 
 ### 13.4 Thym: programs that move meaning
 
