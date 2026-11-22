@@ -1,6 +1,6 @@
 ---
 name: transcognition
-description: Turn this on to translate between human languages (translator skill), or for work rooted in a fabula: a fabulan, a fabulap, or a fabulac made from a codebase or authored toward one (macrocosm-oes skill).
+description: Turn this on to translate between human languages (translator skill), or for work rooted in a fabula: a fabulan, a fabulap, a fabulac made from a codebase or authored toward one, or a fabulam of a Lean proof (macrocosm-oes skill).
 ---
 
 # Transcognition Paradigm
@@ -16,8 +16,9 @@ paradigm has three faces:
   text-planning plans a text. The plan document is the fabulac.
 
 Anything rooted in a fabula is this paradigm's: making or authoring a
-fabulan (prose), a fabulap (verse) or a fabulac (code). A plan for a
-text the person will write stays text-planning's.
+fabulan (prose), a fabulap (verse), a fabulac (code) or a fabulam (a
+Lean proof). A plan for a text the person will write stays
+text-planning's.
 
 ## What is presumed
 
@@ -54,7 +55,7 @@ not say which, ask once, then go on.
 Neither skill is on. `translator` opens offline translation between
 about 419 languages. `macrocosm-oes` opens the fabula tools: a fabulac
 of a codebase, a new program authored as a fabulac, a text's or a
-poem's fabula.
+poem's fabula, a Lean proof's fabulam.
 <!-- /face -->
 <!-- face: translator -->
 ## Translation
@@ -103,11 +104,13 @@ When output looks degraded, follow the fallback order below the cut.
 - One fabulac holds up to sixty files and six thousand lines of
   Python. Say so plainly when a folder is bigger, or in another
   language.
+- A Lean proof is taken apart into its fabulam and told again as
+  pshorts, through `fabulam`; a pshort is a guide, never a proof.
 
 From a codebase: `fabulac` builds it in five stages, you put its
 questions with `dialectic`, one or two at a time, and it is entailed as
 code or as a catem. Toward a codebase: text-planning's steps, with the
-fabulac as the plan. Before the first step of either, `read_file` this
+fabulac as the plan. Before the first step of each, `read_file` this
 file (`rness/paradigms/transcognition.md`) for the flow.
 <!-- /face -->
 
@@ -384,6 +387,28 @@ files whose part moved are told again. `fabulac` `<do>moved</do>` names
 them, and every file changed by hand, file by file; the person chooses
 for each: overwrite it, keep it (a recorded decision), or take it back
 into the fabulac. Never choose for them.
+
+# From a proof
+
+## When to build a fabulam
+
+Only when asked to explain, summarize or "make readable" a Lean 4
+proof, or when a fabulam or a pshort is named. `fabulam`
+`<do>build</do>` with the file's or folder's `<path>` builds
+`<name>.fabulam.cosm` in six stages, as a job: an outline by rule, then
+a model's reading (statements and spine, comments, the public wording
+if given, what the proof delivers, questions). `status` says what
+landed; `resume` takes it up. The skill's body has the rest.
+
+- A file that ends in several results: ask which final theorem to
+  tell (`<target>`); never pick.
+- Offer the three densities, `expert`, `student` and `everyone`; the
+  person chooses, and `<do>entail</do>` writes that pshort.
+- A pshort is a guide to a proof, not a proof. enough reads Lean as
+  text and runs nothing of it: never say a proof is verified or
+  machine-checked beyond the fabulam's one sentence about checking.
+- Lean 4 only; up to sixty files and twelve thousand lines under one
+  head fabulam.
 
 # Other fabulas
 

@@ -1,7 +1,7 @@
 ---
 members: text-planning transcognition workflow-design
 fingerprint.text-planning: sha256:7652469215b11361
-fingerprint.transcognition: sha256:0990137beb14f6f7
+fingerprint.transcognition: sha256:97a4a863a5a414c3
 fingerprint.workflow-design: sha256:6cc7a73ca374173c
 ---
 
@@ -18,7 +18,7 @@ base. Three is the most that can be on at once.
   never prose).
 - **transcognition**: translation between human languages, and
   anything rooted in a fabula: a fabulan, a fabulap or a fabulac, from
-  a codebase or toward one.
+  a codebase or toward one, or a Lean proof's fabulam.
 - **workflow-design**: making or changing the workflow itself: a skill,
   a readvisor, a paradigm and its combinations, or the root
   `rness/AGENT.md` / `rness/MOTIVATION.md`.
@@ -153,7 +153,8 @@ words do not settle which it is, ask once, then go on.
   and Scaffold mode: `rness/paradigms/text-planning.md`.
 - The model rules, the fallback order and the Rosetta primers; the
   five stages, the questions, entailing, transconception and its two
-  gates; the fabulac-first flow and running in the sandbox:
+  gates; the fabulac-first flow and running in the sandbox; the
+  fabulam and its pshorts:
   `rness/paradigms/transcognition.md`.
 - The four targets, the combinations, the completion message and the
   common pitfalls: `rness/paradigms/workflow-design.md`.

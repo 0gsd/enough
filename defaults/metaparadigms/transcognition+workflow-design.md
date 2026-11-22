@@ -1,6 +1,6 @@
 ---
 members: transcognition workflow-design
-fingerprint.transcognition: sha256:0990137beb14f6f7
+fingerprint.transcognition: sha256:97a4a863a5a414c3
 fingerprint.workflow-design: sha256:6cc7a73ca374173c
 ---
 
@@ -13,7 +13,8 @@ work together: neither needs switching to.
 
 - **transcognition**: translation between human languages, and
   anything rooted in a fabula: making or authoring a fabulan, a fabulap
-  or a fabulac, from a codebase or toward one.
+  or a fabulac, from a codebase or toward one, or a Lean proof's
+  fabulam.
 - **workflow-design**: making or changing the workflow itself: a skill,
   a readvisor, a paradigm and its combinations, or the root
   `rness/AGENT.md` / `rness/MOTIVATION.md`.
@@ -24,8 +25,8 @@ skill or paradigm that does fabula or translation work is built by
 workflow-design and bound by transcognition's rules.
 
 For the plan of a text the user will write, turn on `text-planning`
-beside these two (its name on a line of its own under
-`# Active paradigm` in `rness/active-paradigm`).
+beside these two (a line under `# Active paradigm` in
+`rness/active-paradigm`).
 
 ## What the user most likely means
 
@@ -156,7 +157,8 @@ the words do not settle which it is, ask once, then go on.
 
 - The model rules, the fallback order and the Rosetta primers; the
   five stages, the questions, entailing, transconception and its two
-  gates; the fabulac-first flow and running in the sandbox:
+  gates; the fabulac-first flow and running in the sandbox; the
+  fabulam and its pshorts:
   `rness/paradigms/transcognition.md`, below its own cut.
 - The four targets (skills, paradigms and their combinations,
   readvisors, the root files), the completion message and the common

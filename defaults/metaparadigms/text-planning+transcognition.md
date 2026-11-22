@@ -1,7 +1,7 @@
 ---
 members: text-planning transcognition
 fingerprint.text-planning: sha256:7652469215b11361
-fingerprint.transcognition: sha256:0990137beb14f6f7
+fingerprint.transcognition: sha256:97a4a863a5a414c3
 ---
 
 # Text-Planning with Transcognition
@@ -16,16 +16,16 @@ work together: neither needs switching to. text-planning is home base.
   write: `<project>-text-plan.md` and scaffolds of its sections, never
   prose.
 - **transcognition**: anything rooted in a fabula (making or authoring
-  a fabulan, a fabulap or a fabulac), and translation between human
-  languages.
+  a fabulan, a fabulap or a fabulac; a Lean proof's fabulam), and
+  translation between human languages.
 
 The division is by what is made. A plan for a text is text-planning's.
 A fabula, a program and a translation are transcognition's. With both
 on, the plan may be kept as a fabulan when the user asks: only then.
 
 To build or change a skill, readvisor or paradigm, turn on
-`workflow-design` beside these two (its name on a line of its own under
-`# Active paradigm` in `rness/active-paradigm`).
+`workflow-design` beside these two (a line under `# Active paradigm`
+in `rness/active-paradigm`).
 
 ## What the user most likely means
 
@@ -158,7 +158,8 @@ do not settle which it is, ask once, then go on.
   cut.
 - The model rules, the fallback order and the Rosetta primers; the
   five stages, the questions, entailing, transconception and its two
-  gates; the fabulac-first flow and running in the sandbox:
+  gates; the fabulac-first flow and running in the sandbox; the
+  fabulam and its pshorts:
   `rness/paradigms/transcognition.md`, below its own cut.
 
 Read the member's file the moment its procedure applies, before acting

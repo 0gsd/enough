@@ -1,6 +1,6 @@
 ---
 name: macrocosm-oes
-description: Reads, checks and explains MacroCOSM `.cosm` files — Holotypes, Canon catalogs, product trees, fabulas, holographs — and, only when the user asks, decompiles a text into its fabula, writes its atem (the tightest fair, full, plain reduction of a text), puts a volume's questions to the user and records their answers, builds a fabulac of a folder of Python, or runs a Thym program. Use for "what is this .cosm file", "read this Holotype", "lint this .cosm", "decompile this text", "make an atem of this", "say it in one line", "what is a fabula", "what does this stance mean", "ask me the questions", "build a fabulac", "run publish-story on this", "what is Thym". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
+description: Reads and checks `.cosm` files, and opens the fabula tools that decompile a text, poem, program or Lean proof. Use for a .cosm file, a fabulac, fabulap or fabulam, a dialectic or a Thym program. It reads, checks and explains MacroCOSM `.cosm` files — Holotypes, Canon catalogs, product trees, fabulas, holographs — and, only when the user asks, decompiles a text into its fabula, writes its atem (the tightest fair, full, plain reduction of a text), puts a volume's questions to the user and records their answers, builds a fabulac of a folder of Python or a fabulam of a Lean proof, or runs a Thym program. Use for "what is this .cosm file", "read this Holotype", "lint this .cosm", "decompile this text", "make an atem of this", "say it in one line", "what is a fabula", "what does this stance mean", "ask me the questions", "build a fabulac", "explain this Lean proof", "run publish-story on this", "what is Thym". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
 ---
 
 # macrocosm-oes
@@ -38,7 +38,8 @@ E entities, K concepts, N intent, C construction, R production, P claims
 entails what is made from it (a text its fabula, a fabula a short, a short
 its atem). One fabula, many entailments. Its **flavour**: `fabulan` (prose),
 `fabulap` (verse), `fabulac` (code: its short is a **cshort**, source
-rebuilt; its deep atem a **catem**). A text's **twin** sits beside it:
+rebuilt; its deep atem a **catem**), `fabulam` (a formal proof: its short
+is a **pshort**). A text's **twin** sits beside it:
 `notes.md.fabulan.cosm`. An old twin `notes.md.cosm` that says `oes: emf/1`
 is still read and is replaced only when the text is decompiled again.
 "EMF" is the fabula's retired name.
@@ -135,6 +136,49 @@ then reads it closely with a model (without one it stops after hearing).
 `status` and `cancel` as for a fabulac; a poem decompiled in one call is
 rebuilt in steps only with `<restart>yes</restart>`.
 
+## Fabulams
+
+A **fabulam** is the fabula of a formal proof: a Lean 4 file, or a folder
+of them, read by rule as text. `PrimesCongruentOne.lean` →
+`primes-congruent-one.fabulam.cosm`, beside the file or the Lean project
+that holds it. enough installs, builds and runs nothing of Lean. Only when
+asked ("explain this Lean proof", "make it readable for a student"):
+
+- `fabulam` `<do>build</do>` with `<path>` (a `.lean` file, a folder of
+  them, or a `.fabulam.cosm`) runs six stages as a job after your turn:
+  the outline of every declaration, by rule; then, with a model, the
+  statements and the spine, the comments audited, the statement set
+  against a public wording if one was given, what the proof really
+  delivers, and the questions. Without a model it stops at the outline.
+  A file that ends in several results waits for `<target>`, the final
+  theorem to tell: ask the person which; never pick.
+  <!-- M5: confirm build's reply and the <target> refusal wording -->
+- `<do>resume</do>` takes the build up after the last stage that landed.
+  A Lean file changed since the survey starts again from the survey.
+- `<do>status</do>` says what the card says: one line of state (no
+  fabulam yet; choose the result to tell; an outline; {n} of {m} stages
+  landed; built; the Lean file changed; the Lean file gone), the sentence
+  about checking in full, and each density's pshort, entailed or stale.
+  <!-- M5: confirm status's reply -->
+- `<do>entail</do>` with `<density>` `expert`, `student` or `everyone`
+  writes a **pshort**, `<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`,
+  beside the fabulam, from the fabulam alone. Offer the three; the person
+  chooses. `everyone` follows the `teaching` order, the reduction first.
+  <!-- M5: confirm entail's reply -->
+- Its questions are for someone who knows the field: `dialectic` with the
+  fabulam's `<path>`, one or two at a time; never answer them.
+
+Limits: Lean 4 only; up to sixty files and twelve thousand lines under
+one head fabulam, one part a file; files the final theorem does not reach
+are outlined and not read.
+
+Say plainly: a pshort is a guide to a proof, never a proof. Every run of
+its sentences cites fabulam items, and each item cites Lean names and
+lines. Never say a proof is verified or machine-checked; the fabulam's one
+sentence about checking (`P:claim/checking`) is all that may be said. The
+card has no badge or tick that could read as "verified". Whether the
+teaching is good is a person's judgement.
+
 ## Thym programs
 
 A **Thym program** is a `.thym` file: a recipe of moves over documents. It
@@ -164,14 +208,14 @@ refuses the plan; say what was refused and what would make it run.
 ## The tools, in order
 
 Their tags are in the Tools section. With this skill off, this guide is one
-`cosm_guide` call away, and `dialectic`, `fabulac`, `fabulap` and the Thym
-tools do not run.
+`cosm_guide` call away, and `dialectic`, `fabulac`, `fabulap`, `fabulam` and
+the Thym tools do not run.
 
 1. `cosm_read` — the tree, or one item with `<item>`. Start here.
 2. `cosm_lint` — the checks: a fabula's and a holograph's own, else the
    generic ones.
 3. `fabula_derive` or `atem` — only on request.
-4. `dialectic`, `fabulac`, `fabulap` — only on request.
+4. `dialectic`, `fabulac`, `fabulap`, `fabulam` — only on request.
 5. `thym_moves`, `thym_check`, then `thym_run` — runs only on request.
 
 `doc_lookup` answers "what is X" from the specs and the manual. Writing into
