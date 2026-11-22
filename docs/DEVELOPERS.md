@@ -775,6 +775,8 @@ Each is `<tool name="fabulac">` with a `<path>` (the program's name, or its `.fa
 
 For a folder of Python decompiled into its fabulac (not authored), the words are the 0.6 ones: `<do>build</do>`, `<do>status</do>`, `<do>compile</do>` (with `<what>`), `<do>cancel</do>`. Its code is read, never run.
 
+A Lean proof has a tool of its own, `fabulam` (0.9), with a `<path>` (a `.lean` file, a folder of them, or a `.fabulam.cosm`) and a `<do>`: `<do>build</do>` (`<target>` names the final theorem to tell, when a file ends in more than three), `<do>resume</do>`, `<do>status</do>` (the default), `<do>cancel</do>`, and `<do>entail</do>`, which takes `<density>` `expert`, `student` or `everyone`. It starts the jobs of the routes below, and nothing of Lean is ever run. Example: `<tool name="fabulam"><path>PrimesCongruentOne.lean</path><do>build</do></tool>`.
+
 ### 6.3 The routes (API promise 1)
 
 Every route that starts a run or writes (each POST here) needs the header `X-Enough-Api: 1`, or it answers 403 with a sentence. The page and the client send it. A job route answers `{"job": {...}}`; poll `GET /api/canon/job/{job_id}` until `state` is `done` (its `result`), `failed` or `cancelled`. A refusal is a 4xx with `{"detail": "<the sentence>"}`: 400 a bad body, 404 no such fabulac, 409 refused (not authored, not entailed, a service, a library run as a tool, a hand edit, no model), 403 the gate.
@@ -803,6 +805,20 @@ Every route that starts a run or writes (each POST here) needs the header `X-Eno
 With curl, a gated route: `curl -H 'X-Enough-Api: 1' -H 'Content-Type: application/json' -d '{"path": "tally"}' 127.0.0.1:3456/api/fabulac/test`.
 
 The jobs these routes start are of kind `fabulac-author`, `fabulac-entail` and `sandbox`; a sandbox job's snapshot also carries `run` (the run id) and `what` (`tests` or `tool`).
+
+**Two gates, before any route (0.9).** The first is the Origin gate (`enough/origin_gate.py`). Every POST, PUT, PATCH and DELETE, and `GET /api/reset`, `GET /api/update-enough` and `GET /api/reveal`, passes only with no `Origin` header (curl, a script, the client) or with one of enough's own: `http://127.0.0.1`, `http://localhost` or `http://[::1]` on enough's own port, or the desktop shell's (`tauri://localhost`, `http://tauri.localhost`, `https://tauri.localhost`). Anything else, `null` among it, answers 403 with a sentence, and so does a request with no `Origin` that the browser marks `Sec-Fetch-Site: cross-site` or `same-site`. Reads, `GET /api/stream` and `/static` are never held. The second is the header `X-Enough-Api: 1`: every promised POST above, and since 0.9 the older routes that start a model run too, which are not promised (their shape may change without a new `VERSION`): `/api/chat`, `/api/cloud/health-check`, `/api/transcribe`, `/api/canon/read`, `/api/canon/atem`, `/api/thym/run`, `/api/fabula/derive`, `/api/fabula/build`, `/api/fabula/resume`, `/api/fabula/compile`, `/api/fabula/verse/build`, `/api/fabula/verse/resume`, `/api/dialectic/settle`, `/api/composure/scaffold/check`, every POST under `/api/council/` but `/api/council/pause`, and every POST under `/api/fabulam/`. Without it they answer 403 with a sentence. The page sends the header on every call it makes. `POST /api/model` takes no header (it loads a model and runs none); the Origin gate holds it.
+
+**The fabulam's routes (0.9, not promised).** They take the header on every POST and pass the Origin gate. A body's `path` is a `.lean` file, a folder holding `.lean` files, or a `.fabulam.cosm`, from the project's top folder. A refusal is a 4xx with `{"detail": "<the sentence>"}` before any job starts: 400 no path, not Lean, or the Canon store; 404 not there, or gone; 409 a part (it is built with its head), nothing to take up again, already built (pass `restart`), an outline or no model for `entail`, nothing running for `cancel`; 413 past sixty files or twelve thousand lines under one head.
+
+| route | takes | gives | example |
+|---|---|---|---|
+| `GET /api/fabulam/state` | `path` | `state job`; `state` is the card's: `source fabulam name exists state line stages landed of next complete moved targets wording said said_by said_at checking pshorts` | `/api/fabulam/state?path=PrimesCongruentOne.lean` |
+| `POST /api/fabulam/build` | `path target? restart? wording? said? said_by? said_at? name? route? model? calls? job_calls? mode?` | a job and `state`, or the pick answer | `{"path": "PrimesCongruentOne.lean"}` |
+| `POST /api/fabulam/resume` | `path route? model? calls? job_calls?` | a job and `state`, from the stage after the last that landed | `{"path": "PrimesCongruentOne.lean"}` |
+| `POST /api/fabulam/entail` | `path density? route? model? calls?` | a job and `state`; its result names the pshorts written (all three when `density` is left out) | `{"path": "primes-congruent-one.fabulam.cosm", "density": "student"}` |
+| `POST /api/fabulam/cancel` | `path` | `job` | `{"path": "PrimesCongruentOne.lean"}` |
+
+**The pick answer.** A file that ends in more than three final theorems, built with no `target`, is not refused and builds nothing: the answer is 200, `{"job": null, "targets": ["…", "…"], "state": {"state": "pick", "line": "this file ends in 5 results: choose the one to tell", …}, "refusal": {"check": "pick", …}, "message": "nothing was built; …"}`. Build again with `"target"` naming one of `targets`, or a list of them for a folder. A folder answers the same when its head names no target and the rule finds more than three across its files. The job's kind is `fabulam`; `checking` is the sentence of `P:claim/checking`, in full, and nothing more is said about checking anywhere.
 
 ### 6.4 The command line
 

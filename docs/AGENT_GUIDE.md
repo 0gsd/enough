@@ -2629,8 +2629,17 @@ of: a page, a deck or a document. Manual: HELP_CENTER 4.10 and 20.8. Pins:
 - **Routes.** `enough/composure_api.py`, `build_scaffold_router`:
   `GET /api/composure/scaffold`, `POST …/scaffold/{lock,unlock,check,
   check/cancel,accept,decline,export}`. `POST /api/composure/ops` answers 403
-  to `source: "readvisor"`: the readvisor's way in is its tools.
-- **Tests.** `tests/test_composure_scaffold.py`, `test_scaffold_lock.py`,
+  to any claimed `source` but `ui` (0.9: the server sets it): the readvisor's
+  way in is its tools.
+- **The state doors (0.9).** `GET /api/composure/scaffold/state?path=`,
+  `POST …/scaffold/state/out` (a new `<name>.scaffold.md` beside the
+  composure, exclusive create, `-2` …) and `POST …/scaffold/state/in` (a
+  preview, `scaffolder.Bring`, then with `apply` the batch as `ui`, with
+  `replace` naming the boxes whose words the state may write over; a locked
+  state comes in locked with its findings and no undo). The file is the
+  skill's own writer's (`scaffolder.state_text`, `read_state`); the page's
+  items sit in the export menu under "the state file". Manual 20.8.
+- **Tests.** `tests/test_scaffold_state_doors.py`, `tests/test_composure_scaffold.py`, `test_scaffold_lock.py`,
   `test_scaffold_check.py`, `test_scaffold_export.py`, `test_scaffolder.py`;
   uicheck screens `composure-scaffolder*` and the scenario of that name.
 
@@ -5315,6 +5324,17 @@ a way in: the paradigm and the skill say to run an entailment only through the `
 6. Rows in `docs/DEVELOPERS.md` sections 6.2 to 6.5. `tests/test_api_promise.py` fails until the table, the app's
    routes, the client and the reference agree.
 
+**The two route gates (0.9).** `enough/origin_gate.py`'s `OriginGate`, raw ASGI added last in `create_app` so it
+answers first, refuses every POST, PUT, PATCH and DELETE (and the state-changing GETs in `STATE_GETS`: reset,
+update-enough, reveal) whose `Origin` is not enough's own (`own_origin()`: a loopback host on the socket's own port
+or the app's, the shell's `SHELL_ORIGINS`), and one with no Origin that the browser marks `Sec-Fetch-Site:
+cross-site` or `same-site`; no Origin at all passes (curl, the client, the shell's Rust side). Reads, SSE and
+`/static` are never held. `api_promise.MODEL_RUNS`, `MODEL_RUN_PREFIXES` and `MODEL_RUN_OPEN` put the promise header on
+the older routes that start a model run without promising them; the page's one `window.fetch` wrapper and its
+`htmx:configRequest` hook send the header on every same-origin `/api/` call. A new route that starts a model run goes
+in `MODEL_RUNS` (or under a prefix) and in the list in `docs/DEVELOPERS.md` section 6.3, which
+`test_api_promise.py` holds to it; `tests/test_route_guards.py` holds the gates themselves.
+
 ### Adding a starter
 
 A file `defaults/fabulac-starters/<kind>/<name>.fabulac.cosm`, an authored fabulac whose `source.licence` is
@@ -5333,6 +5353,28 @@ kind would need a `--starter` value per name (not built). Update
 real on macOS with `sandbox-exec` and are skipped elsewhere. The developers' manual: `tests/test_docoes.py`
 `test_the_developers_manual` (registered, bundled, the page knows it, lints clean, the help center's 12.8 points at
 it in every language) and `tests/test_docs_api.py` `test_the_developers_manual_is_served_in_english`.
+
+---
+
+## A Lean proof's fabulam (0.9)
+
+The fourth flavour: a Lean 4 file (or a folder of them) read by rule, as text, into `<name>.fabulam.cosm`, and
+entailed from the fabulam alone into pshorts (`<stem>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`, density `expert`,
+`student` or `everyone`). Nothing of Lean is installed, built or run, and no text says a proof is verified: the one
+sentence on checking is `P:claim/checking`, written by rule (`proof.checking_says`). The files: `enough/lean_reader.py`
+(the reader: `outline`, `graph`, `reach`, reached from `repo_engine` through the `lean` entry in `languages.py`,
+`reads` true, `runs` and `target` false); `enough/fabulam.py` (the checks over a volume, hooked in from `fabula.py`);
+`enough/thym/moves/proof.py` (the moves and their checks, `checking_says`, the pshort's fixed lines, `BAND_FILES` 60
+and `BAND_LINES` 12,000; it imports only `enough.thym` and `enough.macrocosm`, so Comprise can vendor and refuse it);
+`enough/fabulam_prompts.py`, `enough/fabulam_job.py` (the entry functions the card and the routes call:
+`file_state`, `run_file_build`, `archive_state`, `run_archive_build`, `run_entail`, `targets_by_rule`,
+`fabulam_path`) and `enough/fabulam_head.py` (where a fabulam lives, the head over a folder's parts, summaries
+upward); `enough/routes/fabulam.py` (`/api/fabulam/state`, `build`, `resume`, `entail`, `cancel`, every POST behind
+the promise header and the Origin gate; the pick answer `{job: null, targets}`; `router.start(do, body)` for the
+readvisor's `fabulam` tool in `fabula_tools.py`); the programs `defaults/thym/decompile-lean*.thym` and
+`entail-pshort.thym`; the card and the pshort reader in `index.html` (`fmOpen`, `fmPaint`, `fmStateLine`,
+`fmPshortOpen`). Spec: MacroCOSM OES at edition 0.9 and Thym's proof moves; the person's guide is HELP_CENTER 12.11;
+the reference, DEVELOPERS 6.2 and 6.3. Tests: `tests/test_fabulam*.py`, `test_pshort.py`, `test_lean_reader*.py`.
 
 ---
 

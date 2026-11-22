@@ -138,3 +138,22 @@ def test_the_reference_table_lists_every_route_word_and_check():
     for name in ("starters", "begin", "add", "check", "entail", "test", "run", "stop", "status", "moved", "keep",
                  "let_go", "take_back", "head", "parts_moved", "answer"):
         assert f"`e.{name}(" in ref, name
+
+
+def test_the_reference_lists_the_fabulams_routes_the_pick_answer_and_the_two_gates(app):
+    """0.9 (lane M7): the fabulam's five routes (not promised, so not in `ROUTES`), the answer a build gives when a
+    file ends in several results, and the two gates every route passes, the Origin gate and the header on the older
+    model-run routes, are all in the reference, held to the app and to `api_promise`."""
+    ref = (REPO / "docs" / "DEVELOPERS.md").read_text(encoding="utf-8")
+    fabulam = {(m, p) for m, p in _app_routes(app) if p.startswith("/api/fabulam/")}
+    assert len(fabulam) == 5, fabulam
+    for method, path in fabulam:
+        assert f"`{method} {path}`" in ref, path
+    assert '{"job": null, "targets": [' in ref and '"check": "pick"' in ref
+    for word in ("build", "resume", "status", "cancel", "entail"):
+        assert f"`<do>{word}</do>`" in ref, word
+    assert "`enough/origin_gate.py`" in ref and "`X-Enough-Api: 1`" in ref
+    for path in P.MODEL_RUNS | set(P.MODEL_RUN_OPEN):
+        assert f"`{path}`" in ref, path
+    for prefix in P.MODEL_RUN_PREFIXES:
+        assert f"every POST under `{prefix}`" in ref, prefix
