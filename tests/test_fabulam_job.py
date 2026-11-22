@@ -395,6 +395,24 @@ def test_a_head_over_three_files_is_built_part_by_part_and_folded(archive: Path)
                                                                         ("Sum.lean", "complete", True)]
 
 
+def test_a_head_of_more_parts_than_one_request_carries_folds_in_rounds(archive: Path, monkeypatch):
+    """The design's 4.4: a head with more than `HEAD_PARTS` parts folds in rounds, then once over the rounds' notes."""
+    from enough.thym.moves import proof as P
+    from tests.test_fabulam_moves import recorded
+    monkeypatch.setattr(P, "HEAD_PARTS", 2)
+    notes = ["notes:\n  - 'Parity.Basic says what even means, and Parity.Double adds two doubles.'\n",
+             "notes:\n  - 'Parity.Sum shows the sum of two even numbers is even.'\n"]
+    cp = Recorded(REC / "parity", {"head": [*notes, recorded(REC / "parity", "head")]})
+    out = J.run_archive_build(archive, archive / "Parity", mode="model", runtime=runtime(cp), now=NOW,
+                              target=["Parity.isEven_add"])
+    assert out["complete"], out
+    asked = cp.asked("head")
+    assert [a.get("round") for a in asked] == ["1 of 2", "2 of 2", None]
+    assert "components" not in asked[2] and "Parity.Sum shows the sum" in asked[2]["notes"]
+    assert asked[0]["components"].count("- id: C:component/") == 2
+    assert FAB.lint(archive / "parity.fabulam.cosm").errors == []
+
+
 def test_a_file_the_target_does_not_reach_is_outlined_by_rule_and_never_read(archive: Path):
     shutil.copy(OWN / "Many.lean", archive / "Parity" / "Many.lean")      # a fourth file, of no use to the target
     cp = Recorded(REC / "parity")

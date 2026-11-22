@@ -472,3 +472,36 @@ def test_a_request_past_the_budget_is_refused_and_nothing_is_sent(project: Path,
         build(project, cp)
     assert "read was refused (request" in str(e.value) and "past the 3000 this build sends" in str(e.value)
     assert cp.sent == []
+
+
+def test_a_declaration_longer_than_a_chunk_is_read_in_windows_and_its_method_from_the_notes(tmp_path: Path):
+    """The design's 4.4: a declaration past `CHUNK_LINES` is read in windows, each given its statement again, and
+    one last request, with the windows' notes and no Lean, writes its method."""
+    proj = tmp_path / "project"
+    proj.mkdir()
+    lines = ["-- Read as text only: enough wrote this file for its tests, and Lean never built it.", "",
+             "theorem long_one : True := by"]
+    lines += [f"  have h{k} : True := trivial" for k in range(1, 651)] + ["  exact h650", ""]
+    lean = proj / "Long.lean"
+    lean.write_text("\n".join(lines), encoding="utf-8")
+    note = "notes:\n  - 'These lines restate what is already known, one small step after another.'\n"
+    last = """declarations:
+  - lean: "long_one"
+    says: 'The statement that is always true holds.'
+    quantifiers: [{kind: for-all, what: 'nothing: the statement has no variable'}]
+    method: 'It restates what is already known, step after step, and then concludes.'
+"""
+    cp = Recorded(REC / "primes-congruent-one", {"read": [note, note, note, last]})
+    with pytest.raises(Exception) as e:                    # the build goes on to the audit, which has no answer here
+        J.run_file_build(proj, lean, mode="model", runtime=runtime(cp), now=NOW)
+    assert "audit" in str(e.value) or "comments" in str(e.value)
+    asked = cp.asked("read")
+    assert [a.get("window") for a in asked] == ["1 of 3", "2 of 3", "3 of 3", None]
+    assert all(a["statement"] == "long_one : True" for a in asked)
+    assert [a["lines"] for a in asked[:3]] == ["3-302 of 654", "303-602 of 654", "603-654 of 654"]
+    assert "code" not in asked[3] and "restate what is already known" in asked[3]["notes"]
+    assert all(len(a["code"].split("\n")) <= P.CHUNK_LINES for a in asked[:3])
+    doc = mc.yaml_load((proj / "long.fabulam.cosm").read_text(encoding="utf-8"))
+    st = items_of(doc)["C:statement/long_one"]
+    assert st["method"].startswith("It restates what is already known") and [
+        r["program"] for r in doc["derived"]["runs"]] == ["survey-the-proof", "read-the-proof"]

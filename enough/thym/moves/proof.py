@@ -1505,6 +1505,8 @@ def read_proof(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     for p in parts:
         a, b = p["a"], p["b"]
         used = taken | {x["id"] for x in new}
+        if not p["long"] and not cover(a, b):
+            continue                                    # lines that hold no reached declaration are not sent
         if not p["long"]:
             gain(ask(inputs(a, b), lambda d, a=a, b=b, used=used: parse_reading(
                 d, fname=fname, items=items, defs=defs, cover=cover(a, b), taken=used, feed=feed)))
