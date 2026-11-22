@@ -346,6 +346,59 @@ def test_rules_atem_scaffold_and_cut():
     assert CD.derive_atem("# Just a title\n")["line"] == "Just a title"
 
 
+def test_canon_reads_sentences_by_thyms_one_rule():
+    """The owner, 2026-11-22: Canon follows Thym's ruling A. A closing mark after a stop stays with its sentence,
+    and Canon keeps no rule of its own."""
+    from enough.thym import checks
+    assert not hasattr(CD, "_SENTENCE_SPLIT")
+    assert CD._ABBREVIATIONS is checks.ABBREVIATIONS
+    text = 'He said "Go." Then he left. Dr. Okafor came (later.) She asked “Why?” Nobody knew.'
+    assert CD.sentences(text) == ['He said "Go."', "Then he left.", "Dr. Okafor came (later.)", "She asked “Why?”",
+                                  "Nobody knew."]
+    assert CD.sentences(text) == checks.split_sentences(text)
+    assert CD.rules_atem(text)["line"] == 'He said "Go."'
+
+
+def test_a_scaffold_made_by_the_old_rule_is_stale(tmp_path):
+    """A rules scaffold whose line lost a closing mark under Canon's old rule reads as stale, so it is derived again;
+    a model's atem, and a scaffold the rule still makes, stay fresh."""
+    text = tmp_path / "said.md"
+    text.write_text('She said "Wait." The rain came.\n', encoding="utf-8")
+    body, stat = CD.read_source(text)
+    twin = tmp_path / "said.md.fabulan.cosm"
+    now_made = CD.set_file_atem(None, CD.rules_atem(body), source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(now_made, encoding="utf-8")
+    assert canon.emf_state(text, twin) == "fresh"
+    twin.write_text(now_made.replace('"Wait."', '"Wait.'), encoding="utf-8")
+    hdr = canon.twin_header(twin)
+    assert hdr["atem"]["line"] == 'She said "Wait.', hdr["atem"]
+    assert canon.emf_state(text, twin) == "stale"
+    model = CD.set_file_atem(None, MODEL_ATEM, source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(model, encoding="utf-8")
+    assert canon.emf_state(text, twin) == "fresh"
+
+
+def test_the_rule_state_reads_an_opening_once(tmp_path, monkeypatch):
+    """A listing asks for every text's state on every refresh: the rule check reads only the text's opening, and
+    once, until the text or the twin changes."""
+    text = tmp_path / "said.md"
+    tail = "\n\n".join(f"Paragraph {i} goes on. It says more." for i in range(2000))
+    text.write_text(f'She said "Wait." The rain came. It fell.\n\n{tail}\n', encoding="utf-8")
+    body, stat = CD.read_source(text)
+    assert len(CD.atem_opening(text)) < len(body) and CD.rules_atem(CD.atem_opening(text)) == CD.rules_atem(body)
+    twin = tmp_path / "said.md.fabulan.cosm"
+    made = CD.set_file_atem(None, CD.rules_atem(body), source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(made.replace('"Wait."', '"Wait.'), encoding="utf-8")
+    reads = []
+    real = CD.atem_opening
+    monkeypatch.setattr(CD, "atem_opening", lambda p: reads.append(p) or real(p))
+    canon._RULE_STATES.clear()
+    assert [canon.emf_state(text, twin) for _ in range(3)] == ["stale"] * 3 and len(reads) == 1
+    twin.write_text(made, encoding="utf-8")
+    os.utime(twin, ns=(stat["mtime_ns"] + 10**9, stat["mtime_ns"] + 10**9))
+    assert canon.emf_state(text, twin) == "fresh" and len(reads) == 2
+
+
 # ---------------------------------------------------------------------------
 # Pins and the file atem
 # ---------------------------------------------------------------------------

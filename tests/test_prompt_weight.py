@@ -532,6 +532,7 @@ def test_the_lean_prompt_names_every_tool_a_turn_can_call(project: Path, monkeyp
     import re
     enable_skill(project, "readvisory")
     enable_skill(project, "girraph-merirmaid")
+    enable_skill(project, "macrocosm-oes")
     set_toggle("composure_enabled", True)
     open_gates(monkeypatch)
     text = _lean(project, pal=True)
@@ -804,6 +805,116 @@ def test_the_known_too_small_pairs_are_real_pairs():
 def test_the_reserve_is_the_preflights():
     from enough import preflight
     assert CTX_RESERVE == preflight.RESERVE
+
+
+#: The skills a paradigm's faces lean on (0.8), and the scaffolder: the set
+#: that broke the 8k fit when skills rode whole in the lean prompt.
+FACE_SKILLS = ("translator", "macrocosm-oes", "scaffolder")
+#: The seven paradigm states: each shipped paradigm alone, each pair, the triple.
+PARADIGM_STATES = [("text-planning",), ("transcognition",), ("workflow-design",),
+                   ("text-planning", "transcognition"), ("text-planning", "workflow-design"),
+                   ("transcognition", "workflow-design"),
+                   ("text-planning", "transcognition", "workflow-design")]
+
+
+def _smallest_lean_window() -> int:
+    """The smallest window a shipped pair holds the lean prompt in (the
+    `KNOWN_TOO_SMALL` pairs aside): 8,192 today."""
+    return min(ctx for p, ctx in _feasible_pairs().items() if p not in KNOWN_TOO_SMALL)
+
+
+@pytest.mark.parametrize("state", PARADIGM_STATES, ids="+".join)
+def test_the_lean_prompt_fits_the_smallest_window_with_the_face_skills_on(project: Path, state):
+    """0.9 (pins 4): with translator, macrocosm-oes and scaffolder ALL on, a
+    fresh project's lean prompt still fits the smallest shipped window with
+    the reserve, in every paradigm state, so transcognition's faces can be
+    used on an 8k window. Skills ride as an index there; their bodies are one
+    `read_file` away."""
+    rness = project / "rness"
+    for skill in FACE_SKILLS:
+        prompt.set_skill_enabled(rness, skill, True)
+    prompt.set_active_paradigms(rness, list(state))
+    window = _smallest_lean_window()
+    lean = _default_prompt_tokens(project, "lean")
+    full = _default_prompt_tokens(project)
+    assert prompt.lean_wanted(full, window), (state, full)
+    assert lean + CTX_RESERVE <= window, (
+        f"{'+'.join(state)} with {', '.join(FACE_SKILLS)} on: the lean prompt is ~{lean:,} tokens; "
+        f"+{CTX_RESERVE:,} reserve is over the {window:,} window")
+
+
+def test_the_lean_skills_are_an_index(project: Path):
+    """In the lean profile an enabled skill is one line: its name, what its
+    description says it is for and when to use it; the body stays in the
+    file, and the section's lead says how to read it. The chat profile still
+    carries every body whole. A disabled skill is in neither."""
+    rness = project / "rness"
+    for skill in FACE_SKILLS:
+        prompt.set_skill_enabled(rness, skill, True)
+    lean = _lean(project)
+    full = prompt.assemble_system_prompt(project)
+    section = lean.split("# Skills\n", 1)[1].split("\n# ", 1)[0]
+    assert prompt.SKILLS_LEAN_PREAMBLE.strip() in section
+    assert "`rness/skills/<name>/SKILL.md`" in section and "`read_file`" in section
+    lines = [ln for ln in section.splitlines() if ln.startswith("- **")]
+    assert [ln.split("**")[1] for ln in lines] == sorted(FACE_SKILLS)
+    for ln in lines:
+        assert len(ln) <= 260, ln
+    assert "MADLAD-400-3B-MT" in section and "translate text TO or FROM" in section
+    assert ".cosm" in section and "decompile" in section
+    assert "scaffold" in section and "landing page" in section
+    for skill in FACE_SKILLS:
+        body = (rness / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
+        tail = max(body.split("\n---\n", 1)[-1].splitlines(), key=len)   # the body's longest line
+        assert f"## {skill}\n" in full and tail in full, skill
+        assert f"## {skill}\n" not in lean and tail not in lean, skill
+    assert "**analyzer**" not in lean and "## analyzer" not in full
+    # a flat skill names its own path; one without a description gives its first paragraph
+    (rness / "skills" / "house.md").write_text("# House\n\nWrites in the house style.\n\nMore.\n", encoding="utf-8")
+    assert "- **house** (body `rness/skills/house.md`) — Writes in the house style." in _lean(project)
+
+
+def test_the_faces_still_follow_the_skills_in_the_lean_prompt(project: Path):
+    """The index changes how a skill rides, not whether it is on: the faces
+    read `_skill_enabled`, and the presumed face is painted in lean."""
+    rness = project / "rness"
+    prompt.set_active_paradigms(rness, ["transcognition"])
+    prompt.set_skill_enabled(rness, "translator", True)
+    assert prompt._skill_enabled(rness, "translator")
+    lean = _lean(project)
+    assert "MADLAD-400-3B" in lean.split("# Paradigm", 1)[1].split("# Skills", 1)[0]
+    prompt.set_skill_enabled(rness, "translator", False)
+    prompt.set_skill_enabled(rness, "macrocosm-oes", True)
+    lean = _lean(project)
+    assert "never run" in lean.split("# Paradigm", 1)[1].split("# Skills", 1)[0]
+    assert "MADLAD-400-3B" not in lean
+
+
+def test_the_lean_tool_core_keeps_every_tag(project: Path, monkeypatch: pytest.MonkeyPatch):
+    """The lean core says the rules shorter and keeps every example tag; with
+    macrocosm-oes on, the MacroCOSM and fabula blocks keep their tags, name
+    every tool, and send the model to the skill's body for the rest."""
+    import re
+    tags = re.findall(r'<tool name="[a-z_]+">.*?</tool>', prompt.TOOL_INSTRUCTIONS, re.DOTALL)
+    assert tags and all(t in prompt.TOOL_LEAN_INSTRUCTIONS for t in tags)
+    assert len(prompt.TOOL_LEAN_INSTRUCTIONS) < len(prompt.TOOL_INSTRUCTIONS)
+    assert '"want a brief introduction to enough?"' in prompt.TOOL_LEAN_INSTRUCTIONS
+    rness = project / "rness"
+    prompt.set_skill_enabled(rness, "macrocosm-oes", True)
+    lean = prompt.tool_instructions(project, lean=True)
+    assert prompt.CANON_PROSE_LEAD in prompt.CANON_TOOL_INSTRUCTIONS
+    for t in re.findall(r'<tool name="[a-z_]+">.*?</tool>',
+                        prompt.CANON_TOOL_INSTRUCTIONS + prompt.FABULA_TOOL_INSTRUCTIONS, re.DOTALL):
+        assert t in lean, t
+    for name in ("thym_moves", "fabulap", "dialectic", "fabulac", "cosm_guide"):
+        assert name in lean, name
+    assert "`rness/skills/macrocosm-oes/SKILL.md`" in lean
+    assert prompt.FABULA_TOOL_INSTRUCTIONS.strip() not in lean
+    assert len(prompt.FABULA_LEAN_INSTRUCTIONS) < len(prompt.FABULA_TOOL_INSTRUCTIONS)
+    # the chat profile is unchanged
+    chat = prompt.tool_instructions(project)
+    assert prompt.CANON_TOOL_INSTRUCTIONS.strip() in chat and prompt.FABULA_TOOL_INSTRUCTIONS.strip() in chat
+    assert prompt.TOOL_INSTRUCTIONS.strip() in chat
 
 
 def test_the_fabula_tools_block_keeps_under_the_cap():

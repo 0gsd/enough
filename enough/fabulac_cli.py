@@ -16,6 +16,11 @@ sandbox only; Ctrl-C stops the run.
     python -m enough.fabulac entail tally --model local
     python -m enough.fabulac test tally
     python -m enough.fabulac run tally -- count notes.md --hand notes.md
+    python -m enough.fabulac moved-parts docs/v090-g --tree . --ref v0.9.0 --base v0.8.0
+
+`moved-parts` is the moved-parts rule (`enough/fabulac_moved.py`): given part fabulacs (files or folders, heads with
+their parts) and a source tree, which parts moved, file by file, and how many of their rulings and questions still
+resolve. By rule; it reads the tree as text and writes nothing.
 """
 from __future__ import annotations
 
@@ -103,6 +108,9 @@ def _lines(cmd: str, out: dict) -> list[str]:
         return ["moved: " + ", ".join(out["moved"]) if out["moved"] else "no part moved"]
     if cmd == "head":
         return [f"made {out['head']} over {', '.join(out['parts'])}"]
+    if cmd == "moved-parts":
+        from . import fabulac_moved as _fm
+        return [_fm.table(out)]
     if cmd == "begin" and out.get("waiting"):
         return [out.get("message") or ""] + [f"  {q['id']}: {q['asks']}" for q in out["waiting"]]
     return [str(out.get("message") or json.dumps(out, ensure_ascii=False))]
@@ -176,6 +184,12 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--name")
     sp.add_argument("--licence")
     sp.add_argument("--by")
+    sp = sub.add_parser("moved-parts", help="which part fabulacs a source tree moved under (the moved-parts rule)")
+    sp.add_argument("fabulacs", nargs="+", help="part and head fabulacs, or folders of them (a later id replaces "
+                                                "an earlier one)")
+    sp.add_argument("--tree", default=".", help="the source checkout (default: here)")
+    sp.add_argument("--ref", help="read the tree at this git ref (a release tag) instead of as it is on disk")
+    sp.add_argument("--base", help="the git ref the set was made from: tells a file added since from one never told")
     return p
 
 
@@ -226,6 +240,9 @@ def dispatch(args: argparse.Namespace) -> dict:
         return FF.head(project, args.path, args.parts, **kw)
     if cmd == "parts-moved":
         return FF.parts_moved(project, args.path)
+    if cmd == "moved-parts":
+        from . import fabulac_moved as _fm
+        return _fm.moved_parts(args.fabulacs, args.tree, ref=args.ref, base=args.base)
     raise FF.FirstError(f"no command {cmd!r}")
 
 

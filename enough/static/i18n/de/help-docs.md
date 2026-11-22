@@ -570,6 +570,21 @@ schreib. der Eintrag speichert sich selbst, während du tippst, und gehst du, oh
 - kommentier einen alten abgelegten Eintrag, wenn sich herausstellt, dass er falsch war — das Protokoll bleibt stehen, und der zweite Gedanke steht daneben.
 - bitte deinen Readvisor, das Journal zu lesen, wenn du wissen willst, wohin eine lange Arbeit tatsächlich gegangen ist.
 
+## scaffold
+name: Scaffold
+path: rness/io/composure/
+
+### what
+ein Composure-Form, in dem du jedes Wort selbst schreibst. ein <strong>Scaffold</strong> ist eine Seite, ein Foliensatz oder ein Dokument, angelegt als Rahmen, jeder eine Seite oder eine Folie, die <em>Plecholder</em> halten: Kästen, die einen Plec in Klammern zeigen (was dieser Teil vermitteln muss) und eine Ziellänge, mit einem freien Feld für deinen Text. der Readvisor baut das Scaffold aus einem Plectrum und ändert einen Plec, ein Ziel oder das Layout, wenn du ihn bittest. in das Feld eines Plecholders schreibt er nie.
+
+### how
+diese Knöpfe erscheinen nur, solange ein Scaffold offen ist. das <strong>Auge</strong> liest es als das fertige Ding, ohne die Klammern. das <strong>Schloss</strong> sperrt das ganze Scaffold: danach ändert sich nichts mehr darin, und das Entsperren legt die nächste Version als neue Datei an und lässt diese, wie sie ist. ist es gesperrt, liest <strong>prüfen</strong> Rechtschreibung, Grammatik und Behauptungen. jeder Befund sitzt an seinem Kasten, mit einem vorgeschlagenen Fix, den du annimmst oder ablehnst, und eine Behauptung, die nicht prüfbar ist, wird so markiert, nie als bestanden. der letzte Knopf sagt, was aus dem Scaffold wird (eine Seite, ein Foliensatz oder ein Dokument), und exportiert es in den Formaten dieses Dings. die Zahl daneben sagt, wie viele Kästen geschrieben sind. wähl einen Kasten, und der Inspektor zeigt seinen Namen, den Plec, das Ziel, was hineinkommt und was er im fertigen Ding ist. ein Kasten lässt sich nur innerhalb seines Rahmens verschieben und in der Größe ändern. jede Änderung, auch was daraus wird, liegt auf ⌘Z.
+
+### ideas
+- markier einen Kasten als geschrieben, wenn du mit ihm fertig bist; die Zahl sagt dir, was noch fehlt.
+- frag den Readvisor über sein Kontextmenü nach einem einzelnen Kasten: er antwortet im Chat und lässt deine Wörter in Ruhe.
+- exportier einen Foliensatz als PPTX, um ihn anderswo zu gestalten, und als PDF für die fertige Fassung.
+
 ## readvisor-panel
 name: Readvisor-Panel
 path: (the right-hand panel)

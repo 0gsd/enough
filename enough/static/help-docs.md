@@ -570,6 +570,21 @@ write. the entry saves itself as you go, and if you leave without filing it the 
 - comment on an old filed entry when it turns out to have been wrong — the record stays, and the second thought sits beside it.
 - ask your readvisor to read the journal when you want a summary of where a long piece of work actually went.
 
+## scaffold
+name: scaffold
+path: rness/io/composure/
+
+### what
+a composure form where you write every word yourself. a <strong>scaffold</strong> is a page, a deck or a document laid out as frames, each a page or a slide, that hold <em>plecholders</em>: boxes that show a plec in brackets (what that part must get across) and a target length, with a free field for your text. the readvisor builds the scaffold from a plectrum and changes a plec, a target or the layout when you ask. it never writes into a plecholder's field.
+
+### how
+these buttons show only while a scaffold is open. the <strong>eye</strong> reads it as the finished thing, with the brackets gone. the <strong>lock</strong> closes the whole scaffold: after that nothing in it changes, and unlocking makes the next version as a new file and keeps this one as it is. once it is locked, <strong>check</strong> reads the spelling, the grammar and the claims. each finding sits on its box with a suggested fix that you accept or decline, and a claim that cannot be checked is marked so, never passed. the last button says what the scaffold becomes (a page, a deck or a document) and exports it in that thing's formats. the count beside them says how many boxes are written. select a box and the inspector gives its name, plec, target, what goes in it and what it is on the finished thing. a box moves and resizes only inside its frame. every change, what it becomes included, is on ⌘Z.
+
+### ideas
+- mark a box written when you are done with it; the count tells you what is left.
+- ask the readvisor about one box from its context menu: it answers in chat and leaves your words alone.
+- export a deck as PPTX to dress it elsewhere, and as PDF for the finished copy.
+
 ## readvisor-panel
 name: readvisor panel
 path: (the right-hand panel)

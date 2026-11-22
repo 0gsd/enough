@@ -98,7 +98,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture
 def client(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         yield c
 
 
@@ -291,7 +291,7 @@ def test_a_plan_that_asks_is_refused_in_rules_mode_and_scaffolds_run_when_asked(
 def test_agent_free_refuses_a_reading_and_a_plan_that_asks_and_runs_one_that_does_not(project: Path):
     set_agent_free(True)
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         r = c.post("/api/canon/read", json={"path": "notes.md", "morph": "plain-letter.morph.cosm"})
         assert r.status_code == 409 and r.json()["detail"].startswith("agent-free mode:")
         r = c.post("/api/thym/run", json={"program": "publish-story", "path": "notes.md"})
@@ -541,7 +541,7 @@ def test_agent_free_refuses_the_cloud_without_asking_the_broker(project: Path, m
     from enough import cloud
     monkeypatch.setattr(cloud, "gate_status", lambda: (_ for _ in ()).throw(AssertionError("the broker was asked")))
     set_agent_free(True)
-    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False)) as c:
+    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False), headers={"X-Enough-Api": "1"}) as c:
         r = c.post("/api/thym/plan", json={"program": "publish-story", "path": "notes.md", "route": "cloud"}).json()
         assert r["refusal"]["check"] == "agent-free"
         assert r["refusal"]["message"] == ("3 steps ask a model on the cloud route, the first `let f = derive story` "

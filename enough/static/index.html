@@ -27,6 +27,40 @@
     function staticUrl(path) {
       return ASSET_VERSION ? path + '?v=' + encodeURIComponent(ASSET_VERSION) : path;
     }
+    // 0.9 (route guards): every call this page makes to its own /api/ sends
+    // the promise header (`X-Enough-Api: 1`, enough/api_promise.py). The
+    // routes that start a model run, and the promised /api/fabulac/* writes,
+    // refuse a request without it; a page on another site cannot send it.
+    // One wrapper here, in the head, so every later fetch (and every fetch a
+    // check script runs in the page) goes through it; htmx's requests get it
+    // from the `htmx:configRequest` listener in the main script. A save that
+    // replaced a link to a shared file with the project's own copy answers
+    // `X-Enough-Unlinked: 1`; the wrapper passes that on as an event.
+    const ENOUGH_API_HEADER = 'X-Enough-Api';
+    (function enoughFetchWrapper() {
+      const raw = window.fetch.bind(window);
+      const own = (u) => {
+        try {
+          const url = new URL(typeof u === 'string' ? u : (u && u.url) || String(u), location.href);
+          return url.origin === location.origin && url.pathname.startsWith('/api/');
+        } catch (_e) { return false; }
+      };
+      window.fetch = function enoughFetch(input, init) {
+        if (!own(input)) return raw(input, init);
+        const o = Object.assign({}, init || {});
+        const h = new Headers(o.headers || (input instanceof Request ? input.headers : undefined));
+        if (!h.has(ENOUGH_API_HEADER)) h.set(ENOUGH_API_HEADER, '1');
+        o.headers = h;
+        return raw(input, o).then((r) => {
+          try {
+            if (r.headers.get('X-Enough-Unlinked') === '1') {
+              window.dispatchEvent(new CustomEvent('enough:unlinked', { detail: { url: r.url } }));
+            }
+          } catch (_e) { /* a note, never a failure */ }
+          return r;
+        });
+      };
+    })();
     if (BOOT_UI_STATE && !BOOT_UI_STATE.home) {
       const _de = document.documentElement;
       if (BOOT_UI_STATE.ui_scale > 0 && BOOT_UI_STATE.ui_scale !== 1)
@@ -2929,6 +2963,19 @@
     }
 
     #composure.comp-reading .comp-box-slot:not(.comp-has-img) { opacity: 0.45; }
+
+    /* 0.9: the reading view looks by what a box is on the finished thing
+       (`data-as`, the plectrum's `as`). Speaker notes and notes are never
+       part of the thing, so they read faint. */
+    #composure.comp-reading .comp-box[data-as="title"] .comp-page { font-size: 2em; font-weight: 700; line-height: 1.15; }
+    #composure.comp-reading .comp-box[data-as="headline"] .comp-page { font-size: 1.5em; font-weight: 700; line-height: 1.2; }
+    #composure.comp-reading .comp-box[data-as="deck"] .comp-page { font-size: 1.2em; }
+    #composure.comp-reading .comp-box[data-as="lede"] .comp-page { font-size: 1.15em; }
+    #composure.comp-reading .comp-box[data-as="call"] .comp-page { font-weight: 600; }
+    #composure.comp-reading .comp-box[data-as="caption"] .comp-page { font-size: 0.85em; font-style: italic; }
+    #composure.comp-reading .comp-box[data-as="quote"] .comp-page { font-style: italic; }
+    #composure.comp-reading .comp-box[data-as="speaker"],
+    #composure.comp-reading .comp-box[data-as="notes"] { opacity: 0.5; }
 
     /* Locked: the sheets take a faint tint, so a locked scaffold never
        reads as one you can still type on. */
@@ -18881,8 +18928,9 @@
                (a composure with a `composure:scaffold` block) is on the
                stage — the reading view, the one lock (unlocking makes the
                next version as a new file), the check, and what it becomes
-               and is exported as. See the SCAFFOLD block in the JS. -->
-          <span class="comp-group" id="comp-scaffold-group" hidden>
+               and is exported as. See the SCAFFOLD block in the JS. The
+               wrapper carries the scaffold's (?), as the journal's does. -->
+          <span class="comp-group" id="comp-scaffold-group" data-help="scaffold" hidden>
             <button type="button" class="comp-btn" id="comp-read-btn"
               title="read it as the finished thing" data-i18n-title="comp.scaffold.read.title">
               <img class="svg-icon" data-icon="read-eye" alt="reading view" draggable="false">
@@ -21516,6 +21564,17 @@
       const v = I18N.strings[key];
       return typeof v === 'string' && v !== '' ? v : fallback;
     }
+
+    // 0.9 (route guards): htmx's requests carry the promise header too (the
+    // head's fetch wrapper covers every fetch), and a save that replaced a
+    // link to a shared file with the project's own copy says so in one line.
+    document.body.addEventListener('htmx:configRequest', (e) => {
+      if (e.detail && e.detail.headers) e.detail.headers[ENOUGH_API_HEADER] = '1';
+    });
+    window.addEventListener('enough:unlinked', () => {
+      const line = t('file.unlinked', 'Saved as this project\'s own copy; the shared file other projects use is unchanged.');
+      if (typeof convertNotice === 'function') convertNotice(line, '', 'done', { ttl: 8000 });
+    });
 
     // data-i18n → textContent (plain-text elements ONLY — an element with
     // inline markup gets the attribute on its text-only children instead),
@@ -49169,6 +49228,11 @@
     const COMP_FULLPORT = [816, 1056];
     const COMP_SLIDE = [1280, 720];
     const COMP_GRAPHIC_SHAPES = ['16:9', '4:3', '1:1', '3:2', 'portrait', 'landscape', 'square'];
+    // 0.9: what a box is on the finished thing, the plectrum's `as` (the
+    // backend's BOX_AS; plectrum.md lists them). A word not here is kept as
+    // written and reads as body.
+    const COMP_BOX_AS = ['title', 'headline', 'lede', 'body', 'step', 'tile',
+      'deck', 'call', 'caption', 'quote', 'speaker', 'notes'];
     const COMP_SWATCHES = ['paper', 'yellow', 'pink', 'blue', 'green',
       'orange', 'lilac', 'gray', 'ink', 'clear'];
 
@@ -49245,7 +49309,7 @@
     //            the last check, the formats it exports as), or null
     //   reading  the reading view is on
     //   job      the canon job entry (canonTrack) of a running check
-    const COMP_SCAFFOLD = { state: null, reading: false, job: null, noticeAt: 0 };
+    const COMP_SCAFFOLD = { state: null, reading: false, job: null, noticeAt: 0, thingMoved: false };
     window.COMP_SCAFFOLD = COMP_SCAFFOLD;
 
     function compEl(id) { return document.getElementById(id); }
@@ -50130,6 +50194,10 @@
       el.appendChild(host);
       if (compIsBox(m)) compBoxPaintState(el, m, host);
       else delete el.dataset.boxState;
+      // 0.9: what the box is on the finished thing (the plectrum's `as`), for
+      // the reading view's look. A word the page does not know reads as body.
+      if (compIsBox(m)) el.dataset.as = COMP_BOX_AS.includes(sf.as) ? sf.as : 'body';
+      else delete el.dataset.as;
       compMarkPageComments(m, host);
 
       // The face. Built now, invisible, so the cross-fade at the zoom
@@ -51283,6 +51351,10 @@
       compRenderInspector();
       compRenderInk();
       if (compScaffold()) compScaffoldTally();
+      if (COMP_SCAFFOLD.thingMoved) {
+        COMP_SCAFFOLD.thingMoved = false;
+        compScaffoldThingChanged();
+      }
     }
 
     function compApplyOpLocal(op) {
@@ -51338,6 +51410,12 @@
           s.frames = order;
         }
         return m.id;
+      }
+      if (op.op === 'set_scaffold' && 'thing' in op) {
+        const s = compScaffold();
+        if (s) s.thing = op.thing;
+        COMP_SCAFFOLD.thingMoved = true;
+        return null;
       }
       if (op.op === 'reorder_frames') {
         const s = compScaffold();
@@ -51460,7 +51538,7 @@
       };
       if (compIsBox(m)) {
         const f = m.fields || {};
-        for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href']) {
+        for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href', 'as']) {
           if (f[k]) snap[k] = f[k];
         }
       }
@@ -52357,6 +52435,7 @@
             kind: 'resize', handle: handle.dataset.handle, id: m.id,
             start: { x: m.x, y: m.y, w: m.w, h: m.h },
             w0: compStageToWorld(stage.x, stage.y),
+            bound: compBoxResizeBound(m),
           };
           compGestureOn();
           return;
@@ -52492,6 +52571,45 @@
       };
     }
 
+    // 0.9: a box resized stays inside its frame, as a box moved does: the
+    // frame's rectangle in world units, or null (not a box, or on no frame).
+    function compBoxResizeBound(m) {
+      if (!compIsBox(m)) return null;
+      const f = compFrameOf(m);
+      return f ? { x0: f.x, y0: f.y, x1: f.x + f.w, y1: f.y + f.h } : null;
+    }
+
+    // The rectangle a resize gesture gives: `s` the module at the start,
+    // `handle` the compass of the handle (n, se, w …), `dx`/`dy` how far the
+    // pointer went, all in world units. Never under the legible minimum;
+    // with a `bound`, never past it on the side being dragged (the far side
+    // stays where it was). A box already wider than its frame keeps its size
+    // rather than jumping: the bound only stops it growing.
+    function compResizeRect(s, handle, dx, dy, bound) {
+      const b = bound || null;
+      let x = s.x, y = s.y, ww = s.w, hh = s.h;
+      if (handle.includes('e')) {
+        ww = Math.max(COMP_MIN_W, s.w + dx);
+        if (b) ww = Math.min(ww, Math.max(Math.min(s.w, ww), COMP_MIN_W, b.x1 - s.x));
+      }
+      if (handle.includes('s')) {
+        hh = Math.max(COMP_MIN_H, s.h + dy);
+        if (b) hh = Math.min(hh, Math.max(Math.min(s.h, hh), COMP_MIN_H, b.y1 - s.y));
+      }
+      if (handle.includes('w')) {
+        ww = Math.max(COMP_MIN_W, s.w - dx);
+        if (b) ww = Math.min(ww, Math.max(Math.min(s.w, ww), COMP_MIN_W, s.x + s.w - b.x0));
+        x = s.x + (s.w - ww);
+      }
+      if (handle.includes('n')) {
+        hh = Math.max(COMP_MIN_H, s.h - dy);
+        if (b) hh = Math.min(hh, Math.max(Math.min(s.h, hh), COMP_MIN_H, s.y + s.h - b.y0));
+        y = s.y + (s.h - hh);
+      }
+      const r2 = (v) => Math.round(v * 100) / 100;
+      return { x: r2(x), y: r2(y), w: r2(ww), h: r2(hh) };
+    }
+
     function compOnPointerMove(ev) {
       const d = COMP.drag;
       if (!d) return;
@@ -52573,23 +52691,14 @@
         const m = compModuleById(d.id);
         const el = compModuleEl(d.id);
         if (!m || !el) return;
-        const dx = w.x - d.w0.x, dy = w.y - d.w0.y;
-        const s = d.start;
-        let x = s.x, y = s.y, ww = s.w, hh = s.h;
-        if (d.handle.includes('e')) ww = Math.max(COMP_MIN_W, s.w + dx);
-        if (d.handle.includes('s')) hh = Math.max(COMP_MIN_H, s.h + dy);
-        if (d.handle.includes('w')) {
-          ww = Math.max(COMP_MIN_W, s.w - dx);
-          x = s.x + (s.w - ww);
-        }
-        if (d.handle.includes('n')) {
-          hh = Math.max(COMP_MIN_H, s.h - dy);
-          y = s.y + (s.h - hh);
-        }
-        m.x = Math.round(x * 100) / 100;
-        m.y = Math.round(y * 100) / 100;
-        m.w = Math.round(ww * 100) / 100;
-        m.h = Math.round(hh * 100) / 100;
+        // World units both sides: `w` came through compEventToStage (the one
+        // `/ UIZ()`) and compStageToWorld (the `/ Z`), so the clamp below
+        // holds at every zoom.
+        const r = compResizeRect(d.start, d.handle, w.x - d.w0.x, w.y - d.w0.y, d.bound);
+        m.x = r.x;
+        m.y = r.y;
+        m.w = r.w;
+        m.h = r.h;
         el.style.left = m.x + 'px';
         el.style.top = m.y + 'px';
         el.style.width = m.w + 'px';
@@ -56241,7 +56350,7 @@
     // person, so a plec set here is theirs).
     function compMirrorScaffoldFields(m, op) {
       const f = m.fields || (m.fields = {});
-      for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href']) {
+      for (const k of ['frame', 'kind', 'shape', 'plec', 'target', 'state', 'href', 'as']) {
         if (k in op) f[k] = op[k] || null;
       }
       if ('plec' in op) f.plec_by = op.plec ? 'person' : null;
@@ -56489,12 +56598,25 @@
     }
 
     // What the scaffold becomes: a page, a deck or a document.
-    async function compScaffoldSetThing(thing) {
+    // 0.9: one undoable op like every other change (its inverse names the
+    // thing it was). The batch goes out as `ui`, and the server sets that
+    // source itself (POST /api/composure/ops takes no other).
+    function compScaffoldSetThing(thing) {
       const s = compScaffold();
       if (!s || s.locked || s.thing === thing) return;
-      await compCommit([{ op: 'set_scaffold', thing }], { wantModel: true });
+      compDo({ ops: [{ op: 'set_scaffold', thing }],
+        undo: [{ op: 'set_scaffold', thing: s.thing || 'page' }] });
+    }
+
+    // After a change of thing (done, undone or redone): the chrome, and the
+    // state the export menu reads (its formats follow the thing), once the
+    // batch has landed.
+    function compScaffoldThingChanged() {
+      // Until the state comes back, the menu offers the formats of the thing
+      // the scaffold is now, not of the one it was.
+      if (COMP_SCAFFOLD.state) COMP_SCAFFOLD.state.exports = null;
       compScaffoldChrome();
-      void compScaffoldLoadState();
+      void compFlush().then(() => compScaffoldLoadState());
     }
 
     // ---------- the inspector ----------
@@ -56527,6 +56649,24 @@
       const shape = f && (f.fields || {}).shape === 'slide'
         ? t('comp.frame.slide', 'slide') : t('comp.frame.page', 'page');
       return (i + 1) + ' · ' + ((f && f.title) || shape);
+    }
+
+    function compBoxAsLabel(a) {
+      switch (a) {
+        case 'title': return t('comp.box.as.title', 'the title');
+        case 'headline': return t('comp.box.as.headline', 'a headline');
+        case 'lede': return t('comp.box.as.lede', 'the opening lines');
+        case 'body': return t('comp.box.as.body', 'running text');
+        case 'step': return t('comp.box.as.step', 'a step');
+        case 'tile': return t('comp.box.as.tile', 'a tile');
+        case 'deck': return t('comp.box.as.deck', 'a line under the headline');
+        case 'call': return t('comp.box.as.call', 'a call to act');
+        case 'caption': return t('comp.box.as.caption', 'a caption');
+        case 'quote': return t('comp.box.as.quote', 'a quotation');
+        case 'speaker': return t('comp.box.as.speaker', 'speaker notes');
+        case 'notes': return t('comp.box.as.notes', 'notes, never exported');
+        default: return a;
+      }
     }
 
     function compShapeLabel(shape) {
@@ -56583,6 +56723,12 @@
         ['text', t('comp.box.kindText', 'words')],
         ['graphic', t('comp.box.kindGraphic', 'a picture')],
       ], f.kind === 'graphic' ? 'graphic' : 'text');
+      // 0.9: the plectrum's `as`, on the module, so it is saved and undone
+      // like the other fields and the export reads it from the composure.
+      compInspHint(slot, t('comp.box.asHint', 'what it is on the finished thing'));
+      const asList = COMP_BOX_AS.map((a) => [a, compBoxAsLabel(a)]);
+      if (f.as && !COMP_BOX_AS.includes(f.as)) asList.push([f.as, f.as]);
+      compInspSelect(slot, 'as', asList, f.as || 'body');
       if (f.kind === 'graphic') {
         compInspHint(slot, t('comp.box.shapeHint', 'its shape'));
         const shapes = COMP_GRAPHIC_SHAPES.slice();
@@ -56663,6 +56809,7 @@
         case 'target-n': return tg.n ? String(tg.n) : '';
         case 'target-unit': return tg.unit;
         case 'kind': return f.kind === 'graphic' ? 'graphic' : 'text';
+        case 'as': return f.as || 'body';
         case 'shape': return f.shape || (compIsFrame(m) ? 'page' : '16:9');
         case 'frame': return f.frame || '';
         default: return '';
@@ -56705,6 +56852,7 @@
         compScaffoldPatch(m, { target: n > 0 ? Math.min(999999, n) + unit : '' });
         return;
       }
+      if (name === 'as') { compScaffoldPatch(m, { as: v.trim().toLowerCase() || 'body' }); return; }
       if (name === 'kind') {
         compScaffoldPatch(m, v === 'graphic'
           ? { kind: 'graphic', shape: f.shape || '16:9' }

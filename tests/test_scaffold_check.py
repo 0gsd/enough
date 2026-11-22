@@ -257,7 +257,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     proj.mkdir()
     F.deck(proj)
     app = create_app(proj, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         c._project = proj  # type: ignore[attr-defined]
         yield c
 

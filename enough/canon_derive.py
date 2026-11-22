@@ -41,6 +41,7 @@ from . import canon_prompts as P
 from . import fabula_names as _names
 from . import macrocosm
 from . import verse as _verse
+from .thym.checks import ABBREVIATIONS as _ABBREVIATIONS, split_sentences
 
 FABULA_OES = _names.OES                    # what a writer writes
 EMF_OES = _names.OLD_OES                   # the old spelling: read, never written
@@ -178,7 +179,7 @@ NAME_CONNECTORS = frozenset("of the de du la le von van der den del da di".split
 # Leading words stripped from a capitalised run when they only start the sentence.
 _LEADERS = frozenset("the a an this that these those our my his her their its we every each some in on at for "
                      "from to by with if when while after before because but and or so then".split())
-_ABBREVIATIONS = frozenset("mr mrs ms dr prof st vs etc eg ie jr sr no fig".split())
+# The abbreviations that end no sentence are Thym's (`enough.thym.checks.ABBREVIATIONS`), imported above: one list.
 
 _RESERVED_SLUGS = frozenset(["con", "prn", "aux", "nul"] + [f"com{i}" for i in range(10)]
                             + [f"lpt{i}" for i in range(10)])
@@ -677,7 +678,6 @@ _INLINE_MD = [
     (re.compile(r"(?<![\w*])[*_]([^*_]+)[*_](?![\w*])"), r"\1"),
     (re.compile(r"<[^>]+>"), ""),
 ]
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])[\"'”’)\]]*\s+(?=[\"'“‘(\[]?[A-Z0-9])")
 
 
 def _paragraphs(text: str) -> list[str]:
@@ -722,18 +722,14 @@ def _paragraphs(text: str) -> list[str]:
 
 
 def sentences(text: str, limit: int | None = None) -> list[str]:
-    """The text's prose sentences in order (markdown stripped), at most `limit`."""
+    """The text's prose sentences in order (markdown stripped), at most `limit`. Canon has no sentence rule of its
+    own: a paragraph splits by Thym's one rule, `enough.thym.checks.split_sentences` (a closing quotation mark or
+    bracket after a stop stays with its sentence, an abbreviation ends none; the owner's ruling of 2026-11-22)."""
     out: list[str] = []
     for para in _paragraphs(text):
-        parts = _SENTENCE_SPLIT.split(para)
-        merged: list[str] = []
-        for s in parts:
-            last = merged[-1].split()[-1].lower().rstrip(".") if merged else ""
-            if merged and last in _ABBREVIATIONS:
-                merged[-1] = f"{merged[-1]} {s}"
-            else:
-                merged.append(s)
-        for s in merged:
+        for s in split_sentences(para):
+            if not s.strip():
+                continue
             out.append(s.strip())
             if limit is not None and len(out) >= limit:
                 return out
@@ -1170,6 +1166,55 @@ def atem_block(atem: dict) -> dict:
 
 def _atem_is_scaffold(atem: dict) -> bool:
     return any(macrocosm.is_pending(atem.get(p)) for p in ("push", "pull"))
+
+
+_MARK_AFTER_STOP = re.compile(r"([.!?])[\"'”’)\]]+")
+
+
+ATEM_OPENING_CHARS = 2048
+
+
+def atem_opening(path: Path) -> str:
+    """As much of a text's opening as `rules_atem` needs, decoded as `read_source` decodes. The opening ends at a
+    blank line (so every paragraph in it is whole, its markdown stripped as in the whole text), holds no unclosed
+    front matter, and holds a third sentence after the first two (so both are whole). It grows fourfold from
+    ATEM_OPENING_CHARS bytes; the whole text when no shorter opening will do. `rules_atem` of it equals
+    `rules_atem` of the whole text."""
+    size = ATEM_OPENING_CHARS
+    with open(path, "rb") as fh:
+        while True:
+            fh.seek(0)
+            data = fh.read(size + 1)
+            if len(data) <= size:
+                return data.decode("utf-8-sig", errors="replace")
+            cut = max(data.rfind(b"\n\n", 0, size), data.rfind(b"\n\r\n", 0, size))
+            if cut > 0:
+                text = data[:cut + 1].decode("utf-8-sig", errors="replace")
+                front_open = (text.startswith("---")
+                              and not re.search(r"\n(?:---|\.\.\.)[ \t]*\r?\n", text[3:]))
+                if not front_open and len(sentences(text, limit=3)) >= 3:
+                    return text
+            size *= 4
+
+
+def scaffold_atem_behind(header: dict, text: str) -> bool:
+    """Whether a twin's file atem is a rules scaffold made before Canon read sentences by Thym's rule (the owner,
+    2026-11-22): its line or focus differs from what `rules_atem` makes of `text` now only by the closing marks a
+    stop kept (`"Go."` where it said `"Go.`). Such a twin is stale, and deriving its atem again re-makes it by rule.
+    A model's atem, or a line a person wrote, differs by more than those marks and is left alone."""
+    derived = header.get("derived") if isinstance(header, dict) else None
+    atem = header.get("atem") if isinstance(header, dict) else None
+    if not (isinstance(derived, dict) and derived.get("mode") == "rules" and isinstance(atem, dict)
+            and _atem_is_scaffold(atem)):
+        return False
+    now = rules_atem(text)
+    for part in ("line", "focus"):
+        had, want = atem.get(part), now.get(part)
+        if isinstance(had, str) and isinstance(want, str):
+            had, want = " ".join(had.split()), " ".join(want.split())
+            if had != want and _MARK_AFTER_STOP.sub(r"\1", had) == _MARK_AFTER_STOP.sub(r"\1", want):
+                return True
+    return False
 
 
 def _atem_messages(text: str, context: str | None) -> list[dict]:
