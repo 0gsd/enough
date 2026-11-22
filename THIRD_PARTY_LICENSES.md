@@ -58,7 +58,7 @@ later to a body that is not a company. The reader,
 
 ## Bundled code
 
-Two third-party source files ship in this repository:
+These third-party source files ship in this repository:
 
 ### htmx
 
@@ -181,6 +181,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+### Mathlib (one Lean file, a test fixture)
+
+`tests/fixtures/fabula/fabulam/PrimesCongruentOne.lean` is a copy, whole and
+unchanged, of `Mathlib/NumberTheory/PrimesCongruentOne.lean` from **Mathlib**
+(<https://github.com/leanprover-community/mathlib4>) at commit
+`6ebcce37335bcb6bca64596e5d57bb3035648030`, distributed under the Apache
+License, Version 2.0 (the same licence as enough: its text is
+[LICENSE](LICENSE) at the repository root). Its header reads
+"Copyright (c) 2020 Riccardo Brasca. All rights reserved." enough reads the
+file as text, as the fixture of the fabulam; it builds and runs nothing of
+it. See
+[tests/fixtures/fabula/fabulam/NOTICE.md](tests/fixtures/fabula/fabulam/NOTICE.md).
 
 ---
 
