@@ -1,7 +1,7 @@
 {
  "impl": "py-roundtrip",
  "seed": "0",
- "cases_digest": "e4ff63db545e439b58307f5dc092e6a97ff56e834cf216c99f330a158d08de35",
+ "cases_digest": "6cd6f907418a845a6e3c13695f667f999315bf9fc40a35476332b3c10578102a",
  "python": "3.13.11 | packaged by Anaconda, Inc. | (main, Dec 10 2025, 21:21:08) [Clang 20.1.8 ]",
  "rows": [
   {
@@ -909,12 +909,12 @@
     "steps": [
      {
       "exit": 0,
-      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add that has not been undone\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
       "err": ""
      },
      {
       "exit": 0,
-      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add that has not been undone\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
       "err": ""
      },
      {
@@ -2025,7 +2025,7 @@
      }
     ],
     "written": {
-     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\", \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 4}\n"
+     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\", \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 2}\n"
     }
    }
   },
@@ -2457,7 +2457,7 @@
      {
       "exit": 1,
       "out": "",
-      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 42, in main\n    current = totals(read(path))\n                     ~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 63, in read\n    return [entry for _, entry in _read_numbered(path)]\n                                  ~~~~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 43, in _read_numbered\n    for n, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 633, in read_text\n    return f.read()\n           ~~~~~~^^\n  File \"<frozen codecs>\", line 325, in decode\nUnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte\n"
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 39, in main\n    totals = ledger.totals(ledger.read(path))\n                           ~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 41, in read\n    for number, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 633, in read_text\n    return f.read()\n           ~~~~~~^^\n  File \"<frozen codecs>\", line 325, in decode\nUnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte\n"
      }
     ],
     "written": {}
@@ -2486,12 +2486,12 @@
      {
       "exit": 1,
       "out": "",
-      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 42, in main\n    current = totals(read(path))\n                     ~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 63, in read\n    return [entry for _, entry in _read_numbered(path)]\n                                  ~~~~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 43, in _read_numbered\n    for n, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 39, in main\n    totals = ledger.totals(ledger.read(path))\n                           ~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 41, in read\n    for number, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                                  ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
      },
      {
       "exit": 1,
       "out": "",
-      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 38, in main\n    entry = add(path, args.name, args.n)\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 83, in add\n    _append(path, entry)\n    ~~~~~~~^^^^^^^^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 71, in _append\n    with path.open(\"a\", encoding=\"utf-8\") as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/cli.py\", line 35, in main\n    entry = ledger.add(path, args.name, args.n)\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 71, in add\n    _append(path, entry)\n    ~~~~~~~^^^^^^^^^^^^^\n  File \"<SCRATCH>/rt/py-roundtrip/work/tally/ledger.py\", line 59, in _append\n    with path.open(\"a\", encoding=\"utf-8\") as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
      }
     ],
     "written": {}

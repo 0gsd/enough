@@ -1,0 +1,124 @@
+{
+ "cshort": "py-roundtrip",
+ "against": "original",
+ "target": "python",
+ "recorded_digest": "0def780f96737aa53a1c8c9f63f8c73248e0d04bd28c76bc5c4062024e896ee8",
+ "run_digest": "bd90cb74f65532b262c84e7b9e41f33837131c52e05423719b4d5aeb9e5aa39a",
+ "rulings_digest": "e4ff63db545e439b58307f5dc092e6a97ff56e834cf216c99f330a158d08de35",
+ "steps": {
+  "kept": 189,
+  "agree": 184
+ },
+ "share": 0.9735,
+ "passes_95": true,
+ "unruled": 5,
+ "passes": false,
+ "findings": [
+  {
+   "case": "B7",
+   "step": 0,
+   "kind": "UNRULED difference",
+   "ruling": null,
+   "argv": {
+    "argv": [
+     "--help"
+    ],
+    "stdin": null
+   },
+   "original": {
+    "exit": 0,
+    "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+    "err": ""
+   },
+   "cshort": {
+    "exit": 0,
+    "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+    "err": ""
+   }
+  },
+  {
+   "case": "B7",
+   "step": 1,
+   "kind": "UNRULED difference",
+   "ruling": null,
+   "argv": {
+    "argv": [
+     "-h"
+    ],
+    "stdin": null
+   },
+   "original": {
+    "exit": 0,
+    "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+    "err": ""
+   },
+   "cshort": {
+    "exit": 0,
+    "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount named things in an append-only ledger.\n\npositional arguments:\n  {add,show,undo}\n    add            add N to the count called NAME\n    show           print every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+    "err": ""
+   }
+  },
+  {
+   "case": "B7",
+   "step": 2,
+   "kind": "UNRULED difference",
+   "ruling": null,
+   "argv": {
+    "argv": [
+     "add",
+     "--help"
+    ],
+    "stdin": null
+   },
+   "original": {
+    "exit": 0,
+    "out": "usage: tally add [-h] name [n]\n\npositional arguments:\n  name\n  n\n\noptions:\n  -h, --help  show this help message and exit\n",
+    "err": ""
+   },
+   "cshort": {
+    "exit": 0,
+    "out": "usage: tally add [-h] name [n]\n\npositional arguments:\n  name        one word, no spaces\n  n           what to add (default 1; may be negative)\n\noptions:\n  -h, --help  show this help message and exit\n",
+    "err": ""
+   }
+  },
+  {
+   "case": "B7",
+   "step": 3,
+   "kind": "UNRULED difference",
+   "ruling": null,
+   "argv": {
+    "argv": [
+     "show",
+     "-h"
+    ],
+    "stdin": null
+   },
+   "original": {
+    "exit": 0,
+    "out": "usage: tally show [-h] [--all] [--json]\n\noptions:\n  -h, --help  show this help message and exit\n  --all       include totals of 0\n  --json      print the totals as one JSON object\n",
+    "err": ""
+   },
+   "cshort": {
+    "exit": 0,
+    "out": "usage: tally show [-h] [--all] [--json]\n\noptions:\n  -h, --help  show this help message and exit\n  --all       include totals of 0\n  --json      print one JSON object instead of rows\n",
+    "err": ""
+   }
+  },
+  {
+   "case": "E1",
+   "step": "written",
+   "kind": "UNRULED difference",
+   "ruling": null,
+   "argv": "written",
+   "original": {
+    "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\", \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 2}\n"
+   },
+   "cshort": {
+    "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\", \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 4}\n"
+   }
+  }
+ ],
+ "source": {
+  "tree": "0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea"
+ }
+}

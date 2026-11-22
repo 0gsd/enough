@@ -1,0 +1,80 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-22-1307-697c
+name: raise-the-questions on tally.1-grounded.fabulac.cosm
+program:
+  name: raise-the-questions
+  sha256: beff2f93ac4620e68b337e8efb81dbb04be935a58f13fb450d4b4b61dd5e67a0
+inputs:
+- name: f
+  type: fabula
+  path: inputs/tally.1-grounded.fabulac.cosm
+  sha256: a1f42e90149e6707670f684a6b8a760f482fba38f817b1d2c8c8293c6eb3f94f
+estimate:
+  steps: 2
+  asks: 1
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-22-1307-697c
+  type: plan
+  name: raise-the-questions on tally.1-grounded.fabulac.cosm
+  summary: Two nodes, one of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 1
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: question f
+  summary: question f
+  step:
+    program: raise-the-questions
+    n: 1
+  move: question
+  asks: true
+  takes:
+  - f
+  gives: asked
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: gather asked with f
+  summary: gather asked with f
+  step:
+    program: raise-the-questions
+    n: 2
+  move: gather
+  asks: false
+  takes:
+  - asked
+  - f
+  gives: g
+  keeps:
+  - fabula-checks
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L13
+    confidence: 1

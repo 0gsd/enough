@@ -15,7 +15,7 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.0-kept.fabulac.cosm
-  sha256: 731d869598ee23abf30a544afe9e452d8632fae44b0c2b5971421e4afd1290ca
+  sha256: dd8ea3c246a5ce6910cdb960384fed487e6130010bc12e53738e9088464e215f
 estimate:
   steps: 1
   asks: 0

@@ -628,8 +628,13 @@ def gather_recorded(ctx: Any, rec: Value, w: Value) -> Value:
                                 "from-items": made["from-items"], "from-file": made["from-file"]})
 
 
-def gather_verdict(ctx: Any, verdict: Value, w: Value) -> Value:
-    """`gather verdict with f`: the fabulac with the verdict read into its cshort's evidence."""
+#: Who ran the judge when the call does not say: the owner, in the owner's sandbox (the rule for other people's code).
+JUDGE_RUNNER = "the owner"
+
+
+def gather_verdict(ctx: Any, verdict: Value, w: Value, *, by: Any = None) -> Value:
+    """`gather verdict with f`: the fabulac with the verdict read into its cshort's evidence. `by` names who ran the
+    judge (an agent may, for the owner's own code in the sandbox kit: 0.8 pins 9 and 21); the owner when unsaid."""
     tc = _tc(ctx)
     cat, nodes = _need_fabula(w, "gather verdict with f")
     raw = verdict.bytes()
@@ -646,7 +651,9 @@ def gather_verdict(ctx: Any, verdict: Value, w: Value) -> Value:
     now = getattr(ctx, "now", None)
     at = now.strftime("%Y-%m-%dT%H:%M") if now is not None else "1970-01-01T00:00"
     run = getattr(ctx, "run", None)
-    by = f"the judge, run by the owner; gathered in run {run}" if run else "the judge, run by the owner"
+    runner = (plain(by) if isinstance(by, Value) else by) if by is not None else None
+    runner = runner.strip() if isinstance(runner, str) and runner.strip() else JUDGE_RUNNER
+    by = f"the judge, run by {runner}" + (f"; gathered in run {run}" if run else "")
     try:
         new_cat, report = tc.fold_verdict({k: x for k, x in cat.items() if k != "nodes"}, v, verdict_bytes=raw,
                                           where=where, at=at, by=by)
@@ -665,7 +672,7 @@ def gather_outside(ctx: Any, parts: Value, **mods: Any) -> Value:
     if parts.type == "folder":
         return gather_recorded(ctx, parts, w)
     if parts.type == "text":
-        return gather_verdict(ctx, parts, w)
+        return gather_verdict(ctx, parts, w, by=mods.get("by"))
     raise MoveError(f"gather takes a list of fabulas or of items, a recording folder or a verdict, not {parts.type}")
 
 

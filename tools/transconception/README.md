@@ -4,8 +4,11 @@ The outside tools of a transconception (MacroCOSM 18.4.9; Thym 20.10): the recor
 two converters. Promoted for 0.8 from the experiment's kit (`docs/v070-x0-sandbox/`, ignored by git), with its file
 shapes kept, so that the experiment's own results still read.
 
-**These are the owner's to run, in the owner's sandbox.** enough never imports or starts any of them, and no agent
-runs the recorder or the runner: they run other people's programs. enough reads the files they leave
+**These run in a sandbox, never inside enough.** enough never imports or starts any of them. They run other people's
+programs, so for other people's code they are the owner's to run, in the owner's sandbox. For the owner's own code
+(enough's and Comprise's parts, and tally, the suite's own trial program), an agent may run the recorder, the runner
+and the judge in the sandbox kit (0.8 pins 9 and 21); `tests/fixtures/fabula/transconception/tally/outside/` is one
+such run. enough reads the files they leave
 (`entail f as cases` writes the cases file; `gather recorded with f` reads a recording folder; `gather verdict with f`
 reads a verdict). The sandbox wrapper stays the owner's: the experiment's `x0.sh` (in the kit) starts these files
 under macOS's `sandbox-exec`, with no network and no writing outside a scratch folder the owner names. Each tool is

@@ -1,0 +1,434 @@
+engine: transconception.standing_weighing
+inputs:
+  call: cc003c71d6b0b4c7ed2e59689cadb795b8d3145893741ecd0a5104a10b42752b
+keys: []
+tokens: 0
+seconds: 0
+output:
+- id: N:target/rust
+  type: target
+  name: rust
+  language: rust
+  version: 1.97.1
+  weighed:
+  - point: 1
+    score: 3
+    evidence: the Rust Foundation (since 2021, several member companies) and the project's own teams and RFC process;
+      stable releases every six weeks since 1.0 in 2015.
+    answered: rules
+  - point: 2
+    score: 2
+    evidence: the Rust Reference and the Ferrocene Language Specification (MIT or Apache-2.0; neither claims to
+      be complete); one production compiler, rustc, others partial (gccrs, mrustc).
+    answered: rules
+  - point: 3
+    score: 3
+    evidence: the stability promise of 1.0 and editions; cargo builds old crates with new compilers.
+    answered: rules
+  - point: 4
+    score: 2
+    evidence: 'every reliance kept is provided: 31 built-in, 1 library, 23 written, 1 dropped; none cannot; gaps:
+      C:reliance/whole-numbers-unbounded, C:reliance/argparse-surface'
+    answered: rules
+  - point: 5
+    score: 2
+    evidence: the recorded fake model's reading of point 5
+    answered: model
+  - point: 6
+    score: 2
+    evidence: the recorded fake model's reading of point 6
+    answered: model
+  - point: 7
+    score: 3
+    evidence: memory-safe without unsafe, data races refused by the compiler; a panic exits with status 101, so
+      a program whose uncaught errors exit 1 catches them in main.
+    answered: rules
+  - point: 8
+    score: 2
+    evidence: exhaustive matching on kinds, the type of each field and the borrow checker; positions and texts are
+      the judge's to check.
+    answered: rules
+  - point: 9
+    score: 2
+    evidence: the recorded fake model's reading of point 9
+    answered: model
+  - point: 10
+    score: 2
+    evidence: the recorded fake model's reading of point 10
+    answered: model
+  - point: 11
+    score: 2
+    evidence: the recorded fake model's reading of point 11
+    answered: model
+  - point: 12
+    score: 2
+    evidence: the recorded fake model's reading of point 12
+    answered: model
+  provides:
+  - for: C:interface/command.tally
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.add
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.show
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/command.undo
+    by: written
+    what: the new program's own command
+    answered: rules
+  - for: C:interface/tally.cli.main
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.ledger_path
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.read
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.add
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.undo
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.totals
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.ledger.LedgerError
+    by: written
+    what: the new program's own class
+    answered: rules
+  - for: C:interface/tally.render.rows
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/tally.render.empty_message
+    by: written
+    what: the new program's own function
+    answered: rules
+  - for: C:interface/format.ledger-line
+    by: written
+    what: the new program's own format
+    answered: rules
+  - for: C:behaviour/add
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/undo
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/read
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/show
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:behaviour/errors
+    by: written
+    what: the new program's own behaviour
+    answered: rules
+  - for: C:reliance/whole-numbers-unbounded
+    by: library
+    what: num-bigint, or i128 where the program's numbers stay small
+    note: the standard library has no unbounded whole number; i64 overflow panics in a debug build and wraps in
+      a release build
+    gap: num-bigint pinned in Cargo.lock and fetched once, or the numbers held in i128 with a refusal past it, ruled
+      by the transconceiver
+    answered: rules
+  - for: C:reliance/number-from-text
+    by: built-in
+    what: str::parse::<i64> after trimming
+    note: underscores between digits, signs and non-ASCII digits the original accepts are glue to write
+    answered: rules
+  - for: C:reliance/halves-round-to-even
+    by: built-in
+    what: f64::round_ties_even (since 1.77)
+    answered: rules
+  - for: C:reliance/division-gives-fraction
+    by: built-in
+    what: f64 division after converting both sides
+    answered: rules
+  - for: C:reliance/fractions-are-doubles
+    by: built-in
+    what: f64
+    answered: rules
+  - for: C:reliance/fraction-from-text
+    by: built-in
+    what: str::parse::<f64> after trimming
+    note: underscores the original reads are glue
+    answered: rules
+  - for: C:reliance/number-as-text
+    by: written
+    what: the printed form of a number around f64's Display
+    note: 'Display gives the shortest digits but never an exponent, Debug writes 1e16: where the form switches to
+      an exponent, and inf and nan, are written'
+    answered: rules
+  - for: C:reliance/conversions
+    by: written
+    what: each conversion the program makes, with the original's refusals
+    answered: rules
+  - for: C:reliance/text-length-in-code-points
+    by: built-in
+    what: str::chars().count()
+    answered: rules
+  - for: C:reliance/text-order-by-code-point
+    by: built-in
+    what: str's Ord
+    note: UTF-8 bytes order as their code points do
+    answered: rules
+  - for: C:reliance/sort-is-stable
+    by: built-in
+    what: slice::sort_by, which is stable
+    answered: rules
+  - for: C:reliance/what-is-a-space
+    by: written
+    what: char::is_whitespace with U+001C to U+001F added
+    note: the set is written out
+    answered: rules
+  - for: C:reliance/lines-end-at
+    by: written
+    what: a line splitter ending lines where the original does
+    note: str::lines ends lines only at \n and \r\n
+    answered: rules
+  - for: C:reliance/text-repeated
+    by: built-in
+    what: str::repeat
+    answered: rules
+  - for: C:reliance/printed-form
+    by: written
+    what: the original's printed form of texts, lists and maps
+    note: Debug prints differently
+    answered: rules
+  - for: C:reliance/format-spec
+    by: written
+    what: the format fields the program uses, over format!
+    note: format! has width, alignment and precision, no grouping
+    answered: rules
+  - for: C:reliance/truth-of-values
+    by: written
+    what: each test of truth written out
+    note: 'Rust has no truth of values: a test names what it tests'
+    answered: rules
+  - for: C:reliance/any-all-stop-early
+    by: built-in
+    what: Iterator::any, Iterator::all
+    answered: rules
+  - for: C:reliance/map-keeps-order
+    by: written
+    what: a Vec of pairs, replaced in place
+    note: HashMap keeps no order; indexmap would do it as a library
+    answered: rules
+  - for: C:reliance/set-members
+    by: built-in
+    what: HashSet, BTreeSet
+    answered: rules
+  - for: C:reliance/set-order-varies
+    by: built-in
+    what: HashSet iteration
+    note: its order varies from run to run as well; only a sort makes it repeatable
+    answered: rules
+  - for: C:reliance/membership-identity-then-equality
+    by: written
+    what: == on values, with the identity cases written
+    answered: rules
+  - for: C:reliance/records-compare-by-fields
+    by: built-in
+    what: derive(PartialEq)
+    answered: rules
+  - for: C:reliance/lists-and-zip
+    by: built-in
+    what: Iterator::zip, which stops at the shorter
+    answered: rules
+  - for: C:reliance/uncaught-error
+    by: written
+    what: main catches every error, prints a report and exits 1
+    note: a panic exits 101
+    answered: rules
+  - for: C:reliance/error-text
+    by: built-in
+    what: Display of the error
+    answered: rules
+  - for: C:reliance/error-kinds
+    by: written
+    what: an enum of the program's errors, matched by kind
+    answered: rules
+  - for: C:reliance/exit-status-from-return
+    by: built-in
+    what: std::process::exit, ExitCode
+    answered: rules
+  - for: C:reliance/chained-errors
+    by: built-in
+    what: Error::source
+    note: the report the original prints of a chain is written
+    answered: rules
+  - for: C:reliance/missing-key-error
+    by: written
+    what: the message naming the key
+    answered: rules
+  - for: C:reliance/program-arguments
+    by: built-in
+    what: std::env::args_os
+    answered: rules
+  - for: C:reliance/argparse-surface
+    by: written
+    what: an option reader with the original's usage line, errors and exit status 2
+    note: the standard library has none; a crate (clap) prints its own messages
+    gap: 'the option reader written (a few hundred lines): usage line, error messages, exit status 2'
+    answered: rules
+  - for: C:reliance/argparse-help
+    by: written
+    what: the help screen, laid out as the original lays it out
+    answered: rules
+  - for: C:reliance/argparse-version
+    by: written
+    what: the version option
+    answered: rules
+  - for: C:reliance/argparse-abbreviation
+    by: written
+    what: unambiguous prefixes of long options, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-negative-numbers
+    by: written
+    what: a negative number taken as a value, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-optional-positional
+    by: written
+    what: an optional value matched once, in the option reader
+    answered: rules
+  - for: C:reliance/argparse-subcommands
+    by: written
+    what: sub-commands, in the option reader
+    answered: rules
+  - for: C:reliance/environment-read
+    by: built-in
+    what: std::env::var_os
+    answered: rules
+  - for: C:reliance/clock-seconds
+    by: built-in
+    what: SystemTime::now() since UNIX_EPOCH
+    answered: rules
+  - for: C:reliance/terminal-width
+    by: written
+    what: COLUMNS, else 80
+    note: the terminal's own size needs a binding to the system
+    answered: rules
+  - for: C:reliance/print-line-end
+    by: built-in
+    what: println!
+    answered: rules
+  - for: C:reliance/output-encoding
+    by: built-in
+    what: UTF-8 bytes written as they are
+    answered: rules
+  - for: C:reliance/json-written
+    by: written
+    what: a JSON writer with the original's spacing, escapes and number forms
+    note: the standard library has no JSON; serde_json writes its own forms
+    answered: rules
+  - for: C:reliance/json-keys-sorted
+    by: built-in
+    what: a BTreeMap, whose keys come sorted
+    answered: rules
+  - for: C:reliance/json-read
+    by: written
+    what: a JSON reader
+    note: the standard library has none; serde_json pinned would do
+    answered: rules
+  - for: C:reliance/home-and-tilde
+    by: built-in
+    what: the HOME variable, read with std::env::var_os
+    note: a leading ~ is expanded by a line of glue
+    answered: rules
+  - for: C:reliance/path-written
+    by: built-in
+    what: std::path::Path
+    answered: rules
+  - for: C:reliance/path-kinds
+    by: built-in
+    what: std::fs::metadata, std::fs::symlink_metadata
+    answered: rules
+  - for: C:reliance/make-folders
+    by: built-in
+    what: std::fs::create_dir_all
+    answered: rules
+  - for: C:reliance/file-created-mode
+    by: built-in
+    what: OpenOptions, 0o666 with the umask applied
+    answered: rules
+  - for: C:reliance/newlines-translated
+    by: written
+    what: \r\n and \r read as \n where the original reads text
+    note: Rust translates no line ends
+    answered: rules
+  - for: C:reliance/text-decoding-strict
+    by: built-in
+    what: String::from_utf8
+    note: the error the original raises is written
+    answered: rules
+  - for: C:reliance/runtime-version
+    by: built-in
+    what: the edition and rust-version of Cargo.toml
+    answered: rules
+  - for: C:reliance/run-as-module
+    by: built-in
+    what: one program, a cargo binary
+    answered: rules
+  - for: C:reliance/pytest-conventions
+    by: dropped
+    what: 'nothing: cargo test reads its own names'
+    note: the original's test runner's names mean nothing to the new program
+    answered: rules
+  summary: 'Weighed for a transconception into Rust: feasible with 2 named gaps.'
+  stance: deduced
+  spike:
+    use: the option reader (C:reliance/argparse-surface), small
+    level: 3
+    where: null
+    cases:
+    - P:case/cli-json-and-error
+    evidence:
+      level: 3
+      against: original
+      cases:
+      - P:case/cli-json-and-error
+      differ:
+        ruled: 0
+        unruled: 0
+      where:
+        file: spikes/rust-spike.verdict.json
+        digest: 69f538a073e552462e77bdc1536a52850424165d7d7fe97337f6e0b9e74e88d7
+      at: 2026-11-22T13:30
+  verdict: feasible-with
+  conditions:
+  - 'C:reliance/whole-numbers-unbounded (whole numbers without limit): num-bigint pinned in Cargo.lock and fetched
+    once, or the numbers held in i128 with a refusal past it, ruled by the transconceiver'
+  - 'C:reliance/argparse-surface (the option reader''s errors and messages): the option reader written (a few hundred
+    lines): usage line, error messages, exit status 2'
+  at: '2026-11-22'
+  made:
+    move: weigh
+    in: rust
+    run: 2026-11-22-1310-a908
+    engine: rules+model:scripted
+  provenance:
+    mode: derived
+    sources:
+    - defaults/cosm/ground/targets/rust.cosm
+    - MacroCOSM OES 18.4.9
+    confidence: 0.7
+    state: known
+- N:target/rust

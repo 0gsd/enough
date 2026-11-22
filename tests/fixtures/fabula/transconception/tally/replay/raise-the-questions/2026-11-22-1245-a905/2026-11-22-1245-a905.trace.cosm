@@ -1,0 +1,164 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-22-1245-a905
+name: raise-the-questions run 2026-11-22-1245-a905
+program:
+  name: raise-the-questions
+  sha256: beff2f93ac4620e68b337e8efb81dbb04be935a58f13fb450d4b4b61dd5e67a0
+plan:
+  sha256: e06620c97bf51049db5432b63ead40e5502a5ce5893219ce82b2ed29c7530453
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-22T12:45:00Z'
+ended: '2026-11-22T18:07:45Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-22-1245-a905
+  type: trace
+  name: raise-the-questions run 2026-11-22-1245-a905
+  summary: 'ran raise-the-questions on tally.3-settled.fabulac.cosm in 19365 s on rules: 2 steps, all checks green'
+  records:
+  - R:record/1
+  - R:record/2
+  outcome: landed
+  inputs_root: .
+  rules: true
+  engines:
+  - ascribe
+  - canon
+  - dialectic
+  - docoes
+  - repo
+  - sandbox
+  - syntax
+  - transconception
+  - verse
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-22-1245-a905.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: question f
+  summary: rules, 1 attempt, 3 checks green.
+  node: R:node/1
+  move: question
+  inputs:
+  - name: f
+    sha256: 572a588ace23ae540ee9213967b96ac8208d0df0586ce8a5a75de4c9f6925935
+    path: inputs/tally.3-settled.fabulac.cosm
+  outputs:
+  - name: asked
+    sha256: 5d4f98dc133d21cb4d8cd8264dc25c2abc740530123d536e771903b4b1169dde
+  engine: rules
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: addressed
+    ok: true
+    why: ''
+  - name: no-duplicate
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  state: pending
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-22-1245-a905.plan.cosm#R:node/1
+    confidence: 1
+- id: R:record/2
+  type: record
+  name: gather asked with f
+  summary: code, 1 attempt, 4 checks green.
+  node: R:node/2
+  move: gather
+  inputs:
+  - name: asked
+    sha256: 5d4f98dc133d21cb4d8cd8264dc25c2abc740530123d536e771903b4b1169dde
+  - name: f
+    sha256: 572a588ace23ae540ee9213967b96ac8208d0df0586ce8a5a75de4c9f6925935
+    path: inputs/tally.3-settled.fabulac.cosm
+  outputs:
+  - name: g
+    sha256: 3d0740e20934e07301683deff522d92d924a161f7fa073be96cef7df7b81d787
+    path: outputs/g.cosm
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: nothing-lost
+    ok: true
+    why: ''
+  - name: ids-unique
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  - name: fabula-checks
+    ok: true
+    why: ''
+  state: pending
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-22-1245-a905.plan.cosm#R:node/2
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: question f
+  summary: question f
+  step:
+    program: raise-the-questions
+    n: 1
+  move: question
+  asks: true
+  takes:
+  - f
+  gives: asked
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: gather asked with f
+  summary: gather asked with f
+  step:
+    program: raise-the-questions
+    n: 2
+  move: gather
+  asks: false
+  takes:
+  - asked
+  - f
+  gives: g
+  keeps:
+  - fabula-checks
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - raise-the-questions.thym#L13
+    confidence: 1

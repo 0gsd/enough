@@ -4,7 +4,7 @@ flavour: fabulac
 purpose: transconception
 id: fabula/tally
 name: tally
-source: {path: tally/, kind: folder, language: python, files: 9, bytes: 11325, skipped: 0, tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea, licence: MIT}
+source: {path: tally/, kind: folder, language: python, files: 9, bytes: 11325, skipped: 0, tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea, licence: MIT, obtained: own}
 derived: {at: 2026-11-05T14:02:40Z, by: person, model: anthropic/claude-opus-5.5, route: cloud, provider: openrouter, program: build-fabulac.thym, run: 2026-11-05-1351-e4f2, mode: model, completeness: full, chunks: 9, stages: [survey, history, read, fold, question]}
 atem:
   line: tally counts named things from the command line in an append-only ledger, so concurrent adds are never lost and any add can be undone.

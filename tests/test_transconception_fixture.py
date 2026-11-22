@@ -118,7 +118,7 @@ def test_the_stages_chain_from_ground_to_entail():
     assert [n for n in w["nodes"] if not str(n["id"]).startswith("N:target/")] == \
         [n for n in f["nodes"] if not str(n["id"]).startswith("N:target/")]
     # the landed cshorts are the entailing runs' folders, file for file
-    for lang, rid in (("go", "2026-11-18-1400-a909"), ("rust", "2026-11-18-1410-a910")):
+    for lang, rid in (("go", "2026-11-22-1400-a909"), ("rust", "2026-11-22-1410-a910")):
         got = _files(LANDED / f"tally.cshort-{lang}-{MK.LANDED_STAMP[lang]}")
         assert got == _files(MK._output(_run_dir("entail-in-a-language", rid), "code"))
         assert (LANDED / f"tally.layout-{lang}-{MK.LANDED_STAMP[lang]}.md").read_bytes() == \
@@ -163,7 +163,7 @@ def test_every_check_holds_or_fails_as_recorded_and_the_gates_report_as_recorded
     assert checks == json.loads((FIX / "recorded" / "checks.json").read_text(encoding="utf-8"))
     assert gates == json.loads((FIX / "recorded" / "gates.json").read_text(encoding="utf-8"))
     assert list(gates) == ([f"inputs/{s}" for s in MK.STAGES] + [f"landed/{MK.FINAL}"]
-                           + [f"inputs/{s}" for s in (MK.RECORDED, MK.JUDGED)])
+                           + [f"inputs/{s}" for s in (MK.FIXED, MK.RECORDED, MK.JUDGED)])
 
 
 def test_the_gates_say_where_the_path_stands():
@@ -187,24 +187,31 @@ def test_the_gates_say_where_the_path_stands():
     assert gates[f"landed/{MK.FINAL}"]["ready-to-keep"]["says"] == "not ready to keep"
 
 
+NINE = ("standing", "ground-given", "ground-cited", "stands-alone", "nothing-carried", "case-outside", "cases-cover",
+        "ruled", "round-trip")
+
+
 def test_which_gate_tallys_fixture_holds():
-    """Where tally's transconception stands after the round trip (lane T1, 0.9), so it cannot fall back silently:
-    recorded outside enough and judged, every check of gate 1 holds but `round-trip`, whose blind Python rebuild
-    stands at level 1 (five differences no ruling covers yet, awaiting the owner); neither gate holds."""
+    """Where tally's transconception stands, so it cannot fall back silently (lane T1, 0.9): on the judged stage gate 1
+    says "ready to keep", and it says so if and only if all nine of its checks hold, every one measured. Before the
+    judged round trip, only `round-trip` fails."""
     gates = json.loads((FIX / "recorded" / "gates.json").read_text(encoding="utf-8"))
-    rec, judged = gates[f"inputs/{MK.RECORDED}"], gates[f"inputs/{MK.JUDGED}"]
-    for g in (rec, judged):
-        keep = g["ready-to-keep"]
-        assert keep["holds"] is False and keep["do-not-hold"] == ["round-trip"] and keep["not-measured"] == []
-        for name in ("case-outside", "cases-cover"):          # the recorded cases stand outside and cover
-            c = keep["checks"][name]
-            assert c["state"] == "holds" and c["errors"] == c["warnings"] == c["notes"] == [], (name, c)
-        for lang in ("go", "rust"):
-            assert g[f"ready-to-entail {lang}"]["do-not-hold"] == ["round-trip"]
-    assert rec["ready-to-keep"]["checks"]["round-trip"]["errors"] == [
-        f"round-trip {MK.RECORDED}: no cshort in python stands at level 2 or more by its evidence"]
-    assert judged["ready-to-keep"]["checks"]["round-trip"]["errors"] == [
-        f"round-trip {MK.JUDGED}: no cshort in python stands at level 2 or more by its evidence (the best is 1)"]
+    for stage, gate in gates.items():
+        keep = gate["ready-to-keep"]
+        assert tuple(keep["checks"]) == NINE, stage
+        nine_hold = all(keep["checks"][n]["state"] == "holds" for n in NINE) and not keep["not-measured"]
+        assert keep["holds"] is nine_hold and (keep["says"] == "ready to keep") is nine_hold, stage
+    judged = gates[f"inputs/{MK.JUDGED}"]["ready-to-keep"]
+    assert judged["holds"] is True and judged["says"] == "ready to keep"
+    assert judged["hold"] == list(NINE) and judged["do-not-hold"] == [] and judged["not-measured"] == []
+    for name in NINE:                                     # nothing left over, not even a warning
+        c = judged["checks"][name]
+        assert c["errors"] == c["warnings"] == [], (name, c)
+    for stage in (MK.FIXED, MK.RECORDED):
+        assert gates[f"inputs/{stage}"]["ready-to-keep"]["do-not-hold"] == ["round-trip"], stage
+    # gate 2 holds on the judged stage too, but its target-confirmed rests on the simulated spikes (see below)
+    for lang in ("go", "rust"):
+        assert gates[f"inputs/{MK.JUDGED}"][f"ready-to-entail {lang}"]["holds"] is True
 
 
 def test_the_round_trip_was_recorded_outside_and_judged_blind():
@@ -214,25 +221,50 @@ def test_the_round_trip_was_recorded_outside_and_judged_blind():
     assert rec["source"] == {"tree": src["tree"]} and rec["seeds"] == ["0", "1"] and rec["unstable"] == []
     assert rec["python"].startswith("3.13.11 ")
     assert len(rec["rows"]) == 53 and sum(len(r["argv"]) for r in rec["rows"]) == 161
-    # the recorder ran on the cases file entail f as cases gives the targeted fabulac
+    # the recorder ran on the cases file entail f as cases gives the targeted fabulac; the judge on the recorded one's
     assert (out / "recording" / "cases.json").read_text(encoding="utf-8") == MK.handed_out(MK.targeted(
-        _load(INPUTS / MK.FINAL)))
+        _load(INPUTS / MK.FIXED)))
+    recorded = _load(INPUTS / MK.RECORDED)
+    assert (out / MK.ROUNDTRIP / "cases.json").read_text(encoding="utf-8") == MK.judge_cases(recorded)
     data = _load(INPUTS / MK.JUDGED)
     cases = [n for n in data["nodes"] if str(n["id"]).startswith("P:case/trial-")]
     assert len(cases) == 53 and all(n["stands"] == "outside" and n["from"] == "recorded" for n in cases)
     assert all(n["of"][0].startswith("C:interface/command.") for n in cases)
-    v = json.loads((out / MK.ROUNDTRIP / "verdict.json").read_text(encoding="utf-8"))
-    assert v["target"] == "python" and v["steps"] == {"kept": 189, "agree": 184} and v["passes"] is False
-    assert sorted((f["case"], str(f["step"])) for f in v["findings"]) == [
+    b7 = next(n for n in cases if n["worksheet-id"] == "B7")
+    assert b7["ruling"] == [MK.B7_RULING] and b7["ruling"][0]["said"] == "Free"     # the owner's, 2026-11-22
+    # the first round trip (from FINAL) found the slip on E1 and the help words of B7; it is kept, never gathered
+    first = json.loads((out / "first-round-trip" / "verdict.json").read_text(encoding="utf-8"))
+    assert first["steps"] == {"kept": 189, "agree": 184} and first["passes"] is False
+    assert sorted((f["case"], str(f["step"])) for f in first["findings"]) == [
         ("B7", "0"), ("B7", "1"), ("B7", "2"), ("B7", "3"), ("E1", "written")]
-    assert {f["kind"] for f in v["findings"]} == {"UNRULED difference"}
+    # the second, a fresh blind agent from the fixed fabulac: every counted step agrees, B7's four shown as ruled
+    v = json.loads((out / MK.ROUNDTRIP / "verdict.json").read_text(encoding="utf-8"))
+    assert v["target"] == "python" and v["steps"] == {"kept": 185, "agree": 185} and v["passes"] is True
+    assert sorted((f["case"], f["step"], f["kind"]) for f in v["findings"]) == [
+        ("B7", i, "ruled difference") for i in range(4)]
     entry = next(e for e in data["shorts"] if e.get("target") == "N:target/python")
-    assert entry["path"] == f"../outside/{MK.ROUNDTRIP}/" and "had not seen tally's source" in entry["by"]
+    assert entry["path"] == f"../outside/{MK.ROUNDTRIP}/" and f"from inputs/{MK.FIXED} alone" in entry["by"]
     ev = entry["evidence"]
-    assert ev["level"] == 1 and ev["steps"] == {"kept": 189, "agree": 184} and "run by an agent" in ev["by"]
-    for which in ("control", MK.ROUNDTRIP):          # tally's own six tests, on the original and on the rebuild
-        log = (out / MK.ROUNDTRIP / f"own-tests-{which}.log").read_text(encoding="utf-8")
-        assert log.strip().splitlines()[-1].startswith("6 passed"), which
+    assert ev["level"] == 3 and ev["steps"] == {"kept": 185, "agree": 185} and "run by an agent" in ev["by"]
+    for d in (out / "first-round-trip", out / MK.ROUNDTRIP):   # tally's own six tests, on the original and the rebuild
+        for which in ("control", MK.ROUNDTRIP):
+            log = (d / f"own-tests-{which}.log").read_text(encoding="utf-8")
+            assert log.strip().splitlines()[-1].startswith("6 passed"), (d.name, which)
+
+
+def test_the_fix_is_recorded_as_a_fix():
+    """The owner's "The fabulac slipped: fix it" (2026-11-22): the words on `undoes` say what the original does, and
+    each item corrected says so in `provenance.fixed`; nothing else of FINAL changed, and no ruling was made for it."""
+    final, fixed = _load(INPUTS / MK.FINAL), _load(INPUTS / MK.FIXED)
+    assert fixed == MK.fixed(final)
+    before = {n["id"]: n for n in final["nodes"]}
+    changed = [n["id"] for n in fixed["nodes"] if n != before[n["id"]]]
+    assert sorted(changed) == sorted(MK.FIX_WORDS)
+    for iid in changed:
+        n = next(x for x in fixed["nodes"] if x["id"] == iid)
+        (fx,) = n["provenance"]["fixed"]
+        assert fx["why"].startswith("the owner, 2026-11-22") and n.get("ruling") == before[iid].get("ruling")
+    assert {k: v for k, v in fixed.items() if k != "nodes"} == {k: v for k, v in final.items() if k != "nodes"}
 
 
 def test_the_landed_cshorts_hold_their_own_checks_and_claim_no_evidence():
@@ -249,7 +281,7 @@ def test_the_landed_cshorts_hold_their_own_checks_and_claim_no_evidence():
         assert tc.surface_problems(items, f"N:target/{lang}", md, file_text=texts.get, unruled=True) == []
         lines = (folder / "requests.jsonl").read_text(encoding="utf-8").split("\n")
         assert tc.apart_problems(lines, tc.source_paths(items), None) == []
-        assert md.splitlines()[0] == f"*a cshort of {MK.FINAL}, in {title}, compiled on 2026-11-18 by scripted; never run*"
+        assert md.splitlines()[0] == f"*a cshort of {MK.FINAL}, in {title}, compiled on 2026-11-22 by scripted; never run*"
     rep = FAB.lint(LANDED / MK.FINAL)
     per = [str(p) for p in rep.errors if p.check in tc.PER_CSHORT]
     assert per == []
@@ -260,8 +292,17 @@ def test_the_landed_cshorts_hold_their_own_checks_and_claim_no_evidence():
 # ---------------------------------------------------------------------------
 
 def test_what_is_simulated_says_so():
+    """Since 0.9 the two sittings are the owner's (2026-11-22, "Confirm all"); the spikes and the model stay
+    simulated, and say so."""
     for vol in sorted(INPUTS.glob("*.answers-*.cosm")):
-        assert "simulated for the conformance fixture" in vol.read_text(encoding="utf-8"), vol.name
+        text = vol.read_text(encoding="utf-8")
+        assert "simulated" not in text and "the owner, as transconceiver, by questionnaire" in text, vol.name
+    ruled = _load(INPUTS / MK.RULED)
+    maker = next(n for n in ruled["nodes"] if n["id"].startswith("R:maker/") and n.get("capacity") == "transconceiver")
+    assert maker["id"] == MK.OWNER and maker["statements"]["programs"] == "tally, in Go, in Rust and in Python, the round trip"
+    assert not any("simulated" in str(v) for v in maker["statements"].values())
+    assert {r["by"] for n in ruled["nodes"] for r in tc.rulings(n)} == {MK.OWNER}
+    assert _load(INPUTS / MK.KEPT)["source"]["obtained"] == "own"
     for lang, title in MK.LANGUAGES:
         v = json.loads((INPUTS / "spikes" / f"{lang}-spike.verdict.json").read_text(encoding="utf-8"))
         assert v["simulated"].startswith("simulated for the conformance fixture: there is no " + title)
@@ -282,8 +323,8 @@ def test_tallys_own_fixture_is_beside_it_untouched():
     assert _files(INPUTS / "tally") == {k: v for k, v in _files(MK.TALLY).items() if "__pycache__" not in k
                                         and ".pytest_cache" not in k}
     kept = (INPUTS / MK.KEPT).read_text(encoding="utf-8")
-    assert kept == MK.TALLY_FABULAC.read_text(encoding="utf-8").replace("flavour: fabulac\n",
-                                                                      "flavour: fabulac\npurpose: transconception\n", 1)
+    assert kept == MK.kept_text(MK.TALLY_FABULAC.read_text(encoding="utf-8"))
+    assert "purpose: transconception\n" in kept and "licence: MIT, obtained: own}" in kept
     assert (INPUTS / "tally.cases.json").read_bytes() == (FIX / "tally.cases.json").read_bytes()
     src = _load(MK.TALLY_FABULAC)["source"]
     assert mc.tree_digest(INPUTS / "tally")["tree"] == src["tree"]

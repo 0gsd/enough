@@ -1,0 +1,37 @@
+contract:
+  move: entail
+  schema:
+    format: markdown
+    says: 'the whole of go.mod in one fenced block, then what you chose where the fabulac is silent, under ## Notes'
+  checks:
+  - target-confirmed
+  - files-present
+  - surface-answered
+  - apart
+  - footer
+  - provenance
+inputs:
+  fabulac: ce49f52f74fa0f060acd0f5090322f58acac31c33b5a7c9d29a40be66664af30
+  name: b01e26d3f5a5130b9d8d821c5a9d61e7c7d86df735f28bdcd6620fc58ac1006e
+  language: 6cc8519b91584e8bd435d63341e0838a99721948718b1c9c1e9c358c64ba992a
+  path: 33ef32bf6c23acb95f5902d7097b7a1d5128ca061167ec0716715b0b9eeaa5f6
+  layout: 4aa40b73b35397067c5d99007c8d8e2562097390af804b9a15ee3beaae3e2a6e
+  brief: 831f52abd5839e4677da2dae0ab76942a88403823077121822734d68c7a30a1d
+  entailed: 1d40973eccd8c0aacfed387df6d69cf600f9439cd53fe60a3f6d7e8de0eda328
+engine: model:scripted
+attempts: 1
+tokens: 10
+seconds: 0
+output: '```
+
+  module tally
+
+  ```
+
+
+  ## Notes
+
+
+  - the fabulac does not say the line width: 80 chosen (a recorded fake''s guess, written down)
+
+  '

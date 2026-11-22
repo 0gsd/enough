@@ -13,6 +13,7 @@ source:
   skipped: 0
   tree: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
   licence: MIT
+  obtained: own
   swhid:
     dir: swh:1:dir:e0360c818b6f33f64b5de76499a39447eb30ec18
 derived:
@@ -34,9 +35,9 @@ derived:
   - question
   runs:
   - program: ground-the-fabulac
-    run: 2026-11-18-1200-a901
-    at: '2026-11-18T12:00:00Z'
-  - {program: settle-the-answers, run: 2026-11-18-1240-a904, at: 2026-11-18T12:40:00Z}
+    run: 2026-11-22-1200-a901
+    at: '2026-11-22T12:00:00Z'
+  - {program: settle-the-answers, run: 2026-11-22-1240-a904, at: 2026-11-22T12:40:00Z}
 atem:
   line: tally counts named things from the command line in an append-only ledger, so concurrent adds are never lost
     and any add can be undone.
@@ -80,7 +81,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -100,7 +101,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -124,7 +125,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -148,7 +149,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -172,7 +173,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -191,7 +192,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -211,7 +212,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -236,7 +237,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -259,7 +260,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -287,7 +288,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -315,7 +316,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -342,7 +343,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -369,7 +370,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -395,7 +396,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -418,7 +419,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -447,7 +448,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -476,7 +477,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -499,7 +500,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -526,7 +527,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -553,7 +554,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -580,7 +581,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -608,7 +609,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -637,7 +638,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -665,7 +666,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -693,7 +694,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -721,7 +722,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -748,7 +749,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -772,7 +773,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -804,7 +805,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -835,7 +836,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -859,7 +860,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -893,12 +894,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/command.add
   type: interface
   name: tally add
@@ -941,12 +942,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/command.show
   type: interface
   name: tally show
@@ -980,12 +981,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/command.undo
   type: interface
   name: tally undo
@@ -1012,12 +1013,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.cli.main
   type: interface
   name: main
@@ -1048,12 +1049,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.ledger_path
   type: interface
   name: ledger_path
@@ -1084,12 +1085,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.read
   type: interface
   name: read
@@ -1122,12 +1123,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.add
   type: interface
   name: add
@@ -1172,12 +1173,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.undo
   type: interface
   name: undo
@@ -1213,12 +1214,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.totals
   type: interface
   name: totals
@@ -1247,12 +1248,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.ledger.LedgerError
   type: interface
   name: LedgerError
@@ -1275,12 +1276,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.render.rows
   type: interface
   name: rows
@@ -1314,12 +1315,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/tally.render.empty_message
   type: interface
   name: empty_message
@@ -1345,12 +1346,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:interface/format.ledger-line
   type: interface
   name: a ledger line
@@ -1374,12 +1375,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:structure/tally.ledger.Entry
   type: structure
   name: Entry
@@ -1416,12 +1417,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:behaviour/add
   type: behaviour
   name: An add appends and reports
@@ -1463,12 +1464,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:behaviour/undo
   type: behaviour
   name: Undo walks back
@@ -1501,12 +1502,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:behaviour/read
   type: behaviour
   name: Reading the ledger
@@ -1535,12 +1536,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:behaviour/show
   type: behaviour
   name: Show draws bars
@@ -1582,12 +1583,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:behaviour/errors
   type: behaviour
   name: Errors and exit status
@@ -1611,12 +1612,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:dependency/python-standard-library
   type: dependency
   name: Python 3.10 and its standard library
@@ -1644,7 +1645,7 @@ nodes:
   address: https://github.com/python/cpython
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1670,7 +1671,7 @@ nodes:
   address: https://pypi.org/project/pytest/
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1698,12 +1699,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:setting/bar-width
   type: setting
   name: BAR_WIDTH and BAR
@@ -1727,12 +1728,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: R:maker/meadow
   type: maker
   name: Meadow Software
@@ -1751,7 +1752,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1775,7 +1776,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1805,7 +1806,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1832,7 +1833,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1857,7 +1858,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1880,7 +1881,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1904,7 +1905,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1931,7 +1932,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1950,7 +1951,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -1977,7 +1978,7 @@ nodes:
     answered: {lane: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2004,7 +2005,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2034,7 +2035,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2065,7 +2066,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2096,7 +2097,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2122,7 +2123,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2157,7 +2158,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2194,7 +2195,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2217,7 +2218,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2241,7 +2242,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2266,7 +2267,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2290,7 +2291,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2309,7 +2310,7 @@ nodes:
   state: open
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2331,7 +2332,7 @@ nodes:
   state: open
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2350,7 +2351,7 @@ nodes:
   state: open
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -2397,12 +2398,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/number-from-text
   type: reliance
   name: a whole number read from text
@@ -2442,12 +2443,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/halves-round-to-even
   type: reliance
   name: halves round to the even neighbour
@@ -2479,12 +2480,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/division-gives-fraction
   type: reliance
   name: dividing gives a fraction
@@ -2516,12 +2517,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/fractions-are-doubles
   type: reliance
   name: fractional numbers are binary doubles
@@ -2564,12 +2565,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/fraction-from-text
   type: reliance
   name: a fractional number read from text
@@ -2601,12 +2602,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/number-as-text
   type: reliance
   name: numbers written as text
@@ -2659,12 +2660,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/conversions
   type: reliance
   name: values converted to a kind
@@ -2708,12 +2709,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/text-length-in-code-points
   type: reliance
   name: text measured in code points
@@ -2752,12 +2753,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/text-order-by-code-point
   type: reliance
   name: text ordered by code point
@@ -2799,12 +2800,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/sort-is-stable
   type: reliance
   name: sorting keeps ties in order
@@ -2838,12 +2839,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/what-is-a-space
   type: reliance
   name: what counts as white space
@@ -2893,12 +2894,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/lines-end-at
   type: reliance
   name: where a line ends
@@ -2931,12 +2932,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/text-repeated
   type: reliance
   name: text repeated
@@ -2968,12 +2969,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/printed-form
   type: reliance
   name: a value's printed form
@@ -3014,12 +3015,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/format-spec
   type: reliance
   name: the format of a value written into text
@@ -3056,12 +3057,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/truth-of-values
   type: reliance
   name: which values count as false
@@ -3102,12 +3103,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/any-all-stop-early
   type: reliance
   name: any and all stop at the first answer
@@ -3143,12 +3144,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/map-keeps-order
   type: reliance
   name: a map of keys to values
@@ -3196,12 +3197,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/set-members
   type: reliance
   name: a set holds each value once
@@ -3237,12 +3238,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/set-order-varies
   type: reliance
   name: the order of a set of texts varies from run to run
@@ -3275,12 +3276,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/membership-identity-then-equality
   type: reliance
   name: membership is identity first, then equality
@@ -3312,12 +3313,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/records-compare-by-fields
   type: reliance
   name: records equal by their fields
@@ -3356,12 +3357,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/lists-and-zip
   type: reliance
   name: pairing lists stops at the shortest
@@ -3397,12 +3398,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/uncaught-error
   type: reliance
   name: an error nobody catches
@@ -3438,12 +3439,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/error-text
   type: reliance
   name: an error printed is its message
@@ -3475,12 +3476,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/error-kinds
   type: reliance
   name: errors caught by kind
@@ -3523,12 +3524,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/exit-status-from-return
   type: reliance
   name: the exit status from a whole number
@@ -3563,12 +3564,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/chained-errors
   type: reliance
   name: an error raised from another
@@ -3601,12 +3602,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/missing-key-error
   type: reliance
   name: a missing key's error names the key
@@ -3637,12 +3638,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/program-arguments
   type: reliance
   name: the program's own arguments
@@ -3679,12 +3680,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-surface
   type: reliance
   name: the option reader's errors and messages
@@ -3735,12 +3736,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-help
   type: reliance
   name: the option reader's help screen
@@ -3783,12 +3784,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-version
   type: reliance
   name: the version option
@@ -3821,12 +3822,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-abbreviation
   type: reliance
   name: long options may be shortened
@@ -3859,12 +3860,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-negative-numbers
   type: reliance
   name: negative numbers are values
@@ -3897,12 +3898,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-optional-positional
   type: reliance
   name: an optional value is matched once
@@ -3936,12 +3937,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/argparse-subcommands
   type: reliance
   name: sub-commands
@@ -3978,12 +3979,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/environment-read
   type: reliance
   name: the environment read as text
@@ -4016,12 +4017,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/clock-seconds
   type: reliance
   name: the time in seconds
@@ -4056,12 +4057,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/terminal-width
   type: reliance
   name: the terminal's width
@@ -4093,12 +4094,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/print-line-end
   type: reliance
   name: printing a line
@@ -4134,12 +4135,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/output-encoding
   type: reliance
   name: the encoding of printed text
@@ -4179,12 +4180,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/json-written
   type: reliance
   name: JSON as written
@@ -4233,12 +4234,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/json-keys-sorted
   type: reliance
   name: JSON keys sorted
@@ -4271,12 +4272,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/json-read
   type: reliance
   name: JSON as read
@@ -4326,12 +4327,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/home-and-tilde
   type: reliance
   name: the home folder and ~
@@ -4374,12 +4375,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/path-written
   type: reliance
   name: paths written the POSIX way
@@ -4425,12 +4426,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/path-kinds
   type: reliance
   name: what a path names
@@ -4471,12 +4472,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/make-folders
   type: reliance
   name: folders made as needed
@@ -4513,12 +4514,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/file-created-mode
   type: reliance
   name: the permissions of a new file
@@ -4553,12 +4554,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/newlines-translated
   type: reliance
   name: line ends read and written as text
@@ -4599,12 +4600,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/text-decoding-strict
   type: reliance
   name: text decoded strictly
@@ -4650,12 +4651,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/runtime-version
   type: reliance
   name: the runtime's release
@@ -4686,12 +4687,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: C:reliance/run-as-module
   type: reliance
   name: a package run by its name
@@ -4725,12 +4726,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: P:assumption/append-is-whole
   type: assumption
   name: one short append lands whole
@@ -4755,7 +4756,7 @@ nodes:
     state: pending
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
@@ -4792,12 +4793,12 @@ nodes:
     answered: {ruling: {sources: [D:session/session-1], confidence: 1}}
   made:
     move: ground
-    run: 2026-11-18-1200-a901
+    run: 2026-11-22-1200-a901
     step: 1
     node: '1'
     engine: code
   ruling:
-    - {is: kept, by: R:maker/nobody-a-transconceiver-simulated-for-th, on: "2026-11-18", said: as proposed}
+    - {is: kept, by: R:maker/the-owner-as-transconceiver, on: "2026-11-22", said: as proposed}
 - id: D:question/modelled-on
   type: question
   about: I
@@ -4808,12 +4809,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/modelled-on
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4827,12 +4828,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/intended
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4846,12 +4847,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/intended
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4865,12 +4866,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/intended
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4884,12 +4885,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/intended
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4903,12 +4904,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/bad-input
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4922,12 +4923,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/bad-input
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4941,12 +4942,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/bad-input
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4960,12 +4961,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/bad-input
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4979,12 +4980,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/bad-input
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -4998,12 +4999,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/settings
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5017,12 +5018,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/settings
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5036,12 +5037,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/changed
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5055,12 +5056,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/changed
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5074,12 +5075,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/changed
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5093,12 +5094,12 @@ nodes:
   raised:
     by: bank
     from: fabulac/worry
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5113,18 +5114,18 @@ nodes:
   raised:
     by: bank
     from: transconception-standing/who-rules
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: "nobody: a transconceiver simulated for the conformance fixture of 0.8; no person ruled tally's transconception", value: "nobody: a transconceiver simulated for the conformance fixture of 0.8; no person ruled tally's transconception", confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [R:maker/nobody-a-transconceiver-simulated-for-th]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: "the owner, as transconceiver", value: "the owner, as transconceiver", confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [R:maker/the-owner-as-transconceiver]}
 - id: D:question/lane-mit
   type: question
   about: R:licence/mit#lane
@@ -5140,18 +5141,18 @@ nodes:
   raised:
     by: bank
     from: transconception-standing/lane
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: open, value: open, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [R:licence/mit#lane]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: open, value: open, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [R:licence/mit#lane]}
 - id: D:question/interface-command-tally
   type: question
   about: C:interface/command.tally#ruling
@@ -5187,18 +5188,18 @@ nodes:
   raised:
     by: bank
     from: transconception-rulings/interface
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [C:interface/command.tally#ruling, C:interface/command.add#ruling, C:interface/command.show#ruling, C:interface/command.undo#ruling, C:interface/format.ledger-line#ruling, C:interface/tally.ledger.add#ruling, C:interface/tally.cli.main#ruling, C:interface/tally.ledger.totals#ruling, C:interface/tally.render.rows#ruling, C:interface/tally.ledger.ledger_path#ruling, C:interface/tally.ledger.read#ruling, C:interface/tally.ledger.undo#ruling, C:interface/tally.ledger.LedgerError#ruling, C:interface/tally.render.empty_message#ruling]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [C:interface/command.tally#ruling, C:interface/command.add#ruling, C:interface/command.show#ruling, C:interface/command.undo#ruling, C:interface/format.ledger-line#ruling, C:interface/tally.ledger.add#ruling, C:interface/tally.cli.main#ruling, C:interface/tally.ledger.totals#ruling, C:interface/tally.render.rows#ruling, C:interface/tally.ledger.ledger_path#ruling, C:interface/tally.ledger.read#ruling, C:interface/tally.ledger.undo#ruling, C:interface/tally.ledger.LedgerError#ruling, C:interface/tally.render.empty_message#ruling]}
 - id: D:question/behaviour-undo
   type: question
   about: C:behaviour/undo#ruling
@@ -5225,18 +5226,18 @@ nodes:
   raised:
     by: bank
     from: transconception-rulings/behaviour
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [C:behaviour/undo#ruling, C:behaviour/read#ruling, C:behaviour/errors#ruling, C:behaviour/show#ruling, C:behaviour/add#ruling]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [C:behaviour/undo#ruling, C:behaviour/read#ruling, C:behaviour/errors#ruling, C:behaviour/show#ruling, C:behaviour/add#ruling]}
 - id: D:question/reliance-whole-numbers-unbounded
   type: question
   about: C:reliance/whole-numbers-unbounded#ruling
@@ -5315,18 +5316,18 @@ nodes:
   raised:
     by: bank
     from: transconception-rulings/reliance
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [C:reliance/whole-numbers-unbounded#ruling, C:reliance/number-as-text#ruling, C:reliance/truth-of-values#ruling, C:reliance/map-keeps-order#ruling, C:reliance/path-written#ruling, C:reliance/fractions-are-doubles#ruling, C:reliance/what-is-a-space#ruling, C:reliance/printed-form#ruling, C:reliance/argparse-surface#ruling, C:reliance/number-from-text#ruling, C:reliance/conversions#ruling, C:reliance/text-length-in-code-points#ruling, C:reliance/text-order-by-code-point#ruling, C:reliance/uncaught-error#ruling, C:reliance/error-kinds#ruling, C:reliance/exit-status-from-return#ruling, C:reliance/clock-seconds#ruling, C:reliance/json-written#ruling, C:reliance/json-keys-sorted#ruling, C:reliance/newlines-translated#ruling, C:reliance/text-decoding-strict#ruling, C:reliance/runtime-version#ruling, C:reliance/run-as-module#ruling, C:reliance/halves-round-to-even#ruling, C:reliance/division-gives-fraction#ruling, C:reliance/fraction-from-text#ruling, C:reliance/sort-is-stable#ruling, C:reliance/lines-end-at#ruling, C:reliance/text-repeated#ruling, C:reliance/format-spec#ruling, C:reliance/any-all-stop-early#ruling, C:reliance/set-members#ruling, C:reliance/set-order-varies#ruling, C:reliance/membership-identity-then-equality#ruling, C:reliance/records-compare-by-fields#ruling, C:reliance/lists-and-zip#ruling, C:reliance/error-text#ruling, C:reliance/chained-errors#ruling, C:reliance/missing-key-error#ruling, C:reliance/program-arguments#ruling, C:reliance/argparse-help#ruling, C:reliance/argparse-version#ruling, C:reliance/argparse-abbreviation#ruling, C:reliance/argparse-negative-numbers#ruling, C:reliance/argparse-optional-positional#ruling, C:reliance/argparse-subcommands#ruling, C:reliance/environment-read#ruling, C:reliance/terminal-width#ruling, C:reliance/print-line-end#ruling, C:reliance/output-encoding#ruling, C:reliance/json-read#ruling, C:reliance/home-and-tilde#ruling, C:reliance/path-kinds#ruling, C:reliance/make-folders#ruling, C:reliance/file-created-mode#ruling, C:reliance/pytest-conventions#ruling]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [C:reliance/whole-numbers-unbounded#ruling, C:reliance/number-as-text#ruling, C:reliance/truth-of-values#ruling, C:reliance/map-keeps-order#ruling, C:reliance/path-written#ruling, C:reliance/fractions-are-doubles#ruling, C:reliance/what-is-a-space#ruling, C:reliance/printed-form#ruling, C:reliance/argparse-surface#ruling, C:reliance/number-from-text#ruling, C:reliance/conversions#ruling, C:reliance/text-length-in-code-points#ruling, C:reliance/text-order-by-code-point#ruling, C:reliance/uncaught-error#ruling, C:reliance/error-kinds#ruling, C:reliance/exit-status-from-return#ruling, C:reliance/clock-seconds#ruling, C:reliance/json-written#ruling, C:reliance/json-keys-sorted#ruling, C:reliance/newlines-translated#ruling, C:reliance/text-decoding-strict#ruling, C:reliance/runtime-version#ruling, C:reliance/run-as-module#ruling, C:reliance/halves-round-to-even#ruling, C:reliance/division-gives-fraction#ruling, C:reliance/fraction-from-text#ruling, C:reliance/sort-is-stable#ruling, C:reliance/lines-end-at#ruling, C:reliance/text-repeated#ruling, C:reliance/format-spec#ruling, C:reliance/any-all-stop-early#ruling, C:reliance/set-members#ruling, C:reliance/set-order-varies#ruling, C:reliance/membership-identity-then-equality#ruling, C:reliance/records-compare-by-fields#ruling, C:reliance/lists-and-zip#ruling, C:reliance/error-text#ruling, C:reliance/chained-errors#ruling, C:reliance/missing-key-error#ruling, C:reliance/program-arguments#ruling, C:reliance/argparse-help#ruling, C:reliance/argparse-version#ruling, C:reliance/argparse-abbreviation#ruling, C:reliance/argparse-negative-numbers#ruling, C:reliance/argparse-optional-positional#ruling, C:reliance/argparse-subcommands#ruling, C:reliance/environment-read#ruling, C:reliance/terminal-width#ruling, C:reliance/print-line-end#ruling, C:reliance/output-encoding#ruling, C:reliance/json-read#ruling, C:reliance/home-and-tilde#ruling, C:reliance/path-kinds#ruling, C:reliance/make-folders#ruling, C:reliance/file-created-mode#ruling, C:reliance/pytest-conventions#ruling]}
 - id: D:question/setting-tally-file
   type: question
   about: C:setting/tally-file#ruling
@@ -5350,18 +5351,18 @@ nodes:
   raised:
     by: bank
     from: transconception-rulings/setting
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [C:setting/tally-file#ruling, C:setting/bar-width#ruling]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [C:setting/tally-file#ruling, C:setting/bar-width#ruling]}
 - id: D:question/structure-tally-ledger-entry
   type: question
   about: C:structure/tally.ledger.Entry#ruling
@@ -5381,18 +5382,18 @@ nodes:
   raised:
     by: bank
     from: transconception-rulings/structure
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: answered
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
   answers:
-    - {at: 2026-11-18T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
-  settled: {at: 2026-11-18T12:40:00Z, run: 2026-11-18-1240-a904, wrote: [C:structure/tally.ledger.Entry#ruling]}
+    - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  settled: {at: 2026-11-22T12:40:00Z, run: 2026-11-22-1240-a904, wrote: [C:structure/tally.ledger.Entry#ruling]}
 - id: D:question/first-need-roles-event
   type: question
   about: I:occasion/first-need#roles.event
@@ -5403,12 +5404,12 @@ nodes:
   raised:
     by: move
     from: question
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
@@ -5422,27 +5423,27 @@ nodes:
   raised:
     by: move
     from: question
-    at: 2026-11-18 12:10:00+00:00
-    run: 2026-11-18-1210-a903
+    at: 2026-11-22 12:10:00+00:00
+    run: 2026-11-22-1210-a903
   state: open
   made:
     move: gather
-    run: 2026-11-18-1210-a903
+    run: 2026-11-22-1210-a903
     step: 2
     node: '2'
     engine: code
 - id: D:session/session-1
   type: session
-  at: 2026-11-18T12:30:00Z
-  with: {to: transconceiver, who: "simulated for the conformance fixture: nobody sat; each ruling is answered as proposed, the rest from tally's own files"}
+  at: 2026-11-22T12:30:00Z
+  with: {to: transconceiver, who: "the owner, as transconceiver, by questionnaire in the 0.9 build, 2026-11-22 (the conductor's relay of the owner's answers to lane T1's sheet): \"Confirm all\""}
   through: person
   asked: [D:question/who-rules, D:question/lane-mit, D:question/interface-command-tally, D:question/behaviour-undo, D:question/reliance-whole-numbers-unbounded, D:question/setting-tally-file, D:question/structure-tally-ledger-entry]
   answered: [D:question/who-rules, D:question/lane-mit, D:question/interface-command-tally, D:question/behaviour-undo, D:question/reliance-whole-numbers-unbounded, D:question/setting-tally-file, D:question/structure-tally-ledger-entry]
   skipped: []
-- id: R:maker/nobody-a-transconceiver-simulated-for-th
+- id: R:maker/the-owner-as-transconceiver
   type: maker
-  name: "nobody: a transconceiver simulated for the"
-  summary: "nobody: a transconceiver simulated for the conformance fixture of 0.8; no person ruled tally's transconception"
+  name: the owner, as transconceiver
+  summary: the owner, as transconceiver
   stance: hearsay
   capacity: transconceiver
   provenance: {mode: dialectic, sources: [D:session/session-1], confidence: 1}

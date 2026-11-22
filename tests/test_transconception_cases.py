@@ -417,6 +417,25 @@ def test_gather_verdict_as_a_move_raises_nothing_and_states_its_evidence(tmp_pat
         TV.gather_outside(ctx(), Value("text", "{}"), **{"with": fab})
 
 
+def test_gather_verdict_names_who_ran_the_judge(tmp_path, sloppy):
+    """`by` from the call names who ran the judge (an agent may, for the owner's own code: 0.8 pins 9 and 21); left
+    out, the owner, as before."""
+    (tmp_path / "s.fabulac.cosm").write_bytes(SLOPPY.read_bytes())
+    (tmp_path / "told" / "py-roundtrip").mkdir(parents=True)
+    vp = tmp_path / "told" / "py-roundtrip" / "verdict.json"
+    vp.write_text(json.dumps(_verdict(passes=False)), encoding="utf-8")
+    fab = Value("fabula", sloppy, path=tmp_path / "s.fabulac.cosm")
+    verdict = Value("text", vp.read_text(encoding="utf-8"), path=vp, raw=vp.read_bytes())
+
+    def by(**mods):
+        return TV.gather_outside(ctx(), verdict, **{"with": fab}, **mods).mapping()["shorts"][0]["evidence"]["by"]
+    assert by().startswith("the judge, run by the owner")
+    assert by(by=Value("string", "an agent in the sandbox kit")).startswith("the judge, run by an agent in the "
+                                                                              "sandbox kit")
+    assert by(by="an agent").startswith("the judge, run by an agent") and "owner" not in by(by="an agent")
+    assert by(by="  ").startswith("the judge, run by the owner")
+
+
 def test_differences_from_verdict_is_the_shared_signature():
     assert list(inspect.signature(tc.differences_from_verdict).parameters) == ["verdict"]
     d = tc.differences_from_verdict(_verdict(passes=False))
