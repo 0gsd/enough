@@ -148,7 +148,7 @@ def tokenize(text: str) -> tuple[list[Tok], list[dict], str]:
                 kind, inner = "module-note", text[pos + 3:j - 2]
             else:
                 inner = text[pos + 2:j - 2]
-                kind = "header" if not toks and not comments else "inline"
+                kind = "header" if not toks and not any(not c["_dash"] for c in comments) else "inline"
             start_line = line
             advance_lines(pos, j)
             comments.append({"kind": kind, "line": start_line, "end": line, "on": "", "words": _words(inner),
@@ -274,6 +274,7 @@ monicity peel apply_fun apply_rules solve_by_elim exact_rules injection injectio
 haveI letI apply_assumption observe slim_check plausible extract_goal trans field_simp? module algebraize
 reduce whnf beta_reduce simp_intro norm_fin aesop_cat tfae_have tfae_finish match_scalars mod_cases
 induction_on cases_on simp_wf decreasing_tactic decreasing_trivial gcongr? positivity? fconstructor econstructor
+mod_cast cat_disch show_term simp_intro exact_mod_cast norm_num_ext rw_mod_cast refine? says
 """.split())
 TACTIC_WORDS = {"at", "using", "only", "generalizing", "with", "to", "says"}
 AUTOMATION = ("simp", "simpa", "aesop", "grind", "omega", "lia", "decide", "norm_num", "linarith", "nlinarith",
@@ -286,7 +287,8 @@ BINDER_SYMS = {"∀", "∃", "∃!", "Π", "Σ", "Σ'", "∑", "∏", "⋃", "�
 HAVE_WORDS = {"have", "haveI", "let", "letI", "set", "obtain", "suffices", "replace"}
 INTRO_WORDS = {"intro", "intros", "rintro", "ext", "ext1", "funext", "rename_i", "next", "case", "case'",
                "by_contra", "by_contra!", "by_contra'", "by_cases", "choose", "choose!", "induction'", "cases'",
-               "generalize", "peel", "wlog", "inhabit", "intro!"}
+               "generalize", "peel", "wlog", "inhabit", "introv", "rintros", "lift", "set!", "contrapose",
+               "push_neg", "by_contra_core", "intro_inst"}
 #: Attributes a declaration can be used through without being named (design 4.2, rule 1).
 PERHAPS_ATTRIBUTES = ("simp", "instance", "aesop", "grind", "ext", "fun_prop", "gcongr", "positivity", "norm_cast",
                       "push_cast", "norm_num")
@@ -369,7 +371,10 @@ class _Reader:
                                                              or t.text in ("@[", "end")):
                 begins = True
             elif t.kind == "id" and t.text in DECL_KINDS and t.text not in ("instance",) and not in_mutual:
-                self.indented.append(t.line)
+                prev = toks[i - 1] if i else None        # `@[…]` on the line above: the keyword is read after it
+                if not (prev is not None and (prev.text in _PREFIX_WORDS or (
+                        prev.text == "]" and start is not None and self._only_prefix(start, i)))):
+                    self.indented.append(t.line)
             if begins:
                 if start is not None:
                     spans.append((start, i))
@@ -381,6 +386,9 @@ class _Reader:
         if start is not None:
             spans.append((start, self.n))
         return self._merge_prefixes(spans)
+
+    def _only_prefix(self, s: int, i: int) -> bool:
+        return self._skip_prefix(s, i)[0] >= i
 
     def _skip_prefix(self, i: int, e: int) -> tuple[int, list[int], list[str]]:
         """Past the attributes and modifiers that open a command: (index, attribute-block starts, modifiers)."""
@@ -636,7 +644,9 @@ class _Reader:
             elif x in (",", "|") and depth > 0:
                 colon[-1] = False
             elif t.kind == "id":
-                if x in KEYWORDS:
+                if x == "_":
+                    pass
+                elif x in KEYWORDS:
                     if depth == 0:
                         live0 = False
                 elif not colon[-1] and (depth > 0 or live0) and "." not in x:
@@ -715,7 +725,7 @@ class _Reader:
             bound |= entry["bound"]
             opens_here += entry["opens"]
         # binders of the statement, and of the body
-        sig_colon = k_colon = j
+        k_colon = j
         while k_colon < (stop if stop is not None else e):
             t = toks[k_colon]
             if t.kind == "sym" and t.text in OPENERS:
@@ -727,10 +737,8 @@ class _Reader:
         sig_colon = k_colon
         bound.update(self.group_binders(j, sig_colon))
         skip: set[int] = set()
-        if kind == "alias":
-            pass
-        elif kind in ("structure", "class") and stop is not None and toks[stop].text == "where":
-            fields, ctor = self.structure_fields(stop, e, skip)
+        if kind in ("structure", "class") and stop is not None and toks[stop].text == "where":
+            fields, ctor = self.structure_fields(stop, e, skip, bound)
             bound.update(fields)
             generates += [f"{qual}.{f}" for f in fields] + [f"{qual}.{ctor or 'mk'}"]
             for p in self.parents(j, stop):
@@ -764,7 +772,8 @@ class _Reader:
             rec["note"] = {"line": note["line"], "end": note["end"]}
             note["on"] = qual
             note["_over"] = True
-        rec.update({"attributes": attributes, "modifiers": [m for m in mods if m in MODIFIERS], "scope": scope,
+        rec.update({"attributes": attributes, "modifiers": [m for m in mods if m in MODIFIERS],
+                    "scope": [dict(x) for x in scope],
                     "sorry": nsorry, "automation": auto, "generates": generates})
         if unknown:
             rec["generates-unknown"] = True
@@ -823,18 +832,29 @@ class _Reader:
                 break
         return got
 
-    def structure_fields(self, where: int, e: int, skip: set[int]) -> tuple[list[str], str | None]:
+    def structure_fields(self, where: int, e: int, skip: set[int],
+                         bound: set[str]) -> tuple[list[str], str | None]:
+        """A structure's or class's fields after `where` (each first on its line, at the fields' column), and its
+        constructor's name when `name ::` gives one; a field's own binders go into `bound`."""
         toks, fields, ctor = self.toks, [], None
+        col = None
         k = where + 1
         while k < e:
             t = toks[k]
-            if t.first and t.kind == "id" and t.text not in KEYWORDS | {"protected", "private"} or (
-                    t.first and t.text in ("protected", "private") and k + 1 < e):
-                kk = k
-                while kk < e and toks[kk].text in ("protected", "private"):
-                    kk += 1
-                if kk + 2 < e and toks[kk + 1].text == ":" and toks[kk + 2].text == ":" and toks[kk + 1].end == \
-                        toks[kk + 2].start:
+            if not t.first:
+                k += 1
+                continue
+            if col is None:
+                col = t.col
+            if t.col != col:
+                k += 1
+                continue
+            kk = k
+            while kk < e and toks[kk].text in ("protected", "private"):
+                kk += 1
+            if kk < e and toks[kk].kind == "id" and toks[kk].text not in KEYWORDS:
+                if kk + 2 < e and toks[kk + 1].text == ":" and toks[kk + 2].text == ":" and \
+                        toks[kk + 1].end == toks[kk + 2].start:
                     ctor = toks[kk].text
                     skip.add(kk)
                     k = kk + 3
@@ -843,16 +863,18 @@ class _Reader:
                     fields.append(toks[kk].text)
                     skip.add(kk)
                     kk += 1
+                bound.update(self.group_binders(kk, e))
                 k = kk
                 continue
-            if t.first and t.text == "(":
-                close = self.match[k]
-                for x in toks[k + 1:close]:
+            if kk < e and toks[kk].text == "(":
+                close = self.match[kk]
+                for m in range(kk + 1, close):
+                    x = toks[m]
                     if x.text == ":":
                         break
                     if x.kind == "id":
                         fields.append(x.text)
-                        skip.add(toks.index(x, k, close))
+                        skip.add(m)
                 k = close + 1
                 continue
             k += 1
@@ -891,7 +913,6 @@ class _Reader:
         """A body's `where` after `:=`: the auxiliary declarations it makes (`foo.go`)."""
         toks, out = self.toks, []
         k = a
-        depth = 0
         where = None
         while k < e:
             t = toks[k]
@@ -915,7 +936,6 @@ class _Reader:
                 out.append(t.text)
                 skip.add(k)
                 bound.update(self.group_binders(k + 1, e))
-        del depth
         return out
 
     def body_binders(self, a: int, e: int, bound: set[str], kind: str) -> None:
@@ -932,16 +952,14 @@ class _Reader:
                         {"|"} if x == "obtain" else set()), pattern=True, eol=True))
                 elif x == "with":
                     bound.update(self.collect(k + 1, e, {"=>", ":=", ";", "<;>"}, pattern=True, eol=True))
-                elif x in INTRO_WORDS:
+                elif x in INTRO_WORDS or x.rstrip("!?") in INTRO_WORDS:
                     bound.update(self.collect(k + 1, e, {":", ":=", "using", "at", "with", ";", "<;>", "=>", "to"},
                                               pattern=True, eol=True))
-                elif x in ("rcases", "obtain", "rintro", "cases", "induction", "match"):
-                    pass
             elif t.kind == "sym":
                 if x == "λ":
                     if k + 1 < e and toks[k + 1].text != "|":
                         bound.update(self.collect(k + 1, e, {"=>", "↦", ","}, pattern=True, eol=False))
-                elif x in BINDER_SYMS or (x in ("∀", "∃") and False):
+                elif x in BINDER_SYMS:
                     kk = k + 1
                     while kk < e and toks[kk].kind == "sym" and toks[kk].text in ("ᶠ", "!", "'", "ˢ") and \
                             toks[kk].start == toks[kk - 1].end:
@@ -1009,7 +1027,8 @@ class _Reader:
                     auto.append(base)
             if x in KEYWORDS or x == "_" or k in skip:
                 continue
-            if by_stack and (x in TACTICS or x in TACTIC_WORDS):
+            if by_stack and (x in TACTICS or x in TACTIC_WORDS or x.rstrip("!?") in TACTICS
+                             or x.rstrip("!?") in TACTIC_WORDS):
                 continue
             if k + 1 < e and toks[k + 1].text == ":=":
                 continue
@@ -1473,8 +1492,6 @@ def reach(g: dict, targets: Any = None) -> dict:
         succ[u] = [v for v in uses.get(u) or [] if v in depth]
     idom = _dominators(reached, succ, ROOT)
     size: dict[str, int] = {u: 1 for u in reached}
-    for u in sorted(reached, key=lambda x: -depth[x]):
-        pass
     # subtree sizes: children before parents, by a post-order of the dominator tree
     kids: dict[str, list[str]] = {}
     for v, p in idom.items():
