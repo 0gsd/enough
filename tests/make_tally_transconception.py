@@ -605,8 +605,32 @@ def _expected(dest: Path, program: str, plan: dict) -> None:
     _write(exp / "plan.cosm", mc.dump(pl.normalise(plan)))
 
 
+class _StillClock:
+    """`time` as the code engines see it while the maker runs, with `monotonic` held still: a step's `seconds` is
+    the wall time it took, so a slow machine once recorded 1 where the fixture holds 0 (0.9 build, CI)."""
+
+    def __init__(self, real: Any) -> None:
+        self._real = real
+
+    def monotonic(self) -> float:
+        return 0.0
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._real, name)
+
+
 def make(dest: Path = DEST, scratch: Path | None = None) -> Path:
     """Write the fixture's made parts into `dest` (its README and tally.cases.json are kept as they are)."""
+    from enough.thym import engines
+    real = engines.time
+    engines.time = _StillClock(real)
+    try:
+        return _make(dest, scratch)
+    finally:
+        engines.time = real
+
+
+def _make(dest: Path, scratch: Path | None) -> Path:
     import tempfile
     dest = Path(dest)
     for sub in ("programs", "expected", "replay", "inputs", "landed", "recorded"):

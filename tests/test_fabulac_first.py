@@ -486,9 +486,19 @@ def test_a_run_s_folder_goes_once_its_result_is_read(project: Path, scripted: No
     FF.entail(project, "tally", now=NOW)
     fab, run = FF.prepare(project, "tally", what="tests")
     assert run.folder.is_dir()
+    try:
+        sb.machinery()
+        boxed = True
+    except sb.Refusal:
+        boxed = False
     if MAC:
         out = FF.execute(project, fab, run, what="tests")
         assert out["ok"] and out["run"] == run.run_id
+    elif boxed:
+        # Linux with bubblewrap (GitHub's runners have it): the box may or may not hold there, but the run is
+        # its own either way, and its folder goes once its result is read.
+        out = FF.execute(project, fab, run, what="tests")
+        assert out["run"] == run.run_id
     else:
         with pytest.raises(FF.FirstError):
             FF.execute(project, fab, run, what="tests")
