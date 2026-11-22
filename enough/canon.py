@@ -527,14 +527,29 @@ def emf_state(text: Path, twin: Path, header: dict[str, Any] | None = None) -> s
     except OSError:
         return "stale"
     if st.st_size == src.get("size") and st.st_mtime_ns == src.get("mtime_ns"):
-        return "fresh"
+        return _rule_state(text, hdr)
     want = src.get("sha256")
     if not isinstance(want, str) or not want:
         return "stale"
     try:
-        return "fresh" if _sha256_file(text) == want.strip().lower() else "stale"
+        return _rule_state(text, hdr) if _sha256_file(text) == want.strip().lower() else "stale"
     except OSError:
         return "stale"
+
+
+def _rule_state(text: Path, header: dict[str, Any]) -> str:
+    """``stale`` when the twin's rules scaffold atem predates Canon's reading sentences by Thym's one rule
+    (`canon_derive.scaffold_atem_behind`), else ``fresh``. Only a rules-mode twin with a scaffold atem reads the
+    text; every other twin costs nothing more."""
+    derived = header.get("derived") if isinstance(header, dict) else None
+    if not (isinstance(derived, dict) and derived.get("mode") == "rules" and isinstance(header.get("atem"), dict)):
+        return "fresh"
+    from . import canon_derive        # late: canon_derive imports this module
+    try:
+        body = text.read_text(encoding="utf-8-sig", errors="replace")
+    except OSError:
+        return "fresh"
+    return "stale" if canon_derive.scaffold_atem_behind(header, body) else "fresh"
 
 
 def _atem_line(header: dict[str, Any]) -> str | None:

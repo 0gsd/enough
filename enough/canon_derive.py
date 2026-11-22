@@ -41,6 +41,7 @@ from . import canon_prompts as P
 from . import fabula_names as _names
 from . import macrocosm
 from . import verse as _verse
+from .thym.checks import ABBREVIATIONS as _ABBREVIATIONS, split_sentences
 
 FABULA_OES = _names.OES                    # what a writer writes
 EMF_OES = _names.OLD_OES                   # the old spelling: read, never written
@@ -178,7 +179,7 @@ NAME_CONNECTORS = frozenset("of the de du la le von van der den del da di".split
 # Leading words stripped from a capitalised run when they only start the sentence.
 _LEADERS = frozenset("the a an this that these those our my his her their its we every each some in on at for "
                      "from to by with if when while after before because but and or so then".split())
-_ABBREVIATIONS = frozenset("mr mrs ms dr prof st vs etc eg ie jr sr no fig".split())
+# The abbreviations that end no sentence are Thym's (`enough.thym.checks.ABBREVIATIONS`), imported above: one list.
 
 _RESERVED_SLUGS = frozenset(["con", "prn", "aux", "nul"] + [f"com{i}" for i in range(10)]
                             + [f"lpt{i}" for i in range(10)])
@@ -677,7 +678,6 @@ _INLINE_MD = [
     (re.compile(r"(?<![\w*])[*_]([^*_]+)[*_](?![\w*])"), r"\1"),
     (re.compile(r"<[^>]+>"), ""),
 ]
-_SENTENCE_SPLIT = re.compile(r"(?<=[.!?])[\"'”’)\]]*\s+(?=[\"'“‘(\[]?[A-Z0-9])")
 
 
 def _paragraphs(text: str) -> list[str]:
@@ -722,18 +722,14 @@ def _paragraphs(text: str) -> list[str]:
 
 
 def sentences(text: str, limit: int | None = None) -> list[str]:
-    """The text's prose sentences in order (markdown stripped), at most `limit`."""
+    """The text's prose sentences in order (markdown stripped), at most `limit`. Canon has no sentence rule of its
+    own: a paragraph splits by Thym's one rule, `enough.thym.checks.split_sentences` (a closing quotation mark or
+    bracket after a stop stays with its sentence, an abbreviation ends none; the owner's ruling of 2026-11-22)."""
     out: list[str] = []
     for para in _paragraphs(text):
-        parts = _SENTENCE_SPLIT.split(para)
-        merged: list[str] = []
-        for s in parts:
-            last = merged[-1].split()[-1].lower().rstrip(".") if merged else ""
-            if merged and last in _ABBREVIATIONS:
-                merged[-1] = f"{merged[-1]} {s}"
-            else:
-                merged.append(s)
-        for s in merged:
+        for s in split_sentences(para):
+            if not s.strip():
+                continue
             out.append(s.strip())
             if limit is not None and len(out) >= limit:
                 return out
@@ -1170,6 +1166,29 @@ def atem_block(atem: dict) -> dict:
 
 def _atem_is_scaffold(atem: dict) -> bool:
     return any(macrocosm.is_pending(atem.get(p)) for p in ("push", "pull"))
+
+
+_MARK_AFTER_STOP = re.compile(r"([.!?])[\"'”’)\]]+")
+
+
+def scaffold_atem_behind(header: dict, text: str) -> bool:
+    """Whether a twin's file atem is a rules scaffold made before Canon read sentences by Thym's rule (the owner,
+    2026-11-22): its line or focus differs from what `rules_atem` makes of `text` now only by the closing marks a
+    stop kept (`"Go."` where it said `"Go.`). Such a twin is stale, and deriving its atem again re-makes it by rule.
+    A model's atem, or a line a person wrote, differs by more than those marks and is left alone."""
+    derived = header.get("derived") if isinstance(header, dict) else None
+    atem = header.get("atem") if isinstance(header, dict) else None
+    if not (isinstance(derived, dict) and derived.get("mode") == "rules" and isinstance(atem, dict)
+            and _atem_is_scaffold(atem)):
+        return False
+    now = rules_atem(text)
+    for part in ("line", "focus"):
+        had, want = atem.get(part), now.get(part)
+        if isinstance(had, str) and isinstance(want, str):
+            had, want = " ".join(had.split()), " ".join(want.split())
+            if had != want and _MARK_AFTER_STOP.sub(r"\1", had) == _MARK_AFTER_STOP.sub(r"\1", want):
+                return True
+    return False
 
 
 def _atem_messages(text: str, context: str | None) -> list[dict]:

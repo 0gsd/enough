@@ -346,6 +346,38 @@ def test_rules_atem_scaffold_and_cut():
     assert CD.derive_atem("# Just a title\n")["line"] == "Just a title"
 
 
+def test_canon_reads_sentences_by_thyms_one_rule():
+    """The owner, 2026-11-22: Canon follows Thym's ruling A. A closing mark after a stop stays with its sentence,
+    and Canon keeps no rule of its own."""
+    from enough.thym import checks
+    assert not hasattr(CD, "_SENTENCE_SPLIT")
+    assert CD._ABBREVIATIONS is checks.ABBREVIATIONS
+    text = 'He said "Go." Then he left. Dr. Okafor came (later.) She asked “Why?” Nobody knew.'
+    assert CD.sentences(text) == ['He said "Go."', "Then he left.", "Dr. Okafor came (later.)", "She asked “Why?”",
+                                  "Nobody knew."]
+    assert CD.sentences(text) == checks.split_sentences(text)
+    assert CD.rules_atem(text)["line"] == 'He said "Go."'
+
+
+def test_a_scaffold_made_by_the_old_rule_is_stale(tmp_path):
+    """A rules scaffold whose line lost a closing mark under Canon's old rule reads as stale, so it is derived again;
+    a model's atem, and a scaffold the rule still makes, stay fresh."""
+    text = tmp_path / "said.md"
+    text.write_text('She said "Wait." The rain came.\n', encoding="utf-8")
+    body, stat = CD.read_source(text)
+    twin = tmp_path / "said.md.fabulan.cosm"
+    now_made = CD.set_file_atem(None, CD.rules_atem(body), source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(now_made, encoding="utf-8")
+    assert canon.emf_state(text, twin) == "fresh"
+    twin.write_text(now_made.replace('"Wait."', '"Wait.'), encoding="utf-8")
+    hdr = canon.twin_header(twin)
+    assert hdr["atem"]["line"] == 'She said "Wait.', hdr["atem"]
+    assert canon.emf_state(text, twin) == "stale"
+    model = CD.set_file_atem(None, MODEL_ATEM, source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(model, encoding="utf-8")
+    assert canon.emf_state(text, twin) == "fresh"
+
+
 # ---------------------------------------------------------------------------
 # Pins and the file atem
 # ---------------------------------------------------------------------------
