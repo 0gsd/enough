@@ -8,7 +8,7 @@ None judges whether the mathematics or the teaching is good. None reads the Lean
 (2.B) and of a pshort (2.C) are Thym's (`enough/thym/moves/proof.py`).
 
 A fabulam is built in stages, and each stage lands a fabulam that must pass `fabula-checks`. So a check that asks for
-something a later stage writes (every statement's yield, the stages and the telling, the worked example, the comment
+something a later stage writes (every statement's yield, the stages and the teaching, the worked example, the comment
 verdicts, a reached lemma's role, the fit) holds it only once the volume says it is whole (`derived.completeness:
 full`) or once that layer has begun (one yield, one stage, one verdict, one role, one fit is there). What is there is
 always held to its shape.
@@ -400,8 +400,8 @@ class _Fabulam:
 
     def stages_whole(self) -> None:
         stages = self.stages
-        telling = self.cat.get("telling")
-        if not stages and not self.full and telling is None:
+        teaching = self.cat.get("teaching")
+        if not stages and not self.full and teaching is None:
             return
         if not stages and self.full and not self.head:
             self.add("stages-whole", None, "a whole fabulam tells its argument in stages (C:part, division: stage)",
@@ -433,22 +433,22 @@ class _Fabulam:
             if not _given(st.data.get("obvious")):
                 self.add("stages-whole", st, f"{st.id} is the reduction and says the obvious way, and why it fails "
                                              "(or none: the file's way is the obvious one)", "obvious")
-        if mc.is_pending(telling):
+        if mc.is_pending(teaching):
             return
-        if not isinstance(telling, list):
-            self.add("stages-whole", None, "telling lists every stage's id once, the reduction first", "telling")
+        if not isinstance(teaching, list):
+            self.add("stages-whole", None, "teaching lists every stage's id once, the reduction first", "teaching")
             return
         ids = [st.id for st in stages]
-        if sorted(map(str, telling)) != sorted(ids) or len(set(map(str, telling))) != len(telling):
-            self.add("stages-whole", None, "telling lists every stage once, and nothing else", "telling")
+        if sorted(map(str, teaching)) != sorted(ids) or len(set(map(str, teaching))) != len(teaching):
+            self.add("stages-whole", None, "teaching lists every stage once, and nothing else", "teaching")
             return
         ranks = [STAGE_ORDER.index(self.by_id[t].data.get("stage")) if self.by_id[t].data.get("stage")
-                 in STAGE_ORDER else 9 for t in telling]
+                 in STAGE_ORDER else 9 for t in teaching]
         if ranks and ranks[0] != 0:
-            self.add("stages-whole", None, f"telling starts with the reduction, not {telling[0]}", "telling")
+            self.add("stages-whole", None, f"teaching starts with the reduction, not {teaching[0]}", "teaching")
         elif ranks != sorted(ranks):
-            self.add("stages-whole", None, "telling goes reduction, then main, tool, side and close stages, in that "
-                                           "order", "telling")
+            self.add("stages-whole", None, "teaching goes reduction, then main, tool, side and close stages, in that "
+                                           "order", "teaching")
 
     def _grounds(self, it: mc.Item, g: Any, fld: str) -> None:
         if mc.is_pending(g):

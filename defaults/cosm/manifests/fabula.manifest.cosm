@@ -59,7 +59,7 @@ volume:
 
 catalog:
   keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, head, parts,
-         atem, telling, audit, shorts, catems, entailed, nodes]       # telling, audit: a fabulam's only (18.4.10)
+         atem, teaching, audit, shorts, catems, entailed, nodes]       # teaching, audit: a fabulam's only (18.4.10)
   purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
                                                        # checks and gates of transconception (MacroCOSM OES 18.4.9),
                                                        # written after flavour; enough/transconception.py runs them
@@ -132,7 +132,7 @@ catalog:
   source-checking-fields: [sorry, axioms, native-decide, said, said-by, said-at, built-here]
                                                        # built-here is always "no"; said, said-by, said-at are the
                                                        # person's own entry, never a model's
-  telling-form: 'the ids of every stage (C:part, division: stage), in the order a teacher would tell them, the
+  teaching-form: 'the ids of every stage (C:part, division: stage), in the order a teacher would tell them (the teaching), the
                  reduction first'
   audit-fields: [lines, kind, 'on', verdict, claim]    # one row per comment of the file, made at the survey
   audit-kind: [header, module-note, note, inline]
@@ -556,7 +556,7 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {as: [layout], contract: [target-confirmed, surface-answered, no-invention, footer, provenance]}
         - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
         - {as: [cases], contract: [cases-whole, provenance]}
-        - {as: [expert, student, everyone], contract: [cites-resolve, every-sentence-cited, yield-cited, telling-followed,
+        - {as: [expert, student, everyone], contract: [cites-resolve, every-sentence-cited, yield-cited, teaching-followed,
                                                        no-up-to, example-worked, nothing-added, checking-told,
                                                        confidence-told, symbols-worded, apart, length, footer, provenance]}
       scaffold-when:                    # code has none: --rules refuses it; cases needs no model, so its scaffold is itself

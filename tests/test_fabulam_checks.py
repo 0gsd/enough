@@ -109,11 +109,11 @@ def _spine_out_of_stages(doc):
 def _two_reductions(doc):
     _node(doc, CLOSE)["stage"] = "reduction"
     _node(doc, CLOSE)["obvious"] = "none: the file's way is the obvious one"
-    doc["telling"] = [RED, CLOSE, MAIN]
+    doc["teaching"] = [RED, CLOSE, MAIN]
 
 
-def _telling_reversed(doc):
-    doc["telling"] = list(reversed(doc["telling"]))
+def _teaching_reversed(doc):
+    doc["teaching"] = list(reversed(doc["teaching"]))
 
 
 def _row_unnamed_claim(doc):
@@ -176,7 +176,7 @@ BREAKS = [
     ("spine-told", _set(BOOK, reached="perhaps")),
     ("stages-whole", _set(CLOSE, number=4)),
     ("stages-whole", _two_reductions),
-    ("stages-whole", _telling_reversed),
+    ("stages-whole", _teaching_reversed),
     ("stages-whole", _pop(RED, "obvious")),
     ("grounds-given", _set(YIELD, grounds=[])),
     ("grounds-given", _set("C:step/order-k-divides-p-minus-one",

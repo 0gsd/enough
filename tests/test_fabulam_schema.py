@@ -27,7 +27,7 @@ def m():
 def test_the_flavour_and_the_catalog(m):
     assert m.flavours == ["fabulan", "fabulap", "fabulac", "fabulam"] and m.flavour_absent == "fabulan"
     cat = m.data["catalog"]
-    assert {"telling", "audit"} <= set(cat["keys"])
+    assert {"teaching", "audit"} <= set(cat["keys"])
     assert cat["source-checking-fields"] == ["sorry", "axioms", "native-decide", "said", "said-by", "said-at",
                                              "built-here"]
     assert cat["source-proof-fields"][:5] == ["path", "kind", "language", "toolchain", "module"]
@@ -125,7 +125,7 @@ def test_the_thym1_calls(m):
     assert all(d in en["modifiers"]["as"] for d in dens)
     assert {"as": dens, "gives": "short"} in en["gives-when"]
     rule = next(r for r in en["contract-when"] if r.get("as") == dens)
-    assert rule["contract"][:4] == ["cites-resolve", "every-sentence-cited", "yield-cited", "telling-followed"]
+    assert rule["contract"][:4] == ["cites-resolve", "every-sentence-cited", "yield-cited", "teaching-followed"]
     assert {"as": dens, "scaffold": "none"} in en["scaffold-when"]
     assert [mv["name"] for mv in m.data["moves"]].count("survey") == 1      # no new move (design 5.1)
 

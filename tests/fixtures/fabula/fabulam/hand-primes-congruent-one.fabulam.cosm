@@ -30,7 +30,7 @@ atem:
   focus: primes one more than a multiple of k
   push: there is no list of them to count
   pull: past any number the proof builds one more
-telling: [C:part/what-must-be-found, C:part/a-number-built-to-have-the-right-factor, C:part/from-one-to-many]
+teaching: [C:part/what-must-be-found, C:part/a-number-built-to-have-the-right-factor, C:part/from-one-to-many]
 audit:
   - {lines: "1-5", kind: header, on: "", verdict: nothing}
   - {lines: "10-15", kind: module-note, on: "", verdict: claim, claim: P:claim/module-note-infinitely-many}
