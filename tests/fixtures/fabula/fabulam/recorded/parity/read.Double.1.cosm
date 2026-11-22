@@ -1,0 +1,15 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `read` over own/Parity/Double.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: read
+tokens: 0
+seconds: 0
+output: |
+  declarations:
+    - lean: "Parity.double_add"
+      says: 'For all natural numbers a and b, 2 · a + 2 · b = 2 · (a + b).'
+      role: support
+      method: 'One rewrite by the distributive law.'
+  reliances:
+    - {slug: the-distributive-law, name: 'Multiplication distributes over addition', lean: [Nat.mul_add], known-as: 'the distributive law', field: arithmetic, case: 'for natural numbers', gives: 'For all natural numbers a, b and c, a · (b + c) = a · b + a · c.'}

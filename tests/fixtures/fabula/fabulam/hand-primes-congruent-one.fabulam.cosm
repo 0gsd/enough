@@ -1,0 +1,379 @@
+# Hand-written for the fabulam schema's tests (tests/test_fabulam_schema.py, tests/test_fabulam_checks.py): a small,
+# complete, valid fabulam of Mathlib's Mathlib/NumberTheory/PrimesCongruentOne.lean (Apache-2.0), written by a
+# person from the design (docs/v090-fabulam-design.md, sections 1 and 2.A). It is not the pipeline's fabulam of the
+# file: that fixture comes from a later lane. Lines and names are the file's at Mathlib's commit 6ebcce37.
+oes: fabula/1
+flavour: fabulam
+id: fabula/hand-primes-congruent-one
+name: hand-primes-congruent-one
+source:
+  path: PrimesCongruentOne.lean
+  kind: text
+  language: lean
+  toolchain: leanprover/lean4:v4.37.0-rc1
+  module: Mathlib.NumberTheory.PrimesCongruentOne
+  lines: 75
+  size: 3151
+  sha256: 5130258351145d9fef49db0c6ef1f6146fbbb3fbb59e75380c281bdc6da47678
+  imports: [Mathlib.RingTheory.Polynomial.Cyclotomic.Eval]
+  commit: 6ebcce37335bcb6bca64596e5d57bb3035648030
+  licence: Apache-2.0
+  obtained: public
+  target: ["Nat.infinite_setOfPred_prime_modEq_one"]
+  target-by: rule
+  read: {by: rules, elaborated: "no", comments: blanked}
+  checking: {sorry: 0, axioms: 0, native-decide: 0, built-here: "no"}
+derived: {at: "2026-11-22T12:00:00Z", by: person, completeness: full}
+atem:
+  of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  line: For every whole number k that is not zero, infinitely many primes leave remainder 1 when divided by k.
+  focus: primes one more than a multiple of k
+  push: there is no list of them to count
+  pull: past any number the proof builds one more
+teaching: [C:part/what-must-be-found, C:part/a-number-built-to-have-the-right-factor, C:part/from-one-to-many]
+audit:
+  - {lines: "1-5", kind: header, on: "", verdict: nothing}
+  - {lines: "10-15", kind: module-note, on: "", verdict: claim, claim: P:claim/module-note-infinitely-many}
+  - {lines: "26-27", kind: note, on: C:lemma/Nat.exists_prime_gt_modEq_one, verdict: agrees}
+  - {lines: "67", kind: note, on: C:statement/Nat.infinite_setOfPred_prime_modEq_one, verdict: agrees}
+nodes:
+  # ---------------------------------------------------------------- the file and what it leans on
+  - id: C:file/PrimesCongruentOne-lean
+    type: file
+    name: PrimesCongruentOne.lean
+    summary: The Lean file, one module of Mathlib.
+    path: PrimesCongruentOne.lean
+    language: lean
+    length: {lines: 75, bytes: 3151}
+    sha256: 5130258351145d9fef49db0c6ef1f6146fbbb3fbb59e75380c281bdc6da47678
+    opens: [Polynomial, Nat, Filter]
+    limits: [The file was read as text; the notation it uses was not expanded.]
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean"], confidence: 1}
+  - id: C:dependency/mathlib
+    type: dependency
+    name: Mathlib
+    summary: The library the file imports its one module from.
+    package: mathlib
+    version: 6ebcce37335bcb6bca64596e5d57bb3035648030
+    scope: standard
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L8"], confidence: 1}
+  - id: C:reliance/exists-infinite-primes
+    type: reliance
+    name: there are infinitely many primes
+    summary: Past any number there is a prime.
+    'on': dependency
+    of: C:dependency/mathlib
+    lean: [exists_infinite_primes]
+    known-as: Euclid's theorem
+    field: number theory
+    case: in the form that past any n there is a prime
+    gives: For every n there is a prime p with n ≤ p.
+    stance: assumed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L31"], confidence: 1}
+  - id: C:reliance/root-of-cyclotomic-has-order-k
+    type: reliance
+    name: a root of the k-th cyclotomic polynomial has order k
+    summary: Modulo a prime that does not divide k, a root of the k-th cyclotomic polynomial has multiplicative order k.
+    'on': dependency
+    of: C:dependency/mathlib
+    lean: [isRoot_cyclotomic_iff]
+    field: algebra
+    case: over the integers modulo p, with k not zero there
+    gives: In a field where k is not zero, x is a root of the k-th cyclotomic polynomial exactly when x is a primitive k-th root of unity.
+    stance: assumed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L57"], confidence: 1}
+  - id: C:reliance/order-divides-p-minus-one
+    type: reliance
+    name: an order modulo p divides p - 1
+    summary: The order of a nonzero number modulo a prime p divides p - 1.
+    'on': dependency
+    of: C:dependency/mathlib
+    lean: [ZMod.orderOf_dvd_card_sub_one]
+    known-as: Fermat's little theorem
+    field: number theory
+    case: in the form that the order divides p - 1
+    gives: For a prime p and a number b not divisible by p, the order of b modulo p divides p - 1.
+    stance: assumed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L53-L54"], confidence: 1}
+  # ---------------------------------------------------------------- the declarations
+  - id: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    type: statement
+    name: infinitely many primes are 1 mod k
+    summary: For every k that is not 0, the primes p with p ≡ 1 (mod k) form an infinite set.
+    lean: "Nat.infinite_setOfPred_prime_modEq_one"
+    span: {file: PrimesCongruentOne.lean, lines: "68-70"}
+    says: For every natural number k with k ≠ 0, the set of primes p with p ≡ 1 (mod k) is infinite.
+    quantifiers:
+      - {kind: for-all, what: every natural number k with k ≠ 0}
+      - {kind: infinitely-many, what: primes p with p ≡ 1 (mod k)}
+    uses: [C:lemma/Nat.frequently_atTop_modEq_one]
+    leans-on: []
+    form: theorem
+    reached: "yes"
+    depth: 0
+    carries: 2
+    proof: term
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L68-L70"], confidence: 1}
+  - id: C:lemma/Nat.exists_prime_gt_modEq_one
+    type: lemma
+    name: a prime 1 mod k beyond any n
+    summary: For every n and every k that is not 0 there is a prime p > n with p ≡ 1 (mod k).
+    lean: "Nat.exists_prime_gt_modEq_one"
+    form: theorem
+    span: {file: PrimesCongruentOne.lean, lines: "28-59"}
+    says: For every n and every k that is not 0 there is a prime p with p > n and p ≡ 1 (mod k).
+    uses: []
+    used-by: [C:lemma/Nat.frequently_atTop_modEq_one]
+    leans-on: [C:reliance/exists-infinite-primes, C:reliance/root-of-cyclotomic-has-order-k, C:reliance/order-divides-p-minus-one]
+    reached: "yes"
+    depth: 2
+    carries: 0
+    private: "no"
+    proof: tactic
+    sorry: 0
+    automation: [simp]
+    scope: []
+    role: spine
+    method: It takes the least prime factor of the k-th cyclotomic polynomial at k · n!, and shows that prime exceeds n and is 1 mod k.
+    why: Without it nothing produces a prime of the right kind. It turns "infinitely many" into "one beyond any n".
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L28-L59"], confidence: 1}
+  - id: C:lemma/Nat.frequently_atTop_modEq_one
+    type: lemma
+    name: primes 1 mod k occur arbitrarily far out
+    summary: For every k that is not 0, primes p ≡ 1 (mod k) occur beyond every bound.
+    lean: "Nat.frequently_atTop_modEq_one"
+    form: theorem
+    span: {file: PrimesCongruentOne.lean, lines: "61-65"}
+    says: For every k that is not 0, frequently along the natural numbers p is a prime with p ≡ 1 (mod k).
+    uses: [C:lemma/Nat.exists_prime_gt_modEq_one]
+    used-by: [C:statement/Nat.infinite_setOfPred_prime_modEq_one]
+    leans-on: []
+    reached: "yes"
+    depth: 1
+    carries: 1
+    private: "no"
+    proof: tactic
+    sorry: 0
+    automation: []
+    scope: []
+    role: bookkeeping
+    method: It restates the lemma before it in the language of filters.
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L61-L65"], confidence: 1}
+  - id: C:definition/Nat.infinite_setOf_prime_modEq_one
+    type: definition
+    name: the old name of the statement
+    summary: A deprecated alias, kept so that older uses still find the statement.
+    lean: "Nat.infinite_setOf_prime_modEq_one"
+    form: alias
+    span: {file: PrimesCongruentOne.lean, lines: "72-73"}
+    says: Another name for the statement, marked deprecated since 2026-07-09.
+    reached: "no"
+    depth: 0
+    carries: 0
+    private: "no"
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L72-L73"], confidence: 1}
+  # ---------------------------------------------------------------- steps and the constant
+  - id: C:step/the-value-exceeds-one
+    type: step
+    name: the value exceeds one
+    summary: For k at least 2 the cyclotomic value at k · n! is larger than 1 in size, so it has a prime factor.
+    inside: C:lemma/Nat.exists_prime_gt_modEq_one
+    says: For k at least 2 the k-th cyclotomic polynomial at b = k · n! has absolute value larger than 1, so its least prime factor p exists.
+    span: {file: PrimesCongruentOne.lean, lines: "34-42"}
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L34-L42"], confidence: 0.5}
+  - id: C:step/b-is-a-root-mod-p
+    type: step
+    name: b is a root modulo p
+    summary: Because p divides the value, b is a root of the cyclotomic polynomial modulo p, and p does not divide b.
+    inside: C:lemma/Nat.exists_prime_gt_modEq_one
+    says: Modulo p, b is a root of the k-th cyclotomic polynomial; such a root is prime to p, so p does not divide b.
+    span: {file: PrimesCongruentOne.lean, lines: "43-50"}
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L43-L50"], confidence: 0.5}
+  - id: C:step/order-k-divides-p-minus-one
+    type: step
+    name: the order k divides p - 1
+    summary: The order of b modulo p is k and divides p - 1, so p ≡ 1 (mod k).
+    inside: C:lemma/Nat.exists_prime_gt_modEq_one
+    says: The order of b modulo p divides p - 1 and equals k, so k divides p - 1.
+    span: {file: PrimesCongruentOne.lean, lines: "53-59"}
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L53-L59"], confidence: 0.5}
+  - id: C:constant/the-point
+    type: constant
+    name: the point k · n!
+    summary: The number the cyclotomic polynomial is evaluated at.
+    says: The proof evaluates the k-th cyclotomic polynomial at k times n factorial.
+    value: k * n!
+    why: Every number from 1 to n divides it, so a prime that does not divide it exceeds n.
+    where: [C:lemma/Nat.exists_prime_gt_modEq_one]
+    confidence: medium
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L33"], confidence: 0.35}
+  # ---------------------------------------------------------------- the stages
+  - id: C:part/what-must-be-found
+    type: part
+    name: what must be found
+    summary: The statement asks for infinitely many such primes; it is enough to find one beyond any given number.
+    division: stage
+    number: 1
+    stage: reduction
+    says: An infinite set is one with an element beyond every bound, so the proof only has to find, for each n, one prime larger than n that is 1 mod k.
+    plain: To show there is no end to these special primes, it is enough to show that however far you go, there is always one further on.
+    plain-if: none
+    obvious: The obvious way is to list the primes that leave remainder 1 and show the list never ends; nothing lists them, so the file shows instead that past any number there is one more.
+    steps: [C:statement/Nat.infinite_setOfPred_prime_modEq_one, C:lemma/Nat.frequently_atTop_modEq_one]
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L61-L70"], confidence: 0.5}
+  - id: C:part/a-number-built-to-have-the-right-factor
+    type: part
+    name: a number built to have the right factor
+    summary: A cyclotomic value at k · n! has a prime factor beyond n that is 1 mod k.
+    division: stage
+    number: 2
+    stage: main
+    says: The least prime factor of the k-th cyclotomic polynomial at k · n! divides no number from 1 to n, so it exceeds n, and its order argument makes it 1 mod k.
+    plain: The proof builds one large whole number on purpose, so that every prime dividing it is bigger than the chosen bound, and the way the number is built forces such a prime to leave remainder one.
+    plain-if: The divisor need not be large unless the number the proof builds is a multiple of every number up to the bound.
+    steps: [C:lemma/Nat.exists_prime_gt_modEq_one, C:step/the-value-exceeds-one, C:step/b-is-a-root-mod-p, C:step/order-k-divides-p-minus-one]
+    confidence: medium
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L28-L59"], confidence: 0.35}
+  - id: C:part/from-one-to-many
+    type: part
+    name: from one to many
+    summary: One such prime beyond every number gives infinitely many.
+    division: stage
+    number: 3
+    stage: close
+    says: Having one such prime beyond every n, the set of such primes is infinite.
+    plain: If there is always one more beyond any point, there can be no last one, so there are endlessly many.
+    plain-if: none
+    steps: [C:lemma/Nat.frequently_atTop_modEq_one, C:statement/Nat.infinite_setOfPred_prime_modEq_one]
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L61-L70"], confidence: 0.5}
+  # ---------------------------------------------------------------- what the proof delivers
+  - id: P:yield/what-the-proof-delivers
+    type: yield
+    name: what the proof delivers
+    summary: The proof names the prime it finds, not only that one exists.
+    of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    beyond: "yes"
+    says: The proof names the prime. For k at least 2 it is the least prime factor of the k-th cyclotomic polynomial at k · n!, and it is larger than n.
+    as-statement: For every k ≥ 2 and every n, the least prime factor p of the k-th cyclotomic polynomial's value at k · n! satisfies p > n and p ≡ 1 (mod k).
+    needs: []
+    bound: none
+    chooses:
+      - {what: the point the polynomial is evaluated at, where: C:lemma/Nat.exists_prime_gt_modEq_one,
+         value: k · n!, best: the file's choice, confidence: medium,
+         gives: a prime ≡ 1 (mod k) dividing no factor of the point; it exceeds n when n! divides the point}
+    trivial:
+      - {case: k = 1, known: every prime qualifies, compares: equal,
+         delivered: a prime beyond n by the known infinitude of primes}
+    grounds: [{of: C:lemma/Nat.exists_prime_gt_modEq_one, lines: "33-59"}]
+    confidence: medium
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L33-L59"], confidence: 0.35}
+  - id: P:case/k-three-n-two
+    type: case
+    name: k = 3, n = 2
+    summary: The yield worked by hand for k = 3 and n = 2.
+    of: P:yield/what-the-proof-delivers
+    from: worked
+    stands: inside
+    given: k = 3 and n = 2. The point is 3 · 2! = 6. The third cyclotomic polynomial is x² + x + 1.
+    expect: At 6 it gives 43. Its least prime factor is 43, which is larger than 2 and equals 3 · 14 + 1.
+    confidence: high
+    stance: opinion
+    provenance: {mode: manual, sources: ["the design's worked example"], confidence: 0.5}
+  - id: P:reading/the-polynomial-does-the-work
+    type: reading
+    name: the polynomial does the work
+    summary: Every prime factor of a cyclotomic value, apart from those dividing k, is 1 mod k; the proof only has to make one large.
+    of: C:part/a-number-built-to-have-the-right-factor
+    whose: {by: model}
+    says: The cyclotomic polynomial is chosen because its prime factors not dividing the point are 1 mod k; the factorial in the point pushes them past n.
+    grounds: [{of: C:step/b-is-a-root-mod-p, lines: "43-50"}, {of: C:step/order-k-divides-p-minus-one, lines: "53-59"}]
+    confidence: medium
+    stance: opinion
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L43-L59"], confidence: 0.35}
+  # ---------------------------------------------------------------- what is said about the work
+  - id: P:claim/checking
+    type: claim
+    name: what is known about the check
+    summary: What the file's text shows about the machine check, and what is not known here.
+    says: The file's text holds no `sorry` and declares no axiom of its own. It was read here as text. Nothing was built or run, so whether Lean accepts it is not known here.
+    stance: observed
+    provenance: {mode: derived, sources: [source.checking], confidence: 1}
+  - id: P:claim/module-note-infinitely-many
+    type: claim
+    name: the module note's claim
+    summary: The module note says that for any positive k there are infinitely many primes p ≡ 1 (mod k).
+    about: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    checked: "yes"
+    by: [C:statement/Nat.infinite_setOfPred_prime_modEq_one]
+    stance: hearsay
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L10-L15"], confidence: 1}
+  - id: P:assumption/read-as-text
+    type: assumption
+    name: read as text
+    summary: How this fabulam was read.
+    about: how this fabulam was read
+    says: The file was read as text. Names were matched by spelling. Lean was not run.
+    checked: "no"
+    carries: must
+    if-false: A link between two declarations may be missing or may point at the wrong one of two with one name.
+    stance: observed
+    provenance: {mode: derived, sources: [source.read], confidence: 1}
+  - id: N:aim/primes-one-mod-k
+    type: aim
+    name: infinitely many primes 1 mod k
+    summary: The module note says the file proves that there are infinitely many primes p ≡ 1 (mod k) for positive k.
+    stance: hearsay
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L10-L15"], confidence: 1}
+  - id: L:term/cyclotomic-polynomial
+    type: term
+    name: cyclotomic polynomial
+    summary: The k-th cyclotomic polynomial, whose roots are the primitive k-th roots of unity.
+    stance: assumed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L34"], confidence: 1}
+  - id: K:concept/order-modulo-p
+    type: concept
+    name: the order of a number modulo p
+    summary: The least power of the number that leaves remainder 1 modulo p.
+    stance: assumed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L53"], confidence: 1}
+  - id: R:maker/header-author
+    type: maker
+    name: the author the header names
+    summary: The file's header names its author and the copyright year 2020.
+    capacity: author
+    stance: hearsay
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L1-L5"], confidence: 1}
+  - id: R:licence/apache-2-0
+    type: licence
+    name: Apache-2.0
+    summary: The header releases the file under the Apache 2.0 licence.
+    identifier: Apache-2.0
+    stance: observed
+    provenance: {mode: manual, sources: ["PrimesCongruentOne.lean#L3"], confidence: 1}
+  - id: R:means/lean
+    type: means
+    name: Lean 4
+    summary: The language the file is written in.
+    what: Lean 4
+    version: leanprover/lean4:v4.37.0-rc1
+    stance: observed
+    provenance: {mode: manual, sources: [lean-toolchain], confidence: 1}

@@ -1,0 +1,31 @@
+thym 1
+
+-- The head fabulam of a folder of Lean 4 files, in two runs. A host runs survey-the-archive first; then, for each
+-- file in the order of the imports, the six programs of decompile-lean.thym, copying each part's summary upward by
+-- rule; then fold-the-head. A file the final theorems do not reach is outlined by rule and never read by a model.
+
+program survey-the-archive
+  why: an archive's files, the order of its imports, what the final theorems reach and which declarations cross
+       between files are found by rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run.
+  decided 2026-11-22: this build reads at most sixty Lean files and twelve thousand lines under one head.
+
+  takes repo: folder, h: fabula
+  gives f: fabula
+
+  let lean = repo where suffix is lean
+  assert count lean > 0 else "there is no Lean file here"
+  assert count lean < 61 else "more than sixty Lean files: past what this build reads"
+  assert lean.lines < 12001 else "more than twelve thousand lines of Lean: past what this build reads"
+  give survey repo with h                          -- files, components, the declarations that cross: rules only
+end
+
+program fold-the-head
+  why: read from its parts' summaries, the archive's argument is told in stages of its own.
+  must: no Lean is read here.
+
+  takes repo: folder, h: fabula
+  gives g: fabula
+
+  give derive repo with h                          -- the head's stages, teaching order, readings, atem
+end

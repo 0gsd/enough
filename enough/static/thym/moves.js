@@ -28,11 +28,11 @@
     band: { gives: ['word'], contract: ['banded'], modifiers: { as: ['list of word'] } },
     compare: { gives: ['report'], contract: [], modifiers: { with: ['fabula'] }, since: 1 },
     compile: { gives: ['text'], contract: ['byte-exact'] },
-    construe: { asks: true, gives: ['fabula'], contract: ['span-resolves', 'no-invention', 'stance-kept', 'coverage', 'terms-grounded', 'nothing-lost', 'fabula-checks', 'provenance'], modifiers: { as: ['figure', 'image', 'allusion', 'voice', 'turn', 'meaning', 'ambiguity'], with: ['fabula'] }, since: 1 },
+    construe: { asks: true, gives: ['fabula'], contract: ['span-resolves', 'no-invention', 'stance-kept', 'coverage', 'terms-grounded', 'nothing-lost', 'fabula-checks', 'provenance'], modifiers: { as: ['figure', 'image', 'allusion', 'voice', 'turn', 'meaning', 'ambiguity', 'comments', 'fit', 'yield', 'stages'], with: ['fabula'] }, since: 1 },
     context: { gives: ['context'], modifiers: { of: ['text', 'package'] } },
     count: { gives: ['number'] },
     cut: { gives: ['short'], contract: ['whole-sentences', 'weight-order', 'coverage', 'provenance'], modifiers: { to: ['words', 'sentences'] } },
-    derive: { asks: true, gives: ['fabula'], contract: ['span-resolves', 'stance-closed', 'terms-grounded', 'coverage', 'fabula-checks', 'provenance'], scaffold: 'rules-twin', modifiers: { as: ['prose', 'verse', 'code'], with: ['fabula'] } },
+    derive: { asks: true, gives: ['fabula'], contract: ['span-resolves', 'stance-closed', 'terms-grounded', 'coverage', 'fabula-checks', 'provenance'], scaffold: 'rules-twin', modifiers: { as: ['prose', 'verse', 'code', 'proof'], with: ['fabula'] } },
     digest: { gives: ['string'] },
     drop: { gives: ['change'], since: 1 },
     edit: { gives: ['text', 'short'], contract: ['only-the-changed', 'never-source', 'provenance'], modifiers: { with: ['list of change'] }, since: 1 },
@@ -66,19 +66,23 @@
     say: { gives: ['string'], since: 1 },
     scan: { gives: ['fabula'], contract: ['lines-found', 'scansion-grounded', 'span-resolves', 'fabula-checks', 'provenance'], modifiers: { as: ['rhyme', 'sound', 'recurrence', 'form'], with: ['fabula'] }, since: 1 },
     settle: { asks: true, gives: ['fabula', 'volume'], contract: ['addressed', 'only-the-asked', 'ruled', 'fabula-checks', 'provenance'], scaffold: 'direct', since: 1 },
-    survey: { gives: ['fabula'], contract: ['files-found', 'code-span', 'licence-recorded', 'fabula-checks', 'provenance'], since: 1 },
+    survey: { gives: ['fabula'], contract: ['files-found', 'code-span', 'licence-recorded', 'fabula-checks', 'provenance'], modifiers: { with: ['fabula'] }, since: 1 },
     // thym 1's view of entail (0.8): a fabulac entails code, a catem, its cases file, or a layout and a cshort in another
-    // language (`in`); what it gives, its contract and its scaffold change with `as` (and `with` a short), as the rows say
+    // language (`in`); what it gives, its contract and its scaffold change with `as` (and `with` a short), as the rows say.
+    // 0.9 (Thym 20.13): a fabulam entails a pshort at one of three densities, `expert`, `student` or `everyone`; the
+    // rows stand in the manifest's order. The page runs none of the fabulam's calls: each asks a model or reads Lean
+    // through the server's syntax engine (`derive … as proof`, `construe`'s four axes of a proof, `survey` of a text)
     tell: { asks: true, gives: ['short'], contract: ['coverage', 'no-invention', 'stance-kept', 'scales-met', 'footer', 'provenance'], scaffold: 'outline',
-      modifiers: { as: ['order', 'code', 'line', 'overview', 'manual', 'cases', 'layout'], by: ['order'], in: ['string'], with: ['morph', 'short'] },
-      givesWhen: [{ as: ['code'], gives: ['folder'] }, { as: ['cases'], gives: ['text'] }, { as: ['layout'], gives: ['short'] }],
+      modifiers: { as: ['order', 'code', 'line', 'overview', 'manual', 'cases', 'layout', 'expert', 'student', 'everyone'], by: ['order'], in: ['string'], with: ['morph', 'short'] },
+      givesWhen: [{ as: ['expert', 'student', 'everyone'], gives: ['short'] }, { as: ['code'], gives: ['folder'] }, { as: ['cases'], gives: ['text'] }, { as: ['layout'], gives: ['short'] }],
       contractWhen: [
         { as: ['code'], with: ['short'], contract: ['target-confirmed', 'files-present', 'surface-answered', 'apart', 'footer', 'provenance'] },
         { as: ['code'], contract: ['parses', 'interfaces-present', 'files-present', 'footer', 'cases-entailed', 'provenance'] },
         { as: ['layout'], contract: ['target-confirmed', 'surface-answered', 'no-invention', 'footer', 'provenance'] },
         { as: ['line', 'overview', 'manual'], contract: ['coverage', 'no-invention', 'quotes-held', 'uses-told', 'footer', 'provenance'] },
-        { as: ['cases'], contract: ['cases-whole', 'provenance'] }],
-      scaffoldWhen: [{ as: ['line', 'overview', 'manual'], scaffold: 'uses-outline' }, { as: ['code'], scaffold: null }, { as: ['cases'], scaffold: 'cases-file' }, { as: ['layout'], scaffold: null }] },
+        { as: ['cases'], contract: ['cases-whole', 'provenance'] },
+        { as: ['expert', 'student', 'everyone'], contract: ['cites-resolve', 'every-sentence-cited', 'yield-cited', 'teaching-followed', 'no-up-to', 'example-worked', 'nothing-added', 'checking-told', 'confidence-told', 'symbols-worded', 'apart', 'length', 'footer', 'provenance'] }],
+      scaffoldWhen: [{ as: ['expert', 'student', 'everyone'], scaffold: null }, { as: ['line', 'overview', 'manual'], scaffold: 'uses-outline' }, { as: ['code'], scaffold: null }, { as: ['cases'], scaffold: 'cases-file' }, { as: ['layout'], scaffold: null }] },
     trace: { gives: ['trace'] },
     uncovered: { gives: ['list of item'], contract: [], modifiers: {}, since: 1 },
     unpack: { gives: ['text'], contract: ['digests'] },
@@ -108,7 +112,7 @@
     lint: "it runs MacroCOSM's checks, which the server holds",
     enumerate: "it is the compiler's, which the server holds",
     compile: "it is the compiler's, which the server holds",
-    survey: "it reads a folder's syntax through the server's syntax engine",
+    survey: "it reads a folder's syntax, or a Lean file's, through the server's syntax engine",
     history: "it reads a clone's history through the server",
     scan: "it reads a poem's stresses and rhymes through FEED's pronunciations, which the server holds",
     'file-outline': "it reads a file's syntax through the server's syntax engine",

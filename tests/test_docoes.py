@@ -369,18 +369,23 @@ def test_the_spec_terms_and_decisions(built):
     # old ones under 0.0.1. (Before the release wrote its day, 0.8.0's head read "(the day of its release)", and the reader
     # took no edition from it.)
     decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
-    assert len(decisions) == 70
+    # 0.9.0 adds 8 (the fabulam). Its head carries no day until the release writes one: the edition is read, the
+    # date is not there yet.
+    assert len(decisions) == 78
     assert decisions[-1].data["name"] == "All rights reserved for the specification and the manifests;"
-    assert decisions[44].data["name"] == "A document is enumerated in its own grammar"
-    assert Counter(d.data.get("edition") for d in decisions) == {"0.8.0": 9, "0.7.0": 8, "0.6.0": 15, "0.5.4": 8,
-                                                                 "0.0.2": 3, "0.0.1": 27}
+    assert decisions[52].data["name"] == "A document is enumerated in its own grammar"
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.9.0": 8, "0.8.0": 9, "0.7.0": 8, "0.6.0": 15,
+                                                                 "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first.get("edition"), first.get("dated")) == \
-        ("S:decision/1", "The authored fabulac", "0.8.0", "2026-11-20")
-    entail = decisions[9].data
+        ("S:decision/1", "The fabulam", "0.9.0", None)
+    authored = decisions[8].data
+    assert (authored["id"], authored["name"], authored.get("edition"), authored.get("dated")) == \
+        ("S:decision/9", "The authored fabulac", "0.8.0", "2026-11-20")
+    entail = decisions[17].data
     assert (entail["id"], entail["name"], entail["edition"], entail["dated"]) == \
-        ("S:decision/10", "Entailment", "0.7.0", "2026-11-13")
-    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 71)]
+        ("S:decision/18", "Entailment", "0.7.0", "2026-11-13")
+    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 79)]
     assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/21"           # 0.6: Changes is 21
 
 
@@ -410,7 +415,7 @@ def test_manifests_become_reference_items():
                     if it["type"] in ("module", "kind", "list"))
     assert [(count[("module", m)], count[("kind", m)])
             for m in ("comprise", "cosm", "canon", "fabula", "doc", "ascribe", "thym")] == \
-        [(9, 73), (2, 11), (2, 5), (11, 46), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check; fabula gained C:form (0.7), N:target, C:reliance, P:assumption (0.8)
+        [(9, 73), (2, 11), (2, 5), (11, 53), (5, 14), (12, 15), (6, 15)]      # each with the core's D (0.6); thym's P gained check; fabula gained C:form (0.7), N:target, C:reliance, P:assumption (0.8), the fabulam's seven (0.9)
     assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "fabula")] == [4, 1, 5, 29]   # canon: fabula.state; fabula: the fabulap's two lists (0.7), ruling.is, ruling.relied-on, relied-on (0.8)
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
         ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/fabula", "R:minicosm/doc",
@@ -627,7 +632,8 @@ def test_the_three_minicosm_specifications_enumerate(built):
     the document's name and edition in the catalog with where it came from, no chapters and no reference, and
     every term defined in a section of its own document."""
     # 0.8: Thym 20.10-20.12 and its Changes entry (16 items); Ascribe's and Comprise OES's 0.8.0 entries (4 and 2)
-    for slug, counts in (("thym", {"section": 115, "term": 21, "example": 1, "decision": 69}),
+    # 0.9: Thym 20.13 (the fabulam and its pshorts) and its Changes entry (5 items)
+    for slug, counts in (("thym", {"section": 116, "term": 21, "example": 1, "decision": 74}),
                          ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 35}),
                          ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 34})):
         vol = built["vols"][(slug, "en")]

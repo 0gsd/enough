@@ -64,19 +64,19 @@ the checks do not enforce.
 means encrypted everywhere, and there is no outsider's graph of a person.
 
 **The words of a text.** A text's meaning has MacroCOSM's three densities: the **fabula** (the text's twin: order-free
-material with stances and spans), the **short** (an entailment of the fabula) and the **atem** (one line, with
-focus, push and pull). The author's text arranges the same material too, and is never called a short: the text entails
-its fabula, and the fabula entails a short. Thym counts the text as a density as well, so a text has four (section
-5.2). To decompile is to make a fabula from an input, and to compile is to make a short of a fabula: those are the
-plain words, and in a program the moves are `derive` and `entail` (DocOES's byte-exact `enumerate` and `compile` keep
-their names). Each of these steps is an entailment, the step that expands meaning by reducing data: the whole entails
-what is made from it (MacroCOSM OES, its section 18.1). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for prose,
-`fabulap` for verse, `fabulac` for code (MacroCOSM OES, its section 18.4). A fabulac's short is a `cshort`, source code
-rebuilt from it and never run, and its atem at depth is a `catem`, a text saying what a person can do with the program
-(section 20). A fabulac a person authored, before any program, is entailed as the program itself, its entailment, and
-that alone may be run, only in a sandbox (sections 20.11 and 20.12). A fabulap is built by its own helper moves, `scan`
-by rule and `construe` by a model (section 20.9).
-Thym adds three nouns and three verbs:
+material with stances and spans), the **short** (an entailment of the fabula) and the **atem** (one line, with focus,
+push and pull). The author's text arranges the same material too, and is never called a short: the text entails its
+fabula, and the fabula entails a short. Thym counts the text as a density as well, so a text has four (section 5.2). To
+decompile is to make a fabula from an input, and to compile is to make a short of a fabula: those are the plain words,
+and in a program the moves are `derive` and `entail` (DocOES's byte-exact `enumerate` and `compile` keep their names).
+Each of these steps is an entailment, the step that expands meaning by reducing data: the whole entails what is made
+from it (MacroCOSM OES, its section 18.1). A fabula has a flavour, the value of its catalog's `flavour`: `fabulan` for
+prose, `fabulap` for verse, `fabulac` for code, `fabulam` for a formal proof (MacroCOSM OES, its section 18.4). A
+fabulam's short is a `pshort`, a guide to the proof for one of three readers (section 20.13). A fabulac's short is a
+`cshort`, source code rebuilt from it and never run, and its atem at depth is a `catem`, a text saying what a person
+can do with the program (section 20). A fabulac a person authored, before any program, is entailed as the program
+itself, its entailment, and that alone may be run, only in a sandbox (sections 20.11 and 20.12). A fabulap is built by
+its own helper moves, `scan` by rule and `construe` by a model (section 20.9). Thym adds three nouns and three verbs:
 
 - a **reading** is an entailment of someone else's fabula in your morph, local and labelled (section 14);
 - the **null morph** is the plainest entailment that conforms, Thym's reference (section 13);
@@ -581,11 +581,12 @@ too when it is an occasional context item. Every meaning value carries **provena
 carry none. A `folder` is not a density: it is an input a move reads, and its provenance is its tree digest. A `line`
 fits wherever a `string` is taken: it is a string with a place.
 
-**Flavour is a property, not a type.** A fabula's flavour (`fabulan`, `fabulap` or `fabulac`) is a property of the
-value, read as `f.flavour`. The compiler carries it as a note on the `fabula` type where it knows it: a fabula from
-`derive … as verse` is a fabulap, one from `derive <folder>` or `survey` a fabulac, and a `fabula` input's flavour is
-unknown until run time. It refuses at compile time what it can prove wrong ("f is a fabulan, the fabula of a text; only
-a fabulac entails code"), and the runtime refuses the rest with the check `flavour`.
+**Flavour is a property, not a type.** A fabula's flavour (`fabulan`, `fabulap`, `fabulac` or `fabulam`) is a property
+of the value, read as `f.flavour`. The compiler carries it as a note on the `fabula` type where it knows it: a fabula
+from `derive … as verse` is a fabulap, one from `derive <folder>` or `survey` a fabulac, or, of a proof, a fabulam
+(section 20.13), and a `fabula` input's flavour is unknown until run time. It refuses at compile time what it can prove
+wrong ("f is a fabulan, the fabula of a text; only a fabulac entails code"), and the runtime refuses the rest with the
+check `flavour`.
 
 ### 5.2 Densities and what fits where
 
@@ -715,12 +716,12 @@ The moves `thym 1` adds or extends. Every move in this table carries `since: 1` 
 
 | move | signature | asks | contract | scaffold |
 |---|---|---|---|---|
-| `derive` | text \| folder → fabula; `as` prose \| verse \| code; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as verse with a fabulap: the same, with `nothing-lost` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · a folder: none |
-| `entail` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview`, `manual`, `cases` or `layout`; `by` order; `in` a language (a string), with `as layout` or `as code`; `with` morph, or, for `as code in` a language, a layout (a short); in that order; `as code` gives a folder, `as cases` a text | yes; `as cases` no | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `cases-entailed` `provenance` · as line, overview or manual: `coverage` `no-invention` `quotes-held` `uses-told` `footer` `provenance` · as cases: `cases-whole` `provenance` · as layout in a language: `target-confirmed` `surface-answered` `no-invention` `footer` `provenance` · as code in a language: `target-confirmed` `files-present` `surface-answered` `apart` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` · cases: the call itself, by rules · layout: none |
-| `survey` | folder → fabula (a fabulac outline) | no | `files-found` `code-span` `licence-recorded` `fabula-checks` `provenance` | — |
+| `derive` | text \| folder → fabula; `as` prose \| verse \| code \| proof; `with` fabula | yes | a text as prose or verse: as above, with `fabula-checks` · a text as verse with a fabulap: the same, with `nothing-lost` · a text as code: `code-span` `outline-cited` `coverage` `terms-grounded` `stance-closed` `fabula-checks` `provenance` · a text as proof: `lines-resolve` `nothing-invented` `nothing-carried` `stance-closed` `fabula-checks` `provenance` · a folder: `fold-grounded` `atem-shape` `licence-recorded` `fabula-checks` `provenance` | a text: the rules twin · as code: `file-outline` · as proof: none · a folder: none |
+| `entail` | fabula \| item \| volume → short; `as` an order, `code`, `line`, `overview`, `manual`, `cases`, `layout`, or a pshort's density, `expert`, `student` or `everyone`; `by` order; `in` a language (a string), with `as layout` or `as code`; `with` morph, or, for `as code in` a language, a layout (a short); in that order; `as code` gives a folder, `as cases` a text | yes; `as cases` no | as an order: as above · as code: `parses` `interfaces-present` `files-present` `footer` `cases-entailed` `provenance` · as line, overview or manual: `coverage` `no-invention` `quotes-held` `uses-told` `footer` `provenance` · as cases: `cases-whole` `provenance` · as layout in a language: `target-confirmed` `surface-answered` `no-invention` `footer` `provenance` · as code in a language: `target-confirmed` `files-present` `surface-answered` `apart` `footer` `provenance` · as expert, student or everyone: `cites-resolve` `every-sentence-cited` `yield-cited` `teaching-followed` `no-up-to` `example-worked` `nothing-added` `checking-told` `confidence-told` `symbols-worded` `apart` `length` `footer` `provenance` | an order: the outline · code: none · a catem: `uses-outline` · cases: the call itself, by rules · layout: none · a pshort: none |
+| `survey` | folder \| text → fabula (an outline: a fabulac's, or, of Lean, a fabulam's); `with` fabula (a text's head) | no | a folder: `files-found` `code-span` `licence-recorded` `fabula-checks` `provenance` · a text: `declarations-found` `comments-covered` `reach-agrees` `code-span` `licence-recorded` `fabula-checks` `provenance` | — |
 | `history` | folder → fabula; `with` fabula | no | `history-grounded` `fabula-checks` `provenance` | — |
 | `scan` | text → fabula (a fabulap); `as` rhyme \| sound \| recurrence \| form; `with` fabula | no | with no `as`: `lines-found` `scansion-grounded` `span-resolves` `fabula-checks` `provenance` · as rhyme, sound or recurrence: `sound-grounded` `nothing-lost` `fabula-checks` `provenance` · as form: `form-grounded` `nothing-lost` `fabula-checks` `provenance` | — |
-| `construe` | text → fabula (a fabulap); `as` figure \| image \| allusion \| voice \| turn \| meaning \| ambiguity; `with` fabula | yes | `span-resolves` `no-invention` `stance-kept` `coverage` `terms-grounded` `nothing-lost` `fabula-checks` `provenance` | none |
+| `construe` | text → fabula; of a poem (a fabulap), `as` figure \| image \| allusion \| voice \| turn \| meaning \| ambiguity; of a proof (a fabulam), `as` comments \| fit \| yield \| stages; `with` fabula | yes | a poem's axes: `span-resolves` `no-invention` `stance-kept` `coverage` `terms-grounded` `nothing-lost` `fabula-checks` `provenance` · as comments: `comments-covered` `lines-resolve` `nothing-lost` `fabula-checks` `provenance` · as fit: `nothing-lost` `fabula-checks` `provenance` · as yield: `lines-resolve` `nothing-invented` `nothing-lost` `fabula-checks` `provenance` · as stages: `lines-resolve` `atem-shape` `nothing-lost` `fabula-checks` `provenance` | none |
 | `gather` | list of fabula \| list of item \| folder \| text → the type of `with`; `with` fabula \| volume; a folder (a recorder's record) gives a text (the cases file); a text (a runner's verdict) gives a fabula, `with` fabula | no | a list: `nothing-lost` `ids-unique` `fabula-checks` `provenance` · a folder: `cases-whole` `source-named` `provenance` · a text: `evidence-stated` `provenance` | — |
 | `ground` | folder → fabula; `with` fabula | no | `ground-cited` `code-span` `nothing-lost` `fabula-checks` `provenance` | — |
 | `weigh` | fabula → fabula (with one `N:target`); `in` a language (a string) | yes | `target-weighed` `no-invention` `fabula-checks` `provenance` | none |
@@ -760,11 +761,14 @@ check. `gather recorded with f` takes the folder a recorder wrote and gives the 
 each recorded case with what the original did and the source it was recorded from; `gather verdict with f` takes the
 text of a runner's verdict, which names the cshort it judged, and gives the fabulac with that cshort's `evidence`.
 `question … in` a language asks the rulings for that target, and `settle` keeps `ruled`, which only a fabulac kept for
-transconception has to hold (section 22.3). The compiler
-picks the `gives`, the contract and the scaffold of a call from the call as written (its `as` word, or its first
-operand's type), and the plan's `P:contract` item lists the chosen contract, so a plan says exactly which checks a node
-keeps. A call whose scaffold is `none` has no scaffold, and `--rules` refuses it at plan time (section 19). Sections 20,
-21 and 22 say what these moves do.
+transconception has to hold (section 22.3). A proof takes no move of its own: `survey` of a Lean text or of a folder of
+Lean, `derive … as proof`, `construe` on a proof's four axes and `entail` at a pshort's density build a fabulam and
+entail its pshorts (section 20.13). `survey` and `derive` of a folder of Lean keep the folder's contract, since a
+contract cannot tell two folders apart by their language; a fabulam's own checks, `parts-resolve` among them, are the
+host's, at each landing (section 20.13). The compiler picks the `gives`, the contract and the scaffold of a call from
+the call as written (its `as` word, or its first operand's type), and the plan's `P:contract` item lists the chosen
+contract, so a plan says exactly which checks a node keeps. A call whose scaffold is `none` has no scaffold, and
+`--rules` refuses it at plan time (section 19). Sections 20, 21 and 22 say what these moves do.
 
 ### 6.4 Signatures in the manifest
 
@@ -832,10 +836,10 @@ a program may also define a check of its own, as a contract block, and promise t
 | `coverage` | every sentence of an entailment traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict. A sentence's `lines` count the lines of the file as written, front matter included, however the map was made. Sentences are read by the one rule of section 12.6 | Thym's own; the trace records the sentence → item map |
 | `no-invention` | the entailment names no entity, claim or event the fabula lacks; for `propose`, no candidate or question says what its fabula lacks | Thym's own |
 | `stance-kept` | each claim's stance in the entailment is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim said over several sentences is said at the weakest any of them marks | Thym's own |
-| `footer` | a short ends with the footer line of MacroCOSM OES, its section 18.4.4 | enough (the short footer) |
+| `footer` | a short ends with the footer line of MacroCOSM OES, its section 18.4.4; a pshort, with the last line its section 18.4.10 gives | enough (the short footer) |
 | `byte-exact` | the compiled bytes equal the source bytes | DocOES (MacroCOSM OES, its section 18.5) |
 | `atem-shape` | the line is 15 to 25 words; focus is at most two sentences; push is one; pull is one | the rule of MacroCOSM OES, its section 18.3.5 |
-| `length` | `to N words`: at most N words and at least 80 per hundred of N; `to N sentences`: N sentences or fewer | Thym's own |
+| `length` | `to N words`: at most N words and at least 80 per hundred of N; `to N sentences`: N sentences or fewer; of a pshort, the words of its body lie within the bounds of its density (MacroCOSM OES, its section 18.4.10) | Thym's own |
 | `span-inside` | the expanded short contains the claims of the atem's span | Thym's own |
 | `whole-sentences` | `cut` removed whole sentences only | Thym's own |
 | `weight-order` | `cut` removed the lowest-salience sentences first (by their items' salience) | Thym's own |
@@ -856,18 +860,18 @@ a program may also define a check of its own, as a contract block, and promise t
 | `digests` | every file in a package's catalog has the sha256 the catalog says | Thym's own |
 | `released` | nothing is in `graph.cosm` without a release recorded in the holograph | Thym's own; the release is Ascribe's (https://ascribe.cosmoes.org/) |
 | `provenance` | every output carries `made` | Thym's own |
-| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). A file's reading (section 20.6) passes them together with the fabula it was read with. `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
+| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). A fabulam's own checks, that section's rows from `declared-once` on, are not among them: the host runs those each time a stage lands, and refuses a landing that fails one (section 20.13). A file's reading (section 20.6) passes them together with the fabula it was read with. `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
 
 The checks the moves of `thym 1` add:
 
 | check | holds when | where it comes from |
 |---|---|---|
-| `flavour` | the fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth, and only a fabulap is taken by `scan … with`, `construe … with` or `derive … as verse with` | MacroCOSM OES, its section 18.4.8 |
+| `flavour` | the fabula's flavour is one the move takes: only a fabulac takes `entail … as code` or a catem's depth, and only a fabulap is taken by `scan … with`, `derive … as verse with` or `construe … with` on a poem's axes; only a fabulam takes `entail … as` a pshort's density, and only a fabulam is taken by `derive … as proof with` or by `construe … with` on a proof's axes | MacroCOSM OES, its section 18.4.8 |
 | `files-found` | every file the folder rule keeps (section 20.1) has a `C:file` item whose sha256 is the file's, and no `C:file` names a file the tree lacks | Thym's own |
-| `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it | MacroCOSM OES, its section 18.4.8 |
-| `licence-recorded` | the fabulac's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
+| `code-span` | every code span `{file, lines}` names a file of the tree and lines inside it; of a fabulam, the proof's file | MacroCOSM OES, its section 18.4.8 |
+| `licence-recorded` | the fabulac's or the fabulam's `source.licence` is the licence's standard short identifier, the licence file's first line, or `{pending: …}`, and never absent | MacroCOSM OES, its section 18.4.8 |
 | `outline-cited` | every behaviour, structure and case a file's reading gives names the interfaces or components of the outline it is about, and they belong to that file, or, for a test file, to the files it tests | Thym's own |
-| `fold-grounded` | every intent and inspiration item the fold gives (aim, audience, use, requirement, decision, exclusion; influence, allusion, occasion) cites at least one item of the fabula so far, and the atem's line cites at least one use | Thym's own |
+| `fold-grounded` | every intent and inspiration item the fold gives (aim, audience, use, requirement, decision, exclusion; influence, allusion, occasion) cites at least one item of the fabula so far, and the atem's line cites at least one use; of a head fabulam's fold, every stage and every reading it gives cites items of the head | Thym's own |
 | `history-grounded` | every change cites commits the clone's log answered, every release a tag it answered, and every maker rests on commits it answered and carries no address | Thym's own |
 | `parses` | every file of a cshort in a language the fabulac names is read by that language's parser without a syntax error; parsing is not running, and nothing is imported or executed | Thym's own; the host's syntax engine |
 | `interfaces-present` | every interface of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
@@ -894,12 +898,27 @@ The checks the moves of `thym 1` add:
 | `source-named` | every case in the cases file that has what the original did names the source it was recorded from, its tree digest or its commit, or says it is stale and why; nothing the recorder wrote is lost | Thym's own |
 | `ruled` | of a fabulac kept for transconception: every ruling written says what its word needs (`alike` an allowance of the closed list, `changed` its `to`, `free` and `kept-wrong` a reason), and a question about a ruling that is open, skipped, or answered and not settled leaves what it is about unruled; of any other volume it holds with nothing to check. `settle` keeps it: an answer that would write a ruling short of what it needs is not written, and a counter question asks again. Every other check of MacroCOSM OES's section 18.4.9 is reported in a dialectic run and refuses only at a gate | MacroCOSM OES, its section 18.4.9 |
 | `surface-answered` | of a cshort in another language, in place of `interfaces-present`: `CSHORT.md` maps every interface ruled `kept` or `alike` to a file and a name, and the name is in that file; of a layout, the layout maps each such interface to a file and a name | MacroCOSM OES, its section 18.4.9; for a layout, Thym's own |
-| `apart` | of a cshort entailed apart: no request of the entailment carried a span, a source path or the source's text | MacroCOSM OES, its section 18.4.9 |
+| `apart` | of a cshort entailed apart: no request of the entailment carried a span, a source path or the source's text; of a pshort: no request carried a span's text, the source's path or the source's text | MacroCOSM OES, its sections 18.4.9 and 18.4.10 |
 | `evidence-stated` | a cshort's `evidence`, once written, carries its level, from 0 to 6, its counts, no more steps agreeing than were counted, and its verdict file with that file's digest; `evidence: []`, not judged yet, holds | MacroCOSM OES, its section 18.4.9 |
 | `cases-entailed` | after an authored fabulac is entailed, every runnable case is a test in `tests/test_cases.py`, and every other case is either a test marked as written by a model or named in `ENTAILED.md` with the reason it was not entailed; of a cshort it holds with nothing to check | MacroCOSM OES, its section 18.4.8 |
 | `authored-source` | the fabulac's `source` is the authored form (MacroCOSM OES, its section 18.4.1), its `licence` a value or `{pending: …}`, and its catalog's `program` names a `kind`; every item a move of authoring writes is `stance: axiom`, its `provenance.mode` `structured-intake` when a brief gave it, `manual` when `add` wrote it and `dialectic` when an answer did; an item read from a brief says only what the brief says, and what the brief leaves open is a question | Thym's own |
 | `only-authored` | the folder run is the entailment of an authored fabulac: the fabulac of the same name beside it says `source: {kind: authored, …}`, and the folder is the one its `entailed` records. A cshort, a decompiled fabulac's folder and any other code are read, never run | Thym's own; the rule is MacroCOSM OES's, its section 18.4.7 |
 | `in-sandbox` | the host ran the folder in a sandbox that holds to every row of MacroCOSM OES's section 18.4.7, and the report says which of them the host could enforce on its system and which it could not, as limits on memory on some systems | Thym's own; the host's sandbox |
+| `declarations-found` | every declaration the reader lists is the `lean` of exactly one item of the fabulam, with the reader's lines, and no item names a declaration the file lacks; with `declared-once` of MacroCOSM OES, every declaration is named exactly once | Thym's own; the host's syntax engine |
+| `lines-resolve` | every span, and every entry of `grounds`, names lines inside the file and inside the lines of the item it names; and every item that says something about the proof (a yield, a reading, a stage, a step, a constant, a slack entry, a claim with `by`) reaches at least one item of a declaration, with its lines, through `grounds`, `steps`, `inside`, `where` or `by` | Thym's own |
+| `nothing-invented` | every name a `C:reliance` carries in `lean` is one the reader found in the file's text, outside the file's own declarations; every `uses`, `used-by` and `leans-on` link is one the reader found; a known theorem is named only through a reliance | Thym's own; the host's syntax engine |
+| `reach-agrees` | every item's `reached`, `depth` and `carries` are those the rule gives from the reader's graph and `source.target` (MacroCOSM OES, its section 18.4.10) | Thym's own; the host's syntax engine |
+| `comments-covered` | every comment the reader lists has exactly one row of `audit`, with its lines, and no row names lines that hold no comment | Thym's own; the host's syntax engine |
+| `nothing-carried` | of a fabulam: no field but `lean` holds a run of more than 80 code points of the file's own text | MacroCOSM OES, which holds a fabulac kept for transconception to 200 (its section 18.4.9) |
+| `cites-resolve` | every id a pshort cites, in square brackets, names an item of its fabulam | Thym's own; the pshort is MacroCOSM OES's, its section 18.4.10 |
+| `every-sentence-cited` | a group of citations covers the sentence it closes and the sentences before it in the paragraph, back to the group before; every sentence of a pshort's body is covered, so every paragraph ends in a group. Sentences are read by the one rule of section 12.6 | Thym's own |
+| `yield-cited` | a pshort cites every `P:yield`, every `P:fit` and `P:claim/checking` | Thym's own |
+| `teaching-followed` | at `everyone`: every stage is cited, and the stages are first cited in the fabulam's teaching order, its `teaching`. At the other two densities it is reported as a note and refuses nothing | Thym's own |
+| `no-up-to` | no sentence of a pshort that a citation of a `P:yield` covers holds "up to" | Thym's own; MacroCOSM OES holds the fabulam to the same (its section 18.4.8) |
+| `example-worked` | at `everyone`: the pshort cites a worked `P:case`; at the other two it holds with nothing to check | Thym's own |
+| `checking-told` | "machine-checked", "verified", "certified" and "proved correct" stand in a pshort only in a sentence that a citation of `P:claim/checking` covers; and its heading, the two lines under it and its last line are the lines MacroCOSM OES gives (its section 18.4.10) | Thym's own |
+| `confidence-told` | a sentence covered only by items of `confidence: low` holds a hedge ("may", "perhaps", "seems", "appears", "we read"). It warns: it is reported in the check's verdict and refuses nothing | Thym's own |
+| `symbols-worded` | at `everyone`: the first sentence that holds a one-letter name also holds the words that say what it is ("call it", "written", "stands for", "is the", "the number"). It warns, and refuses nothing | Thym's own |
 
 `coverage`, `no-invention` and `stance-kept` have a reading for verse, which `construe` keeps (section 20.9).
 
@@ -2124,10 +2143,12 @@ so its `made` lives in the trace's record and in whatever file the move writes i
 ### 20.5 The flavour of a decompile
 
 A fabula's flavour is said with `as`, the modifier every program already has: `derive t as prose` gives a fabulan,
-`derive t as verse` a fabulap, and `derive t as code` the fabulac's reading of one file. With no `as`, a text derives as
-it always has, to a fabulan: `derive t` and `derive t as prose` are the same call. A fabula from `derive <folder>` or
-`survey` is a fabulac. `entail f as told` of a fabulan or a fabulap keeps its contract; `as code` and a catem's depths are
-refused of either (check `flavour`): "f is a fabulap, a poem's fabula; only a fabulac entails a catem".
+`derive t as verse` a fabulap, `derive t as code` the fabulac's reading of one file, and `derive t as proof with f` the
+fabulam's reading of one file of a proof (section 20.13). With no `as`, a text derives as it always has, to a fabulan:
+`derive t` and `derive t as prose` are the same call. A fabula from `derive <folder>` or `survey` is a fabulac, or,
+where the file or the folder is a proof's, a fabulam. A pshort's density is refused of any fabula but a fabulam (check
+`flavour`). `entail f as told` of a fabulan or a fabulap keeps its contract; `as code` and a catem's depths are refused
+of either (check `flavour`): "f is a fabulap, a poem's fabula; only a fabulac entails a catem".
 
 ```thym
 thym 1
@@ -2348,6 +2369,11 @@ One thing may be run, and never by Thym itself: the entailment of a fabulac a pe
 host's sandbox, and the host's answer is recorded as an engine call (section 12.4), so a replay runs nothing
 (section 20.12). A cshort, the folder a fabulac was decompiled from, and any code the person did not author stay read
 and never run.
+
+A proof is read and never built. `survey` of a Lean text asks the host's syntax engine for the file's outline, the
+graph of the names its declarations use and the reach from its targets, and each answer is recorded as an engine call
+(section 12.4), so a replay needs no reader of Lean. Nothing of Lean is installed, built or run, by Thym or by a host
+(section 20.13).
 
 ### 20.9 Decompiling a poem: the fabulap's helper moves
 
@@ -2830,6 +2856,236 @@ program start-the-tool
 end
 ```
 
+### 20.13 Decompiling a proof, and entailing its pshorts
+
+A fabulam is the fabula of a formal proof, and a pshort is the guide it entails (MacroCOSM OES, its section 18.4.10).
+In this edition the proof is one file of Lean 4, or a folder of them under a head. A fabulam is built as a fabulac is:
+in stages, each one atomic run, so that a build that stops takes up again after the last stage that landed. No move is
+new. Four standard moves take a proof by a new operand or by new `as` words, and what only a model can read is asked
+one small thing at a time:
+
+| call | asks | what it gives, and what its contract holds |
+|---|---|---|
+| `survey t with h`, `h` the file's head, or, for a file that stands alone, a fabulam that is a catalog alone, which the host wrote by rule; rules only | no | the fabulam's outline: every declaration an item with its lines, the `C:file`, a `C:dependency` for each library, the makers and the licence, the rows of `audit` with no verdict, `P:claim/checking`, `P:assumption/read-as-text`, and the reach. `declarations-found`, `comments-covered`, `reach-agrees`, `code-span`, `licence-recorded` |
+| `survey repo with h`, of a folder of Lean, `h` the head's catalog, which the host wrote by rule; rules only | no | a head's outline: a `C:component` for each file, the items that cross between files, with `uses` among them by rule, and the order the files are read in. It names no part: `parts`, and each component's `told-in`, are written when the host ties a landed part in. `files-found`, `code-span`, `licence-recorded`, a folder's contract |
+| `derive t as proof with f` | yes, once for each chunk of the file | the reading: the statement, in words, of every declaration that is reached; each lemma's `role`, `method` and `why`; the `C:step`, `C:reliance`, `L:term` and `K:concept` items. `lines-resolve`, `nothing-invented`, `nothing-carried`, `stance-closed` |
+| `construe t as comments with f` | yes | the verdict of every row of `audit`, and the claims; the E items and the `N:aim` that a comment names. `comments-covered`, `lines-resolve`, `nothing-lost` |
+| `construe w as fit with f`, `w` the public wording | yes | `E:work/wording`, a `P:fit` for each statement, and the claims the wording makes. `nothing-lost` |
+| `construe t as yield with f` | yes, once for each statement | the `P:yield`, the worked `P:case`, the `C:constant` items and `slack`. `lines-resolve`, `nothing-invented`, `nothing-lost` |
+| `construe t as stages with f` | yes | the stages, the teaching order (`teaching`), three to six `P:reading` items, the `N:decision` items and the atem. `lines-resolve`, `atem-shape`, `nothing-lost` |
+| `derive repo with h`, `h` a head | yes | the head's stages, its teaching order, its readings and its atem, from its parts' summaries. `fold-grounded`, `atem-shape`, `licence-recorded`, a folder's contract |
+| `entail f as expert`, `as student` or `as everyone` | yes | a short: the pshort for that reader, under the checks of a pshort (below) |
+| `question f`, landed with `gather` | yes | the gaps, as the dialectic's questions to an expert (section 22) |
+
+Every contract here ends with `fabula-checks` and `provenance`, as section 6.3 lists them. `fabula-checks` holds the
+generic checks of a fabulam. Its own checks (MacroCOSM OES, its section 18.4.8, `parts-resolve` and `statements-agree`
+among them) are run by the host each time a program lands, and a landing that fails one is refused, with nothing
+written. Under `--rules`, `survey` runs and every other call of the table is refused at plan time, as `construe` of a
+poem is. A host then runs the survey and stops, and the fabulam is its outline (MacroCOSM OES, its section 18.4.10).
+
+**The reader.** `survey` reads Lean through the host's syntax engine, as it reads Python, and the engine answers three
+things. A file's outline: its declarations, its comments, its imports, and the names each declaration uses, each name
+once, with the line it first stands on. The graph of a set of outlines: which declaration names which, in its own file
+and across files. The reach of a graph from its targets: each declaration's `reached`, `depth` and `carries`, and the
+rule's candidates (MacroCOSM OES, its section 18.4.10). Each answer is recorded as an engine call (section 12.4), so a
+replay, and a runtime in another language, needs no reader of Lean.
+
+The reader matches a name to a declaration by spelling, in a fixed order: the full name of a declaration of the file;
+then the name joined to a namespace that is open at that line, the innermost first; then the name joined to a namespace
+that an `open` holds at that line, when exactly one declaration fits; then, for a name that follows a dot, the one
+declaration of the file whose name ends in it. A name that a declaration makes, a structure's field or an alias's half,
+is placed on the declaration that makes it. A name that fits none of these is an outside name, a library's, and stays
+as written. A name that fits two declarations is linked to each of them, so that the reach takes in too much rather
+than too little, and the reader says that it could not choose. With no targets given for a set of files, the rule that
+finds them (MacroCOSM OES, its section 18.4.10) runs over the files that no other file of the set imports. A file the
+reader cannot split into tokens, for a comment or a string left open, is refused with the line.
+
+**The programs.** Six programs build one file's fabulam. The host runs them in the order they are written, as one job,
+each landing the fabulam so far, as it runs a fabulac's (section 20.6):
+
+| program | asks | sees | its calls |
+|---|---|---|---|
+| `survey-the-proof` | no | the file, and its head or the catalog the host wrote | `survey t with h` |
+| `read-the-proof` | yes | the file with its comments blanked, the outline, and the statements of its neighbours | `derive t as proof with f`, inside a move that keeps the contract block `its-own-file`; the reading is landed with `gather` |
+| `audit-the-comments` | yes | the file with its comments, and the fabulam so far | `construe t as comments with f` |
+| `fit-the-wording` | yes | the wording and the statements' items, never the Lean; it is run only when the person gave a wording | `construe w as fit with f` |
+| `fold-the-argument` | yes | for the yield, each target's proof and the last lemma it rests on, comments blanked; for the stages, the fabulam so far and no Lean | `construe t as yield with f`, then `construe t as stages with` what that gave |
+| `raise-the-questions` | yes | the fabulam | `question f`, landed with `gather`; it `keeps fabula-checks` |
+
+`its-own-file` is kept against the fabulam so far, and not against the file: a text given as an input carries no
+path, so the block reads the file's path from the `C:file` of the fabulam. The file of the six, as the reference
+implementation ships it:
+
+```thym
+thym 1
+
+-- The fabulam of one Lean 4 file, built in six runs. A host runs the programs of this file in the order they are
+-- written, as one job: each lands the fabulam so far, and a job that stops takes up again after the last one that
+-- landed. The Lean is read as text. Nothing of it is installed, built or run.
+
+contract its-own-file(r: fabula, f: fabula)
+  why: a file's reading speaks of that file and of no other.
+
+  assert count r > 0 else "the reading found nothing in the file"
+  for each c in f where kind is file
+    for each i in r where i has span
+      assert i.span.file is c.path else "an item points into another file"
+    end
+  end
+end
+
+program survey-the-proof
+  why: a Lean file's declarations, its comments, its imports and the names each declaration uses are found by
+       rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run; what is known about the machine check is written by rule.
+  decided 2026-11-22: this build reads one file a model can hold, under a head of at most sixty files and twelve
+       thousand lines.
+
+  takes t: text, h: fabula
+  gives f: fabula
+
+  give survey t with h                             -- every declaration an item, the comment table, the reach
+end
+
+program read-the-proof
+  why: the Lean is read once by a model, its comments blanked, against the outline: what each reached
+       declaration says, what each lemma is to the argument, and how it is proved.
+  decided 2026-11-22: the reader of the proof never sees a comment; a comment is something a person said.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  move read-file(t: text, so-far: fabula): fabula
+    keeps its-own-file against so-far
+    give derive t as proof with so-far             -- statements in words, roles, methods, steps, reliances, terms
+  end
+
+  let reading = read-file t, f
+  give gather [reading] with f
+end
+
+program audit-the-comments
+  why: every comment is set against the Lean it stands over, and what Lean cannot bear out is kept as a claim.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  give construe t as comments with f               -- the comment table, the claims
+end
+
+program fit-the-wording
+  why: where the person gave a public wording of the result, each statement is set against it, form apart from
+       content.
+  must: no Lean is read here.
+
+  takes w: text, f: fabula
+  gives g: fabula
+
+  give construe w as fit with f                    -- the fit, one for every statement
+end
+
+program fold-the-argument
+  why: what the proof delivers is set against what the statement says, and the argument is told in stages, the
+       stage that says what must be shown first.
+  decided 2026-11-22: stated is not shown; the stages are folded from the items alone, with no Lean.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  let y = construe t as yield with f               -- the yield, the worked example, the constants, the slack
+  give construe t as stages with y                 -- the stages, the teaching order, the readings, the atem
+end
+
+program raise-the-questions
+  why: where the build could not settle something it asks an expert, and the questions land with the fabulam.
+  decided 2026-11-22: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end
+```
+
+Two more build a head: `survey-the-archive`, before the parts, and `fold-the-head`, after them. The first holds the
+folder to this edition's band, in the words the Python band uses. For a folder the host's job runs the archive's
+survey; then the six programs for each file that a target reaches, a file after everything it imports, tying each
+part in and copying its summary up into the head by rule as the part lands (MacroCOSM OES, its section 18.4.10); then
+the head's fold. A file no target reaches is surveyed and left as an outline. A job takes up again after the last
+program that landed, while the file's sha256 is the one its fabulam recorded.
+
+```thym
+thym 1
+
+-- The head fabulam of a folder of Lean 4 files, in two runs. A host runs survey-the-archive first; then, for each
+-- file in the order of the imports, the six programs of decompile-lean.thym, copying each part's summary upward by
+-- rule; then fold-the-head. A file the final theorems do not reach is outlined by rule and never read by a model.
+
+program survey-the-archive
+  why: an archive's files, the order of its imports, what the final theorems reach and which declarations cross
+       between files are found by rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run.
+  decided 2026-11-22: this build reads at most sixty Lean files and twelve thousand lines under one head.
+
+  takes repo: folder, h: fabula
+  gives f: fabula
+
+  let lean = repo where suffix is lean
+  assert count lean > 0 else "there is no Lean file here"
+  assert count lean < 61 else "more than sixty Lean files: past what this build reads"
+  assert lean.lines < 12001 else "more than twelve thousand lines of Lean: past what this build reads"
+  give survey repo with h                          -- files, components, the declarations that cross: rules only
+end
+
+program fold-the-head
+  why: read from its parts' summaries, the archive's argument is told in stages of its own.
+  must: no Lean is read here.
+
+  takes repo: folder, h: fabula
+  gives g: fabula
+
+  give derive repo with h                          -- the head's stages, teaching order, readings, atem
+end
+```
+
+**One file to a request.** No request to a model holds more than one file of the proof and the statements of its
+neighbours. A file too long for one request is read in chunks, each cut at a declaration's first line. A declaration
+too long for one is read in windows, each given its statement again, and a last request, with the windows' notes and no
+Lean, writes its `method`. The neighbours' statements go one line each, the nearest first, and past a bound by name
+alone. A head's fold carries its parts' summaries and the crossing items that carry most, in rounds when one request
+cannot hold them. An implementation sets these bounds, and the size of a whole request, says what they are, and refuses
+a request over them before it is sent.
+
+**Entailing the pshorts.** `entail f as expert`, `as student` and `as everyone` each give a short, the pshort for that
+reader, and the same fabulam is entailed at any of the three. The entailment is apart from the source: the host takes
+every `span`, every `lines` and the source's path out of the fabulam before a request is made, the Lean is never read,
+and `apart` holds that no request carried them. The contract is the checks of a pshort: `cites-resolve`,
+`every-sentence-cited`, `yield-cited`, `teaching-followed`, `no-up-to`, `example-worked`, `nothing-added` (every name,
+number and word outside FEED in the pshort is in the fabulam), `checking-told`, `confidence-told`, `symbols-worded`,
+`apart`, `length`, `footer` and `provenance` (section 7.3). The host saves a pshort beside its fabulam as
+`<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`. `entail` at a pshort's density has no scaffold, so `--rules` refuses it
+at plan time. The model's answer is asked as YAML with one key, `body`, whose value is the body's markdown as a block:
+the host stamps the model's name only into an answer in YAML, and writes the lines that rules write around the body.
+
+```thym
+thym 1
+
+program entail-the-pshorts
+  why: one fabulam told three times, for an expert, for a student and for everyone, each run of
+       sentences citing the items it rests on.
+  must: the Lean is never read here; nothing is built or run.
+
+  takes f: fabula
+  gives expert: short, student: short, everyone: short
+
+  give expert: entail f as expert                  -- the logic in full, by the names in the source
+  give student: entail f as student                -- each term defined, one reading for each stage
+  give everyone: entail f as everyone              -- the teaching order, the reduction first, one worked example
+end
+```
+
 ---
 
 ## 21. Editing
@@ -3211,6 +3467,10 @@ and in Rust, each with its engine calls, so the whole path replays with no model
 its two spikes' verdicts are simulated and say so, and its model is a recorded fake. No evidence is claimed: nothing
 was built or judged, so neither gate holds, as the folder records.
 
+A third folder holds one proof whole (section 20.13): the reference implementation's `tests/fixtures/fabula/fabulam/`,
+with a file of Lean, the reader's outline of it as data, its fabulam and the three pshorts entailed from it. The
+programs of section 20.13 are compiled by the suite's test, as the other blocks marked `thym` are, and run by none.
+
 ### 24.4 Where an implementation and this text disagree
 
 Where an implementation and this text disagree, one of them is in error: either the implementation does not conform, or
@@ -3222,6 +3482,25 @@ section it touched.
 ## 25. Changes
 
 <!-- atem: what each edition changed, newest first -->
+
+**Edition 0.9.0.** A formal proof is decompiled into a fabulam and entailed as its pshorts, by the moves there were.
+
+1. **Decompiling a proof** (section 20.13, new; sections 6.3 and 20.5; How to read this). No move is new. `survey`
+   takes a Lean text, `with` its head, and a folder of Lean; `derive` takes `as proof`; `construe` takes a proof's four
+   axes, `comments`, `fit`, `yield` and `stages`. Six programs build one file's fabulam and two a head's; under
+   `--rules` the survey alone runs, and gives the outline, which is a valid fabulam. No request to a model holds more
+   than one file and the statements of its neighbours.
+2. **Entailing a pshort** (sections 6.3 and 20.13). `entail` takes `as expert`, `as student` and `as everyone`, each
+   giving a short, the pshort for that reader, entailed apart from the source.
+3. **New checks** (section 7.3). Against the source: `declarations-found`, `lines-resolve`, `nothing-invented`,
+   `reach-agrees`, `comments-covered` and `nothing-carried`. Of a pshort: `cites-resolve`,
+   `every-sentence-cited`, `yield-cited`, `teaching-followed`, `no-up-to`, `example-worked`, `checking-told`,
+   `confidence-told` and `symbols-worded`. `flavour`,
+   `length`, `footer`, `apart`, `code-span`, `licence-recorded`, `fold-grounded` and `fabula-checks` read a fabulam or
+   a pshort too.
+4. **Lean is read and never built** (section 20.8). The host's syntax engine answers a file's outline, a graph of
+   names and a reach, each recorded as an engine call; nothing of Lean is installed, built or run.
+5. **The suite** (section 24.3) names the folder that holds one proof whole.
 
 **Edition 0.8.0 · 2026-11-20.** The text says what a second runtime needs, as the reference runtime does it; no behaviour changed
 but by the three rulings of item 15.

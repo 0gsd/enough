@@ -1,0 +1,13 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `read` over own/Parity/Basic.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: read
+tokens: 0
+seconds: 0
+output: |
+  declarations:
+    - lean: "Parity.IsEven"
+      says: 'A natural number n is even when there is a natural number k with n = 2 · k.'
+  terms:
+    - {name: even, summary: 'A whole number that is twice a whole number.'}

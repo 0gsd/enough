@@ -1,0 +1,90 @@
+thym 1
+
+-- The fabulam of one Lean 4 file, built in six runs. A host runs the programs of this file in the order they are
+-- written, as one job: each lands the fabulam so far, and a job that stops takes up again after the last one that
+-- landed. The Lean is read as text. Nothing of it is installed, built or run.
+
+contract its-own-file(r: fabula, f: fabula)
+  why: a file's reading speaks of that file and of no other.
+
+  assert count r > 0 else "the reading found nothing in the file"
+  for each c in f where kind is file
+    for each i in r where i has span
+      assert i.span.file is c.path else "an item points into another file"
+    end
+  end
+end
+
+program survey-the-proof
+  why: a Lean file's declarations, its comments, its imports and the names each declaration uses are found by
+       rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run; what is known about the machine check is written by rule.
+  decided 2026-11-22: this build reads one file a model can hold, under a head of at most sixty files and twelve
+       thousand lines.
+
+  takes t: text, h: fabula
+  gives f: fabula
+
+  give survey t with h                             -- every declaration an item, the comment table, the reach
+end
+
+program read-the-proof
+  why: the Lean is read once by a model, its comments blanked, against the outline: what each reached
+       declaration says, what each lemma is to the argument, and how it is proved.
+  decided 2026-11-22: the reader of the proof never sees a comment; a comment is something a person said.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  move read-file(t: text, so-far: fabula): fabula
+    keeps its-own-file against so-far
+    give derive t as proof with so-far             -- statements in words, roles, methods, steps, reliances, terms
+  end
+
+  let reading = read-file t, f
+  give gather [reading] with f
+end
+
+program audit-the-comments
+  why: every comment is set against the Lean it stands over, and what Lean cannot bear out is kept as a claim.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  give construe t as comments with f               -- the comment table, the claims
+end
+
+program fit-the-wording
+  why: where the person gave a public wording of the result, each statement is set against it, form apart from
+       content.
+  must: no Lean is read here.
+
+  takes w: text, f: fabula
+  gives g: fabula
+
+  give construe w as fit with f                    -- the fit, one for every statement
+end
+
+program fold-the-argument
+  why: what the proof delivers is set against what the statement says, and the argument is told in stages, the
+       stage that says what must be shown first.
+  decided 2026-11-22: stated is not shown; the stages are folded from the items alone, with no Lean.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  let y = construe t as yield with f               -- the yield, the worked example, the constants, the slack
+  give construe t as stages with y                 -- the stages, the teaching order, the readings, the atem
+end
+
+program raise-the-questions
+  why: where the build could not settle something it asks an expert, and the questions land with the fabulam.
+  decided 2026-11-22: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end

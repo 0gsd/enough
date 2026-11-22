@@ -105,7 +105,7 @@ def test_python_reads_runs_parses_and_has_its_ground_and_programs():
     assert (REPO / "defaults" / "thym" / py.decompile).is_file() and (REPO / "defaults" / "thym" / py.compile).is_file()
     assert L.program("python", "decompile") == "decompile-python.thym" == FJ.PROGRAM_FILE
     assert L.program("Python", "compile") == "compile-python.thym" == FJ.COMPILE_FILE
-    assert L.DEFAULT == "python" and L.reading() == ["python"] and py.owns("a/b.py") and py.owns("x.pyi")
+    assert L.DEFAULT == "python" and L.reading() == ["python", "lean"] and py.owns("a/b.py") and py.owns("x.pyi")
 
 
 def test_go_and_rust_are_weighed_and_entailed_into_and_read_nothing():

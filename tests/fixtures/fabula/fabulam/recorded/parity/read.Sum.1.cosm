@@ -1,0 +1,16 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `read` over own/Parity/Sum.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: read
+tokens: 0
+seconds: 0
+output: |
+  declarations:
+    - lean: "Parity.isEven_add"
+      says: 'For all natural numbers m and n, if m is even and n is even then m + n is even.'
+      quantifiers:
+        - {kind: for-all, what: 'natural numbers m and n, both even'}
+      method: 'It takes the two halves, adds them, and rewrites with the lemma that the doubles of two numbers add to the double of their sum.'
+  steps:
+    - {slug: the-witness, name: 'The witness', inside: "Parity.isEven_add", says: 'The half of the sum is the sum of the two halves: with m = 2 · a and n = 2 · b, m + n = 2 · (a + b).', lines: "15-17", confidence: high}

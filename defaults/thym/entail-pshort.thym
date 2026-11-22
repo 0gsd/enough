@@ -1,0 +1,14 @@
+thym 1
+
+program entail-the-pshorts
+  why: one fabulam told three times, for an expert, for a student and for everyone, each run of
+       sentences citing the items it rests on.
+  must: the Lean is never read here; nothing is built or run.
+
+  takes f: fabula
+  gives expert: short, student: short, everyone: short
+
+  give expert: entail f as expert                  -- the logic in full, by the names in the source
+  give student: entail f as student                -- each term defined, one reading for each stage
+  give everyone: entail f as everyone              -- the teaching order, the reduction first, one worked example
+end

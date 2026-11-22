@@ -27,7 +27,9 @@ SHIPPED = REPO / "defaults" / "thym"
 #: 20.9), and decompile-verse-quick, the one-call fabulap it replaced as the full build (20.5); defaults/thym/ also
 #: holds the three thym 0 programs of 0.5.0.
 ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "decompile-verse-quick", "settle",
-         "tighten")
+         "tighten",
+         # 0.9, Thym 20.13: the fabulam's six programs, a head's two, and its pshorts
+         "decompile-lean", "decompile-lean-archive", "entail-pshort")
 
 
 def scratch_decls() -> dc.Declarations:
@@ -142,7 +144,9 @@ def test_the_draft_holds_the_blocks_this_round_names():
                             "settle-the-answers",
                             # 0.8: transconception (20.10), authoring (20.11), the authored entailment run (20.12)
                             "ground-the-fabulac", "begin-from-a-brief", "entail-authored-python",
-                            "test-the-entailment"]), names
+                            "test-the-entailment",
+                            # 0.9, the fabulam (20.13): decompile-lean opens on its contract block
+                            "its-own-file", "survey-the-archive", "entail-the-pshorts"]), names
 
 
 SHIPPED_FILES = [SHIPPED / f"{n}.thym" for n in ROUND]

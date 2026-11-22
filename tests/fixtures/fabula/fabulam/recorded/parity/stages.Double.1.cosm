@@ -1,0 +1,33 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `stages` over own/Parity/Double.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: stages
+tokens: 0
+seconds: 0
+output: |
+  stages:
+    - slug: the-doubles-add
+      name: The doubles add
+      number: 1
+      stage: reduction
+      says: 'Twice a plus twice b is rewritten as twice the sum of a and b, by the distributive law read from right to left. The file after it needs this to name the half of a sum.'
+      plain: 'Two piles that are each a doubled amount make, together, one doubled amount.'
+      plain-if: none
+      obvious: "none: the file's way is the obvious one"
+      steps: [C:lemma/Parity.double_add]
+      confidence: high
+  teaching: [the-doubles-add]
+  readings:
+    - slug: one-law-does-it
+      name: One law does it
+      summary: 'The identity is the distributive law read from right to left.'
+      of: [the-doubles-add]
+      grounds: [{of: C:lemma/Parity.double_add, lines: "7-8"}]
+      confidence: high
+  decisions: []
+  atem:
+    line: 'For all natural numbers a and b, twice a plus twice b equals twice the sum of a and b.'
+    focus: 'Two doubles added together.'
+    push: 'One rewrite turns the two doubles into one.'
+    pull: 'It is an identity of arithmetic and nothing about even numbers yet.'

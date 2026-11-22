@@ -1,0 +1,27 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `yield` over own/Parity/Sum.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: yield
+tokens: 0
+seconds: 0
+output: |
+  yield:
+    name: What the proof delivers
+    beyond: "yes"
+    says: 'The proof names the half of the sum: it is the sum of the two halves.'
+    as-statement: 'For all natural numbers a and b, if m = 2 · a and n = 2 · b then m + n = 2 · (a + b).'
+    needs: []
+    bound: none
+    chooses: []
+    trivial:
+      - {case: 'n = 0', known: 'm + 0 = m is even when m is', delivered: 'the half of m plus the half of 0, which is the half of m', compares: equal}
+    grounds: [{of: "Parity.isEven_add", lines: "15-17"}]
+    confidence: high
+  case:
+    slug: six-and-ten
+    name: '6 + 10'
+    given: '6 = 2 · 3 and 10 = 2 · 5.'
+    expect: '6 + 10 = 16 = 2 · 8, and 8 = 3 + 5.'
+  constants: []
+  slack: []

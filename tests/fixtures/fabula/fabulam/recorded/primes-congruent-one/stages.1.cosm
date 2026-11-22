@@ -1,0 +1,69 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `stages` over PrimesCongruentOne.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: stages
+tokens: 0
+seconds: 0
+output: |
+  stages:
+    - slug: what-must-be-found
+      name: What must be found
+      number: 1
+      stage: reduction
+      says: 'An infinite set of natural numbers has a member beyond every bound, so it is enough to find, for each n, one prime larger than n that is 1 modulo k.'
+      plain: 'To show there is no end to these special primes, it is enough to show that however far along the whole numbers you go, there is always one more of them further on.'
+      plain-if: none
+      obvious: 'The obvious way is to list the primes that leave remainder 1 and show the list never ends; nothing lists them, so the file shows instead that past any number there is one more.'
+      steps: [C:statement/Nat.infinite_setOfPred_prime_modEq_one, C:lemma/Nat.frequently_atTop_modEq_one]
+      confidence: high
+    - slug: a-number-built-to-have-the-right-factor
+      name: A number built to have the right factor
+      number: 2
+      stage: main
+      says: 'For k at least 2 the least prime factor of the value of the k-th cyclotomic polynomial at k · n! does not divide k · n!, so it exceeds n, and the order of k · n! modulo that prime is k, so the prime is 1 modulo k.'
+      plain: 'The proof builds one large whole number on purpose and takes the smallest prime that divides it. The way the number is built keeps every small prime from dividing it, and forces that smallest prime to leave remainder one.'
+      plain-if: 'The smallest prime that divides the built number lies beyond the chosen bound only because the number is built from a multiple of every whole number from one to that bound.'
+      steps: [C:lemma/Nat.exists_prime_gt_modEq_one, C:step/the-case-k-is-one, C:step/the-value-exceeds-one, C:step/b-is-a-root-modulo-p, C:step/p-exceeds-n, C:step/the-order-of-b-is-k]
+      confidence: medium
+    - slug: from-one-to-many
+      name: From one to many
+      number: 3
+      stage: close
+      says: 'With one such prime beyond every n, the primes that are 1 modulo k occur beyond every bound, and a set of natural numbers with members beyond every bound is infinite.'
+      plain: 'If there is always one more beyond any point, there can be no last one, so there are endlessly many.'
+      plain-if: none
+      steps: [C:lemma/Nat.frequently_atTop_modEq_one, C:statement/Nat.infinite_setOfPred_prime_modEq_one]
+      confidence: high
+  teaching: [what-must-be-found, a-number-built-to-have-the-right-factor, from-one-to-many]
+  readings:
+    - slug: the-polynomial-does-the-work
+      name: The polynomial does the work
+      summary: 'A prime that divides a value of the k-th cyclotomic polynomial and does not divide the point is 1 modulo k; the proof only has to make such a prime large.'
+      of: [a-number-built-to-have-the-right-factor]
+      grounds: [{of: C:step/b-is-a-root-modulo-p, lines: "43-50"}, {of: C:step/the-order-of-b-is-k, lines: "53-59"}]
+      confidence: medium
+    - slug: the-factorial-pushes-the-prime-past-n
+      name: The factorial pushes the prime past n
+      summary: 'Every number from 1 to n divides n!, so a prime that does not divide k · n! is larger than n.'
+      of: [a-number-built-to-have-the-right-factor]
+      grounds: [{of: C:step/p-exceeds-n, lines: "51-52"}]
+      confidence: high
+    - slug: the-case-k-is-one-is-treated-apart
+      name: The case k = 1 is treated apart
+      summary: 'The bound on the cyclotomic value is used only for k larger than 1; for k = 1 every prime qualifies, and the file takes any prime beyond n.'
+      of: [a-number-built-to-have-the-right-factor]
+      grounds: [{of: C:step/the-case-k-is-one, lines: "30-32"}]
+      confidence: high
+    - slug: infinitely-many-means-beyond-every-bound
+      name: Infinitely many means beyond every bound
+      summary: 'The statement is reached by rephrasing: one such prime beyond every n is the same as infinitely many.'
+      of: [from-one-to-many]
+      grounds: [{of: C:lemma/Nat.frequently_atTop_modEq_one, lines: "61-65"}]
+      confidence: high
+  decisions: []
+  atem:
+    line: 'For every whole number k that is not zero, infinitely many primes leave remainder 1 when divided by k.'
+    focus: 'The primes that are one more than a multiple of k.'
+    push: 'Past any number the proof names one more such prime.'
+    pull: 'It shows there is no last one and says nothing of how many lie below a given bound.'

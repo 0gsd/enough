@@ -1,0 +1,44 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `head` over the archive own/Parity.
+engine: model:hand-recorded
+recorded: by hand
+job: head
+tokens: 0
+seconds: 0
+output: |
+  stages:
+    - slug: what-must-be-shown
+      name: What must be shown
+      number: 1
+      stage: reduction
+      says: 'To show that a sum of two even numbers is even it is enough to name its half, and the definition of even asks for exactly that.'
+      plain: 'To show that a total can be shared equally between two people, it is enough to say how much each one gets.'
+      plain-if: none
+      obvious: "none: the archive's way is the obvious one"
+      steps: [C:statement/Parity.isEven_add, C:definition/Parity.IsEven]
+      confidence: high
+    - slug: the-doubles-add
+      name: The doubles add
+      number: 2
+      stage: main
+      says: 'The doubles of two numbers add to the double of their sum, so the sum of the two halves is the half of the sum.'
+      plain: 'Two doubled amounts put together make one doubled amount.'
+      plain-if: none
+      steps: [C:lemma/Parity.double_add]
+      confidence: high
+  teaching: [what-must-be-shown, the-doubles-add]
+  readings:
+    - slug: one-identity-carries-it
+      name: One identity carries it
+      summary: 'The whole argument rests on one identity: twice a plus twice b is twice the sum of a and b.'
+      of: [the-doubles-add]
+      grounds: [{of: C:lemma/Parity.double_add, lines: "7-8"}]
+      confidence: high
+  decisions: []
+  roles:
+    - {of: C:lemma/Parity.double_add, role: spine, why: 'Without it the two halves could not be gathered into one. It turns two doubles into one double, which is what the final theorem needs.'}
+  atem:
+    line: 'For all natural numbers m and n, if m is even and n is even, then their sum m + n is even.'
+    focus: 'The sum of two even numbers.'
+    push: 'One identity about doubles carries the whole argument.'
+    pull: 'It says nothing of odd numbers.'
