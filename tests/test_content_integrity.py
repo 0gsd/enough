@@ -117,7 +117,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # 0.8 (transconception): the word is kept as written in every language
     # (docs/I18N.md), so the card's heading is the same everywhere.
     "transconception",
-    "a–z", "z–a",       # the dictionary's sort-direction toggle
+    # 0.9 (the fabulam): `fabulam` and `pshort` are ruled words (dictionary 1.9), kept as written in every
+    # language like fabulac and cshort (docs/I18N.md), so the pshort viewer's kind reads the same everywhere.
+    "fabulam", "pshort",
+    "a–z", "z–a",      # the dictionary's sort-direction toggle
 ))
 
 # The second is per-language and much more interesting: a word that really
@@ -143,6 +146,8 @@ COGNATES: dict[str, frozenset[str]] = {
         "consonance",       # "une consonance" — likewise (fab.verse.fig.consonance)
         "refrain",          # "un refrain" — a recurrence (fab.verse.fig.refrain)
         "point",            # "un point" — a weighing's column (fab.tc.points.point, 0.8)
+        "expert",           # "un expert" — a pshort's density (fm.density.expert, 0.9)
+        "verdict",          # "un verdict" — a comment's row on the fabulam's top (fm.audit.verdict, 0.9)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"

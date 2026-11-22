@@ -1712,7 +1712,7 @@
     "fm.state.moved": "自其 fabulam 勘查以来，Lean 文件已改变：构建将从勘查重新开始",
     "fm.state.movedFolder": "自其 fabulam 勘查以来，文件夹已改变：构建将从勘查重新开始",
     "fm.state.none": "还没有 fabulam：构建它会写出 {name}",
-    "fm.state.outline": "一份大纲：勘查已按规则完成；阅读在等待模型",
+    "fm.state.outline": "一个轮廓：勘查已按规则完成；阅读在等待模型",
     "fm.state.partway": "已完成 {m} 个阶段中的 {n} 个；构建可从 {next} 继续",
     "fm.state.partwayFolder": "已完成 {m} 个文件中的 {n} 个；构建可从 {next} 继续",
     "fm.state.pick": "此文件以 {n} 个结果结尾：请选择要讲述的那一个",
