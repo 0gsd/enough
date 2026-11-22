@@ -668,7 +668,9 @@ class _Fabulam:
             self._agree(it, theirs, it.data["told-in"], says_field="says")
 
     def _agree(self, it: mc.Item, theirs: dict, uri: str, *, says_field: str) -> None:
-        diff = [f for f in ("lean", "digest") if theirs.get(f) != it.data.get(f)]
+        mine = it.data.get("lean")                      # a reliance's lean lists the names the file writes
+        same_lean = theirs.get("lean") in mine if isinstance(mine, list) else theirs.get("lean") == mine
+        diff = ([] if same_lean else ["lean"]) + (["digest"] if theirs.get("digest") != it.data.get("digest") else [])
         if " ".join(_text(it.data.get(says_field)).split()) != " ".join(_text(theirs.get("says")).split()):
             diff.append(says_field)
         if diff:
@@ -752,6 +754,10 @@ def known_fabulams(vol: mc.Volume):
             folders.append(folder.parent)
             known.add_file(folder.parent / (folder.name[: -len(PARTS_SUFFIX)] + SUFFIX))
             break
+    parts = vol.catalog.get("parts") if isinstance(vol.catalog, dict) else None
+    for p in parts if isinstance(parts, list) else []:
+        if isinstance(p, dict) and isinstance(p.get("path"), str):
+            known.add_file(where.parent / p["path"])
     for folder in folders:
         try:
             for p in sorted(folder.glob(f"*{SUFFIX}")):
