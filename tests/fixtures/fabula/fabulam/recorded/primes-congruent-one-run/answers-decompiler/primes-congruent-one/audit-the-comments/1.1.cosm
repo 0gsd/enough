@@ -1,0 +1,14 @@
+engine: model:blind-decompiler
+output: |
+  audit:
+    - lines: "1-5"
+      verdict: claim
+      claim: {slug: authorship-credit, name: 'Credit to the file''s author', says: 'The header credits Riccardo Brasca as author and copyright holder from 2020, and releases the file under the Apache 2.0 licence.', about: 'the file as a whole', checked: "not-checkable"}
+    - {lines: "10-15", verdict: agrees}
+    - {lines: "26-27", verdict: agrees}
+    - {lines: "67", verdict: agrees}
+  works: []
+  people:
+    - {slug: riccardo-brasca, name: 'Riccardo Brasca', summary: 'Named in the header as the author and copyright holder of the file, from 2020.', lines: "1-5"}
+  aims:
+    - {slug: infinitely-many-primes-one-mod-k, name: 'Infinitely many primes congruent to one', summary: 'The module note says the file proves that, for every positive natural number k, infinitely many primes leave remainder 1 on division by k.', lines: "10-15"}

@@ -1,0 +1,119 @@
+engine: model:blind-decompiler
+output: |
+  stages:
+    - slug: what-must-be-found
+      name: "What must be found"
+      number: 1
+      stage: reduction
+      says: "The statement asks that the primes congruent to 1 modulo k, for k not 0, form an infinite set. It is enough to give, beyond each bound n, one such prime; the next stages build that prime, so the bound is what has to be beaten."
+      plain: "To show there is no end to the primes (whole numbers that are not a product of two smaller whole numbers) that leave a remainder of one when divided by a chosen number, it is enough to show that past any limit you name, one more such prime can be found."
+      plain-if: "the chosen number is not zero."
+      obvious: "Euclid's way, multiplying known primes and adding one, gives a new prime beyond any bound but nothing makes it congruent to 1 modulo k; Dirichlet's theorem on primes in progressions would give the result but needs analytic means the file does not use. So the file builds the prime as a factor of a cyclotomic value instead."
+      regime: {as: "the bound n grows without end", uniform-in: "every bound n", fixed: "k, not 0", worst-over: "none"}
+      steps: ['C:statement/Nat.infinite_setOfPred_prime_modEq_one']
+      confidence: medium
+    - slug: the-trivial-modulus
+      name: "The modulus one"
+      number: 2
+      stage: side
+      says: "Since k is not 0, either k = 1 or k > 1. For k = 1 every number is congruent to 1 modulo 1, so any prime at least n + 1 from the infinitude of primes will do; this leaves k > 1, which the cyclotomic bound needs, to the main stages."
+      plain: "When the chosen number is one, the remainder condition asks nothing, since every whole number passes it, so any prime past the limit will do, and there always is one because the primes never run out."
+      plain-if: "there is no largest prime, a known fact the stage uses as given."
+      steps: ['C:step/case-k-one']
+      confidence: high
+    - slug: a-value-with-a-prime-factor
+      name: "A cyclotomic value with a prime factor"
+      number: 3
+      stage: main
+      says: "For k > 1 set b = k times n factorial, which is at least 2. The absolute value of the k-th cyclotomic polynomial at b exceeds b - 1, so exceeds 1, and its least prime factor p is the candidate the next two stages test."
+      plain: "Multiply the chosen number by the product of all whole numbers up to the limit, and feed the result into a fixed recipe of multiplying and adding that is built from the chosen number. What comes out is bigger than one, so it breaks into primes, and its smallest prime piece is the candidate."
+      plain-if: "the chosen number is more than one, so the starting number is at least two and what comes out of the recipe is bigger than one."
+      steps: ['C:lemma/Nat.exists_prime_gt_modEq_one', 'C:step/value-exceeds-one', 'C:step/least-prime-factor']
+      confidence: high
+    - slug: the-prime-lies-beyond-the-bound
+      name: "The prime lies beyond the bound"
+      number: 4
+      stage: main
+      says: "Since p divides the cyclotomic value, b is a root of the k-th cyclotomic polynomial modulo p, and such a root is coprime to p, so p does not divide b. Every number from 1 to n divides b, so p is larger than n. The next stage also needs that p does not divide b."
+      plain: "Because the candidate divides what came out of the recipe, the starting number solves the recipe when only remainders on division by the candidate are kept, and such a solution is never a multiple of the candidate. Every whole number up to the limit divides the starting number, so the candidate is none of them and lies past the limit."
+      plain-if: "the candidate is a prime, so that keeping only remainders on division by it behaves well."
+      regime: {as: "the bound n grows without end", uniform-in: "every bound n", fixed: "k, more than 1", worst-over: "none"}
+      steps: ['C:step/root-mod-p', 'C:step/p-not-dividing-b', 'C:step/p-above-n']
+      confidence: high
+    - slug: the-order-is-exactly-k
+      name: "The order is exactly k"
+      number: 5
+      stage: main
+      says: "Since k divides b and p does not, k is nonzero modulo p, so the root b is a primitive k-th root of unity there and has order exactly k. The order of a nonzero element modulo a prime divides p - 1, so k divides p - 1 and p is congruent to 1 modulo k, which completes the prime the reduction asked for."
+      plain: "Keeping only remainders on division by the candidate, multiplying the starting number by itself again and again first comes back to one after exactly as many steps as the chosen number. Any such count of steps divides one less than the candidate, so the candidate leaves a remainder of one when divided by the chosen number."
+      plain-if: "the candidate is a prime that does not divide the chosen number, which holds because it does not divide the starting number, a multiple of the chosen number."
+      steps: ['C:step/order-is-k']
+      confidence: high
+    - slug: from-one-to-infinitely-many
+      name: "From one prime past each bound to infinitely many"
+      number: 6
+      stage: close
+      says: "A prime congruent to 1 modulo k above every bound n, with n < p weakened to n at most p, means such primes occur frequently at infinity; on the natural numbers that is the same as the set of them being infinite, which is the statement."
+      plain: "Since past every limit there is another such prime, they never run out, and never running out is all it means for there to be infinitely many."
+      plain-if: none
+      regime: {as: "the bound n grows without end", uniform-in: "every bound n", fixed: "k, not 0", worst-over: "none"}
+      steps: ['C:lemma/Nat.frequently_atTop_modEq_one']
+      confidence: high
+  teaching: [what-must-be-found, a-value-with-a-prime-factor, the-prime-lies-beyond-the-bound, the-order-is-exactly-k, the-trivial-modulus, from-one-to-infinitely-many]
+  readings:
+    - slug: the-order-forces-the-remainder
+      name: "The order forces the remainder"
+      summary: "A prime dividing the cyclotomic value at b, and not dividing k, sees b as an element of order exactly k; since orders modulo a prime divide p - 1, the congruence to 1 modulo k comes for free from divisibility."
+      of: [the-order-is-exactly-k]
+      grounds: [{of: 'C:step/order-is-k', lines: "53-59"}]
+      confidence: high
+    - slug: the-factorial-pushes-past-the-bound
+      name: "The factorial pushes the prime past the bound"
+      summary: "Evaluating at a multiple of n factorial makes every number up to n divide b, while a root of a cyclotomic polynomial modulo p is coprime to p; so no prime up to n can divide the value."
+      of: [the-prime-lies-beyond-the-bound]
+      grounds: [{of: 'C:step/p-not-dividing-b', lines: "49-50"}, {of: 'C:step/p-above-n', lines: "51-52"}]
+      confidence: high
+    - slug: the-factor-k-keeps-k-a-unit
+      name: "The factor k keeps k nonzero modulo the prime"
+      summary: "Putting k itself into b means p, which does not divide b, does not divide k; then k is nonzero modulo p, which is what makes a root of the k-th cyclotomic polynomial a primitive k-th root of unity."
+      of: ['C:constant/factor-k']
+      grounds: [{of: 'C:step/order-is-k', lines: "55-57"}]
+      confidence: high
+    - slug: the-value-is-large-enough-to-factor
+      name: "The value is large enough to have a prime factor"
+      summary: "With b at least 2 the cyclotomic value exceeds b - 1 and so exceeds 1, which is all that is needed for its least factor to be a prime."
+      of: [a-value-with-a-prime-factor]
+      grounds: [{of: 'C:step/value-exceeds-one', lines: "36-40"}, {of: 'C:step/least-prime-factor', lines: "41-42"}]
+      confidence: high
+    - slug: infinitely-many-is-a-change-of-language
+      name: "Infinitely many is a change of language"
+      summary: "Once there is a prime beyond each bound, the infinite set follows by restating it as frequently at infinity and then as an infinite set; no further mathematics is done."
+      of: [from-one-to-infinitely-many]
+      grounds: [{of: 'C:lemma/Nat.frequently_atTop_modEq_one', lines: "61-65"}, {of: 'C:statement/Nat.infinite_setOfPred_prime_modEq_one', lines: "68-70"}]
+      confidence: high
+  decisions:
+    - slug: evaluate-at-k-times-factorial
+      name: "Evaluate at k times n factorial"
+      summary: "The point at which the cyclotomic polynomial is evaluated is b = k times n factorial."
+      chose: "b = k times n factorial"
+      because: "the factor n factorial puts every prime factor above n, and the factor k keeps k nonzero modulo that prime; a smaller multiple of every number up to n would also serve, but n factorial is the ready one."
+    - slug: take-the-least-prime-factor
+      name: "Take the least prime factor"
+      summary: "The prime is the least prime factor of the absolute value of the cyclotomic value."
+      chose: "the least prime factor"
+      because: "a definite prime divisor of a number other than 1 is needed, and the least factor is one at hand; the argument uses only that it is a prime dividing the value."
+    - slug: split-off-the-modulus-one
+      name: "Split off the modulus one"
+      summary: "The case k = 1 is handled apart from the cyclotomic construction."
+      chose: "for k = 1, any prime at least n + 1 from the infinitude of primes"
+      because: "the lower bound on the cyclotomic value is stated for k > 1, and for k = 1 the congruence holds for every number."
+    - slug: through-frequently-at-infinity
+      name: "Reach the infinite set through frequently at infinity"
+      summary: "The infinite set is obtained by first stating that such primes occur frequently as p goes to infinity."
+      chose: "a lemma stating frequency at infinity between the existence lemma and the statement"
+      because: "on the natural numbers frequently at infinity is equivalent to an infinite set, and it unfolds directly into a prime past each bound, which the existence lemma supplies."
+  atem:
+    line: "For every natural number k other than 0, there are infinitely many primes p with p congruent to 1 modulo k."
+    focus: "The proof builds, past any bound n, one prime congruent to 1 modulo k as a prime factor of the k-th cyclotomic polynomial evaluated at k times n factorial."
+    push: "Making every number up to n divide the evaluation point forces each prime factor of the value above n."
+    pull: "Making k divide the evaluation point keeps k nonzero modulo the prime, so the point has order exactly k and k divides p - 1."

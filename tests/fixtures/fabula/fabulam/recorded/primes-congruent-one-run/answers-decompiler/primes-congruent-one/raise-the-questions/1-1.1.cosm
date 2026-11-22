@@ -1,0 +1,34 @@
+engine: model:blind-decompiler
+output: |
+  questions:
+    - about: N:aim/infinitely-many-primes-one-mod-k
+      asks: 'What prompted this file, and for whom was it written?'
+      why: intent
+      kind: choice
+      options: ['a contribution to Mathlib', 'a teaching example or exercise', 'a step in a larger project', 'something else']
+      hint: 'Nothing in the module note says why or for whom.'
+    - about: 'C:part/one-beyond-every-bound#obvious'
+      asks: 'Was the cyclotomic route taken to avoid depending on the general theorem of Dirichlet, or was that theorem not available to you when the file was written?'
+      why: intent
+      kind: choice
+      options: ['chosen to avoid Dirichlet', 'Dirichlet was not available', 'neither; the cyclotomic route was simply preferred']
+    - about: 'P:yield/what-the-proof-delivers#as-statement'
+      asks: 'Was it deliberate that the final statement keeps only that the set is infinite, and not the explicit prime above n with its upper bound?'
+      why: intent
+      kind: yes-no
+      hint: 'The proof builds an explicit witness that the statement then forgets.'
+    - about: 'N:decision/evaluate-at-k-times-n-factorial#because'
+      asks: 'Why is b taken as k times n factorial rather than a smaller multiple such as k times the least common multiple of 1 to n?'
+      why: intent
+      kind: choice
+      options: ['n factorial was easier to use in the library', 'the size of the witness did not matter', 'the smaller choice was not considered', 'another reason']
+    - about: 'N:decision/least-prime-factor#because'
+      asks: 'Was the least prime factor taken for a reason of its own, or only because it is a convenient way to name some prime divisor?'
+      why: intent
+      kind: choice
+      options: ['only a convenient prime divisor', 'the smallest witness was wanted', 'another reason']
+    - about: 'N:decision/through-frequently#because'
+      asks: 'Was the lemma that such primes occur frequently at infinity meant to be used on its own, or only as a step toward the infinite set?'
+      why: intent
+      kind: choice
+      options: ['meant to be used on its own', 'only a step toward the statement']

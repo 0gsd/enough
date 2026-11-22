@@ -64,6 +64,7 @@ HEAD_PARTS = 24
 #: The crossing items one fold request carries, by `carries`.
 HEAD_CROSSING = 40
 #: The whole user message of any request. A request over it is refused before it is sent.
+CHUNK_TRIES = 3            # how often one chunk of a reading is asked before its failing extras are left out
 REQUEST_CHARS = 48_000
 #: What the prompt adds to a request's inputs in its user message: the labels and the shape of the answer.
 SHAPE_CHARS = 2_400
@@ -778,7 +779,10 @@ def _decl_item(d: dict, fname: str, targets: list[str], row: dict | None, used: 
         it["sorry"] = int(d.get("sorry") or 0)
         if d.get("automation"):
             it["automation"] = [str(x) for x in d["automation"]]
-        if d.get("scope"):
+        if d.get("scope") and kind == "lemma":
+            # the manifest opens `scope` (the lines of the variables that hold) on a lemma only; on a statement
+            # the shared closed list of a dependency's scope would refuse it, so a final theorem under a
+            # `variable` carries none (the reader of the proof is shown those lines with the rest of the file)
             it["scope"] = plain(d["scope"])
     it["provenance"] = _code.prov([_code.loc(fname, a, b)])
     return it
@@ -955,7 +959,10 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     relied: list[dict] = []
     if place is not None:
         mine = set(crossing_in(hitems, comp))
-        others = {str(it["lean"]): it for it in _decls(hitems) if it["lean"] not in mine}
+        # only what the head says this part uses (the reader's graph found the use); the name as written is then
+        # looked for in each declaration, to say which of them lean on it
+        theirs = set((comp or {}).get("uses") or [])
+        others = {str(it["lean"]): it for it in _decls(hitems) if it["lean"] not in mine and it.get("id") in theirs}
         for d in defs:
             written = outside_names(d)
             for lean, hit in others.items():
@@ -1016,18 +1023,20 @@ def _modules(paths: list[str], outlines: dict, root: str | None = None) -> dict[
     itself under the prefix the others show, or under `root` (the module the folder is, when the host knows it)."""
     imports = {str(i.get("module")) for ol in outlines.values() for i in ol.get("imports") or []
                if isinstance(i, dict) and i.get("module")}
-    out: dict[str, str] = {}
+    # One prefix for the whole folder: the host's, else the one most of the set's imports show. An import of
+    # another library's file that only ends in the same name (`Mathlib.Analysis.Fourier.ZMod` beside the folder's
+    # own `ZMod.lean`) names no file of the set, so it is never taken for one.
     prefix: str | None = root.rstrip(".") + "." if root else None
-    for p in paths:
-        own = p[:-5].replace("/", ".")
-        hit = next((m for m in sorted(imports) if m == own or m.endswith("." + own)), None)
-        if hit:
-            out[p] = hit
-            if prefix is None and hit != own:
-                prefix = hit[: -len(own)]
-    for p in paths:
-        out.setdefault(p, (prefix or "") + p[:-5].replace("/", "."))
-    return out
+    if prefix is None:
+        votes: dict[str, int] = {}
+        for p in paths:
+            own = p[:-5].replace("/", ".")
+            for m in imports:
+                if m == own or m.endswith("." + own):
+                    votes[m[: -len(own)]] = votes.get(m[: -len(own)], 0) + 1
+        if votes:
+            prefix = sorted(votes, key=lambda k: (-votes[k], k))[0]
+    return {p: (prefix or "") + p[:-5].replace("/", ".") for p in paths}
 
 
 def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
@@ -1151,6 +1160,12 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
         comp["does"] = ({"pending": f"what does {module[p]} prove on the way to the targets? ({NOT_READ})"}
                         if n_reached else "No declaration of it is reached from the targets: it is outlined by "
                                           "rule and was not read.")
+        # what this part really uses of the other parts, by the reader's graph (never by a last name alone: a
+        # file that writes `map_one` does not lean on another file's `MulChar.map_one` it never imports)
+        named = {u for q in defs for u in uses.get(q, [])}
+        theirs = [cross[u] for u in sorted(named) if u in cross and where[u][0] != p]
+        if theirs:
+            comp["uses"] = theirs
         comp.update({"offers": offers[p], "stages": [],
                      "counts": {"declarations": len(defs), "reached": n_reached, "spine": 0},
                      "completeness": "outline", "provenance": _code.prov([p])})
@@ -1482,12 +1497,28 @@ def read_proof(ctx: Any, t: Value, **mods: Any) -> Request | Value:
 
     def ask(ins: dict, read: Any) -> Any:
         err = failed
-        for _try in range(2):
+        data: Any = None
+        for _try in range(CHUNK_TRIES):
             if err:
                 ins = {**ins, "failed": Value("string", err)}
             cand = ctx.ask({"schema": schema, "repair": []}, ins)
+            data = None
             try:
-                return read(answer_mapping(cand.get("output")))
+                data = answer_mapping(cand.get("output"))
+                return read(data)
+            except ValueError as e:
+                err = str(e)
+        # The last answer still holds an entry that cannot be taken. A step, a reliance, a term or a concept is
+        # an extra the reading can lack: the entry is left out by rule and the rest is kept, so that one bad
+        # extra never stops a file's build for good. What a declaration says is never left out this way.
+        while isinstance(data, dict):
+            mt = re.match(r"(steps|reliances|terms|concepts) entry (\d+)\b", err or "")
+            rows = data.get(mt.group(1)) if mt else None
+            if not isinstance(rows, list) or not 1 <= int(mt.group(2)) <= len(rows):
+                break
+            data = {**data, mt.group(1): rows[: int(mt.group(2)) - 1] + rows[int(mt.group(2)):]}
+            try:
+                return read(data)
             except ValueError as e:
                 err = str(e)
         raise MoveError(f"{fname}: the reading could not be read: {err}")
@@ -1553,6 +1584,27 @@ def _brief(items: list[dict], kinds: tuple[str, ...], fields: tuple[str, ...]) -
     return rows
 
 
+AUDIT_FALLBACKS = 12       # how many claims of one audit answer a rule may set to not-checkable, at most
+
+
+def _claim_unsettled(data: Any, err: str | None) -> bool:
+    """After the last try: the claim of the comment the refusal names (`lines A-B: …`) is kept as a claim that
+    was not set against the Lean (`checked: "not-checkable"`, which asks for no other field), so that one claim
+    whose verdict cannot be taken never stops a file's build for good. It is the weakest word, and it says less
+    than the model did, never more. False when the refusal names no claim a rule can keep this way."""
+    mt = re.match(r"lines (\d+(?:-\d+)?): ", err or "")
+    if not mt or not isinstance(data, dict):
+        return False
+    for r in data.get("audit") or []:
+        ab = lines_of(r.get("lines")) if isinstance(r, dict) else None
+        c = r.get("claim") if isinstance(r, dict) else None
+        if ab and _lines_text(*ab) == mt.group(1) and isinstance(c, dict) and r.get("verdict") == "claim" \
+                and c.get("name") and c.get("says") and str(c.get("checked")).strip('"') != "not-checkable":
+            c["checked"] = "not-checkable"
+            return True
+    return False
+
+
 def parse_comments(data: dict, *, fname: str, cat: dict, items: list[dict], rows: list[dict], taken: set[str]
                    ) -> tuple[list[dict], list[dict]]:
     """The audit's answer as `(the rows with their verdicts, the new items)`. Every row asked has one entry."""
@@ -1607,16 +1659,22 @@ def parse_comments(data: dict, *, fname: str, cat: dict, items: list[dict], rows
             for k in CHECKED[word]:
                 v = claim.get(k)
                 if k == "by":
-                    ref = _item_ref(v, by_lean, ids)
-                    if ref is None:
+                    # one declaration, or several (a list, or names with commas between): those of the outline
+                    named = v if isinstance(v, list) else [x for x in re.split(r"\s*,\s*", str(v or "")) if x]
+                    refs = [r for r in (_item_ref(x, by_lean, ids) for x in named) if r is not None]
+                    if not refs:
                         raise ValueError(f"lines {row['lines']}: checked {word!r} names by, the declaration that "
                                          f"bears on it; {v!r} is none of the outline")
-                    it["by"] = [ref]
+                    it["by"] = list(dict.fromkeys(refs))
                 elif k == "mismatch":
                     if v not in MISMATCHES:
                         raise ValueError(f"lines {row['lines']}: mismatch is one of {', '.join(MISMATCHES)}")
                     it["mismatch"] = v
                 elif k == "false-as-written":
+                    if mc.is_pending(v) or v in (None, ""):
+                        raise ValueError(f"lines {row['lines']}: false-as-written is \"yes\" or \"no\", never "
+                                         "pending: where the lines shown cannot settle it, write \"no\" and say "
+                                         "in short-of what is not settled")
                     it[k] = _yes_no(v, f"lines {row['lines']}: false-as-written")
                 elif not (isinstance(v, str) and v.strip()):
                     raise ValueError(f"lines {row['lines']}: checked {word!r} needs {k}")
@@ -1688,13 +1746,19 @@ def audit_comments(ctx: Any, t: Value, **mods: Any) -> Request | Value:
         if not mine:
             continue
         err = None
-        for _try in range(2):
-            ins = inputs(p["a"], p["b"])
-            if err:
-                ins["failed"] = Value("string", err)
-            cand = ctx.ask({"schema": schema, "repair": []}, ins)
+        data: Any = None
+        for _try in range(CHUNK_TRIES + AUDIT_FALLBACKS):
+            if _try < CHUNK_TRIES:
+                ins = inputs(p["a"], p["b"])
+                if err:
+                    ins["failed"] = Value("string", err)
+                cand = ctx.ask({"schema": schema, "repair": []}, ins)
+                data = None
+            elif not _claim_unsettled(data, err):
+                # the last answer's claim still cannot be taken, and no rule mends it
+                raise MoveError(f"{fname}, lines {p['a']} to {p['b']}: the audit could not be read: {err}")
             try:
-                data = answer_mapping(cand.get("output"))
+                data = answer_mapping(cand.get("output")) if data is None else data
                 done, new = parse_comments(data, fname=fname, cat=cat, items=items + new_all, rows=mine,
                                            taken=taken | {x["id"] for x in new_all})
                 model = model or model_of(data)
@@ -1787,11 +1851,15 @@ def fit_wording(ctx: Any, wording: Value, **mods: Any) -> Request | Value:
 # construe t as yield with f: stated against shown (asks, once per statement)
 # ---------------------------------------------------------------------------
 
-_UP_TO = re.compile(r"\bup to\b(?:\s+(?:an?\s+|the\s+)?([a-z]+))?", re.I)
+#: "add up to", "sum up to": the phrase of a total, which bounds nothing (`enough.fabulam` holds the same words).
+UP_TO_AFTER = ("add", "adds", "added", "adding", "sum", "sums", "summed", "summing")
+_UP_TO = re.compile("".join(rf"(?<!\b{w} )" for w in UP_TO_AFTER) + r"\bup to\b(?:\s+(?:an?\s+|the\s+)?([a-z]+))?",
+                    re.I)
 
 
 def holds_up_to(s: Any) -> bool:
-    """Whether a text says "up to" of a bound: the phrase, not followed by one of `UP_TO_ALLOWED`."""
+    """Whether a text says "up to" of a bound: the phrase, not followed by one of `UP_TO_ALLOWED` and not the
+    end of "add up to" or "sum up to" (`UP_TO_AFTER`)."""
     return any((m.group(1) or "").lower() not in UP_TO_ALLOWED for m in _UP_TO.finditer(str(s or "")))
 
 
@@ -1937,6 +2005,35 @@ def parse_yield(data: dict, *, fname: str, st: dict, items: list[dict], taken: s
     return new, slack
 
 
+YIELD_CUTS = ("what no target reaches", "the bookkeeping lemmas", "the support lemmas' methods",
+              "every says and gives past 240 characters", "the support lemmas")
+
+
+def yield_rows(items: list[dict], cut: int = 0) -> list[dict]:
+    """What the yield's request is shown of the file's items beside the proof's own lines. Past one request
+    (`REQUEST_CHARS`) it is shown less, by rule, one cut after another in the order of `YIELD_CUTS`."""
+    kinds = ("lemma", "step", "reliance", "definition")
+    rows = []
+    for it, row in zip([x for x in items if item_kind(x) in kinds],
+                       _brief(items, kinds, ("lean", "says", "role", "method", "why", "depth", "carries", "gives",
+                                             "inside"))):
+        kind, role = item_kind(it), it.get("role")
+        if cut >= 1 and kind in ("lemma", "definition") and it.get("reached") == "no":
+            continue
+        if cut >= 2 and kind == "lemma" and role == "bookkeeping":
+            continue
+        if cut >= 3 and role == "support":
+            row.pop("method", None)
+        if cut >= 4:
+            for k in ("says", "gives"):
+                if isinstance(row.get(k), str) and len(row[k]) > 240:
+                    row[k] = row[k][:239].rstrip() + "…"
+        if cut >= 5 and kind == "lemma" and role == "support":
+            continue
+        rows.append(row)
+    return rows
+
+
 def tell_yield(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     """`construe t as yield with f`: what each statement's proof delivers, set against what it says (5.2 stage 5,
     first half), comments blanked. Once per statement."""
@@ -1949,16 +2046,18 @@ def tell_yield(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     blank = blank_comments(text)
     n = lines_in(text)
     schema = {"format": "yaml", "stamp": "engine", "says": YIELD_SAYS}
-    outline = _yaml(_brief(items, ("lemma", "step", "reliance", "definition"),
-                           ("lean", "says", "role", "method", "why", "depth", "carries", "gives", "inside")))
-
     def inputs(st: dict) -> dict:
         ranges = proof_ranges(items, st, fname)
         code = "\n\n".join(f"lines {a}-{b}:\n{numbered(blank, a, b)}" for a, b in ranges)
-        return held(_strings({"fabulam": "yield", "name": str(cat.get("name") or fname), "path": fname,
-                              "lines": f"{', '.join(_lines_text(a, b) for a, b in ranges)} of {n}",
-                              "statement": _yaml(_brief([st], ("statement",), ("lean", "says", "quantifiers"))),
-                              "code": code, "outline": outline}), f"the yield of {st['lean']}")
+        ins: dict = {}
+        for cut in range(len(YIELD_CUTS) + 1):          # a file of many items is shown less of them, by rule
+            ins = _strings({"fabulam": "yield", "name": str(cat.get("name") or fname), "path": fname,
+                            "lines": f"{', '.join(_lines_text(a, b) for a, b in ranges)} of {n}",
+                            "statement": _yaml(_brief([st], ("statement",), ("lean", "says", "quantifiers"))),
+                            "code": code, "outline": _yaml(yield_rows(items, cut))})
+            if request_chars(ins) <= REQUEST_CHARS:
+                break
+        return held(ins, f"the yield of {st['lean']}")
 
     def value(new: list[dict], slack: dict, model: str | None) -> Value:
         nodes = []
@@ -1981,7 +2080,7 @@ def tell_yield(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     model = None
     for st in statements:
         err = None
-        for _try in range(2):
+        for _try in range(CHUNK_TRIES):
             ins = inputs(st)
             if err:
                 ins["failed"] = Value("string", err)
@@ -2026,10 +2125,18 @@ def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: lis
             raise ValueError(f"stages entry {i}: stage is one of {', '.join(STAGE_WORDS)}")
         if isinstance(row.get("number"), bool) or not isinstance(row.get("number"), int):
             raise ValueError(f"stages entry {i}: number is its place in the logic, 1, 2, 3")
-        steps = [_item_ref(x, by_lean, ids) for x in row.get("steps") or []]
-        if not steps or None in steps or any(item_kind(by_id[s]) not in step_kinds for s in steps):
+        named = list(row.get("steps") or [])
+        steps = [_item_ref(x, by_lean, ids) for x in named]
+        # an item that is no step (a reliance, a yield, a constant) named among the steps is left out by rule
+        # when a real step stands beside it; a name that is no item at all is still refused
+        if any(s is not None and item_kind(by_id[s]) in step_kinds for s in steps):
+            kept = [(x, s) for x, s in zip(named, steps) if s is None or item_kind(by_id[s]) in step_kinds]
+            named, steps = [x for x, _s in kept], [s for _x, s in kept]
+        off = next((f"{x!r} is no item shown" if s is None else f"{s} is a {item_kind(by_id[s])}"
+                    for x, s in zip(named, steps) if s is None or item_kind(by_id[s]) not in step_kinds), None)
+        if not steps or off:
             raise ValueError(f"stages entry {i}: steps names the {', '.join(step_kinds)} items that make it up, by "
-                             "id")
+                             "id" + (f"; {off}" if off else ""))
         if row["stage"] == "reduction" and not (isinstance(row.get("obvious"), str) and row["obvious"].strip()):
             raise ValueError("the reduction has no obvious: the obvious way and why it fails, or \"none: the "
                              "file's way is the obvious one\"")
@@ -2116,6 +2223,12 @@ def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: lis
     if not isinstance(a, dict) or any(not (isinstance(a.get(k), str) and a[k].strip()) for k in
                                       ("line", "focus", "push", "pull")):
         raise ValueError("the answer holds no atem: {line, focus, push, pull}")
+    n = len(words_in(a["line"]))
+    if not 15 <= n <= 25:
+        # said here, where the model is asked again with the reason, in the words of how the count is made
+        raise ValueError(f"the atem's line is {n} words as they are counted, not 15 to 25: every run of letters or "
+                         "of digits is one word, so (p/q) is two and 1/2 is two; say the statement in words, with "
+                         "few symbols")
     atem = {**({"of": atem_of} if atem_of else {}), **{k: fold(a[k]) for k in ("line", "focus", "push", "pull")}}
     return new, teaching, atem
 
@@ -2126,21 +2239,55 @@ def _atem_of(cat: dict, items: list[dict]) -> str | None:
     return of if of in ids else next((it["id"] for it in _statements(items)), None)
 
 
+FOLD_CUTS = ("the comments' claims", "the definitions no target reaches", "the bookkeeping lemmas' methods",
+             "the bookkeeping lemmas", "the support lemmas' methods", "every says past 240 characters")
+
+
+def fold_rows(shown: list[dict], cut: int = 0) -> list[dict]:
+    """What the fold of a file is shown of its items. A file whose items are past one request (`REQUEST_CHARS`)
+    is shown less, by rule, one cut after another in the order of `FOLD_CUTS` (the design's 4.4 does the same for
+    a pshort): the first `cut` of them are made."""
+    kinds = ("statement", "lemma", "step", "definition", "reliance", "yield", "case", "constant", "claim", "fit")
+    fields = ("lean", "name", "says", "quantifiers", "role", "method", "why", "depth", "carries", "reached",
+              "inside", "gives", "known-as", "case", "beyond", "as-statement", "bound", "chooses", "trivial",
+              "given", "expect", "value", "checked", "how", "differences")
+    rows = []
+    for it, row in zip([x for x in shown if item_kind(x) in kinds],
+                       _brief(shown, kinds, fields)):
+        kind, role = item_kind(it), it.get("role")
+        if cut >= 1 and kind == "claim":
+            continue
+        if cut >= 2 and kind == "definition" and it.get("reached") == "no":
+            continue
+        if cut >= 3 and role == "bookkeeping":
+            row.pop("method", None)
+        if cut >= 4 and kind == "lemma" and role == "bookkeeping":
+            continue
+        if cut >= 5 and role == "support":
+            row.pop("method", None)
+        if cut >= 6 and isinstance(row.get("says"), str) and len(row["says"]) > 240:
+            row["says"] = row["says"][:239].rstrip() + "…"
+        rows.append(row)
+    return rows
+
+
 def fold_argument(ctx: Any, t: Value, **mods: Any) -> Request:
     """`construe t as stages with f`: the stages, the teaching order, the readings and the atem (5.2 stage 5, second
     half), from the items alone. No Lean is sent."""
     w = mods.get("with")
     cat, items = _fabulam(w, "construe … as stages takes the fabulam so far: construe t as stages with f")
     fname = _file_name(t)
-    told = _yaml(_brief(items, ("statement", "lemma", "step", "definition", "reliance", "yield", "case", "constant",
-                                "claim", "fit"),
-                        ("lean", "name", "says", "quantifiers", "role", "method", "why", "depth", "carries",
-                         "reached", "inside", "gives", "known-as", "case", "beyond", "as-statement", "bound",
-                         "chooses", "trivial", "given", "expect", "value", "checked", "how", "differences")))
-    inputs = held(_strings({"fabulam": "stages", "name": str(cat.get("name") or fname), "items": told}),
-                  f"the fold of {fname}")
-    taken = {str(it.get("id")) for it in items}
+    # a lemma the targets do not reach is no step of the argument: it is not shown, so it cannot be named
     shown = [it for it in items if not (item_kind(it) == "lemma" and it.get("reached") == "no")]
+    name = str(cat.get("name") or fname)
+    inputs = None
+    for cut in range(len(FOLD_CUTS) + 1):
+        told = _yaml(fold_rows(shown, cut))
+        inputs = _strings({"fabulam": "stages", "name": name, "items": told})
+        if request_chars(inputs) <= REQUEST_CHARS:
+            break
+    inputs = held(inputs, f"the fold of {fname}")
+    taken = {str(it.get("id")) for it in items}
 
     def parse(out: Any) -> Value:
         data = answer_mapping(out)
@@ -2222,7 +2369,7 @@ def fold_head(ctx: Any, repo: Value, **mods: Any) -> Request | Value:
                                  "components": _yaml([_component_summary(c) for c in group]), "crossing": shown}),
                        f"round {k} of the fold of {name}")
             err = None
-            for _try in range(2):
+            for _try in range(CHUNK_TRIES):
                 if err:
                     ins = {**ins, "failed": Value("string", err)}
                 cand = ctx.ask({"schema": {"format": "yaml", "stamp": "engine", "says": "a YAML mapping: notes, a "
@@ -2257,7 +2404,7 @@ def fold_head(ctx: Any, repo: Value, **mods: Any) -> Request | Value:
     if len(rounds) == 1:
         return Request(contract={"schema": schema, "repair": []}, inputs=inputs, parse=read)
     err = None
-    for _try in range(2):
+    for _try in range(CHUNK_TRIES):
         if err:
             inputs = {**inputs, "failed": Value("string", err)}
         cand = ctx.ask({"schema": schema, "repair": []}, inputs)
@@ -2307,9 +2454,35 @@ def _stripped(x: Any) -> Any:
     return x
 
 
+#: What an entailment's request holds beside the fabulam (the brief, the ids to cite): the room kept for it.
+PSHORT_ROOM = 5_000
+PSHORT_LINKS = ("uses", "used-by", "leans-on", "offers", "files", "relied-by")
+
+
+def _said_once(it: dict) -> dict:
+    """An item without what it says twice: a by-rule summary beside its `says`, a name that is its Lean name, a
+    role and a why in its part that are its role and why in the head."""
+    out = dict(it)
+    if isinstance(out.get("says"), str) and out["says"].strip():
+        out.pop("summary", None)
+    if out.get("name") == out.get("lean"):
+        out.pop("name", None)
+    for here, there in (("role", "role-there"), ("why", "why-there")):
+        if there in out and out.get(here) == out[there]:
+            out.pop(there)
+    return out
+
+
+def _cut_long(it: dict, most: int = 300) -> dict:
+    return {k: (v[: most - 1].rstrip() + "…" if k in ("says", "gives", "method", "why", "does") and
+                isinstance(v, str) and len(v) > most else v) for k, v in it.items()}
+
+
 def pshort_view(cat: dict, items: list[dict]) -> tuple[str, list[str]]:
-    """The fabulam as an entailment carries it, as YAML, and what was left out for length (`PSHORT_CHARS`): the
-    bookkeeping lemmas first, then the support lemmas' method."""
+    """The fabulam as an entailment carries it, as YAML, and what was left out for length: the bookkeeping lemmas
+    first, then the support lemmas' method, and so on down `cuts`, one after another, until it is within
+    `PSHORT_CHARS` and within what one request sends (`REQUEST_CHARS`, less `PSHORT_ROOM`). A head's fabulam is
+    the one that needs the later cuts. The footer names every cut made."""
     keep = [it for it in items if item_kind(it) not in ("file", "question", "session")
             and not (item_kind(it) in DECL_KINDS and it.get("reached") == "no")]
     src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
@@ -2319,17 +2492,33 @@ def pshort_view(cat: dict, items: list[dict]) -> tuple[str, list[str]]:
             "audit": [_stripped(r) for r in cat.get("audit") or [] if isinstance(r, dict)
                       and r.get("verdict") == "claim"]}
     left: list[str] = []
+    most = min(PSHORT_CHARS, REQUEST_CHARS - PSHORT_ROOM)
 
     def dump(rows: list[dict]) -> str:
         return _yaml({**head, "items": [_stripped(it) for it in rows]})
+
+    def support(it: dict) -> bool:
+        return item_kind(it) == "lemma" and it.get("role") == "support"
+
+    cuts = (
+        ("the bookkeeping lemmas", lambda rows: [it for it in rows if it.get("role") != "bookkeeping"]),
+        ("the support lemmas' method",
+         lambda rows: [{k: v for k, v in it.items() if not (k == "method" and it.get("role") == "support")}
+                       for it in rows]),
+        ("what an item says twice", lambda rows: [_said_once(it) for it in rows]),
+        ("the links between declarations",
+         lambda rows: [{k: v for k, v in it.items() if k not in PSHORT_LINKS} for it in rows]),
+        ("the definitions the spine does not name",
+         lambda rows: [it for it in rows if item_kind(it) != "definition" or it.get("fields")]),
+        ("the support lemmas", lambda rows: [it for it in rows if not support(it)]),
+        ("the end of every sentence past 300 characters", lambda rows: [_cut_long(it) for it in rows]),
+    )
     text = dump(keep)
-    if len(text) > PSHORT_CHARS:
-        keep = [it for it in keep if it.get("role") != "bookkeeping"]
-        left.append("the bookkeeping lemmas")
-        text = dump(keep)
-    if len(text) > PSHORT_CHARS:
-        keep = [{k: v for k, v in it.items() if not (k == "method" and it.get("role") == "support")} for it in keep]
-        left.append("the support lemmas' method")
+    for name, cut in cuts:
+        if len(text) <= most:
+            break
+        keep = cut(keep)
+        left.append(name)
         text = dump(keep)
     return text, left
 
@@ -2627,6 +2816,8 @@ def _pshort_nothing_added(output: Value, inputs: dict, node: dict, decl: Any, ct
         return False, "no fabulam to hold the pshort's words to"
     have = {w.lower() for w in words_in(text_blob(cat, items))}
     have |= {w.lower() for w in words_in(_yaml(cat.get("source") or {}))}
+    # and what the entailer was shown as a number and not as text: a stage's number, a depth, a count
+    have |= {w.lower() for w in words_in(pshort_view(cat, items)[0])}
     lookup = (getattr(ctx, "engines", None) or {}).get("feed")
     unknown: list[str] = []
     for sentence in split_sentences(" ".join(_body_words(output.text()).split())):
@@ -2670,7 +2861,10 @@ def _pshort_apart(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
     cat, items, _d, _fab = _pshort_of(output, inputs)
     src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
     paths = {str(src.get("path") or "")} | {str(it.get("path")) for it in items if item_kind(it) == "file"}
-    paths = {p for p in paths if p and p != "None"} | {p.rsplit("/", 1)[-1] for p in paths if p and p != "None"}
+    paths = {p.rstrip("/") for p in paths if p and p != "None"} - {""}
+    # a file's own name counts too (`Basic.lean`); a folder's last name does not: it is a word of the mathematics
+    # as often as not (`LSeries`), and a head's source is a folder
+    paths |= {p.rsplit("/", 1)[-1] for p in paths if "." in p.rsplit("/", 1)[-1]}
     for req in sent:
         for name, text in (req or {}).items():
             text = str(text)

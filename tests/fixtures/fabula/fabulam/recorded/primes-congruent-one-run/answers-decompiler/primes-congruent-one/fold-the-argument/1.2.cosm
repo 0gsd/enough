@@ -1,0 +1,37 @@
+engine: model:blind-decompiler
+output: |
+  yield:
+    name: What the proof delivers
+    beyond: "yes"
+    says: 'For k = 1 it delivers only what the statement says, a prime above every bound. For k > 1 it delivers, for every n, an explicit prime: the least prime factor p of the absolute value of the k-th cyclotomic polynomial over the integers at b = k times n factorial. That p is at least n + 1, does not divide b (so it divides neither k nor any number from 1 to n), and is congruent to 1 modulo k. The steps that show this use only that p is prime and divides that value, so every prime factor of that value has the same three properties. Being a factor, the least one is at most that value, which gives an upper bound on where the next such prime above n lies. Infinitude then follows by the change of language in Nat.frequently_atTop_modEq_one and Nat.infinite_setOfPred_prime_modEq_one.'
+    as-statement: 'For all natural numbers k > 1 and n, let V be the absolute value of the k-th cyclotomic polynomial over the integers evaluated at k times n factorial. Then V > 1, and every prime p dividing V satisfies n < p, p does not divide k, and p is congruent to 1 modulo k; in particular there is such a prime p with n < p and p at most V.'
+    needs:
+      - 'Restate the steps of lines 43-59 for an arbitrary prime factor of V in place of the least one, using only that it is prime, positive and divides V.'
+      - 'The least prime factor of a number greater than 1 is at most that number, which the file does not invoke.'
+      - 'Read p does not divide k off line 56, where it is shown inside the proof but not returned.'
+    bound: between
+    chooses:
+      - {what: 'the point b at which the cyclotomic polynomial is evaluated', where: "Nat.exists_prime_gt_modEq_one", value: 'k times n factorial', gives: 'for b = k times m with m at least 1, a prime p congruent to 1 modulo k, at most the absolute value of the k-th cyclotomic polynomial at b, dividing neither k nor m; p exceeds n exactly when every prime at most n divides m', best: 'k times the product of the primes at most n, the least m divisible by every prime at most n, which lowers the upper bound', confidence: medium}
+      - {what: 'which prime factor of the value is taken', where: "Nat.exists_prime_gt_modEq_one", value: 'the least prime factor', gives: 'any prime factor gives a prime above n congruent to 1 modulo k', best: 'the least, as the file does, since it is the smallest such witness', confidence: high}
+      - {what: 'the witness when k = 1', where: "Nat.exists_prime_gt_modEq_one", value: 'any prime at least n + 1', gives: 'a prime above n, with no upper bound', best: "the file's choice", confidence: high}
+    trivial:
+      - {case: 'k = 1', known: 'there are infinitely many primes, and every number is congruent to 1 modulo 1', delivered: 'a prime at least n + 1 for every n, from the infinitude of primes', compares: equal}
+      - {case: 'k = 2, existence', known: 'every prime other than 2 is odd, so infinitely many primes are congruent to 1 modulo 2', delivered: 'every prime factor of 2 times n factorial plus 1 is odd and above n', compares: equal}
+      - {case: 'k = 2, where the next such prime above n lies', known: 'for n at least 2 there is an odd prime above n and at most 2n, by Bertrand', delivered: 'such a prime above n and at most 2 times n factorial plus 1', compares: below}
+      - {case: 'how many such primes there are up to x', known: 'by Dirichlet they are about a 1 over phi(k) share of all primes up to x', delivered: 'infinitely many, with gaps bounded only by the cyclotomic value at k times n factorial', compares: below}
+    grounds:
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "28-59"}
+      - {of: "C:step/case-k-one", lines: "30-32"}
+      - {of: "C:step/least-prime-factor", lines: "41-42"}
+      - {of: "C:step/p-above-n", lines: "51-52"}
+      - {of: "C:step/order-is-k", lines: "53-59"}
+      - {of: "Nat.frequently_atTop_modEq_one", lines: "61-65"}
+      - {of: "Nat.infinite_setOfPred_prime_modEq_one", lines: "68-70"}
+    confidence: high
+  case: {slug: three-and-two, name: 'k = 3, n = 2', given: 'b = 3 times 2 factorial = 6, and the third cyclotomic polynomial is x squared plus x plus 1.', expect: 'Its value at 6 is 43, which is prime, so p = 43; 43 > 2, 43 does not divide 6, and 43 = 3 times 14 plus 1, so 43 is congruent to 1 modulo 3.'}
+  constants:
+    - {slug: evaluation-point, name: 'the evaluation point b', says: 'the cyclotomic polynomial is evaluated at k times n factorial', value: 'k times n factorial', where: "Nat.exists_prime_gt_modEq_one", why: 'the factor k makes b a multiple of k, so p not dividing b gives p not dividing k and k nonzero modulo p; the factor n factorial makes every number from 1 to n divide b, so p not dividing b gives p above n'}
+    - {slug: shift-k-one, name: 'the bound passed to the infinitude of primes', says: 'when k = 1 a prime at least n + 1 is asked for', value: 'n + 1', where: "C:step/case-k-one", why: 'a prime at least n + 1 is strictly above n, as the lemma requires'}
+  slack:
+    - {on: "C:step/least-prime-factor", hypothesis: 'p is the least prime factor of the cyclotomic value', would-suffice: 'p is any prime factor of the cyclotomic value', lines: "43-59", confidence: high}
+    - {on: "C:step/p-above-n", hypothesis: 'b is k times n factorial', would-suffice: 'b is k times any positive number divisible by every prime at most n', lines: "51-52", confidence: medium}

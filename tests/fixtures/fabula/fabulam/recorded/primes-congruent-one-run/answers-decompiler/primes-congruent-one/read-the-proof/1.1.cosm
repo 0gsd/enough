@@ -1,0 +1,50 @@
+engine: model:blind-decompiler
+output: |
+  declarations:
+    - lean: "Nat.infinite_setOfPred_prime_modEq_one"
+      says: 'For every natural number k, if k is not 0, then the set of natural numbers p such that p is prime and p is congruent to 1 modulo k is infinite.'
+      quantifiers:
+        - {kind: for-all, what: 'natural numbers k with k not 0'}
+        - {kind: infinitely-many, what: 'natural numbers p that are prime and congruent to 1 modulo k'}
+      method: 'It takes the previous lemma, that such primes occur frequently along the natural numbers going to infinity, and uses the fact that on the natural numbers holding frequently at infinity is the same as holding on an infinite set.'
+    - lean: "Nat.frequently_atTop_modEq_one"
+      says: 'For every natural number k, if k is not 0, then frequently as p goes to infinity through the natural numbers, p is prime and p is congruent to 1 modulo k.'
+      role: bookkeeping
+      method: 'It unfolds frequently-at-infinity into: for every n some p at least n has the property, and gets that p from Nat.exists_prime_gt_modEq_one, weakening n < p to n at most p.'
+    - lean: "Nat.exists_prime_gt_modEq_one"
+      says: 'For every natural number k and every natural number n, if k is not 0, then there is a natural number p such that p is prime, n < p, and p is congruent to 1 modulo k.'
+      role: spine
+      method: 'For k = 1 it takes any prime above n; for k > 1 it takes the least prime factor p of the k-th cyclotomic polynomial evaluated at b = k times n factorial, so that b is a root of that polynomial modulo p, hence p does not divide b, hence p > n, and b has order exactly k modulo p, so k divides p - 1.'
+      why: 'Without it there is no source of primes congruent to 1 modulo k at all; it is the whole construction. It gives, for each bound n, one such prime beyond n, which turns into infinitely many with only a change of language.'
+  steps:
+    - {slug: case-k-one, name: 'The case k = 1', inside: "Nat.exists_prime_gt_modEq_one", says: 'Since k is not 0, either k = 1 or k > 1. If k = 1, any prime p at least n + 1 works, and there is one by the infinitude of primes; every number is congruent to 1 modulo 1.', lines: "30-32", confidence: high}
+    - {slug: value-exceeds-one, name: 'The cyclotomic value exceeds 1', inside: "Nat.exists_prime_gt_modEq_one", says: 'For k > 1 put b = k times n factorial. Then b is at least 2, and the absolute value of the k-th cyclotomic polynomial over the integers evaluated at b is greater than b - 1, which is at least 1; so that absolute value is greater than 1.', lines: "33-40", confidence: high}
+    - {slug: least-prime-factor, name: 'The least prime factor', inside: "Nat.exists_prime_gt_modEq_one", says: 'Let p be the least prime factor of the absolute value of the k-th cyclotomic polynomial at b; it is prime because that absolute value is not 1.', lines: "41-42", confidence: high}
+    - {slug: root-mod-p, name: 'b is a root modulo p', inside: "Nat.exists_prime_gt_modEq_one", says: 'Because p divides the value of the cyclotomic polynomial at b, the image of b in the integers modulo p is a root of the k-th cyclotomic polynomial over the integers modulo p.', lines: "43-48", confidence: high}
+    - {slug: p-not-dividing-b, name: 'p does not divide b', inside: "Nat.exists_prime_gt_modEq_one", says: 'A root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b.', lines: "49-50", confidence: high}
+    - {slug: p-above-n, name: 'p is larger than n', inside: "Nat.exists_prime_gt_modEq_one", says: 'If p were at most n, then p would divide n factorial and so divide b = k times n factorial, which is false; hence n < p.', lines: "51-52", confidence: high}
+    - {slug: order-is-k, name: 'The order of b modulo p is k', inside: "Nat.exists_prime_gt_modEq_one", says: 'Since b is nonzero modulo p, its multiplicative order divides p - 1. Since k divides b and p does not, k is nonzero modulo p, so a root of the k-th cyclotomic polynomial there is a primitive k-th root of unity and the order of b is exactly k. Hence k divides p - 1, that is, p is congruent to 1 modulo k.', lines: "53-59", confidence: high}
+  reliances:
+    - {slug: infinite-primes, name: 'infinitely many primes', lean: [exists_infinite_primes], known-as: 'the theorem of Euclid on the infinitude of primes', field: 'number theory', case: 'applied to n + 1', gives: 'For every natural number m there is a prime p with m at most p.'}
+    - {slug: cyclotomic-value-bound, name: 'lower bound for a cyclotomic value', lean: [sub_one_lt_natAbs_cyclotomic_eval], known-as: 'the bound q - 1 < |Phi_k(q)|', field: 'algebra, cyclotomic polynomials', case: 'k > 1 and q = b, a natural number different from 1', gives: 'For k > 1 and a natural number q other than 1, q - 1 is less than the absolute value of the k-th cyclotomic polynomial over the integers evaluated at q.'}
+    - {slug: least-factor-prime, name: 'the least factor is prime', lean: [minFac_prime, minFac_dvd], known-as: 'least prime factor', field: 'number theory', case: 'for the absolute value of the cyclotomic value, which is not 1', gives: 'The least factor greater than 1 of a natural number other than 1 is prime and divides the number.'}
+    - {slug: cyclotomic-reduction, name: 'cyclotomic polynomials reduce modulo p', lean: [map_cyclotomic_int], known-as: 'reduction of cyclotomic polynomials', field: 'algebra, cyclotomic polynomials', case: 'mapping from the integers to the integers modulo p', gives: 'The image of the k-th cyclotomic polynomial over the integers in any ring is the k-th cyclotomic polynomial over that ring.'}
+    - {slug: zero-mod-p, name: 'zero modulo p means divisible by p', lean: [ZMod.intCast_zmod_eq_zero_iff_dvd], known-as: 'an integer vanishes modulo p exactly when p divides it', field: 'number theory', case: 'for the integer value of the cyclotomic polynomial at b', gives: 'An integer is 0 in the integers modulo p if and only if p divides it.'}
+    - {slug: root-coprime, name: 'roots of cyclotomic polynomials are coprime to p', lean: [coprime_of_root_cyclotomic], known-as: 'a cyclotomic root modulo p is a unit', field: 'algebra, cyclotomic polynomials', case: 'for the natural number b', gives: 'If a natural number is a root of a cyclotomic polynomial modulo the prime p, it is coprime to p.'}
+    - {slug: divides-factorial, name: 'small numbers divide the factorial', lean: [dvd_factorial], known-as: 'm divides n factorial for 0 < m at most n', field: 'arithmetic', case: 'm = p, assumed at most n', gives: 'Every positive natural number at most n divides n factorial.'}
+    - {slug: fermat-order, name: 'order divides p - 1', lean: [ZMod.orderOf_dvd_card_sub_one], known-as: 'the little theorem of Fermat, in the form of orders', field: 'number theory', case: 'for the image of b, nonzero modulo p', gives: 'A nonzero element of the integers modulo a prime p has multiplicative order dividing p - 1.'}
+    - {slug: cyclotomic-root-primitive, name: 'cyclotomic roots are primitive roots of unity', lean: [isRoot_cyclotomic_iff], known-as: 'roots of the k-th cyclotomic polynomial are the primitive k-th roots of unity', field: 'algebra, cyclotomic polynomials', case: 'in the integers modulo p, where k is nonzero', gives: 'In a domain where k is nonzero, an element is a root of the k-th cyclotomic polynomial if and only if it is a primitive k-th root of unity, whose order is then exactly k.'}
+    - {slug: congruence-as-divisibility, name: 'congruence as divisibility', lean: [modEq_iff_dvd'], known-as: 'c congruent to b modulo n means n divides b - c', field: 'arithmetic', case: 'c = 1 and b = p, using 1 at most p', gives: 'For c at most b, c is congruent to b modulo n if and only if n divides b - c.'}
+    - {slug: frequently-unfolded, name: 'frequently at infinity on the naturals', lean: [frequently_atTop], known-as: 'arbitrarily large witnesses', field: 'topology, filters', case: 'on the natural numbers', gives: 'A property holds frequently as p goes to infinity if and only if for every n there is p at least n with the property.'}
+    - {slug: frequently-infinite, name: 'frequently means infinitely often', lean: [frequently_atTop_iff_infinite], known-as: 'frequently at infinity on the naturals is an infinite set', field: 'topology, filters', case: 'on the natural numbers', gives: 'A property of natural numbers holds frequently at infinity if and only if the set where it holds is infinite.'}
+  terms:
+    - {name: 'congruent modulo k', summary: 'p is congruent to 1 modulo k when p and 1 leave the same remainder on division by k; modulo 1 every number is congruent to 1.'}
+    - {name: 'n factorial', summary: 'The product 1 times 2 times ... times n.'}
+    - {name: 'least prime factor', summary: 'The smallest divisor greater than 1 of a number other than 1; it is always prime.'}
+    - {name: 'the integers modulo p', summary: 'The field of remainders on division by the prime p.'}
+    - {name: 'frequently at infinity', summary: 'A property holds frequently as p goes to infinity when it holds for arbitrarily large p.'}
+  concepts:
+    - {name: 'cyclotomic polynomial', summary: 'The k-th cyclotomic polynomial is the monic polynomial with integer coefficients whose roots over the complex numbers are exactly the primitive k-th roots of unity.'}
+    - {name: 'primitive root of unity', summary: 'An element x with x to the power k equal to 1 and no smaller positive power equal to 1; its order is k.'}
+    - {name: 'multiplicative order', summary: 'The least positive power of an element that equals 1.'}
+    - {name: 'little theorem of Fermat', summary: 'Every nonzero element modulo a prime p satisfies x to the power p - 1 equal to 1, so its order divides p - 1.'}

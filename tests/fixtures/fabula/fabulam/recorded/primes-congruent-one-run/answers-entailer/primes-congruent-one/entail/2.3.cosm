@@ -1,0 +1,24 @@
+engine: model:blind-entailer
+output: |
+  body: |
+    The statement: for every natural number k other than 0, the set of natural numbers p such that p is prime and p is congruent to 1 modulo k is infinite. Here p is congruent to 1 modulo k when p and 1 leave the same remainder on division by k; every number is congruent to 1 modulo 1. [C:statement/Nat.infinite_setOfPred_prime_modEq_one, L:term/congruent-modulo-k]
+
+    On checking: the file's text holds no `sorry` and declares no axiom of its own, but it was read here as text. Nothing was built or run, so whether Lean accepts it is not known here. [P:claim/checking, P:assumption/read-as-text]
+
+    The logic: find one such prime beyond every bound, drawing it from a cyclotomic polynomial. The k-th cyclotomic polynomial is the monic integer polynomial whose complex roots are exactly the primitive k-th roots of unity: elements x with x to the power k equal to 1 and no smaller positive power equal to 1. [C:part/one-beyond-every-bound, K:concept/cyclotomic-polynomial, K:concept/primitive-root-of-unity]
+
+    **Stage 1, reduction.** It is enough to produce, for each bound n, one such prime p with n < p; the middle stages build p, the last restates it as an infinite set. [C:part/one-beyond-every-bound]
+
+    **Stage 2, the modulus one.** Since k is not 0, either k = 1 or k > 1. For k = 1 any prime at least n + 1 serves, and the infinitude of primes supplies one; this case is split off because the cyclotomic bound needs k > 1. [C:part/the-modulus-one, C:step/case-k-one, C:reliance/infinite-primes, N:decision/split-off-k-one]
+
+    **Stage 3, the candidate prime.** For k > 1 put b = k times n factorial, where n factorial is 1 times 2 times ... times n; b is at least 2. The key fact is a lower bound: the absolute value of the k-th cyclotomic polynomial at b exceeds b - 1, hence exceeds 1. So its least prime factor p (its smallest divisor above 1) is prime. As p divides the value, b is a root of the k-th cyclotomic polynomial in the integers modulo p, the field of remainders on division by p. We read this bound as what lets the proof name a prime at all. [C:part/the-candidate-prime, L:term/n-factorial, C:step/value-exceeds-one, C:reliance/cyclotomic-value-bound, C:reliance/least-factor-prime, L:term/least-prime-factor, C:step/root-mod-p, L:term/the-integers-modulo-p, P:reading/the-value-has-a-prime-factor]
+
+    **Stage 4, past the bound.** The key fact: a root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b. Every number from 1 to n divides n factorial, hence b; so p cannot be at most n, and n < p. The reading: the factor n factorial is what makes the prime large. [C:part/past-the-bound, C:reliance/root-coprime, C:reliance/divides-factorial, P:reading/factorial-pushes-past-n]
+
+    **Stage 5, order exactly k.** The multiplicative order of an element is its least positive power equal to 1. Since b is nonzero modulo p, its order divides p - 1, by the little theorem of Fermat. Since k divides b and p does not, k is nonzero modulo p, so the root b is a primitive k-th root of unity, of order exactly k. Hence k divides p - 1: p is congruent to 1 modulo k, which finishes the existence lemma. The reading: the congruence comes from the order, not from any search. [C:part/order-exactly-k, K:concept/multiplicative-order, C:reliance/fermat-order, K:concept/little-theorem-of-fermat, C:reliance/cyclotomic-root-primitive, C:lemma/Nat.exists_prime_gt_modEq_one, P:reading/the-factor-k-keeps-k-nonzero, P:reading/order-forces-the-congruence]
+
+    **Stage 6, back to infinitely many.** For every n the existence lemma gives such a p with n < p, so with n at most p. On the natural numbers this is the property holding frequently at infinity (for arbitrarily large p), which is the same as the set where it holds being infinite. We read the last two declarations as only a change of language. [C:part/back-to-infinitely-many, C:lemma/Nat.frequently_atTop_modEq_one, L:term/frequently-at-infinity, C:reliance/frequently-infinite, P:reading/only-a-change-of-language]
+
+    The proof delivers more than the statement keeps: for k > 1 it uses only that p is a prime dividing the value, so every prime factor of the absolute value of the k-th cyclotomic polynomial at k times n factorial lies above n and is congruent to 1 modulo k. The witness it names, the least such factor, lies between n and that absolute value: above n, at most the value. [P:yield/what-the-proof-delivers]
+
+    Worked example: k = 3, n = 2. Then b = 3 times 2 factorial = 6, and the third cyclotomic polynomial is x squared plus x plus 1, whose value at 6 is 43. As 43 is prime, p = 43; 43 > 2, and 43 - 1 = 42 = 3 times 14, so 43 is congruent to 1 modulo 3. Also 6 cubed = 216 = 5 times 43 plus 1, so 6 has order exactly 3 modulo 43. [P:case/three-and-two]

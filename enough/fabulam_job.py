@@ -622,6 +622,13 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
                 mode = "rules" if refusal.get("check") in ("no-model", "agent-free", "rules") else mode
                 if refusal.get("check") not in ("no-model", "agent-free", "rules"):
                     break
+    if refusal is None:
+        # a part read before a neighbour it relies on holds the question of that neighbour's statement, or an
+        # older wording of it: every part is told its neighbours again, by rule, once all of them have landed
+        for c in _head.components(_head.load(head)):
+            part = _head.part_path(head, c["file"])
+            if part.is_file() and _head.refresh_neighbours(head, part):
+                _head.tie_part(head, part)
     final = archive_state(project_dir, folder, head=head)
     if refusal is None and not final["complete"] and final["exists"] and final["next"] == HEAD_STAGES[1]:
         rows = [_row("repo", "folder", folder), _row("h", "fabula", head)]
@@ -721,9 +728,16 @@ def agent_runtime(project_dir: Path, folder: Path, *, who: str = "outside-agent"
 
     def make(stage: str, plan: dict, info: dict | None, mode: str, scaffolds: bool, program: Any) -> dict:
         rows = [r for r in (plan.get("inputs") or []) if isinstance(r, dict)] if isinstance(plan, dict) else []
-        fab = next((Path(str(r.get("path"))).name for r in rows if str(r.get("path", "")).endswith(SUFFIX)
+        fab = next((Path(str(r.get("path"))) for r in rows if str(r.get("path", "")).endswith(SUFFIX)
                     and r.get("name") in ("f", "h")), None)
-        stem = fab[: -len(SUFFIX)] if fab else "run"
+        stem = "run"
+        if fab is not None:
+            # a part's answers sit under its folders below `<head>.fabulam.parts/`, as the part does: two files
+            # of one name in two folders (`MulChar/Basic.lean`, `Cyclotomic/Basic.lean`) never share an answer
+            parts = fab.parts
+            k = next((i for i in range(len(parts) - 1, -1, -1) if parts[i].endswith(".fabulam.parts")), None)
+            below = "/".join(parts[k + 1:]) if k is not None else fab.name
+            stem = below[: -len(SUFFIX)]
         use = mode == "model" and not scaffolds
         return {"coprocessor": AnswerFolder(Path(folder) / stem / stage, who=who) if use else RefusingCoprocessor(),
                 "agent_free": False, "rules": scaffolds, "preflight": None,

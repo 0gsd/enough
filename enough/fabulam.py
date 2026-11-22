@@ -81,7 +81,10 @@ ASSUMED_KINDS = ("L:term", "K:concept")                  # and a C:reliance with
 
 _LINES_RE = re.compile(r"^([0-9]+)(?:-([0-9]+))?$")
 _COMMENT_SOURCE_RE = re.compile(r"#L[0-9]+(?:-L?[0-9]+)?$")
-_UP_TO_RE = re.compile(r"\bup to\b(?!\s+(?:" + "|".join(UP_TO_ALLOWED) + r")\b)", re.IGNORECASE)
+#: "add up to", "sum up to": the phrase of a total, which bounds nothing (`proof.UP_TO_AFTER` holds the same words).
+UP_TO_AFTER = ("add", "adds", "added", "adding", "sum", "sums", "summed", "summing")
+_UP_TO_RE = re.compile("".join(rf"(?<!\b{w} )" for w in UP_TO_AFTER) + r"\bup to\b(?!\s+(?:an?\s+|the\s+)?(?:" +
+                       "|".join(UP_TO_ALLOWED) + r")\b)", re.IGNORECASE)
 _DIGIT_RE = re.compile(r"[0-9]")
 _ONE_LETTER_RE = re.compile(r"(?<![A-Za-z'’])([B-HJ-Zb-z])(?![A-Za-z'’])")
 

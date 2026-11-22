@@ -542,3 +542,85 @@ def test_where_a_fabulam_lives_and_what_the_host_knows_before_the_survey(tmp_pat
     assert got["source"]["module"] == "Lib.Num.PrimesCongruentOne"
     means = next(n for n in got["nodes"] if n["id"] == "R:means/lean")
     assert means["version"] == "leanprover/lean4:v4.37.0-rc1"
+
+
+# ---------------------------------------------------------------------------
+# Found by the first real runs (lane M6)
+# ---------------------------------------------------------------------------
+
+def test_a_file_is_never_taken_for_another_librarys_module_of_the_same_last_name():
+    """A folder's `ZMod.lean` is `<the folder's module>.ZMod` even when a file of the set imports
+    `Lib.Analysis.Fourier.ZMod`, which sorts first and ends in the same name."""
+    from enough.thym.moves import proof as P
+    outlines = {"Top.lean": {"imports": [{"module": "Lib.Num.Series.Mid"}, {"module": "Lib.Analysis.Fourier.ZMod"}]},
+                "Mid.lean": {"imports": [{"module": "Lib.Num.Series.ZMod"}, {"module": "Lib.Algebra.Basic"}]},
+                "ZMod.lean": {"imports": [{"module": "Lib.Num.Series.Basic"}]},
+                "Basic.lean": {"imports": []}}
+    want = {p: "Lib.Num.Series." + p[:-5] for p in outlines}
+    assert P._modules(sorted(outlines), outlines) == want
+    assert P._modules(sorted(outlines), outlines, "Lib.Num.Series") == want
+    assert P._modules(["A.lean"], {"A.lean": {"imports": []}}) == {"A.lean": "A"}
+
+
+def test_a_chunks_answer_that_is_no_yaml_is_asked_again_and_a_failing_extra_is_left_out_at_last(tmp_path: Path):
+    """A reading in more than one request: an answer the YAML parser refuses is asked again (it is no fault of the
+    runtime), and when the last try still holds a reliance the file does not write, that entry alone is left out."""
+    from enough.thym.moves import answer_mapping
+    from enough.thym.moves import proof as P
+    with pytest.raises(ValueError) as bad:
+        answer_mapping("declarations:\n  - lean: \"a\"\n    says: 'it's broken: here'\n  - lean: b\n")
+    assert "not YAML that can be read at line" in str(bad.value) and "quote any value" in str(bad.value)
+    proj = tmp_path / "project"
+    proj.mkdir()
+    lines = ["-- Read as text only: enough wrote this file for its tests, and Lean never built it.", "",
+             "theorem long_one : True := by"]
+    lines += [f"  have h{k} : True := trivial" for k in range(1, 351)] + ["  exact h350", ""]
+    lean = proj / "Long.lean"
+    lean.write_text("\n".join(lines), encoding="utf-8")
+    note = "notes:\n  - 'These lines restate what is already known, one small step after another.'\n"
+    broken = "declarations:\n  - lean: \"long_one\"\n    says: 'it's broken: here'\n  - lean: b\n"
+    invented = """declarations:
+  - lean: "long_one"
+    says: 'The statement that is always true holds.'
+    quantifiers: [{kind: for-all, what: 'nothing: the statement has no variable'}]
+    method: 'It restates what is already known, step after step, and then concludes.'
+reliances:
+  - {slug: made-up, name: 'a made-up result', lean: [Nat.no_such_lemma_anywhere], known-as: 'nothing', field: none, case: 'none', gives: 'Nothing.'}
+"""
+    assert P.CHUNK_TRIES == 3
+    from enough.thym.coprocessor import candidate
+
+    class AsWritten(Recorded):
+        """An answer that is no YAML reaches the move as the model wrote it (the app's coprocessor does the same)."""
+        def complete(self, contract, inputs, *, budget):
+            try:
+                return super().complete(contract, inputs, budget=budget)
+            except Exception:  # noqa: BLE001
+                return candidate(broken, engine="model:hand-recorded", tokens=0)
+
+    cp = AsWritten(REC / "primes-congruent-one", {"read": [note, note, broken, invented, invented]})
+    with pytest.raises(Exception) as e:                    # the build goes on to the audit, which has no answer here
+        J.run_file_build(proj, lean, mode="model", runtime=runtime(cp), now=NOW)
+    assert "audit" in str(e.value) or "comments" in str(e.value)
+    asked = cp.asked("read")
+    assert len(asked) == 5 and "not YAML that can be read" in asked[3]["failed"]
+    assert "Nat.no_such_lemma_anywhere" in asked[4]["failed"]
+    doc = mc.yaml_load((proj / "long.fabulam.cosm").read_text(encoding="utf-8"))
+    its = items_of(doc)
+    assert its["C:statement/long_one"]["method"].startswith("It restates")
+    assert not [i for i in its if i.startswith("C:reliance/")]      # the invented reliance was left out by rule
+
+
+def test_two_parts_of_one_name_in_two_folders_keep_their_answers_apart(tmp_path: Path):
+    """An outside agent's answers sit under the part's folders below `<head>.fabulam.parts/`."""
+    make = J.agent_runtime(tmp_path, tmp_path / "answers", who="a-blind-decompiler")
+    seen = []
+    for sub in ("MulChar", "Cyclotomic"):
+        part = tmp_path / "num.fabulam.parts" / sub / "Basic.fabulam.cosm"
+        plan = {"inputs": [{"name": "t", "path": f"{sub}/Basic.lean"}, {"name": "f", "path": str(part)}]}
+        seen.append(make("read-the-proof", plan, None, "model", False, None)["coprocessor"].folder)
+    assert seen == [tmp_path / "answers" / "MulChar" / "Basic" / "read-the-proof",
+                    tmp_path / "answers" / "Cyclotomic" / "Basic" / "read-the-proof"]
+    plan = {"inputs": [{"name": "f", "path": str(tmp_path / "primes-congruent-one.fabulam.cosm")}]}
+    assert make("read-the-proof", plan, None, "model", False, None)["coprocessor"].folder == (
+        tmp_path / "answers" / "primes-congruent-one" / "read-the-proof")

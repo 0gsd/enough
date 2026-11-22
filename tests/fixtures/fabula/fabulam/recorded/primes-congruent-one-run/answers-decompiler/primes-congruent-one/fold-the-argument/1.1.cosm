@@ -1,0 +1,32 @@
+engine: model:blind-decompiler
+output: |
+  yield:
+    name: What the proof delivers
+    beyond: "yes"
+    says: 'The statement only says the set is infinite. The proof builds, for every bound n, an explicit witness. For k = 1 it is any prime at least n + 1. For k > 1 it is the least prime factor p of the absolute value of the k-th cyclotomic polynomial at b = k times n factorial. That value is greater than 1, and p is at most it. The argument uses only that p is a prime dividing that value, so it shows that every prime factor of the value is greater than n, does not divide k times n factorial, and is congruent to 1 modulo k. For k > 1, b also has order exactly k modulo each such prime. So the proof gives an effective prime congruent to 1 modulo k in the range from n + 1 to the absolute value of the k-th cyclotomic polynomial at k times n factorial, for every n. Only Nat.frequently_atTop_modEq_one and the final theorem turn this into infinitude, and they weaken n < p to n at most p and then drop the bound.'
+    as-statement: 'For every natural number k > 1 and every natural number n, let V be the absolute value of the k-th cyclotomic polynomial over the integers at k times n factorial. Then V > 1, and every prime factor q of V satisfies n < q, q is congruent to 1 modulo k, and q does not divide k times n factorial. In particular the least prime factor p of V is a prime with n < p, p at most V, and p congruent to 1 modulo k.'
+    needs:
+      - 'Rerun the k > 1 branch of Nat.exists_prime_gt_modEq_one for an arbitrary prime factor q of the value instead of its least one. Each step after line 42 uses only that q is prime and divides the value, so nothing new is needed beyond restating it.'
+      - 'The fact that the least prime factor of a positive number is at most that number. It gives p at most V, and the file does not use it.'
+    bound: between
+    chooses:
+      - {what: 'the point b where the cyclotomic polynomial is evaluated', where: "Nat.exists_prime_gt_modEq_one", value: 'k times n factorial', gives: 'for any b at least 2 that is divisible by every prime at most n and by every prime dividing k, each prime factor of the k-th cyclotomic value at b is prime, greater than n and congruent to 1 modulo k, and the witness is at most that value', best: 'the product of the distinct primes dividing k times n factorial (the radical of k times n factorial), which meets all three needs with the smallest b and so the smallest upper bound; the file takes k times n factorial', confidence: medium}
+      - {what: 'which prime factor of the value is taken', where: "Nat.exists_prime_gt_modEq_one", value: 'the least prime factor', gives: 'any prime factor q of the value works equally, with n < q and q congruent to 1 modulo k', best: "the file's choice, since the least factor gives the smallest witness", confidence: high}
+      - {what: 'the lower bound fed to the infinitude of primes when k = 1', where: "Nat.exists_prime_gt_modEq_one", value: 'n + 1', gives: 'a prime at least m for the m chosen, so a prime greater than n exactly when m is at least n + 1', best: "the file's choice", confidence: high}
+    trivial:
+      - {case: 'k = 1', known: 'there are infinitely many primes, and every number is congruent to 1 modulo 1', delivered: 'a prime at least n + 1 for each n, from the infinitude of primes', compares: equal}
+      - {case: 'k = 2', known: 'every odd prime is congruent to 1 modulo 2, so infinitely many', delivered: 'the second cyclotomic polynomial is x + 1, so the witness is the least prime factor of 2 times n factorial plus 1, an odd prime greater than n (a Euclid-style argument)', compares: equal}
+    grounds:
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "30-32"}
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "33-40"}
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "41-48"}
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "49-52"}
+      - {of: "Nat.exists_prime_gt_modEq_one", lines: "53-59"}
+      - {of: "Nat.frequently_atTop_modEq_one", lines: "63-65"}
+      - {of: "Nat.infinite_setOfPred_prime_modEq_one", lines: "68-70"}
+    confidence: high
+  case: {slug: four-and-two, name: 'k = 4, n = 2', given: 'b = 4 times 2 factorial = 8. The fourth cyclotomic polynomial is x squared + 1, so its value at 8 is 65 = 5 times 13, and 65 > 8 - 1 = 7.', expect: 'The least prime factor is 5. It is greater than 2, does not divide 8, and 5 - 1 = 4, so 5 is congruent to 1 modulo 4 and 8 has order 4 modulo 5 (8 is 3 there, and 3, 9, 27, 81 are 3, 4, 2, 1 modulo 5). The other factor 13 is also greater than 2 and congruent to 1 modulo 4.'}
+  constants:
+    - {slug: shift-n-plus-one, name: 'n + 1 in the case k = 1', says: 'the prime from the infinitude of primes is at least n + 1, hence greater than n', value: 'n + 1', where: "Nat.exists_prime_gt_modEq_one, line 31", why: 'the lemma promises n < p, and the infinitude of primes gives only at least'}
+    - {slug: b-at-least-two, name: 'the lower bound 2 on b', says: 'b = k times n factorial is at least 2 when k > 1', value: 2, where: "Nat.exists_prime_gt_modEq_one, line 36", why: 'it makes b - 1 at least 1, so the cyclotomic value exceeds 1 and has a prime factor'}
+  slack: []

@@ -1,0 +1,33 @@
+engine: model:blind-decompiler
+output: |
+  questions:
+    - about: C:lemma/Nat.exists_prime_gt_modEq_one#slack
+      asks: 'Was the least prime factor chosen because the proof needs it, or only as a convenient way to name some prime factor of the value?'
+      why: intent
+      kind: choice
+      options: ['the proof needs the least one', 'only a convenient way to pick a prime', 'something else']
+      hint: 'The reading finds that any prime dividing the value would do (lines 41-48).'
+    - about: C:definition/Nat.infinite_setOf_prime_modEq_one
+      asks: 'Why does the file keep the alias Nat.infinite_setOf_prime_modEq_one beside Nat.infinite_setOfPred_prime_modEq_one?'
+      why: intent
+      kind: choice
+      options: ['an older name kept for compatibility', 'a shorter name for convenience', 'something else']
+    - about: C:lemma/Nat.frequently_atTop_modEq_one
+      asks: 'Is Nat.frequently_atTop_modEq_one meant to be used by other files on its own, or only as a step toward the statement about the infinite set?'
+      why: intent
+      kind: choice
+      options: ['meant for use on its own', 'only a step toward the infinite set', 'both']
+    - about: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+      asks: 'What prompted this file: was it written as a result in its own right, or as a step toward a larger result such as the theorem of Dirichlet on primes in arithmetic progressions?'
+      why: intent
+      kind: text
+    - about: R:maker/riccardo-brasca#capacity
+      asks: 'Is Riccardo Brasca the only author of the file as it stands, or have others written parts of it since 2020?'
+      why: unsure
+      kind: text
+      hint: 'The header names one author; the file may have been changed since.'
+    - about: P:claim/checking
+      asks: 'Does Lean accept the file as it stands, with no errors, for the Mathlib it is written for?'
+      why: unsure
+      kind: yes-no
+      hint: 'Nothing was built or run when the fabula was read.'

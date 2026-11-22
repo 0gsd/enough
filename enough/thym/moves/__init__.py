@@ -533,7 +533,15 @@ def answer_mapping(out: Any) -> dict:
     """A model's YAML answer as a mapping (fences stripped); ValueError when it is not one."""
     if isinstance(out, dict):
         return out
-    data = mc.yaml_load(strip_fences(str(out or "")))
+    try:
+        data = mc.yaml_load(strip_fences(str(out or "")))
+    except ValueError:
+        raise
+    except Exception as e:  # noqa: BLE001 - a YAML the parser refuses is an answer to ask again, never a fault
+        mark = getattr(e, "problem_mark", None)
+        where = f" at line {mark.line + 1}" if mark is not None else ""
+        raise ValueError(f"the answer is not YAML that can be read{where} ({getattr(e, 'problem', None) or type(e).__name__}); "
+                         "quote any value that holds a colon, a hash, a brace, a bracket or a quote mark") from None
     if not isinstance(data, dict):
         raise ValueError("the answer is not a YAML mapping")
     return data

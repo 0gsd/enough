@@ -77,10 +77,10 @@ READ_SYSTEM = (
     "short its proof); support, a real step the telling would only mention; bookkeeping, needed by Lean and not by "
     "a reader (casts, rearrangements). A spine lemma takes why: what the argument would lack without it and what "
     "it makes easier next; never that no other way exists.\n"
-    "- steps: a step with no declaration of its own that the blackboard telling would state: inside (a lemma's "
-    "lean), says, lines inside that lemma, confidence.\n"
-    "- reliances: a library result that carries real weight: lean (the name as this file writes it), known-as, "
-    "field, case (which case or form is used), gives (what it says).\n"
+    "- steps: a step with no declaration of its own that the blackboard telling would state: inside (the lean of "
+    "a lemma or final theorem, never of a definition or instance), says, lines inside it, confidence.\n"
+    "- reliances: a library result that carries real weight, never a declaration of this file: lean (the name as "
+    "this file writes it), known-as, field, case (which case or form is used), gives (what it says).\n"
     "- terms, concepts: what a reader must know.\n"
     "Tell this file's own argument, not one you remember. " + COMMON)
 
@@ -282,7 +282,7 @@ def yield_messages(contract: dict, inputs: dict) -> list[dict]:
 
 _STAGES_BODY = (
     "- stages, in the order of the logic. Each: slug, name, number (1, 2, 3, no gap), stage, says (what it achieves "
-    "and why the next needs it), plain, plain-if, steps (ids, in the order the argument takes them), confidence. "
+    "and why the next needs it), plain, plain-if, steps (ids of lemmas, statements, steps, definitions, never reliances, in the argument's order), confidence. "
     "stage is reduction, main, tool, side or close. Exactly one is the reduction: what has to be shown or made "
     "large, and why; it also takes obvious: the obvious way to the result and why it fails, or \"none: the file's "
     "way is the obvious one\". Every spine lemma is in some stage's steps.\n"
@@ -331,9 +331,14 @@ decisions: []
 atem: {line: '…', focus: '…', push: '…', pull: '…'}"""
 
 
+#: How the atem's line is counted, said in the request: a model cannot count the words of a formula by eye.
+ATEM_COUNT = ("The atem's line is counted by rule: every run of letters or of digits is one word, so (p/q) is two "
+              "words and 1/2 is two. Write the line in words, with few symbols, and aim at 18 to 22.")
+
+
 def stages_messages(contract: dict, inputs: dict) -> list[dict]:
     user = (f"The proof: {_text(inputs, 'name')}.\n\nIts items:\n```yaml\n{_text(inputs, 'items')}```\n\n"
-            f"Answer in this shape (the values are examples):\n```yaml\n{STAGES_SHAPE}\n```\n{QUOTING}")
+            f"Answer in this shape (the values are examples):\n```yaml\n{STAGES_SHAPE}\n```\n{QUOTING}\n{ATEM_COUNT}")
     return _with_failed([{"role": "system", "content": STAGES_SYSTEM}, {"role": "user", "content": user}], inputs)
 
 
@@ -358,7 +363,7 @@ def head_messages(contract: dict, inputs: dict) -> list[dict]:
         user += "\nAnswer with the YAML mapping only:\nnotes:\n  - '…'\n"
         return _with_failed([{"role": "system", "content": ROUND_SYSTEM}, {"role": "user", "content": user}], inputs)
     user += (f"\nAnswer in this shape (the values are examples), with roles: [] where you judge no lemma "
-             f"differently:\n```yaml\n{STAGES_SHAPE}\nroles: []\n```\n{QUOTING}")
+             f"differently:\n```yaml\n{STAGES_SHAPE}\nroles: []\n```\n{QUOTING}\n{ATEM_COUNT}")
     return _with_failed([{"role": "system", "content": HEAD_SYSTEM}, {"role": "user", "content": user}], inputs)
 
 

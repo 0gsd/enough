@@ -1,0 +1,2588 @@
+oes: fabula/1
+macrocosm: 0.8.0
+flavour: fabulam
+id: fabula/primes-congruent-one
+name: primes-congruent-one
+source:
+  path: PrimesCongruentOne.lean
+  kind: text
+  language: lean
+  toolchain:
+    pending: which Lean version does the source name? no lean-toolchain file was found at or above it
+  module: PrimesCongruentOne
+  lines: 75
+  size: 3151
+  sha256: 5130258351145d9fef49db0c6ef1f6146fbbb3fbb59e75380c281bdc6da47678
+  imports:
+  - Mathlib.RingTheory.Polynomial.Cyclotomic.Eval
+  licence: Apache-2.0
+  obtained: public
+  target:
+  - Nat.infinite_setOfPred_prime_modEq_one
+  target-by: rule
+  read:
+    by: rules
+    elaborated: 'no'
+    comments: blanked
+  checking:
+    sorry: 0
+    axioms: 0
+    native-decide: 0
+    built-here: 'no'
+derived:
+  at: '2026-11-22T12:00:00Z'
+  by: person
+  program: survey-the-proof
+  run: 2026-11-22-1200-0001
+  mode: model
+  completeness: full
+  chunks: 0
+  runs:
+  - program: survey-the-proof
+    run: 2026-11-22-1200-0001
+    at: '2026-11-22T12:00:00Z'
+  - program: read-the-proof
+    run: 2026-11-22-1200-0002
+    at: '2026-11-22T12:00:00Z'
+    model: blind-decompiler
+    route: local
+  - program: audit-the-comments
+    run: 2026-11-22-1200-0003
+    at: '2026-11-22T12:00:00Z'
+    model: blind-decompiler
+    route: local
+  - program: fold-the-argument
+    run: 2026-11-22-1200-0004
+    at: '2026-11-22T12:00:00Z'
+    model: blind-decompiler
+    route: local
+  - {program: raise-the-questions, run: 2026-11-22-1200-0005, at: "2026-11-22T12:00:00Z", model: blind-decompiler, route: local}
+  model: blind-decompiler
+atem:
+  of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  line: For every nonzero natural number k, infinitely many prime numbers p satisfy p congruent to 1 modulo k.
+  focus: The one residue class 1 modulo k, for every modulus k other than 0.
+  push: 'The proof gives more than the statement keeps: every prime factor of the k-th cyclotomic value at k times
+    n factorial lies above n and is congruent to 1 modulo k.'
+  pull: The method reaches only the class 1 modulo k; it says nothing about other classes coprime to k.
+audit:
+- lines: 1-5
+  kind: header
+  'on': ''
+  verdict: claim
+  claim: P:claim/authorship-credit
+- lines: 10-15
+  kind: module-note
+  'on': ''
+  verdict: agrees
+- lines: 26-27
+  kind: note
+  'on': C:lemma/Nat.exists_prime_gt_modEq_one
+  verdict: agrees
+- lines: '67'
+  kind: note
+  'on': C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  verdict: agrees
+teaching:
+- C:part/one-beyond-every-bound
+- C:part/the-candidate-prime
+- C:part/past-the-bound
+- C:part/order-exactly-k
+- C:part/the-modulus-one
+- C:part/back-to-infinitely-many
+shorts:
+  - {path: primes-congruent-one.pshort-expert-2026-11-22-1200.md, at: 2026-11-22T12:00:00Z, by: blind-entailer, mode: model, route: local, entailed: apart, density: expert}
+  - {path: primes-congruent-one.pshort-student-2026-11-22-1200.md, at: 2026-11-22T12:00:00Z, by: blind-entailer, mode: model, route: local, entailed: apart, density: student}
+  - {path: primes-congruent-one.pshort-everyone-2026-11-22-1200.md, at: 2026-11-22T12:00:00Z, by: blind-entailer, mode: model, route: local, entailed: apart, density: everyone}
+nodes:
+- id: C:file/primescongruentone-lean
+  type: file
+  name: PrimesCongruentOne.lean
+  summary: 'PrimesCongruentOne.lean: Primes congruent to one.'
+  stance: observed
+  path: PrimesCongruentOne.lean
+  language: lean
+  length:
+    lines: 75
+    bytes: 3151
+  sha256: 5130258351145d9fef49db0c6ef1f6146fbbb3fbb59e75380c281bdc6da47678
+  opens:
+  - Filter
+  - Nat
+  - Polynomial
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 1-75
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: C:dependency/mathlib
+  type: dependency
+  name: Mathlib
+  summary: The source imports 1 module of Mathlib.
+  stance: observed
+  package: mathlib
+  version:
+    pending: which version of Mathlib is it written for?
+  scope: standard
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L8
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- type: licence
+  stance: observed
+  id: R:licence/apache-2-0
+  name: Apache-2.0
+  summary: The source is under the licence Apache-2.0.
+  identifier: Apache-2.0
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L1-L5
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: R:maker/riccardo-brasca
+  type: maker
+  name: Riccardo Brasca
+  summary: The file's header names Riccardo Brasca as an author.
+  stance: hearsay
+  capacity: author
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L1-L5
+    confidence: 0.5
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: R:means/lean
+  type: means
+  name: Lean
+  summary: The proof is written in Lean 4.
+  stance: observed
+  what: Lean
+  used-for: the formal proof
+  version:
+    pending: which Lean version does the source name?
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: C:lemma/Nat.exists_prime_gt_modEq_one
+  type: lemma
+  name: Nat.exists_prime_gt_modEq_one
+  summary: The theorem Nat.exists_prime_gt_modEq_one, as the Lean file declares it.
+  stance: observed
+  lean: Nat.exists_prime_gt_modEq_one
+  form: theorem
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 28-59
+  digest: b048a5d8e8afe80b
+  says: For every natural number k and every natural number n, if k is not 0, then there is a natural number p such
+    that p is prime, n < p, and p is congruent to 1 modulo k.
+  reached: 'yes'
+  depth: 2
+  carries: 0
+  proof: tactic
+  sorry: 0
+  automation:
+  - simp
+  used-by:
+  - C:lemma/Nat.frequently_atTop_modEq_one
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+  role: spine
+  method: For k = 1 it takes any prime above n; for k > 1 it takes the least prime factor p of the k-th cyclotomic
+    polynomial evaluated at b = k times n factorial, so that b is a root of that polynomial modulo p, hence p does
+    not divide b, hence p > n, and b has order exactly k modulo p, so k divides p - 1.
+  why: Without it there is no source of primes congruent to 1 modulo k at all; it is the whole construction. It
+    gives, for each bound n, one such prime beyond n, which turns into infinitely many with only a change of language.
+  leans-on:
+  - C:reliance/infinite-primes
+  - C:reliance/cyclotomic-value-bound
+  - C:reliance/least-factor-prime
+  - C:reliance/cyclotomic-reduction
+  - C:reliance/zero-mod-p
+  - C:reliance/root-coprime
+  - C:reliance/divides-factorial
+  - C:reliance/fermat-order
+  - C:reliance/cyclotomic-root-primitive
+  - C:reliance/congruence-as-divisibility
+  slack:
+  - hypothesis: p is the least prime factor of the value
+    would-suffice: p is any prime dividing the value
+    lines: 41-48
+    confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    confidence: 1
+    state: known
+- id: C:lemma/Nat.frequently_atTop_modEq_one
+  type: lemma
+  name: Nat.frequently_atTop_modEq_one
+  summary: The theorem Nat.frequently_atTop_modEq_one, as the Lean file declares it.
+  stance: observed
+  lean: Nat.frequently_atTop_modEq_one
+  form: theorem
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 61-65
+  digest: 88e9c0735400e138
+  says: For every natural number k, if k is not 0, then frequently as p goes to infinity through the natural numbers,
+    p is prime and p is congruent to 1 modulo k.
+  reached: 'yes'
+  depth: 1
+  carries: 1
+  proof: tactic
+  sorry: 0
+  uses:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  used-by:
+  - C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L61-L65
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+  role: bookkeeping
+  method: 'It unfolds frequently-at-infinity into: for every n some p at least n has the property, and gets that
+    p from Nat.exists_prime_gt_modEq_one, weakening n < p to n at most p.'
+  leans-on:
+  - C:reliance/frequently-unfolded
+- id: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  type: statement
+  name: Nat.infinite_setOfPred_prime_modEq_one
+  summary: The theorem Nat.infinite_setOfPred_prime_modEq_one, as the Lean file declares it.
+  stance: observed
+  lean: Nat.infinite_setOfPred_prime_modEq_one
+  form: theorem
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 68-70
+  digest: aa7e6cbd249c3ce0
+  says: For every natural number k, if k is not 0, then the set of natural numbers p such that p is prime and p
+    is congruent to 1 modulo k is infinite.
+  quantifiers:
+  - kind: for-all
+    what: natural numbers k with k not 0
+  - kind: infinitely-many
+    what: natural numbers p that are prime and congruent to 1 modulo k
+  reached: 'yes'
+  depth: 0
+  carries: 2
+  proof: term
+  sorry: 0
+  uses:
+  - C:lemma/Nat.frequently_atTop_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L68-L70
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+  method: It takes the previous lemma, that such primes occur frequently along the natural numbers going to infinity,
+    and uses the fact that on the natural numbers holding frequently at infinity is the same as holding on an infinite
+    set.
+  leans-on:
+  - C:reliance/frequently-infinite
+- id: C:definition/Nat.infinite_setOf_prime_modEq_one
+  type: definition
+  name: Nat.infinite_setOf_prime_modEq_one
+  summary: The alias Nat.infinite_setOf_prime_modEq_one, as the Lean file declares it.
+  stance: observed
+  lean: Nat.infinite_setOf_prime_modEq_one
+  form: alias
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 72-73
+  digest: 28731973c912768a
+  reached: 'no'
+  uses:
+  - C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L72-L73
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: P:claim/checking
+  type: claim
+  name: What is known about the machine check
+  summary: What the source's text shows about checking, and what the person entered about it.
+  stance: observed
+  salience: high
+  about: whether Lean accepts the source
+  says: The file's text holds no `sorry` and declares no axiom of its own. It was read here as text. Nothing was
+    built or run, so whether Lean accepts it is not known here.
+  checked: not-checkable
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: P:assumption/read-as-text
+  type: assumption
+  name: Read as text
+  summary: The Lean was read by rules, as text, and never run.
+  stance: observed
+  about: how this fabulam was read
+  says: The file was read as text. Names were matched by spelling. Lean was not run.
+  checked: 'no'
+  carries: must
+  if-false: A link between two declarations may be missing or may point at the wrong one of two with one name.
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 1
+    state: known
+  made:
+    move: survey
+    run: 2026-11-22-1200-0001
+    step: 1
+    node: '1'
+    engine: code
+- id: C:step/case-k-one
+  type: step
+  name: The case k = 1
+  summary: Since k is not 0, either k = 1 or k > 1.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: Since k is not 0, either k = 1 or k > 1. If k = 1, any prime p at least n + 1 works, and there is one by
+    the infinitude of primes; every number is congruent to 1 modulo 1.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 30-32
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L30-L32
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/value-exceeds-one
+  type: step
+  name: The cyclotomic value exceeds 1
+  summary: For k > 1 put b = k times n factorial.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: For k > 1 put b = k times n factorial. Then b is at least 2, and the absolute value of the k-th cyclotomic
+    polynomial over the integers evaluated at b is greater than b - 1, which is at least 1; so that absolute value
+    is greater than 1.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 33-40
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L33-L40
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/least-prime-factor
+  type: step
+  name: The least prime factor
+  summary: Let p be the least prime factor of the absolute value of the k-th cyclotomic polynomial at b; it is prime
+    because that absolute value is not 1.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: Let p be the least prime factor of the absolute value of the k-th cyclotomic polynomial at b; it is prime
+    because that absolute value is not 1.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 41-42
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L41-L42
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/root-mod-p
+  type: step
+  name: b is a root modulo p
+  summary: Because p divides the value of the cyclotomic polynomial at b, the image of b in the integers modulo
+    p is a root of the k-th cyclotomic polynomial over the integers modulo p.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: Because p divides the value of the cyclotomic polynomial at b, the image of b in the integers modulo p is
+    a root of the k-th cyclotomic polynomial over the integers modulo p.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 43-48
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L43-L48
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/p-not-dividing-b
+  type: step
+  name: p does not divide b
+  summary: A root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: A root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 49-50
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L49-L50
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/p-above-n
+  type: step
+  name: p is larger than n
+  summary: If p were at most n, then p would divide n factorial and so divide b = k times n factorial, which is
+    false; hence n < p.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: If p were at most n, then p would divide n factorial and so divide b = k times n factorial, which is false;
+    hence n < p.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 51-52
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L51-L52
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:step/order-is-k
+  type: step
+  name: The order of b modulo p is k
+  summary: Since b is nonzero modulo p, its multiplicative order divides p - 1.
+  stance: opinion
+  inside: C:lemma/Nat.exists_prime_gt_modEq_one
+  says: Since b is nonzero modulo p, its multiplicative order divides p - 1. Since k divides b and p does not, k
+    is nonzero modulo p, so a root of the k-th cyclotomic polynomial there is a primitive k-th root of unity and
+    the order of b is exactly k. Hence k divides p - 1, that is, p is congruent to 1 modulo k.
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 53-59
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L53-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/infinite-primes
+  type: reliance
+  name: infinitely many primes
+  summary: For every natural number m there is a prime p with m at most p.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - exists_infinite_primes
+  known-as: the theorem of Euclid on the infinitude of primes
+  field: number theory
+  case: applied to n + 1
+  gives: For every natural number m there is a prime p with m at most p.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L31
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/cyclotomic-value-bound
+  type: reliance
+  name: lower bound for a cyclotomic value
+  summary: For k > 1 and a natural number q other than 1, q - 1 is less than the absolute value of the k-th cyclotomic
+    polynomial over the integers evaluated at q.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - sub_one_lt_natAbs_cyclotomic_eval
+  known-as: the bound q - 1 < |Phi_k(q)|
+  field: algebra, cyclotomic polynomials
+  case: k > 1 and q = b, a natural number different from 1
+  gives: For k > 1 and a natural number q other than 1, q - 1 is less than the absolute value of the k-th cyclotomic
+    polynomial over the integers evaluated at q.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L40
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/least-factor-prime
+  type: reliance
+  name: the least factor is prime
+  summary: The least factor greater than 1 of a natural number other than 1 is prime and divides the number.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - minFac_prime
+  - minFac_dvd
+  known-as: least prime factor
+  field: number theory
+  case: for the absolute value of the cyclotomic value, which is not 1
+  gives: The least factor greater than 1 of a natural number other than 1 is prime and divides the number.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L42
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/cyclotomic-reduction
+  type: reliance
+  name: cyclotomic polynomials reduce modulo p
+  summary: The image of the k-th cyclotomic polynomial over the integers in any ring is the k-th cyclotomic polynomial
+    over that ring.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - map_cyclotomic_int
+  known-as: reduction of cyclotomic polynomials
+  field: algebra, cyclotomic polynomials
+  case: mapping from the integers to the integers modulo p
+  gives: The image of the k-th cyclotomic polynomial over the integers in any ring is the k-th cyclotomic polynomial
+    over that ring.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L45
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/zero-mod-p
+  type: reliance
+  name: zero modulo p means divisible by p
+  summary: An integer is 0 in the integers modulo p if and only if p divides it.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - ZMod.intCast_zmod_eq_zero_iff_dvd
+  known-as: an integer vanishes modulo p exactly when p divides it
+  field: number theory
+  case: for the integer value of the cyclotomic polynomial at b
+  gives: An integer is 0 in the integers modulo p if and only if p divides it.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L46
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/root-coprime
+  type: reliance
+  name: roots of cyclotomic polynomials are coprime to p
+  summary: If a natural number is a root of a cyclotomic polynomial modulo the prime p, it is coprime to p.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - coprime_of_root_cyclotomic
+  known-as: a cyclotomic root modulo p is a unit
+  field: algebra, cyclotomic polynomials
+  case: for the natural number b
+  gives: If a natural number is a root of a cyclotomic polynomial modulo the prime p, it is coprime to p.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L50
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/divides-factorial
+  type: reliance
+  name: small numbers divide the factorial
+  summary: Every positive natural number at most n divides n factorial.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - dvd_factorial
+  known-as: m divides n factorial for 0 < m at most n
+  field: arithmetic
+  case: m = p, assumed at most n
+  gives: Every positive natural number at most n divides n factorial.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L52
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/fermat-order
+  type: reliance
+  name: order divides p - 1
+  summary: A nonzero element of the integers modulo a prime p has multiplicative order dividing p - 1.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - ZMod.orderOf_dvd_card_sub_one
+  known-as: the little theorem of Fermat, in the form of orders
+  field: number theory
+  case: for the image of b, nonzero modulo p
+  gives: A nonzero element of the integers modulo a prime p has multiplicative order dividing p - 1.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L54
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/cyclotomic-root-primitive
+  type: reliance
+  name: cyclotomic roots are primitive roots of unity
+  summary: In a domain where k is nonzero, an element is a root of the k-th cyclotomic polynomial if and only if
+    it is a primitive k-th root of unity, whose order is then exactly k.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - isRoot_cyclotomic_iff.mp
+  known-as: roots of the k-th cyclotomic polynomial are the primitive k-th roots of unity
+  field: algebra, cyclotomic polynomials
+  case: in the integers modulo p, where k is nonzero
+  gives: In a domain where k is nonzero, an element is a root of the k-th cyclotomic polynomial if and only if it
+    is a primitive k-th root of unity, whose order is then exactly k.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L57
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/congruence-as-divisibility
+  type: reliance
+  name: congruence as divisibility
+  summary: For c at most b, c is congruent to b modulo n if and only if n divides b - c.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - modEq_iff_dvd'
+  known-as: c congruent to b modulo n means n divides b - c
+  field: arithmetic
+  case: c = 1 and b = p, using 1 at most p
+  gives: For c at most b, c is congruent to b modulo n if and only if n divides b - c.
+  used-by:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L59
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/frequently-unfolded
+  type: reliance
+  name: frequently at infinity on the naturals
+  summary: A property holds frequently as p goes to infinity if and only if for every n there is p at least n with
+    the property.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - frequently_atTop
+  known-as: arbitrarily large witnesses
+  field: topology, filters
+  case: on the natural numbers
+  gives: A property holds frequently as p goes to infinity if and only if for every n there is p at least n with
+    the property.
+  used-by:
+  - C:lemma/Nat.frequently_atTop_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L63
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:reliance/frequently-infinite
+  type: reliance
+  name: frequently means infinitely often
+  summary: A property of natural numbers holds frequently at infinity if and only if the set where it holds is infinite.
+  stance: assumed
+  'on': dependency
+  of: C:dependency/mathlib
+  lean:
+  - frequently_atTop_iff_infinite
+  known-as: frequently at infinity on the naturals is an infinite set
+  field: topology, filters
+  case: on the natural numbers
+  gives: A property of natural numbers holds frequently at infinity if and only if the set where it holds is infinite.
+  used-by:
+  - C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L70
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: L:term/congruent-modulo-k
+  type: term
+  name: congruent modulo k
+  summary: p is congruent to 1 modulo k when p and 1 leave the same remainder on division by k; modulo 1 every number
+    is congruent to 1.
+  feed:
+    word: congruent modulo k
+    pos: noun
+    origin: feed
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: L:term/n-factorial
+  type: term
+  name: n factorial
+  summary: The product 1 times 2 times ... times n.
+  feed:
+    word: n factorial
+    pos: noun
+    origin: feed
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: L:term/least-prime-factor
+  type: term
+  name: least prime factor
+  summary: The smallest divisor greater than 1 of a number other than 1; it is always prime.
+  feed:
+    word: least prime factor
+    pos: noun
+    origin: feed
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: L:term/the-integers-modulo-p
+  type: term
+  name: the integers modulo p
+  summary: The field of remainders on division by the prime p.
+  feed:
+    word: the integers modulo p
+    pos: noun
+    origin: feed
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: L:term/frequently-at-infinity
+  type: term
+  name: frequently at infinity
+  summary: A property holds frequently as p goes to infinity when it holds for arbitrarily large p.
+  feed:
+    word: frequently at infinity
+    pos: noun
+    origin: feed
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: K:concept/cyclotomic-polynomial
+  type: concept
+  name: cyclotomic polynomial
+  summary: The k-th cyclotomic polynomial is the monic polynomial with integer coefficients whose roots over the
+    complex numbers are exactly the primitive k-th roots of unity.
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: K:concept/primitive-root-of-unity
+  type: concept
+  name: primitive root of unity
+  summary: An element x with x to the power k equal to 1 and no smaller positive power equal to 1; its order is
+    k.
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: K:concept/multiplicative-order
+  type: concept
+  name: multiplicative order
+  summary: The least positive power of an element that equals 1.
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: K:concept/little-theorem-of-fermat
+  type: concept
+  name: little theorem of Fermat
+  summary: Every nonzero element modulo a prime p satisfies x to the power p - 1 equal to 1, so its order divides
+    p - 1.
+  stance: assumed
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.3
+    state: known
+  made:
+    move: derive
+    run: 2026-11-22-1200-0002
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: P:claim/authorship-credit
+  type: claim
+  name: Credit to the file's author
+  summary: The header credits Riccardo Brasca as author and copyright holder from 2020, and releases the file under
+    the Apache 2.0 licence.
+  stance: hearsay
+  salience: normal
+  about: the file as a whole
+  says: The header credits Riccardo Brasca as author and copyright holder from 2020, and releases the file under
+    the Apache 2.0 licence.
+  checked: not-checkable
+  span:
+    file: PrimesCongruentOne.lean
+    lines: 1-5
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L1-L5
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0003
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: E:person/riccardo-brasca
+  type: person
+  name: Riccardo Brasca
+  summary: Named in the header as the author and copyright holder of the file, from 2020.
+  stance: hearsay
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L1-L5
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0003
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: N:aim/infinitely-many-primes-one-mod-k
+  type: aim
+  name: Infinitely many primes congruent to one
+  summary: The module note says the file proves that, for every positive natural number k, infinitely many primes
+    leave remainder 1 on division by k.
+  stance: hearsay
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L10-L15
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0003
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: P:yield/what-the-proof-delivers
+  type: yield
+  name: What the proof delivers
+  summary: For each k other than 0 and each bound n the proof names one prime congruent to 1 modulo k above n.
+  stance: opinion
+  of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  beyond: 'yes'
+  says: For each k other than 0 and each bound n the proof names one prime congruent to 1 modulo k above n. For
+    k = 1 it is any prime at least n + 1. For k > 1 it is the least prime factor of the absolute value of the k-th
+    cyclotomic polynomial at b = k times n factorial, and the argument uses only that p is a prime dividing that
+    value, so every prime factor of that value is above n and congruent to 1 modulo k. The least one is at most
+    the value itself. The statement keeps only that the set of such primes is infinite.
+  as-statement: For every natural number k > 1 and every natural number n, every prime factor p of the absolute
+    value of the k-th cyclotomic polynomial over the integers at k times n factorial satisfies n < p and p congruent
+    to 1 modulo k; in particular there is such a prime p with n < p, and p at most that absolute value.
+  needs:
+  - Replace the least prime factor by an arbitrary prime factor; the steps at lines 43-59 use only that p is prime
+    and divides the value.
+  - Add that the least prime factor of a number greater than 1 is at most that number, for the upper end.
+  bound: between
+  chooses:
+  - what: the point b at which the cyclotomic polynomial is evaluated
+    where: C:lemma/Nat.exists_prime_gt_modEq_one
+    value: k times n factorial
+    gives: with b = k times m for any m at least 1 divisible by every number from 1 to n, each prime factor of the
+      value is above n and congruent to 1 modulo k; the factor k keeps k nonzero modulo p, the factor m keeps p
+      above n
+    best: k times the least common multiple of 1 to n, which gives a smaller value and so a smaller upper end; the
+      file takes n factorial
+    confidence: medium
+  - what: which prime factor of the value to take
+    where: C:lemma/Nat.exists_prime_gt_modEq_one
+    value: the least prime factor
+    gives: any prime factor gives a prime above n congruent to 1 modulo k
+    best: the file's choice, since the least factor gives the smallest witness
+    confidence: high
+  - what: the prime in the case k = 1
+    where: C:lemma/Nat.exists_prime_gt_modEq_one
+    value: a prime at least n + 1 from the infinitude of primes
+    gives: a prime above n, trivially congruent to 1 modulo 1
+    best: the file's choice
+    confidence: high
+  - what: the bound handed to the existence lemma
+    where: C:lemma/Nat.frequently_atTop_modEq_one
+    value: each n in turn
+    gives: a prime p at least n with the property, the strict n < p weakened to n at most p
+    best: the file's choice
+    confidence: high
+  trivial:
+  - case: k = 1
+    known: there are infinitely many primes, and every number is congruent to 1 modulo 1
+    delivered: any prime at least n + 1, for each n
+    compares: equal
+  - case: k = 2
+    known: there are infinitely many odd primes
+    delivered: the prime factors of 2 times n factorial plus 1, each odd and above n
+    compares: equal
+  - case: k = 4
+    known: prime factors of x squared plus 1 for even x are congruent to 1 modulo 4, so there are infinitely many
+      such primes
+    delivered: the prime factors of 16 times n factorial squared plus 1, each above n and congruent to 1 modulo
+      4
+    compares: equal
+  grounds:
+  - of: C:lemma/Nat.exists_prime_gt_modEq_one
+    lines: 28-59
+  - of: C:lemma/Nat.frequently_atTop_modEq_one
+    lines: 61-65
+  - of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    lines: 68-70
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    - PrimesCongruentOne.lean#L61-L65
+    - PrimesCongruentOne.lean#L68-L70
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: P:case/three-and-two
+  type: case
+  name: k = 3, n = 2
+  summary: 43 is prime, so p = 43; 43 > 2, and 43 - 1 = 42 = 3 times 14, so 43 is congruent to 1 modulo 3; 6 cubed
+    = 216 = 5 times 43 plus 1, so 6 has order exactly 3 modulo 43.
+  stance: opinion
+  of: P:yield/what-the-proof-delivers
+  from: worked
+  stands: inside
+  given: b = 3 times 2 factorial = 6, and the third cyclotomic polynomial is x squared plus x plus 1, so its value
+    at 6 is 43.
+  expect: 43 is prime, so p = 43; 43 > 2, and 43 - 1 = 42 = 3 times 14, so 43 is congruent to 1 modulo 3; 6 cubed
+    = 216 = 5 times 43 plus 1, so 6 has order exactly 3 modulo 43.
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - P:yield/what-the-proof-delivers
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:constant/factor-k
+  type: constant
+  name: the factor k in b
+  summary: b is a multiple of k
+  stance: opinion
+  says: b is a multiple of k
+  where:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  value: k
+  why: p does not divide b, so p does not divide k, so k is nonzero modulo p and a root of the k-th cyclotomic polynomial
+    is a primitive k-th root of unity (lines 55-57)
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:constant/factor-n-factorial
+  type: constant
+  name: the factor n factorial in b
+  summary: every number from 1 to n divides b
+  stance: opinion
+  says: every number from 1 to n divides b
+  where:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  value: n factorial
+  why: a prime at most n would divide b, which p does not, so p > n (lines 51-52)
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:constant/b-at-least-two
+  type: constant
+  name: the lower bound on b
+  summary: b is at least 2
+  stance: opinion
+  says: b is at least 2
+  where:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  value: '2'
+  why: makes b - 1 at least 1 and b other than 1, so the value of the cyclotomic polynomial exceeds 1 and has a
+    prime factor (lines 36-40)
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:constant/k-one-start
+  type: constant
+  name: the start of the search for k = 1
+  summary: the prime is at least n + 1
+  stance: opinion
+  says: the prime is at least n + 1
+  where:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  value: n + 1
+  why: gives a prime strictly above n (line 31)
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 1
+    node: '1'
+    engine: model:blind-decompiler
+- id: C:part/one-beyond-every-bound
+  type: part
+  name: One such prime beyond every bound
+  summary: To show the set of primes congruent to 1 modulo k is infinite (k not 0), it is enough to produce, for
+    each bound n, one such prime p with n < p; the later stages build that prime and the last stage turns it back
+    into the infinite set.
+  stance: opinion
+  division: stage
+  number: 1
+  stage: reduction
+  says: To show the set of primes congruent to 1 modulo k is infinite (k not 0), it is enough to produce, for each
+    bound n, one such prime p with n < p; the later stages build that prime and the last stage turns it back into
+    the infinite set.
+  plain: The goal is to show there is no end to the whole numbers that only one and themselves divide and that leave
+    a remainder of one when divided by a given fixed number. It is enough to show that beyond any number you name,
+    one more such number can always be found.
+  plain-if: none
+  obvious: 'The obvious way copies the old proof that primes never run out: multiply the primes already found and
+    add one. Its prime factors are new, but nothing forces them to be congruent to 1 modulo k, so this fails; the
+    file instead evaluates the k-th cyclotomic polynomial, whose prime factors are forced into that class. The general
+    theorem of Dirichlet would also give the result but is far heavier.'
+  steps:
+  - C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  regime:
+    as: the bound n, any natural number
+    uniform-in: every k other than 0
+    fixed: none
+    worst-over: none
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L68-L70
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: C:part/the-modulus-one
+  type: part
+  name: The modulus one
+  summary: Since k is not 0, either k = 1 or k > 1.
+  stance: opinion
+  division: stage
+  number: 2
+  stage: side
+  says: Since k is not 0, either k = 1 or k > 1. For k = 1 every number is congruent to 1, so any prime at least
+    n + 1, from the infinitude of primes, serves; this clears the way for the cyclotomic stages, whose bound needs
+    k > 1.
+  plain: When the fixed number is one, the remainder condition asks nothing, so any whole number that only one and
+    itself divide, lying beyond the named number, will do. The old fact that such numbers never run out supplies
+    one.
+  plain-if: none
+  steps:
+  - C:step/case-k-one
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L30-L32
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: C:part/the-candidate-prime
+  type: part
+  name: The candidate prime from the cyclotomic value
+  summary: For k > 1 put b = k times n factorial, which is at least 2.
+  stance: opinion
+  division: stage
+  number: 3
+  stage: main
+  says: For k > 1 put b = k times n factorial, which is at least 2. The absolute value of the k-th cyclotomic polynomial
+    at b exceeds b - 1, so it exceeds 1 and its least prime factor p exists; because p divides that value, b is
+    a root of the k-th cyclotomic polynomial modulo p. The next stages read off the two properties of p from this
+    root.
+  plain: For a fixed number above one, the proof builds a starting number by multiplying the fixed number by every
+    whole number from one to the named number, then feeds it into a fixed formula made of its powers and finds that
+    the outcome is larger than one. The smallest divisor of that outcome other than one is then a whole number that
+    only one and itself divide, and the formula gives nothing over when the starting number is put in and everything
+    is counted by remainders on division by that divisor.
+  plain-if: the fixed number is greater than one, so that the outcome of the formula is greater than one
+  steps:
+  - C:lemma/Nat.exists_prime_gt_modEq_one
+  - C:step/value-exceeds-one
+  - C:step/least-prime-factor
+  - C:step/root-mod-p
+  regime:
+    as: exact, for each k > 1 and each n
+    uniform-in: n
+    fixed: k
+    worst-over: none
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L28-L59
+    - PrimesCongruentOne.lean#L33-L40
+    - PrimesCongruentOne.lean#L41-L42
+    - PrimesCongruentOne.lean#L43-L48
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: C:part/past-the-bound
+  type: part
+  name: The candidate lies past the bound
+  summary: A root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b.
+  stance: opinion
+  division: stage
+  number: 4
+  stage: main
+  says: A root of a cyclotomic polynomial modulo p is coprime to p, so p does not divide b. Every number from 1
+    to n divides n factorial and so divides b; a prime p at most n would therefore divide b, which it does not,
+    so n < p.
+  plain: Because of how the formula is built, the divisor found cannot also divide the starting number. Every whole
+    number from one to the named number does divide the starting number, so the divisor is none of them and lies
+    beyond the named number.
+  plain-if: the starting number is a multiple of every whole number from one to the named number
+  steps:
+  - C:step/p-not-dividing-b
+  - C:step/p-above-n
+  regime:
+    as: exact, for each n
+    uniform-in: n
+    fixed: k
+    worst-over: none
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L49-L50
+    - PrimesCongruentOne.lean#L51-L52
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: C:part/order-exactly-k
+  type: part
+  name: The order of b is exactly k
+  summary: Since b is nonzero modulo p, its multiplicative order divides p - 1.
+  stance: opinion
+  division: stage
+  number: 5
+  stage: main
+  says: Since b is nonzero modulo p, its multiplicative order divides p - 1. Since k divides b and p does not divide
+    b, k is nonzero modulo p, so the root b is a primitive k-th root of unity and its order is exactly k. Hence
+    k divides p - 1, so p is congruent to 1 modulo k, which finishes the existence lemma.
+  plain: Multiplying the starting number by itself again and again, keeping only the remainder on division by the
+    divisor, returns to one for the first time after exactly the fixed number of rounds. Such a cycle always fits
+    a whole number of times into one less than the divisor, so the divisor leaves a remainder of one when divided
+    by the fixed number.
+  plain-if: the divisor does not divide the fixed number, which holds because the fixed number divides the starting
+    number and the divisor does not
+  steps:
+  - C:step/order-is-k
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L53-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: C:part/back-to-infinitely-many
+  type: part
+  name: Back to infinitely many
+  summary: For every n the existence lemma gives a prime p with n < p, so with n at most p; on the natural numbers
+    this is the same as the property holding frequently at infinity, which is the same as the set where it holds
+    being infinite.
+  stance: opinion
+  division: stage
+  number: 6
+  stage: close
+  says: For every n the existence lemma gives a prime p with n < p, so with n at most p; on the natural numbers
+    this is the same as the property holding frequently at infinity, which is the same as the set where it holds
+    being infinite. This is the statement.
+  plain: Having one such number beyond every named number is restated as meeting them again and again with no last
+    one, and that is restated once more as there being endlessly many of them.
+  plain-if: none
+  steps:
+  - C:lemma/Nat.frequently_atTop_modEq_one
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L61-L65
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: P:reading/the-value-has-a-prime-factor
+  type: reading
+  name: The cyclotomic value has a prime factor
+  summary: The proof can name a prime at all because the absolute value of the k-th cyclotomic polynomial at b is
+    greater than b - 1, which is at least 1; a number greater than 1 has a least prime factor.
+  stance: opinion
+  of:
+  - C:part/the-candidate-prime
+  whose:
+    by: model
+  grounds:
+  - of: C:step/value-exceeds-one
+    lines: 33-40
+  - of: C:step/least-prime-factor
+    lines: 41-42
+  confidence: high
+  regime:
+    as: exact, for each k > 1 and each n
+    uniform-in: n
+    fixed: k
+    worst-over: none
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L33-L40
+    - PrimesCongruentOne.lean#L41-L42
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: P:reading/factorial-pushes-past-n
+  type: reading
+  name: The factorial pushes the prime past n
+  summary: Every number from 1 to n divides b, while a cyclotomic root modulo p is coprime to p; so p does not divide
+    b and cannot be at most n. The factor n factorial is what makes the prime large.
+  stance: opinion
+  of:
+  - C:constant/factor-n-factorial
+  whose:
+    by: model
+  grounds:
+  - of: C:step/p-not-dividing-b
+    lines: 49-50
+  - of: C:step/p-above-n
+    lines: 51-52
+  confidence: high
+  regime:
+    as: exact, for each n
+    uniform-in: n
+    fixed: k
+    worst-over: none
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L49-L50
+    - PrimesCongruentOne.lean#L51-L52
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: P:reading/the-factor-k-keeps-k-nonzero
+  type: reading
+  name: The factor k keeps k nonzero modulo p
+  summary: Because k divides b and p does not divide b, p does not divide k; only then is a root of the k-th cyclotomic
+    polynomial modulo p a primitive k-th root of unity.
+  stance: opinion
+  of:
+  - C:constant/factor-k
+  whose:
+    by: model
+  grounds:
+  - of: C:step/order-is-k
+    lines: 55-57
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L55-L57
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: P:reading/order-forces-the-congruence
+  type: reading
+  name: The order forces the congruence
+  summary: The order of b modulo p is exactly k and also divides p - 1 by the little theorem of Fermat, so k divides
+    p - 1; the congruence comes from the order, not from any search.
+  stance: opinion
+  of:
+  - C:part/order-exactly-k
+  whose:
+    by: model
+  grounds:
+  - of: C:step/order-is-k
+    lines: 53-59
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L53-L59
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: P:reading/only-a-change-of-language
+  type: reading
+  name: From one beyond each bound to infinitely many
+  summary: One prime beyond every bound already is infinitely many; the last two declarations only restate it, through
+    frequently at infinity, as an infinite set.
+  stance: opinion
+  of:
+  - C:part/back-to-infinitely-many
+  whose:
+    by: model
+  grounds:
+  - of: C:lemma/Nat.frequently_atTop_modEq_one
+    lines: 61-65
+  - of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    lines: 68-70
+  confidence: high
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean#L61-L65
+    - PrimesCongruentOne.lean#L68-L70
+    confidence: 0.5
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: N:decision/evaluate-at-k-times-n-factorial
+  type: decision
+  name: Evaluate at k times n factorial
+  summary: The point b where the cyclotomic polynomial is evaluated is k times n factorial.
+  stance: opinion
+  chose: b = k times n factorial
+  because: The factor k keeps k nonzero modulo p, the factor n factorial keeps p above n, and b is at least 2 so
+    the value exceeds 1; a smaller multiple such as k times the least common multiple of 1 to n would also serve.
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.35
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: N:decision/least-prime-factor
+  type: decision
+  name: Take the least prime factor
+  summary: The prime chosen is the least prime factor of the absolute value of the cyclotomic value.
+  stance: opinion
+  chose: the least prime factor
+  because: It is a ready-made prime divisor of any number other than 1; the argument uses only that p is a prime
+    dividing the value.
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.35
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: N:decision/split-off-k-one
+  type: decision
+  name: Split off k = 1
+  summary: The case k = 1 is handled apart, by the infinitude of primes.
+  stance: opinion
+  chose: a separate case for k = 1
+  because: The lower bound for the cyclotomic value is stated for k > 1, and for k = 1 the congruence is empty.
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.35
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: N:decision/through-frequently
+  type: decision
+  name: Pass through frequently at infinity
+  summary: The infinite set is reached through a lemma that such primes occur frequently at infinity.
+  stance: opinion
+  chose: an intermediate lemma in the language of frequently at infinity
+  because: It matches the existence lemma directly, one witness for every bound, and the library turns frequently
+    at infinity on the naturals into an infinite set.
+  provenance:
+    mode: derived
+    sources:
+    - PrimesCongruentOne.lean
+    confidence: 0.35
+    state: known
+  made:
+    move: construe
+    run: 2026-11-22-1200-0004
+    step: 2
+    node: '2'
+    engine: model:blind-decompiler
+- id: D:question/mathlib-version
+  type: question
+  about: C:dependency/mathlib#version
+  asks: Which version of Mathlib is it written for?
+  why: missing
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/lean-version
+  type: question
+  about: R:means/lean#version
+  asks: Which Lean version does the source name?
+  why: missing
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/infinite-primes-unsure
+  type: question
+  about: C:reliance/infinite-primes
+  asks: Is this right, and if not, what is? "For every natural number m there is a prime p with m at most p."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/cyclotomic-value-bound-unsure
+  type: question
+  about: C:reliance/cyclotomic-value-bound
+  asks: Is this right, and if not, what is? "For k > 1 and a natural number q other than 1, q - 1 is less than the
+    absolute value of the k-th cyclotomic polynomial over the integers evaluated at q."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/least-factor-prime-unsure
+  type: question
+  about: C:reliance/least-factor-prime
+  asks: Is this right, and if not, what is? "The least factor greater than 1 of a natural number other than 1 is
+    prime and divides the number."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/cyclotomic-reduction-unsure
+  type: question
+  about: C:reliance/cyclotomic-reduction
+  asks: Is this right, and if not, what is? "The image of the k-th cyclotomic polynomial over the integers in any
+    ring is the k-th cyclotomic polynomial over that ring."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/zero-mod-p-unsure
+  type: question
+  about: C:reliance/zero-mod-p
+  asks: Is this right, and if not, what is? "An integer is 0 in the integers modulo p if and only if p divides it."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/root-coprime-unsure
+  type: question
+  about: C:reliance/root-coprime
+  asks: Is this right, and if not, what is? "If a natural number is a root of a cyclotomic polynomial modulo the
+    prime p, it is coprime to p."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/divides-factorial-unsure
+  type: question
+  about: C:reliance/divides-factorial
+  asks: Is this right, and if not, what is? "Every positive natural number at most n divides n factorial."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/fermat-order-unsure
+  type: question
+  about: C:reliance/fermat-order
+  asks: Is this right, and if not, what is? "A nonzero element of the integers modulo a prime p has multiplicative
+    order dividing p - 1."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/cyclotomic-root-primitive-unsure
+  type: question
+  about: C:reliance/cyclotomic-root-primitive
+  asks: Is this right, and if not, what is? "In a domain where k is nonzero, an element is a root of the k-th cyclotomic
+    polynomial if and only if it is a primitive k-th root of unity, whose order is then exactly k."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/congruence-as-divisibility-unsure
+  type: question
+  about: C:reliance/congruence-as-divisibility
+  asks: Is this right, and if not, what is? "For c at most b, c is congruent to b modulo n if and only if n divides
+    b - c."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/frequently-unfolded-unsure
+  type: question
+  about: C:reliance/frequently-unfolded
+  asks: Is this right, and if not, what is? "A property holds frequently as p goes to infinity if and only if for
+    every n there is p at least n with the property."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/frequently-infinite-unsure
+  type: question
+  about: C:reliance/frequently-infinite
+  asks: Is this right, and if not, what is? "A property of natural numbers holds frequently at infinity if and only
+    if the set where it holds is infinite."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/congruent-modulo-k-unsure
+  type: question
+  about: L:term/congruent-modulo-k
+  asks: Is this right, and if not, what is? "p is congruent to 1 modulo k when p and 1 leave the same remainder
+    on division by k; modulo 1 every number is congruent to 1."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/n-factorial-unsure
+  type: question
+  about: L:term/n-factorial
+  asks: Is this right, and if not, what is? "The product 1 times 2 times ... times n."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/least-prime-factor-unsure
+  type: question
+  about: L:term/least-prime-factor
+  asks: Is this right, and if not, what is? "The smallest divisor greater than 1 of a number other than 1; it is
+    always prime."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/the-integers-modulo-p-unsure
+  type: question
+  about: L:term/the-integers-modulo-p
+  asks: Is this right, and if not, what is? "The field of remainders on division by the prime p."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/frequently-at-infinity-unsure
+  type: question
+  about: L:term/frequently-at-infinity
+  asks: Is this right, and if not, what is? "A property holds frequently as p goes to infinity when it holds for
+    arbitrarily large p."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/cyclotomic-polynomial-unsure
+  type: question
+  about: K:concept/cyclotomic-polynomial
+  asks: Is this right, and if not, what is? "The k-th cyclotomic polynomial is the monic polynomial with integer
+    coefficients whose roots over the complex numbers are exactly the primitive k-th roots of unity."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/primitive-root-of-unity-unsure
+  type: question
+  about: K:concept/primitive-root-of-unity
+  asks: Is this right, and if not, what is? "An element x with x to the power k equal to 1 and no smaller positive
+    power equal to 1; its order is k."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/multiplicative-order-unsure
+  type: question
+  about: K:concept/multiplicative-order
+  asks: Is this right, and if not, what is? "The least positive power of an element that equals 1."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/little-theorem-of-fermat-unsure
+  type: question
+  about: K:concept/little-theorem-of-fermat
+  asks: Is this right, and if not, what is? "Every nonzero element modulo a prime p satisfies x to the power p -
+    1 equal to 1, so its order divides p - 1."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/evaluate-at-k-times-n-factorial-unsure
+  type: question
+  about: N:decision/evaluate-at-k-times-n-factorial
+  asks: Is this right, and if not, what is? "The point b where the cyclotomic polynomial is evaluated is k times
+    n factorial."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/least-prime-factor-unsure-2
+  type: question
+  about: N:decision/least-prime-factor
+  asks: Is this right, and if not, what is? "The prime chosen is the least prime factor of the absolute value of
+    the cyclotomic value."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/split-off-k-one-unsure
+  type: question
+  about: N:decision/split-off-k-one
+  asks: Is this right, and if not, what is? "The case k = 1 is handled apart, by the infinitude of primes."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/through-frequently-unsure
+  type: question
+  about: N:decision/through-frequently
+  asks: Is this right, and if not, what is? "The infinite set is reached through a lemma that such primes occur
+    frequently at infinity."
+  why: unsure
+  kind: text
+  to: anyone
+  raised:
+    by: move
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/nat-exists-prime-gt-modeq-one-slack-was-the-leas
+  type: question
+  about: C:lemma/Nat.exists_prime_gt_modEq_one#slack
+  asks: Was the least prime factor chosen because the proof needs it, or only as a convenient way to name some prime
+    factor of the value?
+  why: intent
+  kind: choice
+  options:
+  - the proof needs the least one
+  - only a convenient way to pick a prime
+  - something else
+  hint: The reading finds that any prime dividing the value would do (lines 41-48).
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/nat-infinite-setof-prime-modeq-one-why-does-the
+  type: question
+  about: C:definition/Nat.infinite_setOf_prime_modEq_one
+  asks: Why does the file keep the alias Nat.infinite_setOf_prime_modEq_one beside Nat.infinite_setOfPred_prime_modEq_one?
+  why: intent
+  kind: choice
+  options:
+  - an older name kept for compatibility
+  - a shorter name for convenience
+  - something else
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/nat-frequently-attop-modeq-one-is-nat-frequently
+  type: question
+  about: C:lemma/Nat.frequently_atTop_modEq_one
+  asks: Is Nat.frequently_atTop_modEq_one meant to be used by other files on its own, or only as a step toward the
+    statement about the infinite set?
+  why: intent
+  kind: choice
+  options:
+  - meant for use on its own
+  - only a step toward the infinite set
+  - both
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/nat-infinite-setofpred-prime-modeq-one-what-prom
+  type: question
+  about: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  asks: 'What prompted this file: was it written as a result in its own right, or as a step toward a larger result
+    such as the theorem of Dirichlet on primes in arithmetic progressions?'
+  why: intent
+  kind: text
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/checking-does-lean-accept-the-fil
+  type: question
+  about: P:claim/checking
+  asks: Does Lean accept the file as it stands, with no errors, for the Mathlib it is written for?
+  why: unsure
+  kind: yes-no
+  hint: Nothing was built or run when the fabula was read.
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/infinitely-many-primes-one-mod-k-what-prompted-t
+  type: question
+  about: N:aim/infinitely-many-primes-one-mod-k
+  asks: What prompted this file, and for whom was it written?
+  why: intent
+  kind: choice
+  options:
+  - a contribution to Mathlib
+  - a teaching example or exercise
+  - a step in a larger project
+  - something else
+  hint: Nothing in the module note says why or for whom.
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/one-beyond-every-bound-obvious-was-the-cyclotomi
+  type: question
+  about: C:part/one-beyond-every-bound#obvious
+  asks: Was the cyclotomic route taken to avoid depending on the general theorem of Dirichlet, or was that theorem
+    not available to you when the file was written?
+  why: intent
+  kind: choice
+  options:
+  - chosen to avoid Dirichlet
+  - Dirichlet was not available
+  - neither; the cyclotomic route was simply preferred
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/what-the-proof-delivers-as-statement-was-it-deli
+  type: question
+  about: P:yield/what-the-proof-delivers#as-statement
+  asks: Was it deliberate that the final statement keeps only that the set is infinite, and not the explicit prime
+    above n with its upper bound?
+  why: intent
+  kind: yes-no
+  hint: The proof builds an explicit witness that the statement then forgets.
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/evaluate-at-k-times-n-factorial-because-why-is-b
+  type: question
+  about: N:decision/evaluate-at-k-times-n-factorial#because
+  asks: Why is b taken as k times n factorial rather than a smaller multiple such as k times the least common multiple
+    of 1 to n?
+  why: intent
+  kind: choice
+  options:
+  - n factorial was easier to use in the library
+  - the size of the witness did not matter
+  - the smaller choice was not considered
+  - another reason
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/least-prime-factor-because-was-the-least-prime-f
+  type: question
+  about: N:decision/least-prime-factor#because
+  asks: Was the least prime factor taken for a reason of its own, or only because it is a convenient way to name
+    some prime divisor?
+  why: intent
+  kind: choice
+  options:
+  - only a convenient prime divisor
+  - the smallest witness was wanted
+  - another reason
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
+- id: D:question/through-frequently-because-was-the-lemma-that-su
+  type: question
+  about: N:decision/through-frequently#because
+  asks: Was the lemma that such primes occur frequently at infinity meant to be used on its own, or only as a step
+    toward the infinite set?
+  why: intent
+  kind: choice
+  options:
+  - meant to be used on its own
+  - only a step toward the statement
+  to: anyone
+  raised:
+    by: model
+    from: question
+    at: 2026-11-22 12:00:00+00:00
+    run: 2026-11-22-1200-0005
+  state: open
+  made:
+    move: gather
+    run: 2026-11-22-1200-0005
+    step: 2
+    node: '2'
+    engine: code
