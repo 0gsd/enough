@@ -73,7 +73,8 @@
       "obtained": "2026-11-18T12:00:00Z",
       "files": 1,
       "digest": "sha256:d50c7563ffa3c673c44c0c8ec7c2a344057a00370660a7a0dddc5171d94641a9",
-      "address": "https://cosmoes.org/library/example/sheet/2/"
+      "address": "https://cosmoes.org/library/example/sheet/2/",
+      "credit": "This copy includes material copied from or derived from The Example Sheet 2.\nExample® is a made-up mark of the Example Society."
     },
     {
       "shelf": "memos",
