@@ -1,0 +1,4 @@
+t1 setup 2026-11-22-1242
+python: Python 3.13.11 | packaged by Anaconda, Inc. | (main, Dec 10 2025, 21:21:08) [Clang 20.1.8 ]
+sandbox: /usr/bin/sandbox-exec, closed profile (no network, writes only in the scratch folder)
+macOS: 26.6.2 arm64

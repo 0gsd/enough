@@ -1,0 +1,2588 @@
+{
+ "impl": "original",
+ "seed": "1",
+ "cases_digest": "e4ff63db545e439b58307f5dc092e6a97ff56e834cf216c99f330a158d08de35",
+ "python": "3.13.11 | packaged by Anaconda, Inc. | (main, Dec 10 2025, 21:21:08) [Clang 20.1.8 ]",
+ "rows": [
+  {
+   "id": "A1",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "pages",
+      "12"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "pages",
+      "-2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--all"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--all",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "pages: 12\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "pages: 10\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "pages  10  ##############################\ntea     1  ###\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"pages\": 10, \"tea\": 1}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid -2 on pages; pages: 12\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "pages  12  ##############################\ntea     1  ##\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid +12 on pages; pages: 0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid +1 on tea; tea: 0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "nothing to undo\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "nothing tallied yet (or every total is 0; try --all)\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "pages  0\ntea    0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"pages\": 0, \"tea\": 0}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 12, \"name\": \"pages\"}\n{\"at\": <float>, \"delta\": -2, \"name\": \"pages\"}\n{\"at\": <float>, \"delta\": 2, \"name\": \"pages\", \"undoes\": 3}\n{\"at\": <float>, \"delta\": -12, \"name\": \"pages\", \"undoes\": 2}\n{\"at\": <float>, \"delta\": -1, \"name\": \"tea\", \"undoes\": 1}\n"
+    }
+   }
+  },
+  {
+   "id": "A2",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "a",
+      "10"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "bb",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "c",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "c",
+      "-1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--all"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "a: 10\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "bb: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "c: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "c: 0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a   10  ##############################\nbb   1  ###\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a   10  ##############################\nbb   1  ###\nc    0\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 10, \"name\": \"a\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"bb\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"c\"}\n{\"at\": <float>, \"delta\": -1, \"name\": \"c\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A3",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "a",
+      "-2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "a: -2\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a  -2\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"a\": -2}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": -2, \"name\": \"a\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A4",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--all"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "nothing tallied yet (or every total is 0; try --all)\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "nothing tallied yet\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "nothing to undo\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "A5",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "two words"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "0"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      ""
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "   "
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      " tea "
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: adding 0 changes nothing\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A6",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "walks",
+      "2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "walks",
+      "-3"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--all"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "walks: 2\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid +2 on walks; walks: 0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "walks: -3\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid -3 on walks; walks: 0\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "walks  0\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 2, \"name\": \"walks\"}\n{\"at\": <float>, \"delta\": -2, \"name\": \"walks\", \"undoes\": 1}\n{\"at\": <float>, \"delta\": -3, \"name\": \"walks\"}\n{\"at\": <float>, \"delta\": 3, \"name\": \"walks\", \"undoes\": 3}\n"
+    }
+   }
+  },
+  {
+   "id": "A7",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "--version"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tally 0.2.0\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "A8",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     ".tally.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A9",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     ".tally.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A10",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "sub/t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "A11",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "a/b/c.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "B1",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: the following arguments are required: command\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B2",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "frob"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: argument command: invalid choice: 'frob' (choose from add, show, undo)\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B3",
+   "of": "command.add",
+   "argv": [
+    {
+     "argv": [
+      "add"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: the following arguments are required: name\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B4",
+   "of": "command.add",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea",
+      "1",
+      "2"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: unrecognized arguments: 2\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B5",
+   "of": "command.add",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea",
+      "x"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "1.5"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "1e3"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "0x10"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: argument n: invalid int value: 'x'\n"
+     },
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: argument n: invalid int value: '1.5'\n"
+     },
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: argument n: invalid int value: '1e3'\n"
+     },
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: argument n: invalid int value: '0x10'\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B6",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--nope"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: unrecognized arguments: --nope\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B7",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "--help"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "-h"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "--help"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "-h"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "usage: tally [-h] [--version] {add,show,undo} ...\n\nCount things from the command line.\n\npositional arguments:\n  {add,show,undo}\n    add            add to a count\n    show           show every total\n    undo           cancel the latest add\n\noptions:\n  -h, --help       show this help message and exit\n  --version        show program's version number and exit\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "usage: tally add [-h] name [n]\n\npositional arguments:\n  name\n  n\n\noptions:\n  -h, --help  show this help message and exit\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "usage: tally show [-h] [--all] [--json]\n\noptions:\n  -h, --help  show this help message and exit\n  --all       include totals of 0\n  --json      print the totals as one JSON object\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B8",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--al"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--j"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--a",
+      "--j"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea  1  ##############################\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"tea\": 1}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"tea\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "B9",
+   "of": "command.undo",
+   "argv": [
+    {
+     "argv": [
+      "undo",
+      "extra"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: unrecognized arguments: extra\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "B10",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "-5"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "--",
+      "-x",
+      "2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "-x"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json",
+      "--all"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "-5: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "-x: 2\n",
+      "err": ""
+     },
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally add [-h] name [n]\ntally add: error: the following arguments are required: name\n"
+     },
+     {
+      "exit": 0,
+      "out": "{\"-5\": 1, \"-x\": 2}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"-5\"}\n{\"at\": <float>, \"delta\": 2, \"name\": \"-x\"}\n"
+    }
+   }
+  },
+  {
+   "id": "B11",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "--json",
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 2,
+      "out": "",
+      "err": "usage: tally [-h] [--version] {add,show,undo} ...\ntally: error: unrecognized arguments: --json\n"
+     },
+     {
+      "exit": 0,
+      "out": "{}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "C1",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "big",
+      "99999999999999999999999"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "big",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "big: 99999999999999999999999\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "big: 100000000000000000000000\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "big  100000000000000000000000  ##############################\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"big\": 100000000000000000000000}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 99999999999999999999999, \"name\": \"big\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"big\"}\n"
+    }
+   }
+  },
+  {
+   "id": "C2",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "tea",
+      "+5"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "007"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      " 7 "
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "1_000"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "٣"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea",
+      "-0"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "tea: 5\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 12\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 19\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 1019\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 1022\n",
+      "err": ""
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: adding 0 changes nothing\n"
+     },
+     {
+      "exit": 0,
+      "out": "{\"tea\": 1022}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 5, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 7, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 7, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 1000, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 3, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "C3",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "top",
+      "12"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "one",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "five",
+      "5"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "top: 12\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "one: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "five: 5\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "five   5  ############\none    1  ##\ntop   12  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 12, \"name\": \"top\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"one\"}\n{\"at\": <float>, \"delta\": 5, \"name\": \"five\"}\n"
+    }
+   }
+  },
+  {
+   "id": "C4",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "top",
+      "20"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "three",
+      "3"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "top: 20\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "three: 3\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "three   3  ####\ntop    20  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 20, \"name\": \"top\"}\n{\"at\": <float>, \"delta\": 3, \"name\": \"three\"}\n"
+    }
+   }
+  },
+  {
+   "id": "C5",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "top",
+      "4"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "one",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "top: 4\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "one: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "one  1  ########\ntop  4  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 4, \"name\": \"top\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"one\"}\n"
+    }
+   }
+  },
+  {
+   "id": "C6",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "a",
+      "1000"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "b",
+      "-5"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "c",
+      "7"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "a: 1000\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "b: -5\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "c: 7\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a  1000  ##############################\nb    -5\nc     7  #\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1000, \"name\": \"a\"}\n{\"at\": <float>, \"delta\": -5, \"name\": \"b\"}\n{\"at\": <float>, \"delta\": 7, \"name\": \"c\"}\n"
+    }
+   }
+  },
+  {
+   "id": "D1",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "café"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "茶",
+      "3"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "naïve",
+      "2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "café: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "茶: 3\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "naïve: 2\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "café   1  ##########\nnaïve  2  ####################\n茶      3  ##############################\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"caf\\u00e9\": 1, \"na\\u00efve\": 2, \"\\u8336\": 3}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"caf\\u00e9\"}\n{\"at\": <float>, \"delta\": 3, \"name\": \"\\u8336\"}\n{\"at\": <float>, \"delta\": 2, \"name\": \"na\\u00efve\"}\n"
+    }
+   }
+  },
+  {
+   "id": "D2",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "𝒳",
+      "2"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "é",
+      "3"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "ab",
+      "1"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "𝒳: 2\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "é: 3\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "ab: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "ab  1  ##########\né  3  ##############################\n𝒳   2  ####################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 2, \"name\": \"\\ud835\\udcb3\"}\n{\"at\": <float>, \"delta\": 3, \"name\": \"e\\u0301\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"ab\"}\n"
+    }
+   }
+  },
+  {
+   "id": "D3",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "b"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "B"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "a"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "é"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "~"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "～"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "𝒳"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "Z"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "10"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "9"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "b: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "B: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "é: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "~: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "～: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "𝒳: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "Z: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "10: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "9: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "10  1  ##############################\n9   1  ##############################\nB   1  ##############################\nZ   1  ##############################\na   1  ##############################\nb   1  ##############################\n~   1  ##############################\né   1  ##############################\n～   1  ##############################\n𝒳   1  ##############################\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"10\": 1, \"9\": 1, \"B\": 1, \"Z\": 1, \"a\": 1, \"b\": 1, \"~\": 1, \"\\u00e9\": 1, \"\\uff5e\": 1, \"\\ud835\\udcb3\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"b\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"B\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"a\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"\\u00e9\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"~\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"\\uff5e\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"\\ud835\\udcb3\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"Z\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"10\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"9\"}\n"
+    }
+   }
+  },
+  {
+   "id": "D4",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "a b"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "a﻿b"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "a\u001cb"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      " tea "
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea\n"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "te\tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "a​b"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 0,
+      "out": "a﻿b: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 0,
+      "out": "tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 2\n",
+      "err": ""
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: a name is one word, with no spaces\n"
+     },
+     {
+      "exit": 0,
+      "out": "a​b: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"a\\u200bb\": 1, \"a\\ufeffb\": 1, \"tea\": 2}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"a\\ufeffb\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"a\\u200bb\"}\n"
+    }
+   }
+  },
+  {
+   "id": "D5",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "add",
+      "q\"uote"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "back\\slash"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "a\u0001b"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "q\"uote: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "back\\slash: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a\u0001b: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"a\\u0001b\": 1, \"back\\\\slash\": 1, \"q\\\"uote\": 1}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "a\u0001b         1  ##############################\nback\\slash  1  ##############################\nq\"uote      1  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"q\\\"uote\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"back\\\\slash\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"a\\u0001b\"}\n"
+    }
+   }
+  },
+  {
+   "id": "E1",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"tea\": 3}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid +2 on tea; tea: 1\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"tea\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\n\n   \n{\"at\": <float>, \"name\": \"tea\", \"delta\": 2}\n{\"at\": <float>, \"delta\": -2, \"name\": \"tea\", \"undoes\": 2}\n"
+    }
+   }
+  },
+  {
+   "id": "E2",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 2 is not a tally entry\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 2 is not a tally entry\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 2 is not a tally entry\n"
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\nnot json\n{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "E3a",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 3}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3b",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 2}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3c",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3d",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"5\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3e",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3f",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3g",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3h",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 1}\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3i",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E3j",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "undo"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "undid +1 on x; x: -1\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <int>, \"name\": \"x\", \"delta\": 1}\n{\"at\": <int>, \"name\": \"x\", \"delta\": -1, \"undoes\": 7}\n{\"at\": <float>, \"delta\": -1, \"name\": \"x\", \"undoes\": 1}\n"
+    }
+   }
+  },
+  {
+   "id": "E4",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"tea\": 3}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "tea: 4\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "{\"tea\": 4}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}\r\n{\"at\": <int>, \"name\": \"tea\", \"delta\": 2}\r\n{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "E5",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"tea\": 1}\n",
+      "err": ""
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <int>, \"name\": \"tea\", \"delta\": 1}{\"at\": <float>, \"delta\": 1, \"name\": \"tea\"}\n"
+    }
+   }
+  },
+  {
+   "id": "E6",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E7",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/orig/tally/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/orig/tally/tally/cli.py\", line 41, in main\n    totals = ledger.totals(ledger.read(path))\n                           ~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/orig/tally/tally/ledger.py\", line 41, in read\n    for n, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 633, in read_text\n    return f.read()\n           ~~~~~~^^\n  File \"<frozen codecs>\", line 325, in decode\nUnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E8",
+   "of": "command.tally",
+   "argv": [
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "add",
+      "tea"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/orig/tally/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/orig/tally/tally/cli.py\", line 41, in main\n    totals = ledger.totals(ledger.read(path))\n                           ~~~~~~~~~~~^^^^^^\n  File \"<SCRATCH>/orig/tally/tally/ledger.py\", line 41, in read\n    for n, line in enumerate(path.read_text(encoding=\"utf-8\").splitlines(), 1):\n                             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 546, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
+     },
+     {
+      "exit": 1,
+      "out": "",
+      "err": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"<SCRATCH>/orig/tally/tally/__main__.py\", line 5, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"<SCRATCH>/orig/tally/tally/cli.py\", line 37, in main\n    e = ledger.add(path, args.name, args.n)\n  File \"<SCRATCH>/orig/tally/tally/ledger.py\", line 69, in add\n    _append(path, entry)\n    ~~~~~~~^^^^^^^^^^^^^\n  File \"<SCRATCH>/orig/tally/tally/ledger.py\", line 57, in _append\n    with path.open(\"a\", encoding=\"utf-8\") as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"~/miniconda3/lib/python3.13/pathlib/_local.py\", line 537, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '<CASE>/t.jsonl'\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E9",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 1,
+      "out": "",
+      "err": "tally: <CASE>/t.jsonl: line 1 is not a tally entry\n"
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "E10",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    },
+    {
+     "argv": [
+      "show"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"caf\\u00e9\": 1, \"\\ud835\\udcb3\": 2}\n",
+      "err": ""
+     },
+     {
+      "exit": 0,
+      "out": "café  1  ###############\n𝒳     2  ##############################\n",
+      "err": ""
+     }
+    ],
+    "written": {}
+   }
+  },
+  {
+   "id": "F1",
+   "of": "command.show",
+   "argv": [
+    {
+     "argv": [
+      "show",
+      "--json"
+     ],
+     "stdin": null
+    }
+   ],
+   "run": {
+    "steps": [
+     {
+      "exit": 0,
+      "out": "{\"x\": 40}\n",
+      "err": ""
+     }
+    ],
+    "written": {
+     "t.jsonl": "{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n{\"at\": <float>, \"delta\": 1, \"name\": \"x\"}\n"
+    },
+    "burst": {
+     "exits": [
+      "0"
+     ]
+    }
+   }
+  }
+ ]
+}

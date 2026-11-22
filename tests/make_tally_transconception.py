@@ -23,12 +23,13 @@ What is recorded and what is simulated (the fixture's README says the same):
   Swift tally, never Go or Rust; its 18 recorded steps are in the cases file and judge nothing here.
 
 Run: `python tests/make_tally_transconception.py [DEST]` (default the fixture folder). It writes the made parts
-whole (`programs/ expected/ replay/ inputs/ landed/ recorded/`; the README and `tally.cases.json` are kept), every
+whole (`programs/ expected/ replay/ inputs/ landed/ recorded/`; the README, `tally.cases.json` and `outside/` are kept), every
 run id and clock pinned, so making it again gives the same bytes but for each recorded run's plan and trace, which
 carry the wall clock (`tests/test_transconception_fixture.py` holds that). Re-make it, never hand-edit it.
 """
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import hashlib
 import json
@@ -80,6 +81,8 @@ WEIGHED_GO = "tally.6-weighed-go.fabulac.cosm"
 WEIGHED = "tally.7-weighed.fabulac.cosm"     # weighed in Go and in Rust (each spike at level 0)
 FINAL = "tally.fabulac.cosm"                 # each spike's level read from its simulated verdict: what entailing takes
 STAGES = (KEPT, GROUNDED, ASKED, SETTLED, ASKED_AGAIN, RULED, WEIGHED_GO, WEIGHED, FINAL)
+RECORDED = "tally.9-recorded.fabulac.cosm"   # FINAL, the round trip's target, the recorded cases as outside items
+JUDGED = "tally.10-judged.fabulac.cosm"      # RECORDED with the round trip's verdict gathered (lane T1, 0.9)
 
 # ---------------------------------------------------------------------------
 # The programs: the text's own
@@ -353,6 +356,116 @@ def _land(dest: Path, entailed: dict) -> None:
                             layout=t.values["arrangement"].text(), cshort=files, entry=code.origin["entry"])
 
 
+# ---------------------------------------------------------------------------
+# The round trip (lane T1, 0.9): recorded outside enough, rebuilt blind, judged
+# ---------------------------------------------------------------------------
+#
+# The recording, the rebuild, its run and its verdict were made outside enough, in the sandbox, and are kept in
+# `outside/` (the maker reads them, never makes them; `outside/README.md` says how they were made). From them the
+# maker writes two stages beside the path, after FINAL, never over it (the entailing runs above take FINAL):
+#
+# - RECORDED: FINAL with the round trip's target (`N:target/python`, the source language, not weighed), the
+#   round trip's `shorts` entry (no evidence yet), and the recorded cases as outside `P:case` items;
+# - JUDGED: RECORDED with the verdict read into the round trip's evidence (`tc.fold_verdict`).
+
+OUTSIDE = DEST / "outside"
+ROUNDTRIP = "py-roundtrip"
+ROUNDTRIP_AT = "2026-11-22T13:00"
+ROUNDTRIP_BY = ("a fresh agent (model opus, lane T1 of the 0.9 build) that had not seen tally's source, from "
+                f"inputs/{FINAL} alone")
+JUDGE_BY = "the judge (tools/transconception/harness.py), run by an agent in the sandbox (lane T1; 0.8 pins 9, 21)"
+#: What each command a step drives exercises, by rule; a step that exits other than 0 also exercises the errors.
+STEP_BEHAVIOURS = {"add": ["C:behaviour/add", "C:behaviour/read"], "undo": ["C:behaviour/undo", "C:behaviour/read"],
+                   "show": ["C:behaviour/show", "C:behaviour/read"]}
+
+
+def _target_python() -> dict:
+    return {"id": "N:target/python", "type": "target", "name": "python",
+            "summary": "A transconception of tally into python: the round trip, the source language again, to test "
+                       "the fabulac alone.",
+            "stance": "observed", "language": "python", "weighed": "not weighed (the source language)",
+            "provenance": {"mode": "manual", "confidence": 1, "state": "known",
+                           "sources": ["outside/README.md"]},
+            "made": {"move": "hand", "run": "T1-2026-11-22", "engine": "rules"}}
+
+
+def targeted(data: dict) -> dict:
+    """FINAL with the round trip's target and its `shorts` entry (no evidence): what the recording's cases file
+    was handed out from."""
+    out = copy.deepcopy(data)
+    out["shorts"] = list(out.get("shorts") or []) + [{
+        "path": f"../outside/{ROUNDTRIP}/", "at": ROUNDTRIP_AT, "by": ROUNDTRIP_BY, "mode": "model",
+        "order": "code", "language": "python", "entailed": "apart", "target": "N:target/python"}]
+    out["nodes"] = list(out["nodes"]) + [_target_python()]
+    return out
+
+
+def handed_out(data: dict) -> str:
+    """The cases file the recorder ran on: `entail f as cases`'s rule (`tc.cases_document`) over the targeted
+    fabulac and the cases file beside it."""
+    cat = {k: v for k, v in data.items() if k != "nodes"}
+    doc, _ = tc.cases_document(cat, data["nodes"], existing=json.loads(CASES.read_text(encoding="utf-8")))
+    return tc.dump_cases(doc)
+
+
+def _case_item(case: dict) -> dict:
+    """One recorded case as an outside `P:case` item: of the interface it drives and, by rule, the behaviours its
+    steps exercise (STEP_BEHAVIOURS), its steps and the original's recorded results."""
+    steps = case["steps"]
+    exp = case["expect"]["steps"]
+    of = [f"C:interface/{case['of']}"]
+    for s, e in zip(steps, exp):
+        argv = s if isinstance(s, list) else s.get("argv", [])
+        for b in STEP_BEHAVIOURS.get(argv[0] if argv else "", []) + (
+                ["C:behaviour/errors"] if e.get("exit") != 0 else []):
+            if b not in of:
+                of.append(b)
+    given: dict = {k: case[k] for k in ("files", "env", "cwd") if case.get(k) not in (None, {}, "")}
+    given["steps"] = [tc.given_step(s) for s in steps]
+    expect: dict = {"steps": [tc.case_expect(e) for e in exp]}
+    if case["expect"].get("written"):
+        expect["files"] = case["expect"]["written"]
+    rec = dict(case["recorded"])
+    src = rec.pop("source", {}) or {}
+    item = {"id": f"P:case/trial-{case['id'].lower()}", "type": "case", "name": case.get("note") or case["id"],
+            "summary": f"The migration trial's scenario {case['id']}, recorded from the original "
+                       f"({case.get('group', '')}).",
+            "stance": "observed", "worksheet-id": case["id"], "of": of, "stands": "outside", "from": "recorded",
+            "drafted-from": case.get("from") or "document", "given": given, "expect": expect,
+            "recorded": {**({"source-tree": src["tree"]} if src.get("tree") else {}),
+                         **({"source-commit": src["commit"]} if src.get("commit") else {}), **rec}}
+    if case.get("note"):
+        item["note"] = case["note"]
+    item["provenance"] = {"mode": "derived", "confidence": 1, "state": "known",
+                          "sources": [f"outside/recording/recorded.json#{case['id']}"]}
+    item["made"] = {"move": "hand", "run": "T1-2026-11-22", "engine": "rules"}
+    return item
+
+
+def _roundtrip(dest: Path) -> None:
+    """The two stages of the round trip (RECORDED, JUDGED), from what `outside/` holds."""
+    outside = dest / "outside"
+    data = mc.yaml_load((dest / "inputs" / FINAL).read_text(encoding="utf-8"))
+    t = targeted(data)
+    raw = (outside / "recording" / "cases.json").read_text(encoding="utf-8")
+    if raw != handed_out(t):
+        raise RuntimeError("outside/recording/cases.json is not the cases file entail f as cases gives the targeted "
+                           "fabulac: record it again")
+    cat = {k: v for k, v in t.items() if k != "nodes"}
+    doc = json.loads(raw)
+    doc, report = tc.gather_recorded(doc, tc.read_recording_folder(outside / "recording"), now=tc.source_of(cat))
+    if report["stale"] or report["unknown"] or len(report["recorded"]) != len(doc["cases"]):
+        raise RuntimeError(f"the recording does not stand whole: {report}")
+    t["nodes"] = t["nodes"] + [_case_item(c) for c in doc["cases"]]
+    _write(dest / "inputs" / RECORDED, mc.dump(t))
+    vraw = (outside / ROUNDTRIP / "verdict.json").read_bytes()
+    verdict = tc.read_verdict(vraw)
+    cat = {k: v for k, v in t.items() if k != "nodes"}
+    new_cat, _rep = tc.fold_verdict(cat, verdict, verdict_bytes=vraw, where=f"../outside/{ROUNDTRIP}/verdict.json",
+                                    at=ROUNDTRIP_AT, by=JUDGE_BY)
+    _write(dest / "inputs" / JUDGED, mc.dump({**new_cat, "nodes": t["nodes"]}))
+
+
 def problems(rep: mc.Report) -> dict:
     return {"ok": rep.ok, "errors": [str(p) for p in rep.errors], "warnings": [str(p) for p in rep.warnings]}
 
@@ -367,7 +480,8 @@ def gates_of(path: Path, source: Path) -> dict:
 
 def recorded_files(dest: Path) -> list[Path]:
     """The stage fabulacs whose checks and gates the fixture records: every stage, then the landed one."""
-    return [dest / "inputs" / s for s in STAGES] + [dest / "landed" / FINAL]
+    return ([dest / "inputs" / s for s in STAGES] + [dest / "landed" / FINAL]
+            + [dest / "inputs" / s for s in (RECORDED, JUDGED)])
 
 
 def reports(dest: Path) -> tuple[dict, dict]:
@@ -439,6 +553,9 @@ def make(dest: Path = DEST, scratch: Path | None = None) -> Path:
         for program, plan in plans.items():
             _expected(dest, program, plan)
         _land(dest, entailed)
+        if not (dest / "outside").is_dir():
+            shutil.copytree(OUTSIDE, dest / "outside")
+        _roundtrip(dest)
         checks, gates = reports(dest)
         _write(dest / "recorded" / "checks.json", _json(checks))
         _write(dest / "recorded" / "gates.json", _json(gates))

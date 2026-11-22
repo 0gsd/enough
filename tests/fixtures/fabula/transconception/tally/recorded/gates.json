@@ -3881,5 +3881,527 @@
    },
    "says": "not ready to entail in rust"
   }
+ },
+ "inputs/tally.9-recorded.fabulac.cosm": {
+  "ready-to-keep": {
+   "gate": "ready-to-keep",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.9-recorded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to keep"
+  },
+  "ready-to-entail go": {
+   "gate": "ready-to-entail",
+   "language": "go",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.9-recorded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in go"
+  },
+  "ready-to-entail rust": {
+   "gate": "ready-to-entail",
+   "language": "rust",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.9-recorded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in rust"
+  }
+ },
+ "inputs/tally.10-judged.fabulac.cosm": {
+  "ready-to-keep": {
+   "gate": "ready-to-keep",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.10-judged.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-judged.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence (the best is 1)"
+     ],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to keep"
+  },
+  "ready-to-entail go": {
+   "gate": "ready-to-entail",
+   "language": "go",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.10-judged.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-judged.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence (the best is 1)"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in go"
+  },
+  "ready-to-entail rust": {
+   "gate": "ready-to-entail",
+   "language": "rust",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "standing tally.10-judged.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+     ],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-judged.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence (the best is 1)"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in rust"
+  }
  }
 }

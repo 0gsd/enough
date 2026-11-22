@@ -162,7 +162,8 @@ def test_every_check_holds_or_fails_as_recorded_and_the_gates_report_as_recorded
     checks, gates = MK.reports(FIX)
     assert checks == json.loads((FIX / "recorded" / "checks.json").read_text(encoding="utf-8"))
     assert gates == json.loads((FIX / "recorded" / "gates.json").read_text(encoding="utf-8"))
-    assert list(gates) == [f"inputs/{s}" for s in MK.STAGES] + [f"landed/{MK.FINAL}"]
+    assert list(gates) == ([f"inputs/{s}" for s in MK.STAGES] + [f"landed/{MK.FINAL}"]
+                           + [f"inputs/{s}" for s in (MK.RECORDED, MK.JUDGED)])
 
 
 def test_the_gates_say_where_the_path_stands():
@@ -184,6 +185,54 @@ def test_the_gates_say_where_the_path_stands():
     assert rt == ["round-trip tally.fabulac.cosm: no N:target in the source language (python): the round trip is "
                   "entailed for it"]
     assert gates[f"landed/{MK.FINAL}"]["ready-to-keep"]["says"] == "not ready to keep"
+
+
+def test_which_gate_tallys_fixture_holds():
+    """Where tally's transconception stands after the round trip (lane T1, 0.9), so it cannot fall back silently:
+    recorded outside enough and judged, every check of gate 1 holds but `round-trip`, whose blind Python rebuild
+    stands at level 1 (five differences no ruling covers yet, awaiting the owner); neither gate holds."""
+    gates = json.loads((FIX / "recorded" / "gates.json").read_text(encoding="utf-8"))
+    rec, judged = gates[f"inputs/{MK.RECORDED}"], gates[f"inputs/{MK.JUDGED}"]
+    for g in (rec, judged):
+        keep = g["ready-to-keep"]
+        assert keep["holds"] is False and keep["do-not-hold"] == ["round-trip"] and keep["not-measured"] == []
+        for name in ("case-outside", "cases-cover"):          # the recorded cases stand outside and cover
+            c = keep["checks"][name]
+            assert c["state"] == "holds" and c["errors"] == c["warnings"] == c["notes"] == [], (name, c)
+        for lang in ("go", "rust"):
+            assert g[f"ready-to-entail {lang}"]["do-not-hold"] == ["round-trip"]
+    assert rec["ready-to-keep"]["checks"]["round-trip"]["errors"] == [
+        f"round-trip {MK.RECORDED}: no cshort in python stands at level 2 or more by its evidence"]
+    assert judged["ready-to-keep"]["checks"]["round-trip"]["errors"] == [
+        f"round-trip {MK.JUDGED}: no cshort in python stands at level 2 or more by its evidence (the best is 1)"]
+
+
+def test_the_round_trip_was_recorded_outside_and_judged_blind():
+    out = FIX / "outside"
+    rec = json.loads((out / "recording" / "recorded.json").read_text(encoding="utf-8"))
+    src = _load(INPUTS / MK.FINAL)["source"]
+    assert rec["source"] == {"tree": src["tree"]} and rec["seeds"] == ["0", "1"] and rec["unstable"] == []
+    assert rec["python"].startswith("3.13.11 ")
+    assert len(rec["rows"]) == 53 and sum(len(r["argv"]) for r in rec["rows"]) == 161
+    # the recorder ran on the cases file entail f as cases gives the targeted fabulac
+    assert (out / "recording" / "cases.json").read_text(encoding="utf-8") == MK.handed_out(MK.targeted(
+        _load(INPUTS / MK.FINAL)))
+    data = _load(INPUTS / MK.JUDGED)
+    cases = [n for n in data["nodes"] if str(n["id"]).startswith("P:case/trial-")]
+    assert len(cases) == 53 and all(n["stands"] == "outside" and n["from"] == "recorded" for n in cases)
+    assert all(n["of"][0].startswith("C:interface/command.") for n in cases)
+    v = json.loads((out / MK.ROUNDTRIP / "verdict.json").read_text(encoding="utf-8"))
+    assert v["target"] == "python" and v["steps"] == {"kept": 189, "agree": 184} and v["passes"] is False
+    assert sorted((f["case"], str(f["step"])) for f in v["findings"]) == [
+        ("B7", "0"), ("B7", "1"), ("B7", "2"), ("B7", "3"), ("E1", "written")]
+    assert {f["kind"] for f in v["findings"]} == {"UNRULED difference"}
+    entry = next(e for e in data["shorts"] if e.get("target") == "N:target/python")
+    assert entry["path"] == f"../outside/{MK.ROUNDTRIP}/" and "had not seen tally's source" in entry["by"]
+    ev = entry["evidence"]
+    assert ev["level"] == 1 and ev["steps"] == {"kept": 189, "agree": 184} and "run by an agent" in ev["by"]
+    for which in ("control", MK.ROUNDTRIP):          # tally's own six tests, on the original and on the rebuild
+        log = (out / MK.ROUNDTRIP / f"own-tests-{which}.log").read_text(encoding="utf-8")
+        assert log.strip().splitlines()[-1].startswith("6 passed"), which
 
 
 def test_the_landed_cshorts_hold_their_own_checks_and_claim_no_evidence():

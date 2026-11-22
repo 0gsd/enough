@@ -370,5 +370,23 @@
    "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
+ },
+ "inputs/tally.9-recorded.fabulac.cosm": {
+  "ok": false,
+  "errors": [
+   "round-trip tally.9-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+  ],
+  "warnings": [
+   "standing tally.9-recorded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+  ]
+ },
+ "inputs/tally.10-judged.fabulac.cosm": {
+  "ok": false,
+  "errors": [
+   "round-trip tally.10-judged.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence (the best is 1)"
+  ],
+  "warnings": [
+   "standing tally.10-judged.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
+  ]
  }
 }

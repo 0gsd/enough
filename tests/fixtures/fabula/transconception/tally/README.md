@@ -58,6 +58,22 @@ Made by `python tests/make_tally_transconception.py` (every run id and clock pin
   judge nothing here. `keep-the-record` and `keep-the-verdict` (Thym 20.10) are not in the suite: there is no
   recording of tally and no verdict on a cshort of it to gather.
 
+## The round trip (0.9)
+
+tally was recorded outside enough, and a Python rebuild of it was judged. Both were done in the sandbox by an agent
+(lane T1, 2026-11-22; `outside/README.md` says how). The rebuild was written blind, from `inputs/tally.fabulac.cosm`
+alone. The maker reads `outside/` and writes two more stages after `tally.fabulac.cosm`, never over it:
+
+| # | made by | stage file (in `inputs/`) |
+|---|---|---|
+| 9 | the maker: the round trip's target (`N:target/python`, not weighed), its `shorts` entry, and the 53 recorded cases as outside `P:case` items (`trial-a1` …) | `tally.9-recorded.fabulac.cosm` |
+| 10 | the maker: the verdict read into the round trip's evidence (`tc.fold_verdict`) | `tally.10-judged.fabulac.cosm` |
+
+On both stages, every check of gate 1 holds except `round-trip`. The rebuild agrees on 184 of 189 steps. Five
+differences have no ruling: B7's help words, and E1's `undoes` with blank lines. So its evidence stands at level 1,
+and neither gate holds. `tests/test_transconception_fixture.py` holds this. The rulings that would let gate 1 hold
+are the owner's, and none is applied.
+
 ## Passing
 
 A compiler and a runtime conform on this folder as on `tests/fixtures/thym/` (THYM 24.3): every program compiles,
