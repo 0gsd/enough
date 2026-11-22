@@ -527,29 +527,48 @@ def emf_state(text: Path, twin: Path, header: dict[str, Any] | None = None) -> s
     except OSError:
         return "stale"
     if st.st_size == src.get("size") and st.st_mtime_ns == src.get("mtime_ns"):
-        return _rule_state(text, hdr)
+        return _rule_state(text, twin, hdr, st)
     want = src.get("sha256")
     if not isinstance(want, str) or not want:
         return "stale"
     try:
-        return _rule_state(text, hdr) if _sha256_file(text) == want.strip().lower() else "stale"
+        return _rule_state(text, twin, hdr, st) if _sha256_file(text) == want.strip().lower() else "stale"
     except OSError:
         return "stale"
 
 
-def _rule_state(text: Path, header: dict[str, Any]) -> str:
+# (text path, size, mtime_ns, twin path, twin size, twin mtime_ns) → "fresh" | "stale", for `_rule_state`. A
+# listing asks again for every text on every refresh; the verdict only changes when the text or the twin does.
+_RULE_STATES: dict[tuple, str] = {}
+_RULE_STATES_MAX = 50_000
+
+
+def _rule_state(text: Path, twin: Path, header: dict[str, Any], st: os.stat_result) -> str:
     """``stale`` when the twin's rules scaffold atem predates Canon's reading sentences by Thym's one rule
     (`canon_derive.scaffold_atem_behind`), else ``fresh``. Only a rules-mode twin with a scaffold atem reads the
-    text; every other twin costs nothing more."""
+    text, and then only its opening (`canon_derive.atem_opening`); the verdict is kept in process until the text or
+    the twin changes, so a listing pays for each text once."""
     derived = header.get("derived") if isinstance(header, dict) else None
     if not (isinstance(derived, dict) and derived.get("mode") == "rules" and isinstance(header.get("atem"), dict)):
         return "fresh"
-    from . import canon_derive        # late: canon_derive imports this module
     try:
-        body = text.read_text(encoding="utf-8-sig", errors="replace")
+        tst = twin.stat()
     except OSError:
         return "fresh"
-    return "stale" if canon_derive.scaffold_atem_behind(header, body) else "fresh"
+    key = (str(text), st.st_size, st.st_mtime_ns, str(twin), tst.st_size, tst.st_mtime_ns)
+    got = _RULE_STATES.get(key)
+    if got is not None:
+        return got
+    from . import canon_derive        # late: canon_derive imports this module
+    try:
+        opening = canon_derive.atem_opening(text)
+    except OSError:
+        return "fresh"
+    got = "stale" if canon_derive.scaffold_atem_behind(header, opening) else "fresh"
+    if len(_RULE_STATES) >= _RULE_STATES_MAX:
+        _RULE_STATES.clear()
+    _RULE_STATES[key] = got
+    return got
 
 
 def _atem_line(header: dict[str, Any]) -> str | None:

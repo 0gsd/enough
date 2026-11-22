@@ -1171,6 +1171,32 @@ def _atem_is_scaffold(atem: dict) -> bool:
 _MARK_AFTER_STOP = re.compile(r"([.!?])[\"'”’)\]]+")
 
 
+ATEM_OPENING_CHARS = 2048
+
+
+def atem_opening(path: Path) -> str:
+    """As much of a text's opening as `rules_atem` needs, decoded as `read_source` decodes. The opening ends at a
+    blank line (so every paragraph in it is whole, its markdown stripped as in the whole text), holds no unclosed
+    front matter, and holds a third sentence after the first two (so both are whole). It grows fourfold from
+    ATEM_OPENING_CHARS bytes; the whole text when no shorter opening will do. `rules_atem` of it equals
+    `rules_atem` of the whole text."""
+    size = ATEM_OPENING_CHARS
+    with open(path, "rb") as fh:
+        while True:
+            fh.seek(0)
+            data = fh.read(size + 1)
+            if len(data) <= size:
+                return data.decode("utf-8-sig", errors="replace")
+            cut = max(data.rfind(b"\n\n", 0, size), data.rfind(b"\n\r\n", 0, size))
+            if cut > 0:
+                text = data[:cut + 1].decode("utf-8-sig", errors="replace")
+                front_open = (text.startswith("---")
+                              and not re.search(r"\n(?:---|\.\.\.)[ \t]*\r?\n", text[3:]))
+                if not front_open and len(sentences(text, limit=3)) >= 3:
+                    return text
+            size *= 4
+
+
 def scaffold_atem_behind(header: dict, text: str) -> bool:
     """Whether a twin's file atem is a rules scaffold made before Canon read sentences by Thym's rule (the owner,
     2026-11-22): its line or focus differs from what `rules_atem` makes of `text` now only by the closing marks a

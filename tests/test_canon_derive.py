@@ -378,6 +378,27 @@ def test_a_scaffold_made_by_the_old_rule_is_stale(tmp_path):
     assert canon.emf_state(text, twin) == "fresh"
 
 
+def test_the_rule_state_reads_an_opening_once(tmp_path, monkeypatch):
+    """A listing asks for every text's state on every refresh: the rule check reads only the text's opening, and
+    once, until the text or the twin changes."""
+    text = tmp_path / "said.md"
+    tail = "\n\n".join(f"Paragraph {i} goes on. It says more." for i in range(2000))
+    text.write_text(f'She said "Wait." The rain came. It fell.\n\n{tail}\n', encoding="utf-8")
+    body, stat = CD.read_source(text)
+    assert len(CD.atem_opening(text)) < len(body) and CD.rules_atem(CD.atem_opening(text)) == CD.rules_atem(body)
+    twin = tmp_path / "said.md.fabulan.cosm"
+    made = CD.set_file_atem(None, CD.rules_atem(body), source_name="said.md", source_stat=stat, now=NOW)
+    twin.write_text(made.replace('"Wait."', '"Wait.'), encoding="utf-8")
+    reads = []
+    real = CD.atem_opening
+    monkeypatch.setattr(CD, "atem_opening", lambda p: reads.append(p) or real(p))
+    canon._RULE_STATES.clear()
+    assert [canon.emf_state(text, twin) for _ in range(3)] == ["stale"] * 3 and len(reads) == 1
+    twin.write_text(made, encoding="utf-8")
+    os.utime(twin, ns=(stat["mtime_ns"] + 10**9, stat["mtime_ns"] + 10**9))
+    assert canon.emf_state(text, twin) == "fresh" and len(reads) == 2
+
+
 # ---------------------------------------------------------------------------
 # Pins and the file atem
 # ---------------------------------------------------------------------------
