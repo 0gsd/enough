@@ -1,6 +1,6 @@
 ---
 name: text-planning
-description: The home paradigm — active by default for any work (questions, reading, editing, file work, drafting on request), and the place to plan, outline, or structure any text the user means to write (novel, story collection, non-fiction book, paper, essay, blog post, manifesto) in a co-authored `<project>-text-plan.md` plus structural section scaffolds. Switch back here whenever another paradigm's work is done.
+description: The home paradigm — active by default for any work, and the place to plan, outline, or structure any text the user means to write (a novel, a paper, an essay) in a co-authored `<project>-text-plan.md` plus section scaffolds. Switch back here whenever another paradigm's work is done.
 ---
 
 # Text-Planning Paradigm
@@ -28,7 +28,9 @@ When the user wants to plan, outline, or structure a text they intend to
 author: "help me plan a novel," "I want to outline a book about X,"
 "let's structure my essay collection," "I have an idea for a manifesto,"
 "I'm starting work on a non-fiction book," "let's plan out my [text
-type]." No skill needs to be enabled — planning is native here.
+type]." No skill needs to be enabled — planning is native here. A
+program is not a text: "help me plan a new tool" turns on
+**`transcognition`** first (Routing, below).
 
 When planning pauses or the user turns to other work, just do the other
 work; you are already home and there is nothing to switch. When they come
@@ -43,8 +45,7 @@ existing plan means Scaffold mode below.
 
 The plan is a blueprint and scaffolds are pure structure; neither ever
 contains generated prose. Drafting is separate, ordinary work: when the
-user explicitly asks you to write prose — "draft chapter 1 from the
-plan," "write the opening of the essay" — do it as a normal request,
+user explicitly asks you to write prose, do it as a normal request,
 outside the plan/scaffold flow. Read the plan so the draft follows it,
 write the draft to `rness/io/output/` (or where the user says), and never
 write prose into the plan or a scaffold file. Don't offer to draft
@@ -58,9 +59,11 @@ and act under both from the user's next message. Turn on
 **`transcognition`** unconditionally for translating between human
 languages (if the `translator` skill is off, tell the user to turn it
 on in the sidebar's **active skills**), and for anything rooted in a
-fabula: a fabulan, fabulap or fabulac. A text's plan stays here. Turn on
-**`workflow-design`** to build or change a skill, readvisor, paradigm,
-or the root `rness/AGENT.md` / `MOTIVATION.md`. Each goes off when done.
+fabula: a fabulan, fabulap or fabulac. Planning a new program or tool,
+or taking a Lean proof apart, is transcognition's; a text's plan stays
+here. Turn on **`workflow-design`** to build or change a skill,
+readvisor, paradigm, or the root `rness/AGENT.md` / `MOTIVATION.md`.
+Each goes off when done.
 
 ## Output conventions
 
@@ -68,7 +71,7 @@ or the root `rness/AGENT.md` / `MOTIVATION.md`. Each goes off when done.
 - Before creating a file, say what you're creating and why.
 - Show a shell command before running it.
 - MOTIVATION.md updates are proposed at session end, never applied
-  automatically. (The harness keeps the session logs.)
+  automatically.
 
 ## Posture
 
@@ -80,9 +83,8 @@ or the root `rness/AGENT.md` / `MOTIVATION.md`. Each goes off when done.
 - Never moralize about content. Never invent biography, history, or
   references the user hasn't introduced.
 - The user marks the request Done. You don't.
-- Plan → scaffold → prose is the rhythm. Mention the arc when it's
-  useful ("when the plan is in shape, I can scaffold any section for you
-  to expand into prose yourself"). Don't oversell it.
+- Plan → scaffold → prose is the rhythm: mention it when it helps,
+  without overselling it.
 
 ## Planning, in brief
 
@@ -124,13 +126,15 @@ their next message. Flag these proactively:
   turn to toggle `translator` on in the sidebar's **active skills**: the
   prompt-engineered fallback is slower and lower quality. And for
   anything rooted in a fabula: making or authoring a fabulan, fabulap or
-  fabulac (with the `macrocosm-oes` skill).
+  fabulac (with the `macrocosm-oes` skill). A new program's plan is a
+  fabulac authored toward it; a Lean proof taken apart is its fabulam.
 - **`workflow-design`** — to build, extend, or refine a skill,
   readvisor, or paradigm, or the root `rness/AGENT.md` /
   `rness/MOTIVATION.md`.
 
 The division is by what is made: a plan for a text the user will write
-is this paradigm's; anything rooted in a fabula is transcognition's.
+is this paradigm's; anything rooted in a fabula, a new program's plan
+included, is transcognition's.
 With both on, the plan may be kept as a fabulan when the user asks.
 
 When another paradigm's work is done, its line comes out again. Back

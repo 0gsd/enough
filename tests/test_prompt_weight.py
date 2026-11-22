@@ -722,8 +722,13 @@ def test_lean_keeps_what_the_council_profile_keeps(project: Path):
 #: The same reserve the runtime preflight keeps (`enough.preflight.RESERVE`).
 CTX_RESERVE = 2_048
 #: chars per token — gemma-4's, the lower (more tokens) of the two shipped
-#: tokenizer families (plan §1a: 3.76 gemma, 3.88 qwen).
-CHARS_PER_TOKEN = 3.7
+#: tokenizer families (plan §1a: 3.76 gemma, 3.88 qwen). 0.9 (lane E1): on the
+#: lean prompt with skills on, Gemma's own `/tokenize` came to 3.60 to 3.68
+#: chars a token, densest where transcognition rides, so 3.7 (`prompt`'s
+#: estimate for choosing a profile) undercounted by up to 2.3 per cent and
+#: the test believed in headroom an 8,192 window did not have. The fit tests
+#: count at the measured floor, 3.6, so a change they pass fits a real window.
+CHARS_PER_TOKEN = 3.6
 #: The fixture's project path is written `<project>`; a real one is longer.
 #: 130 chars is the path the plan measured with (§1).
 PROJECT_PATH_CHARS = 130
@@ -859,7 +864,10 @@ def test_the_lean_skills_are_an_index(project: Path):
     lines = [ln for ln in section.splitlines() if ln.startswith("- **")]
     assert [ln.split("**")[1] for ln in lines] == sorted(FACE_SKILLS)
     for ln in lines:
-        assert len(ln) <= 260, ln
+        assert len(ln) <= 320, ln
+        # 0.9 (E2): a skill's name is not a tool's; the line says so itself
+        name = ln.split("**")[1]
+        assert f"a skill, not a tool: `read_file` `rness/skills/{name}/SKILL.md` first." in ln, ln
     assert "MADLAD-400-3B-MT" in section and "translate text TO or FROM" in section
     assert ".cosm" in section and "decompile" in section
     assert "scaffold" in section and "landing page" in section
@@ -871,7 +879,8 @@ def test_the_lean_skills_are_an_index(project: Path):
     assert "**analyzer**" not in lean and "## analyzer" not in full
     # a flat skill names its own path; one without a description gives its first paragraph
     (rness / "skills" / "house.md").write_text("# House\n\nWrites in the house style.\n\nMore.\n", encoding="utf-8")
-    assert "- **house** (body `rness/skills/house.md`) — Writes in the house style." in _lean(project)
+    assert ("- **house** — a skill, not a tool: `read_file` `rness/skills/house.md` first. "
+            "Writes in the house style.") in _lean(project)
 
 
 def test_the_faces_still_follow_the_skills_in_the_lean_prompt(project: Path):

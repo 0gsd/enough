@@ -132,11 +132,10 @@ Rules:
 - `fetch_url` is how to read the web (not `shell` + `curl`): it returns a
   preview and a cache path under `rness/io/input/`; `read_file` the cache
   only when you need the rest.
-- `show_intro` puts enough's brief introduction on the user's screen. If a
-  conversation opens with a bare greeting, offer once:
-  "want a brief introduction to enough?" Call it on a yes, or when they ask
-  what enough is; then don't repeat it.
-- A user turn takes at most 10 tool calls. The harness journals every call.
+- `show_intro` shows enough's brief introduction. On a bare greeting offer
+  it once, "want a brief introduction to enough?"; call it on a yes or when
+  asked what enough is.
+- A user turn takes at most 10 tool calls.
 """])
 
 #: The closing section of the tool docs, in every profile: a tool call is a
@@ -442,9 +441,9 @@ they'll publish.
 WIKI_ABSENT_INSTRUCTIONS = """\
 ## Wikisink (local Wikipedia)
 
-No local Wikipedia archive is installed (the user adds one from the 🚰
-wikisink pane); `wiki_status` says so, and `wiki_search`, `read_wiki_article`
-and `wikisink` wait on it. Use `fetch_url` for an encyclopedic lookup.
+No local Wikipedia archive is installed (the 🚰 wikisink pane adds one):
+`wiki_status` says so; `wiki_search`, `read_wiki_article` and `wikisink`
+wait on it. Use `fetch_url` for an encyclopedic lookup.
 """
 
 #: The canon store section (the three `canon_*` tools keep their examples
@@ -955,8 +954,7 @@ for material with a shape rather than a sequence. Every tool takes the
 `read_composure` (the outline, or `<module>m3</module>`'s text — quote the
 ids it gives back), `new_composure` (`<form>` blank | cards | scaffold |
 journal | council, `<title>`), `comp_add_module` (`<type>` text | doc | wiki |
-weblink | webframe | image, `<bg>` a named swatch, markdown `<content>`,
-no geometry), `comp_update_module`, `comp_set_page`
+weblink | webframe | image, no geometry), `comp_update_module`, `comp_set_page`
 (`<module>`, `<page>`, `<content>`), `comp_remove_module` (the user's own
 `<confirmed>yes</confirmed>` this turn), `comp_arrange`, `comp_save_as_form`,
 `composure_from_outline` (`<title>`, `<form>`, an outline: `#` title, `##`
@@ -1282,9 +1280,8 @@ def convert_instructions(lean: bool = False) -> str:
             "editable markdown **twin** beside it (`report.pdf` → `report.pdf.md`).\n"
             "To change one: `read_file` the original (it returns the twin's text),\n"
             "then `write_file` the twin, `report.pdf.md` — never the original.\n"
-            "`export_document` (`<path>`, `<target>` one of " + targets + ",\n"
-            "`<mode>` `copy` or `overwrite`) turns edits back into a document, on\n"
-            "request; an overwrite is refused when the original changed outside\n"
+            "`export_document` turns edits back into a document (`<target>` " + targets + "),\n"
+            "on request; an overwrite is refused when the original changed outside\n"
             "enough.\n"
         )
     rows = ["| type | opens as | export back | keep in sync |",
@@ -1398,7 +1395,10 @@ def _skill_root_note(root: str) -> str:
 
 #: The lean profile's Skills section opens with this (0.9): the skills that
 #: are on ride as an index, a line each, as the policies do, and the body is
-#: one `read_file` away.
+#: one `read_file` away. Each line says the skill is not a tool and names
+#: its body's path: small models read an index line as a tool to call (lane
+#: E1, 13 replies); neither this preamble nor a line without the path stopped
+#: it on Gemma E4B, the line with the path did (lane E2).
 SKILLS_LEAN_PREAMBLE = """\
 Each skill on here is one line. When a request fits one, `read_file` its
 body, `rness/skills/<name>/SKILL.md`, before you act (once a conversation)
@@ -1429,7 +1429,8 @@ def _load_skills(rness: Path, *, lean: bool = False) -> str:
             continue
         text = _read_or_empty(skill_md)
         if text and lean:
-            parts.append(f"- **{name}** — {_skill_gist(text)}")
+            parts.append(f"- **{name}** — a skill, not a tool: `read_file` "
+                         f"`rness/skills/{name}/SKILL.md` first. {_skill_gist(text)}")
         elif text:
             root = f"rness/skills/{name}/"
             parts.append(f"## {name}\n\n{_skill_root_note(root)}\n\n{text}")
@@ -1439,7 +1440,8 @@ def _load_skills(rness: Path, *, lean: bool = False) -> str:
             continue
         text = _read_or_empty(flat)
         if text and lean:
-            parts.append(f"- **{name}** (body `rness/skills/{flat.name}`) — {_skill_gist(text)}")
+            parts.append(f"- **{name}** — a skill, not a tool: `read_file` "
+                         f"`rness/skills/{flat.name}` first. {_skill_gist(text)}")
         elif text:
             # Flat skills have no companion-files root, so no path note.
             parts.append(f"## {name}\n\n{text}")
@@ -1870,7 +1872,8 @@ def _load_policies(rness: Path, *, lean: bool = False) -> str:
         if not text:
             continue
         if lean:
-            parts.append(f"- **{p.stem}** (`rness/policies/{p.name}`) — {_policy_gist(text)}")
+            parts.append(f"- **{p.stem}** (`rness/policies/{p.name}`) — "
+                         f"{_policy_gist(text, first=True)}")
         else:
             parts.append(f"## {p.stem}\n\n{text}")
     if lean:
@@ -1878,9 +1881,11 @@ def _load_policies(rness: Path, *, lean: bool = False) -> str:
     return "\n\n".join(parts)
 
 
-def _policy_gist(text: str, limit: int = 120) -> str:
+def _policy_gist(text: str, limit: int = 120, *, first: bool = False) -> str:
     """A policy's first paragraph after its title, on one line — what the
-    lean index says it is for. Capped at a sentence boundary past `limit`."""
+    lean index says it is for. Capped at a sentence boundary past `limit`;
+    with `first`, at its first sentence (0.9: the three rules above the
+    index carry what the policies require)."""
     paras: list[str] = []
     cur: list[str] = []
     for ln in text.splitlines():
@@ -1896,6 +1901,8 @@ def _policy_gist(text: str, limit: int = 120) -> str:
         cur.append(s)
     gist = " ".join(cur) if cur else ""
     gist = re.sub(r"\s+", " ", gist).strip()
+    if first and ". " in gist:
+        gist = gist[:gist.find(". ") + 1]
     if len(gist) > limit:
         cutp = gist.find(". ", limit)
         gist = gist[:cutp + 1] if cutp != -1 else gist[:limit].rstrip() + "…"

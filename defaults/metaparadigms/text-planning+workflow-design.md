@@ -1,6 +1,6 @@
 ---
 members: text-planning workflow-design
-fingerprint.text-planning: sha256:7652469215b11361
+fingerprint.text-planning: sha256:b9e0eebb7ebe7be2
 fingerprint.workflow-design: sha256:6cc7a73ca374173c
 ---
 
@@ -22,7 +22,8 @@ work together: neither needs switching to. text-planning is home base.
 The division is by what is made. Work done *with* the workflow is
 text-planning's; a change *to* the workflow is workflow-design's.
 
-For translation, or anything rooted in a fabula, turn on
+For translation, a new program's plan, a Lean proof taken apart, or
+anything rooted in a fabula, turn on
 `transcognition` beside these two (its name on a line of its own under
 `# Active paradigm` in `rness/active-paradigm`).
 

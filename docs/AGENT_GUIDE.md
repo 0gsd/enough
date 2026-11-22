@@ -704,14 +704,18 @@ pieces answer it; none changes prompt text.
   first sentence, asides cut, then its "Use …" sentence), under
   `SKILLS_LEAN_PREAMBLE`, the one line that tells the model to `read_file`
   `rness/skills/<name>/SKILL.md` before acting on a skill (a flat skill's
-  line names its own path). A skill on or off still decides the faces
+  line names its own path). Each line also says "a skill, not a tool" and
+  names its own `read_file` path: small models otherwise call a skill's
+  name as a tool. The policy
+  lines carry their first sentence only (`_policy_gist(first=True)`). A skill on or off still decides the faces
   (`_skill_enabled`); only the body moved out. To pay for the index the lean
   core is `TOOL_LEAN_INSTRUCTIONS` (the same tags, shorter rules), and with
   `macrocosm-oes` on the MacroCOSM block drops its closing paragraph
   (`CANON_PROSE_LEAD`) and the fabula block is `FABULA_LEAN_INSTRUCTIONS`,
   both pointing at the skill's body. With translator, macrocosm-oes and
   scaffolder all on, every paradigm state fits 8,192 with the reserve
-  (`tests/test_prompt_weight.py`, the skills-on fit test). The **`harness_guide`**
+  (`tests/test_prompt_weight.py`, the skills-on fit test, which counts at
+  3.6 chars a token: Gemma's measured floor on the lean prompt). The **`harness_guide`**
   tool (`<topic>` composures | girraphs | review | wikisink | canon | cloud |
   twins; `tools.run_harness_guide`, `prompt.harness_guides()`) hands the full
   text back on demand — no file, no gate, exactly what the chat prompt would
@@ -719,7 +723,7 @@ pieces answer it; none changes prompt text.
 - *The rule.* `lean_wanted(tokens, n_ctx)`: lean when the full prompt would
   take more than `LEAN_SHARE` (half) of the window. `_run_turn` applies it
   per turn through `assemble_for_window(project_dir, n_ctx, pal=)` (chars /
-  `CHARS_PER_TOKEN` = 3.7, the fit test's estimator) and records the choice
+  `CHARS_PER_TOKEN` = 3.7; the fit tests count at 3.6) and records the choice
   on `session.prompt_profile`; `/api/llm-status` reports it as
   `prompt_profile` beside the preflight's own `profile`. The preflight gets
   a second builder, `build_lean_prompt`, and when the exact full count wants

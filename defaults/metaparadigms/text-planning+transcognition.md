@@ -1,7 +1,7 @@
 ---
 members: text-planning transcognition
-fingerprint.text-planning: sha256:7652469215b11361
-fingerprint.transcognition: sha256:97a4a863a5a414c3
+fingerprint.text-planning: sha256:b9e0eebb7ebe7be2
+fingerprint.transcognition: sha256:84eb255c49deb27b
 ---
 
 # Text-Planning with Transcognition

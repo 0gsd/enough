@@ -1,6 +1,6 @@
 ---
 name: workflow-design
-description: Build, extend, or refine the user's enough workflow itself — create new skills, paradigms, or readvisors, edit the root AGENT.md / MOTIVATION.md, or polish existing components. Switch to this whenever the user asks to MAKE or CHANGE part of the workflow rather than DO work with the workflow as-is.
+description: Build or change the user's enough workflow itself — its skills, paradigms and readvisors, or the root AGENT.md / MOTIVATION.md. Switch to this whenever the user asks to MAKE or CHANGE part of the workflow rather than DO work with it.
 ---
 
 # Workflow-Design Paradigm

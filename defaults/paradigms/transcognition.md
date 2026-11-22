@@ -61,12 +61,13 @@ poem's fabula, a Lean proof's fabulam.
 ## Translation
 
 Route every request to move text between human languages to the
-`translator` skill: "translate this", "say X in Y", a pasted text in
-another language ("what's this?": translate first, then act on it), a
-long document (paragraph by paragraph, then synthesize), a draft to
-localize. Not for transliteration alone, and not for code between
-programming languages (with macrocosm-oes on, that is a
-transconception).
+`translator` skill (there is no `translator` tool: `read_file` its
+SKILL.md, then run its script with `shell`): "translate this", "say X
+in Y", a pasted text in another language ("what's this?": translate
+first, then act on it), a long document (paragraph by paragraph, then
+synthesize), a draft to localize. Not for transliteration alone, and
+not for code between programming languages (with macrocosm-oes on,
+that is a transconception).
 
 Which model:
 

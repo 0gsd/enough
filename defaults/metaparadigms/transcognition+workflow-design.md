@@ -1,6 +1,6 @@
 ---
 members: transcognition workflow-design
-fingerprint.transcognition: sha256:97a4a863a5a414c3
+fingerprint.transcognition: sha256:84eb255c49deb27b
 fingerprint.workflow-design: sha256:6cc7a73ca374173c
 ---
 
@@ -25,8 +25,7 @@ skill or paradigm that does fabula or translation work is built by
 workflow-design and bound by transcognition's rules.
 
 For the plan of a text the user will write, turn on `text-planning`
-beside these two (a line under `# Active paradigm` in
-`rness/active-paradigm`).
+beside these two (its own line in `rness/active-paradigm`).
 
 ## What the user most likely means
 
