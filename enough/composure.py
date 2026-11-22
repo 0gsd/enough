@@ -120,6 +120,13 @@ BOX_KINDS: tuple[str, ...] = ("text", "graphic")
 #: files that carry it; the lock itself is the scaffold's, in its meta block
 #: (`lock_scaffold`), and is never set box by box.
 BOX_STATES: tuple[str, ...] = ("empty", "written", "over", "locked")
+#: What a box is on the finished thing: the plectrum grammar's known `as`
+#: values (`defaults/skills/scaffolder/references/plectrum.md`). Others are
+#: kept as written and read as `body`.
+BOX_AS: tuple[str, ...] = ("title", "headline", "lede", "body", "step", "tile",
+                           "deck", "call", "caption", "quote", "speaker", "notes")
+BOX_AS_CHARS = 32
+_BOX_AS_RE = re.compile(r"^[a-z][a-z0-9-]{0,31}$")
 #: Who last set a box's plec. Derived from the op's source, never sent.
 PLEC_BY: tuple[str, ...] = ("readvisor", "person")
 
@@ -932,9 +939,12 @@ class Module:
     # is a frame's `page|slide` or a graphic box's proportion (`16:9`);
     # `kind` is a box's `text|graphic`; `plec` the bracketed brief and
     # `plec_by` who last set it; `target` a length with its unit (`140c`,
-    # `300w`); `state` one of `BOX_STATES`.
+    # `300w`); `state` one of `BOX_STATES`; `as_` what the box is on the
+    # finished thing (the plectrum's `as`: `title`, `headline`, `lede` …;
+    # empty reads as `body`). On disk `data-as`, in an op and the model `as`.
     frame: str = ""
     kind: str = ""
+    as_: str = ""
     shape: str = ""
     plec: str = ""
     plec_by: str = ""
@@ -1017,14 +1027,14 @@ _KNOWN_MODULE_ATTRS = {
     "data-url", "data-article", "data-install", "data-refresh", "data-cache",
     "data-speaker", "data-speaker-kind", "data-turn",
     "data-frame", "data-kind", "data-shape", "data-plec", "data-plec-by",
-    "data-target", "data-state",
+    "data-target", "data-state", "data-as",
 }
 
 #: The scaffold fields in the order `dumps` writes them (attribute, field).
 _SCAFFOLD_ATTRS: tuple[tuple[str, str], ...] = (
     ("data-frame", "frame"), ("data-kind", "kind"), ("data-shape", "shape"),
     ("data-plec", "plec"), ("data-plec-by", "plec_by"),
-    ("data-target", "target"), ("data-state", "state"),
+    ("data-target", "target"), ("data-state", "state"), ("data-as", "as_"),
 )
 _KNOWN_PAGE_ATTRS = {"data-n", "data-date", "data-filed"}
 
@@ -1199,7 +1209,7 @@ class _CompParser(HTMLParser):
         m.speaker_kind = _clean_text(attrd.get("data-speaker-kind"), 32)
         m.turn = _clean_text(attrd.get("data-turn"), 16)
         for attr, name in _SCAFFOLD_ATTRS:
-            limit = MAX_ATTR_CHARS if name == "plec" else 16
+            limit = MAX_ATTR_CHARS if name == "plec" else (BOX_AS_CHARS if name == "as_" else 16)
             setattr(m, name, _clean_text(attrd.get(attr), limit))
         m.extra = _extra_attrs(attrd, _KNOWN_MODULE_ATTRS)
         self._module = m
@@ -1654,6 +1664,7 @@ def module_model(m: Module) -> dict[str, Any]:
             "plec_by": m.plec_by or None,
             "target": m.target or None,
             "state": m.state or None,
+            "as": m.as_ or None,
         },
         "speaker": m.speaker or None,
         "speaker_kind": m.speaker_kind or None,
@@ -2152,7 +2163,7 @@ def _set_common_fields(comp: Composure, m: Module, op: dict[str, Any],
 
 #: The op keys a frame or a plecholder takes (besides geometry and title).
 _SCAFFOLD_KEYS: tuple[str, ...] = ("frame", "kind", "shape", "plec", "target",
-                                   "state")
+                                   "state", "as")
 _TARGET_RE = re.compile(r"^(0|[1-9][0-9]{0,5})[cw]$")
 _GRAPHIC_SHAPE_RE = re.compile(r"^[1-9][0-9]{0,2}:[1-9][0-9]{0,2}$")
 _GRAPHIC_SHAPES: tuple[str, ...] = ("portrait", "landscape", "square")
@@ -2205,6 +2216,17 @@ def _set_scaffold_fields(comp: Composure, m: Module, op: dict[str, Any],
         m.kind = kind
     if "shape" in op:
         m.shape = _clean_text(op["shape"], 16).lower()
+    if "as" in op:
+        # The plectrum's `as` (plectrum.md: a word; a value a harness does not
+        # know is shown as `body`, so any word is kept, never refused for being
+        # new). Empty means not set: the plectrum's word, else `body`.
+        as_ = _clean_text(op["as"], BOX_AS_CHARS + 1).lower()
+        if as_ and not _BOX_AS_RE.match(as_):
+            raise ComposureError(
+                f"a scaffold-box's as is one word saying what the box is on the "
+                f"finished thing: {', '.join(BOX_AS)} (got {as_!r}). Send '' "
+                f"for body.")
+        m.as_ = as_
     if "plec" in op:
         m.plec = _clean_text(op["plec"], MAX_ATTR_CHARS)
         m.plec_by = ("person" if source == "ui" else "readvisor") if m.plec else ""

@@ -12,8 +12,10 @@ What lives where:
   plecholder a `scaffold-box`; their module ids come from the plectrum's ids (`module_id`), so a
   changed plectrum finds the boxes it made without a lookup table;
 - the plectrum is kept beside the composure as `<name>.plectrum.md` (`plectrum_path`). It carries
-  what a composure has no field for: the front matter past the title and the thing, a box's `as`,
-  `fixed`, `chips` and `place`, a frame's `copy-of`.
+  what a composure has no field for: the front matter past the title and the thing, a box's
+  `fixed`, `chips` and `place`, a frame's `copy-of`. A box's `as` is on the composure (0.9,
+  `data-as`), so a change the person makes to it is saved, undone and exported like any field;
+  a box made before 0.9 has none, and its `as` still comes from the plectrum.
 
 `plectrum_ops` is the pure half of the `scaffold_from_plectrum` tool, as `outline_ops` is for
 `composure_from_outline`. It never writes a box's text: the composure refuses a readvisor's text
@@ -296,7 +298,8 @@ def _lay_out(plan: Plan, box_ops: list[dict[str, Any]], geo: dict[str, list[floa
             _patch_box(plan, box_ops, mods[mid], b)
         else:
             op: dict[str, Any] = {"op": "add_module", "type": C.BOX, "id": mid, "frame": fid,
-                                  "title": b["name"], "kind": b["kind"], "plec": b["plec"],
+                                  "title": b["name"], "kind": b["kind"], "as": b["as"],
+                                  "plec": b["plec"],
                                   "target": composure_target(b["target"]) if b["kind"] == "text"
                                   else "", "x": x, "y": y, "w": w, "h": h}
             if b["kind"] == "graphic":
@@ -310,11 +313,13 @@ def _lay_out(plan: Plan, box_ops: list[dict[str, Any]], geo: dict[str, list[floa
 
 
 def _patch_box(plan: Plan, box_ops: list[dict[str, Any]], m: C.Module, b: dict[str, Any]) -> None:
-    """Title, kind, shape, target and plec, where the plectrum differs. A plec the person set is
-    theirs: it is kept, and the report says so."""
+    """Title, kind, `as`, shape, target and plec, where the plectrum differs. A plec the person
+    set is theirs: it is kept, and the report says so."""
     patch: dict[str, Any] = {}
     if m.title != b["name"]:
         patch["title"] = b["name"]
+    if (m.as_ or "body") != (b["as"] or "body"):
+        patch["as"] = b["as"]
     shape = (b["shape"] or "16:9") if b["kind"] == "graphic" else ""
     if (m.kind or "text") != b["kind"]:
         patch["kind"] = b["kind"]
@@ -411,7 +416,7 @@ def state_from_composure(comp: C.Composure, plectrum: Any | None = None,
             page = m.pages[0].rich if m.pages else ""
             frame["boxes"].append({
                 "id": pb.get("id") or m.id, "name": m.title or pb.get("name") or m.id,
-                "as": pb.get("as") or "body", "kind": kind,
+                "as": m.as_ or pb.get("as") or "body", "kind": kind,
                 "target": (m.target or "0") if kind == "text" else (m.target or None),
                 "shape": (m.shape or "16:9") if kind == "graphic" else (m.shape or None),
                 "row": row, "col": col, "place": pb.get("place"),
