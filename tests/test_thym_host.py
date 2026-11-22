@@ -409,7 +409,7 @@ def test_sibling_prompt_builders_go_first_and_pass_what_is_not_theirs(monkeypatc
         return [{"role": "user", "content": "code"}] if contract.get("as") == "code" else None
     mod.PROMPTS = {"derive": derive_code, "survey-note": lambda c, i: [{"role": "user", "content": "new"}]}
     monkeypatch.setitem(sys.modules, "enough.fabulac_prompts", mod)
-    for absent in ("enough.thym.moves.code", "enough.thym.moves.dialectic"):
+    for absent in ("enough.thym.moves.code", "enough.thym.moves.dialectic", "enough.fabulam_prompts"):   # 0.9: the fabulam's builders name derive too
         monkeypatch.setitem(sys.modules, absent, None)
     moves = registry.Moves()
     assert {"derive", "survey-note"} <= set(H.register_prompts(moves))
