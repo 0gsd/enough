@@ -384,7 +384,7 @@ def run_file_build(project_dir: Path, lean: Path, *, mode: str, why: str = "", r
                 "refusal": {"stage": "plan", "check": "pick", "line": None, "program": STAGES[0],
                             "message": state["line"]},
                 "message": f"{dest.name}: nothing was built; {state['line']}"}
-    changed = any(x is not None for x in (target, wording, said, said_by, said_at)) and state["exists"]
+    changed = state["exists"] and _entries_changed(before, target, wording, said, said_by, said_at)
     first = 0 if (restart or not state["exists"] or state["moved"] or changed) else state["landed"]
     if resume_only and (not state["exists"] or state["landed"] == 0 or state["moved"]):
         raise BuildError(f"nothing to take up again: {state['line']}", 409)
@@ -459,6 +459,18 @@ def run_file_build(project_dir: Path, lean: Path, *, mode: str, why: str = "", r
     if refusal is not None:
         out["refusal"] = refusal
     return out
+
+
+def _entries_changed(before: dict, target: Any, wording: Any, said: Any, said_by: Any, said_at: Any) -> bool:
+    """Whether the person's entries given now differ from what the fabulam there holds: then the survey runs again.
+    An entry left out (None) changes nothing."""
+    src = before.get("source") if isinstance(before.get("source"), dict) else {}
+    chk = src.get("checking") if isinstance(src.get("checking"), dict) else {}
+    if target is not None and [str(x) for x in target] != [str(x) for x in src.get("target") or []]:
+        return True
+    return any(new is not None and str(new) != str(old or "")
+               for new, old in ((wording, src.get("wording")), (said, chk.get("said")),
+                                (said_by, chk.get("said-by")), (said_at, chk.get("said-at"))))
 
 
 def _skip(fab: Path, stage: str, now: dt.datetime | None) -> None:
@@ -558,7 +570,7 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
     ran: list[dict] = []
     results: list[dict] = []
     refusal: dict | None = None
-    changed = any(x is not None for x in (target, wording, said, said_by, said_at)) and state["exists"]
+    changed = state["exists"] and _entries_changed(before, target, wording, said, said_by, said_at)
     if restart or changed or state["state"] in ("none", "moved"):
         doc = _head.catalog_alone(folder, fab=head, name=name, before=before, target=target, wording=wording,
                                   said=said, said_by=said_by, said_at=said_at, obtained=obtained)
@@ -628,6 +640,96 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
     if refusal is not None:
         out["refusal"] = refusal
     return out
+
+
+# ---------------------------------------------------------------------------
+# A run whose model is an outside agent, or a person: answers from a folder
+# ---------------------------------------------------------------------------
+
+class AnswerFolder:
+    """A coprocessor whose model is whoever writes the answers into a folder: an outside agent standing in for the
+    model in a calibration run, or a person. Each request has a key, the one Thym gives it (`<node>` or
+    `<node>-<k>`), and an attempt, and its answer is the file `<key>.<attempt>.cosm` in the folder: a mapping
+    `{engine: model:<name>, output: <the answer, as a block>}` (the shape of a recorded candidate, Thym 12.4), or
+    the answer alone as text. When the file is not there the request is written beside it as
+    `<key>.<attempt>.request.md` (the system prompt, the user message, and what failed in the answer before) and
+    the run is refused, nothing landing; the job takes up again once the answer is written. A job run again finds
+    the same keys, so every answer already given is given again and only the next request waits."""
+
+    def __init__(self, folder: Path, *, who: str = "outside-agent", moves: Any = None) -> None:
+        from .thym import registry as _registry
+        self.folder = Path(folder)
+        self.who = who
+        self.moves = moves if moves is not None else _registry.MOVES
+        self._n = 0
+
+    def complete(self, contract: Any, inputs: Any, *, budget: Any, at: Any = None) -> Any:
+        from .thym.coprocessor import candidate
+        self._n += 1
+        key, attempt = at if at else (str(self._n), 1)
+        answer = self.folder / f"{key}.{attempt}.cosm"
+        if not answer.is_file():
+            request = self.folder / f"{key}.{attempt}.request.md"
+            self.folder.mkdir(parents=True, exist_ok=True)
+            _fj.write_atomic(request, self.request_text(contract, inputs, answer.name))
+            return Refusal("run", "answer-wanted", f"no answer yet for request {key}, attempt {attempt}: the request "
+                                                   f"is {request}; write {answer.name} beside it and take the build "
+                                                   "up again")
+        text = answer.read_text(encoding="utf-8")
+        engine, out, tokens = f"model:{self.who}", text, 0
+        try:
+            data = _macrocosm.yaml_load(text)
+        except Exception:  # noqa: BLE001 - an answer that is not a mapping is the answer itself, as text
+            data = None
+        if isinstance(data, dict) and "output" in data:
+            out = data["output"]
+            said = str(data.get("engine") or "")
+            engine = said if said.startswith("model:") and len(said) > 6 else engine
+            tokens = int(data.get("tokens") or 0)
+        sch = contract.get("schema") if isinstance(contract, dict) else None
+        if isinstance(sch, dict) and sch.get("format") == "yaml" and sch.get("stamp") == "engine" and \
+                isinstance(out, str):
+            try:
+                read = _macrocosm.yaml_load(out)
+            except Exception:  # noqa: BLE001 - the runtime says why it cannot be read, and asks again
+                read = None
+            if isinstance(read, dict):
+                out = {**read, "engine": engine}           # as the host's coprocessor does: the footer names it
+        return candidate(out, engine=engine, tokens=tokens)
+
+    def request_text(self, contract: Any, inputs: Any, answer_name: str) -> str:
+        build = self.moves.prompt(str((contract or {}).get("move")))
+        msgs = build(contract, inputs) if build is not None else []
+        out = [f"# A request of the move `{(contract or {}).get('move')}`", ""]
+        failed = ((contract or {}).get("repair") or {}).get("failed") or []
+        for m in msgs:
+            out += [f"## {m.get('role')}", "", str(m.get("content") or ""), ""]
+        if failed:
+            out += ["## what did not hold in the answer before", ""]
+            out += [f"- {f.get('name')}: {f.get('why')}" if isinstance(f, dict) else f"- {f}" for f in failed] + [""]
+        out += ["## where the answer goes", "",
+                f"Write `{answer_name}` beside this file: the two lines `engine: model:{self.who}` and `output: |`, "
+                "then the answer, each line two spaces in.", ""]
+        return "\n".join(out)
+
+
+def agent_runtime(project_dir: Path, folder: Path, *, who: str = "outside-agent") -> Runtime:
+    """The `runtime` of a build or an entailment whose model is an outside agent or a person (`AnswerFolder`): each
+    program's requests and answers sit in `<folder>/<the fabulam's name>/<the program>/`. Hand it to
+    `run_file_build`, `run_archive_build` or `run_entail` with `mode="model"`."""
+    from .thym.coprocessor import RefusingCoprocessor
+
+    def make(stage: str, plan: dict, info: dict | None, mode: str, scaffolds: bool, program: Any) -> dict:
+        rows = [r for r in (plan.get("inputs") or []) if isinstance(r, dict)] if isinstance(plan, dict) else []
+        fab = next((Path(str(r.get("path"))).name for r in rows if str(r.get("path", "")).endswith(SUFFIX)
+                    and r.get("name") in ("f", "h")), None)
+        stem = fab[: -len(SUFFIX)] if fab else "run"
+        use = mode == "model" and not scaffolds
+        return {"coprocessor": AnswerFolder(Path(folder) / stem / stage, who=who) if use else RefusingCoprocessor(),
+                "agent_free": False, "rules": scaffolds, "preflight": None,
+                "environment": {"route": "local"} if use else {}, "root": _host.host_root(),
+                "engines": _host.engines(catalog=_host.catalog_engine(Path(project_dir))), "calls": None}
+    return make
 
 
 # ---------------------------------------------------------------------------
@@ -732,6 +834,6 @@ def run_entail(project_dir: Path, fab: Path, *, density: str | None = None, mode
     return out
 
 
-__all__ = ["ARCHIVE_FILE", "DENSITIES", "HEAD_LINE", "HEAD_STAGES", "PROGRAM_FILE", "PSHORT_FILE", "STAGES",
-           "STAGE_WORDS", "STATE_LINES", "archive_state", "fabulam_path", "file_state", "program_path", "pshort_program",
+__all__ = ["ARCHIVE_FILE", "AnswerFolder", "DENSITIES", "HEAD_LINE", "HEAD_STAGES", "PROGRAM_FILE", "PSHORT_FILE",
+           "STAGES", "STAGE_WORDS", "STATE_LINES", "agent_runtime", "archive_state", "own_errors", "fabulam_path", "file_state", "program_path", "pshort_program",
            "pshorts", "run_archive_build", "run_entail", "run_file_build", "stages_for", "targets_by_rule"]

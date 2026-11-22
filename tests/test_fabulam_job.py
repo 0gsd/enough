@@ -230,6 +230,11 @@ def test_a_file_that_ends_in_more_than_three_results_waits_for_the_person_to_pic
     # the person's choice is kept by the next build, which leaves it out
     again = J.run_file_build(proj, lean, mode="rules", why="no model", runtime=runtime(), now=NOW, restart=True)
     assert again["state"]["targets"] == ["Many.two_le_three"] and again["state"]["target_by"] == "given"
+    # the same choice given again changes nothing: the build is taken up, not started again from the survey
+    with pytest.raises(RuntimeError) as e:
+        J.run_file_build(proj, lean, mode="model", runtime=runtime(Recorded(PRIMES)), now=NOW,
+                         target=["Many.two_le_three"])
+    assert "read was refused" in str(e.value) and J.file_state(proj, lean)["landed"] == 1
 
 
 def test_with_a_public_wording_the_fit_runs_before_the_fold_and_without_lean(project: Path):  # noqa: F811
@@ -274,6 +279,45 @@ def test_a_run_replays_from_its_record_with_no_reader_and_no_model(project: Path
     for run_dir in (survey_dir, read_dir):
         again = RUN.replay(run_dir, inputs_root=project, root=tmp_path / "replays", engines={})
         assert isinstance(again, T.Trace) and again.replay["identical"], (run_dir.name, getattr(again, "replay", again))
+
+
+def test_an_outside_agent_stands_in_as_the_model_through_a_folder_of_answers(project: Path, tmp_path: Path):  # noqa: F811
+    """A calibration run: the model is whoever writes the answers. A request with no answer is written out and the
+    build waits; with the answer beside it, the build takes up again and asks the next."""
+    from tests.test_fabulam_moves import recorded
+    answers = tmp_path / "answers"
+    lean = project / LEAN.name
+    given = {"read-the-proof": ["read"], "audit-the-comments": ["comments"], "fold-the-argument": ["yield", "stages"],
+             "raise-the-questions": None}
+    waited: list[str] = []
+    out = None
+    for _ in range(12):
+        try:
+            out = J.run_file_build(project, lean, mode="model", runtime=J.agent_runtime(project, answers,
+                                                                                    who="a-blind-decompiler"), now=NOW)
+            break
+        except RuntimeError as e:
+            assert "answer-wanted" in str(e) and "nothing of it was written" in str(e), str(e)
+        request = max(answers.rglob("*.request.md"), key=lambda p: p.stat().st_mtime_ns)
+        stage = request.parent.name
+        waited.append(stage)
+        assert request.parent.parent.name == "primes-congruent-one"
+        text = request.read_text(encoding="utf-8")
+        assert "## system" in text and "## user" in text and "## where the answer goes" in text
+        if stage == "read-the-proof":
+            assert "comments blanked" in text and "theorem exists_prime_gt_modEq_one" in text
+            assert "Copyright" not in text                  # the agent that reads the proof sees no comment
+        k = len(list(request.parent.glob("*.cosm")))
+        body = "questions: []\n" if given[stage] is None else recorded(PRIMES, given[stage][k])
+        answer = request.with_name(request.name.replace(".request.md", ".cosm"))
+        answer.write_text("engine: model:a-blind-decompiler\noutput: |\n" + "".join(
+            ("  " + ln if ln.strip() else "") + "\n" for ln in body.rstrip("\n").split("\n")), encoding="utf-8")
+    assert out is not None and out["complete"], out
+    assert waited == ["read-the-proof", "audit-the-comments", "fold-the-argument", "fold-the-argument",
+                      "raise-the-questions"]
+    doc = fabulam(project)
+    assert {r.get("model") for r in doc["derived"]["runs"][1:]} == {"a-blind-decompiler"}
+    assert FAB.lint(fab_path(project)).errors == []
 
 
 def test_the_fixture_is_mathlibs_file_byte_for_byte():
