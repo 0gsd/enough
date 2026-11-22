@@ -372,17 +372,66 @@
         }
         function tick() {
           if (done) return;
-          var s = sig();
+          /* A CSS transition (the sidebar's and the panels' 180ms slides)
+           * moves things without changing the body's size, so the
+           * signature alone calls it settled half-way (0.9, U1). */
+          var s = sig() + '|' + moving();
           stable = (s === last) ? stable + 1 : 0;
           last = s;
-          if (stable >= 3) return finish(true);
+          if (stable >= 3 && !moving()) return finish(true);
           if (++frames >= maxFrames) return finish(false);
           requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);
         setTimeout(function () { finish(false); }, 2500);
       });
+    },
+    /* How many finite animations and transitions are running. A spinner's
+     * infinite animation never ends, so it is not counted: waiting for it
+     * would be waiting forever. */
+    moving: function () { return moving(); },
+    /* "What I am about to read has stopped changing" (0.9, U1): no finite
+     * animation or transition running, and `sigFn()` (default: the idle
+     * signature) the same across `frames` consecutive animation frames.
+     * Resolves true when settled, false when `budgetMs` ran out. A frame
+     * that rAF does not deliver within 100ms (a throttled tab) is taken by
+     * a timer instead, so this always settles. */
+    settle: function (sigFn, budgetMs, frames) {
+      var want = frames || 2, until = Date.now() + (budgetMs || 3000);
+      var read = sigFn || function () {
+        var b = document.body;
+        return [b.scrollHeight, b.scrollWidth, document.querySelectorAll('*').length];
+      };
+      return new Promise(function (resolve) {
+        var last, stable = 0, first = true;
+        function step() {
+          var s;
+          try { s = JSON.stringify(read()); } catch (e) { s = 'throw:' + e; }
+          var still = !moving();
+          stable = (!first && still && s === last) ? stable + 1 : 0;
+          first = false;
+          last = s;
+          if (stable >= want) return resolve(true);
+          if (Date.now() >= until) return resolve(false);
+          var fired = false;
+          var go = function () { if (!fired) { fired = true; step(); } };
+          requestAnimationFrame(go);
+          setTimeout(go, 100);
+        }
+        step();
+      });
     }
   };
+  function moving() {
+    if (!document.getAnimations) return 0;
+    var n = 0, all = document.getAnimations();
+    for (var i = 0; i < all.length; i++) {
+      var a = all[i];
+      if (a.playState !== 'running') continue;
+      var t = a.effect && a.effect.getComputedTiming ? a.effect.getComputedTiming() : null;
+      if (t && isFinite(t.endTime)) n++;
+    }
+    return n;
+  }
   return true;
 })();

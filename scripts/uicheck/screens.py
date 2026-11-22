@@ -169,11 +169,12 @@ ALLO_LISTED_JS = """(async () => {
   return true; })()""" % {"holo": json.dumps(ALLO_HOLO), "prog": json.dumps(ALLO_PROGRAM),
                           "proofs": json.dumps(ALLO_PROOFS)}
 #: The allograph card open on the holograph, its listing and the holder's every proof read.
-ALLO_HELD_READY: Step = ("eval_await", """(async () => {
+ALLO_HELD_READY: Step = ("eval_until", """(async () => {
   await dlgAlloOpen(%s);
-  for (let i = 0; i < 200 && !(DLG.allo && DLG.allo.held && (DLG.allo.held.error || Array.isArray(DLG.allo.held.proofs))
-       && document.querySelector('#allo-held')); i++) await new Promise((r) => setTimeout(r, 50));
-  return true; })()""" % json.dumps(ALLO_HOLO))
+  const ok = () => !!(DLG.allo && DLG.allo.held && (DLG.allo.held.error || Array.isArray(DLG.allo.held.proofs))
+       && document.querySelector('#allo-held'));
+  for (let i = 0; i < 200 && !ok(); i++) await new Promise((r) => setTimeout(r, 50));
+  return ok(); })()""" % json.dumps(ALLO_HOLO))
 #: Withdrawn and signed out again, so the next screen or scenario finds the holograph unlisted and Connect signed out.
 ALLO_UNLIST: Step = ("eval_await", """(async () => {
   try { dlgClose(); } catch (e) {}
@@ -247,52 +248,43 @@ JOURNAL_READY: Step = ("wait_for", ".comp-journal-head")
 #: card waits on (GET /api/council/participants). The wait is done INSIDE the
 #: page for the reason `_open` gives: a `wait_for`'s 8-second ceiling expires
 #: on a busy tab even when the thing it wants is already there.
-COUNCIL_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200
-       && !document.querySelector('#cc-participants .cc-person'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+COUNCIL_READY: Step = ("ready", """document.querySelector('#cc-participants .cc-person')""")
 
-#: The sidebar's collapse/expand transition (180ms) has finished.
-SIDEBAR_SETTLED: Step = ("eval_await", "new Promise((r) => setTimeout(() => r(true), 260))")
+#: The composure the page booted into is adopted, saved, fitted and not
+#: easing: `_compFitT` is the page's pending auto-fit timer and `comp-eased`
+#: the class of an eased move (0.9, U1).
+COMP_BOOTED: Step = ("ready", "COMP.ready && !COMP.saving && !COMP.pending.length && !_compFitT"
+                              " && !document.getElementById('comp-world').classList.contains('comp-eased')")
+#: …and every composure control's box is where it will stay (two frames alike).
+COMP_STILL: Step = ("wait_settled", "[...document.querySelectorAll('[id^=\"comp-\"]')].map((e) =>"
+                                    " { const r = e.getBoundingClientRect(); return [r.left, r.top, r.width]; })")
+
+#: The sidebar's collapse/expand transition (180ms) has finished: nothing is
+#: animating and the sidebar's box is the same across two frames (0.9, U1:
+#: this was a fixed 260 ms, which a loaded machine could outlast).
+SIDEBAR_SETTLED: Step = ("wait_settled", "(() => { const s = document.getElementById('sidebar')"
+                                         " || document.querySelector('.sidebar, aside');"
+                                         " const r = s ? s.getBoundingClientRect() : {};"
+                                         " return [r.left, r.width]; })()")
 
 #: The dictionary has drawn a page. FEED builds its database in the
 #: background at boot (a few seconds on the real data), so the wait is long
 #: and done inside the page, for the reason COUNCIL_READY gives.
-DICT_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 360
-       && !document.querySelector('#dict-flow .dict-e'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+DICT_READY: Step = ("ready", """document.querySelector('#dict-flow .dict-e')""")
 #: The WDL has a plate (not the "looking it up" line).
-WDL_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200
-       && !document.querySelector('#wdl-scroll .wdl-mast'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+WDL_READY: Step = ("ready", """document.querySelector('#wdl-scroll .wdl-mast')""")
 #: The cosm viewer has drawn its volume (cards, a refusal or an error) —
 #: GET /api/cosm then the render, waited for inside the page.
-COSM_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector(
-       '#cosm-body .cosm-card, #cosm-body .cosm-refusal, #cosm-body .cosm-error'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+COSM_READY: Step = ("ready", """document.querySelector(
+       '#cosm-body .cosm-card, #cosm-body .cosm-refusal, #cosm-body .cosm-error')""")
 #: The docs viewer (0.4.4) has drawn its document — the short density's
 #: sections, the atem density's outline or the fabula's prism cards (or an
 #: error, which the `_OK` variants below refuse to call ready). GET /api/docs
 #: builds the doc volume on its first call (about a second, cold), so the
 #: wait is long and in-page.
-DOCS_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 300 && !document.querySelector(
+DOCS_READY: Step = ("ready", """document.querySelector(
        '#docs-body .docs-sec h2[id], #docs-body .docs-outline, #docs-body .cosm-card.docs-prism,'
-       + ' #docs-body .ref-error, #docs-body .lib-doc:not(:has(.atem-spin))'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+       + ' #docs-body .ref-error, #docs-body .lib-doc:not(:has(.atem-spin))')""")
 #: …and it is the short density's sections, not an error: a step that fails
 #: (a harness error) when the document could not be loaded — how the home
 #: screens prove the route is home-accessible.
@@ -302,56 +294,28 @@ DOCS_ATEM_OK: Step = ("wait_for", "#docs-body .docs-outline .docs-ol-row")
 DOCS_FAB_OK: Step = ("wait_for", "#docs-body .cosm-card.docs-prism")
 #: …and a live example's block has loaded and linted (POST /api/cosm/inline),
 #: its verdict line painted — waited for inside the page.
-DOCS_LIVE_OK: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector('#docs-body .docs-live[data-ready]'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return !!document.querySelector('#docs-body .docs-live[data-ready="ok"]'); })()""")
+DOCS_LIVE_OK: Step = ("ready", """document.querySelector('#docs-body .docs-live[data-ready]')""")
 #: merirmaid has drawn a diagram's nodes (a lens: GET /api/docs/lens, then Pele).
-MM_NODES_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 300 && !document.querySelector('#merirmaid-body g.pele-node'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+MM_NODES_READY: Step = ("ready", """document.querySelector('#merirmaid-body g.pele-node')""")
 
 
 #: A program in the docs viewer (0.5.0) has drawn its density — cards, the
 #: source, the outline — or said what is missing.
-THYM_DOC_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector('#docs-body .cosm-card, #docs-body .thym-src,'
-       + ' #docs-body .docs-outline, #docs-body .ref-error, #docs-body .docs-busy'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_DOC_READY: Step = ("ready", """document.querySelector('#docs-body .cosm-card, #docs-body .thym-src,'
+       + ' #docs-body .docs-outline, #docs-body .ref-error, #docs-body .docs-busy')""")
 #: The run card has its programs (or the "not available yet" line), and a
 #: program chosen shows its plan, a refusal, or the same line.
-THYM_PICK_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector('#thym-plan .thym-atem-line, #thym-plan .thym-unavail,'
-       + ' #thym-plan .thym-refusal, #thym-list .thym-unavail'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_PICK_READY: Step = ("ready", """document.querySelector('#thym-plan .thym-atem-line, #thym-plan .thym-unavail,'
+       + ' #thym-plan .thym-refusal, #thym-list .thym-unavail')""")
 #: A reading's band is up in the full reader with its footer line read.
-THYM_BAND_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(document.querySelector('#read-band-review:not([hidden])')
-       && document.querySelector('#read-band-review .read-band-line').textContent); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_BAND_READY: Step = ("ready", """(document.querySelector('#read-band-review:not([hidden])')
+       && document.querySelector('#read-band-review .read-band-line').textContent)""")
 
 
 #: The package card has looked for a morph beside its text (the parts drawn).
-THYM_PACK_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(THYM_PACK.open && THYM_PACK.morph !== undefined); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_PACK_READY: Step = ("ready", """(THYM_PACK.open && THYM_PACK.morph !== undefined)""")
 #: The unpack card knows what the package carries (a sealed one: that it cannot).
-THYM_UNPACK_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(THYM_PACK.open && THYM_PACK.parts !== null); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_UNPACK_READY: Step = ("ready", """(THYM_PACK.open && THYM_PACK.parts !== null)""")
 #: Closes the package card even with a key showing (only "I have it" does, by hand).
 THYM_PACK_CLOSE: Step = ("eval", "(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
 
@@ -359,22 +323,19 @@ THYM_PACK_CLOSE: Step = ("eval", "(() => { try { thymPackClose(true); } catch (e
 def _thym_edit(path: str, size: str = "full") -> Step:
     """A program open in the editor, its check strip drawn (clean or refused)."""
     root = "#thym-ed" if size == "full" else "#thym-ed-mini"
-    return ("eval_await", "(async () => { await openReadEdit(%s, {size: %s, face: 'edit'});"
+    sel = json.dumps(root + ".refused, " + root + ".clean")
+    return ("eval_until", "(async () => { await openReadEdit(%s, {size: %s, face: 'edit'});"
                           " for (let i = 0; i < 200 && !document.querySelector(%s); i++)"
-                          " await new Promise((r) => setTimeout(r, 50)); return true; })()"
-            % (json.dumps(path), json.dumps(size), json.dumps(root + ".refused, " + root + ".clean")))
+                          " await new Promise((r) => setTimeout(r, 50)); return !!document.querySelector(%s); })()"
+            % (json.dumps(path), json.dumps(size), sel, sel))
 
 
 #: The editor's text back as it is on disk, so a teardown never meets the dirty guard.
 THYM_EDIT_CLEAN: Step = ("eval", "(() => { try { const ta = reEditTextarea(); if (ta) { ta.value = RE_PRISTINE;"
                                  " RE_EDIT_BUFFER = RE_PRISTINE; } } catch (e) {} return true; })()")
 #: The run card's plan has drawn (its steps, or a refusal at its statement).
-THYM_PLAN_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector('#thym-plan ol.thym-plan-read, #thym-plan .thym-refusal,'
-       + ' #thym-plan .thym-unavail'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+THYM_PLAN_READY: Step = ("ready", """document.querySelector('#thym-plan ol.thym-plan-read, #thym-plan .thym-refusal,'
+       + ' #thym-plan .thym-unavail')""")
 
 
 def _thym_run_on(program: str, inputs: dict[str, Any] | None = None, text: str | None = None,
@@ -393,11 +354,13 @@ THYM_PICK_CLOSE: Step = ("eval", "(() => { try { thymPickClose(); } catch (e) {}
 def _thym_pick(text: str, program: str) -> Step:
     """Open "run with…" on `text` and choose `program` as a person would (a
     click on its radio, which plans it); the route-less build shows its line."""
-    return ("eval_await", "(async () => { await thymRunOpen({input: %s});"
+    return ("eval_until", "(async () => { await thymRunOpen({input: %s});"
                           " for (let i = 0; i < 200 && !document.querySelector('#thym-list input, #thym-list .thym-unavail'); i++)"
                           " await new Promise((r) => setTimeout(r, 50));"
                           " const r = document.querySelector('#thym-list input[value=' + JSON.stringify(%s) + ']');"
-                          " if (r) r.click(); return true; })()" % (json.dumps(text), json.dumps(program)))
+                          " if (r) r.click();"
+                          " return !!document.querySelector('#thym-list input, #thym-list .thym-unavail'); })()"
+            % (json.dumps(text), json.dumps(program)))
 
 
 def _docs(doc: str, density: str = "short", lang: str | None = None,
@@ -412,27 +375,15 @@ def _docs(doc: str, density: str = "short", lang: str | None = None,
         opts["anchor"] = anchor
     return ("eval", f"enterDocsMode({json.dumps(opts)})")
 #: The fabula card (0.6) has read what it shows: a text's twins, or a folder's build and what it made.
-FAB_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(FAB.open && (FAB.face === 'text' ? !!FAB.flavour
-       : (FAB.build !== null && (FAB.build.error || !FAB.build.exists || FAB.compiled !== null)))); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+FAB_READY: Step = ("ready", """(FAB.open && (FAB.face === 'text' ? !!FAB.flavour
+       : (FAB.build !== null && (FAB.build.error || !FAB.build.exists || FAB.compiled !== null))))""")
 FAB_CLOSE: Step = ("eval", "(() => { try { fabCardClose(); } catch (e) {} return true; })()")
 #: 0.8 (W4-X7): the transconception card has read GET /api/fabula/transconception and drawn it.
-TC_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 300 && !document.querySelector('#fab-tc .fab-tc, #fab-tc .thym-refusal'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+TC_READY: Step = ("ready", """document.querySelector('#fab-tc .fab-tc, #fab-tc .thym-refusal')""")
 #: 0.8 (W4-FP): the card of an authored fabulac has read what it shows (the starters on the begin face,
 #: GET /api/fabulac/status on the authored one) and no request of its own is in flight.
-FAP_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(FAB.open && (FAB.face === 'begin' ? FA.starters !== null
-       : (FA.status !== null && !FA.checking && !FA.sending))); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+FAP_READY: Step = ("ready", """(FAB.open && (FAB.face === 'begin' ? FA.starters !== null
+       : (FA.status !== null && !FA.checking && !FA.sending)))""")
 #: A sandbox run's result as the card shows it, recorded from a real run of the seeded tally's tool
 #: (`tally count notes.md` with notes.md handed over), so the screen runs nothing itself.
 FAP_RUN_RESULT: Step = ("eval", """(() => {
@@ -455,22 +406,13 @@ FAP_RUN_RESULT: Step = ("eval", """(() => {
   document.getElementById('fab-run').scrollIntoView({block: 'start'});
   return true; })()""")
 #: The cshort / catem viewer has its file (a cshort: its first file's text too).
-FABV_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind !== 'cshort'
-       || FABV.text !== null || FABV.ferror)))); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+FABV_READY: Step = ("ready", """(FABV.open && (FABV.error || (FABV.data && (FABV.kind !== 'cshort'
+       || FABV.text !== null || FABV.ferror))))""")
 FABV_CLOSE: Step = ("eval", "(() => { try { fabViewClose(); } catch (e) {} return true; })()")
 #: The dialectic card (0.6, U1b) has read its volume (the questions and the viewer's
 #: read of it), or, on its isograph face, the holder's programs.
-DLG_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(DLG.open && (DLG.face === 'iso' ? (DLG.iso.programs !== null || DLG.iso.error)
-       : ((DLG.data && DLG.cosm !== null) || DLG.error))); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  await new Promise((r) => setTimeout(r, 120));
-  return true; })()""")
+DLG_READY: Step = ("ready", """(DLG.open && (DLG.face === 'iso' ? (DLG.iso.programs !== null || DLG.iso.error)
+       : ((DLG.data && DLG.cosm !== null) || DLG.error)))""")
 DLG_CLOSE: Step = ("eval", "(() => { try { dlgClose(); DLG.drafts.clear(); DLG.putNext = []; } catch (e) {} return true; })()")
 
 
@@ -478,25 +420,13 @@ def _dlg_put(*keys: str) -> Step:
     """Put these questions in hand (as a settle or a refusal would), and repaint."""
     return ("eval", f"(() => {{ DLG.putNext = {json.dumps(list(keys))}; DLG.mainKey = null; dlgPaint(); return true; }})()")
 #: The Canon chip knows the text's twin state (GET /api/fabula/twin answered).
-CANON_CHIP_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+CANON_CHIP_READY: Step = ("ready", """(CANON.doc && CANON.doc.state)""")
 #: The EMF face has drawn the twin's cards.
-EMF_FACE_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector(
-       '#review-emf:not([hidden]) .cosm-card, #preview-emf:not([hidden]) .cosm-card'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+EMF_FACE_READY: Step = ("ready", """document.querySelector(
+       '#review-emf:not([hidden]) .cosm-card, #preview-emf:not([hidden]) .cosm-card')""")
 #: The atem card has its answer (rules mode: a scaffold) or an error.
-ATEM_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200 && !document.querySelector(
-       '#atem-modal:not(.hidden) .cosm-atem-line, #atem-modal:not(.hidden) .atem-error'); i++) {
-    await new Promise((r) => setTimeout(r, 50));
-  }
-  return true; })()""")
+ATEM_READY: Step = ("ready", """document.querySelector(
+       '#atem-modal:not(.hidden) .cosm-atem-line, #atem-modal:not(.hidden) .atem-error')""")
 ATEM_CLOSE: Step = ("eval", "(() => { try { atemCardClose(); } catch (e) {} return true; })()")
 
 
@@ -505,12 +435,15 @@ def _atem_of_passage(size: str) -> Step:
     sentences, as the right-click menu does (path included, so the card can
     pin). The harness has no model: the card shows the labelled scaffold.
     The mini panel slides open over 180ms, and the card's modal makes the
-    page stop moving in a way `wait_idle` reads as settled: wait out the
-    slide first, or the header is measured half-open."""
+    page stop moving in a way `wait_idle` reads as settled: wait for the
+    slide to end (the reader's box still across two frames, nothing
+    animating) first, or the header is measured half-open."""
     return ("eval_await", "(async () => { await openReadEdit(%s, {size: %s, face: 'read'});"
-                          " await new Promise((r) => setTimeout(r, 260));"
+                          " await __uicheck.settle(() => { const p = document.getElementById(%s === 'full'"
+                          " ? 'review-mode' : 'preview'); const r = p ? p.getBoundingClientRect() : {};"
+                          " return [r.left, r.top, r.width, r.height]; }, 6000);"
                           " await canonAtemSelection({text: %s}, {path: %s, where: 'notes.md'});"
-                          " return true; })()" % (json.dumps(EMF_TEXT), json.dumps(size),
+                          " return true; })()" % (json.dumps(EMF_TEXT), json.dumps(size), json.dumps(size),
                                                   json.dumps(EMF_PASSAGE), json.dumps(EMF_TEXT)))
 
 
@@ -743,9 +676,12 @@ def _open(form: str, ready: Step | None = None) -> Step:
     sel = ready[1] if ready else ""
     poll = (f" for (let i = 0; i < 120 && !document.querySelector({sel!r});"
             " i++) await new Promise((r) => setTimeout(r, 50));" if sel else "")
-    return ("eval_await",
+    done = f"!!document.querySelector({sel!r})" if sel else "COMP.ready"
+    # `eval_until` (0.9, U1): a form whose swatch never appeared is a failed
+    # step that names it, not a screen measured on the wrong document.
+    return ("eval_until",
             f"(async () => {{ await compOpenNew('{form}');{poll}"
-            " return true; })()")
+            f" return {done}; }})()")
 
 
 # Put the composure stage back to the ground floor (composure round, P4c).
@@ -854,11 +790,11 @@ RV_BACK: tuple[Step, ...] = (("eval", "rvSetState('open')"), ("wait_idle", ""))
 #: it: `agentFreeSet()` POSTs /api/ui-config {agent_free} and awaits the
 #: answer. The preference lives in the ui.json `build_env()` points
 #: ENOUGH_UI_CONFIG at — the SCRATCH one, shared by the run's project and
-#: home servers, never the developer's. The 260 ms waits out the panel's
-#: 180 ms column slide, which `wait_idle` cannot see (SIDEBAR_SETTLED's
-#: reason).
-AF_ON: Step = ("eval_await", "(async () => { await agentFreeSet(true);"
-                             " await new Promise((r) => setTimeout(r, 260));"
+#: home servers, never the developer's. The settle waits out the panel's
+#: 180 ms column slide (SIDEBAR_SETTLED's reason), and the step fails if the
+#: switch did not turn on.
+AF_ON: Step = ("eval_until", "(async () => { await agentFreeSet(true);"
+                             " await __uicheck.settle(null, 6000);"
                              " return agentFreeOn(); })()")
 #: Every agent-free screen's teardown. The page is reloaded after a screen,
 #: but the FILE is not: a switch left on would carry into every screen (and
@@ -1744,7 +1680,12 @@ PROJECT_SCREENS: list[Screen] = [
     # or a different tool on the same stage. Teardown puts a blank back:
     # a composure nobody types into writes no file, so this costs nothing
     # on disk however many times the matrix runs it.
+    # The page boots into it, so there is nothing to open — but booting is a
+    # fetch, an adopt, a fit and an eased move, and a page measured before
+    # they end has a control off screen (0.8's integ-w6: `offscreen` at en
+    # 1512x982, on a page that passed the run before). Wait for all four.
     Screen("composure-blank", "project",
+           setup=(COMP_BOOTED, COMP_STILL, ("wait_idle", "")),
            note="a fresh project opens on a blank composure, caret ready"),
 
     Screen("composure-cards", "project",
