@@ -2868,13 +2868,16 @@ def _box_has_picture(m: Module) -> bool:
 
 def empty_boxes(comp: Composure) -> list[str]:
     """The scaffold-boxes nobody has written in yet, in reading order: a
-    text box with no words, a graphic box with no picture."""
+    text box with no words, a graphic box with no picture. A notes box
+    (`as: notes`, words to the readvisor that never reach the thing) is
+    left out: an empty one is not a gap in the thing (0.9, as `lock.md`
+    and the one-file page leave it)."""
     view = scaffold_view(comp) or {"boxes": {}, "loose": []}
     ordered = [b for ids in view["boxes"].values() for b in ids] + list(view["loose"])
     out: list[str] = []
     for bid in ordered:
         m = comp.module(bid)
-        if m is None:
+        if m is None or m.as_ == "notes":
             continue
         filled = _box_has_picture(m) if m.kind == "graphic" else _has_text(m)
         if not filled:
@@ -3184,6 +3187,7 @@ def apply_ops(
     title: str = "",
     project_dir: Path | None = None,
     rel_path: str = "",
+    carried_plec_by: dict[str, str] | None = None,
 ) -> OpsResult:
     """Apply a batch of ops to the composure at `path`, atomically.
 
@@ -3241,6 +3245,15 @@ def apply_ops(
                     f"failed and the whole batch was discarded: {e}"
                 ) from None
 
+        # 0.9 (the state in): who wrote each plec, as the carried state file
+        # records it (`plec-by`), so a plec the readvisor wrote in another
+        # harness stays the readvisor's when the person brings it in. Python
+        # only: no HTTP body reaches this, and it only names who wrote a plec
+        # that is already there.
+        for mid, who in (carried_plec_by or {}).items():
+            m = draft.module(mid)
+            if m is not None and m.type == BOX and m.plec and who in ("readvisor", "person"):
+                m.plec_by = who
         draft.rev = file_rev + 1
         draft.modified = _now_iso()
         draft.generator = _generator()
@@ -3710,6 +3723,33 @@ def record_check(comp_path: Path, findings: list[dict[str, Any]],
         out = [{**c["finding"], "comment": c.get("id")} for c in doc["comments"]
                if isinstance(c.get("finding"), dict)]
     return {"added": added, "kept": len(out) - len(added), "findings": out}
+
+
+def carry_findings(comp_path: Path, findings: list[dict[str, Any]],
+                   stamp: dict[str, Any] | None, doc_rel: str = "") -> int:
+    """A carried state's findings into a sidecar that holds none (0.9, the
+    state in): each keeps its id, status and version, and `stamp` (the
+    state's `checked`) becomes the sidecar's `check`. A sidecar that holds
+    findings already is left as it is and 0 is returned: findings of two
+    scaffolds are never mixed."""
+    clean = [(str(f.get("id") or ""), _clean_finding(f)) for f in findings]
+    with _finding_lock(comp_path):
+        doc = load_comments(comp_path, doc_rel)
+        if any(isinstance(c.get("finding"), dict) for c in doc["comments"]):
+            return 0
+        for fid, f in clean:
+            entry = _finding_entry(doc, f)
+            if re.fullmatch(r"f[1-9][0-9]*", fid) and fid not in {
+                    str((c.get("finding") or {}).get("id")) for c in doc["comments"]}:
+                entry["finding"]["id"] = fid
+            doc["comments"].append(entry)
+        nums = [int(str(c["finding"]["id"])[1:]) for c in doc["comments"]
+                if isinstance(c.get("finding"), dict)]
+        doc["findings_next"] = max(nums, default=0) + 1
+        if stamp:
+            doc["check"] = dict(stamp)
+        _save_comments(comp_path, doc)
+    return len(clean)
 
 
 def answer_finding(comp_path: Path, finding_id: str, answer: str, *,

@@ -300,8 +300,9 @@ def test_a_documents_title_line_is_the_persons_title_box_when_there_is_one(tmp_p
 
 
 def test_the_engines_say_what_the_trials_found():
-    # S2's trials (2026-11-22): the rows tried are marked with who tried them, and enough's engine page no longer
-    # promises a state in or out (enough has no door for it yet); the check in enough is enough's own job.
+    # S2's trials (2026-11-22): the rows tried are marked with who tried them; the check in enough is enough's own
+    # job. S3 (the same day) built enough's two doors, the person's: the page says the state goes out and comes in
+    # from the scaffold's menu, and no longer that it does not.
     engines = SKILL / "references" / "engines"
     index = (engines / "index.md").read_text(encoding="utf-8")
     rows = {ln.split("|")[1].strip(): ln for ln in index.splitlines() if ln.startswith("| ") and ln.count("|") > 6}
@@ -310,7 +311,9 @@ def test_the_engines_say_what_the_trials_found():
     assert "Artifact with a store: not tried" in rows["Claude Code"]
     assert "tried 2026-11-19" in rows["claude.ai"]
     enough = (engines / "enough.md").read_text(encoding="utf-8")
-    assert "gives back its state" not in enough and "does not yet read a state or give one back" in enough
+    assert "does not yet read a state" not in enough and "no state goes in or out" not in rows["enough"]
+    assert '"take the state out (.scaffold.md)"' in enough and '"bring a state in…"' in enough
+    assert "Words already in a box are never" in enough and "undo takes back" in enough
     assert "The check is enough's own job" in enough
     assert "In enough the check is enough's own job" in (SKILL / "references" / "lock.md").read_text(encoding="utf-8")
     single = (engines / "single-html.md").read_text(encoding="utf-8")

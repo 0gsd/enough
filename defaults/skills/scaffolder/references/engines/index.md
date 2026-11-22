@@ -24,9 +24,9 @@ The one thing that moves a scaffold between engines is its **state**: one
 markdown file (`../state.md`), so a scaffold begun in one harness is
 finished in another. The page's "Copy everything out" button gives it;
 `scripts/scaffold_state.py` reads it; `scripts/export.py fill` puts it back
-into a page. enough does not read or give a state yet: a scaffold goes into
-enough as its plectrum, and the person carries their words by hand
-([enough.md](enough.md), "Carrying a scaffold in and out").
+into a page. In enough the person takes the state out and brings one in
+from the scaffold's menu ([enough.md](enough.md), "Carrying a scaffold in
+and out").
 
 ## Which harness can do which
 
@@ -38,7 +38,7 @@ tried, say so when you rely on it.
 
 | harness | engine to use | the page | a store | runs `scripts/` | exports it can make itself | tried |
 |---|---|---|---|---|---|---|
-| enough | composure | enough's own canvas | the project's files | yes | all (HTML, PDF, PPTX, Markdown) | tried 2026-11-22 by an agent with stand-in text: a deck finished here (plectrum in, words pasted by hand, lock, check, findings taken and kept, PPTX and PDF) and a document begun here; no state goes in or out yet |
+| enough | composure | enough's own canvas | the project's files | yes | all (HTML, PDF, PPTX, Markdown) | tried 2026-11-22 by an agent with stand-in text: a deck finished here (plectrum in, words pasted by hand, lock, check, findings taken and kept, PPTX and PDF) and a document begun here; then the state in and out from the scaffold's menu (that deck's state in, its words in place, undo as one step, out again byte for byte; its locked state in with its findings) |
 | Claude Code | artifact with a store; else one HTML file | the published artifact, or the file opened in a browser | the artifact's store (`db`); else the browser | yes, with the person's Python | what `export.py can` reports | one HTML file: tried 2026-11-22 by an agent with stand-in text (a deck begun, a document finished: writing, saving in the browser, lock, copy out, the check filed in the state, fixes taken and kept, Markdown and PDF); the copy went to the panel, not the clipboard, from a file. Artifact with a store: not tried |
 | claude.ai | artifact with a store | the published artifact | the artifact's store (`db`); "Save as a file" through `downloads` | yes, in its sandbox when code runs there | what `export.py can` reports there | tried 2026-11-19 (a page): plectrum, scaffold, saving, lock and check worked; "Save as a file" failed until the page used `downloads` |
 | a chat harness with an HTML preview and no store | one HTML file | the preview, or the file saved and opened | the browser only | if it runs code | HTML always; the rest if it runs the script | not tried |

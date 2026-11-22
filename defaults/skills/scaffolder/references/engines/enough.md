@@ -21,24 +21,35 @@ refuses a readvisor's write to a box's text, with the reason.
 
 ## Carrying a scaffold in and out
 
-The state (`../state.md`) is how a scaffold moves between harnesses. enough
-does not yet read a state or give one back: no button, route or tool of
-enough takes a state's words in or hands the state out. Until it does:
+The state (`../state.md`) is how a scaffold moves between harnesses. In
+enough both doors are the person's: two items under "the state file" in
+the scaffold's menu (the export button in the scaffold's group). You never
+press them for the person, and no tool of yours takes a state in.
 
-- **Into enough:** give enough the plectrum (`scripts/scaffold_state.py
-  plectrum FILE` takes it out of a state) and call `scaffold_from_plectrum`;
-  it builds the boxes, with their ids, plecs, targets and `as`. The tool
-  never writes a box's text, so tell the person that their words travel by
-  their own hand: they paste each box's words from the state file (the text
-  under each box's `plec` block) into the same box on enough's canvas. Say
-  how many boxes hold words, so they know when they are done. Marks
-  (`state: written`) and findings do not come in; they mark boxes again.
-- **Out of enough:** a person can export the thing in its own formats from
-  the scaffold's menu, but not the state. A harness that must finish a
-  scaffold begun in enough builds a fresh scaffold from the plectrum beside
-  the composure (`<name>.plectrum.md`) and the person pastes their words into
-  it, as above. Say plainly that this is the way until enough gives the
-  state back.
+- **Out of enough:** "take the state out (.scaffold.md)" writes the
+  scaffold's state beside the composure as a new file
+  (`<name>.scaffold.md`, then `<name>-2.scaffold.md` …), never over one.
+  It is what `scripts/scaffold_state.py` writes from the same scaffold, byte
+  for byte: the layout, the person's words, the `written` marks, the
+  version, the lock and the findings. It works on a locked scaffold too.
+  Hand that file to the next harness.
+- **Into enough:** the person makes a fresh scaffold (or opens one), presses
+  "bring a state in…" and picks the state file. enough reads it with the
+  same parser and refuses, with a sentence, a file that does not read, a
+  plectrum (it has no words), a state for another thing than the scaffold
+  makes once that scaffold holds words, and a locked scaffold. It then says
+  what it would bring: how many of the state's boxes the scaffold has, how
+  many are new, how many of the scaffold's boxes get no words from it. On
+  the person's yes, the layout and the words come in as the person's own
+  change, one step that undo takes back. Words already in a box are never
+  written over unless the person is shown those boxes and says to; "keep my
+  words" keeps them. Who wrote each plec comes as the file says. A locked
+  state comes in locked, with its findings and when it was checked (nothing
+  lost), and is then changed only by unlocking, as any locked scaffold. A
+  picture does not travel: its path was the other harness's, so the person
+  puts it in again.
+- Tell the person which file to bring and that the button is theirs. If
+  enough refused the file, say what the refusal said.
 
 ## Lock, check, export
 
@@ -52,8 +63,8 @@ final; unlocking makes a new version.
   truth with the model enough runs, when one answers. With no model (or
   agent-free), it says so: spelling by FEED only, each unknown word flagged
   with no fix, grammar and truth "not checked". A readvisor outside enough
-  has no door to file findings into a composure; it checks a scaffold only
-  where it holds the state (`../lock.md`).
+  files findings only in a state (`../lock.md`); when the person brings that
+  state into a scaffold that has no findings of its own, they come with it.
 - Each finding shows in the comments panel with "take the fix" and "keep my
   words"; a claim that cannot be checked shows as final, with neither.
 - **Export** is in the scaffold's menu: a page as HTML and PDF, a deck as
@@ -67,4 +78,9 @@ Tried 2026-11-22 by an agent with stand-in text: a deck begun in one HTML
 file and finished here (plectrum in, words pasted by hand, lock, check with
 FEED and a model, findings taken and kept one by one, PPTX and PDF); a
 document begun here and finished in one HTML file (the state taken out
-through enough's own code, which a harness cannot reach).
+through enough's own code). Then, the same day, with the two doors: that
+deck's state brought into a fresh scaffold through "bring a state in…"
+(the 7 written boxes in their places, undo and redo, "keep my words" on a
+box the person had changed), taken out through "take the state out" byte
+for byte the file that came in, and its locked final state brought in
+locked with its 8 findings.

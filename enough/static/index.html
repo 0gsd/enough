@@ -19198,6 +19198,9 @@
         <div class="comp-menu" id="comp-menu" hidden role="menu"></div>
         <div class="comp-menu" id="comp-ctx-menu" hidden role="menu"></div>
         <div class="comp-menu" id="comp-scaffold-menu" hidden role="menu"></div>
+        <!-- 0.9: the state file the person picks to bring in (the scaffold
+             menu's "bring a state in"); read here, parsed by the server. -->
+        <input type="file" id="comp-state-file" accept=".md,text/markdown,text/plain" hidden>
 
         <div class="composure-wordmark">composure</div>
       </div>
@@ -51314,7 +51317,9 @@
       compApplyOps(e.undo);
       COMP.redo.push(e);
       compUpdateUndoBtns();
-      compFlush();
+      const flushed = compFlush();
+      // A step the server built (a state brought in) reloads what it holds.
+      if (e.reload) void Promise.resolve(flushed).then(() => compReload());
     }
 
     function compRedo() {
@@ -51324,7 +51329,8 @@
       compApplyOps(e.ops);
       COMP.undo.push(e);
       compUpdateUndoBtns();
-      compFlush();
+      const flushed = compFlush();
+      if (e.reload) void Promise.resolve(flushed).then(() => compReload());
     }
 
     function compUpdateUndoBtns() {
@@ -57064,6 +57070,14 @@
     // The check's toast, from canonToast (kind `scaffold`): its progress
     // while it reads, then what it found — and what it could not check,
     // always said, never passed over.
+    function compScaffoldFoundCount(res) {
+      const r = res || {};
+      if (typeof r.findings === 'number') return r.findings;
+      if (Array.isArray(r.findings)) return r.findings.length;
+      if (Array.isArray(r.added)) return r.added.length;
+      return typeof r.added === 'number' ? r.added : 0;
+    }
+
     function compScaffoldJobToast(e, snap, id, dismiss) {
       const icon = 'composure';
       if (!CANON_TERMINAL.has(snap.state)) {
@@ -57087,8 +57101,9 @@
       if (snap.state === 'done') {
         const nc = res.not_checked || {};
         const notes = Object.keys(nc).map((k) => nc[k]).filter(Boolean);
-        const found = (res.findings || []).length || res.added || 0;
-        const message = (res.message || t('comp.scaffold.checked', 'checked: {n} findings').replace('{n}', String(found)))
+        // A count, never the ids: the job's `findings` is a number, and its
+        // `added` the list of the new findings' ids (0.9, the deck trial).
+        const message = t('comp.scaffold.checked', 'checked: {n} findings').replace('{n}', String(compScaffoldFoundCount(res)))
           + (notes.length ? ' · ' + t('comp.scaffold.notChecked', 'not checked: {what}')
             .replace('{what}', notes.join('; ')) : '');
         const actions = here ? [{ label: t('comp.scaffold.showFindings', 'show the findings'), run: () => {
@@ -57247,6 +57262,20 @@
         b.textContent = compExportLabel(as);
         menu.appendChild(b);
       }
+      // 0.9: the scaffold's one-file state (the skill's state.md), out to
+      // carry to another harness, and in from one. Out works locked too.
+      menu.appendChild(document.createElement('hr'));
+      head(t('comp.scaffold.stateHead', 'the state file'));
+      for (const [act, label] of [
+        ['state-out', t('comp.scaffold.stateOut', 'take the state out (.scaffold.md)')],
+        ['state-in', t('comp.scaffold.stateIn', 'bring a state in…')]]) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.act = act;
+        b.textContent = label;
+        if (act === 'state-in') b.disabled = !!s.locked;
+        menu.appendChild(b);
+      }
       const findings = COMP.comments.filter((c) => c.finding && c.by === 'check');
       if (findings.length) {
         menu.appendChild(document.createElement('hr'));
@@ -57294,6 +57323,139 @@
         compRefreshTree();
       } catch (_e) {
         compNotice(t('comp.scaffold.exportFailed', 'nothing was exported'));
+      }
+    }
+
+    // ---------- the state file, out and in (0.9) ----------
+    // Out: the server writes the scaffold's state beside the composure as a
+    // new file, in the skill's own writer's bytes, locked or open. In: the
+    // person picks a state file; the server reads it with the one parser and
+    // says what it would bring; on the person's yes it brings the layout and
+    // the words as the person's ops (the server sets `ui`), one undo step.
+    async function compScaffoldStateOut() {
+      compEndEditing();
+      await compFlush();
+      if (!COMP.path) {
+        compNotice(t('comp.scaffold.exportNoFile', 'nothing is written in this scaffold yet, so there is nothing to export'));
+        return;
+      }
+      try {
+        const r = await fetch('/api/composure/scaffold/state/out', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: COMP.path }),
+        });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) { compNotice(d.detail || t('comp.scaffold.stateOutFailed', 'the state was not written')); return; }
+        compNotice(t('comp.scaffold.stateOutDone', 'wrote {path}: the scaffold\'s state, to finish it in another harness')
+          .replace('{path}', d.path || ''));
+        compRefreshTree();
+      } catch (_e) {
+        compNotice(t('comp.scaffold.stateOutFailed', 'the state was not written'));
+      }
+    }
+
+    async function compScaffoldStateIn(text) {
+      const s = compScaffold();
+      if (!s) return;
+      if (s.locked) {
+        compNotice(t('comp.scaffold.stateInLocked', 'this scaffold is locked: nothing comes into it. unlock it first, or bring the state into a fresh scaffold'));
+        return;
+      }
+      compEndEditing();
+      await compFlush();
+      const path = COMP.path || COMP.pendingPath;
+      if (!path || !text) { compNotice(t('comp.scaffold.stateInFailed', 'nothing was brought in')); return; }
+      const send = async (extra) => {
+        const r = await fetch('/api/composure/scaffold/state/in', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.assign({ path, text, create: !COMP.path }, extra)),
+        });
+        return { ok: r.ok, d: await r.json().catch(() => ({})) };
+      };
+      try {
+        const look = await send({});
+        if (!look.ok) { compNotice(look.d.detail || t('comp.scaffold.stateInFailed', 'nothing was brought in')); return; }
+        const p = look.d;
+        const names = (list) => (list || []).join(', ');
+        const lines = [t('comp.scaffold.stateInCounts',
+          '{match} of its boxes are in this scaffold and {new} are new; {none} of this scaffold\'s boxes get no words from it.')
+          .replace('{match}', String(p.matching || 0)).replace('{new}', String(p.new || 0))
+          .replace('{none}', String(p.no_words || 0))];
+        if ((p.removed || []).length) {
+          lines.push(t('comp.scaffold.stateInRemoved', 'empty boxes and frames its layout does not have go: {names}')
+            .replace('{names}', names(p.removed)));
+        }
+        if ((p.pictures || []).length) {
+          lines.push(t('comp.scaffold.stateInPictures', 'pictures do not travel; put them in again: {names}')
+            .replace('{names}', names(p.pictures)));
+        }
+        if (p.findings_brought) {
+          lines.push(t('comp.scaffold.stateInFindings', '{n} findings come with it').replace('{n}', String(p.findings_brought)));
+        } else if (p.findings) {
+          lines.push(t('comp.scaffold.stateInFindingsStay', 'its {n} findings stay out: this scaffold has findings of its own')
+            .replace('{n}', String(p.findings)));
+        }
+        if (p.locked) {
+          lines.push(t('comp.scaffold.stateInLockedFile', 'it was locked ({at}): it comes in locked, with its findings, and cannot be undone. unlocking makes the next version.')
+            .replace('{at}', p.locked));
+        }
+        const ok = await confirmOverlay({
+          title: t('comp.scaffold.stateInTitle', 'bring this state in?'),
+          message: lines.join('\n'),
+          lines: true,
+          confirmLabel: t('comp.scaffold.stateInOk', 'bring it in'),
+        });
+        if (!ok) return;
+        // Words already in a box are never written over without naming the
+        // boxes and asking. "Keep my words" (or closing) keeps them all.
+        let replace = [];
+        if ((p.replace || []).length) {
+          const yes = await confirmOverlay({
+            title: t('comp.scaffold.stateInReplaceTitle', 'write over your words?'),
+            message: t('comp.scaffold.stateInReplace', 'these boxes hold other words of yours, and the state has its own for them: {names}')
+              .replace('{names}', names(p.replace.map((x) => x.name))),
+            lines: true,
+            confirmLabel: t('comp.scaffold.stateInReplaceOk', 'use the state\'s words'),
+            cancelLabel: t('comp.scaffold.stateInKeep', 'keep my words'),
+          });
+          replace = yes ? p.replace.map((x) => x.id) : [];
+        }
+        const extra = { apply: true, replace };
+        if (COMP.path && p.rev != null) extra.base_rev = p.rev;
+        const done = await send(extra);
+        if (!done.ok) { compNotice(done.d.detail || t('comp.scaffold.stateInFailed', 'nothing was brought in')); return; }
+        const d = done.d;
+        if (d.path && d.path !== COMP.path) {
+          COMP.path = d.path;
+          COMP.pendingPath = null;
+          compRefreshTree();
+          compStampLast();
+        }
+        COMP.rev = d.rev;
+        if (d.model) compAdoptModel(d.model, null);
+        if (d.undo) {
+          // One step: the whole bring. Undo sends its inverse through the one
+          // door, then the page reloads the model the server holds.
+          COMP.undo.push({ ops: d.ops, undo: d.undo, reload: true });
+          if (COMP.undo.length > COMP_UNDO_CAP) COMP.undo.shift();
+          COMP.redo.length = 0;
+        } else {
+          COMP.undo = [];
+          COMP.redo = [];
+        }
+        compUpdateUndoBtns();
+        void compLoadComments();
+        void compScaffoldLoadState();
+        compScaffoldChrome();
+        let msg = t('comp.scaffold.stateInDone', 'brought in: words in {n} boxes').replace('{n}', String((d.filled || []).length));
+        if ((d.kept || []).length) {
+          msg += ' · ' + t('comp.scaffold.stateInKept', 'your words stayed in {names}').replace('{names}', names(d.kept));
+        }
+        compNotice(msg);
+      } catch (_e) {
+        compNotice(t('comp.scaffold.stateInFailed', 'nothing was brought in'));
       }
     }
 
@@ -57372,6 +57534,17 @@
         if (b.dataset.thing) { compCloseMenus(); void compScaffoldSetThing(b.dataset.thing); return; }
         if (b.dataset.export) { compCloseMenus(); void compScaffoldExport(b.dataset.export); return; }
         if (b.dataset.act === 'findings') { compCloseMenus(); compToggleComments(true); }
+        if (b.dataset.act === 'state-out') { compCloseMenus(); void compScaffoldStateOut(); }
+        if (b.dataset.act === 'state-in') { compCloseMenus(); compEl('comp-state-file').click(); }
+      });
+      compEl('comp-state-file').addEventListener('change', async (e) => {
+        const input = e.currentTarget;
+        const file = input.files && input.files[0];
+        input.value = '';
+        if (!file) return;
+        let text = '';
+        try { text = await file.text(); } catch (_e) { text = ''; }
+        void compScaffoldStateIn(text);
       });
 
       // ---- inspector ----
