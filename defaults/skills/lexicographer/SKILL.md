@@ -1,11 +1,11 @@
 ---
 name: lexicographer
-description: Looks words up in FEED, the first-party enough english dictionary, and writes the user's own dictionary entries with them — a coinage, a family word, a term from their field, a private name for a thing, or their own version of a word FEED already has — one column at a time, in FEED's house style. Use for "is X a word", "what does X mean", "look up X", "add X to my dictionary", "put this word in the dictionary", "I made up a word", "my family says X", "fix the entry for X", "my version of X", "define X for me and keep it". Not for translating text (that is the translator skill) and not for spelling or grammar checks of a document (that is analyzer's proofread).
+description: Looks words up in FEED, the free enough enumerated dictionary, and writes the user's own dictionary entries with them — a coinage, a family word, a term from their field, a private name for a thing, or their own version of a word FEED already has — one column at a time, in FEED's house style. Use for "is X a word", "what does X mean", "look up X", "add X to my dictionary", "put this word in the dictionary", "I made up a word", "my family says X", "fix the entry for X", "my version of X", "define X for me and keep it". Not for translating text (that is the translator skill) and not for spelling or grammar checks of a document (that is analyzer's proofread).
 ---
 
 # lexicographer
 
-FEED, the **first-party enough english dictionary**, ships with enough: about
+FEED, the **free enough enumerated dictionary**, ships with enough: about
 117,000 headwords, each a row of columns. Beside it sits the user's **own
 dictionary**, which starts empty and holds only what they add. A word in both
 is the user's: their version wins everywhere in enough.
@@ -155,4 +155,4 @@ To change one column later, send only that column with
 uses the dictionary view.
 
 ---
-enough-tooltip-text: "use lexicographer to look words up in feed, enough's own english dictionary, and to add your own words — coinages, family words, terms from your field — or your own version of a word feed already has."
+enough-tooltip-text: "use lexicographer to look words up in feed, enough's own dictionary, and to add your own words — coinages, family words, terms from your field — or your own version of a word feed already has."

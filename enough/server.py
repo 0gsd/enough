@@ -1939,7 +1939,7 @@ def create_app(
         session=session,
     ))
 
-    # ---------- FEED (the first-party enough english dictionary) ----------
+    # ---------- FEED (the free enough enumerated dictionary) ----------
     #
     # Install-wide, not per project: `enough/dictionary.py` is the engine,
     # `enough/dictionary_api.py` the HTTP translation, and the router closes

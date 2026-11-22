@@ -23,16 +23,24 @@ with this summary.
 
 Two parts of this repository are first-party, by enough's author, but are
 **not** released under the Apache License 2.0 with the rest of enough: the
-dictionary, bundled for use within enough only with all rights reserved until
-a licence is published beside it, and the OES specifications with their
-manifests, published under CC BY 4.0 with a patent promise under OWFa 1.0.
+dictionary data, licensed under CC BY-SA 4.0, and the OES specifications with
+their manifests, published under CC BY 4.0 with a patent promise under OWFa 1.0.
 
-### FEED, the first-party enough english dictionary
+### FEED, the free enough enumerated dictionary
 
 `reflib/dict/` holds the public edition of the Enough Dictionary as JSON
 lines, which enough builds into its local dictionary database on first
-launch. Copyright © 2026 Graham Smith; see
-[reflib/dict/NOTICE.md](reflib/dict/NOTICE.md) for the terms.
+launch. Copyright © 2026 Graham Smith, licensed under the Creative Commons
+Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0,
+<https://creativecommons.org/licenses/by-sa/4.0/>). A copy carries the
+author, the dictionary's name and edition, and a link to this repository. The
+licence does not cover the names FEED and enough. Some columns draw on other
+works under their own terms: the synonyms on WordNet 3.1 (Princeton
+University, the WordNet licence), the first edition's pronunciation drafts on
+CMUdict (Carnegie Mellon University, BSD-style) and Wiktionary (CC BY-SA), and
+the frequency bands on wordfreq (CC BY-SA 4.0 data). See
+[reflib/dict/NOTICE.md](reflib/dict/NOTICE.md) for the terms and the WordNet
+notice.
 
 ### The OES specifications (MacroCOSM OES, Thym, Ascribe, Comprise OES)
 

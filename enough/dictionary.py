@@ -1,4 +1,4 @@
-"""FEED, the first-party enough english dictionary: build, read, and the user's own entries.
+"""FEED, the free enough enumerated dictionary: build, read, and the user's own entries.
 
 Two SQLite files under the state root (env `ENOUGH_DICT_ROOT`, default `~/enough/dict/`):
 

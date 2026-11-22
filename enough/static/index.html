@@ -11057,7 +11057,7 @@
     }
 
     /* ---------------- Dictionary mode (FEED, 0.4.1) ----------------
-       The first-party enough english dictionary as a printed page you
+       The free enough enumerated dictionary as a printed page you
        turn (design direction A, docs/feed-041-plan.md "FEED UI"): one page
        of two to four columns, hanging syllable-dotted headwords, guide
        words in the running head, the next page's first word in the foot,
@@ -19781,7 +19781,7 @@
         </div>
       </div>
 
-      <!-- Dictionary mode (FEED, 0.4.1): the first-party enough english
+      <!-- Dictionary mode (FEED, 0.4.1): the free enough enumerated
            dictionary as a printed page you turn. Read-only; a normal
            mode-stack citizen (name `dict`). Pages are measured, not
            scrolled: the frame holds as many entries as fit in two to four
@@ -20658,12 +20658,12 @@
           <img class="svg-icon" data-icon="hxc" alt="" draggable="false">
           <span data-i18n="prefs.help.label">help</span>
         </button>
-        <!-- FEED (0.4.1): the first-party enough english dictionary, in
+        <!-- FEED (0.4.1): the free enough enumerated dictionary, in
              its read-only dictionary mode (see #dict-mode). Project mode
              only: a home server has no /api/dict routes. -->
         <button type="button" class="help-center-launch" id="ui-dict-btn"
           data-i18n-title="dict.launch.title"
-          title="open the first-party enough english dictionary"
+          title="open the free enough enumerated dictionary"
           onclick="closeUIModal(); enterDictMode();">
           <img class="svg-icon" data-icon="feed" alt="" draggable="false">
           <span data-i18n="dict.launch.label">dictionary</span>
@@ -58536,7 +58536,7 @@
             title: t('dict.group.firstEdition', 'in the first edition') };
         case 'origin': return key === 'user'
           ? { lbl: t('dict.origin.yours', 'yours'), tab: t('dict.origin.yours', 'yours') }
-          : { lbl: t('dict.origin.feedLong', 'first-party enough english dictionary'),
+          : { lbl: t('dict.origin.feedLong', 'free enough enumerated dictionary'),
             tab: t('dict.origin.feed', 'feed') };
       }
       return { lbl, tab: lbl.slice(0, 4) };
@@ -58995,7 +58995,7 @@
       DICT.status = s;
       if (!s.available) {
         dictStateShow('<span class="big">' + dictEsc(t('dict.unavailable.title', 'no dictionary in this install'))
-          + '</span><p>' + dictEsc(t('dict.unavailable.body', 'the first-party enough english dictionary ships in reflib/dict, and this copy of enough does not have it. a fresh install brings it back.')) + '</p>');
+          + '</span><p>' + dictEsc(t('dict.unavailable.body', 'the free enough enumerated dictionary ships in reflib/dict, and this copy of enough does not have it. a fresh install brings it back.')) + '</p>');
         return false;
       }
       if (s.ready && !s.building) {
@@ -60015,7 +60015,7 @@
       const q = r.query || WDL.stack[WDL.stack.length - 1];
       const sugg = dictArr(r.suggestions);
       return '<header class="wdl-mast"><div><h2 class="wdl-hw missing" id="wdl-hw">' + dictEsc(q) + '</h2>'
-        + '<div class="wdl-sub">' + dictEsc(t('dict.wdl.missing', 'not in the first-party enough english dictionary')) + '</div></div></header>'
+        + '<div class="wdl-sub">' + dictEsc(t('dict.wdl.missing', 'not in the free enough enumerated dictionary')) + '</div></div></header>'
         + '<div class="wdl-missing"><p id="wdl-where"></p>'
         + (sugg.length ? '<p><span class="dict-sc" style="color:var(--fg-muted)">' + dictEsc(t('dict.wdl.perhaps', 'perhaps'))
           + '</span>&ensp;' + wdlRun(sugg) + '</p>' : '<p class="wdl-none">' + dictEsc(t('dict.wdl.noSuggestions', 'nothing close by, either.')) + '</p>')

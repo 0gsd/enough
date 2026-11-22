@@ -39,7 +39,7 @@ from an otherwise local turn (0.4.0 — see "`/pal`" under OPRO-API). A
 canvas — concludes into an answer, a document or **a whole new composure**
 (0.4.0; see "Councils"). An optional **wikisink** subsystem puts an offline
 copy of Wikipedia on the machine (see its own section below and
-[docs/WIKISINK.md](WIKISINK.md)). **FEED**, the first-party enough english
+[docs/WIKISINK.md](WIKISINK.md)). **FEED**, the free enough enumerated
 dictionary (0.4.1), ships as text in `reflib/dict/`, is built into a local
 SQLite file on first launch, and is read in its own full-frame mode, in a
 word lightbox, and from a right-click on any word (see "The dictionary
@@ -5702,7 +5702,7 @@ User-facing: HELP_CENTER §13.8. A holograph opens the same `#dialectic-modal`
 
 ## The dictionary (FEED)
 
-**FEED**, the **first-party enough english dictionary** (0.4.1): 116,911
+**FEED**, the **free enough enumerated dictionary** (0.4.1): 116,911
 headwords (209,829 words with their forms) as shipped in 0.6.0 —
 pack 042 added the MacroCOSM/Comprise terms of art (atem, cosm, minicosm,
 syuzhet …) and 19 OES senses of existing words, pack 044 the fabula
@@ -5715,7 +5715,7 @@ cap and no growth pack on a schedule. `reflib/dict/manifest.json`'s `headwords` 
 numbers, and a re-sync moves them — an original work, read-only to
 the user and to the readvisors, with a second **user dictionary** beside it
 that only the user's own words go into. Names are fixed: product name
-lowercase in the UI ("feed", "first-party enough english dictionary"); code
+lowercase in the UI ("feed", "free enough enumerated dictionary"); code
 prefix `dict` (module `enough/dictionary.py`, routes `/api/dict/*`, DOM ids
 `dict-*`, mode-stack name `dict`, i18n keys `dict.*`); the lightbox is the
 **word data lightbox**, ids `wdl-*`. User-facing doc: HELP_CENTER §14.
@@ -5748,12 +5748,19 @@ $ENOUGH_DICT_ROOT/user-dictionary.sqlite  the user's words, precious
   `{dictionary_version, schema_version, headwords, words, files: {relpath:
   sha256}, digest}` — `digest` is the sha256 of the sorted `relpath sha256`
   lines, **no timestamps**. Exit 0 synced / nothing to do, 1 `--check` found
-  changes, 2 no lexicon. `NOTICE.md` is hand-written and never touched.
+  changes, 2 no lexicon. `NOTICE.md` is hand-written; the sync only sets
+  the edition its attribution line names to `meta.jsonl`'s
+  `dictionary_version` (the release publishes that notice beside the
+  edition on the locker).
 - **`reflib/dict/` is not under the Apache licence.** Its `NOTICE.md`: ©
-  2026 Graham Smith, all rights reserved, bundled for use within enough
-  only, licence to be decided. Never hand-edit anything in it (rerun the
-  sync), never copy it elsewhere, and don't describe it as part of the
-  open-source tree. It is the only part of `reflib/` that ships:
+  2026 Graham Smith, the data licensed under CC BY-SA 4.0 (since
+  2026-11-22), with the attribution a copy carries (author, FEED's name and
+  edition, a link to the repository), the names FEED and enough not
+  licensed, and the columns drawn from other works (WordNet 3.1 synonyms,
+  whose notice it carries; CMUdict and Wiktionary pronunciation drafts;
+  wordfreq bands). Never hand-edit the data in it (rerun the sync), and
+  don't describe it as Apache-licensed: it is openly licensed data beside
+  the code, under its own terms. It is the only part of `reflib/` that ships:
   `desktop/src-tauri/build.rs`'s `SNAPSHOT` names `reflib/dict` (~380 MB),
   not `reflib`.
 - **The build** (`dictionary.build()`, via `ensure_built()`) runs when
@@ -7872,10 +7879,10 @@ A list of things that will confuse you if you don't see them coming:
   widen the roots: everything under them already reaches the prompt, and a
   new root would make `read_file` a door to something that doesn't.
   (`dict_guide` predates this and still reads the install's copy itself.)
-- **`reflib/dict/` is not open-source, and `user-dictionary.sqlite` is not
-  disposable.** The first is FEED's shipped text form, all rights reserved
-  (its `NOTICE.md`), regenerated only by `scripts/sync_dictionary.py` —
-  never hand-edited, never copied into another repo or package. The second
+- **`reflib/dict/` is not Apache-licensed, and `user-dictionary.sqlite` is not
+  disposable.** The first is FEED's shipped text form, CC BY-SA 4.0 (its
+  `NOTICE.md`), regenerated only by `scripts/sync_dictionary.py` —
+  never hand-edited; a copy elsewhere carries the notice's attribution. The second
   is the user's own words: no code path may rebuild, migrate-by-recreate or
   delete it; a schema change has to be an in-place migration. `feed.sqlite`
   is the opposite — delete it and the next launch rebuilds it.
@@ -8424,9 +8431,10 @@ Third-party content (the bundled `defaults/skills/` packages) carries
 its own licenses — see [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
 
 **Not covered by the Apache licence:** `reflib/dict/`, FEED's dictionary
-data. © 2026 Graham Smith, all rights reserved, bundled for use within
-enough only; a licence is still to be decided. Its
-[NOTICE.md](../reflib/dict/NOTICE.md) is authoritative.
+data. © 2026 Graham Smith, licensed under CC BY-SA 4.0
+(<https://creativecommons.org/licenses/by-sa/4.0/>); the names FEED and
+enough are not licensed. Its [NOTICE.md](../reflib/dict/NOTICE.md) is
+authoritative.
 
 **Nor are the OES specifications** (0.4.3; four since 0.5.4): MacroCOSM OES,
 Thym, Ascribe and Comprise OES ([docs/MACROCOSM_OES.md](MACROCOSM_OES.md),

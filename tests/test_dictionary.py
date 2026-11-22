@@ -1,4 +1,4 @@
-"""FEED, the first-party enough english dictionary: the sync filter, the build, reads, user entries, the routes.
+"""FEED, the free enough enumerated dictionary: the sync filter, the build, reads, user entries, the routes.
 
 Everything here runs against a small fixture lexicon written by the test (a few dozen rows), synced through the
 real `scripts/sync_dictionary.py` into a temp `reflib/dict`, and pointed at by `ENOUGH_DICT_SOURCE`. conftest
@@ -229,6 +229,19 @@ def test_sync_rerun_is_byte_stable_and_check_reports(tmp_path: Path, lexicon: Pa
     assert not (out / "words" / "x.jsonl").exists()
     assert (out / "NOTICE.md").read_text() == "hand-written\n"
     assert sync_dictionary.main(argv) == 0
+
+
+def test_sync_sets_the_edition_the_notice_names(tmp_path: Path, lexicon: Path):
+    out = tmp_path / "out"
+    sync_dictionary.sync(lexicon, out)
+    notice = "# FEED\n\n- FEED, the free enough enumerated dictionary, edition 0.9;\n- licensed CC BY-SA 4.0.\n"
+    (out / "NOTICE.md").write_text(notice, encoding="utf-8")
+    assert sync_dictionary.sync(lexicon, out, check=True)["changed"] == ["NOTICE.md"]
+    assert (out / "NOTICE.md").read_text(encoding="utf-8") == notice, "--check writes nothing"
+    r = sync_dictionary.sync(lexicon, out)
+    assert r["changed"] == ["NOTICE.md"]
+    assert (out / "NOTICE.md").read_text(encoding="utf-8") == notice.replace("edition 0.9", "edition 1.1")
+    assert sync_dictionary.sync(lexicon, out)["changed"] == []
 
 
 # ---------------------------------------------------------------------------

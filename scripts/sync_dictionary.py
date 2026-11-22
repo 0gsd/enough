@@ -19,7 +19,9 @@ Key order is preserved and lines are re-serialised the way the lexicon's exporte
 unchanged lexicon is byte-stable. Only files whose filtered content changed are rewritten; files with no source
 are removed. `manifest.json` records every file's sha256 and a digest over them (no timestamps), which is what
 `enough/dictionary.py` compares to decide whether an install's `feed.sqlite` needs rebuilding. `NOTICE.md` is
-hand-written and never touched here.
+hand-written (the CC BY-SA 4.0 terms and the attribution a copy carries); the sync only sets the edition its
+attribution line names ("the free enough enumerated dictionary, edition N") to `meta.jsonl`'s `dictionary_version`,
+so the notice the release publishes beside an edition names that edition.
 
 Exit status: 0 = synced (or, with --check, nothing to do); 1 = --check found changes; 2 = no lexicon.
 """
@@ -30,6 +32,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -44,6 +47,8 @@ NULLED = ("notes", "source", "corrected_on")
 LIVE = (None, "live")
 # Hand-written or generated here; never mirrored from the lexicon, never removed.
 OWN = frozenset({"manifest.json", "NOTICE.md"})
+# The one thing the sync writes into the hand-written NOTICE.md: the edition its attribution line names.
+NOTICE_EDITION = re.compile(r"(free enough enumerated dictionary, edition )([0-9][0-9.]*[0-9]|[0-9])")
 
 
 def _sha(data: bytes) -> str:
@@ -212,6 +217,15 @@ def sync(lexicon: Path, out: Path, *, check: bool = False) -> dict:
         if not check:
             _write(mpath, manifest)
     report["digest"] = json.loads(manifest)["digest"]
+    version = _meta_value(meta, "dictionary_version")
+    npath = out / "NOTICE.md"
+    if version and npath.is_file():
+        text = npath.read_text(encoding="utf-8")
+        stamped = NOTICE_EDITION.sub(lambda m: m.group(1) + version, text)
+        if stamped != text:
+            report["changed"].append("NOTICE.md")
+            if not check:
+                _write(npath, stamped.encode("utf-8"))
     return report
 
 
