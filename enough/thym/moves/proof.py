@@ -299,7 +299,13 @@ def _with_run(cat: dict, ctx: Any, model: str | None, **derived: Any) -> dict:
     d.update({k: v for k, v in derived.items() if v is not None})
     if model:
         d["model"] = model
-    d.setdefault("runs", []).append(_run_entry(ctx, model))
+    entry = _run_entry(ctx, model)
+    runs = d.setdefault("runs", [])
+    same = next((r for r in runs if isinstance(r, dict) and entry.get("run") and r.get("run") == entry["run"]), None)
+    if same is None:
+        runs.append(entry)
+    else:
+        same.update({k: v for k, v in entry.items() if k not in same})
     return c
 
 
@@ -725,6 +731,14 @@ def _dependency_items(fname: str, imports: list[dict], version: Any, inside: set
     return out
 
 
+def wording_item(wording: str) -> dict:
+    """`E:work/wording`: the public wording of the result, as the person gave it. What it says is hearsay."""
+    name = wording.replace("\\", "/").rsplit("/", 1)[-1]
+    return {"id": "E:work/wording", "type": "work", "name": name,
+            "summary": f"The public wording of the result, as the person gave it: {name}.",
+            "stance": "hearsay", "provenance": _code.prov([wording], 0.5)}
+
+
 def _means_item(toolchain: Any, source: str) -> dict:
     return {"id": "R:means/lean", "type": "means", "name": "Lean", "summary": "The proof is written in Lean 4.",
             "stance": "observed", "what": "Lean", "used-for": "the formal proof",
@@ -916,6 +930,8 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
                              hsrc.get("commit") or (toolchain if isinstance(toolchain, str) else None), inside)
     out += licence_items + _maker_items(fname, header, words)
     out.append(_means_item(toolchain if isinstance(toolchain, str) else None, fname))
+    if isinstance(src.get("wording"), str) and src["wording"].strip():
+        out.append(wording_item(src["wording"]))
     used |= {it["id"] for it in out}
     ids: dict[str, str] = {}
     decl_items: dict[str, dict] = {}
@@ -1163,6 +1179,8 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
         lic_items[0]["provenance"] = _code.prov([lic_files[0].path])
     out += lic_items
     out.append(_means_item(toolchain if isinstance(toolchain, str) else None, f.name + "/"))
+    if isinstance(hsrc.get("wording"), str) and hsrc["wording"].strip():
+        out.append(wording_item(hsrc["wording"]))
     total = {"sorry": 0, "axioms": 0, "native-decide": 0}
     for ol in outlines.values():
         for k, v in _counts(ol).items():
@@ -1717,10 +1735,8 @@ def fit_wording(ctx: Any, wording: Value, **mods: Any) -> Request | Value:
         if not isinstance(fits, list):
             raise ValueError("the answer holds no fits: list")
         used = set(taken)
-        work = {"id": _fresh("E:work/wording", used), "type": "work", "name": wname,
-                "summary": f"The public wording of the result, as the person gave it: {wname}.",
-                "stance": "hearsay", "provenance": _code.prov([wname], 0.5)}
-        new: list[dict] = [] if "E:work/wording" in taken else [work]
+        new: list[dict] = [] if "E:work/wording" in taken else [wording_item(wname)]
+        used.add("E:work/wording")
         seen: set[str] = set()
         for i, row in enumerate(fits, 1):
             of = _item_ref(row.get("of"), by_lean, ids) if isinstance(row, dict) else None

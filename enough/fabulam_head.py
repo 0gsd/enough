@@ -340,6 +340,28 @@ def tie_part(head: Path, part: Path) -> dict:
     return entry
 
 
+def refresh_neighbours(head: Path, part: Path) -> list[str]:
+    """A part's reliances on other parts, told again from the head as it stands: each `gives` is the `says` of the
+    head's item it is stated in. A part surveyed before its neighbours were read holds the question of them; this
+    answers it, by rule, before the part is read. Returns the ids it changed."""
+    hdoc = load(head)
+    said = {str(it.get("lean")): it.get("says") for it in _items(hdoc) if _kind(it) in DECL_KINDS}
+    twin = _twin(part)
+    changed = []
+    for it in _items(twin.doc):
+        if _kind(it) != "reliance" or not it.get("stated-in"):
+            continue
+        lean = it.get("lean")
+        lean = lean[0] if isinstance(lean, list) and lean else lean
+        says = said.get(str(lean))
+        if isinstance(says, str) and it.get("gives") != says:
+            it["gives"] = says
+            changed.append(str(it.get("id")))
+    if changed:
+        _dl.write_atomic(Path(part), twin.render())
+    return changed
+
+
 def stamp_parts(head: Path) -> list[dict]:
     """Each part's sha256 in the head's `parts`, written again from the files as they are now. Returns the entries."""
     twin = _twin(head)
@@ -354,5 +376,5 @@ def stamp_parts(head: Path) -> list[dict]:
 
 
 __all__ = ["ENTRIES", "PARTS_SUFFIX", "SAID", "SUFFIX", "TOOLCHAIN_FILE", "catalog_alone", "components",
-           "copy_upward", "fabulam_path", "home", "load", "module_of", "part_path", "stamp_parts", "summary",
-           "tie_part", "toolchain_root"]
+           "copy_upward", "fabulam_path", "home", "load", "module_of", "part_path", "refresh_neighbours",
+           "stamp_parts", "summary", "tie_part", "toolchain_root"]

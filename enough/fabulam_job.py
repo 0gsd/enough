@@ -589,6 +589,8 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
             if whole and c["told-in"] and not restart:
                 continue
             if not (whole and not restart):
+                if part.is_file() and not restart:      # its neighbours may have been read since it was surveyed
+                    _head.refresh_neighbours(head, part)
                 res = run_file_build(project_dir, src, mode=mode, why=why, route=route, model=model, calls=calls,
                                      llm_url=llm_url, scaffolds=scaffolds, restart=restart, runtime=make,
                                      progress=progress, should_stop=should_stop, now=now, job_calls=ceiling,
