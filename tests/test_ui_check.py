@@ -348,12 +348,31 @@ def test_every_step_verb_is_one_the_driver_implements():
     # open is about to replace.
     # `unlink` joined with the paradigm screens (0.8): a teardown taking back
     # a file its setup wrote, which the page has no route to delete.
+    # `wait_until`, `ready`, `eval_until` and `wait_settled` joined in 0.9 (U1):
+    # a step waits on the state it is measured on, and fails naming it.
     known = {"click", "key", "eval", "eval_await",
-             "wait_for", "wait_gone", "wait_idle", "unlink"}
+             "wait_for", "wait_gone", "wait_idle", "unlink",
+             "wait_until", "ready", "eval_until", "wait_settled"}
     for screen in screens.ALL_SCREENS:
         for verb, _arg in tuple(screen.setup) + tuple(screen.teardown):
             assert verb in known, f"{screen.name} uses unknown step {verb!r}"
     assert callable(Driver.run_steps)
+
+
+def test_no_step_waits_on_a_fixed_delay():
+    """0.9 (U1): late in a full sweep, steps that slept and then read state lost
+    the race. A pure delay (a promise that only resolves after N ms) is left in
+    one place, `_hold`, for negative claims, each caller saying why."""
+    import re
+    here = Path(__file__).resolve().parents[1] / "scripts" / "uicheck"
+    pure = re.compile(r"setTimeout\(\(\) => r\(true\), ")
+    for name in ("screens.py", "interactions.py"):
+        text = (here / name).read_text(encoding="utf-8")
+        hits = [m.start() for m in pure.finditer(text)]
+        allowed = text.index("def _hold(") if name == "interactions.py" else -1
+        bad = [i for i in hits if not (allowed >= 0 and allowed < i < allowed + 600)]
+        assert not bad, f"{name}: a fixed delay before a read at offset {bad[0]}"
+        assert "_sleep(" not in text.replace("`_sleep(d, ms)`", ""), f"{name} still calls _sleep"
 
 
 def test_a_screen_that_writes_a_paradigm_takes_it_back(tmp_path):

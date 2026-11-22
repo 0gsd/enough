@@ -51,6 +51,9 @@ PROBES_JS = (Path(__file__).resolve().parent / "probes.js").read_text(encoding="
 # cold machine under load never trips them.
 STEP_BUDGET_S = 45.0
 SCENARIO_BUDGET_S = 150.0
+#: A `ready` step's bound: the longest a card waits on its server (FEED's
+#: first page, a cold docs build) with room to spare, inside STEP_BUDGET_S.
+READY_BUDGET_S = 30.0
 
 
 class Wedged(RuntimeError):
@@ -157,6 +160,13 @@ class StepError(RuntimeError):
 class Driver:
     """One page, plus the vocabulary the screens and scenarios speak."""
 
+    #: `--cpu-throttle N` (0.9, U1): slow the page's CPU N times, as a loaded
+    #: machine late in a full sweep does, so a race shows in a short run.
+    cpu_throttle: float = 1.0
+    #: `--latency MS`: every request the page makes answers MS later, as a
+    #: busy scratch server does.
+    latency_ms: int = 0
+
     def __init__(self, page: Page, base_url: str, project: Path | None = None) -> None:
         self.page = page
         self.base_url = base_url
@@ -258,6 +268,13 @@ class Driver:
         reason the rest of this module can assume it exists.
         """
         self.page.evaluate(PROBES_JS, await_promise=False)
+        if self.cpu_throttle > 1:
+            self.page.send("Emulation.setCPUThrottlingRate", {"rate": self.cpu_throttle})
+        if self.latency_ms > 0:
+            self.page.send("Network.enable", {})
+            self.page.send("Network.emulateNetworkConditions",
+                           {"offline": False, "latency": self.latency_ms,
+                            "downloadThroughput": -1, "uploadThroughput": -1})
         self.wait_booted()
         self.wait_idle()
 
@@ -313,20 +330,71 @@ class Driver:
             await_promise=False))
 
     def wait_for(self, selector: str, *, timeout: float = 8.0) -> None:
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            if self.exists(selector):
-                return
-            time.sleep(0.02)
-        raise StepError(f"selector never appeared: {selector}")
+        if not self.poll(f"!!document.querySelector({json.dumps(selector)})", timeout=timeout):
+            raise StepError(f"selector never appeared in {timeout:g} s: {selector}")
 
     def wait_gone(self, selector: str, *, timeout: float = 8.0) -> None:
+        if not self.poll(f"!document.querySelector({json.dumps(selector)})", timeout=timeout):
+            raise StepError(f"selector never went away in {timeout:g} s: {selector}")
+
+    # -- waiting on state (0.9, U1) --------------------------------------
+    #
+    # The one vocabulary for "wait until the thing I am about to read is
+    # there": a condition polled in short calls (one evaluate never runs past
+    # the CDP reply limit on a loaded machine, which is why a loop inside one
+    # evaluate is not used for this), a bounded budget kept here, and a
+    # failure that names what it waited for. Late in a full sweep the page is
+    # slower than in a run of one scenario, and a step that read state after
+    # a fixed delay lost that race (0.8's integ-w5 and integ-w6).
+
+    #: The pause between two asks. It is not a wait on time: the condition is
+    #: asked again after it, and the budget is the bound.
+    POLL_S = 0.05
+
+    def poll(self, cond: str, *, timeout: float = 10.0) -> bool:
+        """Ask `cond` (a JS expression) until it is true or `timeout` runs out.
+        A throw in the page or a busy page that does not answer one ask is a
+        "not yet", inside the budget."""
+        probe = "(() => { try { return !!(%s); } catch (e) { return false; } })()" % cond
         deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            if not self.exists(selector):
-                return
-            time.sleep(0.02)
-        raise StepError(f"selector never went away: {selector}")
+        while True:
+            try:
+                if self.page.evaluate(probe, await_promise=False, timeout=10.0):
+                    return True
+            except CDPError:
+                pass
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(self.POLL_S)
+
+    def wait_until(self, cond: str, what: str | None = None, *, timeout: float = 20.0) -> None:
+        """`poll`, else a StepError that says what never came."""
+        if not self.poll(cond, timeout=timeout):
+            raise StepError(f"waited {timeout:g} s for {what or cond}; it never came")
+
+    def settled(self, sig: str | None = None, *, timeout: float = 8.0, frames: int = 2) -> bool:
+        """True once no finite animation or transition runs and `sig` (a JS
+        expression; default the page's size and element count) reads the same
+        across `frames` animation frames. Asked in calls of at most 3 s."""
+        fn = f"() => ({sig})" if sig else "null"
+        deadline = time.monotonic() + timeout
+        while True:
+            left = max(0.2, min(3.0, deadline - time.monotonic()))
+            try:
+                if self.page.evaluate(
+                        f"window.__uicheck ? __uicheck.settle({fn}, {int(left * 1000)}, {int(frames)})"
+                        f" : Promise.resolve(true)", timeout=left + 8.0):
+                    return True
+            except CDPError:
+                pass
+            if time.monotonic() >= deadline:
+                return False
+
+    def wait_settled(self, what: str, sig: str | None = None, *, timeout: float = 8.0,
+                     frames: int = 2) -> None:
+        """`settled`, else a StepError that names what never stopped moving."""
+        if not self.settled(sig, timeout=timeout, frames=frames):
+            raise StepError(f"waited {timeout:g} s for {what} to stop moving; it never did")
 
     def wait_idle(self, *, timeout: float = 20.0) -> None:
         try:
@@ -510,6 +578,27 @@ class Driver:
             self.wait_gone(arg)
         elif verb == "wait_idle":
             self.wait_idle()
+        elif verb == "wait_until":
+            # A condition the screen is about to be measured on (0.9, U1):
+            # the in-page loops that gave up silently and let the matrix
+            # measure a half-drawn card became this.
+            self.wait_until(arg)
+        elif verb == "eval_until":
+            # An async expression that waits in the page and RETURNS whether
+            # what it waited for came: false is a failure, named by the step.
+            if not self.js_await(arg, timeout=READY_BUDGET_S):
+                raise StepError("the page's own wait ended without what it waited for")
+        elif verb == "ready":
+            # A card or viewer has read what it shows (`arg`, a condition),
+            # and its paint after the read has settled. These were loops
+            # inside one evaluate that returned true whether or not the
+            # condition came, so a screen could be measured half-drawn.
+            self.wait_until(arg, timeout=READY_BUDGET_S)
+            self.wait_settled("the paint after the read", None)
+        elif verb == "wait_settled":
+            # Nothing moving and `arg` (a JS expression, or empty for the
+            # page's size) the same across two frames: the end of a slide.
+            self.wait_settled("the page", arg or None)
         elif verb == "unlink":
             self.unlink(arg)
         else:

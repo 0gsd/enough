@@ -6,6 +6,7 @@
     uv run python scripts/ui_check.py --update-baseline
     uv run python scripts/ui_check.py --screens read-full,girraph -v
     uv run python scripts/ui_check.py --scenarios dict-sorts-rail --langs es   # one scenario, one language
+    uv run python scripts/ui_check.py --scenarios composure-input-rules --langs de --cpu-throttle 4   # under load
 
 What it does: boots two scratch enough servers (a project one and a home
 one) through the real `python -m enough` entry, drives a headless Chrome
@@ -660,8 +661,14 @@ def main(argv: list[str] | None = None) -> int:
                     help="don't capture screenshots for new findings")
     ap.add_argument("--list", action="store_true",
                     help="print the screen registry and the matrix, run nothing")
+    ap.add_argument("--cpu-throttle", type=float, default=1.0, metavar="N",
+                    help="slow the pages' CPU N times (a loaded machine), to show a race in a short run")
+    ap.add_argument("--latency", type=int, default=0, metavar="MS",
+                    help="add MS of latency to every request the pages make (a busy server), for the same reason")
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args(argv)
+    Driver.cpu_throttle = max(1.0, args.cpu_throttle)
+    Driver.latency_ms = max(0, args.latency)
 
     if args.list:
         plan = build_plan(args)

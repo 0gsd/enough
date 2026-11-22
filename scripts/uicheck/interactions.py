@@ -667,11 +667,24 @@ def scenario_rv_minis_inside_main(d: Driver) -> list[str]:
 # reaches past the product's functions ends up testing itself.
 
 def _comp_blank(d: Driver) -> None:
-    """Back to a blank composure, with nothing queued."""
+    """Back to a blank composure, with nothing queued.
+
+    The open is AWAITED (0.9, U1). It used to be fired and forgotten, with a
+    `wait_idle` after it: the page's layout can stand still while
+    POST /api/composure/new is in flight, so late in a full sweep a scenario
+    went on typing into the document that the blank then replaced, and read
+    an empty page (composure-input-rules, 0.8's integ-w6)."""
     d.js("compToggleComments(false); compCloseMenus(); compSearchClear(true);"
          " compSetInkSelection(null); compSetMode('view');"
-         " compSetTool('pointer'); compSetSelection([]); compOpenNew('blank')")
+         " compSetTool('pointer'); compSetSelection([])")
+    d.js_await("(async () => { await compOpenNew('blank'); return true; })()", timeout=30)
+    d.wait_until("COMP.ready && !COMP.saving && !COMP.pending.length",
+                 "a blank composure, adopted, with nothing queued")
     d.wait_idle()
+
+
+#: The first page's rich text as the model holds it, for a wait on words typed.
+_RICH = "((COMP.model.modules[0].pages[0] || {}).rich || '')"
 
 
 def scenario_composure_input_rules(d: Driver) -> list[str]:
@@ -689,6 +702,8 @@ def scenario_composure_input_rules(d: Driver) -> list[str]:
     d.wait_for(".comp-page[contenteditable]")
     d.js("compEl('comp-modules').querySelector('.comp-page[contenteditable]')"
          ".focus()")
+    d.wait_until("document.activeElement && document.activeElement.matches('.comp-page[contenteditable]')",
+                 "the blank page's text to have the caret")
     # One insertText per character: an input rule fires when the block's
     # whole text IS the marker, so the events have to arrive one at a time.
     for ch in "- bullet":
@@ -697,6 +712,9 @@ def scenario_composure_input_rules(d: Driver) -> list[str]:
     for ch in "1. numbered":
         d.type_text(ch)
     d.wait_idle()
+    # The model takes the page's text on its own beat: wait for the words typed
+    # to be in it before reading its shape (0.9, U1).
+    _wait_js(d, _RICH + ".includes('numbered')")
     rich = (d.js("COMP.model.modules[0].pages[0].rich") or "").replace("\n", "")
     if "<ul><li>bullet</li></ul><ol><li>numbered</li></ol>" not in rich:
         fails.append(f"the ordered list is not a sibling of the bullet list: "
@@ -709,6 +727,7 @@ def scenario_composure_input_rules(d: Driver) -> list[str]:
     for ch in "plain":
         d.type_text(ch)
     d.wait_idle()
+    _wait_js(d, _RICH + ".includes('plain')")
     rich = (d.js("COMP.model.modules[0].pages[0].rich") or "").replace("\n", "")
     if not rich.rstrip().endswith("<p>plain</p>"):
         fails.append(f"Enter on an empty item did not leave the list: {rich!r}")
@@ -720,6 +739,7 @@ def scenario_composure_input_rules(d: Driver) -> list[str]:
     d.type_text("b")
     d.key("Tab")
     d.wait_idle()
+    _wait_js(d, _RICH + ".includes('<li>b</li>')")
     rich = (d.js("COMP.model.modules[0].pages[0].rich") or "").replace("\n", "")
     if "<ul><li>a<ul><li>b</li></ul></li></ul>" not in rich:
         fails.append(f"Tab did not nest the item under its predecessor: {rich!r}")
@@ -966,10 +986,8 @@ def scenario_composure_scaffolder(d: Driver) -> list[str]:
     # The lock: the confirm, then a closed canvas.
     d.js("void compScaffoldLock()")
     _confirm_ok(d)
-    for _ in range(40):
-        if d.js("compScaffoldLocked()"):
-            break
-        d.js_await("new Promise((r) => setTimeout(() => r(true), 100))")
+    _wait_js(d, "compScaffoldLocked() && compStage().classList.contains('comp-scaffold-locked')"
+                " && compEl('comp-title').readOnly")
     locked = d.js("({locked: compScaffoldLocked(), cls: compStage().classList"
                   ".contains('comp-scaffold-locked'),"
                   " title: compEl('comp-title').readOnly})")
@@ -988,10 +1006,7 @@ def scenario_composure_scaffolder(d: Driver) -> list[str]:
     old = d.js("COMP.path")
     d.js("void compScaffoldUnlock()")
     _confirm_ok(d)
-    for _ in range(40):
-        if d.js("COMP.path") != old:
-            break
-        d.js_await("new Promise((r) => setTimeout(() => r(true), 100))")
+    _wait_js(d, "COMP.path !== %s && !compScaffoldLocked() && (compScaffold() || {}).version === 2" % json.dumps(old))
     nxt = d.js("({path: COMP.path, locked: compScaffoldLocked(),"
                " version: (compScaffold() || {}).version})")
     if nxt["path"] == old or nxt["locked"] or nxt["version"] != 2:
@@ -1185,9 +1200,7 @@ def scenario_composure_council_setup(d: Driver) -> list[str]:
     _comp_blank(d)
     d.js_await("compOpenNew('council')")
     d.wait_idle()
-    d.js_await("(async () => { for (let i = 0; i < 160 &&"
-               " !document.querySelector('#cc-participants .cc-person'); i++)"
-               " await new Promise((r) => setTimeout(r, 50)); return true; })()")
+    d.wait_until("!!document.querySelector('#cc-participants .cc-person')", "the council's participants", timeout=15)
     if d.js("document.getElementById('comp-council-setup').hidden"):
         fails.append("a council in `setup` did not show the setup card")
     if not d.js("document.getElementById('comp-council-footer').hidden"):
@@ -1313,9 +1326,7 @@ def scenario_composure_council_controls(d: Driver) -> list[str]:
     # and without one, which is exactly the shape a 409 has: the server's own
     # words have to reach the footer's notice rather than the console.
     d.click("#cc-conclude")
-    d.js_await("(async () => { for (let i = 0; i < 300 &&"
-               " document.getElementById('cc-notice').hidden; i++)"
-               " await new Promise((r) => setTimeout(r, 50)); return true; })()")
+    _wait_js(d, "!document.getElementById('cc-notice').hidden", 15000)
     if d.js("document.getElementById('cc-notice').hidden"):
         fails.append("a refused control showed nothing at all")
     else:
@@ -1408,9 +1419,7 @@ def scenario_pal_gate_closed(d: Driver) -> list[str]:
     d.focus("#message")
     d.type_text("/pal which obligations slipped?")
     d.key("Enter")
-    d.js_await("(async () => { for (let i = 0; i < 200 &&"
-               " !document.querySelector('#conversation .msg.system'); i++)"
-               " await new Promise((r) => setTimeout(r, 50)); return true; })()")
+    _wait_js(d, "!!document.querySelector('#conversation .msg.system')")
     d.wait_idle()
     said = d.js("(() => { const el = document.querySelector("
                 "'#conversation .msg.system .body');"
@@ -1696,8 +1705,28 @@ def scenario_composure_inspector_is_clickable(d: Driver) -> list[str]:
 
 # --- 0.4.1 polish (U1) -----------------------------------------------------
 
-def _sleep(d: Driver, ms: int) -> None:
+# Waiting on state (0.9, U1). These replaced `_sleep(d, ms)`, a fixed delay
+# before a read: every step now waits on the element, value or geometry it is
+# about to read, within a bound, and a wait that runs out says what it waited
+# for. The one wait on time left is `_hold`, for a claim that something does
+# NOT happen, where there is no state to wait for.
+
+def _settle(d: Driver, what: str, sig: str | None = None, ms: int = 8000, frames: int = 2) -> None:
+    """Nothing animating and `sig` (the geometry or state about to be read; a
+    JS expression) the same across `frames` frames, else a StepError naming `what`."""
+    d.wait_settled(what, sig, timeout=ms / 1000, frames=frames)
+
+
+def _hold(d: Driver, ms: int) -> None:
+    """Let `ms` pass in the page. Only for a negative claim ("this did not
+    open"): there is no state to wait on, and the time given is the claim's
+    own window. Every caller says why."""
     d.js_await(f"new Promise((r) => setTimeout(() => r(true), {int(ms)}))")
+
+
+#: Rects of the chat column and its turns, for `_settle` in the chat scenarios.
+_CHAT_SIG = ("[...document.querySelectorAll('#conversation, #conversation .msg')]"
+             ".map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.right, r.top]; })")
 
 
 def scenario_chat_sides(d: Driver) -> list[str]:
@@ -1720,7 +1749,7 @@ def scenario_chat_sides(d: Driver) -> list[str]:
     d.wait_idle()
     for state in ("open", "full"):
         d.js(f"rvSetState('{state}')")
-        _sleep(d, 300)
+        _settle(d, f"the chat column at {state}", _CHAT_SIG)
         g = d.js("(() => { const c = document.getElementById('conversation');"
                  " const cs = getComputedStyle(c); const r = c.getBoundingClientRect();"
                  " const z = UIZ(); const pl = parseFloat(cs.paddingLeft) * z,"
@@ -1743,7 +1772,8 @@ def scenario_chat_sides(d: Driver) -> list[str]:
          + json.dumps("x" * 400 + " https://example.invalid/" + "a/b/" * 60))
     for z in (1, 1.1, 1.2):
         d.js(f"(() => {{ UI_SCALES.ui_scale = {z}; applyUIScales(); return true; }})()")
-        _sleep(d, 150)
+        _settle(d, f"the composer at ui {z}", "(() => { const t = document.getElementById('message');"
+                " return [t.scrollWidth, t.clientWidth, t.getBoundingClientRect().width]; })()")
         sw = d.js("(() => { const t = document.getElementById('message');"
                   " return [t.scrollWidth, t.clientWidth]; })()")
         if sw[0] > sw[1]:
@@ -1771,7 +1801,8 @@ def scenario_chat_tool_chip(d: Driver) -> list[str]:
                    " + '<div class=\"tool-indicators\"></div></div>';"
                    " const ev = (status) => es.dispatchEvent(new MessageEvent('tool', {data: JSON.stringify("
                    "{name: 'dict_lookup', key: '', status})}));"
-                   " ev('running'); ev('ok'); await new Promise((r) => setTimeout(r, 50));"
+                   " ev('running'); ev('ok');"
+                   " await __uicheck.settle(() => c.innerHTML, 3000);"
                    " const ti = c.querySelectorAll('.tool-indicators');"
                    " const chip = ti[1].querySelector('.tool-indicator');"
                    " return {chip: chip && chip.className, text: chip && chip.textContent,"
@@ -1804,7 +1835,9 @@ def scenario_topbar_no_collisions(d: Driver) -> list[str]:
     d.js("applyProjectName('a deliberately long project name that has to give way to the rest of the bar')")
     for z in (1, 1.1, 1.2):
         d.js(f"(() => {{ UI_SCALES.ui_scale = {z}; applyUIScales(); return true; }})()")
-        _sleep(d, 200)
+        _settle(d, f"the top bar at ui {z}",
+                "[...document.querySelectorAll('.topbar, .topbar *')].slice(0, 80)"
+                ".map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.width]; })")
         g = d.js("""(() => {
           const R = (el) => el.getBoundingClientRect();
           const bar = document.querySelector('.topbar');
@@ -1848,24 +1881,32 @@ def scenario_composure_autofit(d: Driver) -> list[str]:
     pan = ("(() => { COMP.origin = {x: COMP.origin.x + 260, y: COMP.origin.y + 90};"
            " COMP.zoomed = true; compApplyView(false); return true; })()")
     centred = lambda o: o and abs(o[0]) <= 2 and abs(o[1]) <= 2  # noqa: E731
+    # The page's own state says when a fit is owed: `_compFitT` is its pending
+    # timer (COMP_AUTOFIT_SETTLE_MS after the last resize) and `_compFitTries`
+    # counts the fits a drag has put off (0.9, U1: these were fixed sleeps).
+    centred_js = ("(() => { const o = %s; return Math.abs(o[0]) <= 2 && Math.abs(o[1]) <= 2; })()" % off)
+    fit_done = "!_compFitT && !document.getElementById('comp-world').classList.contains('comp-eased')"
     d.js(pan)
     d.click("#toggle-sidebar")
-    _sleep(d, 700)
+    _wait_js(d, centred_js + " && " + fit_done, 8000)
     if not centred(d.js(off)):
         fails.append(f"hiding the sidebar did not refit the plane: {d.js(off)}")
     d.js(pan)
     d.js("COMP.drag = {kind: 'pan'}")
+    d.js("_compFitTries = 0")
     d.click("#toggle-sidebar")
-    _sleep(d, 600)
+    # The fit has come due and been put off by the drag at least once: what
+    # would have refitted has had its turn.
+    _wait_js(d, "_compFitTries > 0", 8000)
     if centred(d.js(off)):
         fails.append("the plane was refitted in the middle of a drag")
     d.js("COMP.drag = null")
-    _sleep(d, 600)
+    _wait_js(d, centred_js + " && " + fit_done, 8000)
     if not centred(d.js(off)):
         fails.append(f"the deferred fit never landed after the drag: {d.js(off)}")
     d.js(pan)
     d.js("rvSetState(RV_STATE === 'closed' ? 'open' : 'closed')")
-    _sleep(d, 700)
+    _wait_js(d, centred_js + " && " + fit_done, 8000)
     if not centred(d.js(off)):
         fails.append(f"toggling the readvisor panel did not refit: {d.js(off)}")
     d.js("rvSetState('open')")
@@ -2086,7 +2127,9 @@ def _cmd_f(d: Driver) -> None:
 def _scales(d: Driver, ui: float, txt: float) -> None:
     d.js(f"(() => {{ UI_SCALES.ui_scale = {ui}; UI_SCALES.text_scale = {txt};"
          " applyUIScales(); return true; })()")
-    _sleep(d, 200)
+    _settle(d, f"the page at ui {ui}, text {txt}",
+            "(() => { const b = document.getElementById('docs-body') || document.body;"
+            " return [b.scrollHeight, b.clientWidth, b.getBoundingClientRect().width]; })()")
 
 
 _FIND_OPEN = "!document.getElementById('docs-find').hidden"
@@ -2108,7 +2151,7 @@ def _docs_open(d: Driver, doc: str, density: str = "short", anchor: str | None =
     if anchor:
         opts["anchor"] = anchor
     d.js_await("(async () => { await enterDocsMode(" + json.dumps(opts) + "); return true; })()")
-    d.js_await(DOCS_READY[1])
+    d.wait_until(DOCS_READY[1], "the docs viewer's document", timeout=30)
     d.wait_for({"short": "#docs-body .docs-sec h2[id]", "atem": "#docs-body .docs-outline",
                 "fabula": "#docs-body .cosm-card.docs-prism"}[density])
     d.wait_idle()
@@ -2172,7 +2215,7 @@ def scenario_docs_find_contents(d: Driver) -> list[str]:
     elif not d.js("document.activeElement.classList.contains('find-q')"):
         fails.append(f"⌘F opened the bar but focus is on {_active(d)}")
     d.type_text("composure")
-    _sleep(d, 350)
+    _wait_js(d, "(DOCS_FIND.state() || {}).n >= 3")
     st = d.js("DOCS_FIND.state()")
     if not st or st["n"] < 3:
         fails.append(f"find 'composure' in the manual: {st}")
@@ -2221,7 +2264,9 @@ def scenario_docs_find_contents(d: Driver) -> list[str]:
         fails.append("⌘F with the caret in the chat composer opened help's find")
     # Mini: the contents list drops over the text and esc folds it first.
     d.js("document.activeElement.blur(); docsToggleSize(); docsTocToggle(true)")
-    _sleep(d, 200)
+    _settle(d, "help at mini with its contents sheet",
+            "(() => { const t = document.getElementById('docs-toc'), m = document.getElementById('docs-mode');"
+            " return [getComputedStyle(t).position, m.getBoundingClientRect().width]; })()")
     sheet = d.js("getComputedStyle(document.getElementById('docs-toc')).position")
     if sheet != "absolute":
         fails.append(f"in mini the contents list is not a sheet ({sheet})")
@@ -2247,7 +2292,7 @@ def scenario_chat_intro(d: Driver) -> list[str]:
     d.reload()
     d.wait_idle()
     d.js("rvSetState('open')")
-    _sleep(d, 200)
+    _wait_js(d, "!!document.querySelector('#empty-hint .intro-link')")
     if not d.exists("#empty-hint .intro-link"):
         fails.append("the empty conversation has no 'a brief introduction' link")
         return fails
@@ -2258,7 +2303,9 @@ def scenario_chat_intro(d: Driver) -> list[str]:
         fails.append("asking for the intro produced no rendered intro bubble")
         d.js_await("fetch('/api/reset').then(() => true)")
         return fails
-    _sleep(d, 400)
+    # The turn is over when the composer is given back (what `off` reads below).
+    _wait_js(d, "!document.getElementById('message').disabled && !document.getElementById('send-btn').disabled")
+    _settle(d, "the intro bubble", "document.querySelector('.msg.intro').innerHTML")
     g = d.js("(() => { const m = document.querySelector('.msg.intro');"
              " const b = m.querySelector('.body');"
              " return {user: !!document.querySelector('.msg.user'),"
@@ -2277,7 +2324,7 @@ def scenario_chat_intro(d: Driver) -> list[str]:
         fails.append("the composer stayed disabled after the intro")
     for state in ("open", "full"):
         d.js(f"rvSetState('{state}')")
-        _sleep(d, 300)
+        _settle(d, f"the chat column at {state}", _CHAT_SIG)
         w = d.js("(() => { const c = document.getElementById('conversation');"
                  " const cs = getComputedStyle(c), r = c.getBoundingClientRect(), z = UIZ();"
                  " const inL = r.left + parseFloat(cs.paddingLeft) * z,"
@@ -2289,7 +2336,7 @@ def scenario_chat_intro(d: Driver) -> list[str]:
     d.js("rvSetState('open')")
     d.reload()
     d.wait_idle()
-    _sleep(d, 300)
+    _wait_js(d, "!!document.querySelector('.msg.intro .body[data-md-rendered] strong')")
     if not d.js("!!document.querySelector('.msg.intro .body[data-md-rendered] strong')"):
         fails.append("after a reload the intro is not rendered from history")
     d.js_await("fetch('/api/reset').then(() => true)")
@@ -2304,7 +2351,7 @@ def _dict_open(d: Driver, word: str | None = None) -> None:
     d.js(DICT_PLAIN[1])
     d.js(f"enterDictMode({json.dumps({'word': word} if word else {})})")
     d.wait_for("#dict-mode.open")
-    d.js_await(DICT_READY[1], timeout=25)
+    d.wait_until(DICT_READY[1], "the dictionary's first page", timeout=30)
     d.wait_idle()
 
 
@@ -2317,6 +2364,18 @@ def _dict_page(d: Driver) -> dict:
                 " next: (document.querySelector('#dict-next .cw') || {}).textContent,"
                 " overflowX: document.getElementById('dict-mode').scrollWidth"
                 " > document.getElementById('dict-mode').clientWidth + 1}; })()") or {}
+
+
+#: The dictionary shows the page that starts at entry %d, drawn.
+_DICT_AT = "DICT.start === %d && !!document.querySelector('#dict-flow .dict-e')"
+#: What a dictionary page is, for `_settle`: where it starts, how many fit, and its entries' frame. A re-pagination
+#: after a resize (the panel's slide, then the page's own measure) changes one of these until it is done.
+_DICT_SIG = ("[DICT.start, DICT.fit, document.querySelectorAll('#dict-flow .dict-e').length,"
+             " document.getElementById('dict-flow').getBoundingClientRect().width]")
+#: Frames `_DICT_SIG` must hold still after a resize. The page re-paginates 90 ms after the frame's last resize, on a
+#: timer inside a closure the harness cannot read, so "settled" has to outlast that timer: 10 frames is about 160 ms.
+#: The one place a settle is given a length, and the length is the page's own timer's.
+_DICT_QUIET = 10
 
 
 def _right_click(d: Driver, root_sel: str, word: str, *, shift: bool = False) -> dict | None:
@@ -2335,7 +2394,10 @@ def _right_click(d: Driver, root_sel: str, word: str, *, shift: bool = False) ->
         d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": pos["x"], "y": pos["y"],
                                                  "button": "right", "buttons": buttons,
                                                  "clickCount": 1, "modifiers": mods})
-    _sleep(d, 120)
+    # The menu opens on contextmenu, or the system menu is left alone (shift). Waiting for it to open is a wait on
+    # state; when the caller expects it NOT to open, the 1.5 s this then runs out is that claim's window.
+    _wait_js(d, "!document.getElementById('dict-ctx-menu').hidden", 1500)
+    _settle(d, "the dictionary menu", "document.getElementById('dict-ctx-menu').innerText")
     return d.js("(() => { const m = document.getElementById('dict-ctx-menu');"
                 " return {open: !m.hidden, text: m.innerText}; })()")
 
@@ -2352,7 +2414,7 @@ def scenario_dict_open_flip(d: Driver) -> list[str]:
     d.wait_for("#ui-modal:not(.hidden)")
     d.click("#ui-dict-btn")
     d.wait_for("#dict-mode.open")
-    d.js_await(DICT_READY[1], timeout=25)
+    d.wait_until(DICT_READY[1], "the dictionary's first page", timeout=30)
     d.wait_idle()
     if d.js("modeTop() && modeTop().name") != "dict":
         fails.append(f"the launcher did not push `dict`: {_names(d)}")
@@ -2373,23 +2435,23 @@ def scenario_dict_open_flip(d: Driver) -> list[str]:
         fails.append("dictionary mode overflows horizontally")
     d.focus("#dict-frame")
     d.key("ArrowRight")
-    _sleep(d, 250)
+    _wait_js(d, _DICT_AT % (p0["start"] + p0["fit"]))
     p1 = _dict_page(d)
     if p1.get("start") != p0["start"] + p0["fit"] or p1.get("first") != p0.get("next"):
         fails.append(f"→ went to {p1.get('start')} ({p1.get('first')!r}), not "
                      f"{p0['start'] + p0['fit']} ({p0.get('next')!r})")
     d.key("ArrowLeft")
-    _sleep(d, 250)
+    _wait_js(d, _DICT_AT % p0["start"])
     if _dict_page(d).get("start") != p0["start"]:
         fails.append(f"← did not come back to the first page: {_dict_page(d)}")
     first = _dict_page(d).get("first")
     d.js("rvSetState('open')")
-    _sleep(d, 500)
+    _settle(d, "the dictionary page beside the docked panel", _DICT_SIG, frames=_DICT_QUIET)
     after = _dict_page(d)
     if after.get("first") != first:
         fails.append(f"docking the panel moved the page: first {first!r} → {after.get('first')!r}")
     d.js("rvSetState('closed')")
-    _sleep(d, 300)
+    _settle(d, "the dictionary page with the panel closed", _DICT_SIG, frames=_DICT_QUIET)
     d.key("Escape")
     d.wait_idle()
     if "dict" in _names(d):
@@ -2476,21 +2538,25 @@ def scenario_dict_paging(d: Driver) -> list[str]:
         seen.append(d.js("(() => { const n = document.querySelector('#dict-folio .num');"
                          " return n ? +n.textContent.replace(/[^0-9]/g, '') : null; })()"))
         d.key("ArrowRight")
-        _sleep(d, 250)
+        _wait_js(d, "(() => { const n = document.querySelector('#dict-folio .num');"
+                    " return !!n && +n.textContent.replace(/[^0-9]/g, '') !== %s; })()" % json.dumps(seen[-1]))
     if None in seen or any(b <= a for a, b in zip(seen, seen[1:])):
         fails.append(f"the folio did not count up while paging forward: {seen}")
     for word in ("gloaming", "zymurgy"):
         r = d.js_await("(async () => { DICT.avg = 4; await dictJumpTo(" + json.dumps(word) + ");"
-                       " await new Promise((r) => setTimeout(r, 400)); await dictPrev();"
-                       " await new Promise((r) => setTimeout(r, 600));"
+                       " await __uicheck.settle(() => " + _DICT_SIG + ", 6000, " + str(_DICT_QUIET) + ");"
+                       " await dictPrev();"
+                       " await __uicheck.settle(() => " + _DICT_SIG + ", 6000, " + str(_DICT_QUIET) + ");"
                        " const st = dictStore(), s = DICT.start, f = DICT.fit;"
                        " const roomy = s > 0 && dictFitsAll(st, s - 1, s + f);"
                        " await dictShow(s, {keepBack: true, limit: f});"
                        " return {s, f, roomy}; })()", timeout=25) or {}
         if r.get("roomy"):
             fails.append(f"← after a jump to {word!r} left room for another entry: {r}")
-    r = d.js_await("(async () => { await dictShow(3); await new Promise((r) => setTimeout(r, 400));"
-                   " await dictPrev(); await new Promise((r) => setTimeout(r, 600));"
+    r = d.js_await("(async () => { await dictShow(3);"
+                   " await __uicheck.settle(() => " + _DICT_SIG + ", 6000, " + str(_DICT_QUIET) + ");"
+                   " await dictPrev();"
+                   " await __uicheck.settle(() => " + _DICT_SIG + ", 6000, " + str(_DICT_QUIET) + ");"
                    " return {s: DICT.start, f: DICT.fit}; })()", timeout=20) or {}
     if r.get("s") != 0 or (r.get("f") or 0) <= 3:
         fails.append(f"← near the top did not turn to a full first page: {r}")
@@ -2507,24 +2573,27 @@ def scenario_dict_search_jump(d: Driver) -> list[str]:
     _dict_open(d, "lantern")
     before = _dict_page(d).get("start")
     _cmd_f(d)
-    _sleep(d, 100)
+    _wait_js(d, "document.activeElement && document.activeElement.id === 'dict-q'", 3000)
     if _active(d) != "#dict-q":
         fails.append(f"⌘F in dictionary mode focused {_active(d)}, not the search")
     d.type_text("twilight")
-    _sleep(d, 900)
+    _wait_js(d, "DICT.view.q === 'twilight' && !!dictStore().total"
+                " && !!document.querySelector('#dict-flow mark, #dict-flow .dict-hw.hit')", 15000)
     r = d.js("(() => ({q: DICT.view.q, total: dictStore().total,"
              " hits: document.querySelectorAll('#dict-flow mark, #dict-flow .dict-hw.hit').length}))()") or {}
     if r.get("q") != "twilight" or not r.get("total") or not r.get("hits"):
         fails.append(f"searching did not show marked matches: {r}")
     d.key("Escape")
-    _sleep(d, 500)
+    _wait_js(d, "!DICT.view.q && !document.getElementById('dict-q').value && DICT.start === %s" % json.dumps(before),
+             15000)
     r = d.js("(() => ({q: DICT.view.q, start: DICT.start, value: document.getElementById('dict-q').value}))()") or {}
     if r.get("q") or r.get("value") or r.get("start") != before:
         fails.append(f"esc in the search did not clear it and go back: {r} (was at {before})")
     d.focus("#dict-q")
     d.type_text("gloaming")
     d.key("Enter")
-    _sleep(d, 1200)
+    _wait_js(d, "!DICT.view.q && DICT.sel === 'gloaming'"
+                " && !!document.querySelector('#dict-flow .dict-e[data-w=\"gloaming\"]')", 15000)
     r = d.js("(() => ({q: DICT.view.q, sel: DICT.sel,"
              " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"gloaming\"]')}))()") or {}
     if r.get("q") or r.get("sel") != "gloaming" or not r.get("on"):
@@ -2534,10 +2603,11 @@ def scenario_dict_search_jump(d: Driver) -> list[str]:
     r = d.js_await("(async () => { const f0 = window.fetch;"
                    " window.fetch = (u, ...a) => (String(u).includes('/api/dict/position')"
                    " && String(u).includes('word=zymurgy'))"
+                   # The 700 ms is the fault this injects (a slow answer to the first jump), not a wait.
                    " ? new Promise((res) => setTimeout(res, 700)).then(() => f0(u, ...a)) : f0(u, ...a);"
                    " try { await Promise.all([dictJumpTo('zymurgy'), dictJumpTo('lantern')]); }"
                    " finally { window.fetch = f0; }"
-                   " await new Promise((r) => setTimeout(r, 300));"
+                   " await __uicheck.settle(() => [DICT.sel, " + _DICT_SIG + "], 6000, " + str(_DICT_QUIET) + ");"
                    " return {sel: DICT.sel,"
                    " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')}; })()",
                    timeout=20) or {}
@@ -2559,7 +2629,7 @@ def scenario_dict_wdl_a11y(d: Driver) -> list[str]:
          " || document.querySelector('#dict-flow .dict-e');"
          " e.dispatchEvent(new MouseEvent('dblclick', {bubbles: true})); return true; })()")
     d.wait_for("#wdl-modal:not(.hidden)")
-    d.js_await(WDL_READY[1])
+    d.wait_until(WDL_READY[1], "the lightbox's plate", timeout=30)
     d.wait_idle()
     if d.js("document.getElementById('wdl-modal').getAttribute('aria-hidden')") != "false":
         fails.append("#wdl-modal: aria-hidden is not 'false' while it is open")
@@ -2590,6 +2660,11 @@ def scenario_dict_wdl_a11y(d: Driver) -> list[str]:
     return fails
 
 
+#: The lightbox has drawn the plate of headword %s, neighbours and all (`wdlRender` sets `WDL.nb` to null as it
+#: paints and fills it last); spliced with `% "word"`. WDL_READY alone is true of the plate already showing.
+_WDL_HW = "(document.getElementById('wdl-hw') || {}).textContent === '%s' && !!WDL.nb"
+
+
 def scenario_dict_wdl_walk(d: Driver) -> list[str]:
     """Every word in the plate walks it; the walk is kept (trail + back);
     ←/→ step through the current order; a form resolves to its headword;
@@ -2600,48 +2675,48 @@ def scenario_dict_wdl_walk(d: Driver) -> list[str]:
     _dict_open(d)
     d.js("wdlOpen('gloaming', {fromDict: true})")
     d.wait_for("#wdl-modal:not(.hidden)")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 400)
+    d.wait_until(WDL_READY[1], "the lightbox's plate")
+    # WDL_READY is true of the plate already showing, so each step below waits for the plate it asked for.
+    d.wait_until(_WDL_HW % "gloaming" + " && !!document.querySelector('#wdl-scroll .wdl-w[data-go=\"twilight\"]')",
+                 "gloaming's plate with its synonym twilight")
     d.click("#wdl-scroll .wdl-w[data-go=\"twilight\"]")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 300)
+    _wait_js(d, _WDL_HW % "twilight" + " && WDL.stack.length === 2")
     r = d.js("(() => ({hw: document.getElementById('wdl-hw').textContent, stack: WDL.stack.slice(),"
              " crumbs: document.querySelectorAll('#wdl-trail [data-trail]').length,"
              " back: !document.getElementById('wdl-back').disabled}))()") or {}
     if r.get("hw") != "twilight" or r.get("stack") != ["gloaming", "twilight"] or not r.get("crumbs") or not r.get("back"):
         fails.append(f"clicking a synonym did not walk the plate: {r}")
     d.click("#wdl-back")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 400)
+    _wait_js(d, _WDL_HW % "gloaming")
     if d.js("document.getElementById('wdl-hw').textContent") != "gloaming":
         fails.append("back did not return to gloaming")
     nxt = d.js("WDL.nb && WDL.nb.next")
     d.focus("#wdl-scroll")
     d.key("ArrowRight")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 400)
+    if nxt:
+        _wait_js(d, _WDL_HW % nxt)
     if not nxt or d.js("document.getElementById('wdl-hw').textContent") != nxt:
         fails.append(f"→ did not step to the next entry {nxt!r}")
     d.js("wdlNav('gloamings')")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 300)
+    _wait_js(d, _WDL_HW % "gloaming" + " && ((document.querySelector('.wdl-matched') || {}).textContent || '')"
+                ".includes('gloamings')")
     r = d.js("(() => ({hw: document.getElementById('wdl-hw').textContent,"
              " note: (document.querySelector('.wdl-matched') || {}).textContent || ''}))()") or {}
     if r.get("hw") != "gloaming" or "gloamings" not in r.get("note", ""):
         fails.append(f"a form did not resolve to its headword with a note: {r}")
     d.js("wdlNav('glomrify')")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 600)
+    _wait_js(d, "!!document.querySelector('.wdl-hw.missing') && !!WDL.nb"
+                " && ((document.getElementById('wdl-where') || {}).textContent || '').includes('glom')")
     r = d.js("(() => ({missing: !!document.querySelector('.wdl-hw.missing'),"
              " where: (document.getElementById('wdl-where') || {}).textContent || ''}))()") or {}
     # the sentence is translated; the neighbouring words (glom…) are not
     if not r.get("missing") or "glom" not in r.get("where", ""):
         fails.append(f"the not-found plate did not say where it would fall: {r}")
     d.js("wdlNav('lantern')")
-    d.js_await(WDL_READY[1])
-    _sleep(d, 300)
+    d.wait_until(_WDL_HW % "lantern" + " && !!document.getElementById('wdl-show')", "lantern's plate")
     d.click("#wdl-show")
-    _sleep(d, 900)
+    _wait_js(d, "!wdlIsOpen() && DICT.sel === 'lantern'"
+                " && !!document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')", 15000)
     r = d.js("(() => ({wdl: wdlIsOpen(), top: modeTop() && modeTop().name, sel: DICT.sel,"
              " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')}))()") or {}
     if r.get("wdl") or r.get("top") != "dict" or r.get("sel") != "lantern" or not r.get("on"):
@@ -2665,7 +2740,7 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
     else:
         d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
         d.wait_for("#wdl-modal:not(.hidden)")
-        d.js_await(WDL_READY[1])
+        d.wait_until(WDL_READY[1], "the lightbox's plate", timeout=30)
         if d.js("document.getElementById('wdl-hw').textContent") != "paragraph":
             fails.append("the menu did not open the lightbox on the word")
         if d.js("modeTop() && modeTop().name") != "readedit":
@@ -2673,8 +2748,7 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
         m = _right_click(d, "#wdl-scroll .wdl-def", "text")
         if m and m.get("open"):
             d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
-            d.js_await(WDL_READY[1])
-            _sleep(d, 300)
+            _wait_js(d, "WDL.stack.slice(-1)[0] === 'text' && !!WDL.nb")
             if d.js("WDL.stack.slice(-1)[0]") != "text":
                 fails.append("the menu inside the lightbox did not walk it")
         else:
@@ -2688,7 +2762,9 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
     for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
         d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": off["x"], "y": off["y"],
                                                  "button": "right", "buttons": buttons, "clickCount": 1})
-    _sleep(d, 120)
+    # A negative: the menu must NOT open. There is no state to wait for; 300 ms is the window in which an
+    # opening menu (it opens on the contextmenu event itself) would have shown.
+    _hold(d, 300)
     if d.js("!document.getElementById('dict-ctx-menu').hidden"):
         fails.append("a right-click off any word opened the dictionary menu")
     d.js("dictCtxClose()")
@@ -2700,7 +2776,8 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
                      f"(page {_dict_page(d)}, rv {_rv(d)})")
     else:
         d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
-        _sleep(d, 900)
+        _wait_js(d, "DICT.sel === 'candlelight' && !wdlIsOpen()"
+                    " && !!document.querySelector('#dict-flow .dict-e[data-w=\"candlelight\"]')", 15000)
         r = d.js("(() => ({sel: DICT.sel, on: !!document.querySelector('#dict-flow .dict-e[data-w=\"candlelight\"]'),"
                  " wdl: wdlIsOpen()}))()") or {}
         if r.get("sel") != "candlelight" or not r.get("on") or r.get("wdl"):
@@ -2756,7 +2833,7 @@ def scenario_canon_open_catalog(d: Driver) -> list[str]:
     _dblclick(d, cat)
     try:
         d.wait_for("#cosm-mode.open")
-        d.js_await(COSM_READY[1])
+        d.wait_until(COSM_READY[1], "the cosm viewer's volume", timeout=30)
     except StepError:
         fails.append("double-clicking canon.cosm did not open the cosm viewer")
         _reset(d)
@@ -2788,7 +2865,7 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
     _reset(d)
     resident = _names(d)
     d.js_await(f"enterCosmMode('{HOLOTYPE}').then(() => true)")
-    d.js_await(COSM_READY[1])
+    d.wait_until(COSM_READY[1], "the cosm viewer's volume", timeout=30)
     lenses = d.js("Array.from(document.getElementById('cosm-lens').options).map((o) => o.value)"
                   ".filter(Boolean)")
     if "map" not in (lenses or []):
@@ -2815,10 +2892,8 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
     # Switch lenses in place: the picker redraws, the stack does not grow.
     d.js("(() => { const s = document.getElementById('mm-lens'); s.value = 'tree';"
          " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()")
-    d.js_await("(async () => { for (let i = 0; i < 200 && !(MM_CURRENT && MM_CURRENT.lens"
-               " && MM_CURRENT.lens.lens === 'tree' && document.querySelector("
-               "'#merirmaid-body g.pele-node')); i++) await new Promise((r) => setTimeout(r, 50));"
-               " return true; })()")
+    _wait_js(d, "MM_CURRENT && MM_CURRENT.lens && MM_CURRENT.lens.lens === 'tree'"
+                " && !!document.querySelector('#merirmaid-body g.pele-node')")
     sw = d.js("(() => ({lens: MM_CURRENT && MM_CURRENT.lens && MM_CURRENT.lens.lens,"
               " crumbs: document.getElementById('mm-crumbs').textContent,"
               " stack: MODE_STACK.filter((e) => e.name === 'merirmaid').length}))()")
@@ -2840,7 +2915,12 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
         _reset(d)
         return fails
     d.click('#mm-node-menu .ctx-item[data-act="lens-show"]')
-    _sleep(d, 400)
+    card_js = ("document.querySelector('#cosm-body .cosm-card[data-key=\"' + CSS.escape(%s) + '\"]')"
+               % json.dumps(node))
+    _wait_js(d, "modeTop() && modeTop().name === 'cosm' && !MODE_STACK.some((e) => e.name === 'merirmaid')"
+                " && !!" + card_js)
+    _settle(d, "the item's card scrolled to", "(() => { const c = " + card_js + ";"
+            " return c ? c.getBoundingClientRect().top : null; })()")
     back = d.js("(() => { const c = document.querySelector('#cosm-body .cosm-card[data-key=\"'"
                 " + CSS.escape(%s) + '\"]'); const body = document.getElementById('cosm-body');"
                 " const b = c && c.getBoundingClientRect(), br = body.getBoundingClientRect();"
@@ -2935,7 +3015,8 @@ def scenario_docs_contents(d: Driver) -> list[str]:
     # stand-in); the back pill returns to the link (docs-term-roundtrip has
     # the rest).
     d.js("refJump('docs-sec-18-4', DOCS_CTX)")
-    _sleep(d, 100)
+    _wait_js(d, "!!document.getElementById('docs-sec-18-4')")
+    _settle(d, "the jump to §18.4", _TOP_OF % "'docs-sec-18-4'")
     t = d.js("(() => { const a = document.getElementById('docs-sec-18-4').closest('.docs-sec')"
              ".querySelector('a.docs-term'); if (!a) return null; a.focus(); a.click();"
              " return a.dataset.term; })()")
@@ -3015,13 +3096,13 @@ def scenario_docs_contents(d: Driver) -> list[str]:
     _reset(d)
     d.js(f"enterCosmMode('{EMF_TEXT}.cosm')")
     d.wait_for("#cosm-mode.open")
-    d.js_await(COSM_READY[1])
+    d.wait_until(COSM_READY[1], "the cosm viewer's volume", timeout=30)
     d.click("#cosm-about-btn")
     if not _wait_js(d, "DOCS.data && DOCS.data.doc === 'macrocosm-oes' && DOCS.density === 'short'"
                        " && !!document.getElementById('docs-sec-18-4')"):
         fails.append("about this format did not open the spec at short")
     else:
-        _sleep(d, 150)
+        _settle(d, "the spec's jump to §18.4", _TOP_OF % "'docs-sec-18-4'")
         off = d.js("document.getElementById('docs-sec-18-4').getBoundingClientRect().top"
                    " - document.getElementById('docs-body').getBoundingClientRect().top")
         if not (0 <= off <= 40):
@@ -3037,6 +3118,14 @@ def scenario_docs_contents(d: Driver) -> list[str]:
 # the local graph
 # ---------------------------------------------------------------------------
 
+#: Where the element with id %s sits in the docs frame (and how far the frame is scrolled), for `_settle` after a
+#: jump: a smooth scroll moves it every frame until it lands.
+_TOP_OF = ("(() => { const h = document.getElementById(%s), b = document.getElementById('docs-body');"
+           " return h && b ? [h.getBoundingClientRect().top, b.scrollTop] : null; })()")
+#: The same for the card of key %s.
+_CARD_TOP = ("(() => { const c = document.querySelector('#docs-body .cosm-card[data-key=\"' + CSS.escape(%s) + '\"]');"
+             " return c ? [c.getBoundingClientRect().top, document.getElementById('docs-body').scrollTop,"
+             " document.activeElement === c] : null; })()")
 _IN_VIEW = ("(() => { const c = document.querySelector('#docs-body .cosm-card[data-key=\"' + CSS.escape(%s)"
             " + '\"]'); if (!c) return null; const b = document.getElementById('docs-body')"
             ".getBoundingClientRect(), r = c.getBoundingClientRect();"
@@ -3194,7 +3283,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
         fails.append(f"the term link did not open the fabula on {t['key']}'s card")
         _reset(d)
         return fails
-    _sleep(d, 150)
+    _settle(d, f"{t['key']}'s card scrolled to", _CARD_TOP % key)
     c = d.js(_IN_VIEW % key)
     if not c or not c["focused"] or not (-2 <= c["top"] <= 80):
         fails.append(f"{t['key']}'s card is not focused at the top of the frame: {c}")
@@ -3219,7 +3308,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
     d.js("document.activeElement.click()")
     _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
                 " && document.activeElement.dataset.key === %s" % key)
-    _sleep(d, 150)
+    _settle(d, f"{t['key']}'s card again", _CARD_TOP % key)
     d.js("(() => { const c = document.querySelector('#docs-body .cosm-card[data-key=\"' + CSS.escape(%s)"
          " + '\"]'); const a = c.querySelectorAll('.docs-crumb a[data-short]'); a[a.length - 1].click();"
          " return true; })()" % key)
@@ -3227,7 +3316,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
     if not _wait_js(d, "DOCS.density === 'short' && !!document.querySelector('#docs-body .docs-sec')"):
         fails.append("the breadcrumb did not open the short")
     else:
-        _sleep(d, 150)
+        _settle(d, "the breadcrumb's jump", _TOP_OF % ("DOCS.ix.dom.get(%s)" % dom))
         off = d.js("(() => { const id = DOCS.ix.dom.get(%s); const h = document.getElementById(id);"
                    " return h ? h.getBoundingClientRect().top - document.getElementById('docs-body')"
                    ".getBoundingClientRect().top : null; })()" % dom)
@@ -3241,7 +3330,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
                                " && document.activeElement.dataset.key === %s" % key):
                 fails.append(f"back from the breadcrumb did not return to the card (focus on {_active(d)})")
             else:
-                _sleep(d, 150)
+                _settle(d, "the card after back", _CARD_TOP % key)
                 c = d.js(_IN_VIEW % key)
                 if not c or not (-200 <= c["top"] <= d.js("document.getElementById('docs-body').clientHeight")):
                     fails.append(f"back from the breadcrumb left the card off screen: {c}")
@@ -3303,7 +3392,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
         if ph == d.js("t('find.placeholder', 'find…')"):
             fails.append(f"find at the fabula does not say it searches the cards: {ph!r}")
         d.type_text("check")
-        _sleep(d, 300)
+        _wait_js(d, "(FIND_BARS.docs.state() || {}).n > 0")
         n = d.js("(() => { const s = FIND_BARS.docs.state(); return s.n; })()")
         if not n:
             fails.append("find at the fabula found nothing for 'check'")
@@ -3388,7 +3477,8 @@ def scenario_docs_example_live(d: Driver) -> list[str]:
         fails.append(f"\"show item\" did not open the cosm viewer on {node}")
         _reset(d)
         return fails
-    _sleep(d, 200)
+    _settle(d, "the cosm viewer on the item", "[document.getElementById('cosm-title').textContent,"
+            " document.activeElement && document.activeElement.dataset.key, MODE_STACK.length]")
     sh = d.js("(() => ({mm: MODE_STACK.some((e) => e.name === 'merirmaid'),"
               " title: document.getElementById('cosm-title').textContent,"
               " raw: document.getElementById('cosm-raw-btn').hidden,"
@@ -3464,22 +3554,13 @@ def _wait_js(d: Driver, cond: str, ms: int = 10000) -> bool:
 
     It used to be ONE evaluate that looped in the page for up to `ms`, under js_await's own 20 s reply limit: a
     wait of 30 s for a job ("the build did not finish") failed as "no reply within 20.0s" whenever another sweep
-    shared the machine. Each call now reads the condition and returns at once; the budget is kept here."""
-    probe = "(() => { try { return !!(%s); } catch (e) { return false; } })()" % cond
-    deadline = time.monotonic() + ms / 1000
-    while True:
-        try:
-            if d.js(probe, timeout=10.0):
-                return True
-        except RuntimeError:                       # StepError, or the CDP's own "no reply within …"
-            pass                                   # a page busy for a moment: ask again within the budget
-        if time.monotonic() >= deadline:
-            return False
-        time.sleep(0.05)
+    shared the machine. Each call now reads the condition and returns at once; the budget is kept here.
+    Since 0.9 (U1) it is `Driver.poll`, the one such loop, which `wait_until` turns into a named failure."""
+    return d.poll(cond, timeout=ms / 1000)
 
 
 # The ready states of this round's cards, as conditions `_wait_js` polls (the screens' FAB_READY, FABV_READY,
-# COSM_READY and DLG_READY loop inside one evaluate, which a loaded machine can push past its reply limit).
+# COSM_READY and DLG_READY are the same kind of condition since 0.9, polled by the `ready` step).
 _FAB_OK = ("FAB.open && (FAB.face === 'text' ? !!FAB.flavour : (FAB.build !== null && (FAB.build.error"
            " || !FAB.build.exists || FAB.compiled !== null)))")
 _FABV_OK = ("FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem' || FABV.text !== null"
@@ -3490,9 +3571,11 @@ _DLG_OK = ("DLG.open && (DLG.face === 'iso' ? (DLG.iso.programs !== null || DLG.
 
 
 def _ready(d: Driver, cond: str, ms: int = 60000) -> bool:
-    """A card or viewer has read what it shows (one of the conditions above), polled within a minute."""
+    """A card or viewer has read what it shows (one of the conditions above), polled within a minute, and
+    its paint after the read has settled (0.9, U1: this was a fixed 120 ms)."""
     ok = _wait_js(d, cond, ms)
-    time.sleep(0.12)                               # the paint after the read, as DLG_READY waits for it
+    if ok:
+        _settle(d, "the card's paint after its read")
     return ok
 
 
@@ -3525,7 +3608,7 @@ def scenario_twin_flip(d: Driver) -> list[str]:
     resident = _names(d)
     d.js(f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
-    d.js_await(CANON_CHIP_READY[1])
+    d.wait_until(CANON_CHIP_READY[1], "the Canon chip's twin state", timeout=30)
     chip = d.js("(() => { const c = document.getElementById('canon-chip-review');"
                 " const b = c.querySelector('[data-cnc=\"badge\"]');"
                 " return {shown: !c.hidden, badge: b.className, icon: (b.querySelector('img') || {}).src || '',"
@@ -3555,7 +3638,9 @@ def scenario_twin_flip(d: Driver) -> list[str]:
     if not _wait_js(d, "document.querySelector('#review-emf:not([hidden]) .cosm-card')"):
         fails.append("the face did not come back with the reader at full size")
     d.click('#review-emf [data-ef="back"]')
-    _sleep(d, 150)
+    _wait_js(d, "document.getElementById('review-emf').hidden"
+                " && getComputedStyle(document.getElementById('review-body')).display !== 'none'"
+                " && document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed') === 'false'")
     back = d.js("(() => ({face: !document.getElementById('review-emf').hidden,"
                 " text: getComputedStyle(document.getElementById('review-body')).display,"
                 " pressed: document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed')}))()") or {}
@@ -3586,7 +3671,7 @@ def scenario_atem_selection(d: Driver) -> list[str]:
     for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
         d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": pos["x"], "y": pos["y"],
                                                  "button": "right", "buttons": buttons, "clickCount": 1})
-    _sleep(d, 150)
+    _wait_js(d, "!!document.querySelector('#dict-ctx-menu:not([hidden]) .ctx-item[data-act=\"atem\"]')", 5000)
     if not d.exists('#dict-ctx-menu:not([hidden]) .ctx-item[data-act="atem"]'):
         m = d.js("(() => { const m = document.getElementById('dict-ctx-menu');"
                  " return {open: !m.hidden, text: m.innerText, sel: getSelection().toString()}; })()")
@@ -3594,7 +3679,7 @@ def scenario_atem_selection(d: Driver) -> list[str]:
         _reset(d)
         return fails
     d.click('#dict-ctx-menu .ctx-item[data-act="atem"]')
-    d.js_await(ATEM_READY[1])
+    d.wait_until(ATEM_READY[1], "the atem card's answer", timeout=30)
     card = d.js("(() => ({open: !document.getElementById('atem-modal').classList.contains('hidden'),"
                 " source: document.getElementById('atem-source').textContent,"
                 " line: (document.querySelector('#atem-modal .cosm-atem-line') || {}).textContent || '',"
@@ -3615,7 +3700,8 @@ def scenario_atem_selection(d: Driver) -> list[str]:
         if not card.get("pin"):
             fails.append(f"a passage of a file can be pinned, but \"pin to twin\" is missing: {card}")
     d.click("#atem-close")
-    _sleep(d, 150)
+    _wait_js(d, "document.getElementById('atem-modal').classList.contains('hidden')"
+                " && modeTop() && modeTop().name === 'readedit'")
     after = d.js("(() => ({open: !document.getElementById('atem-modal').classList.contains('hidden'),"
                  " top: modeTop() && modeTop().name, review: document.getElementById('review-mode').classList.contains('open')}))()") or {}
     if after.get("open") or after.get("top") != "readedit" or not after.get("review"):
@@ -3635,7 +3721,7 @@ def scenario_atem_pin(d: Driver) -> list[str]:
     before = _emf_items(d, LEDGER, "X")
     d.js(f"openReadEdit('{LEDGER}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
-    d.js_await(CANON_CHIP_READY[1])
+    d.wait_until(CANON_CHIP_READY[1], "the Canon chip's twin state", timeout=30)
     d.wait_idle()
     pos = _select_text(d, "#review-body", "Next year we want a second press")
     if not pos:
@@ -3645,7 +3731,7 @@ def scenario_atem_pin(d: Driver) -> list[str]:
     d.js_await("(async () => { const sel = canonSelectionAt({target: document.elementFromPoint(%s, %s),"
                " clientX: %s, clientY: %s}); await canonAtemSelection(sel, {path: sel && sel.path,"
                " where: sel && sel.where}); return true; })()" % (pos["x"], pos["y"], pos["x"], pos["y"]))
-    d.js_await(ATEM_READY[1])
+    d.wait_until(ATEM_READY[1], "the atem card's answer", timeout=30)
     if not d.exists("#atem-modal:not(.hidden) #atem-pin:not([hidden])"):
         fails.append("the passage's card offers no \"pin to twin\"")
         _reset(d)
@@ -3686,7 +3772,7 @@ def scenario_compile_short(d: Driver) -> list[str]:
     before = _short_count(d, PRESS)
     d.js(f"openReadEdit('{PRESS}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
-    d.js_await(CANON_CHIP_READY[1])
+    d.wait_until(CANON_CHIP_READY[1], "the Canon chip's twin state", timeout=30)
     d.click('#canon-chip-review [data-cnc="twin"]')
     if not _wait_js(d, "document.querySelector('#review-emf:not([hidden]) .cosm-card')"):
         fails.append("\"twin\" did not turn the reader to the EMF face")
@@ -3706,7 +3792,7 @@ def scenario_compile_short(d: Driver) -> list[str]:
     if menu.get("focus") != "short-told":
         fails.append(f"the menu did not take the focus on its first item: {menu}")
     d.key("Escape")
-    _sleep(d, 150)
+    _wait_js(d, "document.querySelector('#review-emf .emf-short-menu').hidden", 5000)
     esc = d.js("(() => ({menu: !document.querySelector('#review-emf .emf-short-menu').hidden,"
                " face: !document.getElementById('review-emf').hidden,"
                " reader: document.getElementById('review-mode').classList.contains('open')}))()") or {}
@@ -3791,7 +3877,10 @@ def scenario_fabula_decompile_card(d: Driver) -> list[str]:
         fails.append(f"the card did not take the focus: {c}")
     before = (_raw(d, FAB_POEM + ".fabulap.cosm"), _raw(d, FAB_POEM + ".fabulan.cosm"))
     d.key("Escape")
-    _sleep(d, 300)
+    _wait_js(d, "document.getElementById('fabula-modal').classList.contains('hidden')", 5000)
+    # A negative follows (closing wrote no twin): a write would be a request already sent by now; 300 ms is the
+    # window for it to reach the disk, and there is no state of "a write that did not happen" to wait on.
+    _hold(d, 300)
     if _fab_card(d).get("open"):
         fails.append("Esc did not close the fabula card")
     if (_raw(d, FAB_POEM + ".fabulap.cosm"), _raw(d, FAB_POEM + ".fabulan.cosm")) != before:
@@ -3801,12 +3890,11 @@ def scenario_fabula_decompile_card(d: Driver) -> list[str]:
     d.click("#fab-go")
     if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done')).length > 0", 90000):
         fails.append("no toast said the fabula was written")
-    twin = None
-    for _ in range(40):
-        twin = _raw(d, FAB_POEM + ".fabulap.cosm")
-        if twin:
-            break
-        _sleep(d, 250)
+    # Asked of the server until the file is there, within 10 s (the page's own loop: `_raw` is a fetch).
+    twin = d.js_await("(async () => { for (let i = 0; i < 40; i++) {"
+                      " const r = await fetch('/api/file/raw?path=' + encodeURIComponent("
+                      + json.dumps(FAB_POEM + ".fabulap.cosm") + ")); if (r.ok) return await r.text();"
+                      " await new Promise((res) => setTimeout(res, 250)); } return null; })()", timeout=30)
     if not twin or "oes: fabula/1" not in twin or "flavour: fabulap" not in twin:
         fails.append(f"the verse twin did not land as a fabulap: {(twin or '')[:120]!r}")
     calls = d.js("window.__fabCalls") or []
@@ -3976,6 +4064,9 @@ def scenario_cshort_read(d: Driver) -> list[str]:
     _reset(d)
     d.js(f"fabFolderOpen('{FAB_TOOL}')")
     _ready(d, _FAB_OK)
+    # The card reads its build before it paints what the build made: wait for the list it is about to read
+    # (0.9, U1: the fixed 120 ms in `_ready` used to cover this, and lost once without it).
+    _wait_js(d, "!!document.querySelector('#fab-compile ul.fab-made-list button[data-fab=\"view\"]')")
     rows = d.js("Array.from(document.querySelectorAll('#fab-compile ul.fab-made-list button[data-fab=\"view\"]'))"
                 ".map((b) => b.dataset.fabPath)") or []
     if FAB_CSHORT not in rows:
@@ -4000,7 +4091,7 @@ def scenario_cshort_read(d: Driver) -> list[str]:
     if v.get("risky"):
         fails.append(f"the viewer offers to run or download: {v.get('risky')}")
     d.key("Escape")
-    _sleep(d, 150)
+    _wait_js(d, "document.getElementById('cshort-modal').classList.contains('hidden')", 5000)
     after = d.js("(() => ({viewer: !document.getElementById('cshort-modal').classList.contains('hidden'),"
                  " card: !document.getElementById('fabula-modal').classList.contains('hidden'),"
                  " focus: document.getElementById('fabula-modal').contains(document.activeElement)}))()") or {}
@@ -4047,8 +4138,18 @@ def _dlg_check_text(d: Driver, i: int, want: str | None, ms: int = 6000) -> str:
     return d.js(f"(document.getElementById('dlg-chk-{i}') || {{}}).textContent || ''") or ""
 
 
+_DLG_SHOWN = "Array.from(document.querySelectorAll('#dlg-main .dlg-q')).map((q) => q.dataset.dlgKey)"
+
+
 def _dlg_shown(d: Driver) -> list[str]:
-    return d.js("Array.from(document.querySelectorAll('#dlg-main .dlg-q')).map((q) => q.dataset.dlgKey)") or []
+    return d.js(_DLG_SHOWN) or []
+
+
+def _dlg_turned(d: Driver, before: list[str]) -> None:
+    """After "keep these, and the next": the card shows other questions than `before`, and has stopped painting.
+    The check after it says which ones; this only waits for the turn (0.9, U1: a fixed 200 ms)."""
+    _wait_js(d, "JSON.stringify(%s) !== %s" % (_DLG_SHOWN, json.dumps(json.dumps(before, separators=(",", ":")))))
+    _settle(d, "the dialectic card's next questions", _DLG_SHOWN)
 
 
 def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
@@ -4096,13 +4197,15 @@ def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
             d.key("ArrowDown")                 # plain → warm → formal → other:
     if step("the other: field", "a.id === 'dlg-other-1'"):
         d.type_text("dry")
-    _sleep(d, 600)
+    _wait_js(d, "(() => { const x = DLG.drafts.get(DLG.vol).get('D:question/tone');"
+                " return !!x && dlgValueOf(x) === 'dry' && !DLG.timers.size; })()")
     v = d.js("(() => { const x = DLG.drafts.get(DLG.vol).get('D:question/tone'); return x ? dlgValueOf(x) : null; })()")
     if v != "dry":
         fails.append(f"the choice's other: did not take the word typed: {v!r}")
+    shown = _dlg_shown(d)
     if step("keep these, and the next", "a.id === 'dlg-next'"):
         d.key("Enter")
-    _sleep(d, 200)
+    _dlg_turned(d, shown)
     # 2. yes-no, and a number refused then right
     if _dlg_shown(d)[:2] != ["D:question/meant-to-reassure", "D:question/retry-hour"]:
         fails.append(f"the next pair is not yes-no and number: {_dlg_shown(d)}")
@@ -4129,9 +4232,10 @@ def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
     if (d.js("document.getElementById('dlg-chk-1').textContent") or "").strip():
         fails.append("5 is inside the range and should clear the refusal: "
                      + repr(d.js("[document.getElementById('dlg-in-1').value, document.getElementById('dlg-chk-1').textContent]")))
+    shown = _dlg_shown(d)
     if step("keep these, and the next", "a.id === 'dlg-next'"):
         d.key("Enter")
-    _sleep(d, 200)
+    _dlg_turned(d, shown)
     # 3. a date refused then right, and a ref
     if step("the date", "a.id === 'dlg-in-0'"):
         d.type_text("2019-13")
@@ -4144,17 +4248,19 @@ def scenario_dialectic_answer_kinds(d: Driver) -> list[str]:
     if step("the ref", "a.id === 'dlg-in-1'"):
         d.type_text("E:person/support-lead")
     _dlg_check_text(d, 1, None)
+    shown = _dlg_shown(d)
     if step("keep these, and the next", "a.id === 'dlg-next'"):
         d.key("Enter")
-    _sleep(d, 200)
+    _dlg_turned(d, shown)
     # 4. a span, and a whole item's question
     if step("the span", "a.id === 'dlg-in-0'"):
         d.type_text("7")
     if step("the item's question", "a.id === 'dlg-in-1'"):
         d.type_text("Right, but the retry at five is part of it.")
+    shown = _dlg_shown(d)
     if step("keep these, and the next", "a.id === 'dlg-next'"):
         d.key("Enter")
-    _sleep(d, 200)
+    _dlg_turned(d, shown)
     # 5. an open field, "I don't know"
     if step("I don't know", "a.id === 'dlg-alt-dont_know-0'"):
         d.key("Enter")
@@ -4271,7 +4377,8 @@ def scenario_dialectic_holograph_no_cloud(d: Driver) -> list[str]:
     if not _tab_to(d, "a.id === 'dlg-in-1'"):
         fails.append("Tab never reached the second answer")
     d.type_text("How the tides turn at the harbour mouth.")
-    _sleep(d, 600)
+    _wait_js(d, "!DLG.timers.size && (document.getElementById('dlg-in-1') || {}).value"
+                " === 'How the tides turn at the harbour mouth.'")
     if _tab_to(d, "a.id === 'dlg-send'"):
         d.key("Enter")
     if not _wait_js(d, "DLG.sent !== null && !DLG.sending"
@@ -4393,7 +4500,7 @@ def scenario_thym_read_labelled(d: Driver) -> list[str]:
         return [f"the seeded text or reading is missing: {EMF_TEXT} / {THYM_READING}"]
     d.js(f"openReadEdit('{THYM_READING}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
-    d.js_await(THYM_BAND_READY[1])
+    d.wait_until(THYM_BAND_READY[1], "the reading's band", timeout=30)
     band = d.js("(() => { const b = document.getElementById('read-band-review');"
                 " return {shown: !b.hidden, lead: b.querySelector('.read-band-lead').textContent,"
                 " want: t('thym.band.lead', 'read through {name}').replace('{name}', 'null'),"
@@ -4650,7 +4757,7 @@ def scenario_agentfree_toggle(d: Driver) -> list[str]:
         if not _wait_js(d, "agentFreeOn() && !AF_BUSY", 15000):
             fails.append("the slider did not turn agent-free on (or its save never answered)")
             return fails
-        d.js_await("new Promise((r) => setTimeout(r, 320))")   # the knob, the words, the column
+        _settle(d, "the slider's knob, words and column", _AF_STATE)
         st = d.js(_AF_STATE) or {}
         want = st.get("want") or {}
         if not (st.get("attr") and st.get("checked") == "true" and st.get("mirror") == "true"):
@@ -4689,6 +4796,7 @@ def scenario_agentfree_toggle(d: Driver) -> list[str]:
           const msg = document.getElementById('message');
           msg.value = 'uicheck: this must never be sent';
           document.getElementById('chat-form').requestSubmit();
+          // A negative (nothing is sent): 400 ms is the window a send would show in; there is no state to wait on.
           await new Promise((r) => setTimeout(r, 400));
           msg.value = '';
           document.body.removeEventListener('htmx:beforeRequest', spy);
@@ -4712,7 +4820,7 @@ def scenario_agentfree_toggle(d: Driver) -> list[str]:
                            " && LLM_STATUS && LLM_STATUS.agent_free === false", 15000):
             fails.append("off: Enter on the slider did not turn agent-free off, or "
                          "/api/llm-status was never polled after it")
-        d.js_await("new Promise((r) => setTimeout(r, 320))")
+        _settle(d, "the slider's knob, words and column", _AF_STATE)
         st = d.js(_AF_STATE) or {}
         want = st.get("want") or {}
         if st.get("attr") or st.get("checked") != "false" or st.get("mirror") != "false":
