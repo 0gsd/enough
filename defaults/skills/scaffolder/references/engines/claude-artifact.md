@@ -79,4 +79,6 @@ gives you the whole state as markdown. Work from that, as
 
 ## Tried
 
-claude.ai: not tried. Claude Code: not tried (see the index's table).
+claude.ai: tried 2026-11-19 by the owner, a page (see the index's table).
+Claude Code: not tried as an artifact; its one-HTML-file route was tried
+(`single-html.md`).

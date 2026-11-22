@@ -5,6 +5,12 @@ the whole thing; the check reads it for spelling, grammar and truth, box by
 box; the person answers each finding. The format of a finding is the
 state's (`state.md`, sections 5 and 6); this page is the procedure.
 
+Where the check runs: outside enough, you run it on the state (the person
+copies everything out, or you read the page's store), and you file the
+findings in that state's `# Findings`; the page shows them once you fill it
+from that state. In enough the check is enough's own job, started from its
+page, and you file nothing (`engines/enough.md`).
+
 **The rule holds here too.** The check is the one place you offer wording:
 a suggested fix for a quoted span. Nothing changes until the person accepts
 it, and then only that span changes.
