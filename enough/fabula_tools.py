@@ -1,4 +1,4 @@
-"""The readvisor's fabula-round tools (0.6): `dialectic` and `fabulac`; and `fabulap` (0.7).
+"""The readvisor's fabula-round tools (0.6): `dialectic` and `fabulac`; `fabulap` (0.7); and `fabulam` (0.9).
 
 **`dialectic`** (pins P4.7): a readvisor puts one or two questions at a time to the person and records what they say.
 Called with a `<path>` alone it shows the next one or two open questions of that volume (a text's fabula, a fabulac, a
@@ -20,6 +20,12 @@ when the person chose it for this job and the gate is open. Nothing told is ever
 up again), how it stands (`status`, the default) or cancelled: the five programs of `decompile-verse.thym`, the same
 job the page starts (`fabulap_job`). Scan and hear run by rule; reading closely asks a model, and waits without one.
 
+**`fabulam`** (0.9, pins section 10): a Lean file, a folder of them, or a `.fabulam.cosm`: `<do>build</do>` (optional
+`<target>`, the final theorem to tell), `resume`, `entail` (with `<density>` expert, student or everyone), `status`
+(the default) and `cancel`: the same jobs the card starts (`routes/fabulam.py` over `fabulam_job`). A file that ends
+in more than three results and names no `<target>` builds nothing: the answer lists them, for the person to choose.
+Nothing of Lean is run, and no answer says more about checking than the fabulam's one sentence about it.
+
 Registered into `tools._DISPATCH` the way `canon_tools` is, documented in `prompt.FABULA_TOOL_INSTRUCTIONS`, beside the
 MacroCOSM block in both profiles while the `macrocosm-oes` skill is on (their guide, as for Thym's tools: with it off a
 runner says how to switch it on and runs nothing, and a fresh project's prompt pays nothing for them).
@@ -32,7 +38,7 @@ from typing import Any, Callable
 
 log = logging.getLogger("enough.fabula_tools")
 
-TOOL_NAMES: tuple[str, ...] = ("dialectic", "fabulac", "fabulap")
+TOOL_NAMES: tuple[str, ...] = ("dialectic", "fabulac", "fabulap", "fabulam")
 #: Questions shown at a time: one or two (P4.7, Ascribe 8.2).
 SHOWN = 2
 STATES = {"unknown": "dont_know", "dont-know": "dont_know", "i don't know": "dont_know", "declined": "declined",
@@ -44,14 +50,15 @@ _conf: dict[str, Any] = {}
 
 def configure(*, project_dir: Path | None = None, start: Callable | None = None, build: Callable | None = None,
               compile: Callable | None = None, settle: Callable | None = None, jobs: Any = None,
-              emit: Callable | None = None, verse: Callable | None = None, first: Callable | None = None) -> None:
+              emit: Callable | None = None, verse: Callable | None = None, first: Callable | None = None,
+              fabulam: Callable | None = None) -> None:
     """Hand the tools the app's job starters and its event sender (`emit(event, data)`, for the `dialectic` event a
-    recorded sitting sends); `first(do, body)` is the authored fabulac's (`routes/fabulac.py`'s `router.start`);
-    `configure()` with nothing resets them: tests."""
+    recorded sitting sends); `first(do, body)` is the authored fabulac's (`routes/fabulac.py`'s `router.start`),
+    `fabulam(do, body)` the fabulam's (`routes/fabulam.py`'s); `configure()` with nothing resets them: tests."""
     _conf.clear()
     _conf.update({k: v for k, v in {"project_dir": project_dir, "start": start, "build": build, "compile": compile,
                                      "settle": settle, "jobs": jobs, "emit": emit, "verse": verse,
-                                     "first": first}.items()
+                                     "first": first, "fabulam": fabulam}.items()
                   if v is not None})
 
 
@@ -452,7 +459,96 @@ def run_fabulap(project_dir: Path, call: Any) -> Any:
                                                            if do == "build" else ""))
 
 
-_RUNNERS = {"dialectic": run_dialectic, "fabulac": run_fabulac, "fabulap": run_fabulap}
+# ---------------------------------------------------------------------------
+# fabulam (0.9)
+# ---------------------------------------------------------------------------
+
+FABULAM_DO: tuple[str, ...] = ("build", "resume", "entail", "status", "cancel")
+_PICK_ASK = "Ask the person which one to tell, then <do>build</do> with <target>; never pick."
+
+
+def fabulam_status_lines(st: dict) -> list[str]:
+    """What the card says, as lines: the state's line (and a head's), the sentence about checking in full, each
+    density's pshort. Nothing here says more about checking than the fabulam's own sentence."""
+    lines = [f"{st.get('fabulam') or st.get('source')}: {st.get('line')}"]
+    if st.get("state") == "pick":
+        lines += ["its final theorems: " + ", ".join(st.get("targets") or []), _PICK_ASK]
+    if st.get("head_line"):
+        lines.append(st["head_line"])
+    if st.get("checking"):
+        lines.append(f"what is said about checking: {st['checking']}")
+    rows = []
+    for p in st.get("pshorts") or []:
+        if not p.get("path") or not p.get("exists"):
+            rows.append(f"{p['density']} none")
+        else:
+            rows.append(f"{p['density']} {'stale' if p.get('stale') else 'entailed'} {p.get('at')} ({p['path']})")
+    if rows:
+        lines.append("pshorts: " + "; ".join(rows))
+    return lines
+
+
+def run_fabulam(project_dir: Path, call: Any) -> Any:
+    from .fabulac_job import BuildError
+    from .routes import fabulam as R
+    extra = getattr(call, "extra", None) or {}
+    raw = _ct()._tool_path(project_dir, call.path)
+    if not _skill_on(project_dir):
+        return _skill_off("fabulam", raw)
+    if not raw:
+        return _err("fabulam", "", "fabulam needs a <path>: a .lean file, a folder of them, or a .fabulam.cosm.")
+    do = (extra.get("do") or "status").strip().lower()
+    if do not in FABULAM_DO:
+        return _err("fabulam", raw, f"<do> is build, resume, entail, status or cancel, not {do!r}")
+    try:
+        t = R.target_of(project_dir, raw)
+    except BuildError as e:
+        return _err("fabulam", raw, str(e))
+    jobs = _conf.get("jobs")
+    if do == "status":
+        lines = fabulam_status_lines(R.state_of(project_dir, t))
+        jid = jobs.running_for(t["key"]) if jobs is not None else None
+        if jid:
+            lines.append(_job_line(jobs.snapshot(jid)))
+        return _result("fabulam", raw, True, "\n".join(lines))
+    body: dict[str, Any] = {"path": raw}
+    route = (extra.get("model") or "").strip() or None
+    if route:
+        body["route"] = route
+    if do == "build":
+        if (extra.get("target") or "").strip():
+            body["target"] = extra["target"].strip()
+        if (extra.get("restart") or "").strip().lower() in ("yes", "true", "1"):
+            body["restart"] = True
+    if do == "entail":
+        density = (extra.get("density") or "").strip().lower()
+        if density not in ("expert", "student", "everyone"):
+            return _err("fabulam", raw, "entail needs a <density>: expert, student or everyone. Offer the three; the "
+                                        "person chooses.")
+        body["density"] = density
+    starter, fn = _conf.get("start"), _conf.get("fabulam")
+    if starter is None or fn is None:
+        return _err("fabulam", raw, "this runs as a job in the reader, and no reader is running here; ask the person "
+                                    "to start it there")
+    try:
+        got = starter(lambda: fn(do, body))
+    except Exception as e:  # noqa: BLE001 - an HTTPException carries the route's words
+        return _err("fabulam", raw, str(getattr(e, "detail", None) or e))
+    if isinstance(got, dict) and got.get("targets") and not got.get("job"):
+        return _result("fabulam", raw, True, f"nothing was built: {(got.get('state') or {}).get('line')}\n"
+                       + "its final theorems: " + ", ".join(got["targets"]) + "\n" + _PICK_ASK)
+    if not isinstance(got, dict) or not isinstance(got.get("job"), dict):
+        return _err("fabulam", raw, str(got))
+    tail = {"build": ". It runs after this turn: the survey by rule, then the stages that ask a model; without one it "
+                     "stops at the outline. <do>status</do> says what landed.",
+            "resume": ". It runs after this turn, from the stage that waits; <do>status</do> says what landed.",
+            "entail": f". It runs after this turn and writes <name>.pshort-{body.get('density')}-<YYYY-MM-DD-HHMM>.md "
+                      "beside the fabulam, from the fabulam alone. A pshort is a guide to a proof, not a proof.",
+            "cancel": "."}[do]
+    return _result("fabulam", raw, True, _job_line(got) + tail)
+
+
+_RUNNERS = {"dialectic": run_dialectic, "fabulac": run_fabulac, "fabulap": run_fabulap, "fabulam": run_fabulam}
 
 
 def register() -> None:
@@ -463,4 +559,5 @@ def register() -> None:
         _t._TRACE_TOGGLE.setdefault(name, "trace_log_enabled")
 
 
-__all__ = ["FIRST_DO", "TOOL_NAMES", "configure", "register", "run_dialectic", "run_fabulac", "run_fabulap"]
+__all__ = ["FABULAM_DO", "FIRST_DO", "TOOL_NAMES", "configure", "fabulam_status_lines", "register", "run_dialectic",
+           "run_fabulac", "run_fabulam", "run_fabulap"]

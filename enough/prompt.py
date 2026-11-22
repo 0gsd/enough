@@ -745,6 +745,8 @@ cancel; `<model>cloud` only when asked. An authored one: begin
 let-go, take-back (`<file>`), head (`<parts>`), parts-moved; it runs
 only in the sandbox. `fabulap` does build, status,
 cancel for a poem's `<path>`: scan, hear, then read closely.
+`fabulam` does build (`<target>`), resume, entail (`<density>`),
+status for a Lean `<path>`; Lean is never run.
 """
 
 #: The lean profile with the macrocosm-oes skill on (0.9): the MacroCOSM
@@ -767,7 +769,8 @@ FABULA_LEAN_INSTRUCTIONS = """\
 <do>build</do>
 </tool>
 
-`fabulap` takes a poem's `<path>`; `thym_moves` lists Thym's moves. What
+`fabulap` takes a poem's `<path>`, `fabulam` a Lean file's; `thym_moves`
+lists Thym's moves. What
 each MacroCOSM tool does, every `<do>` and tag, is in
 `rness/skills/macrocosm-oes/SKILL.md`: read it first. Derive, ask or run
 only on request; never answer a question for the person; an authored
@@ -776,7 +779,7 @@ fabulac runs only in the sandbox.
 
 #: With the skill off: the three names, and where they come from (as the wiki tools are named without an archive).
 FABULA_ABSENT_INSTRUCTIONS = """\
-`dialectic`, `fabulac` and `fabulap` come with the macrocosm-oes skill.
+`dialectic`, `fabulac`, `fabulap` and `fabulam` come with the macrocosm-oes skill.
 """
 
 
