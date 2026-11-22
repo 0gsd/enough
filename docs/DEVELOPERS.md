@@ -580,6 +580,11 @@ The head names each part (`parts`) with one `C:component` per part, and each par
 - Command line: `python -m enough.fabulac parts-moved kit`
 - Client: `e.parts_moved("kit")["moved"]`
 
+`parts-moved` reads a head beside its parts' folders. When the parts were made over copies of the files (as enough's
+own are), compare them with the tree they came from instead: `python -m enough.fabulac moved-parts <part fabulacs or
+a folder of them> --tree <checkout> [--ref <tag>]` lists each part as moved or not, file by file, with how many of its
+rulings and questions still resolve.
+
 ### 4.21 The whole loop in one script
 
 ```python
@@ -820,6 +825,7 @@ The jobs these routes start are of kind `fabulac-author`, `fabulac-entail` and `
 | `python -m enough.fabulac take-back PATH FILE` | `take-back tally tally/__main__.py --model local` |
 | `python -m enough.fabulac head PATH PART…` | `head counter counter-core counter-cli` |
 | `python -m enough.fabulac parts-moved PATH` | `parts-moved counter` |
+| `python -m enough.fabulac moved-parts FABULACS… --tree DIR [--ref TAG] [--base REF]` | `moved-parts docs/parts --tree . --ref v0.9.0` |
 
 The options that ask a model, on `begin`, `entail` and `take-back`: `--model local`, `cloud` or `cloud:<model id>`; `--llm-url` the local model's address (else `ENOUGH_LLM_URL`, else enough's own); `--calls N` a ceiling on model calls. `run` also takes `--stdin-file FILE`, a project file whose text is the tool's input.
 
