@@ -227,7 +227,9 @@ def test_check_of_an_unknown_program_lists_the_names(project: Path):
     r = run(project, tool("thym_check", path="nope.thym"))
     assert not r.ok and "no program 'nope.thym'" in r.body
     assert "the programs here: a-story, leaky, publish-story, " in r.body, r.body          # the project's first
-    assert "open-house" in r.body and "read-my-way" in r.body, "then the shipped ones (their number grows)"
+    # then the shipped ones; their number grows (0.9 added the fabulam's nine), so past the twelve shown the rest
+    # are counted, and the names themselves are held where they are listed whole
+    assert " more)." in r.body and {"open-house", "read-my-way", "survey-the-proof"} <= set(TT.program_names(project))
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +264,7 @@ def test_run_of_an_unknown_program_lists_the_names_and_runs_nothing(project: Pat
     assert not r.ok
     assert r.body.startswith("error: no program 'nope': give a program's name or the path of a .thym file; the "
                              "programs here: a-story, leaky, publish-story, "), r.body
-    assert "open-house" in r.body and "read-my-way" in r.body
+    assert " more)." in r.body and {"open-house", "read-my-way"} <= set(TT.program_names(project))
     assert not runs_dir().exists()
 
 

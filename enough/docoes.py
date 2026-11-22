@@ -1716,9 +1716,7 @@ def spec_tables(text: str) -> SpecTables:
                 out.lists.setdefault((mini, key), {})
                 for r in body:
                     if len(r) >= 2:
-                        # the first table that says a word gives its meaning; a later table of the same head says
-                        # it again for a narrower case (18.4.10's stances "in a fabulam") and changes nothing here
-                        out.lists[(mini, key)].setdefault(_plain(r[0]), _plain(r[1]))
+                        out.lists[(mini, key)][_plain(r[0])] = _plain(r[1])
     return out
 
 
@@ -1873,10 +1871,7 @@ def enumerate_manifests(registry: mc.Registry | None = None, *, tables: SpecTabl
             owner = "DocOES's own check" if c in DOC_CHECKS else "a generic check"
         it = {"id": f"R:check/{c}", "type": "check", "name": c,
               "summary": f"The {c} check, {owner}: " + (catches + "." if catches else "see the spec."),
-              # a row whose opening words name an item by its id (18.4.10's `fit-stated`, `checking-said`) cannot
-              # be an atem as written (an atem holds no id): the check is said by its name and its owner
-              "atem": (_atem_cut(catches) if catches and not _ID_RE.search(_atem_cut(catches))
-                       else _atem_cut(f"the {c} check, {owner}")),
+              "atem": _atem_cut(catches) if catches else _atem_cut(f"the {c} check, {owner}"),
               "severity": severity, "selected_by": [f"R:minicosm/{x}" for x in sel],
               "provenance": {"mode": "catalogue",
                              "sources": [f"{_manifest_rel(reg.get(x), root)}#checks" for x in sel]

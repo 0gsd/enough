@@ -764,11 +764,11 @@ text of a runner's verdict, which names the cshort it judged, and gives the fabu
 transconception has to hold (section 22.3). A proof takes no move of its own: `survey` of a Lean text or of a folder of
 Lean, `derive … as proof`, `construe` on a proof's four axes and `entail` at a pshort's density build a fabulam and
 entail its pshorts (section 20.13). `survey` and `derive` of a folder of Lean keep the folder's contract, since a
-contract cannot tell two folders apart by their language; `parts-resolve` holds of a head through `fabula-checks`. The
-compiler picks the `gives`, the contract and the scaffold of a call from the call as written (its `as` word, or its
-first operand's type), and the plan's `P:contract` item lists the chosen contract, so a plan says exactly which checks
-a node keeps. A call whose scaffold is `none` has no scaffold, and `--rules` refuses it at plan time (section 19).
-Sections 20, 21 and 22 say what these moves do.
+contract cannot tell two folders apart by their language; a fabulam's own checks, `parts-resolve` among them, are the
+host's, at each landing (section 20.13). The compiler picks the `gives`, the contract and the scaffold of a call from
+the call as written (its `as` word, or its first operand's type), and the plan's `P:contract` item lists the chosen
+contract, so a plan says exactly which checks a node keeps. A call whose scaffold is `none` has no scaffold, and
+`--rules` refuses it at plan time (section 19). Sections 20, 21 and 22 say what these moves do.
 
 ### 6.4 Signatures in the manifest
 
@@ -860,7 +860,7 @@ a program may also define a check of its own, as a contract block, and promise t
 | `digests` | every file in a package's catalog has the sha256 the catalog says | Thym's own |
 | `released` | nothing is in `graph.cosm` without a release recorded in the holograph | Thym's own; the release is Ascribe's (https://ascribe.cosmoes.org/) |
 | `provenance` | every output carries `made` | Thym's own |
-| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`, and, of a fabulam, the checks of that section from `declared-once` on; MacroCOSM OES, its section 18.4.8). A file's reading (section 20.6) passes them together with the fabula it was read with. `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
+| `fabula-checks` | the volume passes its own manifest's checks: for a fabula, the generic ones and `fabula/1`'s own (`flavour`, `flavour-kind`, `code-span`, `licence-recorded`; MacroCOSM OES, its section 18.4.8). A fabulam's own checks, that section's rows from `declared-once` on, are not among them: the host runs those each time a stage lands, and refuses a landing that fails one (section 20.13). A file's reading (section 20.6) passes them together with the fabula it was read with. `emf-checks` is its old name: it is read wherever a manifest, a program or a trace writes it, a `thym 0` program's enumeration keeps it, and a verdict keeps the name it was asked by | the MacroCOSM reader's lint |
 
 The checks the moves of `thym 1` add:
 
@@ -2866,8 +2866,8 @@ one small thing at a time:
 
 | call | asks | what it gives, and what its contract holds |
 |---|---|---|
-| `survey t`, and `survey t with h`, `h` the file's head, or a fabulam that is a catalog alone, which the host wrote by rule; rules only | no | the fabulam's outline: every declaration an item with its lines, the `C:file`, a `C:dependency` for each library, the makers and the licence, the rows of `audit` with no verdict, `P:claim/checking`, `P:assumption/read-as-text`, and the reach. `declarations-found`, `comments-covered`, `reach-agrees`, `code-span`, `licence-recorded` |
-| `survey repo`, of a folder of Lean; rules only | no | a head's outline: its `parts`, a `C:component` for each, the items that cross between parts, and the order the files are read in. `files-found`, `code-span`, `licence-recorded`, a folder's contract; `parts-resolve` holds through `fabula-checks` |
+| `survey t with h`, `h` the file's head, or, for a file that stands alone, a fabulam that is a catalog alone, which the host wrote by rule; rules only | no | the fabulam's outline: every declaration an item with its lines, the `C:file`, a `C:dependency` for each library, the makers and the licence, the rows of `audit` with no verdict, `P:claim/checking`, `P:assumption/read-as-text`, and the reach. `declarations-found`, `comments-covered`, `reach-agrees`, `code-span`, `licence-recorded` |
+| `survey repo with h`, of a folder of Lean, `h` the head's catalog, which the host wrote by rule; rules only | no | a head's outline: a `C:component` for each file, the items that cross between files, with `uses` among them by rule, and the order the files are read in. It names no part: `parts`, and each component's `told-in`, are written when the host ties a landed part in. `files-found`, `code-span`, `licence-recorded`, a folder's contract |
 | `derive t as proof with f` | yes, once for each chunk of the file | the reading: the statement, in words, of every declaration that is reached; each lemma's `role`, `method` and `why`; the `C:step`, `C:reliance`, `L:term` and `K:concept` items. `lines-resolve`, `nothing-invented`, `nothing-carried`, `stance-closed` |
 | `construe t as comments with f` | yes | the verdict of every row of `audit`, and the claims; the E items and the `N:aim` that a comment names. `comments-covered`, `lines-resolve`, `nothing-lost` |
 | `construe w as fit with f`, `w` the public wording | yes | `E:work/wording`, a `P:fit` for each statement, and the claims the wording makes. `nothing-lost` |
@@ -2877,9 +2877,11 @@ one small thing at a time:
 | `entail f as expert`, `as student` or `as everyone` | yes | a short: the pshort for that reader, under the checks of a pshort (below) |
 | `question f`, landed with `gather` | yes | the gaps, as the dialectic's questions to an expert (section 22) |
 
-Every contract here ends with `fabula-checks` and `provenance`, as section 6.3 lists them. Under `--rules`, `survey`
-runs and every other call of the table is refused at plan time, as `construe` of a poem is. A host then runs the survey
-and stops, and the fabulam is its outline (MacroCOSM OES, its section 18.4.10).
+Every contract here ends with `fabula-checks` and `provenance`, as section 6.3 lists them. `fabula-checks` holds the
+generic checks of a fabulam. Its own checks (MacroCOSM OES, its section 18.4.8, `parts-resolve` and `statements-agree`
+among them) are run by the host each time a program lands, and a landing that fails one is refused, with nothing
+written. Under `--rules`, `survey` runs and every other call of the table is refused at plan time, as `construe` of a
+poem is. A host then runs the survey and stops, and the fabulam is its outline (MacroCOSM OES, its section 18.4.10).
 
 **The reader.** `survey` reads Lean through the host's syntax engine, as it reads Python, and the engine answers three
 things. A file's outline: its declarations, its comments, its imports, and the names each declaration uses, each name
@@ -2903,19 +2905,150 @@ each landing the fabulam so far, as it runs a fabulac's (section 20.6):
 
 | program | asks | sees | its calls |
 |---|---|---|---|
-| `survey-the-proof` | no | the file | `survey t` |
-| `read-the-proof` | yes | the file with its comments blanked, the outline, and the statements of its neighbours | `derive t as proof with f`; it keeps the contract block `its-own-file` against the file, as a fabulac's reading does (section 20.6) |
+| `survey-the-proof` | no | the file, and its head or the catalog the host wrote | `survey t with h` |
+| `read-the-proof` | yes | the file with its comments blanked, the outline, and the statements of its neighbours | `derive t as proof with f`, inside a move that keeps the contract block `its-own-file`; the reading is landed with `gather` |
 | `audit-the-comments` | yes | the file with its comments, and the fabulam so far | `construe t as comments with f` |
 | `fit-the-wording` | yes | the wording and the statements' items, never the Lean; it is run only when the person gave a wording | `construe w as fit with f` |
-| `fold-the-argument` | yes | for the yield, each target's proof and the last lemma it rests on, comments blanked; for the stages, the fabulam so far and no Lean | `construe t as yield with f`, then `construe t as stages with f` |
+| `fold-the-argument` | yes | for the yield, each target's proof and the last lemma it rests on, comments blanked; for the stages, the fabulam so far and no Lean | `construe t as yield with f`, then `construe t as stages with` what that gave |
 | `raise-the-questions` | yes | the fabulam | `question f`, landed with `gather`; it `keeps fabula-checks` |
 
-Two more build a head: `survey-the-archive`, which is `survey repo`, before the parts, and `fold-the-head`, which is
-`derive repo with h`, after them. For a folder the host's job runs the archive's survey; then the six programs for each
-file that a target reaches, a file after everything it imports, copying each part's summary up into the head by rule as
-the part lands (MacroCOSM OES, its section 18.4.10); then the head's fold. A file no target reaches is surveyed and
-left as an outline. A job takes up again after the last program that landed, while the file's sha256 is the one its
-fabulam recorded.
+`its-own-file` is kept against the fabulam so far, and not against the file: a text given as an input carries no
+path, so the block reads the file's path from the `C:file` of the fabulam. The file of the six, as the reference
+implementation ships it:
+
+```thym
+thym 1
+
+-- The fabulam of one Lean 4 file, built in six runs. A host runs the programs of this file in the order they are
+-- written, as one job: each lands the fabulam so far, and a job that stops takes up again after the last one that
+-- landed. The Lean is read as text. Nothing of it is installed, built or run.
+
+contract its-own-file(r: fabula, f: fabula)
+  why: a file's reading speaks of that file and of no other.
+
+  assert count r > 0 else "the reading found nothing in the file"
+  for each c in f where kind is file
+    for each i in r where i has span
+      assert i.span.file is c.path else "an item points into another file"
+    end
+  end
+end
+
+program survey-the-proof
+  why: a Lean file's declarations, its comments, its imports and the names each declaration uses are found by
+       rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run; what is known about the machine check is written by rule.
+  decided 2026-11-22: this build reads one file a model can hold, under a head of at most sixty files and twelve
+       thousand lines.
+
+  takes t: text, h: fabula
+  gives f: fabula
+
+  give survey t with h                             -- every declaration an item, the comment table, the reach
+end
+
+program read-the-proof
+  why: the Lean is read once by a model, its comments blanked, against the outline: what each reached
+       declaration says, what each lemma is to the argument, and how it is proved.
+  decided 2026-11-22: the reader of the proof never sees a comment; a comment is something a person said.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  move read-file(t: text, so-far: fabula): fabula
+    keeps its-own-file against so-far
+    give derive t as proof with so-far             -- statements in words, roles, methods, steps, reliances, terms
+  end
+
+  let reading = read-file t, f
+  give gather [reading] with f
+end
+
+program audit-the-comments
+  why: every comment is set against the Lean it stands over, and what Lean cannot bear out is kept as a claim.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  give construe t as comments with f               -- the comment table, the claims
+end
+
+program fit-the-wording
+  why: where the person gave a public wording of the result, each statement is set against it, form apart from
+       content.
+  must: no Lean is read here.
+
+  takes w: text, f: fabula
+  gives g: fabula
+
+  give construe w as fit with f                    -- the fit, one for every statement
+end
+
+program fold-the-argument
+  why: what the proof delivers is set against what the statement says, and the argument is told in stages, the
+       stage that says what must be shown first.
+  decided 2026-11-22: stated is not shown; the stages are folded from the items alone, with no Lean.
+
+  takes t: text, f: fabula
+  gives g: fabula
+
+  let y = construe t as yield with f               -- the yield, the worked example, the constants, the slack
+  give construe t as stages with y                 -- the stages, the teaching order, the readings, the atem
+end
+
+program raise-the-questions
+  why: where the build could not settle something it asks an expert, and the questions land with the fabulam.
+  decided 2026-11-22: the answers come back in a second run, settle; nothing waits inside a run.
+
+  takes f: fabula
+  gives g: fabula
+  keeps fabula-checks
+
+  let asked = question f
+  give gather asked with f
+end
+```
+
+Two more build a head: `survey-the-archive`, before the parts, and `fold-the-head`, after them. The first holds the
+folder to this edition's band, in the words the Python band uses. For a folder the host's job runs the archive's
+survey; then the six programs for each file that a target reaches, a file after everything it imports, tying each
+part in and copying its summary up into the head by rule as the part lands (MacroCOSM OES, its section 18.4.10); then
+the head's fold. A file no target reaches is surveyed and left as an outline. A job takes up again after the last
+program that landed, while the file's sha256 is the one its fabulam recorded.
+
+```thym
+thym 1
+
+-- The head fabulam of a folder of Lean 4 files, in two runs. A host runs survey-the-archive first; then, for each
+-- file in the order of the imports, the six programs of decompile-lean.thym, copying each part's summary upward by
+-- rule; then fold-the-head. A file the final theorems do not reach is outlined by rule and never read by a model.
+
+program survey-the-archive
+  why: an archive's files, the order of its imports, what the final theorems reach and which declarations cross
+       between files are found by rule, before any model reads a line.
+  must: nothing of Lean is installed, built or run.
+  decided 2026-11-22: this build reads at most sixty Lean files and twelve thousand lines under one head.
+
+  takes repo: folder, h: fabula
+  gives f: fabula
+
+  let lean = repo where suffix is lean
+  assert count lean > 0 else "there is no Lean file here"
+  assert count lean < 61 else "more than sixty Lean files: past what this build reads"
+  assert lean.lines < 12001 else "more than twelve thousand lines of Lean: past what this build reads"
+  give survey repo with h                          -- files, components, the declarations that cross: rules only
+end
+
+program fold-the-head
+  why: read from its parts' summaries, the archive's argument is told in stages of its own.
+  must: no Lean is read here.
+
+  takes repo: folder, h: fabula
+  gives g: fabula
+
+  give derive repo with h                          -- the head's stages, teaching order, readings, atem
+end
+```
 
 **One file to a request.** No request to a model holds more than one file of the proof and the statements of its
 neighbours. A file too long for one request is read in chunks, each cut at a declaration's first line. A declaration
@@ -2933,7 +3066,8 @@ and `apart` holds that no request carried them. The contract is the checks of a 
 number and word outside FEED in the pshort is in the fabulam), `checking-told`, `confidence-told`, `symbols-worded`,
 `apart`, `length`, `footer` and `provenance` (section 7.3). The host saves a pshort beside its fabulam as
 `<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`. `entail` at a pshort's density has no scaffold, so `--rules` refuses it
-at plan time.
+at plan time. The model's answer is asked as YAML with one key, `body`, whose value is the body's markdown as a block:
+the host stamps the model's name only into an answer in YAML, and writes the lines that rules write around the body.
 
 ```thym
 thym 1
@@ -3335,7 +3469,7 @@ was built or judged, so neither gate holds, as the folder records.
 
 A third folder holds one proof whole (section 20.13): the reference implementation's `tests/fixtures/fabula/fabulam/`,
 with a file of Lean, the reader's outline of it as data, its fabulam and the three pshorts entailed from it. The
-program of section 20.13 is compiled by the suite's test, as the other blocks marked `thym` are, and run by none.
+programs of section 20.13 are compiled by the suite's test, as the other blocks marked `thym` are, and run by none.
 
 ### 24.4 Where an implementation and this text disagree
 

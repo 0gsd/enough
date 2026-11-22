@@ -3647,13 +3647,13 @@ class, while each field of a class the head states has the head's type and plain
 | `declared-once` | error | in a fabulam, every `C:statement`, `C:definition` and `C:lemma` carries `lean` and a span; no two of them carry the same `lean`; a `C:constant` carries none; a `C:reliance` carries the names it leans on, in `lean` |
 | `statement-whole` | error | a fabulam that stands alone holds at least one `C:statement`, and a head one for every target; a part holds one for each target that its own file declares, and needs no other; each statement names a `source.target`, and has `says` and `quantifiers`; `atem.of` names a statement, or, in a part that holds none, one of the part's own declaration items; `relates` stands only between two |
 | `yield-stated` | error | every statement has exactly one `P:yield`: its `beyond` a quoted word, `as-statement` exactly when `yes`, `needs` and `chooses` lists, each entry of `chooses` whole, and `trivial` with an entry or `no-trivial` with a sentence |
-| `fit-stated` | error | when `source.wording` is set, every statement has exactly one `P:fit` and `E:work/wording` exists; when it is not, there is no `P:fit` |
+| `fit-stated` | error | when the source names a public wording, in `source.wording`, every statement has exactly one `P:fit`, and the wording's own item exists, `E:work/wording`; when it names none, there is no `P:fit` |
 | `spine-told` | error | every lemma with `reached: yes` has a `role`, and no other lemma has one; every spine lemma has `why` and is in the `steps` of a stage; following `uses` from the statements reaches every spine lemma, where the fabulam holds a statement |
 | `stages-whole` | error | the stages' `number`s run 1, 2, 3 with no gap; exactly one stage is the `reduction`, and it has `obvious`; each stage has `plain` and `plain-if`; `teaching` lists every stage once, the reduction first, then by `stage` in the order of section 18.4.10 |
 | `grounds-given` | error | every `P:yield`, every `P:reading` and every `slack` entry has grounds with lines; every `C:step` has `inside` and a span inside it |
 | `audit-whole` | error | every row of `audit` has `lines`, `kind` and a `verdict` of the closed list; a row says `claim` exactly when it names a `P:claim`; every `P:claim` whose source is a comment is named by one row; every claim's `checked` is one of the four words, with the fields that word asks for |
 | `stance-fits` | error | each item's stance is one that its kind's row in section 18.4.10 allows; a `hearsay` item names its source in `provenance.sources`; an item that is a model's opinion says its `confidence`; `assumed` stands only on a reliance without `stated-in`, a term or a concept; `deduced` may stand on any kind |
-| `checking-said` | error | `P:claim/checking` exists; `source.checking.built-here` is `no`; the item's `says` holds `said` only with `said-by`; without them it holds none of "machine-checked", "verified", "certified" and "proved correct" |
+| `checking-said` | error | what is said about checking is said once, and by rule: `source.checking.built-here` is `no`; the fixed item exists, `P:claim/checking`; its `says` holds `said` only with `said-by`; without them it holds none of "machine-checked", "verified", "certified" and "proved correct" |
 | `example-worked` | error | every statement has a `P:case` with `from: worked`, whose `given` and `expect` each hold a number |
 | `no-up-to` | error | no field of a `P:yield` and no stage's `plain` holds "up to"; the phrase is allowed before "isomorphism", "order", "sign", "symmetry" and "relabelling" |
 | `statements-agree` | error | a `C:reliance` with `stated-in` has the `lean` and the `digest` of the head's item it names, and its `gives` is that item's `says`; a head's own item agrees in the same way with the part it is told in |
@@ -3663,8 +3663,10 @@ class, while each field of a class the head states has the head's type and plain
 | `spine-rule-differs` | warning | a candidate of the rule (section 18.4.10) was judged `bookkeeping`, or a lemma with `carries: 0` at depth 3 or more was judged `spine`; a question is raised about each |
 
 A fabulac whose `purpose` is `transconception` runs the checks of section 18.4.9 as well. The rows from
-`declared-once` on are a fabulam's, and hold over the fabulam alone. A fabulam is built in stages, and each stage
-lands a fabulam that passes these checks, so an outline is a valid fabulam. A check that asks for what a later stage
+`declared-once` on are a fabulam's, and hold over the fabulam alone. A fabulam is built in stages, and a host runs
+these checks each time a stage lands: a landing that fails one is refused, and nothing is written. Thym's
+`fabula-checks`, which every stage's contract keeps, holds the generic checks (Thym, its section 20.13). So an
+outline passes them, and is a valid fabulam. A check that asks for what a later stage
 writes, every statement's yield, the stages and the teaching order, the worked example, the comments' verdicts, a
 reached lemma's role, the fit, holds it only once the fabulam says it is whole, `derived.completeness: full`, or once
 that layer has begun: one yield, one stage, one verdict, one role or one fit is there. What is there is always held to
@@ -3902,7 +3904,7 @@ takes an `x` in front. When two names give one id, the later takes `-2`. An inst
 Each item's stance is from the fabula's closed list (section 18.4.3), and in a fabulam each stance has one meaning.
 The check `stance-fits` holds each kind to its row:
 
-| Stance | In a fabulam | Kinds that may carry it |
+| A stance, in a fabulam | Is used for | Kinds that may carry it |
 |---|---|---|
 | `observed` | read from a statement or a definition of the source, as written, or counted from its text | `C:file`, `C:statement`, `C:definition`, `C:lemma`, `C:dependency`, `P:assumption`, `N:decision`, every kind of R, and `P:claim/checking` while the person has given no entry |
 | `deduced` | found by rule from other items, or from the names one declaration uses of another; a neighbour's statement copied from the head | a `C:reliance` with `stated-in`, and anything a rule adds |
@@ -4018,7 +4020,7 @@ Every mismatch between a comment and the source is a claim. So is every remark t
 would want kept: a credit, a piece of history, a judgement. A `P:claim` says what it is `about`, an item or a few
 words, and its `checked` says how it stands against the source:
 
-| `checked` | Means | Also carries |
+| A claim's `checked` | Means | Also carries |
 |---|---|---|
 | `yes` | a statement of the file bears it out in full | `by` |
 | `partial` | a statement bears it out in part | `by`; `short-of`, what is missing; `mismatch`; `false-as-written`, `yes` or `no` |
@@ -4098,17 +4100,19 @@ theorem or lemma of the file that is not private, is not deprecated, and that no
 an alias of it aside. A file of a library can give many. When the rule gives more than three, a builder asks the person
 to choose, and builds nothing until they do.
 
-After each stage the fabulam, with what the stage found, is written, and a build that stops is taken up again after the
-last stage that landed, as long as the file's sha256 is still the one recorded. Each run joins `derived.runs`. The
-survey writes `derived.completeness: outline`, and only the last stage writes `full`: until then the checks ask of a
-fabulam only what its stages so far have written (section 18.4.8). A build with no model runs the survey and stops at
-the outline: every declaration with its lines and its reach, and nothing read for meaning. The moves are Thym's (Thym,
-its section 20.13).
+After each stage the fabulam, with what the stage found, is held to its checks and written, or refused whole with
+nothing written (section 18.4.8), and a build that stops is taken up again after the last stage that landed, as long as
+the file's sha256 is still the one recorded. Each run joins `derived.runs`. The survey writes
+`derived.completeness: outline`, and only the last stage writes `full`: until then the checks ask of a fabulam only
+what its stages so far have written (section 18.4.8). A build with no model runs the survey and stops at the outline: every declaration with
+its lines and its reach, and nothing read for meaning. The moves are Thym's (Thym, its section 20.13).
 
 **A head fabulam and its parts.** A proof of several files is told one file at a time: each file has a fabulam of its
 own, a part, and a **head fabulam** names the parts, as a head fabulac does (section 18.4.7). The head's catalog lists
-them in `parts`, each `{uri, path, sha256}`, and each part names its head in `head`. The head's `source` is the folder.
-The files one head covers are its archive: a name that leads outside the archive is a library's name.
+them in `parts`, each `{uri, path, sha256}`, and each part names its head in `head`. A head's survey names no part yet:
+a part's entry in `parts`, and its component's `told-in`, are written when a landed part is tied in. The head's
+`source` is the folder. The files one head covers are its archive: a name that leads outside the archive is a library's
+name.
 
 The parts are kept in a folder beside the head, `<name>.fabulam.parts/`, which mirrors the folders of the source, each
 part named for its file, `<File>.fabulam.cosm`. A part's id is `fabula/<name>--<module>`, the module's name with a
@@ -4119,7 +4123,7 @@ The head states once whatever a part needs of another, so that each part reads a
 | The head states | As |
 |---|---|
 | the targets, the Lean version, the licence, the wording, and what is said about checking | its `source`, `E:work/wording`, `P:claim/checking` and `R:licence`; each part repeats `toolchain`, `target` and `checking`, by rule |
-| every declaration that crosses: one that a reached declaration of another part names | an item of its own of the same id, a `C:statement`, `C:lemma` or `C:definition`, with `lean`, `says` and `digest` copied from the part by rule, `told-in`, the URI of the part's item, its `depth` and its `carries` over the whole archive, and `role-there`, its role in its own part |
+| every declaration that crosses: one that a reached declaration of another part names | an item of its own of the same id, a `C:statement`, `C:lemma` or `C:definition`, with `lean`, `says` and `digest` copied from the part by rule, `told-in`, the URI of the part's item, its `depth` and its `carries` over the whole archive, `uses`, by rule, among the head's own items, and `role-there`, its role in its own part |
 | the members of a structure or a class that crosses | `fields` on the head's `C:definition`, copied from the part |
 | what each part is | one `C:component` for each part: `told-in`, `does`, `offers`, `stages`, `counts` and `completeness` (section 18.4.2) |
 | the yield of each target | the `P:yield` of the part that holds the target, copied by rule, with `told-in` |
@@ -5400,7 +5404,8 @@ disagreed and one was corrected, the entry says which.
    `example-worked`, `no-up-to`, `statements-agree`, `regime-named`, `no-judgement`, `plain-words` and
    `spine-rule-differs`. `flavour` takes four values, and `code-span`, `licence-recorded` and `parts-resolve` read a
    fabulam as they read a fabulac. A check that asks for what a later stage writes holds only once the fabulam is whole
-   or that layer has begun, so an outline is a valid fabulam. The checks against the source, and those of a pshort,
+   or that layer has begun, so an outline is a valid fabulam. A host runs them each time a stage lands, and refuses a
+   landing that fails one. The checks against the source, and those of a pshort,
    are Thym's (its section 7.3).
 8. **Four smaller things.** Entailment's definition names a proof: a formal proof entails its fabulam, and a fabulam
    a pshort (section 18.1). A kind may say `open`, the fields of its own that the manifest's shared closed lists do

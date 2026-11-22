@@ -27,7 +27,9 @@ SHIPPED = REPO / "defaults" / "thym"
 #: 20.9), and decompile-verse-quick, the one-call fabulap it replaced as the full build (20.5); defaults/thym/ also
 #: holds the three thym 0 programs of 0.5.0.
 ROUND = ("compile-python", "decompile-prose", "decompile-python", "decompile-verse", "decompile-verse-quick", "settle",
-         "tighten", "entail-pshort")              # entail-pshort: 0.9, Thym 20.13's block (the fabulam's pshorts)
+         "tighten",
+         # 0.9, Thym 20.13: the fabulam's six programs, a head's two, and its pshorts
+         "decompile-lean", "decompile-lean-archive", "entail-pshort")
 
 
 def scratch_decls() -> dc.Declarations:
@@ -143,8 +145,8 @@ def test_the_draft_holds_the_blocks_this_round_names():
                             # 0.8: transconception (20.10), authoring (20.11), the authored entailment run (20.12)
                             "ground-the-fabulac", "begin-from-a-brief", "entail-authored-python",
                             "test-the-entailment",
-                            # 0.9: the fabulam's pshorts (20.13)
-                            "entail-the-pshorts"]), names
+                            # 0.9, the fabulam (20.13): decompile-lean opens on its contract block
+                            "its-own-file", "survey-the-archive", "entail-the-pshorts"]), names
 
 
 SHIPPED_FILES = [SHIPPED / f"{n}.thym" for n in ROUND]
@@ -172,13 +174,9 @@ def test_the_shipped_programs_are_the_six_of_the_design_and_the_three_of_0_5_0()
     # author-python (0.8) is Thym 20.11's block on v080-texts, ahead of the bundled text: tests/test_fabulac_author.py
     # compiles, plans and enumerates it; it joins ROUND when the sync brings 20.11 here. entail-authored-python (0.8)
     # is Thym 20.7's second block on v080-texts, the same way: tests/test_fabulac_entail.py holds it to the text
-    # decompile-lean and decompile-lean-archive (0.9) are Thym 20.13's programs, a table in the bundled text until
-    # its next pass makes them blocks: tests/test_fabulam_job.py compiles and plans them; they join ROUND then
     assert sorted(p.stem for p in SHIPPED.glob("*.thym")) == sorted(ROUND + ("open-house", "publish-story",
                                                                              "read-my-way", "author-python",
-                                                                             "entail-authored-python",
-                                                                             "decompile-lean",
-                                                                             "decompile-lean-archive"))
+                                                                             "entail-authored-python"))
 
 
 def test_the_shipped_programs_plan_as_the_text_says():
