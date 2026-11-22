@@ -2,55 +2,431 @@
   "format": "cosmoes-library/1",
   "about": "The language library's registry. Shelves, and one entry per text: kept (aboard true, written by scripts/fetch_library.py with the text's folder) or pinned by name and version only (aboard false, never copied). Never in specs/specs.json. See README.md.",
   "shelves": [
-    {"slug": "python", "title": "Python", "kind": "language", "about": "The Python documentation, kept as the publisher's plain-text build for each version a transcoding names and the current release."},
-    {"slug": "ecmascript", "title": "ECMAScript", "kind": "language", "about": "ECMA-262 for each edition, under Ecma International's alternative copyright notice; its conformance tests are pinned."},
-    {"slug": "go", "title": "Go", "kind": "language", "about": "The Go Programming Language Specification for each release."},
-    {"slug": "rust", "title": "Rust", "kind": "language", "about": "The Rust Reference and the FLS for each release; neither claims to be complete."},
-    {"slug": "json", "title": "JSON", "kind": "standard", "about": "RFC 8259, kept whole and served only as the publisher's own file."},
-    {"slug": "unicode", "title": "Unicode", "kind": "standard", "about": "The Unicode Character Database's data files, kept whole; the core specification is pinned, not kept."},
-    {"slug": "ieee-754", "title": "IEEE 754", "kind": "standard", "about": "Floating-point arithmetic: sold, all rights reserved, so pinned by name and version only."}
+    {
+      "slug": "python",
+      "title": "Python® documentation",
+      "kind": "language",
+      "about": "The Python documentation, kept as the publisher's plain-text build for each version a transcoding names and the current release."
+    },
+    {
+      "slug": "ecmascript",
+      "title": "ECMAScript",
+      "kind": "language",
+      "about": "ECMA-262 for each edition, under Ecma International's alternative copyright notice; its conformance tests are pinned."
+    },
+    {
+      "slug": "go",
+      "title": "Go",
+      "kind": "language",
+      "about": "The Go Programming Language Specification for each release."
+    },
+    {
+      "slug": "rust",
+      "title": "Rust",
+      "kind": "language",
+      "about": "The Rust Reference and the FLS for each release; neither claims to be complete."
+    },
+    {
+      "slug": "lean",
+      "title": "Lean",
+      "kind": "language",
+      "about": "Lean 4 and Mathlib, which the fabulam reads as text and leans on by name: pinned by release and commit, never kept."
+    },
+    {
+      "slug": "json",
+      "title": "JSON",
+      "kind": "standard",
+      "about": "RFC 8259, kept whole and served only as the publisher's own file."
+    },
+    {
+      "slug": "unicode",
+      "title": "Unicode® data files",
+      "kind": "standard",
+      "about": "The Unicode® Character Database's data files, kept whole; the core specification is pinned, not kept."
+    },
+    {
+      "slug": "ieee-754",
+      "title": "IEEE 754",
+      "kind": "standard",
+      "about": "Floating-point arithmetic: sold, all rights reserved, so pinned by name and version only."
+    }
   ],
   "texts": [
     {
-      "shelf": "python", "text": "cpython", "version": "3.13", "name": "CPython", "publisher": "Python Software Foundation",
-      "what": "implementation", "lane": "open", "aboard": false,
-      "licence": {"name": "PSF License Version 2", "url": "https://docs.python.org/3.13/license.html"},
-      "from": "https://github.com/python/cpython", "release": null, "swhid": null, "digest": null,
+      "shelf": "python",
+      "text": "cpython",
+      "version": "3.13",
+      "name": "CPython",
+      "publisher": "Python Software Foundation",
+      "what": "implementation",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "PSF License Version 2",
+        "url": "https://docs.python.org/3.13/license.html"
+      },
+      "from": "https://github.com/python/cpython",
+      "release": null,
+      "swhid": null,
+      "digest": null,
       "note": "The implementation tally runs on (3.13.11 on this Mac, 2026-11-18). Release, digest and swhid are filled when a transcoding names it; never copied."
     },
     {
-      "shelf": "ecmascript", "text": "test262", "version": "17.0", "name": "test262", "publisher": "Ecma International (TC39)",
-      "what": "tests", "lane": "open", "aboard": false,
-      "licence": {"name": "BSD 3-Clause", "url": "https://github.com/tc39/test262/blob/main/LICENSE"},
-      "from": "https://github.com/tc39/test262", "release": null, "swhid": null, "digest": null,
+      "shelf": "python",
+      "text": "docs",
+      "version": "3.13",
+      "name": "The Python documentation",
+      "publisher": "Python Software Foundation",
+      "what": "text",
+      "form": "text",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "PSF License Version 2; examples, recipes and other code in the documentation are also under the Zero-Clause BSD license",
+        "url": "https://docs.python.org/3.13/license.html"
+      },
+      "copyright": "Copyright © 2001-2024 Python Software Foundation. All rights reserved.\n\nCopyright © 2000 BeOpen.com. All rights reserved.\n\nCopyright © 1995-2000 Corporation for National Research Initiatives.\nAll rights reserved.\n\nCopyright © 1991-1995 Stichting Mathematisch Centrum. All rights\nreserved.",
+      "publisher_page": "https://docs.python.org/3.13/",
+      "from": "https://docs.python.org/3.13/archives/python-3.13-docs-text.tar.bz2",
+      "obtained": "2026-11-19T00:16:33Z",
+      "files": 514,
+      "digest": "sha256:5f54ca16888295042aca28f1b28bd4a207d186f64c8595484efc5ea43f5e9564",
+      "address": "https://cosmoes.org/library/python/docs/3.13/"
+    },
+    {
+      "shelf": "python",
+      "text": "docs",
+      "version": "3.15",
+      "name": "The Python documentation",
+      "publisher": "Python Software Foundation",
+      "what": "text",
+      "form": "text",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "PSF License Version 2; examples, recipes and other code in the documentation are also under the Zero-Clause BSD license",
+        "url": "https://docs.python.org/3.15/license.html"
+      },
+      "copyright": "Copyright © 2001 Python Software Foundation. All rights reserved.\n\nCopyright © 2000 BeOpen.com. All rights reserved.\n\nCopyright © 1995-2000 Corporation for National Research Initiatives.\nAll rights reserved.\n\nCopyright © 1991-1995 Stichting Mathematisch Centrum. All rights\nreserved.",
+      "publisher_page": "https://docs.python.org/3.15/",
+      "from": "https://docs.python.org/3.15/archives/python-3.15-docs-text.tar.bz2",
+      "obtained": "2026-11-22T18:33:45Z",
+      "files": 553,
+      "digest": "sha256:e1d0742e7a796573d86fc9a4a8a1e37c1393e9782478ef7c528373ab0c4c1209",
+      "address": "https://cosmoes.org/library/python/docs/3.15/"
+    },
+    {
+      "shelf": "ecmascript",
+      "text": "ecma-262",
+      "version": "17.0",
+      "name": "ECMA-262, ECMAScript 2026 Language Specification",
+      "publisher": "Ecma International",
+      "what": "standard",
+      "form": "html",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "Ecma International's alternative copyright notice and copyright license (the edition's annex)",
+        "url": "https://ecma-international.org/policies/by-ipr/ecma-text-copyright-policy/"
+      },
+      "copyright": "Ecma International\n\nRue du Rhone 114\n\nCH-1204 Geneva\n\nTel: +41 22 849 6000\n\nFax: +41 22 849 6001\n\nWeb: https://ecma-international.org/\n\nCopyright Notice\n\nALTERNATIVE COPYRIGHT NOTICE AND COPYRIGHT LICENSE\n\n© 2026 Ecma International\n\nBy obtaining and/or copying this work, you (the licensee) agree that you have read, understood, and will comply with the following terms and conditions.\n\nPermission under Ecma’s copyright to copy, modify, prepare derivative works of, and distribute this work, with or without modification, for any purpose and without fee or royalty is hereby granted, provided that you include the following on ALL copies of the work or portions thereof, including modifications:\n\n(i) The full text of this COPYRIGHT NOTICE AND COPYRIGHT LICENSE in a location viewable to users of the redistributed or derivative work.\n\n(ii) Any pre-existing intellectual property disclaimers, notices, or terms and conditions. If none exist, the Ecma alternative copyright notice should be included.\n\n(iii) Notice of any changes or modifications, through a copyright statement on the document such as “This document includes material copied from or derived from ECMAScript® 2026 Language Specification https://tc39.es/ecma262/. Copyright © Ecma International.”\n\nDisclaimers\n\nTHIS WORK IS PROVIDED “AS IS,” AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE DOCUMENT WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.\n\nCOPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE DOCUMENT.\n\nThe name and trademarks of copyright holders may NOT be used in advertising or publicity pertaining to the work without specific, written prior permission. Title to copyright in this work will at all times remain with copyright holders.\n\nSoftware License\n\nAll Software contained in this document (\"Software\") is protected by copyright and is being made available under the \"BSD License\", included below. This Software may be subject to third party rights (rights from parties other than Ecma International), including patent rights, and no licenses under such third party rights are granted under this license even if the third party concerned is a member of Ecma International. SEE THE ECMA CODE OF CONDUCT IN PATENT MATTERS AVAILABLE AT https://ecma-international.org/memento/codeofconduct.htm FOR INFORMATION REGARDING THE LICENSING OF PATENT CLAIMS THAT ARE REQUIRED TO IMPLEMENT ECMA INTERNATIONAL STANDARDS.\n\nRedistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n\nRedistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.\n\nRedistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.\n\nNeither the name of the authors nor Ecma International may be used to endorse or promote products derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE ECMA INTERNATIONAL \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL ECMA INTERNATIONAL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+      "publisher_page": "https://262.ecma-international.org/17.0/",
+      "from": "https://262.ecma-international.org/17.0/index.html",
+      "obtained": "2026-11-22T18:34:02Z",
+      "files": 1,
+      "digest": "sha256:4a59d15ec7f0b6df93e239ce7dbf939116e6a94ea5c68458c4ce2126809eee57",
+      "address": "https://cosmoes.org/library/ecmascript/ecma-262/17.0/",
+      "credit": "This copy includes material copied from or derived from ECMAScript® 2026 Language Specification (ECMA-262, 17th edition, June 2026), https://262.ecma-international.org/17.0/index.html.\nECMAScript® is a registered trademark of Ecma International."
+    },
+    {
+      "shelf": "ecmascript",
+      "text": "test262",
+      "version": "17.0",
+      "name": "test262",
+      "publisher": "Ecma International (TC39)",
+      "what": "tests",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "BSD 3-Clause",
+        "url": "https://github.com/tc39/test262/blob/main/LICENSE"
+      },
+      "from": "https://github.com/tc39/test262",
+      "release": null,
+      "swhid": null,
+      "digest": null,
       "note": "The conformance tests for ECMA-262's 17th edition: pinned by commit when one is chosen; never copied."
     },
     {
-      "shelf": "go", "text": "go", "version": "1.27", "name": "The Go toolchain (gc)", "publisher": "The Go Authors (Google)",
-      "what": "implementation", "lane": "open", "aboard": false,
-      "licence": {"name": "BSD-style (the repository's LICENSE)", "url": "https://go.dev/copyright"},
-      "from": "https://go.dev/dl/", "release": "go1.27.4", "swhid": null, "digest": null,
+      "shelf": "go",
+      "text": "go",
+      "version": "1.27",
+      "name": "The Go toolchain (gc)",
+      "publisher": "The Go Authors (Google)",
+      "what": "implementation",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "BSD-style (the repository's LICENSE)",
+        "url": "https://go.dev/copyright"
+      },
+      "from": "https://go.dev/dl/",
+      "release": "go1.27.4",
+      "swhid": null,
+      "digest": null,
       "note": "go1.27.4 was on this Mac on 2026-11-13. Digest and swhid are filled when a transcoding names it; never copied."
     },
     {
-      "shelf": "rust", "text": "rustc", "version": "1.97", "name": "rustc", "publisher": "The Rust Project",
-      "what": "implementation", "lane": "open", "aboard": false,
-      "licence": {"name": "MIT or Apache License 2.0", "url": "https://www.rust-lang.org/policies/licenses"},
-      "from": "https://static.rust-lang.org/dist/", "release": "1.97.1", "swhid": null, "digest": null,
+      "shelf": "go",
+      "text": "spec",
+      "version": "1.27",
+      "name": "The Go Programming Language Specification",
+      "publisher": "The Go Authors (Google)",
+      "what": "standard",
+      "form": "html",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "Creative Commons Attribution 4.0 International (go.dev/copyright: the site's contents)",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "copyright": "Copyright 2009 The Go Authors.",
+      "publisher_page": "https://go.dev/ref/spec",
+      "from": "https://go.dev/dl/go1.27.4.src.tar.gz",
+      "obtained": "2026-11-22T18:34:26Z",
+      "files": 3,
+      "digest": "sha256:e84d44b8a55f8fa499684783a14b6a610983f02b006228e4bb406d791a2df760",
+      "address": "https://cosmoes.org/library/go/spec/1.27/",
+      "credit": "The Go Programming Language Specification (language version go1.27, May 26, 2026), by The Go Authors, https://go.dev/ref/spec, under the Creative Commons Attribution 4.0 International licence, https://creativecommons.org/licenses/by/4.0/. Its pages here are made from a text extraction."
+    },
+    {
+      "shelf": "rust",
+      "text": "fls",
+      "version": "1.97",
+      "name": "The FLS (Rust language specification, formerly the Ferrocene Language Specification)",
+      "publisher": "The Rust Project",
+      "what": "text",
+      "form": "rst",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "MIT or Apache License 2.0, at your option (README.rst; each file's SPDX header)",
+        "url": "https://github.com/rust-lang/fls"
+      },
+      "copyright": "SPDX-FileCopyrightText: The Ferrocene Developers\nSPDX-FileCopyrightText: The Rust Project Contributors",
+      "publisher_page": "https://rust-lang.github.io/fls/",
+      "from": "https://github.com/rust-lang/fls/archive/4ab04b009042e6ab56e07cbe187b0b52988da308.tar.gz",
+      "obtained": "2026-11-22T18:35:38Z",
+      "files": 107,
+      "digest": "sha256:8bdf874f4899efd2ad00495bcc2566d7eb375bda95a29fdbd364717c8f96d154",
+      "address": "https://cosmoes.org/library/rust/fls/1.97/",
+      "pages": "src/"
+    },
+    {
+      "shelf": "rust",
+      "text": "fls",
+      "version": "1.99",
+      "name": "The FLS (Rust language specification, formerly the Ferrocene Language Specification)",
+      "publisher": "The Rust Project",
+      "what": "text",
+      "form": "rst",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "MIT or Apache License 2.0, at your option (README.rst; each file's SPDX header)",
+        "url": "https://github.com/rust-lang/fls"
+      },
+      "copyright": "SPDX-FileCopyrightText: The Ferrocene Developers\nSPDX-FileCopyrightText: The Rust Project Contributors",
+      "publisher_page": "https://rust-lang.github.io/fls/",
+      "from": "https://github.com/rust-lang/fls/archive/946eacae5a4a33a89af7832178504692439e7478.tar.gz",
+      "obtained": "2026-11-22T18:35:22Z",
+      "files": 107,
+      "digest": "sha256:f344e4fcee71975e4ce94c4498160a28d3c442755a77de8ae30576971150eb67",
+      "address": "https://cosmoes.org/library/rust/fls/1.99/",
+      "pages": "src/"
+    },
+    {
+      "shelf": "rust",
+      "text": "reference",
+      "version": "1.100",
+      "name": "The Rust Reference",
+      "publisher": "The Rust Project",
+      "what": "text",
+      "form": "markdown",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "MIT or Apache License 2.0, at your option",
+        "url": "https://github.com/rust-lang/reference"
+      },
+      "copyright": "Copyright (c) 2010 The Rust Project Developers",
+      "publisher_page": "https://doc.rust-lang.org/1.100.0/reference/",
+      "from": "https://github.com/rust-lang/reference/archive/e24eecf97b0c9a6dbac67191098204dc8a190aaa.tar.gz",
+      "obtained": "2026-11-22T18:34:46Z",
+      "files": 213,
+      "digest": "sha256:41967ed69f42050fc90f3eb9850c2a8725c233a56fd5aefd89fe9c98c2910ae1",
+      "address": "https://cosmoes.org/library/rust/reference/1.100/",
+      "pages": "src/"
+    },
+    {
+      "shelf": "rust",
+      "text": "reference",
+      "version": "1.97",
+      "name": "The Rust Reference",
+      "publisher": "The Rust Project",
+      "what": "text",
+      "form": "markdown",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "MIT or Apache License 2.0, at your option",
+        "url": "https://github.com/rust-lang/reference"
+      },
+      "copyright": "Copyright (c) 2010 The Rust Project Developers",
+      "publisher_page": "https://doc.rust-lang.org/1.97.1/reference/",
+      "from": "https://github.com/rust-lang/reference/archive/ad35aca481751a06afeb23820a672b0f3b11a476.tar.gz",
+      "obtained": "2026-11-22T18:35:05Z",
+      "files": 190,
+      "digest": "sha256:68d366b2b35eb2a6cd43dc3c77605dd3d1d93a4e3dc29f196f2ff09075eb1028",
+      "address": "https://cosmoes.org/library/rust/reference/1.97/",
+      "pages": "src/"
+    },
+    {
+      "shelf": "rust",
+      "text": "rustc",
+      "version": "1.97",
+      "name": "rustc",
+      "publisher": "The Rust Project",
+      "what": "implementation",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "MIT or Apache License 2.0",
+        "url": "https://www.rust-lang.org/policies/licenses"
+      },
+      "from": "https://static.rust-lang.org/dist/",
+      "release": "1.97.1",
+      "swhid": null,
+      "digest": null,
       "note": "1.97.1 was on this Mac on 2026-11-13. Digest and swhid are filled when a transcoding names it; never copied."
     },
     {
-      "shelf": "unicode", "text": "standard", "version": "15.1.0", "name": "The Unicode Standard", "publisher": "Unicode, Inc.",
-      "what": "standard", "lane": "closed", "aboard": false,
-      "licence": {"name": "Unicode Terms of Use (personal or internal business use only)", "url": "https://www.unicode.org/copyright.html"},
-      "from": "https://www.unicode.org/versions/Unicode15.1.0/", "swhid": null, "digest": null,
+      "shelf": "lean",
+      "text": "lean4",
+      "version": "4.37.0-rc1",
+      "name": "Lean 4 (the toolchain)",
+      "publisher": "The Lean developers (leanprover)",
+      "what": "implementation",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "Apache License 2.0",
+        "url": "https://github.com/leanprover/lean4/blob/master/LICENSE"
+      },
+      "from": "https://github.com/leanprover/lean4",
+      "release": "v4.37.0-rc1",
+      "swhid": null,
+      "digest": null,
+      "note": "The toolchain the owner's Mathlib clone names (fabulac-test-repos/mathlib4/lean-toolchain: leanprover/lean4:v4.37.0-rc1, a prerelease tagged 2026-11-18). Read as text by the fabulam's reader; enough installs, builds and runs none of it. Never copied."
+    },
+    {
+      "shelf": "lean",
+      "text": "mathlib",
+      "version": "6ebcce37",
+      "name": "Mathlib (mathlib4)",
+      "publisher": "The Mathlib community (leanprover-community)",
+      "what": "text",
+      "lane": "open",
+      "aboard": false,
+      "licence": {
+        "name": "Apache License 2.0",
+        "url": "https://github.com/leanprover-community/mathlib4/blob/master/LICENSE"
+      },
+      "from": "https://github.com/leanprover-community/mathlib4",
+      "release": "6ebcce37335bcb6bca64596e5d57bb3035648030",
+      "swhid": null,
+      "digest": null,
+      "note": "The commit of the owner's clone at fabulac-test-repos/mathlib4 (2026-11-22; its LICENSE is the Apache License 2.0, each file's header names its own copyright holders). A fabulam leans on its declarations by name and lines; it is read as text, never built, never copied."
+    },
+    {
+      "shelf": "json",
+      "text": "rfc",
+      "version": "8259",
+      "name": "RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format",
+      "publisher": "IETF (RFC Editor)",
+      "what": "standard",
+      "form": "unchanged",
+      "lane": "bound",
+      "aboard": true,
+      "licence": {
+        "name": "IETF Trust Legal Provisions relating to IETF Documents (BCP 78)",
+        "url": "https://trustee.ietf.org/documents/trust-legal-provisions/tlp-5/"
+      },
+      "copyright": "   Copyright (c) 2017 IETF Trust and the persons identified as the\n   document authors.  All rights reserved.\n\n   This document is subject to BCP 78 and the IETF Trust's Legal\n   Provisions Relating to IETF Documents\n   (https://trustee.ietf.org/license-info) in effect on the date of\n   publication of this document.  Please review these documents\n   carefully, as they describe your rights and restrictions with respect\n   to this document.  Code Components extracted from this document must\n   include Simplified BSD License text as described in Section 4.e of\n   the Trust Legal Provisions and are provided without warranty as\n   described in the Simplified BSD License.\n\n   This document may contain material from IETF Documents or IETF\n   Contributions published or made publicly available before November\n   10, 2008.  The person(s) controlling the copyright in some of this\n   material may not have granted the IETF Trust the right to allow\n   modifications of such material outside the IETF Standards Process.\n   Without obtaining an adequate license from the person(s) controlling\n   the copyright in such materials, this document may not be modified\n   outside the IETF Standards Process, and derivative works of it may\n   not be created outside the IETF Standards Process, except to format\n   it for publication as an RFC or to translate it into languages other\n   than English.",
+      "publisher_page": "https://www.rfc-editor.org/rfc/rfc8259",
+      "from": "https://www.rfc-editor.org/rfc/rfc8259.txt",
+      "obtained": "2026-11-22T18:35:59Z",
+      "files": 1,
+      "digest": "sha256:d64f8f2c83fd605ff7aa516e562f4ed206170c056fd85966767145a7cc482ecc",
+      "address": "https://cosmoes.org/library/json/rfc/8259/"
+    },
+    {
+      "shelf": "unicode",
+      "text": "standard",
+      "version": "15.1.0",
+      "name": "The Unicode Standard",
+      "publisher": "Unicode, Inc.",
+      "what": "standard",
+      "lane": "closed",
+      "aboard": false,
+      "licence": {
+        "name": "Unicode Terms of Use (personal or internal business use only)",
+        "url": "https://www.unicode.org/copyright.html"
+      },
+      "from": "https://www.unicode.org/versions/Unicode15.1.0/",
+      "swhid": null,
+      "digest": null,
       "note": "The core specification: may not be passed on (copyright.html 3.2.2, 3.4), so named and pinned only. The address follows the publisher's pattern; the owner confirms it."
     },
     {
-      "shelf": "ieee-754", "text": "standard", "version": "2019", "name": "IEEE 754-2019, Standard for Floating-Point Arithmetic", "publisher": "IEEE",
-      "what": "standard", "lane": "closed", "aboard": false,
-      "licence": {"name": "IEEE, all rights reserved (sold)", "url": "https://standards.ieee.org/ieee/754/6210/"},
-      "from": "https://standards.ieee.org/ieee/754/6210/", "swhid": null, "digest": null,
+      "shelf": "unicode",
+      "text": "ucd",
+      "version": "15.1.0",
+      "name": "The Unicode® Character Database",
+      "publisher": "Unicode, Inc.",
+      "what": "data",
+      "form": "data",
+      "lane": "open",
+      "aboard": true,
+      "licence": {
+        "name": "Unicode License v3",
+        "url": "https://www.unicode.org/license.txt"
+      },
+      "copyright": "Copyright © 1991-2026 Unicode, Inc.",
+      "publisher_page": "https://www.unicode.org/Public/15.1.0/ucd/",
+      "from": "https://www.unicode.org/Public/15.1.0/ucd/UCD.zip",
+      "obtained": "2026-11-22T18:36:16Z",
+      "files": 70,
+      "digest": "sha256:c2641803039534ef1c0f47f91422f3fed1c05a56f80647958361969a9f51f5f2",
+      "address": "https://cosmoes.org/library/unicode/ucd/15.1.0/",
+      "credit": "Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the United States and other countries."
+    },
+    {
+      "shelf": "ieee-754",
+      "text": "standard",
+      "version": "2019",
+      "name": "IEEE 754-2019, Standard for Floating-Point Arithmetic",
+      "publisher": "IEEE",
+      "what": "standard",
+      "lane": "closed",
+      "aboard": false,
+      "licence": {
+        "name": "IEEE, all rights reserved (sold)",
+        "url": "https://standards.ieee.org/ieee/754/6210/"
+      },
+      "from": "https://standards.ieee.org/ieee/754/6210/",
+      "swhid": null,
+      "digest": null,
       "note": "Offered by purchase or subscription; named and pinned only."
     }
   ]

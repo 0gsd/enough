@@ -31,9 +31,10 @@ texts:
     what: text
     form: text
     lane: open
-    aboard: false
+    aboard: true
     licence: {name: 'PSF License Version 2; examples, recipes and other code in the documentation are also under the
         Zero-Clause BSD license', url: 'https://docs.python.org/3.13/license.html'}
+    from: https://docs.python.org/3.13/archives/python-3.13-docs-text.tar.bz2
     cited-as: python
     cited-version: 3.13.18
 pins:

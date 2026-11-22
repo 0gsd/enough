@@ -184,13 +184,17 @@ def test_the_catalogues_head_agrees_with_the_library():
     lib = json.loads(LIBRARY_JSON.read_text(encoding="utf-8"))
     doc = L.catalogue("python")
     assert L.catalogue_agrees(doc, lib) == []
-    # the docs are not aboard yet (the owner's fetch adds them): the head says so
-    assert [t["aboard"] for t in doc["texts"]] == [False]
+    # the docs are aboard (the owner's 0.8 fetch of the 3.13.18 build; the fixture is cosmoes-site's registry as of
+    # the 0.9 fetch sitting, byte for byte): the head says so, with the address the text came from
+    assert [t["aboard"] for t in doc["texts"]] == [True]
+    assert doc["texts"][0]["from"] == "https://docs.python.org/3.13/archives/python-3.13-docs-text.tar.bz2"
     bad = json.loads(json.dumps(doc))
     bad["pins"][0]["name"] = "PyPy"
-    bad["texts"][0]["aboard"] = True
+    bad["texts"][0]["aboard"] = False
     probs = L.catalogue_agrees(bad, lib)
-    assert any("says name 'PyPy'" in p for p in probs) and any("aboard: false" in p for p in probs)
+    assert any("says name 'PyPy'" in p for p in probs) and any("says aboard False" in p for p in probs)
+    del bad["texts"][0]["from"]
+    assert any("carries no from" in p for p in L.catalogue_agrees(bad, lib))
 
 
 @pytest.mark.skipif(not DOCS.is_dir(), reason="the owner's 0.7 fetch of the 3.13 documentation is not here")
