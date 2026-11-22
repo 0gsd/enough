@@ -9,16 +9,18 @@ here, not a branch elsewhere.
 
 | field | means |
 |---|---|
-| `reads` | the syntax engine (`enough.repo_engine`) reads its files: an outline, a parse, the survey's rules |
-| `parses` | the `parses` check holds for it (a cshort in it is parsed by the syntax engine) |
+| `reads` | the syntax engine (`enough.repo_engine`) reads its files, through its `reader`: an outline, the survey's rules |
+| `parses` | the syntax engine parses its files (`parse`), and the `parses` check holds for it (a cshort in it is parsed) |
 | `runs` | enough may run an authored entailment in it, in the sandbox only (Thym 20.12) |
 | `target` | it may be weighed (`weigh f in <language>`) and entailed into (`entail f as code in <language>`) |
 | `ground` | its ground catalogue, relative to the repository (`defaults/cosm/ground/<language>.ground.cosm`) |
 | `provides` | its target table, what it provides for each ground entry when a program is entailed into it, and the points of weighing that are facts of the language alone (`defaults/cosm/ground/targets/<language>.cosm`; read by `weigh f in <language>`) |
-| `decompile`, `compile` | the shipped programs (`defaults/thym/`) that build a fabulac of it and entail one into it |
+| `decompile`, `compile` | the shipped programs (`defaults/thym/`) that build a fabula of it (its `flavour`) and entail from that fabula |
 | `shelf` | its shelf in the language library (cosmoes-site `library/<shelf>/`, `library.json`) |
 | `runtime` | the package name its runtime's `C:dependency` carries (`C:dependency/<runtime>`) |
 | `names` | the words a text uses when it names the language, its runtime or its standard library (`stands-alone`) |
+| `reader` | the module whose `outline` (and `uses`, `graph`, `reach`, where it has them) the syntax engine hands on to |
+| `flavour` | the flavour of fabula a decompile of the language makes (`fabulac` for Python, `fabulam` for Lean) |
 
 Standalone: the standard library, and `enough.macrocosm` only to read a ground catalogue.
 """
@@ -30,7 +32,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-#: The language the builder reads today, the only one with `reads`: what a survey of a folder is taken to be.
+#: The language a survey of a folder is taken to be when nothing names one (Lean is read file by file, by its
+#: own reader).
 DEFAULT = "python"
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -64,6 +67,8 @@ class Language:
     runtime: str | None = None
     names: re.Pattern | None = field(default=None, compare=False)
     provides: str | None = None
+    reader: str | None = None
+    flavour: str | None = None
 
     def owns(self, path: str) -> bool:
         """Whether a file of this name is written in this language, by its suffix."""
@@ -83,7 +88,12 @@ LANGUAGES: dict[str, Language] = {
     "python": Language(
         name="python", title="Python", suffixes=("py", "pyi"), reads=True, parses=True, runs=True, target=True,
         ground="defaults/cosm/ground/python.ground.cosm", decompile="decompile-python.thym",
-        compile="compile-python.thym", shelf="python", runtime="python", names=_PYTHON_NAMES),
+        compile="compile-python.thym", shelf="python", runtime="python", names=_PYTHON_NAMES,
+        reader="enough.repo_engine", flavour="fabulac"),
+    "lean": Language(
+        name="lean", title="Lean", suffixes=("lean",), reads=True, parses=False, runs=False, target=False,
+        ground=None, provides=None, decompile="decompile-lean.thym", compile="entail-pshort.thym",
+        shelf=None, runtime="lean", names=None, reader="enough.lean_reader", flavour="fabulam"),
     "go": Language(name="go", title="Go", suffixes=("go",), target=True, shelf="go", runtime="go",
                    provides="defaults/cosm/ground/targets/go.cosm"),
     "rust": Language(name="rust", title="Rust", suffixes=("rs",), target=True, shelf="rust", runtime="rust",
@@ -115,12 +125,13 @@ def suffixes() -> dict[str, str]:
 
 
 def reads(name: Any) -> bool:
-    """Whether the syntax engine reads the language (Python only in this build)."""
+    """Whether the syntax engine reads the language (Python and Lean in this build)."""
     lang = get(name)
     return bool(lang and lang.reads)
 
 
 def parses(name: Any) -> bool:
+    """Whether the syntax engine parses the language (Python only: Lean is read as text and never parsed)."""
     lang = get(name)
     return bool(lang and lang.parses)
 
@@ -144,6 +155,18 @@ def source_names(name: Any) -> re.Pattern | None:
     """The words that name a source language, its runtime or its standard library (`stands-alone`), or None."""
     lang = get(name)
     return lang.names if lang else None
+
+
+def reader(name: Any) -> str | None:
+    """The module the syntax engine hands a language's files on to, or None for one it does not read."""
+    lang = get(name)
+    return lang.reader if lang and lang.reads else None
+
+
+def flavour(name: Any) -> str | None:
+    """The flavour of fabula a decompile of the language makes, or None."""
+    lang = get(name)
+    return lang.flavour if lang else None
 
 
 def program(name: Any, which: str) -> str:
@@ -392,5 +415,5 @@ def catalogue_agrees(doc: dict, library: dict) -> list[str]:
 
 
 __all__ = ["DEFAULT", "LANGUAGES", "Language", "PROVIDED_BY", "TABLE_POINTS", "catalogue", "catalogue_agrees",
-           "entries", "get", "lint_catalogue", "lint_provides", "of_path", "parses", "program", "provides_table",
-           "reading", "reads", "require", "runs", "source_names", "suffixes", "targets"]
+           "entries", "flavour", "get", "lint_catalogue", "lint_provides", "of_path", "parses", "program", "provides_table",
+           "reader", "reading", "reads", "require", "runs", "source_names", "suffixes", "targets"]

@@ -29,6 +29,7 @@ import configparser
 import datetime as dt
 import doctest
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -327,7 +328,7 @@ def language(path: str) -> str:
 def parse(path: str, text: str) -> dict:
     """`{ok: true}` or `{ok: false, line, message}` for a file in a language this edition parses (Python), by
     `ast.parse` on the text; `{ok: null, why}` for any other language. Nothing is imported or executed."""
-    if not _languages.reads(language(path)):
+    if not _languages.parses(language(path)):
         return {"ok": None, "why": f"{path} is not Python, and this edition parses Python only"}
     try:
         ast.parse(text, filename=path)
@@ -785,7 +786,30 @@ def _is_alias(n: ast.AST, val: ast.AST) -> bool:
     return False
 
 
+def _reader(lang: str) -> Any:
+    """The module a language's files are handed on to (`enough.languages`, the field `reader`), or None when the
+    syntax engine does not read the language. Python's reader is this module."""
+    name = _languages.reader(lang)
+    if not name:
+        return None
+    if name == __name__:
+        return sys.modules[__name__]
+    return importlib.import_module(name)
+
+
 def outline(path: str, text: str) -> dict:
+    """A file's outline, from the reader of its language (`enough.languages`): Python's below (`_outline_python`),
+    Lean's in `enough.lean_reader`; `{ok: null, language, why}` for a language the syntax engine does not read."""
+    lang = language(path)
+    mod = _reader(lang)
+    if mod is None:
+        return {"ok": None, "language": lang, "why": f"no outline of {lang} in this edition"}
+    if mod is sys.modules[__name__]:
+        return _outline_python(path, text)
+    return mod.outline(path, text)
+
+
+def _outline_python(path: str, text: str) -> dict:
     """A Python file's outline from its syntax tree (never run): `{ok, language, lines, doc, all, imports, defs,
     constants, env, main, argparse}`, every line number an integer, every value as written. `defs` are the
     module's functions and classes and the classes' methods (`qual` `Class.method`), each with `kind`, `line`,
@@ -793,8 +817,6 @@ def outline(path: str, text: str) -> dict:
     functions are left out. A file that does not parse gives `{ok: false, line, message}`; a file in another
     language `{ok: null, language, why}`."""
     lang = language(path)
-    if not _languages.reads(lang):
-        return {"ok": None, "language": lang, "why": f"no outline of {lang} in this edition, which reads Python"}
     try:
         tree = ast.parse(text, filename=path)
     except (SyntaxError, ValueError) as e:
@@ -1201,6 +1223,19 @@ def _written(n: ast.AST | None) -> str | None:
 
 
 def uses(path: str, text: str) -> dict:
+    """What a file takes from its language and its library, from the reader of its language: Python's below
+    (`_uses_python`); `{ok: null, language, why}` for a language whose reader has no `uses` (Lean's has none: a
+    fabulam is not grounded)."""
+    lang = language(path)
+    mod = _reader(lang)
+    if mod is sys.modules[__name__]:
+        return _uses_python(path, text)
+    if mod is None or not callable(getattr(mod, "uses", None)):
+        return {"ok": None, "language": lang, "why": f"no uses of {lang} in this edition"}
+    return mod.uses(path, text)
+
+
+def _uses_python(path: str, text: str) -> dict:
     """What a Python file takes from its language and its library, read from its syntax (never run): the ground's
     input (MacroCOSM OES 18.4.9; Thym 20.10). Gives `{ok, language, imports, calls, attrs, annotations, forms,
     decorators, bases, handlers, strings, entry}`, each site with its `line` and the definition it is in (`in`, the
@@ -1224,8 +1259,6 @@ def uses(path: str, text: str) -> dict:
 
     A file that does not parse gives `{ok: false, line, message}`; a file in another language `{ok: null, why}`."""
     lang = language(path)
-    if not _languages.reads(lang):
-        return {"ok": None, "language": lang, "why": f"no uses of {lang} in this edition, which reads Python"}
     try:
         tree = ast.parse(text, filename=path)
     except (SyntaxError, ValueError) as e:
@@ -1543,8 +1576,35 @@ def is_packaging(path: str) -> bool:
     return "/" not in path and (name in PACKAGING or re.fullmatch(r"requirements[\w.-]*\.txt", name) is not None)
 
 
+def _reader_of(lang: Any, what: str) -> tuple[Any, dict | None]:
+    mod = _reader(str(lang or ""))
+    fn = getattr(mod, what, None) if mod is not None and mod is not sys.modules[__name__] else None
+    if not callable(fn):
+        return None, {"ok": None, "language": lang, "why": f"no {what} of {lang} in this edition"}
+    return fn, None
+
+
+def graph(outlines: dict) -> dict:
+    """The declarations of a set of files and which uses which, from the reader of their language (Lean's:
+    `enough.lean_reader.graph`, design docs/v090-fabulam-design.md 3.2). `outlines` maps each path to its `outline`;
+    every outline must be of one language. `{ok: null, why}` for a language whose reader has no graph."""
+    langs = sorted({str(o.get("language")) for o in (outlines or {}).values() if isinstance(o, dict)})
+    if len(langs) != 1:
+        return {"ok": None, "why": "a graph is of the files of one language" if langs else "no outlines"}
+    fn, refusal = _reader_of(langs[0], "graph")
+    return refusal if fn is None else fn(outlines)
+
+
+def reach(graph: dict, targets: Any = None) -> dict:
+    """From a graph's targets down: `reached`, `depth` and `carries` for each declaration and the rule's candidates,
+    from the reader of the graph's language (Lean's: design 4.2). No targets: the targets by rule."""
+    lang = graph.get("language") if isinstance(graph, dict) else None
+    fn, refusal = _reader_of(lang, "reach")
+    return refusal if fn is None else fn(graph, targets)
+
+
 SYNTAX = SimpleNamespace(outline=outline, parse=parse, manifest=manifest, language=language, uses=uses, locks=locks,
-                         catalogue=catalogue)
+                         catalogue=catalogue, graph=graph, reach=reach)
 
 
 def repo_engine() -> Any:
@@ -1563,4 +1623,4 @@ def engines() -> dict:
 
 
 __all__ = ["GIT_OVERRIDES", "REPO", "SYNTAX", "engines", "repo_engine", "syntax_engine", "template", "files", "git_binary", "git_env", "history", "is_lock",
-           "catalogue", "is_packaging", "language", "locks", "manifest", "outline", "parse", "run_git", "swhid", "text", "tree", "uses"]
+           "catalogue", "graph", "is_packaging", "language", "locks", "manifest", "outline", "parse", "reach", "run_git", "swhid", "text", "tree", "uses"]
