@@ -93,6 +93,8 @@ docs/v070-*.md
 docs/v070-*/
 docs/v080-*.md
 docs/v080-*/
+docs/v090-*.md
+docs/v090-*/
 
 # The language library (0.8): copied from cosmoes.org's shelf by scripts/sync_languages.py. Third parties' texts
 # under their own licences, kept and published with their notices at cosmoes.org; never committed here (unlike
