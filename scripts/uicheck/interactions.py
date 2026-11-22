@@ -1717,6 +1717,16 @@ def _settle(d: Driver, what: str, sig: str | None = None, ms: int = 8000, frames
     d.wait_settled(what, sig, timeout=ms / 1000, frames=frames)
 
 
+def _click_when_ready(d: Driver, sel: str, ms: int = 15000) -> None:
+    """Click `sel` once it is there, shown and enabled. A card paints its buttons after its last read, and a click on
+    a button still disabled from the first paint does nothing (0.9, U1: fabulac-build-outline lost its click this way
+    once `_ready` stopped sleeping 120 ms)."""
+    d.wait_until("(() => { const b = document.querySelector(%s); return !!b && !b.disabled && !b.hidden"
+                 " && b.getClientRects().length > 0; })()" % json.dumps(sel), f"{sel} shown and enabled",
+                 timeout=ms / 1000)
+    d.click(sel)
+
+
 def _hold(d: Driver, ms: int) -> None:
     """Let `ms` pass in the page. Only for a negative claim ("this did not
     open"): there is no state to wait on, and the time given is the claim's
@@ -2741,6 +2751,10 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
         d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
         d.wait_for("#wdl-modal:not(.hidden)")
         d.wait_until(WDL_READY[1], "the lightbox's plate", timeout=30)
+        # The plate that is drawn, neighbours and all, before a word inside it is looked for (0.9, U1: seen to
+        # find no word in a plate still being painted, on the old harness too).
+        _wait_js(d, _WDL_HW % "paragraph")
+        _settle(d, "the paragraph plate", "document.getElementById('wdl-scroll').innerHTML")
         if d.js("document.getElementById('wdl-hw').textContent") != "paragraph":
             fails.append("the menu did not open the lightbox on the word")
         if d.js("modeTop() && modeTop().name") != "readedit":
@@ -3887,7 +3901,7 @@ def scenario_fabula_decompile_card(d: Driver) -> list[str]:
         fails.append("closing the card wrote a twin")
     d.js(f"canonDecompileAsk('{FAB_POEM}', 'absent')")
     _ready(d, _FAB_OK)
-    d.click("#fab-go")
+    _click_when_ready(d, "#fab-go")
     if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done')).length > 0", 90000):
         fails.append("no toast said the fabula was written")
     # Asked of the server until the file is there, within 10 s (the page's own loop: `_raw` is a fetch).
@@ -3933,7 +3947,7 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
         fails.append(f"the fabulac card did not open: {first}")
         _reset(d)
         return fails
-    d.click("#fab-go")
+    _click_when_ready(d, "#fab-go")
     if not _wait_js(d, "FAB.result !== null || FAB.error !== null", 90000):
         fails.append("the build did not finish")
         _reset(d)
@@ -3953,7 +3967,7 @@ def scenario_fabulac_build_outline(d: Driver) -> list[str]:
         fails.append(f"the card does not say what waits in the job's words: {st}")
     if not st.get("open"):
         fails.append(f"no \"open the fabulac\" once it exists: {st}")
-    d.click("#fab-open")
+    _click_when_ready(d, "#fab-open")
     d.wait_for("#cosm-mode.open")
     _ready(d, _COSM_OK)
     cv = d.js("(() => ({btn: !document.getElementById('cosm-fab-btn').hidden,"
@@ -5673,7 +5687,7 @@ def scenario_fabulac_first(d: Driver) -> list[str]:
         d.type_text("tally")
         if d.js("document.getElementById('fab-go').disabled"):
             fails.append("begin stays off with a name typed")
-        d.click("#fab-go")
+        _click_when_ready(d, "#fab-go")
         fab = f"{first}/tally.fabulac.cosm"
         if not _wait_js(d, "FAB.face === 'authored' && FA.status !== null && FA.path === %s" % json.dumps(fab), 20000):
             fails.append(f"beginning from the starter did not turn the card to {fab}: {d.js('[FAB.face, FA.path, FA.aerror]')}")
