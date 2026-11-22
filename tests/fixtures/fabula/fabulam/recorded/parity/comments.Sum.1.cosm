@@ -1,0 +1,16 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `comments` over own/Parity/Sum.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: comments
+tokens: 0
+seconds: 0
+output: |
+  audit:
+    - {lines: "1", verdict: nothing}
+    - {lines: "5-9", verdict: agrees}
+    - {lines: "13", verdict: agrees}
+  works: []
+  people: []
+  aims:
+    - {slug: the-sum-of-two-even-numbers, name: 'The sum of two even numbers', summary: 'The module note says the sum of two even numbers is even.', lines: "5-9"}

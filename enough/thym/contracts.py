@@ -31,18 +31,17 @@ CHECKS = (
     "form-grounded", "ground-cited", "target-weighed", "target-confirmed", "case-outside", "cases-whole",
     "source-named", "ruled", "surface-answered", "apart", "evidence-stated", "cases-entailed", "authored-source",
     "only-authored", "in-sandbox",
+    # 0.9, the fabulam (Thym 20.13; enough/thym/moves/proof.py): against the source, then of a pshort
+    "declarations-found", "lines-resolve", "nothing-invented", "reach-agrees", "comments-covered", "nothing-carried",
+    "cites-resolve", "every-sentence-cited", "yield-cited", "teaching-followed", "no-up-to", "example-worked",
+    "checking-told", "confidence-told", "symbols-worded",
 )
 
 # The checks a shipped declaration names ahead of the text: an owner's ruling that section 7.3's table does not hold
 # yet, for the next revision of the specification at cosmoes.org. A test holds each to being no row of the table, so
 # that it leaves this list the day the text takes it. Empty since the 0.8 texts were synced (every check 0.8 built
-# is a row of the bundled 7.3). Since the 0.9 build: the fabulam's checks against its source and of a pshort (Thym
-# 20.13, `enough/thym/moves/proof.py`), which the 0.9 text's 7.3 takes.
-AHEAD: tuple[str, ...] = (
-    "declarations-found", "comments-covered", "reach-agrees", "lines-resolve", "nothing-invented", "nothing-carried",
-    "cites-resolve", "every-sentence-cited", "yield-cited", "teaching-followed", "no-up-to", "example-worked",
-    "checking-told", "confidence-told", "symbols-worded",
-)
+# is a row of the bundled 7.3), and again since the 0.9 texts were synced (the fabulam's fifteen).
+AHEAD: tuple[str, ...] = ()
 
 # The moves a shipped declaration names ahead of the bundled text's 6.3 table. A test holds each to being no row of
 # that table, so it leaves this list the day the text is synced. Empty since the 0.8 sync.

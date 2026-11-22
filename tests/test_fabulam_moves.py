@@ -80,7 +80,7 @@ class Recorded:
             self.sent.append(("question", {}))
             return candidate("questions: []", engine="model:hand-recorded", tokens=0)
         key = f"pshort-{_t(inputs, 'density')}" if job == "pshort" else job
-        stem = Path(_t(inputs, "path")).stem if _t(inputs, "path") else _t(inputs, "name")
+        stem = Path(_t(inputs, "path")).stem if _t(inputs, "path") else _t(inputs, "name").rsplit("-", 1)[-1]
         if f"{key}.{stem}" in self.answers or (self.folder / f"{key}.{stem}.1.cosm").is_file():
             key = f"{key}.{stem}"
         self.sent.append((key, {k: _t(inputs, k) for k in inputs}))

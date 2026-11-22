@@ -1,0 +1,33 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `stages` over own/Parity/Basic.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: stages
+tokens: 0
+seconds: 0
+output: |
+  stages:
+    - slug: what-even-means
+      name: What even means
+      number: 1
+      stage: reduction
+      says: 'The file fixes what it means for a natural number to be even: to be twice a natural number. The files after it need that to speak of even numbers at all.'
+      plain: 'The file says what an even number is: a whole number that splits into two equal whole shares.'
+      plain-if: none
+      obvious: "none: the file's way is the obvious one"
+      steps: [C:definition/Parity.IsEven]
+      confidence: high
+  teaching: [what-even-means]
+  readings:
+    - slug: even-means-twice
+      name: Even means twice
+      summary: 'Being even is given by a witness: the number it is twice of.'
+      of: [what-even-means]
+      grounds: [{of: C:definition/Parity.IsEven, lines: "11"}]
+      confidence: high
+  decisions: []
+  atem:
+    line: 'A natural number is called even when it is twice some natural number, which is the one definition the archive takes from this file.'
+    focus: 'What it means for a number to be even.'
+    push: 'It asks for a witness, the number it is twice of.'
+    pull: 'It says nothing yet about sums.'

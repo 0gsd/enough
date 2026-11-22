@@ -1,0 +1,42 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `stages` over own/Parity/Sum.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: stages
+tokens: 0
+seconds: 0
+output: |
+  stages:
+    - slug: what-must-be-shown
+      name: What must be shown
+      number: 1
+      stage: reduction
+      says: 'To show that m + n is even it is enough to name a number it is twice of.'
+      plain: 'To show that a total can be shared equally between two people, it is enough to say how much each one gets.'
+      plain-if: none
+      obvious: "none: the file's way is the obvious one"
+      steps: [C:statement/Parity.isEven_add]
+      confidence: high
+    - slug: adding-the-halves
+      name: Adding the halves
+      number: 2
+      stage: main
+      says: 'The half of the sum is the sum of the two halves, by the lemma that the doubles of two numbers add to the double of their sum.'
+      plain: 'Each of the two amounts splits into two equal shares, and putting the shares together splits the total into two equal shares.'
+      plain-if: 'Each of the two amounts must itself split into two equal shares.'
+      steps: [C:step/the-witness]
+      confidence: high
+  teaching: [what-must-be-shown, adding-the-halves]
+  readings:
+    - slug: the-half-is-named
+      name: The half is named
+      summary: 'The proof works because it names the half of the sum outright.'
+      of: [adding-the-halves]
+      grounds: [{of: C:step/the-witness, lines: "15-17"}]
+      confidence: high
+  decisions: []
+  atem:
+    line: 'For all natural numbers m and n, if m is even and n is even, then their sum m + n is even.'
+    focus: 'The sum of two even numbers.'
+    push: 'The proof names the half of the sum.'
+    pull: 'It says nothing of odd numbers.'

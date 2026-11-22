@@ -975,8 +975,8 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     first = next((it["id"] for it in decl_items.values() if item_kind(it) == "statement"), None) or next(
         (it["id"] for it in sorted(decl_items.values(), key=lambda x: x.get("depth", 10 ** 6))
          if it.get("reached") == "yes"), None)
-    if first:
-        atem = {"of": first, **atem}
+    first = first or next((it["id"] for it in decl_items.values()), None)
+    atem = {"of": first or {"pending": f"{fname} declares nothing: what does it restate?"}, **atem}
     cat.update({"atem": atem, "audit": _audit_rows(ol, ids)})
     cat["nodes"] = [_code._prov_last(it) for it in out]
     return Value("fabula", cat, origin={"proof": {"path": fname, "candidates": reach["candidates"]}})
@@ -995,7 +995,7 @@ def is_lean_folder(v: Any) -> bool:
     return lean > 0 and lean >= sum(1 for e in texts if e.suffix == "py")
 
 
-def _modules(paths: list[str], outlines: dict, graph: dict, root: str | None = None) -> dict[str, str]:
+def _modules(paths: list[str], outlines: dict, root: str | None = None) -> dict[str, str]:
     """Each Lean file's dotted module name: the import, among the set's, that spells the file's path; else the path
     itself under the prefix the others show, or under `root` (the module the folder is, when the host knows it)."""
     imports = {str(i.get("module")) for ol in outlines.values() for i in ol.get("imports") or []
@@ -1036,15 +1036,18 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
     if lost:
         raise MoveError(f"{lost[0]} is no declaration of {f.name}; name a final theorem by its full name")
     targets, by = (given, "given") if given else (targets_by_rule(outlines), "rule")
-    reach = reach_of(ctx, outlines, {x: 0 for x in targets})
+    module = _modules(sorted(outlines), outlines, hsrc.get("module") if isinstance(hsrc.get("module"), str) else None)
+    # the reader finds an imported file by its module's path (`A/B/C.lean` for `A.B.C`): the set goes to it so
+    gpath = {p: module[p].replace(".", "/") + ".lean" for p in outlines}
+    back = {g: p for p, g in gpath.items()}
+    reach = reach_of(ctx, {gpath[p]: ol for p, ol in outlines.items()}, {x: 0 for x in targets})
     graph, rows, uses = reach["graph"], reach["rows"], reach["uses"]
-    name_of = {reach["keys"].get((p, int(d.get("line") or 0)), decl_name(d)): decl_name(d)
+    name_of = {reach["keys"].get((gpath[p], int(d.get("line") or 0)), decl_name(d)): decl_name(d)
                for p, ol in outlines.items() for d in ol.get("defs") or []}
     uses = {name_of.get(k, k): [name_of.get(u, u) for u in us] for k, us in uses.items()}
     rows = {name_of.get(k, k): row for k, row in rows.items()}
-    order = [p for p in graph.get("order") or [] if p in outlines]
+    order = [back[g] for g in graph.get("order") or [] if g in back]
     order += [p for p in sorted(outlines) if p not in order]
-    module = _modules(order, outlines, graph, hsrc.get("module") if isinstance(hsrc.get("module"), str) else None)
     name = str(hcat.get("name") or respell(f.name))
     hid = str(hcat.get("id") or f"fabula/{name}")
     paths = [e.path for e in f.entries]
@@ -1105,6 +1108,22 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
             it.pop("digest")
         offers[p].append(iid)
         head_items.append(it)
+    # at the head's grain, a crossing declaration uses the crossing declarations it reaches without passing through
+    # another: so a chain of uses leads from the targets to every one of them
+    cross = {it["lean"]: it["id"] for it in head_items}
+    for it in head_items:
+        seen, todo, hit = {it["lean"]}, list(uses.get(it["lean"], [])), []
+        while todo:
+            u = todo.pop(0)
+            if u in seen:
+                continue
+            seen.add(u)
+            if u in cross:
+                hit.append(cross[u])
+            elif rows.get(u, {}).get("reached") == "yes":
+                todo += uses.get(u, [])
+        if hit:
+            it["uses"] = hit
     for p in order:
         ol = outlines[p]
         defs = [decl_name(d) for d in ol.get("defs") or []]

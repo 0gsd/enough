@@ -560,6 +560,7 @@ A **kind** is a table. It is declared under its module, with:
 | `required` | the fields an item of the kind must carry (section 13.5) |
 | `flavours` | in a format with flavours (the fabula's, section 18.4), the flavours whose volumes may hold the kind; the check `flavour-kind` reads it |
 | `closed` | closed lists for the kind's own fields, `{<field>: [values]}`, applied to items of the kind over the manifest's `closed-lists` (section 13.3) |
+| `open` | the kind's fields that the manifest's `closed-lists` do not bind, a list: a field of one name may hold a closed word on one kind and something else on this one, as `scope` does on the fabula's `C:dependency` and its `C:lemma` |
 | other keys | what a format's own code needs: a `level`, an exception id form (`id: 'P:<slug>'`), `stored: database`, `public: never`, a `note` |
 
 An item's `type` must be a kind its module declares (check `type`), and must equal the kind in its id (check
@@ -1053,7 +1054,7 @@ manifests add. A reader keeps every key, including the ones it does not use.
 | `references` | `forms`, `dotted-fields`, `unresolved`, `exceptions`; an address, an id with `#` and a field path, is read in any reference field (section 9.1) | `ref-grammar`, `ref-unresolved` |
 | `links` | `rels`, a closed list of typed-link relations (0.0.1) | `closed-list` on `links[].rel` |
 | `closed-lists` | a mapping from a field name to its closed list of values, applied wherever that field appears (0.0.1) | `closed-list` |
-| `modules` | for each letter: `name`, `subtitle`, `note`, and `kinds`, each with `refs`, `required` (0.0.1), `checked`, `flavours` (the flavours that may hold the kind), `closed` (closed lists for the kind's own fields, applied to its items over `closed-lists`) and format-specific keys | `type`, `type-prefix`, the reference checks, `closed-list`, `flavour-kind`, the viewer's rail |
+| `modules` | for each letter: `name`, `subtitle`, `note`, and `kinds`, each with `refs`, `required` (0.0.1), `checked`, `flavours` (the flavours that may hold the kind), `closed` (closed lists for the kind's own fields, applied to its items over `closed-lists`), `open` (the kind's fields that `closed-lists` do not bind) and format-specific keys | `type`, `type-prefix`, the reference checks, `closed-list`, `flavour-kind`, the viewer's rail |
 | `checks` | `envelope` (the generic check ids that apply), `load`, `severity` (0.0.1), `own` (the format's own checks: a list of ids, or prose), and other keys of the format's own (`products`, `rules`, `equilibrium` …) | selecting checks; listing the own checks as not run (section 12.3) |
 | `open-questions` | the form, who answers, the field path | the pending list |
 | `dialectic` | the opening questions a format's volumes are asked, as banks of questions by module, kind or field, with who answers them; Ascribe's older shape, a list of questions per module, is read as one bank named after the manifest (section 18.6) | the dialectic's questions |
@@ -1110,9 +1111,9 @@ Four more optional keys, which the reference implementation also reads:
   (section 14.3).
 
 The core adds further optional keys, read the same way: `core`; `declaration.old`; `catalog.id-old`; a kind's
-`flavours` and `closed`; `checks.own` as a list; `dialectic`; and the core's module D (section 13.4). A reader that
-does not know them keeps them. Without them it refuses an old spelling and leaves module D undeclared, and every file it
-read before still reads.
+`flavours`, `closed` and `open`; `checks.own` as a list; `dialectic`; and the core's module D (section 13.4). A reader
+that does not know them keeps them. Without them it refuses an old spelling and leaves module D undeclared, and every
+file it read before still reads.
 
 ### 13.6 The registry
 
@@ -1340,7 +1341,7 @@ that a reader always has them, and that reading their volumes needs no specifica
 |---|---|---|---|---|---|---|
 | `cosm` | `oes: cosm/0`; in the files, `cosm: 0.2` · `0.3`, `opi:` | one whole's product tree, outside any Holotype | a folder of `.cosm` files | the file holding `brand:` | P | 18.2 |
 | `canon` | `oes: canon/1` | Canon, the home file system: a volume or a project, its folders, files and articles, and what has been derived from them | one file | `canon.cosm` | V | 18.3 |
-| `fabula` | `oes: fabula/1`; old spelling `oes: emf/1` | one input decompiled, a text, a poem or a folder of code: everything found in it or derived from it, item by item | one file, beside its input | `<text>.fabulan.cosm`, `<text>.fabulap.cosm`, `<folder>.fabulac.cosm`; an older twin's `<text>.cosm` | I L E K N C R P T X | 18.4 |
+| `fabula` | `oes: fabula/1`; old spelling `oes: emf/1` | one input decompiled, a text, a poem, a folder of code or a formal proof: everything found in it or derived from it, item by item | one file, beside its input | `<text>.fabulan.cosm`, `<text>.fabulap.cosm`, `<folder>.fabulac.cosm`, `<name>.fabulam.cosm`; an older twin's `<text>.cosm` | I L E K N C R P T X | 18.4 |
 | `doc` | `oes: doc/1` | one document: its sections, terms, examples and decisions, joined to the reference | one file per telling, built at runtime | `<doc>.<lang>.doc.cosm` | S T R B | 18.5 |
 | `thym` | `oes: thym/1` | Thym's programs, morphs, contexts, plans, traces and packages, and a run's snapshots of the folders it took | one file, one of seven kinds | `<name>.thym.cosm`, `<name>.morph.cosm` … | P M C R K | 18.7 |
 
@@ -1358,30 +1359,31 @@ Where a program or a trace names the move `tell`, it names `entail` by its earli
 derived from it, enumerated item by item. To compile is to make a short of a fabula, its items said again in an
 order. The plainest thing that can be said of either is an atem. These are three densities of one meaning: the fabula is the material, a
 short is one arrangement of it, and an atem is a reduction, with a hermeneutic shape of its own (section 18.3.5). For
-code each density has a form of its own:
+code and for a proof each density has a form of its own:
 
-| Density | Prose and verse | Code |
-|---|---|---|
-| the input | a text: an essay, a story, a poem, a song | a folder of source, or none, when the fabulac is authored |
-| fabula | a `fabulan` (narrative and non-fiction prose) or a `fabulap` (poetry, metered verse, song lyrics) | a `fabulac`: the program's specification, item by item |
-| short | a short: an entailment of the fabula in markdown, its items in an order (section 18.4.4) | a `cshort`: source code rebuilt from the fabulac, to be read and never run; or, from an authored fabulac, its entailment, source code meant to run, which may be run only in a sandbox (section 18.4.7) |
-| atem | the atem: a line, with its focus, push and pull | the atem, as for any fabula; and a `catem`, a text saying everything a user can do with the program, at the depth `line`, `overview` or `manual` |
+| Density | Prose and verse | Code | Proof |
+|---|---|---|---|
+| the input | a text: an essay, a story, a poem, a song | a folder of source, or none, when the fabulac is authored | one file of a formal proof's source, read as text |
+| fabula | a `fabulan` (narrative and non-fiction prose) or a `fabulap` (poetry, metered verse, song lyrics) | a `fabulac`: the program's specification, item by item | a `fabulam`: the proof taken apart, each item tied to the source by name and lines |
+| short | a short: an entailment of the fabula in markdown, its items in an order (section 18.4.4) | a `cshort`: source code rebuilt from the fabulac, to be read and never run; or, from an authored fabulac, its entailment, source code meant to run, which may be run only in a sandbox (section 18.4.7) | a `pshort`: a guide to the proof in markdown, written for an expert, a student or everyone, each run of its sentences citing the fabulam's items (section 18.4.10) |
+| atem | the atem: a line, with its focus, push and pull | the atem, as for any fabula; and a `catem`, a text saying everything a user can do with the program, at the depth `line`, `overview` or `manual` | the atem, its line restating one statement of the proof |
 
-The flavour is a property of the fabula, named in its catalog; one format, `fabula/1`, holds all three (section 18.4).
+The flavour is a property of the fabula, named in its catalog; one format, `fabula/1`, holds all four (section 18.4).
 A running program is outside the model: nothing in the core runs a cshort, imports it or installs it. The one exception
 is the entailment of a fabulac a person authored, which an implementation may run in a sandbox, under the rule of
-section 18.4.7.
+section 18.4.7. A proof's source is read as text, and nothing of it is installed, built or run (section 18.4.10).
 
 <!-- term: entailment -->
 An **entailment** is the step that expands meaning by reducing data, and it is also what that step makes. The whole
 entails what is made from it: an input entails its fabula, a fabula a short, and a short an atem; a codebase or an
-application entails its fabulac, and a fabulac a cshort or a catem; a Holotype entails its isotype and its paratype, and a
-holograph its isograph and its allograph. What is made says nothing its whole does not hold. It says it at a smaller size, or in another order or
-voice. An entailment made by rule, a projection (section 16), holds by construction. An entailment made by a model holds
-only because the contract's checks hold it: `no-invention` (it names nothing its whole lacks), `stance-kept` (it says
-no claim more strongly than its whole does) and `coverage` (each of its sentences traces to items of its whole), as
-Thym (https://thym.cosmoes.org/), its section 7.3, states them. Decompiling and compiling are both entailments; the
-move `entail` makes one by a model, and `project` makes one by rule.
+application entails its fabulac, and a fabulac a cshort or a catem; a formal proof entails its fabulam, and a fabulam a
+pshort; a Holotype entails its isotype and its paratype, and a holograph its isograph and its allograph. What is made
+says nothing its whole does not hold. It says it at a smaller size, or in another order or voice. An entailment made by
+rule, a projection (section 16), holds by construction. An entailment made by a model holds only because the contract's
+checks hold it: `no-invention` (it names nothing its whole lacks), `stance-kept` (it says no claim more strongly than
+its whole does) and `coverage` (each of its sentences traces to items of its whole), as Thym
+(https://thym.cosmoes.org/), its section 7.3, states them. Decompiling and compiling are both entailments; the move
+`entail` makes one by a model, and `project` makes one by rule.
 
 **The work is done by Thym's moves.** `derive` decompiles and `entail` compiles; a fabula of code is built in stages,
 each one atomic run, and a job may resume between them (section 18.4.7); the dialectic's moves `question`, `record` and
@@ -1635,7 +1637,8 @@ user can do with the program (sections 18.1 and 18.4.7).
   Imports, ingests, listings and reconciles never make one.
 - **Without a model,** enough writes a labelled scaffold: the line is the passage's first sentence, cut to 25 words; the
   focus is its first two sentences; push and pull are open questions, `{pending: "a model has not read this passage"}`;
-  the twin records `derived.mode: rules`, and the card says "scaffold, no model".
+  the twin records `derived.mode: rules`, and the card says "scaffold, no model". The sentences are read by the one
+  rule of Thym (https://thym.cosmoes.org/), its section 12.6.
 
 #### 18.3.6 Examples
 
@@ -1727,8 +1730,8 @@ nodes:
 ### 18.4 fabula: the fabula
 
 <!-- atem: one input decompiled into everything it holds, item by item -->
-**What it enumerates.** One input, a text, a poem or a folder of source code, taken apart into everything found in it
-or derived from it.
+**What it enumerates.** One input, a text, a poem, a folder of source code or a formal proof, taken apart into
+everything found in it or derived from it.
 
 <!-- term: fabula -->
 A **fabula** enumerates all the inspiration, meaning, intent, construction, production and assertions that can be found
@@ -1743,20 +1746,20 @@ word comes from.
 entails it, and it entails its shorts and its atem:
 
 - **decompiling** an input makes its fabula;
-- **compiling** a fabula makes a short, an entailment of it (section 18.4.4), and for code a cshort, source rebuilt
-  from it (section 18.4.7);
+- **compiling** a fabula makes a short, an entailment of it (section 18.4.4), for code a cshort, source rebuilt
+  from it (section 18.4.7), and for a proof a pshort, a guide to it (section 18.4.10);
 - an **atem** says it most plainly (section 18.3.5), and for code a catem says at depth everything a user can do
   (section 18.4.7).
 
 In a Thym program the two acts are the moves `derive` and `entail` (Thym (https://thym.cosmoes.org/), its section 6; for
-a folder of code, its section 20).
+a folder of code and for a proof, its section 20).
 
-**Three flavours.** One format serves three kinds of input. A fabula's flavour says which, in the catalog's `flavour`
+**Four flavours.** One format serves four kinds of input. A fabula's flavour says which, in the catalog's `flavour`
 key, and every module and kind of section 18.4.2 says which flavours may hold it.
 
 <!-- term: flavour -->
-A fabula's **flavour** is the kind of input it is the fabula of, from a closed list of three: `fabulan`, `fabulap` and
-`fabulac`. A fabula that names no flavour is a fabulan.
+A fabula's **flavour** is the kind of input it is the fabula of, from a closed list of four: `fabulan`, `fabulap`,
+`fabulac` and `fabulam`. A fabula that names no flavour is a fabulan.
 
 <!-- term: fabulan -->
 A **fabulan** is the fabula of narrative or non-fiction prose: an essay, a guide, a story, a report, a page of notes.
@@ -1769,6 +1772,9 @@ form, and lets several readings of one line stand side by side (section 18.4.6).
 A **fabulac** is the fabula of code: a folder of source, enumerated as the specification of the program it holds, or a
 program not yet written, authored as its specification (section 18.4.7).
 
+The fourth flavour, the **fabulam**, is the fabula of a formal proof: one file of the proof's source, enumerated as
+the argument it holds. Section 18.4.10 defines it, with the pshort it entails.
+
 **Its declaration.** `oes: fabula/1`. The fabula is one of the built-ins of the core (section 18.1), and its manifest
 ships with every reader. There is no legacy form, and a catalog without the key is refused. The fabula was first
 published under the declaration `oes: emf/1`. That value is an old spelling of `fabula/1`: a reader identifies it as a
@@ -1779,7 +1785,9 @@ it did not write: a file that declares `oes: emf/1` keeps saying so until its te
 <!-- term: twin -->
 **Its volume.** One file. A text's fabula kept beside it is the text's **twin**, named by adding the flavour and `.cosm`
 to the text's whole name: `close.md` and `close.md.fabulan.cosm`, a poem `rose.txt` and `rose.txt.fabulap.cosm`. A
-folder's fabulac sits beside the folder: `tool/` and `tool.fabulac.cosm`. A twin's `source:` names its input.
+folder's fabulac sits beside the folder: `tool/` and `tool.fabulac.cosm`. A proof's fabulam takes a name of its own,
+`<name>.fabulam.cosm`, and sits beside the root folder of the proof's source, never inside it (section 18.4.10). A
+twin's `source:` names its input.
 
 - **A fabula is identified by its declaration, never by its file name.** A twin named as the first edition named it,
   the text's whole name with `.cosm` added (`close.md.cosm`), is read forever.
@@ -1788,16 +1796,20 @@ folder's fabulac sits beside the folder: `tool/` and `tool.fabulac.cosm`. A twin
   This is the same act as refreshing a twin in place, under the new name. Nothing else ever renames or removes a twin.
 - **Two names at once.** If both `close.md.fabulan.cosm` and `close.md.cosm` exist, the one named with its flavour is
   the twin, and the old one is listed as an ordinary file with a note saying so. A text may have one twin per flavour.
-- **A standalone fabula** has no `source:` and is named `<name>.fabulan.cosm`, `<name>.fabulap.cosm` or
-  `<name>.fabulac.cosm`; an old standalone `<name>.cosm` reads. It is read the same way as a twin.
+- **A standalone fabula** has no `source:` and is named `<name>.fabulan.cosm`, `<name>.fabulap.cosm`,
+  `<name>.fabulac.cosm` or `<name>.fabulam.cosm`; an old standalone `<name>.cosm` reads. It is read the same way as a
+  twin.
 - **One file, however large.** A fabulac is one file whatever the size of its folder. A program too large for one
-  fabulac is told as several, each one file, under a head fabulac that names them (section 18.4.7). A fabula kept as a
+  fabulac is told as several, each one file, under a head fabulac that names them (section 18.4.7). A proof of several
+  files is told the same way: one fabulam for each file, under a head fabulam (section 18.4.10). A fabula kept as a
   volume of several files is reserved for a later edition.
 - **An authored fabulac's folder.** The folder beside an authored fabulac, of the same name, is its entailment, not its
   source (section 18.4.7). It is never decompiled into a fabulac of its own: a builder asked to decompile it refuses,
   and says that the fabulac beside it is authored.
 - **The flavour of a text** is the person's choice when the text is decompiled. An implementation may suggest
-  `fabulap` for a text that looks like verse (short lines, stanza breaks, no headings) and `fabulan` otherwise.
+  `fabulap` for a text that looks like verse (short lines, stanza breaks, no headings) and `fabulan` otherwise. It
+  never offers `fabulam` for a text: a fabulam is made only from a file in a proof language the implementation reads
+  (section 18.4.10).
 
 #### 18.4.1 The catalog
 
@@ -1807,36 +1819,42 @@ The catalog's keys, in this order:
 |---|---|---|
 | `oes` | all | `fabula/1`; `emf/1` is read and never written |
 | `macrocosm` | all | reserved (section 5.6) |
-| `flavour` | all | `fabulan`, `fabulap` or `fabulac`; absent, `fabulan` |
+| `flavour` | all | `fabulan`, `fabulap`, `fabulac` or `fabulam`; absent, `fabulan` |
 | `purpose` | fabulac | `transconception`, when the fabulac is kept so that the program can be entailed into another language (section 18.4.9); absent, the fabulac is kept for its own sake |
 | `written-for` | fabulac | `{assumes}`: a list of *text*, what a reader of the fabulac is taken to know already (section 18.4.9); absent, the manifest's default |
 | `ruled-by` | fabulac | `none`, when nobody could rule the transconception (section 18.4.9); absent otherwise |
 | `id` | all | `fabula/<slug>`, the slug being the input's path in its volume or project, respelled by the Canon rule (section 18.3.3): the twin of `guides/close.md` is `fabula/guides--close-md`, and the fabulac of the folder `tool/` is `fabula/tool`. A twin written as `emf/<slug>` is read as it is |
 | `name` | all | the text's title, or its file name when it has none; a folder's name |
-| `source` | all | the input, in one of the three forms below; absent for a standalone fabula |
+| `source` | all | the input, in one of the four forms below; absent for a standalone fabula |
 | `derived` | all | how the fabula was made (below) |
 | `program` | fabulac | what kind of program the fabulac specifies, and how it is started: `{kind, start, serve}` (section 18.4.7); absent, not said |
-| `head` | fabulac | for a part, the URI of its head fabulac (section 18.4.7) |
-| `parts` | fabulac | for a head, its parts: a list of `{uri, path, sha256}` (section 18.4.7) |
-| `atem` | all | the whole input's atem: `{line, focus, push, pull}` (section 18.3.5). Every fabula has one, a fabulac too |
+| `head` | fabulac, fabulam | for a part, the URI of its head fabulac (section 18.4.7) or its head fabulam (section 18.4.10) |
+| `parts` | fabulac, fabulam | for a head, its parts: a list of `{uri, path, sha256}` (sections 18.4.7 and 18.4.10) |
+| `atem` | all | the whole input's atem: `{line, focus, push, pull}` (section 18.3.5). Every fabula has one, a fabulac too. A fabulam's also carries `of`, *ref* the `C:statement` its line restates, or, in a part that holds no statement, one of the part's own declaration items |
+| `teaching` | fabulam | the teaching order: the ids of the argument's stages, in the order a teacher would tell them (section 18.4.10) |
+| `audit` | fabulam | the comment table: one row for each comment of the source (section 18.4.10) |
 | `shorts` | all | the shorts compiled from the fabula, one entry per compile, appended (section 18.4.4); absent until the first |
 | `catems` | fabulac | the catems compiled from the fabulac, one entry per compile, appended (section 18.4.7); absent until the first |
 | `cases` | fabulac | the file of outside cases kept beside the fabulac, `<folder>.cases.json` (section 18.4.9); absent when there is none |
 | `entailed` | fabulac | for an authored fabulac, what its last entailment wrote, file by file (below); absent until the first |
 | `nodes` | all | the items |
 
-**`source`**, in one of three forms:
+**`source`**, in one of four forms:
 
 | Form | Fields | Example |
 |---|---|---|
 | a text (fabulan, fabulap) | `path`, the text's file name relative to the fabula; `sha256`; `size`; `mtime_ns`. `kind: text` may be written and is the default | `{path: close.md, sha256: d297…1b14, size: 494, mtime_ns: 1792660324518000000}` |
 | a folder (fabulac only) | `path`, the folder relative to the fabula, ending `/`; `kind: folder`; `language` (`python` in this edition); `files`, `bytes` and `skipped`, the counts of the files read; `tree`, the tree digest (below); `commit`, the hash of the commit checked out, when the folder is a clean git clone, and absent otherwise; `origin`, the clone's remote address, when known; `licence`, the licence's standard short identifier (`MIT`), else the first line of the licence file, else `{pending: "…"}`; `obtained`, how the folder came to whoever decompiled it, one of `public` (published for anyone to read), `permitted` (given with its holder's leave) or `own` (their own code), absent until said | `{path: days/, kind: folder, language: python, files: 3, bytes: 2988, skipped: 0, tree: c9c7…0900, licence: MIT}` |
 | authored (fabulac only) | `kind: authored`; `language`, the language its entailments are written in (`python` in this edition); `licence`, the terms on which its author offers it, as a folder's `licence` is written; `by`, *refs* `R:maker`, who authored it; `at`, the day it was begun; `brief`, the path of the written brief it was begun from, relative to the fabulac, absent when it was begun from questions alone | `{kind: authored, language: python, licence: MIT, by: [R:maker/author], at: 2026-11-20, brief: tally.brief.md}` |
+| a proof's file (fabulam only) | `path`, the file relative to the fabulam; `kind: text`; `language` (`lean` in this edition); `toolchain`, the Lean version the source names, read from the nearest file of that name at or above the source, else `{pending: "…"}`; `module`, the file's dotted module name; `lines`, `size` and `sha256`, of the file; `imports`, the modules it imports, as written, in order; `commit`, `origin`, `licence` and `obtained`, as a folder's are; `target`, the full names of the final theorems the fabulam tells, and `target-by`, `given` when the person named them and `rule` when the rule of section 18.4.10 found them; `wording`, the path of a public wording of the result, when the person gave one; `read`, how the file was read, and `checking`, what is known about its machine check (section 18.4.10) | `{path: proofs/Primes.lean, kind: text, language: lean, lines: 120, sha256: 9c1e…40d2, licence: MIT, target: ["Primes.infinite"], target-by: rule, read: {by: rules, elaborated: "no", comments: blanked}, checking: {sorry: 0, axioms: 0, native-decide: 0, built-here: "no"}}` |
 
 A fabulan's or a fabulap's source is always a text. A fabulac's is a folder when the fabulac was decompiled from one,
 and the authored form when a person wrote the fabulac first, with no program behind it: an authored fabulac is its own
 source, and the program is entailed from it (section 18.4.7). An authored fabulac whose parts were later taken back
-from code keeps the authored form; the items taken back say so in their own `stance` and `provenance`.
+from code keeps the authored form; the items taken back say so in their own `stance` and `provenance`. A fabulam's
+source is the one file it was read from. A head fabulam's is the folder its parts' files lie in, in the folder form,
+with `toolchain`, `target`, `target-by`, `wording`, `read` and `checking` as a proof's file has them (section
+18.4.10).
 
 **`derived`** says how the fabula was made. Its single keys describe the last run that derived the fabula from its
 source; a run that only settles the dialectic's answers (section 18.6.4) changes none of them:
@@ -1867,6 +1885,7 @@ appends its runs. The single keys repeat the last entry that derived the fabula,
 | `shorts`, a prose or verse short | `{path, at, by, mode, order}`, and `route` when a model wrote it | `order` is `told` or `weight`; the path is `<text-stem>.short-<YYYY-MM-DD-HHMM>.md` (section 18.4.4) |
 | `shorts`, a cshort | `{path, at, by, mode, order: code, route, language, files}` | `path` is the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/`, with its `/`, taking `-2`, `-3` on a collision; `language` is the cshort's own; `files`, how many files it holds besides `CSHORT.md` (section 18.4.7). In a transconception it also carries `entailed`, `apart` or `beside`, how it was entailed; `target`, *ref* the `N:target` it was entailed for; `layout`, the path of the layout it was entailed with; and, once it has been judged, `evidence` (section 18.4.9) |
 | `shorts`, a layout | `{path, at, by, mode, order: layout, route, language, target}` | the files, parts and names a cshort in another language will have, written before its code; the path is `<name>.layout-<language>-<YYYY-MM-DD-HHMM>.md` (section 18.4.9) |
+| `shorts`, a pshort | `{path, at, by, mode, route, density, entailed}` | `density` is `expert`, `student` or `everyone`; `entailed` is `apart`, since a pshort is entailed from the fabulam alone; the path is `<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`, beside the fabulam, taking `-2`, `-3` on a collision as shorts do (section 18.4.10) |
 | `catems` | `{path, at, by, mode, route, depth}` | `depth` is `line`, `overview` or `manual`; the path is `<name>.catem-<YYYY-MM-DD-HHMM>.md`, taking `-2`, `-3` on a collision as shorts do (section 18.4.7) |
 
 **Fresh and stale, for a text.** A twin is `fresh` while its text's size and modification time match the twin's
@@ -1888,6 +1907,11 @@ modification time. The **tree digest** is computed exactly as follows, so that t
 | digest | the sha256 of the concatenation, for each file in order, of: the relative path in UTF-8, one NUL byte, the file's sha256 as 64 lowercase hexadecimal digits, one LF byte. Written as 64 lowercase hexadecimal digits, with no prefix |
 | counts | `files`, the files read; `bytes`, the sum of their sizes; `skipped`, the files skipped (a folder skipped whole counts nothing) |
 | not used | `.gitignore` and every other ignore file; the git index; modification times |
+
+**Fresh and stale, for a proof.** A fabulam is `fresh` while its file's sha256 equals `source.sha256`, and `stale`
+otherwise; it is `absent` when its file is gone, and the fabulam is kept. A head fabulam is fresh while its folder's
+tree digest equals `source.tree`, as a fabulac is. A stale fabulam is kept and shown with its state, and a build of
+it starts again from its first stage.
 
 **Fresh and stale, for an authored fabulac.** An authored fabulac is its own source, so it is never stale: there is no
 input it could fall behind. What can fall behind is its entailment, the folder entailed from it, and the `entailed` key
@@ -1944,15 +1968,16 @@ core's dialectic module D (section 18.6).
 | E | Entities | meaning | the particular things and people named | `person`, `org`, `place`, `work`, `thing` |
 | K | Concepts | meaning | the ideas and universals the work uses | `concept` |
 | N | Intent | intent | what the work sets out to do, for whom, and what it chose | `aim`, `audience`, `use`, `requirement`, `decision`, `exclusion`, `target` |
-| C | Construction | construction | how the work is built | prose and verse: `part`, `device`, `voice`; verse only: `line`, `metre`, `rhyme`, `form`; code: `file`, `component`, `interface`, `structure`, `behaviour`, `dependency`, `setting`, `reliance` |
+| C | Construction | construction | how the work is built | prose and verse: `part`, `device`, `voice`; verse only: `line`, `metre`, `rhyme`, `form`; code: `file`, `component`, `interface`, `structure`, `behaviour`, `dependency`, `setting`, `reliance`; proof: `statement`, `definition`, `lemma`, `constant`, `step`, with `part`, `file`, `component`, `dependency` and `reliance` |
 | R | Production | production | who made the work, with what, and how it changed | `maker`, `change`, `phase`, `release`, `means`, `licence` |
-| P | Propositions | assertions | what the work claims, how it can be read, what it must do, and what it takes to be true | `claim`, `reading`, `case`, `assumption` |
+| P | Propositions | assertions | what the work claims, how it can be read, what it must do, what it takes to be true, and, for a proof, what it delivers and how it fits a public wording | `claim`, `reading`, `case`, `assumption`, `yield`, `fit` |
 | T | Transitions | assertions | what happens, in order | `event` |
 | X | Atems | | the tight reductions of passages | `atem` |
 | D | Dialectic | | what was asked about the work, and what was answered (section 18.6) | `question`, `session` |
 
 The modules L, E, K and X, and the kinds `P:claim` and `T:event`, are unchanged since the fabula's first edition, in
-their fields and their closed lists, so that every file that declares `oes: emf/1` is a valid fabulan.
+their fields and their closed lists, so that every file that declares `oes: emf/1` is a valid fabulan. The fields a
+fabulam adds to a claim are read in a fabulam alone.
 
 <!-- term: mefa -->
 A **mefa** is the smallest unit of meaning in a fabula: one item, one entry of one kind in one module, such as a
@@ -1960,56 +1985,63 @@ requirement, a case, a reliance or an event, which carries meaning alone and is 
 inside its volume and by its URI (section 11.3) outside it. The fabula is the whole; a mefa is one of its items. The
 word began as the letters of *meaning enumeration foundation atom*.
 
-**Every kind.** In the table, n is fabulan, p fabulap and c fabulac. A reference field is checked like every reference
-(section 9); `roles.*` is the wildcard of section 9.6: a slot holds an item's id when the participant is an item of the
-fabula, and a literal otherwise.
+**Every kind.** In the table, n is fabulan, p fabulap, c fabulac and m fabulam. A reference field is checked like
+every reference (section 9); `roles.*` is the wildcard of section 9.6: a slot holds an item's id when the participant
+is an item of the fabula, and a literal otherwise.
 
 | Kind | What it holds | Flavours | Reference fields | Also checked |
 |---|---|---|---|---|
 | `I:influence` | something outside the work that shaped it: a work, a person, a tradition, a tool | n p c | `roles.*` | `stance`, `how` |
 | `I:allusion` | a reference the text makes to another work without saying so | n p | `roles.*` | `stance`, `cue` |
 | `I:occasion` | what the work was made for or prompted by: an event, a request, a need, a date | n p c | `roles.*` | `stance`, `when` |
-| `L:term` | a word the work leans on | n p c | | `feed`, `sense` |
-| `E:person` `E:org` `E:place` `E:work` `E:thing` | a particular named thing or person | n p c | | |
-| `K:concept` | an idea or universal the work uses | n p c | `defined-by` | |
-| `N:aim` | what the work sets out to do | n p c | `roles.*` | `stance`, `measure` |
+| `L:term` | a word the work leans on | n p c m | | `feed`, `sense` |
+| `E:person` `E:org` `E:place` `E:work` `E:thing` | a particular named thing or person | n p c m | | |
+| `K:concept` | an idea or universal the work uses | n p c m | `defined-by` | |
+| `N:aim` | what the work sets out to do | n p c m | `roles.*` | `stance`, `measure` |
 | `N:audience` | whom it is for | n p c | | `stance`, `who`, `needs` |
 | `N:use` | one thing a user can do with the program, end to end | c | `for`, `via` | `stance`, `steps`, `gets` |
 | `N:requirement` | what the program must, should or may do or be | c | `met-by`, `checked-by` | `stance`, `force` |
-| `N:decision` | a choice made between options | n p c | `by`, `changed-in` | `stance`, `chose`, `over`, `because` |
+| `N:decision` | a choice made between options | n p c m | `by`, `changed-in` | `stance`, `chose`, `over`, `because`, `confidence` |
 | `N:exclusion` | what the work deliberately does not do or cover | n p c | | `stance`, `horizon`, `because` |
 | `N:target` | a language the program could be entailed into, weighed (section 18.4.9) | c | | `stance`, `language`, `version`, `weighed`, `provides`, `verdict` |
-| `C:part` | a division of the text | n p | `of` | `stance`, `division`, `number`, `heading` |
+| `C:part` | a division of the text; in a fabulam, one stage of the argument | n p m | `of`, `steps` | `stance`, `division`, `number`, `heading`, `stage`, `says`, `plain`, `plain-if`, `obvious`, `regime`, `confidence` |
 | `C:device` | a figure or technique at a place | n p | `where` | `stance`, `figure`, `effect`, `cue`, `senses`, `intended` |
 | `C:voice` | who speaks, to whom, how | n p | `roles.*` | `stance`, `perspective`, `tone` |
 | `C:line` | one line of verse | p | `part`, `metre` | `stance`, `number`, `text`, `stresses`, `syllables`, `rhyme`, `ending` |
 | `C:metre` | a metre that governs lines | p | `lines`, `departures.line` | `stance`, `foot`, `feet`, `basis` |
 | `C:rhyme` | one rhyme sound shared by lines | p | `lines` | `stance`, `scheme`, `sound`, `quality`, `placement` |
 | `C:form` | the form a poem keeps: a sonnet, a villanelle, a ballad stanza, free verse | p | `parts`, `metre`, `departures.at` | `stance`, `form`, `scheme`, `rules`, `intended` |
-| `C:file` | one file of the tree | c | `component` | `stance`, `path`, `language`, `holds`, `length`, `sha256`, `entry` |
-| `C:component` | a package, module or group of files with one responsibility | c | `files`, `of`, `exposes`, `uses` | `stance`, `does`, `told-in` |
+| `C:file` | one file of the tree; in a fabulam, the proof's file | c m | `component` | `stance`, `path`, `language`, `holds`, `length`, `sha256`, `entry`, `opens`, `limits` |
+| `C:component` | a package, module or group of files with one responsibility; in a head fabulam, one part | c m | `files`, `of`, `exposes`, `uses`, `offers` | `stance`, `does`, `told-in`, `stages`, `counts`, `completeness` |
 | `C:interface` | something another program or a person calls, types, reads or writes | c | `defined-in` | `stance`, `surface`, `signature`, `takes`, `gives`, `raises`, `exported`, `plain`, `stated-in`, `ruling` |
 | `C:structure` | a shape of data: a class of records, a file format's record, a table | c | `defined-in` | `stance`, `shape`, `fields`, `invariants`, `ruling` |
 | `C:behaviour` | what happens, for which input | c | `of` | `stance`, `when`, `does`, `edges`, `errors`, `intended`, `ruling` |
-| `C:dependency` | something outside the tree that the code needs | c | `used-by` | `stance`, `package`, `version`, `scope`, `needed-for`, `licence`, `address`, `resolved`, `digest` |
+| `C:dependency` | something outside the tree that the code needs; in a fabulam, a library the proof imports | c m | `used-by` | `stance`, `package`, `version`, `scope`, `needed-for`, `licence`, `address`, `resolved`, `digest` |
 | `C:setting` | a value a user or an installer can change, or a constant that shapes behaviour | c | `read-by` | `stance`, `key`, `set-in`, `default`, `means`, `ruling` |
-| `C:reliance` | something the program leans on beneath its own code: a gift of its language, its runtime, its platform or a dependency (section 18.4.9) | c | `of`, `used-by`, `shown-by` | `stance`, `on`, `gives`, `example`, `entry`, `stated`, `contradicted-by`, `ruling` |
-| `R:maker` | who made the work, and in what capacity | n p c | `who` | `stance`, `capacity` |
+| `C:reliance` | something the program leans on beneath its own code: a gift of its language, its runtime, its platform or a dependency (section 18.4.9); in a fabulam, a result from outside the file that the proof depends on (section 18.4.10) | c m | `of`, `used-by`, `shown-by` | `stance`, `on`, `gives`, `example`, `entry`, `stated`, `contradicted-by`, `ruling`, `lean`, `known-as`, `field`, `case`, `stated-in`, `digest` |
+| `R:maker` | who made the work, and in what capacity | n p c m | `who` | `stance`, `capacity` |
 | `R:change` | one change: a commit, an entry in a change log, a revision between drafts | n p c | `by`, `touches`, `release`, `phase` | `stance`, `at`, `nature`, `because`, `commit` |
 | `R:phase` | an episode: changes that belong together | n p c | `changes` | `stance`, `began`, `ended` |
 | `R:release` | a version made public: a tag, an edition, a publication | n p c | `changes` | `stance`, `version`, `at`, `tag`, `venue` |
-| `R:means` | a tool, method or material of production | n p c | | `stance`, `what`, `used-for`, `version` |
-| `R:licence` | the terms on which the work may be used | n p c | | `stance`, `identifier`, `file`, `holder`, `year`, `first-line`, `lane` |
-| `P:claim` | what the work claims, and how the text knows it | n p c | `roles.*` | `stance`, `salience`, `span` |
-| `P:reading` | an interpretation the text supports and does not state | n p | `of`, `grounds.of` | `stance`, `whose`, `grounds`, `intended`, `span` |
-| `P:case` | an example: what is given and what is expected | c | `of` | `stance`, `given`, `expect`, `span`, `stands`, `from`, `allowing`, `ruling` |
-| `P:assumption` | what the program takes to be true of its surroundings without checking it (section 18.4.9) | c | `relied-by` | `stance`, `about`, `checked`, `if-false`, `carries` |
+| `R:means` | a tool, method or material of production | n p c m | | `stance`, `what`, `used-for`, `version` |
+| `R:licence` | the terms on which the work may be used | n p c m | | `stance`, `identifier`, `file`, `holder`, `year`, `first-line`, `lane` |
+| `P:claim` | what the work claims, and how the text knows it; in a fabulam, what a comment, a public wording or a person says about the proof that the source does not itself bear out | n p c m | `roles.*`, `by` | `stance`, `salience`, `span`, `about`, `checked`, `mismatch`, `short-of`, `false-as-written` |
+| `P:reading` | an interpretation the text supports and does not state; in a fabulam, a key idea: why the proof works | n p m | `of`, `grounds.of` | `stance`, `whose`, `grounds`, `intended`, `span`, `regime`, `confidence` |
+| `P:case` | an example: what is given and what is expected; in a fabulam, a worked example in numbers | c m | `of` | `stance`, `given`, `expect`, `span`, `stands`, `from`, `allowing`, `ruling` |
+| `P:assumption` | what the program takes to be true of its surroundings without checking it (section 18.4.9); in a fabulam, what a final theorem takes as given, and that the file was read as text (section 18.4.10) | c m | `relied-by` | `stance`, `about`, `checked`, `if-false`, `carries` |
+| `C:statement` | a final theorem of a proof: what the file sets out to prove | m | `uses`, `leans-on`, `relates.to` | `stance`, `lean`, `says`, `quantifiers`, `form`, `slack`, `reached`, `depth` |
+| `C:definition` | a declaration of a proof's file that defines something: a definition, a structure, a class, an instance, a notation | m | `uses`, `used-by` | `stance`, `lean`, `says`, `form`, `fields`, `reached`, `depth`, `carries`, `private` |
+| `C:lemma` | any other proved declaration of the file: a theorem or a lemma on the way to a final one | m | `uses`, `used-by`, `leans-on` | `stance`, `lean`, `says`, `form`, `role`, `method`, `why`, `slack`, `automation`, `scope`, `reached`, `depth`, `carries`, `private`, `proof`, `sorry` |
+| `C:constant` | a constant or a choice of parameter that the proof fixes: a threshold, an exponent, a multiplier | m | `where` | `stance`, `says`, `value`, `why` |
+| `C:step` | a step of a proof that a reader needs and that has no declaration of its own | m | `inside` | `stance`, `says`, `span` |
+| `P:yield` | what a statement's proof delivers, set against what the statement says | m | `of`, `grounds.of`, `chooses.where` | `stance`, `beyond`, `says`, `as-statement`, `needs`, `bound`, `chooses`, `trivial`, `no-trivial`, `grounds`, `confidence`, `regime` |
+| `P:fit` | how a statement compares with a public wording of the result | m | `of`, `against` | `stance`, `how`, `form-differences`, `differences`, `confidence` |
 | `T:event` | what happens; in code, one step of what happens when the program is used | n p c | `agent`, `patient`, `before`, `after` | `when`, `span` |
-| `X:atem` | the atem of a passage | n p c | `of` | `line`, `focus`, `push`, `pull`, `span` |
-| `D:question` `D:session` | the dialectic's kinds (section 18.6) | n p c | as section 18.6 says | as section 18.6 says |
+| `X:atem` | the atem of a passage | n p c m | `of` | `line`, `focus`, `push`, `pull`, `span` |
+| `D:question` `D:session` | the dialectic's kinds (section 18.6) | n p c m | as section 18.6 says | as section 18.6 says |
 
 A kind outside the catalog's flavour is an error (`flavour-kind`, section 18.4.8): a fabulan holds no `C:line`, a
-fabulap no `C:file`.
+fabulap no `C:file`, a fabulac no `C:lemma`.
 
 **The common rules.**
 
@@ -2038,7 +2070,7 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `N:decision` | **`chose`** *text*; `over`, a list of `{option, because}`, what was not chosen and why; `because` *text*; `by` *ref* (an `R:maker` or the maker's E item); `changed-in` *refs* `R:change` |
 | `N:exclusion` | `horizon` [`never` `later`]; `because` *text* |
 | `N:target` | **`language`** *text*; **`version`** *text*, the release weighed; `weighed`, a list of `{point, score, evidence, answered, ruled}`, one per point of the target bank, `point` the point's number and `score` an *integer* from 0 to 3, each as section 18.4.9 says, `answered` `rules` or `model`, whichever gave the score, and `ruled` the transconceiver's word on the point, once asked; `provides`, a list of `{for, by, what, note, gap, entry, answered}`, how the language gives what the fabulac keeps, `for` *ref* (a `C:reliance`, `C:interface` or `C:behaviour`), `by` [`built-in` `library` `binding` `written` `cannot` `dropped`], `gap` *text*, what the language lacks and the new program must fill, `entry` the ground entry the row was read from; `spike` `{use, level, where, cases, evidence}`, the small trial entailment that tested it, `cases` *refs* `P:case`, the spike's own cases; **`verdict`** [`feasible` `feasible-with` `not`], with `conditions` *text* when `feasible-with`; `at` *date*; `by` *ref* `R:maker` (section 18.4.9) |
-| `C:part` | **`division`** [`chapter` `section` `paragraph` `scene` `list` `quotation` `stanza` `verse` `chorus` `refrain` `bridge` `other`]; `number` *integer*, its place among its siblings, from 1; `of` *ref* `C:part`, the part it sits in; `heading` *text* |
+| `C:part` | **`division`** [`chapter` `section` `paragraph` `scene` `list` `quotation` `stanza` `verse` `chorus` `refrain` `bridge` `stage` `other`], `stage` for a stage of a fabulam's argument; `number` *integer*, its place among its siblings, from 1; `of` *ref* `C:part`, the part it sits in; `heading` *text* |
 | `C:device` | **`figure`** *text*, an open word (`apostrophe`, `metaphor`, `symbol`, `image`, `alliteration`, `anaphora`, `refrain`, `caesura`, `turn`, `hook`, `irony`, `personification`, `appeal to authority` …); `where` *refs* (`C:line`, `C:part`, `L:term`, `P:claim`); `effect` *text*; `cue` *text*, the words that carry it, at most 60 characters; `senses`, for an image, a list from [`sight` `hearing` `touch` `taste` `smell` `movement`]; `intended` *bool*, whether the author meant it, absent until asked |
 | `C:voice` | `roles.*`: `speaker`, `addressee`, `listener`; `perspective` [`first` `second` `third` `mixed`]; `tone` *text* |
 | `C:line` | **`number`** *integer*, counted from 1 over the whole poem; `text`, the line as written (section 18.4.6 says when it is written); `part` *ref* `C:part`; `metre` *ref* `C:metre`; `stresses` *text* (`x` unstressed, `/` stressed, `\|` between feet); `syllables` *integer*; `rhyme` *text*, the line's letter in the scheme; `ending` [`stopped` `run-on`] |
@@ -2052,7 +2084,7 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `C:behaviour` | **`does`** *text*; `of` *refs* (`C:interface`, `C:component`); `when` *text*, the trigger; `edges`, a list of `{given, then}`; `errors`, a list of `{when, message, exit}`; `intended` *bool*, absent until asked; `ruling` (below) |
 | `C:dependency` | **`scope`** [`standard` `run-time` `test` `build` `optional`]; `package`; `version`, a constraint; `needed-for` *text*; `used-by` *refs*; `licence`; `address`, where it is published (a package index's name and the package's name there, or a repository's address); `resolved`, the exact version that was read; `digest`, the sha256 of what was read at that version |
 | `C:setting` | **`set-in`** [`environment` `file` `option` `constant`]; `key`; `default`; `type`; `means`; `read-by` *refs* `C:interface`; `ruling` (below) |
-| `C:reliance` | **`on`** [`language` `runtime` `platform` `dependency`]; **`gives`** *text*, what the program takes from it, in plain words that name neither the language nor the dependency; **`example`** *text*, one plain example of it; `of` *ref* (an `R:means` or a `C:dependency`), whose gift it is; `used-by` *refs* (`C:behaviour`, `C:interface`), what leans on it; `shown-by` *refs* `P:case`; `entry` *text*, the id of the ground catalog's entry it was copied from; `stated`, a list of where the gift is written (section 18.4.9); `contradicted-by` `{at, says}`, where a text says otherwise than the program does; `ruling` (below) |
+| `C:reliance` | **`on`** [`language` `runtime` `platform` `dependency` `part`], `part` for a fabulam's reliance on another part; **`gives`** *text*, what the program takes from it, in plain words that name neither the language nor the dependency; **`example`** *text*, one plain example of it; `of` *ref* (an `R:means` or a `C:dependency`), whose gift it is; `used-by` *refs* (`C:behaviour`, `C:interface`), what leans on it; `shown-by` *refs* `P:case`; `entry` *text*, the id of the ground catalog's entry it was copied from; `stated`, a list of where the gift is written (section 18.4.9); `contradicted-by` `{at, says}`, where a text says otherwise than the program does; `ruling` (below) |
 | `R:maker` | `who` *ref* (an `E:person` or `E:org`); `capacity` [`author` `maintainer` `contributor` `editor` `translator` `publisher` `performer` `composer` `transconceiver`] |
 | `R:change` | `at` *date*; `by` *ref* `R:maker`; `nature` [`feature` `fix` `refactor` `removal` `docs` `tests` `build` `revision`]; `because` *text*; `touches` *refs*; `release` *ref* `R:release`; `phase` *ref* `R:phase`; `commit` *text* |
 | `R:phase` | `began`, `ended` *date*; `changes` *refs* `R:change` |
@@ -2060,8 +2092,23 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `R:means` | `what` *text*; `used-for` *text*; `version` |
 | `R:licence` | `identifier`, the licence's standard short identifier (`MIT`) or plain words (`public domain`); `file`, a path; `holder`; `year` *text*, as the source writes it (`'1794'`); `first-line`; `lane` [`open` `bound` `closed`], in a fabulac, what its terms allow a transconception to do (section 18.4.9) |
 | `P:reading` | **`of`** *refs* (the `C:line`, `L:term`, E item, `C:part` or `P:claim` it reads); **`whose`** `{by: [author expert critic model reader], name, work, session, model}`; `grounds`, a list of `{of, because}`, what in the text supports it; `intended` *bool*, whether the author meant it, absent until asked (section 18.4.6) |
-| `P:case` | **`of`** *refs* (`C:interface`, `C:behaviour`, `N:requirement`, `N:use`); **`given`**, a mapping of `calls`, `arguments`, `input`, `env`, `file`, `files`, `steps`; **`expect`**, a mapping of `value`, `output`, `error-output`, `exit`, `files`, `raises`, `steps`; written as data, a case can be run (section 18.4.7); `stands` [`outside` `inside`], whether the case is judged at the program's boundary or by calling inside it; `from` [`test` `document` `recorded` `ruled`], where it came from; `allowing`, an allowance from the closed list of section 18.4.9; `ruling` (below) |
+| `P:case` | **`of`** *refs* (`C:interface`, `C:behaviour`, `N:requirement`, `N:use`); **`given`**, a mapping of `calls`, `arguments`, `input`, `env`, `file`, `files`, `steps`; **`expect`**, a mapping of `value`, `output`, `error-output`, `exit`, `files`, `raises`, `steps`; written as data, a case can be run (section 18.4.7); `stands` [`outside` `inside`], whether the case is judged at the program's boundary or by calling inside it; `from` [`test` `document` `recorded` `ruled` `worked`], where it came from, `worked` for a fabulam's worked example; `allowing`, an allowance from the closed list of section 18.4.9; `ruling` (below) |
 | `P:assumption` | **`about`** *text*, what is taken to be true; **`checked`** *bool*, whether the program checks it; `if-false` *text*, what happens when it does not hold; `relied-by` *refs*, the items that take it; `carries` [`must` `need-not`], whether an entailment must take it too |
+| `C:statement` | **`lean`** *text*, the declaration's full name as the source has it, always written in quotes; **`says`** *text*, the statement in full, in words and ordinary notation: every quantifier, hypothesis and constant in the order the source gives them, nothing left out and nothing added; **`quantifiers`**, the list in order, each `{kind, what}`, `kind` from [`for-all` `exists` `infinitely-many` `eventually`]; `form`, the keyword it is declared with; `uses` *refs*, the declarations it names, and `leans-on` *refs* `C:reliance`, both by rule; `relates`, only when the fabulam has two statements, `{to, how, says}`, `how` from [`implies` `special-case-of` `equivalent` `independent`]; `slack`, `reached` and `depth` (below) |
+| `C:definition` | **`lean`**; **`form`**, by rule, the keyword it is declared with, from the closed list below; `says` *text*, what it defines, in words; `fields`, for a structure or a class, a list of `{name, says}`; `uses`, `used-by` *refs*; `reached`, `depth`, `carries` and `private` *bool*, all by rule |
+| `C:lemma` | **`lean`**; `says` *text*, its statement in words; `form` [`theorem` `lemma` `instance` `example`]; `role` [`spine` `support` `bookkeeping`], `method` *text*, one sentence on how it is proved, `why` *text* and `slack`, a model's, and only on a lemma that is reached (section 18.4.10); by rule: `uses`, `used-by` *refs*; `leans-on` *refs* `C:reliance`; `reached`; `depth` and `carries` *integer*; `private` *bool*; `proof` [`tactic` `term` `none`]; `sorry` *integer*, how often its proof holds an admitted gap; `automation`, the search tactics its proof calls, so that its `uses` may be short; `scope`, the lines of the variables declared around it, a field this kind leaves open (section 7.3) |
+| `C:constant` | **`says`** *text*; **`where`** *refs*, the item or items that hold it; `value` *text*, as the file gives it; `why` *text*. It never carries `lean` |
+| `C:step` | **`inside`** *ref* (a `C:lemma` or a `C:statement`), the item whose proof holds it; **`says`** *text*; **`span`**, its lines, inside that item's lines |
+| `P:yield` | **`of`** *ref* `C:statement`; **`beyond`** [`yes` `no`]; **`says`** *text*; `as-statement` *text*, with `yes` alone; **`needs`**, a list of *text*; **`bound`** [`at-least` `at-most` `exactly` `between` `none`]; **`chooses`**, a list of `{what, where, value, gives, best, confidence}`; **`trivial`**, a list of `{case, known, delivered, compares}`, `compares` from [`above` `equal` `below`], with at least one entry, or empty with `no-trivial` *text*, one sentence on why there is none; **`grounds`**, a list of `{of, lines}`, at least one; **`confidence`** [`high` `medium` `low`]; `regime`. Section 18.4.10 says what each holds |
+| `P:fit` | **`of`** *ref* `C:statement`; **`against`** *ref*, the wording, `E:work/wording`; **`how`** [`same` `stronger` `weaker` `a-particular-reading` `different`]; `form-differences`, a list of *text*, differences of form only; **`differences`**, a list of *text*, differences of mathematical content, one plain sentence each, with no word of judgement; **`confidence`** [`high` `medium` `low`] |
+| `C:part`, in a fabulam | `division: stage`; `number`, its place in the logic, from 1 with no gap; `stage` [`reduction` `main` `tool` `side` `close`]; `says`, `plain`, `plain-if` and `obvious` *text*; `steps` *refs*, the lemmas, steps and statements that make it up, in the argument's order; `regime` (section 18.4.10) |
+| `C:file`, in a fabulam | `opens`, the namespaces the file opens; `limits`, a list of *text*, what the reader could not read |
+| `C:component`, in a head fabulam | `told-in`, the part's URI; `does`, the part's atem line; `offers` *refs*, the head's items told in the part; `stages`, the names of the part's stages, in its teaching order; `counts` `{declarations, reached, spine}`; `completeness`, the part's own (section 18.4.10) |
+| `C:dependency`, in a fabulam | one for each library the file imports from, Lean's own modules counting as one; `version`, the library's commit or the Lean version the source names; `scope: standard` |
+| `C:reliance`, in a fabulam | **`lean`**, a name or a list of names, as the file writes them, asked of a fabulam's reliance alone (`declared-once`); `on: dependency` with `of` *ref* `C:dependency` for a library's result, or `on: part` for a result of another part, with `stated-in` *text*, the URI of the head's item, and `digest`, that item's; `gives`, what the result says, in words; `known-as` *text*, the name the result is known by; `field` *text*, the part of mathematics it belongs to; `case` *text*, which case or form of a known theorem is used |
+| `P:claim`, in a fabulam | `about`, *ref* the item the claim is about, or a few words when no item holds it; `checked` [`yes` `partial` `contradicted` `not-checkable`]; `by`, the item or items whose statements bear it out; `short-of` *text*; `mismatch` [`formula` `hypothesis` `name` `numbering` `inference`]; `false-as-written` [`yes` `no`] (section 18.4.10) |
+| `P:reading`, in a fabulam | `whose: {by: model}`; `of`, the statement or the stage it reads; `grounds`, a list of `{of, lines}`; `regime` |
+| `P:case`, in a fabulam | `from: worked`; `of` *ref* (a `C:statement` or a `P:yield`); `given` and `expect` *text*, in words and numbers; `stands: inside` |
 
 **The plain kinds.** `C:interface.plain` and a structure's `kind` say what a value is without the language's own
 types, from a closed list: `text`, `whole number`, `number`, `yes-or-no`, `moment`, `list`, `map`, `record`, `path`,
@@ -2091,6 +2138,23 @@ says what an entailment of it must keep. Beside `ruling`, the item may carry `re
 `tested` `used` `seen`], which says why anyone relies on the thing: rules fill the first two, from the program's
 documents and its tests. A thing with no ruling for a target raises a question (section 18.6), and an entailment into
 that target waits for the answer.
+
+**Three shapes a fabulam's kinds share.** `slack` is a list of `{hypothesis, would-suffice, lines, confidence}`: a
+strict inequality or a range among an item's hypotheses that the proof does not use in full, the weaker one that
+would do, and the lines that show it. `regime` is `{as, uniform-in, fixed, worst-over}`, on any item that speaks of
+size, rate or order of magnitude. `reached` is one of `yes`, `no` and `perhaps`, with `depth` and `carries`, by the
+rule of section 18.4.10. The words `yes` and `no` are always written in quotes. An item that is a model's reading
+carries `confidence`, one of `high`, `medium` and `low`, and the builder writes `provenance.confidence` from it by
+rule: 0.5, 0.35 and 0.2. A definition's `form` is one of these, the last for a keyword the list does not hold:
+
+```text
+def abbrev structure class inductive instance opaque axiom alias notation other
+```
+
+In a fabulam the unchanged kinds take the proof's terms: `L:term` and `K:concept` a word or an idea a reader must
+know to follow the statement or the spine, E items the papers, the people and the bodies the inputs name, `N:aim`
+what the work sets out to prove, as its inputs say it, `N:decision` a choice visible in the formal text, and
+`D:question` a gap the build could not settle, asked of an expert.
 
 In a fabulac the unchanged kinds take the program's terms: `L:term` its own vocabulary, E items the named things it
 deals with (a holder, a service, a file it writes), `K:concept` the ideas the code relies on, `P:claim` what its
@@ -3565,23 +3629,48 @@ them passing with no error; its old name, `emf-checks`, is read wherever a manif
 | `closed-list` | error | every closed list: `stance`, `salience`, `feed.origin`, the nine relations, and the closed lists of section 18.4.2 and of the dialectic |
 | `pending-shape` | warning | as section 12.2 |
 | `catalog-key` | error, or a note | as section 12.2; the id may keep the old form `emf/<slug>` |
-| `flavour` | error | the catalog's `flavour` is `fabulan`, `fabulap` or `fabulac`, or absent |
+| `flavour` | error | the catalog's `flavour` is `fabulan`, `fabulap`, `fabulac` or `fabulam`, or absent |
 | `flavour-kind` | error | every item's kind belongs to the catalog's flavour: "C:line/1: a line belongs to fabulap, not to a fabulan" |
-| `code-span` | error | in a fabulac, every `span` is `{file, lines}`; its `file` is the path of a `C:file` of the fabulac; its `lines` are `n` or `n-m`, with n no greater than m, within the file's `length.lines` |
-| `licence-recorded` | error; a warning while pending | a fabulac records `source.licence`, a value or a question, and holds an `R:licence` item |
+| `code-span` | error | in a fabulac or a fabulam, every `span` is `{file, lines}`; its `file` is the path of a `C:file` of the fabulac; its `lines` are `n` or `n-m`, with n no greater than m, within the file's `length.lines` |
+| `licence-recorded` | error; a warning while pending | a fabulac or a fabulam records `source.licence`, a value or a question, and holds an `R:licence` item |
 | `question-about` | error | a question's `about` names an item, an item's field, a span of the right shape (in a fabulac, one whose file and lines exist), or a module or kind the fabula declares; a settled, stale or withdrawn question is skipped (section 18.6) |
 | `question-shape` | error | a question's answers agree with its state (section 18.6) |
 | `session-declared` | warning | a source `D:session/<id>` names a session of the fabula; the bare forms `session-<n>` and `elicit-…` are accepted without one |
 | `reading-whose` | warning | an author's or an expert's reading names the session it was given in; a critic's names the critic, or asks who |
 | `interface-signature` | warning | a `function`, `method`, `class`, `command` or `format` interface carries its `signature` |
 | `case-outcome` | error | a case says what is given and what is expected |
-| `parts-resolve` | error | in a head, every part in `parts` is a fabulac the reader knows, at its `path`, whose catalog names this head in `head`, and every `told-in` names one of them; in a part, every `stated-in` names an interface of its head that exists |
+| `parts-resolve` | error | in a head, every part in `parts` is a fabulac the reader knows, at its `path`, whose catalog names this head in `head`, and every `told-in` names one of them; in a part, every `stated-in` names an interface of its head that exists. Over fabulams the same: a head fabulam's parts are fabulams, and a part's `stated-in` names an item of its head |
 | `interfaces-agree` | error | in a part, every `C:interface` that says `stated-in` has the same name, surface, signature and parameters as the head's item, and so does each method the head states of a
 class, while each field of a class the head states has the head's type and plain kind; a part whose file's sha256 differs from the head's `parts` entry is reported as moved, with a note |
 | `cases-entailed` | error | after an authored fabulac is entailed, every runnable case is a test in `tests/test_cases.py`, and every other case is either a test marked as written by a model or named in `ENTAILED.md` with the reason it was not entailed |
 | `requirement-cased` | warning | in an authored fabulac, every `N:requirement` of `force: must` names at least one `P:case` in `checked-by` |
+| `declared-once` | error | in a fabulam, every `C:statement`, `C:definition` and `C:lemma` carries `lean` and a span; no two of them carry the same `lean`; a `C:constant` carries none; a `C:reliance` carries the names it leans on, in `lean` |
+| `statement-whole` | error | a fabulam that stands alone holds at least one `C:statement`, and a head one for every target; a part holds one for each target that its own file declares, and needs no other; each statement names a `source.target`, and has `says` and `quantifiers`; `atem.of` names a statement, or, in a part that holds none, one of the part's own declaration items; `relates` stands only between two |
+| `yield-stated` | error | every statement has exactly one `P:yield`: its `beyond` a quoted word, `as-statement` exactly when `yes`, `needs` and `chooses` lists, each entry of `chooses` whole, and `trivial` with an entry or `no-trivial` with a sentence |
+| `fit-stated` | error | when `source.wording` is set, every statement has exactly one `P:fit` and `E:work/wording` exists; when it is not, there is no `P:fit` |
+| `spine-told` | error | every lemma with `reached: yes` has a `role`, and no other lemma has one; every spine lemma has `why` and is in the `steps` of a stage; following `uses` from the statements reaches every spine lemma, where the fabulam holds a statement |
+| `stages-whole` | error | the stages' `number`s run 1, 2, 3 with no gap; exactly one stage is the `reduction`, and it has `obvious`; each stage has `plain` and `plain-if`; `teaching` lists every stage once, the reduction first, then by `stage` in the order of section 18.4.10 |
+| `grounds-given` | error | every `P:yield`, every `P:reading` and every `slack` entry has grounds with lines; every `C:step` has `inside` and a span inside it |
+| `audit-whole` | error | every row of `audit` has `lines`, `kind` and a `verdict` of the closed list; a row says `claim` exactly when it names a `P:claim`; every `P:claim` whose source is a comment is named by one row; every claim's `checked` is one of the four words, with the fields that word asks for |
+| `stance-fits` | error | each item's stance is one that its kind's row in section 18.4.10 allows; a `hearsay` item names its source in `provenance.sources`; an item that is a model's opinion says its `confidence`; `assumed` stands only on a reliance without `stated-in`, a term or a concept; `deduced` may stand on any kind |
+| `checking-said` | error | `P:claim/checking` exists; `source.checking.built-here` is `no`; the item's `says` holds `said` only with `said-by`; without them it holds none of "machine-checked", "verified", "certified" and "proved correct" |
+| `example-worked` | error | every statement has a `P:case` with `from: worked`, whose `given` and `expect` each hold a number |
+| `no-up-to` | error | no field of a `P:yield` and no stage's `plain` holds "up to"; the phrase is allowed before "isomorphism", "order", "sign", "symmetry" and "relabelling" |
+| `statements-agree` | error | a `C:reliance` with `stated-in` has the `lean` and the `digest` of the head's item it names, and its `gives` is that item's `says`; a head's own item agrees in the same way with the part it is told in |
+| `regime-named` | warning | a `P:yield`, a `P:reading` or a stage whose sentences speak of size has a `regime` |
+| `no-judgement` | warning | no difference a `P:fit` lists holds a word of judgement: "trivial", "easy", "intended", "obvious", "famous" |
+| `plain-words` | warning | a stage's `plain` holds no symbol and no one-letter name |
+| `spine-rule-differs` | warning | a candidate of the rule (section 18.4.10) was judged `bookkeeping`, or a lemma with `carries: 0` at depth 3 or more was judged `spine`; a question is raised about each |
 
-A fabulac whose `purpose` is `transconception` runs the checks of section 18.4.9 as well.
+A fabulac whose `purpose` is `transconception` runs the checks of section 18.4.9 as well. The rows from
+`declared-once` on are a fabulam's, and hold over the fabulam alone. A fabulam is built in stages, and each stage
+lands a fabulam that passes these checks, so an outline is a valid fabulam. A check that asks for what a later stage
+writes, every statement's yield, the stages and the teaching order, the worked example, the comments' verdicts, a
+reached lemma's role, the fit, holds it only once the fabulam says it is whole, `derived.completeness: full`, or once
+that layer has begun: one yield, one stage, one verdict, one role or one fit is there. What is there is always held to
+its shape. The four warnings prompt a person, and are never a gate. None of the checks judges whether the mathematics
+is right. A fabulam is held to its source, and a pshort to its fabulam, by named checks of Thym
+(https://thym.cosmoes.org/), its section 7.3, which the moves of its section 20.13 keep.
 
 The generic reader runs the checks of section 12.2, and `flavour` and `flavour-kind`, which the manifest drives. The
 others are the fabula's own, run by the reference implementation, enough (https://github.com/0gsd/enough); a reader that
@@ -3760,6 +3849,477 @@ target. Entailing into a new target asks again only the rulings made for another
 (section 18.4.1). Decompiled again, it carries each ruling and each reliance over while the item it is on still
 resolves, as a question is carried over (section 18.6.3). A recorded case and a cshort's evidence hold only against the
 source they were recorded from, which each names; against a moved source they are recorded again.
+
+#### 18.4.10 Proof: the fabulam and the pshort
+
+**The model for a proof.** A fabulam is a map of a formal proof that a mathematician can check: one file of the
+proof's source taken apart into what it states, what it defines, what it proves on the way, what it leans on, what its
+proof delivers, and how the argument runs. Every declaration of the file is one item, with its name and its lines, and
+every item that says something about the proof cites those items. So whatever a fabulam says of the proof reaches
+names and lines of the source, and checks hold it to that (section 18.4.8; Thym (https://thym.cosmoes.org/), its
+section 7.3). A **pshort** is a guide to the proof, entailed from the fabulam alone, for one of three readers. Both are
+files that are read. The source is read as text, by rule: no conforming implementation installs, builds or runs
+anything of the proof's own system, to make a fabulam or a pshort or to show one.
+
+<!-- term: fabulam -->
+A **fabulam** is the fabula of a formal proof: one file of the proof's source, enumerated as the argument it holds,
+each item tied to the declarations it was read from, by name and by lines.
+
+<!-- term: pshort -->
+A **pshort** is a fabulam's short: a markdown text that guides one of three readers, an expert, a student or
+everyone, through the proof, each run of its sentences citing the items of the fabulam it rests on.
+
+In the two words, the *m* is for mathematics and the *p* is for proof.
+
+A fabulam is one file, `<name>.fabulam.cosm`, and its id is `fabula/<name>`. The name is the person's choice; where
+they give none, a builder makes it from the name of the file, less its ending, or of the folder: a hyphen goes in where
+a small letter or a digit meets a capital, and the result is respelled as a slug (section 18.3.3), so that
+`PrimesCongruentOne.lean` gives `primes-congruent-one`. The fabulam sits beside the root folder of the proof's source,
+the folder that holds the file naming its Lean version, as a fabulac sits beside its folder and never inside a clone. A
+loose file with no such folder has its fabulam beside it.
+
+**What a fabulam holds, facet by facet.**
+
+| Facet | In a fabulam |
+|---|---|
+| inspiration | none of its kinds, in this edition; a paper or a source that the inputs name is an `E:work` |
+| meaning | the words and the ideas a reader must know to follow the statement or the spine (`L:term`, `K:concept`); the papers, people and bodies the inputs name (E), the public wording of the result among them, `E:work/wording`, when the person gave one |
+| intent | what the work sets out to prove, as its inputs say it (`N:aim`); a choice visible in the formal text (`N:decision`) |
+| construction | the file (`C:file`); every final theorem (`C:statement`), every definition (`C:definition`) and every other proved declaration (`C:lemma`), each with its name in the source and its lines; a step a reader needs that has no declaration of its own (`C:step`); a constant or a parameter the proof fixes (`C:constant`); the libraries the file imports (`C:dependency`), and each result from outside the file that carries real weight in the proof (`C:reliance`); the stages of the argument (`C:part`) |
+| production | the authors a header names (`R:maker`); the licence (`R:licence`); the proof's own system, and any other system the inputs name (`R:means`) |
+| assertions | what each statement's proof delivers, set against what the statement says (`P:yield`); how each statement compares with the public wording (`P:fit`); what a comment, the wording or a person says that the source does not itself bear out (`P:claim`), the one item on checking among them; the key ideas, why the proof works (`P:reading`); a worked example in numbers (`P:case`); what a final theorem takes as given, and that the file was read as text (`P:assumption`) |
+
+What the build could not settle is a `D:question` to an expert (section 18.6), so that every gap has an id a pshort
+can cite. A fabulam says the proof again in words and ordinary notation: the names in `lean` aside, it carries no run
+of the file's own text longer than 80 code points (`nothing-carried`, Thym, its section 7.3).
+
+An item made from a declaration takes its id from its kind and the declaration's full name, `C:lemma/<full name>`. A
+character the id grammar refuses is respelled by rule: `'` becomes `-prime`, and any other becomes `-x` and its code
+point in hexadecimal, so that a full stop at the end is `-x2e`; a name that begins with neither a letter nor a digit
+takes an `x` in front. When two names give one id, the later takes `-2`. An instance or an example with no name is
+`C:definition/instance-L<line>` or `C:lemma/example-L<line>`. The `lean` field keeps the real name.
+
+Each item's stance is from the fabula's closed list (section 18.4.3), and in a fabulam each stance has one meaning.
+The check `stance-fits` holds each kind to its row:
+
+| Stance | In a fabulam | Kinds that may carry it |
+|---|---|---|
+| `observed` | read from a statement or a definition of the source, as written, or counted from its text | `C:file`, `C:statement`, `C:definition`, `C:lemma`, `C:dependency`, `P:assumption`, `N:decision`, every kind of R, and `P:claim/checking` while the person has given no entry |
+| `deduced` | found by rule from other items, or from the names one declaration uses of another; a neighbour's statement copied from the head | a `C:reliance` with `stated-in`, and anything a rule adds |
+| `opinion` | a model's reading of a proof's body, or of how the pieces fit | `C:step`, `C:constant`, `C:part`, `P:yield`, `P:fit`, `P:reading`, `P:case`, `N:decision` |
+| `hearsay` | said by something the proof's system does not check: a comment, the public wording, a person's entry on checking | `P:claim`, `N:aim`, every kind of E, `R:maker` |
+| `assumed` | known from general mathematics, and not read from the inputs | a `C:reliance` without `stated-in`, `L:term`, `K:concept`, and no other kind |
+
+Nothing about what this proof does is `assumed`. A hearsay item names its source in `provenance.sources`: a comment's
+place in the file, or `E:work/wording`. A lemma is one item in two layers. Its `says` is observed. Its `role`, `method`,
+`why` and `slack` are a model's, and are read as opinion, field by field, while the item's own stance stays `observed`.
+
+**Stated is not shown.** What a statement says and what its proof delivers are kept apart. The statement goes in the
+`C:statement`, in its `says`, with its own ranges and nothing more. What the proof's construction delivers goes in a
+`P:yield`, exactly one for each statement. The rule cuts both ways: the atem's line, and a statement's `name`,
+`summary` and `says`, keep to the statement's own ranges, however much more the proof gives.
+
+| Field of a `P:yield` | Holds |
+|---|---|
+| `of` | the statement |
+| `beyond` | `yes` when the construction delivers more than the statement says, `no` when it delivers exactly the statement |
+| `says` | what the construction delivers, in full; with `no`, why the reading is sure of it |
+| `as-statement` | with `yes` alone: the delivered result as one theorem, with every range, quantifier and constant |
+| `needs` | the steps between the file and `as-statement` that the file does not itself take; an empty list when there are none |
+| `bound` | `at-least`, `at-most`, `exactly` or `between`, when the delivered result bounds a quantity; else `none` |
+| `chooses` | one entry for each parameter or constant the proof picks, `{what, where, value, gives, best, confidence}`: `gives` is the delivered result written as a function of that choice; `best` is the choice that makes `gives` best and what it then gives, or `the file's choice`, or `{pending: "…"}`. An empty list when the proof picks nothing |
+| `trivial` | the cases anyone can settle without the proof, each `{case, known, delivered, compares}`: what is plainly true there, what the delivered result says there, and `above`, `equal` or `below`. At least one, or `no-trivial` with one sentence on why there is none |
+| `grounds` | the lemmas or steps it was read from, each with the lines, `{of, lines}`; at least one |
+| `confidence` | `high`, `medium` or `low` |
+
+A yield is found by reading the proof of each target and of the last lemma it rests on. Where the statement says that
+something exists, the yield says how it is made. Where the statement fixes a range or a constant, the yield says
+whether the proof uses it or would run for more. Each choice the proof makes is then varied, and the result is written
+as a function of the choice. Last come the trivial cases: where the delivered result is weaker than what is plainly
+true, `compares: below` says so outright.
+
+- **No "up to".** A delivered bound is told in the words of `bound`: "at least", "at most", "exactly", "between". The
+  phrase "up to" is refused in a yield, in a stage's `plain`, and in any sentence of a pshort that cites a yield
+  (`no-up-to`).
+- **Slack.** For each statement and each lemma at depth 1, every strict inequality and every range among its hypotheses
+  is asked whether the proof uses its full strength. Where lines of the proof show that a weaker one would do, the item
+  carries `slack` (section 18.4.2). Slack in a constant the proof chose belongs in `chooses`.
+- **The worked example.** Every statement has at least one `P:case` with `from: worked`: small numbers put through
+  the yield, which a reader can check by hand. The pshort for everyone uses its numbers and no others.
+
+**Spine, support, bookkeeping.** Every lemma that a final theorem reaches has a `role`:
+
+| `role` | The lemma |
+|---|---|
+| `spine` | is one that a mathematician telling the proof at a blackboard would state: without it the argument has a hole. A step that changes what must be proved is spine, however short its proof: a reformulation, a reduction of one condition to another, a bound that makes a later count possible. The length of a proof is no guide |
+| `support` | is a real mathematical step that the same mathematician would only mention |
+| `bookkeeping` | is needed by the proof's system and not by a reader: casts, rearrangements, bounds that are plain on paper |
+
+A spine lemma carries `why`: what the argument would lack without it, and what it makes easier for the step after it.
+A `why` says what this proof does with the step. It never says that no other way exists.
+
+What a final theorem reaches, and how much rests on each declaration, is found by rule, before any model is asked,
+from the names one declaration uses of another:
+
+1. **Reach.** From the targets, the names are followed. A declaration that is met is `reached: yes`, and its `depth`
+   is the least number of steps from a target. One that is not met, and that the proof's system could use without
+   naming it, is `perhaps`: in Lean, an instance, or a declaration that carries one of the attributes listed below,
+   when it stands in a target's own file or in a file that file imports.
+   Every other is `no`: the final theorem never uses it, and no model reads it.
+2. **Carries.** A declaration's `carries` is the number of reached declarations that every chain of names from a
+   target meets only through it. A lemma that carries much is one the proof passes through.
+3. **Candidates.** The rule's candidates for the spine are the targets, every reached theorem or lemma at depth 1,
+   and every reached theorem or lemma whose `carries` is at least 3 and at least 2 in a hundred of all that is reached.
+
+```text
+simp instance aesop grind ext fun_prop gcongr positivity norm_cast push_cast norm_num
+```
+
+A model then judges, and only within what the rule found: `spine`, `support` or `bookkeeping` for each lemma with
+`reached: yes`, shown its `depth` and its `carries`. Where the model and the rule part ways, `spine-rule-differs`
+warns, and a question is raised for a person (section 18.4.8).
+
+**Stages and the teaching order.** The argument is told in stages. A stage is a `C:part` of division `stage`:
+
+| Field of a stage | Holds |
+|---|---|
+| `number` | its place in the logic: 1, 2, 3, with no gap |
+| `stage` | `reduction`, `main`, `tool`, `side` or `close` |
+| `says` | what the stage achieves, and why the next one needs it |
+| `plain` | one or two sentences that a reader with no mathematics could follow, saying what happens in the stage: the mechanism, and not only the goal. No symbol, and no term to look up. It names each thing by what it is before it uses it, and says nothing the stage's own items do not hold |
+| `plain-if` | the condition the mechanism in `plain` needs in order to be true, in plain words; the word `none` only when `plain` is true with no condition |
+| `obvious` | on the reduction only: the obvious way to the result and why it fails, or `none: the file's way is the obvious one` |
+| `steps` | the lemmas, steps and statements that make it up, in the order the argument takes them |
+| `regime` | when the stage speaks of size (below) |
+
+Exactly one stage is the `reduction`: what has to be shown, or made large, and why. When the proof is direct, the
+reduction says so, and its `steps` name the statement. The catalog's `teaching` is the teaching order. It lists every
+stage's id once, in the order a teacher would tell them: the reduction first, then the `main` stages, then `tool`,
+then `side`, then `close`. Among stages of one word the order is the model's. `number` keeps the order of the logic,
+which may be another.
+
+Sizes name their regime. Any item that speaks of size, rate or order of magnitude carries `regime`: what grows or
+shrinks (`as`), what the statement is uniform in (`uniform-in`), what is held fixed (`fixed`) and what the worst case is
+taken over (`worst-over`). A proof with no sizes has no `regime` anywhere.
+
+**Comments are hearsay.** A proof's system checks declarations and never comments. So what a comment says is hearsay
+until the source bears it out, and a fabulam says which comments the source bears out. Every comment of the file is
+one row of the catalog's `audit`, `{lines, kind, on, verdict, claim}`:
+
+| Field of a row | Holds |
+|---|---|
+| `lines` | the comment's lines in the file |
+| `kind` | `header`, the file's first block comment; `module-note`, a note on the file as a whole; `note`, the comment above a declaration; `inline`, any other |
+| `on` | for a `note`, the item of the declaration it stands over; for an `inline` comment, the item of the declaration it sits inside; else empty |
+| `verdict` | `agrees`: the source under it bears it out. `nothing`: it says nothing about the mathematics (a heading, a licence line, a note on layout). `claim`: it is recorded as a `P:claim` |
+| `claim` | with the verdict `claim`, the `P:claim` |
+
+Every mismatch between a comment and the source is a claim. So is every remark the source cannot bear out and a reader
+would want kept: a credit, a piece of history, a judgement. A `P:claim` says what it is `about`, an item or a few
+words, and its `checked` says how it stands against the source:
+
+| `checked` | Means | Also carries |
+|---|---|---|
+| `yes` | a statement of the file bears it out in full | `by` |
+| `partial` | a statement bears it out in part | `by`; `short-of`, what is missing; `mismatch`; `false-as-written`, `yes` or `no` |
+| `contradicted` | the source shows otherwise | `by`, `mismatch` |
+| `not-checkable` | the source could bear it out neither way | |
+
+`mismatch` is one of `formula`, `hypothesis`, `name`, `numbering` and `inference`. `numbering` is a comment that points
+at a step or a lemma by a number the file does not have. A mismatch is never softened: a comment whose conclusion does
+not follow is `contradicted`, or `false-as-written: yes`.
+
+The rows are made by rule, with no verdict, when the file is surveyed, and the audit stage gives each its verdict.
+The model that reads the proof is given the file with its comments blanked, so that it tells what the declarations
+say and not what the comments promise. Only the audit sees the comments. `source.read` records it: `{by: rules,
+elaborated: "no", comments: blanked}`, fixed in this edition.
+
+**What is said about checking.** A fabulam does not check a proof. What is known about the machine check is kept in
+one place, `source.checking`:
+
+| Field | Holds | Written by |
+|---|---|---|
+| `sorry` | how many admitted gaps the file's text holds, outside comments and strings | rule |
+| `axioms` | how many axioms the file itself declares | rule |
+| `native-decide` | how many times the file's text uses `native_decide`, which trusts the compiler | rule |
+| `built-here` | always `no`: nothing was built or run | rule |
+| `said`, `said-by`, `said-at` | one sentence on what is known about the check, who says it, and where or when; all three absent when the person gave none | the person, never a model |
+
+One item with a fixed id, `P:claim/checking`, says it in words. Rules write it when the file is surveyed, never a
+model. With no entry from the person, and with every count at 0, its `says` is:
+
+```text
+The file's text holds no `sorry` and declares no axiom of its own. It was read here as text. Nothing was built or run,
+so whether Lean accepts it is not known here.
+```
+
+A count above 0 changes the first sentence, which then gives the counts as they are, and a file that uses
+`native_decide` adds: "It uses `native_decide` n times, which trusts the compiler." With an entry from the person the
+item goes on: `<said-by> says: <said> (<said-at>).` Its stance is `hearsay` with an entry and `observed` without. Its
+id is fixed so that a pshort can cite it.
+
+An implementation never says more about checking than this item says. Nothing it shows or writes, a page, a card, a
+pshort or a message, says that a proof is machine-checked, verified, certified or proved correct, except in the words
+of this item, shown in full with who says them. It shows no badge, tick or colour that could be read as such a claim
+(`checking-said`, section 18.4.8; `checking-told`, Thym, its section 7.3).
+
+**Read as text.** Reading a formal proof as text leaves some things unknown, and a fabulam marks each one where it
+falls:
+
+| Not knowable from the text | What the reader does | How the fabulam marks it |
+|---|---|---|
+| what the proof's system fills in: implicit arguments, coercions, what a name's type really is | reads the text as written | `source.read.elaborated: "no"`; a statement's `says` is what is written |
+| which of the variables declared around it a declaration really takes | lists every one in scope | `scope` on the lemma; the model is shown those lines |
+| instances and tagged lemmas that are used without being named | cannot see the use | `reached: perhaps` |
+| the lemmas a search tactic finds | lists the tactics, from a fixed list of their names | `automation` on the lemma: its `uses` may be short |
+| which declaration a short name means, under the namespaces a file opens | places the name where exactly one declaration fits; where two fit, links it to each, so that the reach takes in too much rather than too little | `uses` may be long; a `C:reliance` keeps a library's name as written |
+| declarations that an attribute or a command makes, and notation the file defines | lists what the text shows, and expands nothing | `limits` on the `C:file` |
+| whether the file builds, and the axioms it rests on through its imports | nothing | `P:claim/checking` |
+
+One fixed item, `P:assumption/read-as-text`, says all of it once, so that a pshort can cite it. Its `about` is how
+the fabulam was read. It says that the file was read as text, that names were matched by spelling, and that Lean was
+not run. Its `if-false` says what may follow: a link between two declarations may be missing, or may point at the wrong
+one of two with one name. An entailment must carry it (`carries: must`).
+
+**How a fabulam is built.** In six stages, each one whole run that lands the fabulam so far before the next begins.
+The first is by rule alone; each of the others asks a model one small thing:
+
+| Stage | Asks a model | Sees | Writes |
+|---|---|---|---|
+| survey | no | the file | the outline: every declaration an item with its lines, the file, its libraries, its makers and its licence, the comment rows, `P:claim/checking`, `P:assumption/read-as-text`, and the reach |
+| read | yes | the file with its comments blanked, the outline, and the statements of its neighbours | each reached declaration's statement in words; each lemma's role, method and why; steps; reliances; terms and concepts |
+| audit | yes | the file with its comments, and the fabulam so far | each comment row's verdict, and the claims |
+| fit | yes; run only when a wording was given | the wording and the statements' items, never the source | `E:work/wording`, a `P:fit` for each statement, and the claims the wording makes |
+| fold | yes | for the yield, each target's proof and the last lemma it rests on, comments blanked; for the stages, the fabulam so far and no source | the yield, the worked example, slack and constants; then the stages, the teaching order, three to six readings, the decisions and the atem |
+| question | yes | the fabulam | the gaps, each a `D:question` to an expert (section 18.6) |
+
+The survey also finds the targets. A person may name them. When they name none, the targets are found by rule: every
+theorem or lemma of the file that is not private, is not deprecated, and that no other declaration of the file names,
+an alias of it aside. A file of a library can give many. When the rule gives more than three, a builder asks the person
+to choose, and builds nothing until they do.
+
+After each stage the fabulam, with what the stage found, is written, and a build that stops is taken up again after the
+last stage that landed, as long as the file's sha256 is still the one recorded. Each run joins `derived.runs`. The
+survey writes `derived.completeness: outline`, and only the last stage writes `full`: until then the checks ask of a
+fabulam only what its stages so far have written (section 18.4.8). A build with no model runs the survey and stops at
+the outline: every declaration with its lines and its reach, and nothing read for meaning. The moves are Thym's (Thym,
+its section 20.13).
+
+**A head fabulam and its parts.** A proof of several files is told one file at a time: each file has a fabulam of its
+own, a part, and a **head fabulam** names the parts, as a head fabulac does (section 18.4.7). The head's catalog lists
+them in `parts`, each `{uri, path, sha256}`, and each part names its head in `head`. The head's `source` is the folder.
+The files one head covers are its archive: a name that leads outside the archive is a library's name.
+
+The parts are kept in a folder beside the head, `<name>.fabulam.parts/`, which mirrors the folders of the source, each
+part named for its file, `<File>.fabulam.cosm`. A part's id is `fabula/<name>--<module>`, the module's name with a
+hyphen for each dot and its capitals kept.
+
+The head states once whatever a part needs of another, so that each part reads alone:
+
+| The head states | As |
+|---|---|
+| the targets, the Lean version, the licence, the wording, and what is said about checking | its `source`, `E:work/wording`, `P:claim/checking` and `R:licence`; each part repeats `toolchain`, `target` and `checking`, by rule |
+| every declaration that crosses: one that a reached declaration of another part names | an item of its own of the same id, a `C:statement`, `C:lemma` or `C:definition`, with `lean`, `says` and `digest` copied from the part by rule, `told-in`, the URI of the part's item, its `depth` and its `carries` over the whole archive, and `role-there`, its role in its own part |
+| the members of a structure or a class that crosses | `fields` on the head's `C:definition`, copied from the part |
+| what each part is | one `C:component` for each part: `told-in`, `does`, `offers`, `stages`, `counts` and `completeness` (section 18.4.2) |
+| the yield of each target | the `P:yield` of the part that holds the target, copied by rule, with `told-in` |
+
+A part that uses a declaration from another part holds a `C:reliance` for it: `on: part`, `stated-in` naming the head's
+item, with the head's `lean` and `digest`, and `gives` copied from the head's `says`. The check `statements-agree`
+holds the two to one statement. Nothing in a part needs another part's file to be read.
+
+A fabulam that stands alone holds at least one statement, and a head holds one for every target. A part need not. Each
+target that is a declaration of the part's own file has one statement there, and the other targets need none in that
+part. A part that holds no statement has its atem's `of` naming one of its own declaration items, and what is asked of
+each statement, its yield, its fit and its worked example, is asked of the statements there are. A part's `reached` and
+`depth` are the archive's, counted from the archive's targets across its files. Its `carries` counts within its own
+file, and the head's crossing items hold the archive's `carries`.
+
+The files are read in an order that puts each file after every file it imports, so that when a file is read each
+neighbour's statement is already in the head. A file that no target reaches is surveyed by rule and left as an
+outline: no model reads it, and its component in the head says `completeness: outline`. Summaries go upward:
+
+1. When a part lands, rules copy into the head the part's crossing items, its component's `does`, `stages` and
+   `counts`, and a target's yield.
+2. When every reached part has landed, the head is folded: a model is asked once. It sees the components and the
+   crossing items, never the source, and writes the head's own stages, whose `steps` are the head's crossing items,
+   with their `plain` and `plain-if`, its teaching order, its readings and its atem.
+3. A head that is itself a part hands the same summary to the head above it.
+
+A pshort entailed from a head tells the archive at the head's grain. A pshort entailed from a part tells one file.
+
+**The pshort.** Entailing a fabulam writes a pshort: a markdown file beside the fabulam, named
+`<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md` and recorded in `shorts` (section 18.4.1). A pshort is a guide to a
+formal proof, and it is never called a proof, in its own text or by an implementation that shows it. Its `density`
+names its reader, and the same fabulam is entailed at any of the three. The word is the field's name: these are not
+the densities of section 18.1, among which every pshort is a short.
+
+| | `expert` | `student` | `everyone` |
+|---|---|---|---|
+| The reader | a mathematician in the field | someone with a first course in the subject | no mathematics assumed |
+| The order | the logic, by `number` | the logic | the teaching order, the reduction first |
+| It must hold | the statement in full; the fit; the yield, with `as-statement`, `needs`, `chooses` and slack; every spine lemma by its name in the source, with its `why`; each reliance by the name it is known by, and its case; the comments the source contradicts; the questions | each term defined where it is first used; each stage's `says` and its key lemma; one reading for each stage; the worked example | each stage's `plain` with its `plain-if`; exactly one worked example, the `P:case`, with its numbers and no others; every symbol tied to its words where it is first used, or no symbols; why the result matters, only from the `N:aim`, `E:work` and `K:concept` items; what is open, last |
+| Words | 500 to 900 | 500 to 800 | 350 to 600 |
+
+Its heading, the two lines under it and its last line are written by rule, and the body between them by a model:
+
+```text
+# <the fabulam's name>, for <experts | students | everyone>
+
+*A pshort of <file>.fabulam.cosm at <density>. It is a guide to a formal proof. It is not a proof.*
+
+*<the says of P:claim/checking>* [P:claim/checking]
+
+<the body>
+
+*a pshort of <file>.fabulam.cosm, at <density>, entailed apart on <day> by <model>*
+```
+
+Every sentence of the body is cited. A citation is the id of an item of the fabulam in square brackets, and a group of
+them, one or more ids in one pair of brackets with a comma between, closes a run of sentences: it covers the sentence
+it closes and the sentences before it in the paragraph, back to the group before. So every paragraph ends in a
+citation. General mathematics is cited as anything else is, through a term, a concept or a reliance. The body says
+nothing the items do not hold. It gives the statement with its own ranges, and tells the yield as what the proof
+delivers, in the words of `bound`. It hedges what the fabulam holds at `confidence: low`, and tells an open question
+as open.
+
+A pshort is entailed apart from the source. The model that writes it is given the fabulam's items and nothing else:
+every `span`, every `lines` and the source's path are taken out of what it is sent, and it never sees the source. An
+implementation may bound the size of the fabulam one entailment carries. Past its bound it leaves out the bookkeeping
+lemmas, by rule, then the `method` of the support lemmas, and the pshort says so in its last line. `<day>` in that
+line is the day of the run, in UTC, as in a cshort's footer.
+
+The checks that hold a pshort to its fabulam are Thym's (its section 7.3): `cites-resolve`, `every-sentence-cited`,
+`yield-cited`, `teaching-followed`, `no-up-to`, `example-worked`, `nothing-added`, `checking-told`, `confidence-told`,
+`symbols-worded`, `apart`, `length`, `footer` and `provenance`. They hold a pshort to what its fabulam says. Whether
+the teaching is good is a person's judgement, and no check decides it.
+
+**What this edition specifies.** A conforming builder reads Lean 4, as text. One fabulam tells one file, and a proof
+of several files is told under one head, one level deep, within sixty files and twelve thousand lines; a builder
+refuses more. A fabulam entails pshorts, and nothing is entailed into a proof language. A head may itself be a part:
+a folder's head names the fabulams of the folder's files and the heads of its folders, so that a tree of any depth is
+told level by level. That rule is fixed here so that nothing is renamed later, and a builder of this edition makes one
+level. Other proof languages, deeper trees, and a reading that asks the proof's own system are reserved for a later
+edition.
+
+**An example.** One file of Mathlib, the library of mathematics written in Lean:
+`Mathlib/NumberTheory/PrimesCongruentOne.lean`, read as text at one commit of the library, under its Apache-2.0
+licence. Its 75 lines prove that for every k that is not 0 there are infinitely many primes that leave remainder 1
+when divided by k. The catalog of its fabulam and five of its items follow, cut down:
+the envelope's `name`, `summary` and `provenance` are left out for room, and so are the other items and some
+fields of these. The conformance
+corpus carries a fabulam whole (section 20.3).
+
+```yaml
+oes: fabula/1
+flavour: fabulam
+id: fabula/primes-congruent-one
+name: primes-congruent-one
+source:
+  path: mathlib4/Mathlib/NumberTheory/PrimesCongruentOne.lean
+  kind: text
+  language: lean
+  toolchain: leanprover/lean4:v4.37.0-rc1
+  module: Mathlib.NumberTheory.PrimesCongruentOne
+  lines: 75
+  size: 3151
+  sha256: 5130258351145d9fef49db0c6ef1f6146fbbb3fbb59e75380c281bdc6da47678
+  imports: [Mathlib.RingTheory.Polynomial.Cyclotomic.Eval]
+  commit: 6ebcce37335bcb6bca64596e5d57bb3035648030
+  licence: Apache-2.0
+  target: ["Nat.infinite_setOfPred_prime_modEq_one"]
+  target-by: rule
+  read: {by: rules, elaborated: "no", comments: blanked}
+  checking: {sorry: 0, axioms: 0, native-decide: 0, built-here: "no"}
+atem:
+  of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+  line: For every whole number k that is not zero, infinitely many primes leave remainder 1 when divided by k.
+teaching: [C:part/what-must-be-found, C:part/a-number-built-to-have-the-right-factor, C:part/from-one-to-many]
+audit:
+  - {lines: "1-5", kind: header, on: "", verdict: nothing}
+  - {lines: "10-15", kind: module-note, on: "", verdict: agrees}
+  - {lines: "26-27", kind: note, on: C:lemma/Nat.exists_prime_gt_modEq_one, verdict: agrees}
+  - {lines: "67", kind: note, on: C:statement/Nat.infinite_setOfPred_prime_modEq_one, verdict: agrees}
+nodes:
+  - id: P:claim/checking
+    type: claim
+    stance: observed
+    says: The file's text holds no `sorry` and declares no axiom of its own. It was read here as text. Nothing was
+      built or run, so whether Lean accepts it is not known here.
+  - id: C:lemma/Nat.exists_prime_gt_modEq_one
+    type: lemma
+    stance: observed
+    lean: "Nat.exists_prime_gt_modEq_one"
+    form: theorem
+    span: {file: PrimesCongruentOne.lean, lines: "28-59"}
+    says: For every n and every k that is not 0 there is a prime p with p > n and p ≡ 1 (mod k).
+    reached: "yes"
+    depth: 2
+    carries: 0
+    proof: tactic
+    automation: [simp]
+    role: spine
+    why: Without it nothing produces a prime of the right kind. It turns "infinitely many" into "one beyond any n".
+  - id: C:part/a-number-built-to-have-the-right-factor
+    type: part
+    stance: opinion
+    division: stage
+    number: 2
+    stage: main
+    says: A number is built from k and n whose least prime factor is larger than n and leaves remainder 1 when
+      divided by k. The last stage needs one such prime beyond every n.
+    plain: Multiply the divisor by every whole number from one through the number you were given. Put the result
+      into a formula made for that divisor. The smallest prime that divides what comes out lies beyond the number
+      you were given, and dividing it by the divisor leaves one.
+    plain-if: The divisor is two or more.
+    steps: [C:lemma/Nat.exists_prime_gt_modEq_one]
+  - id: P:yield/what-the-proof-delivers
+    type: yield
+    stance: opinion
+    of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+    beyond: "yes"
+    says: The proof names the prime. For k at least 2 it is the least prime factor of the k-th cyclotomic
+      polynomial at k · n!, and it is larger than n.
+    as-statement: For every k ≥ 2 and every n, the least prime factor p of the k-th cyclotomic polynomial's value
+      at k · n! satisfies p > n and p ≡ 1 (mod k).
+    needs: []
+    bound: none
+    chooses:
+      - {what: the point the polynomial is evaluated at, where: C:lemma/Nat.exists_prime_gt_modEq_one,
+         value: k · n!, best: the file's choice, confidence: medium,
+         gives: a prime ≡ 1 (mod k) dividing no factor of the point; it exceeds n when n! divides the point}
+    trivial:
+      - {case: k = 1, known: every prime qualifies, compares: equal,
+         delivered: a prime beyond n by the known infinitude of primes}
+    grounds: [{of: C:lemma/Nat.exists_prime_gt_modEq_one, lines: "33-59"}]
+    confidence: medium
+  - id: P:case/k-three-n-two
+    type: case
+    stance: opinion
+    of: P:yield/what-the-proof-delivers
+    from: worked
+    stands: inside
+    given: k = 3 and n = 2. The point is 3 · 2! = 6. The third cyclotomic polynomial is x² + x + 1.
+    expect: At 6 it gives 43. Its least prime factor is 43, which is larger than 2 and equals 3 · 14 + 1.
+```
+
+The pshort for everyone, entailed from it, opens and closes with the lines rules write. One paragraph of its body
+stands between them here, with its citation:
+
+```markdown
+# primes-congruent-one, for everyone
+
+*A pshort of primes-congruent-one.fabulam.cosm at everyone. It is a guide to a formal proof. It is not a proof.*
+
+*The file's text holds no `sorry` and declares no axiom of its own. It was read here as text. Nothing was built or run,
+so whether Lean accepts it is not known here.* [P:claim/checking]
+
+Take the divisor 3 and the number 2. Three times two times one is 6. The formula made for 3 turns 6 into 43, and the
+smallest prime that divides 43 is 43 itself. It lies beyond 2, and dividing it by 3 leaves 1.
+[P:case/k-three-n-two, P:yield/what-the-proof-delivers]
+
+*a pshort of primes-congruent-one.fabulam.cosm, at everyone, entailed apart on 2026-11-22 by vendor/large-model*
+```
 
 ### 18.5 doc: documents (DocOES)
 
@@ -4778,11 +5338,14 @@ A reader conforms to MacroCOSM OES when:
   through the generic reader and Comprise's manifest with no load problems, and every item has the path Comprise gives
   it;
 - every block marked `cosm` in this document loads, identifies as the format it declares, and passes the checks its
-  manifest selects with no errors; among them the fabula's examples of section 18.4, one of each flavour (a fabulan of
-  a short guide, a fabulap of a poem and a fabulac of a small program), and the twin that keeps the old spelling
+  manifest selects with no errors; among them the fabula's examples of section 18.4 (a fabulan of a short guide, a
+  fabulap of a poem and a fabulac of a small program; the fabulam's is in the corpus, below), and the twin that keeps
+  the old spelling
   `oes: emf/1`, which identifies as `fabula/1`, old;
 - the fuller fabulac the reference implementation's corpus carries beside its program, a program of several modules
   with a history and tests, loads and passes the same way;
+- the fabulam the reference implementation's corpus carries, whole, beside the file of a formal proof it was built
+  from, loads and passes the same way, with the three pshorts entailed from it (section 18.4.10);
 - every path in the table of section 11.2 resolves to the id beside it;
 - each refusal case of section 5 (an unknown format, an unknown major, a misspelled value such as `comprise/01` or
   `' emf/1 '`, an empty `oes:`, a catalog with no declaration at a name no default claims) is refused, and each legacy
@@ -4804,6 +5367,46 @@ disagreement stands as a rule of its own.
 <!-- atem: what changed in each edition and version, newest first -->
 Each entry records what changed in the text or the grammar, newest first. Where an implementation and this text
 disagreed and one was corrected, the entry says which.
+
+**Edition 0.9.0.** A formal proof can be taken apart into a fabulam, and told again as a pshort.
+
+1. **The fabulam** (sections 18.1, 18.4, 18.4.1, 18.4.2 and 18.4.10, a new term). A fourth flavour of the fabula, for
+   a formal proof: one file of the proof's source, Lean 4 in this edition, read as text and enumerated as the argument
+   it holds, every declaration an item with its name and its lines. The catalog gains `teaching` and `audit`, `source` a
+   fourth form, and a fabulam's `atem` an `of`. New kinds `C:statement`, `C:definition`, `C:lemma`, `C:constant`,
+   `C:step`, `P:yield` and `P:fit`; `C:part`, `C:file`, `C:component`, `C:dependency`, `C:reliance`, `P:claim`,
+   `P:reading`, `P:case` and `P:assumption` take a fabulam's fields, and the closed lists of `division`, `on` and `from`
+   gain `stage`, `part` and `worked`. Nothing of the proof's own system is installed, built or run.
+2. **Stated is not shown** (section 18.4.10). What a statement says and what its proof delivers are kept apart. The
+   `P:yield` is written as a function of what the proof chooses and set against the trivial cases, in the words "at
+   least", "at most", "exactly" and "between", never "up to". Slack is recorded, and every statement has one worked
+   example in numbers.
+3. **The spine, the stages and the teaching order** (section 18.4.10). What a final theorem reaches, and how much each
+   declaration carries, is found by rule; a model judges spine, support or bookkeeping within what the rule found. The
+   argument is told in stages, each with a `plain` sentence and its `plain-if`, and the teaching order starts with the
+   reduction.
+4. **Comments are hearsay, and checking is said once** (section 18.4.10). Every comment is a row of the comment table,
+   and a claim's `checked` is one of four words; the proof is read with its comments blanked. `source.checking` and the
+   fixed item `P:claim/checking` record what is known about the machine check and who says it, and an implementation
+   never says more.
+5. **The head fabulam** (sections 18.4.1 and 18.4.10). A proof of several files is told as one fabulam for each file,
+   under a head that names its parts and states once every declaration that crosses between them. One level in this
+   edition.
+6. **The pshort** (sections 18.1, 18.4.1 and 18.4.10, a new term). A fabulam's short: a guide for an expert, a student
+   or everyone, each run of its sentences cited to items of the fabulam, its heading lines and its last line written by
+   rule, entailed apart from the source. A pshort is never called a proof.
+7. **The fabulam's checks** (section 18.4.8). New checks `declared-once`, `statement-whole`, `yield-stated`,
+   `fit-stated`, `spine-told`, `stages-whole`, `grounds-given`, `audit-whole`, `stance-fits`, `checking-said`,
+   `example-worked`, `no-up-to`, `statements-agree`, `regime-named`, `no-judgement`, `plain-words` and
+   `spine-rule-differs`. `flavour` takes four values, and `code-span`, `licence-recorded` and `parts-resolve` read a
+   fabulam as they read a fabulac. A check that asks for what a later stage writes holds only once the fabulam is whole
+   or that layer has begun, so an outline is a valid fabulam. The checks against the source, and those of a pshort,
+   are Thym's (its section 7.3).
+8. **Four smaller things.** Entailment's definition names a proof: a formal proof entails its fabulam, and a fabulam
+   a pshort (section 18.1). A kind may say `open`, the fields of its own that the manifest's shared closed lists do
+   not bind (sections 7.3 and 13.3); the fabula's `C:lemma` says it of `scope`. Section 18.3.5 names the rule a
+   scaffold's sentences are read by (Thym, its section 12.6). The conformance corpus carries a fabulam with its three
+   pshorts (section 20.3).
 
 **Edition 0.8.0 · 2026-11-20.** A program can be written fabulac first, and carried into another
 language through its fabulac.
