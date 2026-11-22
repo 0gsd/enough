@@ -111,7 +111,10 @@ def test_a_read_route_needs_no_header(app):
 
 
 def test_the_gate_leaves_every_other_route_alone():
-    assert P.refusal("POST", "/api/fabula/build", None) is None
+    # 0.9: the older model-run routes take the header too (tests/test_route_guards.py); other routes need none.
+    assert P.refusal("POST", "/api/fabula/build", None) == P.MODEL_RUN_MISSING
+    assert P.refusal("POST", "/api/file", None) is None
+    assert P.refusal("POST", "/api/council/pause", None) is None
     assert P.refusal("GET", "/api/fabulac/status", None) is None
     assert P.refusal("POST", "/api/fabulac/test", None) == P.MISSING
     assert P.refusal("POST", "/api/fabulac/test", " 1 ") is None

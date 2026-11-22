@@ -1615,6 +1615,7 @@
     "fap.way.starter": "スターターから",
     "fap.way.starter.none": "この種類のスターターはインストールされていません",
     "fap.way.starter.why": "{kind} のスターター {name} として、あなたの名前で始まります：{line}（ケース {n} 個）",
+    "file.unlinked": "このプロジェクト専用のコピーとして保存しました。他のプロジェクトが使う共有ファイルは変わっていません。",
     "find.aria": "このドキュメント内を検索",
     "find.close.aria": "検索を閉じる",
     "find.close.title": "検索を閉じる（esc）",

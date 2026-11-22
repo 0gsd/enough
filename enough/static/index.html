@@ -27,6 +27,40 @@
     function staticUrl(path) {
       return ASSET_VERSION ? path + '?v=' + encodeURIComponent(ASSET_VERSION) : path;
     }
+    // 0.9 (route guards): every call this page makes to its own /api/ sends
+    // the promise header (`X-Enough-Api: 1`, enough/api_promise.py). The
+    // routes that start a model run, and the promised /api/fabulac/* writes,
+    // refuse a request without it; a page on another site cannot send it.
+    // One wrapper here, in the head, so every later fetch (and every fetch a
+    // check script runs in the page) goes through it; htmx's requests get it
+    // from the `htmx:configRequest` listener in the main script. A save that
+    // replaced a link to a shared file with the project's own copy answers
+    // `X-Enough-Unlinked: 1`; the wrapper passes that on as an event.
+    const ENOUGH_API_HEADER = 'X-Enough-Api';
+    (function enoughFetchWrapper() {
+      const raw = window.fetch.bind(window);
+      const own = (u) => {
+        try {
+          const url = new URL(typeof u === 'string' ? u : (u && u.url) || String(u), location.href);
+          return url.origin === location.origin && url.pathname.startsWith('/api/');
+        } catch (_e) { return false; }
+      };
+      window.fetch = function enoughFetch(input, init) {
+        if (!own(input)) return raw(input, init);
+        const o = Object.assign({}, init || {});
+        const h = new Headers(o.headers || (input instanceof Request ? input.headers : undefined));
+        if (!h.has(ENOUGH_API_HEADER)) h.set(ENOUGH_API_HEADER, '1');
+        o.headers = h;
+        return raw(input, o).then((r) => {
+          try {
+            if (r.headers.get('X-Enough-Unlinked') === '1') {
+              window.dispatchEvent(new CustomEvent('enough:unlinked', { detail: { url: r.url } }));
+            }
+          } catch (_e) { /* a note, never a failure */ }
+          return r;
+        });
+      };
+    })();
     if (BOOT_UI_STATE && !BOOT_UI_STATE.home) {
       const _de = document.documentElement;
       if (BOOT_UI_STATE.ui_scale > 0 && BOOT_UI_STATE.ui_scale !== 1)
@@ -21516,6 +21550,17 @@
       const v = I18N.strings[key];
       return typeof v === 'string' && v !== '' ? v : fallback;
     }
+
+    // 0.9 (route guards): htmx's requests carry the promise header too (the
+    // head's fetch wrapper covers every fetch), and a save that replaced a
+    // link to a shared file with the project's own copy says so in one line.
+    document.body.addEventListener('htmx:configRequest', (e) => {
+      if (e.detail && e.detail.headers) e.detail.headers[ENOUGH_API_HEADER] = '1';
+    });
+    window.addEventListener('enough:unlinked', () => {
+      const line = t('file.unlinked', 'Saved as this project\'s own copy; the shared file other projects use is unchanged.');
+      if (typeof convertNotice === 'function') convertNotice(line, '', 'done', { ttl: 8000 });
+    });
 
     // data-i18n → textContent (plain-text elements ONLY — an element with
     // inline markup gets the attribute on its text-only children instead),

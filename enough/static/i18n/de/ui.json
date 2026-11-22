@@ -1615,6 +1615,7 @@
     "fap.way.starter": "aus einer Vorlage",
     "fap.way.starter.none": "für diese Art ist keine Vorlage installiert",
     "fap.way.starter.why": "beginnt als {name}, die Vorlage für {kind}, unter deinem Namen: {line} ({n} Fälle)",
+    "file.unlinked": "Als eigene Kopie dieses Projekts gespeichert; die gemeinsame Datei, die andere Projekte nutzen, bleibt unverändert.",
     "find.aria": "in diesem Dokument suchen",
     "find.close.aria": "Suche schließen",
     "find.close.title": "Suche schließen (esc)",

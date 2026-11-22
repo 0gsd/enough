@@ -444,7 +444,7 @@ def test_the_session_log_keeps_what_left_and_what_came_back(project: Path,
 @pytest.fixture()
 def client(project: Path):
     app = create_app(project, "http://127.0.0.1:1/v1", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         yield c
 
 

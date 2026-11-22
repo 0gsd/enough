@@ -1615,6 +1615,7 @@
     "fap.way.starter": "从起步模板开始",
     "fap.way.starter.none": "没有安装这一种类的起步模板",
     "fap.way.starter.why": "以 {name} 开始，即{kind}的起步模板，署你的名：{line}（{n} 个用例）",
+    "file.unlinked": "已保存为本项目自己的副本；其他项目共用的文件未作改动。",
     "find.aria": "在这份文档里查找",
     "find.close.aria": "关闭查找",
     "find.close.title": "关闭查找（esc）",

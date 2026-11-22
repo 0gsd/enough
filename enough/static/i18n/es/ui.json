@@ -1615,6 +1615,7 @@
     "fap.way.starter": "a partir de una plantilla",
     "fap.way.starter.none": "no hay ninguna plantilla de este tipo instalada",
     "fap.way.starter.why": "empieza como {name}, la plantilla para {kind}, a tu nombre: {line} ({n} casos)",
+    "file.unlinked": "Guardado como copia propia de este proyecto; el archivo compartido que usan los demás proyectos no cambia.",
     "find.aria": "buscar en este documento",
     "find.close.aria": "cerrar la búsqueda",
     "find.close.title": "cerrar la búsqueda (esc)",

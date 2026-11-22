@@ -572,7 +572,7 @@ def test_tools_refuse_what_the_routes_refuse(project: Path, path: str, status: i
 def test_the_routes_still_refuse_identically(project: Path):
     """After the refactor the derive route answers every refusal with the shared function's status and words."""
     from enough.server import create_app
-    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False)) as c:
+    with TestClient(create_app(project, "http://127.0.0.1:9", supervise=False), headers={"X-Enough-Api": "1"}) as c:
         for path, status, words in REFUSED + [("", 400, "missing path")]:
             try:
                 CT.text_target(project, path)

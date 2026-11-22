@@ -101,12 +101,49 @@ def gated(method: str, path: str) -> bool:
     return (method.upper(), path) in _GATED
 
 
+#: 0.9 (route guards, pins section 5): the older routes that start a model run take the header too. They are not
+#: promised (another program may not rely on their shape), but the page sends the header on every API call, so a
+#: page elsewhere, which cannot send it without a preflight enough never answers, starts no model. Exact POST paths,
+#: and every POST under `MODEL_RUN_PREFIXES` but `MODEL_RUN_OPEN` (stopping a council is always allowed).
+#: `POST /api/model` is not here: it loads a model and starts no run, and the desktop shell's first-run wizard posts
+#: it from Rust without the header. The Origin gate (`enough/origin_gate.py`) covers it as it covers every write.
+MODEL_RUNS: frozenset[str] = frozenset({
+    "/api/chat",
+    "/api/cloud/health-check",
+    "/api/transcribe",
+    "/api/canon/read",
+    "/api/canon/atem",
+    "/api/thym/run",
+    "/api/fabula/derive",
+    "/api/fabula/build",
+    "/api/fabula/resume",
+    "/api/fabula/compile",
+    "/api/fabula/verse/build",
+    "/api/fabula/verse/resume",
+    "/api/dialectic/settle",
+    "/api/composure/scaffold/check",
+})
+MODEL_RUN_PREFIXES: tuple[str, ...] = ("/api/council/",)
+MODEL_RUN_OPEN: frozenset[str] = frozenset({"/api/council/pause"})
+
+MODEL_RUN_MISSING = (f"this route starts a model run: send the header {HEADER}: {VERSION} (the page and "
+                     "enough_client do)")
+
+
+def model_run(method: str, path: str) -> bool:
+    """True for an older route that starts a model run (0.9): it takes the header as a promised route does."""
+    if method.upper() != "POST" or path in MODEL_RUN_OPEN:
+        return False
+    return path in MODEL_RUNS or path.startswith(MODEL_RUN_PREFIXES)
+
+
 def refusal(method: str, path: str, said: str | None) -> str | None:
     """The 403 sentence for a request the gate refuses, else None. Pure."""
-    if not gated(method, path):
+    promised = gated(method, path)
+    if not promised and not model_run(method, path):
         return None
     if said is None or not said.strip():
-        return MISSING
+        return MISSING if promised else MODEL_RUN_MISSING
     if said.strip() != str(VERSION):
         return WRONG.format(have=VERSION, said=said.strip())
     return None
@@ -120,7 +157,8 @@ class PromiseGate:
         self.app = app
 
     async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
-        if scope.get("type") == "http" and gated(scope.get("method", "GET"), scope.get("path", "")):
+        method, path = scope.get("method", "GET"), scope.get("path", "")
+        if scope.get("type") == "http" and (gated(method, path) or model_run(method, path)):
             said = None
             for k, v in scope.get("headers") or ():
                 if k.lower() == _HEADER_KEY:
@@ -133,4 +171,5 @@ class PromiseGate:
         await self.app(scope, receive, send)
 
 
-__all__ = ["HEADER", "PromiseGate", "Promised", "ROUTES", "VERSION", "gated", "payload", "refusal"]
+__all__ = ["HEADER", "MODEL_RUNS", "PromiseGate", "Promised", "ROUTES", "VERSION", "gated", "model_run", "payload",
+           "refusal"]

@@ -51,7 +51,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture
 def client(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         yield c
     FT.configure()
 

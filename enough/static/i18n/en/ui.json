@@ -1615,6 +1615,7 @@
     "fap.way.starter": "from a starter",
     "fap.way.starter.none": "no starter of this kind is installed",
     "fap.way.starter.why": "begins as {name}, the starter for {kind}, under your name: {line} ({n} cases)",
+    "file.unlinked": "Saved as this project's own copy; the shared file other projects use is unchanged.",
     "find.aria": "find in this document",
     "find.close.aria": "close find",
     "find.close.title": "close find (esc)",

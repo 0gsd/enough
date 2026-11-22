@@ -258,7 +258,7 @@ def project(tmp_path: Path) -> Path:
 
 
 def _client(project: Path, mode: str) -> TestClient:
-    return TestClient(create_app(project, "http://127.0.0.1:9", supervise=False, home=(mode == "home")))
+    return TestClient(create_app(project, "http://127.0.0.1:9", supervise=False, home=(mode == "home")), headers={"X-Enough-Api": "1"})
 
 
 def _docs(c: TestClient, doc: str = "macrocosm-oes", lang: str = "en", **params: str):

@@ -1615,6 +1615,7 @@
     "fap.way.starter": "à partir d'un modèle de départ",
     "fap.way.starter.none": "aucun modèle de départ de ce genre n'est installé",
     "fap.way.starter.why": "commence comme {name}, le modèle de départ pour {kind}, sous votre nom : {line} ({n} cas)",
+    "file.unlinked": "Enregistré comme copie propre à ce projet ; le fichier partagé qu'utilisent les autres projets est inchangé.",
     "find.aria": "chercher dans ce document",
     "find.close.aria": "fermer la recherche",
     "find.close.title": "fermer la recherche (esc)",

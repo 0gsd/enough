@@ -66,7 +66,7 @@ def free(project: Path) -> Path:
 @pytest.fixture
 def client(free: Path):
     app = create_app(free, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         yield c
 
 
@@ -138,7 +138,7 @@ def test_only_a_literal_true_turns_it_on(tmp_path: Path):
 
 def test_the_preference_round_trips(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         # A file from before 0.4.4 has no key: the read view says false.
         c.get("/api/ui-config")                 # seeds the live file
         live = agent_free.ui_config_path()
@@ -164,13 +164,13 @@ def test_the_preference_round_trips(project: Path):
 
 def test_the_page_boots_knowing_it(free: Path):
     app = create_app(free, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert '"agent_free": true' in c.get("/").text
 
 
 def test_home_mode_saves_it_and_boots_knowing_it(tmp_path: Path, project: Path):
     app = create_app(tmp_path, "http://127.0.0.1:9", supervise=False, home=True)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert '"agent_free": false' in c.get("/").text
         assert c.post("/api/ui-config", json={"agent_free": True}).json()[agent_free.KEY] is True
         assert '"agent_free": true' in c.get("/").text
@@ -185,7 +185,7 @@ def test_home_mode_saves_it_and_boots_knowing_it(tmp_path: Path, project: Path):
 
 def test_an_agent_free_boot_starts_no_model(free: Path, fake_sup: FakeSupervisor):
     app = create_app(free, "http://127.0.0.1:9", supervise=True)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert fake_sup.bootstraps == 0
         body = c.get("/api/llm-status").json()
         assert body["mode"] == "agent-free" and body["ready"] is False
@@ -277,7 +277,7 @@ def test_what_needs_no_model_stays_open(client: TestClient):
 
 def test_the_gate_opens_when_the_switch_is_off(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         # An empty message is the handler's no-op 200: the gate let it by.
         assert c.post("/api/chat", data={"message": ""}).status_code == 200
         set_agent_free(True)
@@ -375,7 +375,7 @@ def test_derive_atem_and_compile_run_by_rules(client: TestClient, free: Path, mo
 def test_rules_jobs_without_agent_free_keep_their_shape(project: Path):
     """No model answering, switch off: rules as in 0.4.3, and no `reason`."""
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         job = c.post("/api/canon/atem", json={"text": "A short passage of text."}).json()["job"]
         assert job["mode"] == "rules" and "reason" not in job
         assert not job["message"].startswith("agent-free")
@@ -427,7 +427,7 @@ def test_ingest_runs_directly_and_says_its_caps(client: TestClient, tmp_path: Pa
 
 def test_turning_it_on_stops_the_model_and_off_starts_it(project: Path, fake_sup: FakeSupervisor):
     app = create_app(project, "http://127.0.0.1:9", supervise=True)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert fake_sup.bootstraps == 1                     # an ordinary launch
         c.post("/api/ui-config", json={"agent_free": True})
         assert fake_sup.stop_calls == [False]               # owned or adopted
@@ -455,7 +455,7 @@ def test_turning_it_off_starts_through_the_startup_choice(free: Path, monkeypatc
                         lambda self, cute, ctx: launched.append((cute, ctx)))
     monkeypatch.setattr(_supervisor.LlamaSupervisor, "_start_healthwatch", lambda self: None)
     app = create_app(free, "http://127.0.0.1:9", supervise=True)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert launched == []
         assert c.post("/api/ui-config", json={"agent_free": False}).status_code == 200
         assert launched == [("g40-04", 4096)]
