@@ -123,7 +123,8 @@ MODEL_RUNS: frozenset[str] = frozenset({
     "/api/dialectic/settle",
     "/api/composure/scaffold/check",
 })
-MODEL_RUN_PREFIXES: tuple[str, ...] = ("/api/council/",)
+#: 0.9 (pins section 10): every POST under `/api/fabulam/` (build, resume, entail, cancel; `enough/routes/fabulam.py`).
+MODEL_RUN_PREFIXES: tuple[str, ...] = ("/api/council/", "/api/fabulam/")
 MODEL_RUN_OPEN: frozenset[str] = frozenset({"/api/council/pause"})
 
 MODEL_RUN_MISSING = (f"this route starts a model run: send the header {HEADER}: {VERSION} (the page and "

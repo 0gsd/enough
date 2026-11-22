@@ -422,6 +422,10 @@ def _walk_tree(
             if twin.is_file() and not twin.is_symlink() and _fabulac_authored(twin):
                 node["fabulac_twin"] = "/".join(rel_parts + (twin.name,))
             node["children"] = _walk_tree(root, rel_parts + (p.name,), visited, wikisink_real)
+            # 0.9: a folder that holds Lean, here or below (its card builds a fabulam), read from the walk itself.
+            if any((c.get("is_dir") and c.get("lean")) or (not c.get("is_dir") and str(c.get("name", "")).endswith(
+                    ".lean")) for c in node["children"]):
+                node["lean"] = True
         elif p.name == "article.html":
             try:
                 if (p.parent / ".meta.json").is_file():
@@ -599,6 +603,8 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             if n.get("fabulac_twin"):
                 twin_rel = str(n["fabulac_twin"]).replace('"', "&quot;")
                 saved_attr += f' data-fab-twin="{twin_rel}"'
+            if n.get("lean"):
+                saved_attr += ' data-lean="1"'
             # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
@@ -2026,6 +2032,11 @@ def create_app(
     from .routes import fabulac as _r_fabulac
     _first_router = _r_fabulac.build_router(ctx)
     app.include_router(_first_router)
+    # 0.9 (pins section 10): a Lean file's or folder's fabulam and its pshorts (`enough/routes/fabulam.py`,
+    # `/api/fabulam/*`); a build or an entailment is a CanonJob of kind `fabulam`, keyed by the source.
+    from .routes import fabulam as _r_fabulam
+    _fabulam_router = _r_fabulam.build_router(ctx)
+    app.include_router(_fabulam_router)
 
     # The names a release has retired (`enough/retired_names.py`): each old path is served by its new path's handler
     # for one release; nothing documents them. The table is empty in 0.7.
@@ -2053,7 +2064,7 @@ def create_app(
                                 build=_fabula_router.start_build, compile=_fabula_router.start_compile,
                                 verse=_fabulap_router.start_build,
                                 settle=_dialectic_router.start_settle, jobs=canon_jobs, emit=_emit_threadsafe,
-                                first=_first_router.start)
+                                first=_first_router.start, fabulam=_fabulam_router.start)
 
     app.include_router(_r_chat.build_router(ctx))             # /api/chat, /api/stream, /api/broker*, ...
     app.include_router(_r_settings.build_router(ctx))         # /api/ui-config, /api/readvisor/chief

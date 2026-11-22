@@ -150,21 +150,21 @@ asked ("explain this Lean proof", "make it readable for a student"):
   statements and the spine, the comments audited, the statement set
   against a public wording if one was given, what the proof really
   delivers, and the questions. Without a model it stops at the outline.
-  A file that ends in several results waits for `<target>`, the final
-  theorem to tell: ask the person which; never pick.
-  <!-- M5: confirm build's reply and the <target> refusal wording -->
+  The reply is the job's line. A file that ends in more than three
+  results builds nothing until `<target>` names the final theorem to
+  tell: the reply lists them; ask the person which; never pick.
 - `<do>resume</do>` takes the build up after the last stage that landed.
-  A Lean file changed since the survey starts again from the survey.
+  A Lean file changed since the survey has nothing to take up: `build`
+  starts it again from the survey.
 - `<do>status</do>` says what the card says: one line of state (no
   fabulam yet; choose the result to tell; an outline; {n} of {m} stages
   landed; built; the Lean file changed; the Lean file gone), the sentence
   about checking in full, and each density's pshort, entailed or stale.
-  <!-- M5: confirm status's reply -->
 - `<do>entail</do>` with `<density>` `expert`, `student` or `everyone`
   writes a **pshort**, `<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md`,
-  beside the fabulam, from the fabulam alone. Offer the three; the person
-  chooses. `everyone` follows the `teaching` order, the reduction first.
-  <!-- M5: confirm entail's reply -->
+  beside the fabulam, from the fabulam alone, once every stage has landed
+  and a model answers. Offer the three; the person chooses. `everyone`
+  follows the `teaching` order, the reduction first.
 - Its questions are for someone who knows the field: `dialectic` with the
   fabulam's `<path>`, one or two at a time; never answer them.
 

@@ -364,7 +364,7 @@ def build_router(ctx: AppContext) -> APIRouter:
                       and _model_route.holds_generation_lock(route or "local") else None),
                 message=_canon_start_message(mode, why, doing), reason=reason,
                 extra=({"route": _job_route(mode, route), "flavour": flavour, "what": what, **(extra or {})}
-                       if kind in ("emf", "atem", "compile", "fabulac", "dialectic", "fabulap")
+                       if kind in ("emf", "atem", "compile", "fabulac", "dialectic", "fabulap", "fabulam")
                        else None))   # Thym's runs: their lane's
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None

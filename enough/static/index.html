@@ -10831,6 +10831,31 @@
       color: var(--fg);
     }
 
+    /* 0.9 (lane M5): the fabulam's face, its pshort and its top in the cosm
+       viewer. Plain rules and weight only: no badge, tick or colour that
+       could read as "verified". */
+    #fabula-modal .fm-checking, #cosm-body .fm-checking {
+      margin: 6px 0 10px;
+      padding: 4px 10px;
+      border-left: 2px solid var(--fg);
+    }
+    #fabula-modal .fm-checking p, #cosm-body .fm-checking p { margin: 2px 0 0; }
+    #fabula-modal .fm-pshorts { list-style: none; padding: 0; margin: 4px 0; }
+    #fabula-modal .fm-pshorts li { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; padding: 2px 0; }
+    #fabula-modal .fm-density { min-width: 6em; font-weight: 600; }
+    #fabula-modal textarea#fm-said { width: 100%; font: inherit; }
+    #cshort-modal .fm-nocite .fm-cites { display: none; }
+    #cshort-modal .fm-cite { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--fg); }
+    #cshort-modal .fm-nocite-switch { display: block; margin: 4px 0 8px; }
+    #cosm-body .fm-top { margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--border, rgba(127, 127, 127, .35)); border-radius: 6px; }
+    #cosm-body .fm-top-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    #cosm-body .fm-go { color: inherit; border-bottom: 1px dotted var(--fg); text-decoration: none; }
+    #cosm-body .fm-teaching li { margin: 4px 0 8px; }
+    #cosm-body .fm-audit { border-collapse: collapse; width: 100%; font-size: .92em; }
+    #cosm-body .fm-audit th, #cosm-body .fm-audit td { text-align: left; padding: 2px 6px; vertical-align: top;
+      border-bottom: 1px solid var(--border, rgba(127, 127, 127, .25)); }
+    #cosm-body .fm-audit tr.fm-mismatch td { font-weight: 600; }
+
     #cshort-modal .fabv-foot {
       margin: 0;
       font-size: 12px;
@@ -34384,6 +34409,8 @@
         if (th != null) return th;
       }
       let h = '';
+      // 0.9: a fabulam opens as any fabula does, with its statement, checking sentence, stages and comments on top.
+      if (window.__fabReady && host === COSM && (data.catalog || {}).flavour === 'fabulam') h += fmViewerTopHTML(data);
       const atem = (data.catalog || {}).atem;
       if (cosmIsMap(atem)) h += cosmAtemHTML(atem, host);
       h += cosmModulesHTML(data, host);
@@ -34713,6 +34740,8 @@
       else if (low.endsWith('.thym.enc')) { if (window.__thymReady) thymUnpackOpen(full); }
       else if (low.endsWith('.girraph')) enterGirraphMode(full);
       else if (low.endsWith('.merirmaid')) enterMerirmaidMode(full);
+      // 0.9: a pshort opens as markdown with its citations linked (fmPshortOpen)
+      else if (window.__fabReady && FM_PSHORT_RE.test(full)) void fmPshortOpen(full);
       else openReadEdit(full, { size: 'full', face: 'read' });
     }
 
@@ -34901,6 +34930,9 @@
       if (ta && window.__thymReady) { e.preventDefault(); thymAct(ta, COSM); return; }
       const go = e.target.closest('[data-go]');
       if (go) { e.preventDefault(); cosmFocus(go.dataset.go); return; }
+      // 0.9: a fabulam's card, from the top of its view
+      const fmc = e.target.closest('[data-fm-card]');
+      if (fmc && window.__fabReady) { e.preventDefault(); void fmOpen(fmc.dataset.fmCard); return; }
       const op = e.target.closest('[data-open]');
       if (op) { e.preventDefault(); cosmOpenPath(op.dataset.open, op.dataset.okind || 'file'); return; }
       const more = e.target.closest('[data-more]');
@@ -35340,6 +35372,8 @@
       if (e.want === 'fabulac' && window.__fabReady) fabJobOnSnap(e, snap);
       // 0.7 (V2c): a poem's build in steps that the fabula card follows.
       if (e.want === 'fabulap' && window.__fabReady) fabVerseOnSnap(e, snap);
+      // 0.9: a fabulam's build or its pshorts, that the fabula card's lean face follows.
+      if (e.want === 'fabulam' && window.__fabReady) fmOnSnap(e, snap);
       // 0.8 (W4-FP): an authored fabulac's authoring, entailing or sandbox run.
       if (e.want === 'fabulac-first' && window.__fabReady) fapJobOnSnap(e, snap);
       // 0.6 (U1b): a settle the dialectic card follows.
@@ -35426,7 +35460,7 @@
       // 0.6: a fabulac's build or compile (fabIsFabulacSnap), told from its progress.
       const fab = window.__fabReady && fabIsFabulacSnap(snap, e);
       const icon = e.kind === 'emf' || e.kind === 'compile' || e.kind === 'thym' || e.kind === 'fabulac' || e.kind === 'dialectic'
-        || e.kind === 'fabulap' ? 'cosm'
+        || e.kind === 'fabulap' || e.kind === 'fabulam' ? 'cosm'
         : (e.kind === 'read' ? 'short' : 'atem');
       const dismiss = { label: t('canon.job.dismiss', 'dismiss'), run: () => convertToastClose(id) };
       // 0.8: a scaffold's check (kind `scaffold`) tells its own progress and
@@ -35442,6 +35476,26 @@
       // 0.6: so does the fabula card.
       if (fab && fabCardShowing(e.id)) { convertToastClose(id); return; }
       if (fab && CANON_TERMINAL.has(snap.state)) { fabToastEnd(e, snap, id, icon, dismiss); return; }
+      // 0.9: a fabulam's build or its pshorts, told from its progress; its end in the job's own words.
+      if (e.kind === 'fabulam' && window.__fabReady) {
+        if (fabCardShowing(e.id)) { convertToastClose(id); return; }
+        if (!CANON_TERMINAL.has(snap.state)) {
+          convertToast(id, { state: 'running', icon, square: true, title: e.label, message: fmProgressText(snap),
+            progress: snap.chunks > 0 ? Math.round(100 * Math.max(0, snap.chunk || 0) / snap.chunks) : null,
+            actions: [{ label: t('canon.job.cancel', 'cancel'), run: () => { void canonCancel(e.id); } }] });
+          return;
+        }
+        const res = snap.result || {};
+        if (snap.state === 'done') {
+          const actions = res.fabulam ? [{ label: t('canon.job.open', 'open'), run: () => { convertToastClose(id); void enterCosmMode(res.fabulam); } }, dismiss] : [dismiss];
+          convertToast(id, { state: 'done', icon, square: true, title: e.label, message: res.message || snap.message || '', actions, ttl: 15000 });
+          return;
+        }
+        convertToast(id, { state: 'failed', icon, square: true, title: e.label,
+          message: snap.message || snap.error || (snap.state === 'cancelled' ? t('canon.job.cancelled', 'cancelled — nothing was written')
+            : t('canon.job.failed', 'that did not work')), ttl: 15000, actions: [dismiss] });
+        return;
+      }
       // 0.7 (V2c): a poem's build in steps, told from its progress; its end in the job's own words.
       if (e.kind === 'fabulap' && window.__fabReady) {
         if (fabCardShowing(e.id)) { convertToastClose(id); return; }
@@ -39707,6 +39761,8 @@
       // 0.8 (W4-FP): the authored faces' state
       fabRouteReset('fap');
       fapReset();
+      // 0.9: the fabulam's face
+      fmReset();
       ['fab-main', 'fab-tc', 'fab-author', 'fab-verse', 'fab-route-box', 'fab-compile', 'fab-run', 'fab-dialectic', 'fab-status'].forEach((id) => {
         const el = fabEl(id);
         if (el) { el.innerHTML = ''; el._fabHtml = ''; }
@@ -39728,7 +39784,7 @@
       m.setAttribute('aria-hidden', 'true');
       FAB.open = false;
       // A build or a compile still running carries on in a toast.
-      [FAB.job, FAB.cjob, FAB.vjob, FA.ajob, FA.ejob, FA.rjob].forEach((id) => {
+      [FAB.job, FAB.cjob, FAB.vjob, FA.ajob, FA.ejob, FA.rjob, FM.job].forEach((id) => {
         const e = id && id !== 'pending' ? CANON.jobs.get(id) : null;
         if (e && !e.terminal) { e.want = 'toast'; canonToast(e, e.snap || { state: 'running', kind: e.kind }); }
       });
@@ -39736,7 +39792,7 @@
     }
     window.fabCardClose = fabCardClose;
 
-    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id || fapShowing(id))); }
+    function fabCardShowing(id) { return !!(FAB.open && id && (FAB.job === id || FAB.cjob === id || FAB.vjob === id || fapShowing(id) || (FAB.face === 'lean' && FM.job === id))); }
 
     // "decompile" on a text: the card's text face.
     async function fabDecompileOpen(path, state, opts = {}) {
@@ -39820,6 +39876,8 @@
     function fabCardPaint() {
       if (!FAB.open) return;
       if (FAB.face === 'begin' || FAB.face === 'authored') { fapPaint(); return; }
+      // 0.9: a Lean file's, a folder's or a fabulam's card (fmPaint)
+      if (FAB.face === 'lean') { fmPaint(); return; }
       const text = FAB.face === 'text';
       fabEl('fab-title').textContent = text ? t('fab.title.decompile', 'decompile…') : t('fab.title.fabulac', 'the fabulac');
       const src = fabEl('fab-source');
@@ -40742,17 +40800,19 @@
       if (FAB.face === 'text') { void fabDecompileGo(); return; }
       if (FAB.face === 'begin') { void fapBeginGo(); return; }
       if (FAB.face === 'authored') return;
+      if (FAB.face === 'lean') { void fmGo('build'); return; }
       void fabBuildGo(fabResumable(FAB.build) ? 'resume' : 'build');
     });
-    fabEl('fab-restart').addEventListener('click', () => { void fabBuildGo('restart'); });
+    fabEl('fab-restart').addEventListener('click', () => { if (FAB.face === 'lean') void fmGo('restart'); else void fabBuildGo('restart'); });
     fabEl('fab-open').addEventListener('click', () => {
-      const f = FAB.face === 'authored' ? FA.path : (FAB.build && FAB.build.fabulac);
+      const f = FAB.face === 'authored' ? FA.path : (FAB.face === 'lean' ? (FM.st && FM.st.fabulam) : (FAB.build && FAB.build.fabulac));
       fabCardClose();
       if (f && !(COSM.path && canonSame(COSM.path, f) && cosmEl('cosm-mode').classList.contains('open'))) void enterCosmMode(f);
     });
     fabEl('fab-cancel-job').addEventListener('click', () => {
       if (FAB.face === 'begin') { if (FA.ajob && FA.ajob !== 'pending') void canonCancel(FA.ajob); return; }
       if (FAB.face === 'authored') { void fapStopGo(); return; }
+      if (FAB.face === 'lean') { void fmCancel(); return; }
       void fabCancelGo();
     });
     fabEl('fab-close').addEventListener('click', fabCardClose);
@@ -40815,13 +40875,16 @@
       if (!FABV.open) return;
       const d = FABV.data;
       fabEl('fabv-title').textContent = FABV.kind === 'catem' ? t('fab.view.catem', 'catem')
-        : (FABV.kind === 'layout' ? t('fab.view.layout', 'layout') : t('fab.view.cshort', 'cshort'));
+        : (FABV.kind === 'layout' ? t('fab.view.layout', 'layout') : (FABV.kind === 'pshort' ? t('fm.view.pshort', 'pshort')
+          : t('fab.view.cshort', 'cshort')));
       const src = fabEl('fabv-source');
       src.textContent = canonBase(String(FABV.path).replace(/\/$/, '')) + (FABV.kind === 'cshort' ? '/' : '');
       src.title = FABV.path;
       const body = fabEl('fabv-body');
       if (FABV.error) { fabSet(body, '<p class="thym-refusal">' + cosmEsc(FABV.error) + '</p>'); return; }
       if (!d) { fabSet(body, '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>'); return; }
+      // 0.9: a pshort, its citations linked to the fabulam's cards (fmPshortHTML)
+      if (FABV.kind === 'pshort') { fabSet(body, fmPshortHTML(d)); return; }
       let h = '';
       if (FABV.kind === 'layout') {
         h += '<p class="fabv-note">' + cosmEsc(t('fab.view.layoutNote', 'a layout: the files and the names a cshort in another language is written to, entailed by its fabulac; read, never run')) + '</p>';
@@ -41776,8 +41839,14 @@
           return item('fap-entail', t('fap.menu.entail', 'entail again…')) + item('fap-run', t('fap.menu.run', 'test and run…'))
             + item('fap-moved', t('fap.menu.moved', 'what moved…'));
         }
-        return item('fab-build', t('fab.menu.build', 'build its fabulac…')) + item('fap-begin', t('fap.menu.begin', 'begin a fabulac here…'));
+        // 0.9: a folder that holds Lean builds its fabulam too (the tree marks it, data-lean)
+        const lean = target && target.lean ? item('fm-open', t('fm.menu.build', 'build its fabulam…')) : '';
+        return lean + item('fab-build', t('fab.menu.build', 'build its fabulac…')) + item('fap-begin', t('fap.menu.begin', 'begin a fabulac here…'));
       }
+      // 0.9: a Lean file, a fabulam and a pshort
+      if (FM_LEAN_RE.test(p)) return item('fm-open', t('fm.menu.build', 'build its fabulam…'));
+      if (FM_FABULAM_RE.test(p)) return item('fm-open', t('fm.menu.card', 'the fabulam’s card…'));
+      if (FM_PSHORT_RE.test(p)) return item('fm-pshort', t('fm.menu.pshort', 'read the pshort'));
       if (FAB_FABULAC_RE.test(p) && target && target.fabAuthored) return item('fap-open', t('fap.cosm.label', 'entail and run…'));
       if (FAB_FABULAC_RE.test(p)) return item('fab-build', t('fab.cosm.label', 'build and compile…'));
       if (FAB_CATEM_RE.test(p)) return item('fab-view', t('fab.menu.catem', 'read the catem'));
@@ -41791,6 +41860,8 @@
       if (act === 'fap-run') { void fapOpen(twin, 'run'); return true; }
       if (act === 'fab-build') { void fabFolderOpen(path); return true; }
       if (act === 'fab-view') { void fabViewOpen(path); return true; }
+      if (act === 'fm-open') { void fmOpen(path); return true; }
+      if (act === 'fm-pshort') { void fmPshortOpen(path); return true; }
       return false;
     }
 
@@ -41834,9 +41905,505 @@
       });
     }
 
+    // ---- the fabulam card (0.9, lane M5; the design's 6) ----
+    // A `.lean` file, a folder of them, or a `.fabulam.cosm` opens the
+    // fabula card's `lean` face: GET /api/fabulam/state (enough/routes/
+    // fabulam.py over fabulam_job's file_state and archive_state), and the
+    // jobs POST /api/fabulam/build | resume | entail | cancel start (kind
+    // `fabulam`, the promise header on each). One line of state in the
+    // design's words (fmStateLine), the sentence of P:claim/checking in full
+    // under it, one row per density, and the person's two entries, written
+    // through the build and never by a model. Nothing on this face is a
+    // badge, a tick or a colour that could read as "verified": enough reads
+    // Lean as text and runs nothing of it.
+    const FM_LEAN_RE = /\.lean$/i;
+    const FM_FABULAM_RE = /\.fabulam\.cosm$/i;
+    const FM_PSHORT_RE = /\.pshort-(expert|student|everyone)-\d{4}-\d{2}-\d{2}-\d{4}(?:-\d+)?\.md$/i;
+    const FM_DENSITIES = ['expert', 'student', 'everyone'];
+    const FM_PROGRAM_WORD = {
+      'survey-the-proof': 'survey', 'read-the-proof': 'read', 'audit-the-comments': 'audit', 'fit-the-wording': 'fit',
+      'fold-the-argument': 'fold', 'raise-the-questions': 'question', 'survey-the-archive': 'survey', 'fold-the-head': 'fold',
+    };
+    const FM = { path: null, st: null, error: null, job: null, snap: null, result: null, jerror: null, target: null,
+      said: null, saidBy: null, saidAt: null, wording: null };
+
+    function fmReset() {
+      Object.assign(FM, { path: null, st: null, error: null, job: null, snap: null, result: null, jerror: null, target: null,
+        said: null, saidBy: null, saidAt: null, wording: null });
+      fabRouteReset('fm');
+    }
+
+    function fmStageWord(s) {
+      const w = FM_PROGRAM_WORD[s] || s;
+      const words = {
+        survey: t('fm.stage.survey', 'survey'), read: t('fm.stage.read', 'read'), audit: t('fm.stage.audit', 'audit'),
+        fit: t('fm.stage.fit', 'fit'), fold: t('fm.stage.fold', 'fold'), question: t('fm.stage.question', 'question'),
+      };
+      return words[w] || String(w || '');
+    }
+    function fmDensityWord(d) {
+      return d === 'expert' ? t('fm.density.expert', 'expert') : (d === 'student' ? t('fm.density.student', 'student')
+        : t('fm.density.everyone', 'everyone'));
+    }
+
+    // The card's one line for a state: the design's seven (fabulam_job.STATE_LINES), and a folder's own words.
+    function fmStateLine(st) {
+      const s = st || {};
+      const folder = s.kind === 'folder';
+      const n = (v) => String(v == null ? 0 : v);
+      switch (s.state) {
+        case 'none':
+          return t('fm.state.none', 'no fabulam yet: building it writes {name}').replace('{name}', () => String(s.name || ''));
+        case 'pick':
+          return (folder ? t('fm.state.pickFolder', 'this folder ends in {n} results: choose the ones to tell')
+            : t('fm.state.pick', 'this file ends in {n} results: choose the one to tell')).replace('{n}', n((s.targets || []).length));
+        case 'outline':
+          return t('fm.state.outline', 'an outline: the survey landed by rules; reading waits for a model');
+        case 'partway': {
+          if (folder) {
+            const parts = Array.isArray(s.parts) ? s.parts : [];
+            const undone = parts.filter((p) => (p.reached && p.state !== 'complete') || !p.tied).length;
+            return t('fm.state.partwayFolder', '{n} of {m} files landed; the build can take up again from {next}')
+              .replace('{n}', n(parts.length - undone)).replace('{m}', n(parts.length))
+              .replace('{next}', () => (FM_PROGRAM_WORD[s.next] ? fmStageWord(s.next) : String(s.next || '')));
+          }
+          return t('fm.state.partway', '{n} of {m} stages landed; the build can take up again from {next}')
+            .replace('{n}', n(s.landed)).replace('{m}', n(s.of)).replace('{next}', () => fmStageWord(s.next));
+        }
+        case 'complete':
+          return t('fm.state.complete', 'built: every stage landed');
+        case 'moved':
+          return folder ? t('fm.state.movedFolder', 'the folder has changed since its fabulam was surveyed: a build starts again from the survey')
+            : t('fm.state.moved', 'the Lean file has changed since its fabulam was surveyed: a build starts again from the survey');
+        case 'gone':
+          return folder ? t('fm.state.goneFolder', 'the folder is not there any more; its fabulam stays as it is')
+            : t('fm.state.gone', 'the Lean file is not there any more; its fabulam stays as it is');
+        default:
+          return String(s.line || '');
+      }
+    }
+
+    // A head's line (fabulam_job.HEAD_LINE).
+    function fmHeadLine(st) {
+      const s = st || {};
+      if (s.kind !== 'folder' || !s.exists) return '';
+      return t('fm.head.line', '{k} of {n} files read; {m} not reached and left as outlines')
+        .replace('{k}', String(s.read || 0)).replace('{n}', String(s.files || 0)).replace('{m}', String(s.unreached || 0));
+    }
+
+    // One density's row: none; entailed, with its time; stale when the fabulam was derived after it.
+    function fmPshortWords(p) {
+      if (!p || !p.path || !p.exists) return t('fm.pshort.none', 'none');
+      const at = String(p.at || '').replace('T', ' ').replace(/:\d\d(\.\d+)?(\+00:00|Z)$/, ' UTC');
+      return (p.stale ? t('fm.pshort.stale', 'stale: entailed {at}, before the fabulam was derived again')
+        : t('fm.pshort.entailed', 'entailed {at}')).replace('{at}', () => at);
+    }
+
+    function fmRunning() { return !!(FM.job && (FM.job === 'pending' || (FM.snap && !CANON_TERMINAL.has(FM.snap.state)))); }
+    function fmResumable(s) { return !!(s && s.exists && !s.moved && !s.complete && s.state !== 'gone' && s.state !== 'pick' && (s.landed > 0 || s.kind === 'folder')); }
+
+    async function fmOpen(path) {
+      if (IS_HOME || !path) return;
+      fabCardReset('lean');
+      FM.path = String(path).replace(/\/+$/, '');
+      fabCardOpenModal();
+      fabCardPaint();
+      const seq = FAB.seq;
+      await Promise.all([fmLoad(seq), fabGateLoad()]);
+      if (seq !== FAB.seq) return;
+      fabCardPaint();
+    }
+    window.fmOpen = fmOpen;
+
+    async function fmLoad(seq = FAB.seq) {
+      const r = await canonJSON('/api/fabulam/state?path=' + encodeURIComponent(FM.path));
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FM.st = null; FM.error = r.error || t('canon.job.failed', 'that did not work'); return; }
+      FM.error = null;
+      FM.st = r.data.state || null;
+      const s = FM.st || {};
+      if (FM.said == null) FM.said = s.said || '';
+      if (FM.saidBy == null) FM.saidBy = s.said_by || '';
+      if (FM.saidAt == null) FM.saidAt = s.said_at ? String(s.said_at) : '';
+      if (FM.wording == null) FM.wording = s.wording || '';
+      const job = r.data.job;
+      if (job && job.id && !CANON_TERMINAL.has(job.state) && !FM.job) {
+        // A job already running (the agent's tool, another tab's): follow it here.
+        FM.job = job.id;
+        FM.snap = job;
+        const e = CANON.jobs.get(job.id);
+        if (e) e.want = 'fabulam';
+        else canonTrack(job, { want: 'fabulam', label: canonBase(FM.path), writes: true });
+      }
+    }
+
+    // "stage 2 of 5: read · 1 model call"
+    function fmProgressText(snap) {
+      const s = snap || {};
+      if (s.state === 'queued' || s.phase === 'waiting') return t('canon.phase.waiting', 'waiting for the model');
+      if (s.state === 'cancelling') return t('canon.phase.cancelling', 'cancelling…');
+      const p = cosmIsMap(s.progress) ? s.progress : null;
+      if (!p || !p.program) return s.message || t('canon.phase.starting', 'starting…');
+      const bits = [t('fm.progress', 'stage {n} of {of}: {stage}').replace('{n}', String(p.n || '?'))
+        .replace('{of}', String(p.of || '?')).replace('{stage}', () => fmStageWord(p.program))];
+      if (p.calls) bits.push(t('fab.progress.callsOpen', '{k} model calls').replace('{k}', String(p.calls)));
+      if (p.route) bits.push(p.route === 'cloud' ? t('fab.made.cloud', 'on the cloud') : t('fab.made.here', 'here'));
+      return bits.join(' · ');
+    }
+
+    function fmStagesHTML(s, running) {
+      const p = running && FM.snap && cosmIsMap(FM.snap.progress) ? FM.snap.progress : null;
+      if (s.kind === 'folder') {
+        const parts = Array.isArray(s.parts) ? s.parts : [];
+        if (!parts.length) return '';
+        return '<ol class="fab-stages fm-parts" aria-label="' + cosmEsc(t('fm.parts', 'its files')) + '">' + parts.map((x) => {
+          const st = { kind: 'file', state: x.state, name: canonBase(x.fabulam || ''), landed: 0, of: 0, targets: [] };
+          return '<li><span class="fab-mark" aria-hidden="true">·</span><span class="fab-stage-name">' + cosmEsc(String(x.file || '')) + '</span>'
+            + '<span class="fab-stage-meta">' + cosmEsc((x.reached ? '' : t('fm.part.unreached', 'not reached: an outline by rule') + ' · ')
+              + (x.state === 'partway' ? t('fm.part.partway', 'partway') : fmStateLine(st))) + '</span></li>';
+        }).join('') + '</ol>';
+      }
+      const stages = Array.isArray(s.stages) ? s.stages : [];
+      return '<ol class="fab-stages fm-stages" aria-label="' + cosmEsc(t('fm.stages', 'its stages')) + '">' + stages.map((x, i) => {
+        const now = !!(p && p.program === x.name);
+        const meta = x.landed ? t('fab.stage.landed', 'landed') + ' · ' + (x.model ? String(x.model) : t('fab.stage.byRules', 'by rules'))
+          : (now ? t('fab.stage.running', 'running') : t('fab.stage.waits', 'waits'));
+        return '<li class="' + (now ? 'running' : '') + '"><span class="fab-mark" aria-hidden="true">' + (now ? '▸' : '·') + '</span>'
+          + '<span class="fab-stage-name">' + cosmEsc((i + 1) + '. ' + fmStageWord(x.name)) + '</span>'
+          + '<span class="fab-stage-meta">' + cosmEsc(meta) + '</span></li>';
+      }).join('') + '</ol>';
+    }
+
+    function fmPaint() {
+      const s = FM.st;
+      const running = fmRunning();
+      fabEl('fab-title').textContent = t('fm.title', 'the fabulam');
+      const src = fabEl('fab-source');
+      src.textContent = canonBase(FM.path || '') + (s && s.kind === 'folder' ? '/' : '');
+      src.title = FM.path || '';
+      ['fab-tc', 'fab-author', 'fab-verse', 'fab-compile', 'fab-run', 'fab-dialectic'].forEach((id) => fabSet(fabEl(id), ''));
+      let h = '';
+      if (!s && !FM.error) {
+        h = '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span>' + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
+      } else if (!s) {
+        h = '<p class="thym-refusal">' + cosmEsc(FM.error) + '</p>';
+      } else {
+        h += '<p class="fab-say fm-line" id="fm-line">' + cosmEsc(fmStateLine(s)) + '</p>';
+        const head = fmHeadLine(s);
+        if (head) h += '<p class="thym-meta fm-head-line">' + cosmEsc(head) + '</p>';
+        // The sentence of P:claim/checking, in full, always under the state.
+        h += '<div class="fm-checking" id="fm-checking"><div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.checking.head', 'what is said about checking')) + '</div>'
+          + '<p>' + cosmEsc(s.checking ? String(s.checking) : t('fm.checking.none', 'the survey writes this sentence by rule, from the file’s text and your entry below')) + '</p></div>';
+        if (s.state === 'pick') {
+          const ts = Array.isArray(s.targets) ? s.targets : [];
+          h += '<div class="thym-sec-h dict-sc" id="fm-pick-h">' + cosmEsc(t('fm.pick.head', 'the result to tell')) + '</div>'
+            + '<div class="thym-list" role="radiogroup" aria-labelledby="fm-pick-h">' + ts.map((x) => '<label class="thym-opt"><input type="radio" name="fm-target" value="'
+              + cosmEsc(String(x)) + '"' + (FM.target === x ? ' checked' : '') + '><span class="thym-opt-main"><span class="thym-opt-name"><code>'
+              + cosmEsc(String(x)) + '</code></span></span></label>').join('') + '</div>'
+            + '<div class="fab-row"><button type="button" data-fm="pick"' + (FM.target && !running ? '' : ' disabled') + '>'
+            + cosmEsc(t('fm.pick.go', 'build it for this result')) + '</button></div>';
+        }
+        h += fmStagesHTML(s, running);
+        if (running) {
+          const sn = FM.snap || {};
+          const pct = sn.chunks > 0 ? Math.round(100 * Math.max(0, sn.chunk || 0) / sn.chunks) : null;
+          h += '<p class="thym-wait"><span class="atem-spin" aria-hidden="true"></span><span>' + cosmEsc(fmProgressText(sn)) + '</span></p>'
+            + (pct != null ? '<div class="thym-bar"><span style="width:' + pct + '%"></span></div>' : '');
+        } else if (FM.result && FM.result.message) {
+          h += '<p class="thym-note fm-result">' + cosmEsc(String(FM.result.message)) + '</p>';
+        }
+        if (FM.jerror) h += '<p class="thym-refusal">' + cosmEsc(FM.jerror) + '</p>';
+        // One row per density.
+        const rows = Array.isArray(s.pshorts) && s.pshorts.length ? s.pshorts : FM_DENSITIES.map((d) => ({ density: d }));
+        const canEntail = !!(s.exists && s.complete && !running && !AGENT_FREE);
+        h += '<div class="thym-sec-h dict-sc" id="fm-pshorts-h">' + cosmEsc(t('fm.pshorts.head', 'its pshorts')) + '</div>'
+          + '<p class="thym-note">' + cosmEsc(t('fm.pshorts.note', 'a pshort is a guide to a formal proof, entailed from the fabulam alone; it is not a proof')) + '</p>'
+          + '<ul class="fm-pshorts" aria-labelledby="fm-pshorts-h">' + rows.map((p) => '<li data-fm-density="' + cosmEsc(p.density) + '">'
+            + '<span class="fm-density">' + cosmEsc(fmDensityWord(p.density)) + '</span><span class="thym-meta">' + cosmEsc(fmPshortWords(p)) + '</span>'
+            + (p.path && p.exists ? '<button type="button" data-fm="pshort" data-fm-path="' + cosmEsc(String(p.path)) + '">' + cosmEsc(t('fm.pshort.read', 'read')) + '</button>' : '')
+            + '<button type="button" data-fm="entail" data-fm-density="' + cosmEsc(p.density) + '"' + (canEntail ? '' : ' disabled') + '>'
+            + cosmEsc(t('fm.pshort.entail', 'entail')) + '</button></li>').join('') + '</ul>';
+        if (AGENT_FREE) h += '<p class="thym-note">' + cosmEsc(t('fm.pshorts.agentFree', 'agent-free is on: a pshort asks a model, so none is entailed')) + '</p>';
+        else if (s.exists && !s.complete) h += '<p class="thym-note">' + cosmEsc(t('fm.pshorts.wait', 'a pshort is entailed once every stage has landed')) + '</p>';
+        // The person's two entries: what is said about checking and who says it; the public wording's file.
+        if (s.state !== 'gone') {
+          const ok = !!(String(FM.said || '').trim() && String(FM.saidBy || '').trim());
+          h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.said.head', 'your entry on checking')) + '</div>'
+            + '<p class="thym-note">' + cosmEsc(t('fm.said.note', 'one sentence on what is known about the machine check, who says it, and where or when; yours, never a model’s. Saving it builds the fabulam again from the survey, and the sentence above then quotes it.')) + '</p>'
+            + '<div class="thym-row fap-field"><label for="fm-said">' + cosmEsc(t('fm.said.said', 'what is said')) + '</label>'
+            + '<textarea id="fm-said" rows="2" spellcheck="true">' + cosmEsc(FM.said || '') + '</textarea></div>'
+            + fapField('fm-said-by', t('fm.said.by', 'who says it'), FM.saidBy)
+            + fapField('fm-said-at', t('fm.said.at', 'where or when'), FM.saidAt)
+            + '<div class="fab-row"><button type="button" data-fm="said"' + (ok && !running ? '' : ' disabled') + '>'
+            + cosmEsc(t('fm.save', 'save and build again')) + '</button></div>';
+          h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.wording.head', 'the public wording')) + '</div>'
+            + '<p class="thym-note">' + cosmEsc(t('fm.wording.note', 'a file that states the result in public words, its path from the fabulam’s folder; the fit stage sets the statement against it')) + '</p>'
+            + fapField('fm-wording', t('fm.wording.label', 'its file'), FM.wording, { placeholder: 'wording.md' })
+            + '<div class="fab-row"><button type="button" data-fm="wording"' + (String(FM.wording || '').trim() && !running ? '' : ' disabled') + '>'
+            + cosmEsc(t('fm.save', 'save and build again')) + '</button></div>';
+        }
+      }
+      fabSet(fabEl('fab-main'), h);
+      fabSet(fabEl('fab-route-box'), s ? fabRouteHTML('fm', { ceiling: 'cloud' }) : '');
+      fabStatusPaint('');
+      const go = fabEl('fab-go');
+      const resumable = fmResumable(s);
+      go.hidden = !s || s.state === 'gone' || s.state === 'pick';
+      go.textContent = resumable ? t('fab.resume', 'take up again') : (s && s.complete ? t('fab.rebuild', 'build again') : t('fab.build', 'build'));
+      go.disabled = running || !s;
+      const rs = fabEl('fab-restart');
+      rs.hidden = !resumable || running;
+      const op = fabEl('fab-open');
+      op.hidden = !(s && s.exists && s.fabulam);
+      op.textContent = t('fm.open', 'open the fabulam');
+      fabEl('fab-cancel-job').hidden = !running || FM.job === 'pending';
+    }
+
+    async function fmPost(url, body) {
+      const seq = FAB.seq;
+      Object.assign(FM, { job: 'pending', snap: null, result: null, jerror: null });
+      fabCardPaint();
+      const r = await canonPost(url, fabRouteBody('fm', body));
+      if (seq !== FAB.seq) return;
+      if (!r.ok || !r.data) { FM.job = null; FM.jerror = r.error || t('canon.job.failed', 'that did not work'); fabCardPaint(); return; }
+      if (!r.data.job) {
+        // Nothing started: a file that ends in several results waits for the person to choose.
+        FM.job = null;
+        if (r.data.state) FM.st = r.data.state;
+        FM.result = r.data.message ? { message: r.data.message } : null;
+        fabCardPaint();
+        return;
+      }
+      FM.job = r.data.job.id;
+      FM.snap = r.data.job;
+      canonTrack(r.data.job, { want: 'fabulam', label: canonBase(FM.path), writes: true });
+      fabCardPaint();
+    }
+
+    // build, take up again, start again from the survey; a target chosen; an entry saved.
+    function fmGo(kind, extra = {}) {
+      const s = FM.st;
+      if (!s || !FM.path) return;
+      const body = Object.assign({ path: FM.path }, extra);
+      if (kind === 'restart' || (kind === 'build' && s.complete && !Object.keys(extra).length)) body.restart = true;
+      const resume = kind === 'build' && fmResumable(s) && !Object.keys(extra).length;
+      return fmPost(resume ? '/api/fabulam/resume' : '/api/fabulam/build', body);
+    }
+
+    function fmEntail(density) {
+      const s = FM.st;
+      if (!s || !s.fabulam) return;
+      return fmPost('/api/fabulam/entail', { path: s.fabulam, density });
+    }
+
+    async function fmCancel() {
+      if (!FM.path) return;
+      const r = await canonPost('/api/fabulam/cancel', { path: FM.path });
+      if (r.ok && r.data && r.data.job) canonOnSnap(r.data.job);
+      else if (!r.ok && FAB.open) { FM.jerror = r.error; fabCardPaint(); }
+    }
+
+    // Every snapshot of a fabulam's job the card follows (canonApply, want 'fabulam').
+    function fmOnSnap(e, snap) {
+      if (!FAB.open || FAB.face !== 'lean' || FM.job !== e.id) return;
+      FM.snap = snap;
+      if (CANON_TERMINAL.has(snap.state)) {
+        const words = snap.state === 'done' ? null : (snap.message || snap.error || t('canon.job.failed', 'that did not work'));
+        Object.assign(FM, { job: null, result: snap.state === 'done' ? (snap.result || {}) : null, jerror: words });
+        const seq = FAB.seq;
+        void fmLoad(seq).then(() => { if (seq === FAB.seq) fabCardPaint(); });
+      }
+      fabCardPaint();
+    }
+    window.fmOnSnap = fmOnSnap;
+    window.fmProgressText = fmProgressText;
+
+    fabEl('fab-body').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-fm]');
+      if (!b || b.disabled || FAB.face !== 'lean') return;
+      switch (b.dataset.fm) {
+        case 'pick': if (FM.target) void fmGo('build', { target: [FM.target] }); break;
+        case 'said': void fmGo('build', { said: String(FM.said || '').trim(), said_by: String(FM.saidBy || '').trim(),
+          ...(String(FM.saidAt || '').trim() ? { said_at: String(FM.saidAt).trim() } : {}) }); break;
+        case 'wording': void fmGo('build', { wording: String(FM.wording || '').trim() }); break;
+        case 'entail': void fmEntail(b.dataset.fmDensity); break;
+        case 'pshort': { const p = b.dataset.fmPath; fabCardClose(); void fmPshortOpen(p); break; }
+        default: break;
+      }
+    });
+    const fmField = (e) => {
+      if (FAB.face !== 'lean') return;
+      if (fabRouteOnEvent(e, 'fm', () => fabCardPaint())) return;
+      const id = e.target.id;
+      if (e.target.name === 'fm-target') { FM.target = e.target.value; fabCardPaint(); return; }
+      const key = { 'fm-said': 'said', 'fm-said-by': 'saidBy', 'fm-said-at': 'saidAt', 'fm-wording': 'wording' }[id];
+      if (!key) return;
+      FM[key] = e.target.value;
+      // Only the buttons' state follows a keystroke; the fields keep their text and the caret.
+      const said = fabEl('fab-main').querySelector('button[data-fm="said"]');
+      if (said) said.disabled = fmRunning() || !(String(FM.said || '').trim() && String(FM.saidBy || '').trim());
+      const w = fabEl('fab-main').querySelector('button[data-fm="wording"]');
+      if (w) w.disabled = fmRunning() || !String(FM.wording || '').trim();
+    };
+    fabEl('fab-body').addEventListener('input', fmField);
+    fabEl('fab-body').addEventListener('change', fmField);
+
+    // ---- a pshort, read (0.9): markdown in the viewer of what a fabula makes ----
+    // Each citation `[a, b]` links to its item's card in the fabulam beside
+    // it (the cosm viewer, at that card); a switch hides the marks. The three
+    // fixed lines and the footer are shown as they are written.
+    function fmFabulamOf(pshort) { return String(pshort || '').replace(FM_PSHORT_RE, '.fabulam.cosm'); }
+
+    function fmCitesHTML(html) {
+      const id = '[A-Z]:[A-Za-z0-9][A-Za-z0-9._/-]*';
+      const re = new RegExp('\\[(' + id + '(?:,\\s*' + id + ')*)\\]', 'g');
+      return String(html).replace(re, (_m, list) => '<span class="fm-cites">['
+        + list.split(/,\s*/).map((x) => '<a href="#" class="fm-cite" data-fm-cite="' + x + '">' + x + '</a>').join(', ') + ']</span>');
+    }
+
+    async function fmPshortOpen(path) {
+      if (!path) return;
+      FABV.seq++;
+      Object.assign(FABV, { kind: 'pshort', path: String(path), data: null, file: null, text: null, error: null, ferror: null });
+      const m = fabEl('cshort-modal');
+      m.classList.remove('hidden');
+      m.setAttribute('aria-hidden', 'false');
+      FABV.open = true;
+      applyHelpBubbles();
+      fabViewPaint();
+      const seq = FABV.seq;
+      try {
+        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(FABV.path));
+        if (seq !== FABV.seq) return;
+        if (!r.ok) FABV.error = 'HTTP ' + r.status;
+        else FABV.data = { text: await r.text(), fabulam: fmFabulamOf(FABV.path) };
+      } catch (err) {
+        if (seq !== FABV.seq) return;
+        FABV.error = String((err && err.message) || err);
+      }
+      fabViewPaint();
+    }
+    window.fmPshortOpen = fmPshortOpen;
+
+    function fmPshortHTML(d) {
+      const m = FM_PSHORT_RE.exec(String(FABV.path || ''));
+      let h = '<p class="fabv-note"><strong>' + cosmEsc(t('fm.view.never', 'a pshort is a guide to a formal proof, entailed from its fabulam alone. It is not a proof.')) + '</strong> '
+        + cosmEsc(t('fm.view.cites', 'each mark in brackets names the fabulam’s items a run of sentences rests on: follow one to its card.')) + '</p>';
+      h += '<label class="fm-nocite-switch"><input type="checkbox" id="fm-nocite"' + (FABV.nocite ? ' checked' : '') + '> '
+        + cosmEsc(t('fm.view.hide', 'hide the citation marks')) + '</label>';
+      if (m) h += '<p class="thym-meta">' + cosmEsc(t('fm.view.density', 'density: {density}').replace('{density}', () => fmDensityWord(m[1].toLowerCase()))) + '</p>';
+      h += '<div class="fabv-pane' + (FABV.nocite ? ' fm-nocite' : '') + '" id="fm-pshort-pane"><div class="fabv-md">'
+        + fmCitesHTML(renderMarkdown(String(d.text || ''), null).html) + '</div></div>';
+      return h;
+    }
+
+    fabEl('fabv-body').addEventListener('click', (e) => {
+      const a = e.target.closest('a.fm-cite');
+      if (!a || FABV.kind !== 'pshort' || !FABV.data) return;
+      e.preventDefault();
+      const fab = FABV.data.fabulam;
+      const id = a.dataset.fmCite;
+      fabViewClose();
+      void enterCosmMode(fab, { focus: id });
+    });
+    fabEl('fabv-body').addEventListener('change', (e) => {
+      if (e.target.id !== 'fm-nocite' || FABV.kind !== 'pshort') return;
+      FABV.nocite = !!e.target.checked;
+      const pane = fabEl('fm-pshort-pane');
+      if (pane) pane.classList.toggle('fm-nocite', FABV.nocite);
+    });
+
+    // ---- a fabulam in the cosm viewer (0.9): what the design's 6 adds at the top ----
+    // The statement (`says`), atem.line, the checking sentence and the
+    // counts; the stages in `teaching` order with `plain` and `plain-if`
+    // and their steps; the comment table, mismatches first; the questions.
+    // Every item named is a link to its card below (data-go). The `argument`
+    // lens is not here: a lens is the server's (macrocosm.lenses), drawn as
+    // merirmaid, and this build adds none.
+    function fmViewerTopHTML(data) {
+      const cat = data.catalog || {};
+      const items = new Map();
+      for (const m of data.modules || []) for (const k of m.kinds || []) for (const it of k.items || []) items.set(String(it.id), it);
+      const dataOf = (id) => { const it = items.get(String(id)); return it && cosmIsMap(it.data) ? it.data : null; };
+      const go = (id) => '<a href="#" class="fm-go" data-go="' + cosmEsc(String(id)) + '">' + cosmEsc(String((dataOf(id) || {}).name || id)) + '</a>';
+      const all = [...items.values()].map((it) => (cosmIsMap(it.data) ? it.data : {}));
+      const of = (type) => all.filter((x) => x.type === type);
+      // A field an outline leaves pending (`{pending: …}`) says that it waits; anything else as text.
+      const said = (v) => (cosmIsPending(v) ? t('fm.top.pending', 'not read yet: this waits for a model')
+        : (v == null || typeof v === 'object' ? '' : String(v)));
+      let h = '<section class="fm-top" aria-label="' + cosmEsc(t('fm.top.label', 'the fabulam at a glance')) + '">';
+      h += '<div class="fm-top-row"><span class="thym-where dict-sc">' + cosmEsc(t('fm.top.head', 'a fabulam: a formal proof taken apart, read as text')) + '</span>'
+        + '<button type="button" class="cosm-tool-btn" data-fm-card="' + cosmEsc(String(COSM.path || '')) + '">' + cosmEsc(t('fm.top.card', 'its card')) + '</button></div>';
+      for (const st of of('statement')) {
+        h += '<div class="fm-statement"><div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.top.statement', 'the statement')) + ' · ' + go(st.id) + '</div>'
+          + (st.lean ? '<p class="thym-meta"><code>' + cosmEsc(String(st.lean)) + '</code></p>' : '')
+          + '<p>' + cosmEsc(said(st.says) || said(st.summary)) + '</p></div>';
+      }
+      const atem = cosmIsMap(cat.atem) ? cat.atem : null;
+      if (atem && atem.line) h += '<p class="fm-atem-line">' + cosmEsc(said(atem.line)) + '</p>';
+      const chk = dataOf('P:claim/checking');
+      if (chk && chk.says) {
+        h += '<div class="fm-checking"><div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.checking.head', 'what is said about checking')) + '</div><p>'
+          + cosmEsc(String(chk.says)) + '</p></div>';
+      }
+      const decls = of('statement').length + of('definition').length + of('lemma').length;
+      const reached = all.filter((x) => x.reached === 'yes').length;
+      const spine = of('lemma').filter((x) => x.role === 'spine').length;
+      const open = of('question').filter((x) => !x.state || x.state === 'open').length;
+      h += '<p class="thym-meta fm-counts">' + cosmEsc(t('fm.top.counts', '{d} declarations · {r} reached · {s} spine · {q} questions open')
+        .replace('{d}', String(decls)).replace('{r}', String(reached)).replace('{s}', String(spine)).replace('{q}', String(open))) + '</p>';
+      // The stages, in the teaching order.
+      const teaching = Array.isArray(cat.teaching) ? cat.teaching : [];
+      if (teaching.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.top.stages', 'the stages, in teaching order')) + '</div><ol class="fm-teaching">';
+        for (const id of teaching) {
+          const p = dataOf(id) || {};
+          h += '<li><div class="fm-stage-h">' + go(id) + (p.stage ? ' <span class="thym-meta">' + cosmEsc(String(p.stage)) + '</span>' : '') + '</div>';
+          if (p.plain) h += '<p>' + cosmEsc(said(p.plain)) + '</p>';
+          if (p['plain-if']) h += '<p class="thym-meta">' + cosmEsc(t('fm.top.plainIf', 'true when: {if}').replace('{if}', () => said(p['plain-if']))) + '</p>';
+          const steps = Array.isArray(p.steps) ? p.steps : [];
+          if (steps.length) h += '<p class="thym-meta">' + cosmEsc(t('fm.top.steps', 'its steps')) + ': ' + steps.map(go).join(', ') + '</p>';
+          h += '</li>';
+        }
+        h += '</ol>';
+      }
+      // The comment table, mismatches first.
+      const audit = Array.isArray(cat.audit) ? cat.audit : [];
+      if (audit.length) {
+        const rank = (r) => {
+          const c = r.claim ? dataOf(r.claim) : null;
+          if (c && (c.mismatch || c['false-as-written'] === 'yes' || c.checked === 'contradicted')) return 0;
+          return r.verdict === 'claim' ? 1 : (r.verdict === 'agrees' ? 2 : (r.verdict ? 3 : 4));
+        };
+        const rows = audit.map((r, i) => ({ r: cosmIsMap(r) ? r : {}, i })).sort((a, b) => rank(a.r) - rank(b.r) || a.i - b.i);
+        const verdict = { agrees: t('fm.audit.agrees', 'agrees'), claim: t('fm.audit.claim', 'a claim'), nothing: t('fm.audit.nothing', 'says nothing of the mathematics') };
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.top.audit', 'the comments, mismatches first')) + '</div>'
+          + '<table class="fm-audit"><thead><tr><th>' + cosmEsc(t('fm.audit.lines', 'lines')) + '</th><th>' + cosmEsc(t('fm.audit.kind', 'kind'))
+          + '</th><th>' + cosmEsc(t('fm.audit.on', 'on')) + '</th><th>' + cosmEsc(t('fm.audit.verdict', 'verdict')) + '</th></tr></thead><tbody>'
+          + rows.map(({ r }) => {
+            const c = r.claim ? dataOf(r.claim) : null;
+            const mism = c && (c.mismatch || c.checked) ? ' (' + [c.checked, c.mismatch].filter(Boolean).map(String).join(', ') + ')' : '';
+            return '<tr' + (rank(r) === 0 ? ' class="fm-mismatch"' : '') + '><td>' + cosmEsc(String(r.lines || '')) + '</td><td>' + cosmEsc(String(r.kind || ''))
+              + '</td><td>' + (r.on ? go(r.on) : '') + '</td><td>' + cosmEsc(r.verdict ? (verdict[r.verdict] || String(r.verdict)) : t('fm.audit.unread', 'not read yet'))
+              + (r.claim ? ' · ' + go(r.claim) : '') + cosmEsc(mism) + '</td></tr>';
+          }).join('') + '</tbody></table>';
+      }
+      // The questions.
+      const qs = of('question');
+      if (qs.length) {
+        h += '<div class="thym-sec-h dict-sc">' + cosmEsc(t('fm.top.questions', 'its questions')) + '</div><ul class="fm-questions">'
+          + qs.map((q) => '<li>' + go(q.id) + (q.asks ? ': ' + cosmEsc(String(q.asks)) : '') + (q.state && q.state !== 'open' ? ' <span class="thym-meta">' + cosmEsc(String(q.state)) + '</span>' : '') + '</li>').join('')
+          + '</ul>';
+      }
+      return h + '</section>';
+    }
+    window.fmViewerTopHTML = fmViewerTopHTML;
+
     window.fabOnLanguage = () => {
       if (FAB.open) fabCardPaint();
       if (FABV.open) fabViewPaint();
+      // 0.9: a fabulam on screen in the cosm viewer draws its top again in the new language
+      if (COSM.data && (COSM.data.catalog || {}).flavour === 'fabulam' && cosmEl('cosm-mode').classList.contains('open')) cosmRender();
     };
 
     // The hooks in the Canon, cosm, Thym and tree code call in here only once this block has run.
@@ -44648,6 +45215,8 @@
           // 0.8 (W4-FP): an authored fabulac, and the folder that is its entailment
           fabAuthored: li.dataset.fabAuthored === '1',
           fabTwin: li.dataset.fabTwin || '',
+          // 0.9: a folder that holds Lean (its fabulam)
+          lean: li.dataset.lean === '1',
         });
       }, true);   // <-- capture phase
     })();
