@@ -205,8 +205,9 @@ skeletons by `skeleton.py`:
   from comprise-dev and never edited here, so Comprise's Thym moves live in
   the sidecar `comprise.moves.cosm` beside it (not a manifest either).
   `fabula`, `doc`, `thym` and `ascribe` carry their own `moves:` blocks.
-  `defaults/cosm/NOTICE.md`: all rights reserved, not Apache (see
-  "MacroCOSM" and "License")
+  `defaults/cosm/NOTICE.md`: the specifications and manifests are CC BY 4.0 with
+  the author's OWFa 1.0 patent promise, not Apache; the names are not licensed
+  (see "MacroCOSM" and "License")
 - `docs/specs.json` (0.5.4) — the registry of the four bundled OES specifications as cosmoes-site
   publishes them (slug, name, edition, describes, host, revised; plus the bundled
   path and sha256 of each copy), the vendored client's source, commit and sha256,
