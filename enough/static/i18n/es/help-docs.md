@@ -571,6 +571,21 @@ escribe. la entrada se guarda sola sobre la marcha, y si te vas sin archivarla, 
 - comenta una entrada archivada antigua cuando resulte que estaba equivocada — el registro se queda, y la segunda lectura se sienta a su lado.
 - pídele a tu readvisor que lea el diario cuando quieras un resumen de por dónde fue realmente un trabajo largo.
 
+## scaffold
+name: scaffold
+path: rness/io/composure/
+
+### what
+un form de composure en el que escribes tú cada palabra. un <strong>scaffold</strong> es una página, una presentación o un documento dispuesto en marcos, cada uno una página o una diapositiva, que contienen <em>plecholders</em>: cajas que muestran un plec entre corchetes (lo que esa parte tiene que transmitir) y una longitud objetivo, con un campo libre para tu texto. el readvisor construye el scaffold a partir de un plectrum y cambia un plec, un objetivo o la disposición cuando se lo pides. nunca escribe en el campo de un plecholder.
+
+### how
+estos botones solo aparecen mientras hay un scaffold abierto. el <strong>ojo</strong> lo lee como la cosa terminada, sin los corchetes. el <strong>candado</strong> bloquea el scaffold entero: a partir de ahí nada cambia en él, y desbloquearlo crea la versión siguiente como un archivo nuevo y deja esta como está. una vez bloqueado, <strong>revisar</strong> lee la ortografía, la gramática y las afirmaciones. cada hallazgo se queda en su caja con una corrección sugerida que aceptas o rechazas, y una afirmación que no se puede comprobar se marca así, nunca como aprobada. el último botón dice en qué se convierte el scaffold (una página, una presentación o un documento) y lo exporta en los formatos de esa cosa. la cuenta de al lado dice cuántas cajas están escritas. selecciona una caja y el inspector muestra su nombre, su plec, su objetivo, qué va dentro y qué es en la cosa terminada. una caja solo se mueve y cambia de tamaño dentro de su marco. cada cambio, también en qué se convierte, se deshace con ⌘Z.
+
+### ideas
+- marca una caja como escrita cuando hayas terminado con ella; la cuenta te dice lo que falta.
+- pregúntale al readvisor por una sola caja desde su menú contextual: responde en el chat y deja tus palabras en paz.
+- exporta una presentación como PPTX para darle forma en otro sitio, y como PDF para la copia terminada.
+
 ## readvisor-panel
 name: panel del readvisor
 path: (the right-hand panel)

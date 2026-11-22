@@ -20,6 +20,10 @@ from ..tools import _read_allowlist, _under_any
 from .common import AppContext
 from ..server import _escape_html, _store_prefix
 
+#: 0.9: the save's answer carries this header (value `1`) when it replaced a link to a shared file with the project's
+#: own copy (`_replace_shared_link`); the page says so in one line.
+UNLINKED_HEADER = "X-Enough-Unlinked"
+
 
 def build_router(ctx: AppContext) -> APIRouter:
     router = APIRouter()
@@ -432,6 +436,42 @@ def build_router(ctx: AppContext) -> APIRouter:
             raise HTTPException(404, "no such highlight id")
         return {"path": path, "highlight": updated}
 
+    def _replace_shared_link(path: str, target: Path) -> bool:
+        """Remove the link at `target` when it is a link to a shared file, so
+        the write that follows makes the project's own file. True when a link
+        was removed.
+
+        Shared: `rness/paradigms/<n>.md` and `rness/metaparadigms/<n>.md`
+        whatever they point at (the readvisor's rule, `tools._replace_global_link`),
+        and any file link into this install's `defaults/` (the policies the
+        skeleton links, a paradigm linked by hand). The link must be the file
+        itself, in a folder of the project that is not itself a link. A link
+        to anything else (a file of the person's own outside the project, a
+        Canon path) keeps writing through, as before. Skills and readvisors
+        never get here: the route refuses them."""
+        if _store_prefix(path) or not target.is_symlink():
+            return False
+        rel = Path(path)
+        if rel.is_absolute() or ".." in rel.parts:
+            return False
+        root = project_dir.resolve()
+        if target.parent.resolve(strict=False) != root / rel.parent:
+            return False
+        dest = target.resolve(strict=False)
+        if not dest.is_file():
+            return False
+        paradigm = (len(rel.parts) == 3 and rel.parts[0] == "rness"
+                    and rel.parts[1] in ("paradigms", "metaparadigms") and rel.suffix == ".md")
+        from .. import skeleton as _skeleton
+        defaults = _skeleton._install_defaults_root().resolve()
+        if not (paradigm or dest.is_relative_to(defaults)):
+            return False
+        try:
+            target.unlink()
+        except OSError:
+            return False
+        return True
+
     @router.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
         form = await request.form()
@@ -490,12 +530,33 @@ def build_router(ctx: AppContext) -> APIRouter:
         target.parent.mkdir(parents=True, exist_ok=True)
         # Stash the previous contents so the user-side "undo last
         # edit" affordance (Phase 4b) can revert. Cheap; no-op when
-        # the file doesn't exist yet.
+        # the file doesn't exist yet. (Through a link it reads the shared
+        # text; the stash itself lands beside the link, in the project.)
         from .. import tools as _tools
         _tools.stash_for_undo(target)
+        # 0.9 (route guards): a save to a link to a shared file (a paradigm,
+        # a metaparadigm, a policy: every project links the same one) makes
+        # the project's own copy in place of the link, as the readvisor's
+        # write_file does, and says so. Other links keep writing through.
+        unlinked = _replace_shared_link(path, target)
         from .. import prompt as _prompt
         content, _stamp_warning = _prompt.stamp_metaparadigm_on_save(target, str(content))
         target.write_text(str(content), encoding="utf-8")
+        return await _api_file_write_answer(path, target, unlinked=unlinked)
+
+    async def _api_file_write_answer(path: str, target: Path, *, unlinked: bool) -> HTMLResponse:
+        """The rest of a save, after the write: the convert sync and the
+        re-rendered preview. `unlinked` rides back twice: a header
+        (`X-Enough-Unlinked: 1`) and a hidden `.file-unlinked` marker."""
+        resp = await _api_file_write_tail(path, target)
+        if not unlinked:
+            return resp
+        marker = (f'<div class="file-unlinked" hidden data-path="{_escape_html(path)}"></div>')
+        out = HTMLResponse(marker + resp.body.decode("utf-8"))
+        out.headers[UNLINKED_HEADER] = "1"
+        return out
+
+    async def _api_file_write_tail(path: str, target: Path) -> HTMLResponse:
         # convert §4: a twin whose manifest opted into "keep the original in
         # sync" exports itself over the original right after every save. The
         # twin is written FIRST and unconditionally — a stale original refuses

@@ -78,7 +78,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 @pytest.fixture
 def client(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         assert _wait_for(project / canon.PROJECT_CATALOG)
         yield c
 
@@ -631,7 +631,7 @@ def test_cancel_between_passages(client: TestClient, project: Path, monkeypatch,
 
 def test_home_mode_has_no_derivation_routes(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False, home=True)
-    with TestClient(app) as c:
+    with TestClient(app, headers={"X-Enough-Api": "1"}) as c:
         for method, path in (("post", "/api/fabula/derive"), ("post", "/api/canon/atem"),
                              ("post", "/api/canon/atem/pin"), ("get", "/api/fabula/twin?path=notes.md"),
                              ("post", "/api/fabula/compile"), ("get", "/api/canon/job/cn1")):

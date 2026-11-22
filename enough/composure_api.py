@@ -300,20 +300,23 @@ def build_router(
     async def api_composure_ops(request: Request) -> dict[str, Any]:
         """Apply a batch of ops. The one write door.
 
-        Body: `{path, base_rev, ops: [...], create?, form?, title?, source?,
-        want_model?}`. A `base_rev` behind the file is not an error — the
+        Body: `{path, base_rev, ops: [...], create?, form?, title?,
+        want_model?}`; the source is always `ui` (a `source` other than `ui`
+        is refused). A `base_rev` behind the file is not an error — the
         reply carries `stale: true` and the ids that changed underneath, so
         the client refreshes exactly those modules."""
         body = await _body(request)
         target = _target(body.get("path") or "")
         rel = _rel(target)
-        source = str(body.get("source") or "ui")
-        if source not in comp_core.SOURCES:
+        # 0.9 (route guards): the server sets the source. A batch over HTTP is the page's, `ui`; the readvisor writes
+        # through its tools, the council and enough itself through the core, never this door. A body that names
+        # another source is refused, not relabelled, so a client that thought it could claim one is told.
+        claimed = body.get("source")
+        if claimed not in (None, "", "ui"):
             raise HTTPException(
-                400, f"unknown source {source!r}; one of "
-                     f"{', '.join(comp_core.SOURCES)}")
-        if source == "readvisor":  # the readvisor writes through its tools, never this door (survey 6.8)
-            raise HTTPException(403, "source readvisor is not taken here: the readvisor changes a composure through its tools")
+                403, f"source {str(claimed)!r} is not taken here: the server sets a batch's source, and one sent over "
+                     f"HTTP is the page's (ui); the readvisor changes a composure through its tools")
+        source = "ui"
         base_rev = body.get("base_rev")
         try:
             result = await asyncio.to_thread(

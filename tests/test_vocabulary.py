@@ -79,6 +79,9 @@ ALLOWLIST: tuple[tuple[str, str], ...] = (
     # --- agents that are not enough's: an external coding/LLM agent.
     (r"\b(?:coding|LLM|external|frontier|browser)\s+agents?\b",
      "an agent that is not enough's assistant"),
+    # The scaffolder's harness table marks a trial run by an outside coding
+    # agent with stand-in text (0.9, S2), in the conductor's words.
+    (r"\bby an agent with stand-in text\b", "a tried-by marker: an outside coding agent, not enough's"),
     # Graham's byline in the manual's first paragraph, and the same sentence
     # in each translated manual.
     (r"maintained primarily by agents",

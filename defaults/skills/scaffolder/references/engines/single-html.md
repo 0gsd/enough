@@ -79,6 +79,27 @@ the check at lock (`../lock.md`), and write the new state. Fill a new page
 from it (`export.py fill`) and give it to the person; their words are in
 the state and in their browser.
 
+The lock and the check, in turns:
+
+1. The person presses "Lock", then "Lock now". The page names the empty
+   boxes first. Then they copy everything out and paste it to you. Its
+   `locked:` has a time; if it has none, they have not locked it.
+2. You run the check (`../lock.md`) on that text and write `checked:` and
+   the findings under `# Findings`, each `status: open` or `cannot be
+   checked`. Change nothing else in it.
+3. `export.py fill` that state. It writes a new file beside the old one
+   (`-2`, `-3` …). Tell the person to open the new file: it shows each
+   finding beside its box with "Accept the fix" and "Keep my words".
+4. They answer each one, then copy everything out again and paste it to
+   you. That text is what you export from (`export.py md`, `pdf` …).
+
+From a page opened as a file, the browser may refuse the clipboard: the page
+then shows the whole text selected in a box below the scaffold, and the
+person copies it with the keyboard or presses "Save as a file".
+
 ## Tried
 
-Not tried (see the index's table).
+Tried 2026-11-22 by an agent with stand-in text, in Chrome from a file: a
+deck begun here and carried into enough; a document carried in from enough,
+finished, locked, checked in turns as above, fixes taken and kept, and
+exported as Markdown and PDF.

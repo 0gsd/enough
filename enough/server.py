@@ -1871,6 +1871,10 @@ def create_app(
     # Home has no model routes to refuse (ModeGate 404s them all).
     if not home:
         app.add_middleware(AgentFreeGate)
+    # 0.9: the Origin gate (`enough/origin_gate.py`), added last so it answers first: a request that changes state
+    # from a page that is not enough's own is refused before any other gate or route sees it.
+    from . import origin_gate as _origin_gate
+    app.add_middleware(_origin_gate.OriginGate, port=port)
 
     # ---------- The routes (0.8): one module per group, under enough/routes/ ----------
     #

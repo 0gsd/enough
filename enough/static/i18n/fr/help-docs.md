@@ -571,6 +571,21 @@ un form de composure pour tenir un registre daté. un module, une entrée par pa
 - commentez une vieille entrée classée quand elle s'avère avoir été fausse — le registre reste, et la seconde pensée s'assied à côté.
 - demandez à votre readvisor de lire le journal quand vous voulez un résumé de là où un long travail est réellement passé.
 
+## scaffold
+name: scaffold
+path: rness/io/composure/
+
+### what
+un form de composure où vous écrivez vous-même chaque mot. un <strong>scaffold</strong> est une page, une présentation ou un document disposé en cadres, chacun une page ou une diapositive, qui contiennent des <em>plecholders</em> : des boîtes qui montrent un plec entre crochets (ce que cette partie doit faire passer) et une longueur visée, avec un champ libre pour votre texte. le readvisor construit le scaffold à partir d'un plectrum et change un plec, une cible ou la mise en page quand vous le lui demandez. il n'écrit jamais dans le champ d'un plecholder.
+
+### how
+ces boutons n'apparaissent que lorsqu'un scaffold est ouvert. l'<strong>œil</strong> le lit comme la chose finie, sans les crochets. le <strong>cadenas</strong> verrouille le scaffold entier : ensuite plus rien n'y change, et le déverrouiller crée la version suivante dans un nouveau fichier et laisse celle-ci telle quelle. une fois verrouillé, <strong>vérifier</strong> lit l'orthographe, la grammaire et les affirmations. chaque constat se pose sur sa boîte avec une correction proposée que vous acceptez ou refusez, et une affirmation invérifiable est marquée comme telle, jamais comme validée. le dernier bouton dit ce que devient le scaffold (une page, une présentation ou un document) et l'exporte dans les formats de cette chose. le compte à côté dit combien de boîtes sont écrites. sélectionnez une boîte et l'inspecteur donne son nom, son plec, sa cible, ce qui y va et ce qu'elle est dans la chose finie. une boîte ne se déplace et ne se redimensionne qu'à l'intérieur de son cadre. chaque changement, ce que devient le scaffold compris, s'annule avec ⌘Z.
+
+### ideas
+- marquez une boîte comme écrite quand vous en avez fini ; le compte vous dit ce qui reste.
+- interrogez le readvisor sur une seule boîte depuis son menu contextuel : il répond dans le chat et laisse vos mots tranquilles.
+- exportez une présentation en PPTX pour l'habiller ailleurs, et en PDF pour la copie finie.
+
 ## readvisor-panel
 name: panneau readvisor
 path: (the right-hand panel)

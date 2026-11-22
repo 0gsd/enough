@@ -160,11 +160,12 @@ def test_path_rules(client: TestClient):
 
 
 def test_unknown_source_is_refused(client: TestClient):
+    # 0.9: the server sets the source; any claimed one but `ui` is refused (tests/test_route_guards.py).
     seed(client)
     r = client.post("/api/composure/ops", json={
         "path": REL, "source": "hacker",
         "ops": [{"op": "set_meta", "title": "x"}]})
-    assert r.status_code == 400 and "unknown source" in r.json()["detail"]
+    assert r.status_code == 403 and "the server sets a batch's source" in r.json()["detail"]
 
 
 def test_get_composure_sanitizes_a_hostile_file(client: TestClient,
@@ -601,19 +602,20 @@ def test_the_sse_event_fires_on_every_batch(project: Path):
             "path": REL, "create": True, "form": "blank", "title": "Plane",
             "ops": [{"op": "set_meta", "title": "Plane"}]}).json()
         second = c.post("/api/composure/ops", json={
-            "path": REL, "base_rev": created["rev"], "source": "enough",
+            "path": REL, "base_rev": created["rev"],
             "ops": [{"op": "add_module", "type": "text"}]}).json()
-        # 0.8: the readvisor writes through its tools, never this door.
-        refused = c.post("/api/composure/ops", json={
-            "path": REL, "source": "readvisor",
-            "ops": [{"op": "add_module", "type": "text"}]})
-        assert refused.status_code == 403 and "readvisor" in refused.json()["detail"]
+        # 0.8: the readvisor writes through its tools, never this door; 0.9: nor may a client claim enough's source.
+        for claimed in ("readvisor", "enough"):
+            refused = c.post("/api/composure/ops", json={
+                "path": REL, "source": claimed,
+                "ops": [{"op": "add_module", "type": "text"}]})
+            assert refused.status_code == 403 and "readvisor" in refused.json()["detail"]
 
     assert [e for e, _ in seen] == [composure_api.EVENT] * 2
     assert seen[0][1] == {"path": REL, "rev": 1, "changed": [],
                           "source": "ui", "created": True}
     assert seen[1][1] == {"path": REL, "rev": 2, "changed": second["changed"],
-                          "source": "enough", "created": False}
+                          "source": "ui", "created": False}
 
 
 def test_model_is_json_serializable_end_to_end(client: TestClient):

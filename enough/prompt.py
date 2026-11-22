@@ -112,6 +112,33 @@ Rules:
   file directly; the harness does.
 """
 
+#: The lean profile's core (0.9): the same tags, the rules said shorter. It
+#: paid for the skills index, so a project with skills on still starts a chat
+#: on an 8,192 window (`tests/test_prompt_weight.py`, the fit test).
+TOOL_LEAN_INSTRUCTIONS = "\n".join([
+    """\
+To use a tool, emit its XML tag exactly as shown, never inside a code fence.
+The result comes back as a user message starting `<tool_result name="...">`;
+then continue your response.
+
+Available tools:
+""",
+    TOOL_INSTRUCTIONS.split("Available tools:\n", 1)[1].split("\nRules:\n", 1)[0].strip("\n") + "\n",
+    """\
+Rules:
+- Paths are relative to the project; absolute paths and `../` are refused.
+  `write_file` makes parent folders. `shell` runs in the project with no
+  sandbox: be deliberate.
+- `fetch_url` is how to read the web (not `shell` + `curl`): it returns a
+  preview and a cache path under `rness/io/input/`; `read_file` the cache
+  only when you need the rest.
+- `show_intro` puts enough's brief introduction on the user's screen. If a
+  conversation opens with a bare greeting, offer once:
+  "want a brief introduction to enough?" Call it on a yes, or when they ask
+  what enough is; then don't repeat it.
+- A user turn takes at most 10 tool calls. The harness journals every call.
+"""])
+
 #: The closing section of the tool docs, in every profile: a tool call is a
 #: step, not an answer. Carried separately so the sections that can be
 #: gated or summarised sit between the core and it, as they always did.
@@ -720,6 +747,33 @@ only in the sandbox. `fabulap` does build, status,
 cancel for a poem's `<path>`: scan, hear, then read closely.
 """
 
+#: The lean profile with the macrocosm-oes skill on (0.9): the MacroCOSM
+#: block's tags without its closing paragraph (`CANON_PROSE_LEAD` on), then
+#: this — the two fabula tags, the rules that hold without reading anything,
+#: and the rest left to the skill's body, which its lean index line says to
+#: read before acting on it.
+CANON_PROSE_LEAD = "\n`cosm_read` shows the tree"
+FABULA_LEAN_INSTRUCTIONS = """\
+## Dialectic and fabulacs
+
+<tool name="dialectic">
+<path>notes.md</path>
+<question>D:question/occasion</question>
+<says>their words</says>
+</tool>
+
+<tool name="fabulac">
+<path>tool</path>
+<do>build</do>
+</tool>
+
+`fabulap` takes a poem's `<path>`; `thym_moves` lists Thym's moves. What
+each MacroCOSM tool does, every `<do>` and tag, is in
+`rness/skills/macrocosm-oes/SKILL.md`: read it first. Derive, ask or run
+only on request; never answer a question for the person; an authored
+fabulac runs only in the sandbox.
+"""
+
 #: With the skill off: the three names, and where they come from (as the wiki tools are named without an archive).
 FABULA_ABSENT_INSTRUCTIONS = """\
 `dialectic`, `fabulac` and `fabulap` come with the macrocosm-oes skill.
@@ -1066,7 +1120,7 @@ def tool_instructions(project_dir: Path, *, pal: bool = False, lean: bool = Fals
     user opened with `/pal` and by no other, so `ask_pal` costs an ordinary
     turn nothing at all."""
     rness = project_dir / "rness"
-    parts = [LEAN_TOOLS_NOTE, TOOL_INSTRUCTIONS] if lean else [TOOL_INSTRUCTIONS]
+    parts = [LEAN_TOOLS_NOTE, TOOL_LEAN_INSTRUCTIONS] if lean else [TOOL_INSTRUCTIONS]
     if not lean:
         parts.append(GIRRAPH_TOOL_INSTRUCTIONS)
     elif _skill_enabled(rness, "girraph-merirmaid") or _girraph_present(project_dir):
@@ -1094,9 +1148,13 @@ def tool_instructions(project_dir: Path, *, pal: bool = False, lean: bool = Fals
     if _dictionary_available():
         parts.append(DICTIONARY_TOOL_INSTRUCTIONS)
     if _macrocosm_available():
-        parts.append(CANON_TOOL_INSTRUCTIONS)
-        parts.append(FABULA_TOOL_INSTRUCTIONS if _skill_enabled(rness, "macrocosm-oes")
-                     else FABULA_ABSENT_INSTRUCTIONS)
+        if not _skill_enabled(rness, "macrocosm-oes"):
+            parts += [CANON_TOOL_INSTRUCTIONS, FABULA_ABSENT_INSTRUCTIONS]
+        elif lean:
+            # The skill's body, one read_file away, says what each tool does.
+            parts += [CANON_TOOL_INSTRUCTIONS.split(CANON_PROSE_LEAD, 1)[0], FABULA_LEAN_INSTRUCTIONS]
+        else:
+            parts += [CANON_TOOL_INSTRUCTIONS, FABULA_TOOL_INSTRUCTIONS]
     if pal:
         parts.append(PAL_TOOL_INSTRUCTIONS)
     return "\n".join(p.rstrip() + "\n" for p in parts)
@@ -1335,8 +1393,20 @@ def _skill_root_note(root: str) -> str:
     )
 
 
-def _load_skills(rness: Path) -> str:
-    """Concatenate every ENABLED skill's content into one block.
+#: The lean profile's Skills section opens with this (0.9): the skills that
+#: are on ride as an index, a line each, as the policies do, and the body is
+#: one `read_file` away.
+SKILLS_LEAN_PREAMBLE = """\
+Each skill on here is one line. When a request fits one, `read_file` its
+body, `rness/skills/<name>/SKILL.md`, before you act (once a conversation)
+and follow it; its own paths resolve under that folder.
+"""
+
+
+def _load_skills(rness: Path, *, lean: bool = False) -> str:
+    """Concatenate every ENABLED skill's content into one block — or, for the
+    lean profile (0.9), index them: one line per skill, its path and what its
+    front-matter `description` says it is for and when to use it.
 
     Two layouts supported:
       rness/skills/<name>/SKILL.md   — folder-based (Claude Code convention)
@@ -1355,7 +1425,9 @@ def _load_skills(rness: Path) -> str:
         if name in disabled:
             continue
         text = _read_or_empty(skill_md)
-        if text:
+        if text and lean:
+            parts.append(f"- **{name}** — {_skill_gist(text)}")
+        elif text:
             root = f"rness/skills/{name}/"
             parts.append(f"## {name}\n\n{_skill_root_note(root)}\n\n{text}")
     for flat in sorted(skills_dir.glob("*.md")):
@@ -1363,10 +1435,48 @@ def _load_skills(rness: Path) -> str:
         if name in disabled:
             continue
         text = _read_or_empty(flat)
-        if text:
+        if text and lean:
+            parts.append(f"- **{name}** (body `rness/skills/{flat.name}`) — {_skill_gist(text)}")
+        elif text:
             # Flat skills have no companion-files root, so no path note.
             parts.append(f"## {name}\n\n{text}")
+    if lean:
+        return SKILLS_LEAN_PREAMBLE + "\n" + "\n".join(parts) if parts else ""
     return "\n\n".join(parts)
+
+
+def _clip(text: str, limit: int) -> str:
+    """`text` cut to at most `limit` chars at a word, marked with an ellipsis."""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,;:—-")
+    return cut + "…"
+
+
+def _skill_gist(text: str, what: int = 110, when: int = 90) -> str:
+    """A skill's lean index line: what it is for (the first sentence of its
+    front-matter `description`, asides in parentheses or between dashes left
+    out) and when to read it (the description's first sentence opening
+    "Use" or "Trigger", up to its first aside). A skill without a
+    description falls back to its first paragraph, as a policy does."""
+    fm, body = _parse_paradigm_frontmatter(text)
+    desc = re.sub(r"\s+", " ", fm.get("description", "")).strip().strip("\"'")
+    if not desc:
+        return _policy_gist(body)
+    sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z\"'])", desc)
+
+    def _plain(s: str) -> str:
+        s = re.sub(r"\s*\([^()]*\)", "", s)
+        s = re.sub(r"\s+—[^—]*—\s+", " ", s)
+        return re.sub(r"\s+", " ", s).strip()
+
+    head = _clip(_plain(sentences[0]), what)
+    use = next((s for s in sentences[1:] if re.match(r"(Use|Trigger)\b", s)), "")
+    if use:
+        use = use.split(" — ", 1)[0].rstrip(".") + "."
+    elif len(sentences) > 1:          # no "Use ..." sentence: the next one says it
+        use = _plain(sentences[1])
+    return f"{head} {_clip(use, when)}" if use else head
 
 
 # ---------------------------------------------------------------------------
@@ -2703,7 +2813,7 @@ def assemble_system_prompt(
     policies_block = _load_policies(rness, lean=lean)
     if policies_block:
         parts.append(_section("Policies", policies_block))
-    skills_block = _load_skills(rness)
+    skills_block = _load_skills(rness, lean=lean)
     if skills_block:
         parts.append(_section("Skills", skills_block))
     if intention:

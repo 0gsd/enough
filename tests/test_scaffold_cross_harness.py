@@ -180,7 +180,8 @@ def test_markdown_for_a_document_and_refusals(tmp_path):
     assert r.returncode == 0, r.stderr
     md = Path(r.stdout.strip()).read_text(encoding="utf-8")
     assert md.startswith("# What we cook on Sundays\n")
-    assert md.count("\n## ") == 26                 # 1 + 24 recipes + 1; the notes frame left out
+    assert md.count("\n## ") == 24                 # each recipe's own headline; no frame name is a heading
+    assert "Before the recipes" not in md and "After the recipes" not in md
     assert "Notes to the readvisor" not in md
     assert "Photo of the dish" not in md           # an empty graphic box is left out, and named on stderr
     assert "Photo of the dish (24 boxes)" in r.stderr
@@ -230,6 +231,91 @@ def test_pptx_through_python_pptx(tmp_path):
     with zipfile.ZipFile(out) as z:
         notes = [n for n in z.namelist() if n.startswith("ppt/notesSlides/")]
     assert notes                                   # the speaker boxes went to the notes
+
+
+def _in_person_words(name: str):
+    """An example locked with every text box holding a stand-in line that names
+    nothing of the scaffold, so any frame name, box name or plec found in an
+    export was written there by the exporter (S2's trials, 2026-11-22)."""
+    m = as_state(example(name))
+    for i, b in enumerate(m.boxes()):
+        if b["kind"] == "text":
+            b["text"] = f"Stand-in line {i} of the person."
+    m.meta["locked"] = "2026-11-22T12:00:00Z"
+    return m
+
+
+def _readvisor_words(m) -> list[str]:
+    words = set()
+    for f in m.frames:
+        words.add(f["name"])
+        for b in f["boxes"]:
+            words.update([b["name"], b["plec"] or ""])
+    return sorted(w for w in words if w)
+
+
+def _visible(text: str) -> str:
+    import html as _html
+    import re as _re
+    text = _re.sub(r"<(style|title|script)[^>]*>.*?</\1>", " ", text, flags=_re.DOTALL)
+    return _html.unescape(_re.sub(r"<[^>]+>", " ", text))
+
+
+@pytest.mark.parametrize("name", ("more-page.md", "ten-slide-deck.md", "document.md"))
+def test_no_frame_name_box_name_or_plec_reaches_the_thing(tmp_path, name):
+    # S2's trials found the frame name as a document's heading when a section had no headline box, and a tile's
+    # box name printed above the person's words, in Markdown, HTML, PDF and PPTX. enough's export shows neither.
+    m = _in_person_words(name)
+    outs = {"html": _visible(export.to_html(m, tmp_path)), "typst": export.to_typst(m, {})}
+    if m.meta["thing"] == "document":
+        outs["md"] = export.to_markdown(m)
+    if m.meta["thing"] == "deck":
+        outs["pandoc"] = export.deck_markdown(m)
+        if export.find_pptx():
+            from pptx import Presentation
+            out = tmp_path / "deck.pptx"
+            export.pptx_by_python(m, tmp_path, out)
+            outs["pptx"] = "\n".join(sh.text_frame.text for s in Presentation(str(out)).slides
+                                     for sh in s.shapes if sh.has_text_frame)
+    person = " ".join(b["text"] for b in m.boxes())
+    for fmt, text in outs.items():
+        for w in _readvisor_words(m):
+            if w in person or (fmt == "html" and w == m.meta["title"]):
+                continue
+            assert w not in text, f"{name} as {fmt} shows the readvisor's {w!r}"
+        for b in m.boxes():
+            if b["kind"] == "text" and b["as"] not in ("notes", "speaker"):
+                assert b["text"] in text, f"{name} as {fmt} lost {b['id']}"
+
+
+def test_a_documents_title_line_is_the_persons_title_box_when_there_is_one(tmp_path):
+    m = _in_person_words("document.md")
+    assert export.to_markdown(m).startswith("# What we cook on Sundays\n")
+    m.frames[0]["boxes"][0]["as"] = "title"
+    md = export.to_markdown(m)
+    assert "What we cook on Sundays" not in md
+    assert md.startswith(f"## {m.frames[0]['boxes'][0]['text']}\n")
+    assert "What we cook on Sundays" not in export.to_typst(m, {})
+    assert "<h1>" not in export.to_html(m, tmp_path)
+
+
+def test_the_engines_say_what_the_trials_found():
+    # S2's trials (2026-11-22): the rows tried are marked with who tried them, and enough's engine page no longer
+    # promises a state in or out (enough has no door for it yet); the check in enough is enough's own job.
+    engines = SKILL / "references" / "engines"
+    index = (engines / "index.md").read_text(encoding="utf-8")
+    rows = {ln.split("|")[1].strip(): ln for ln in index.splitlines() if ln.startswith("| ") and ln.count("|") > 6}
+    for harness in ("enough", "Claude Code"):
+        assert "tried 2026-11-22 by an agent with stand-in text" in rows[harness], harness
+    assert "Artifact with a store: not tried" in rows["Claude Code"]
+    assert "tried 2026-11-19" in rows["claude.ai"]
+    enough = (engines / "enough.md").read_text(encoding="utf-8")
+    assert "gives back its state" not in enough and "does not yet read a state or give one back" in enough
+    assert "The check is enough's own job" in enough
+    assert "In enough the check is enough's own job" in (SKILL / "references" / "lock.md").read_text(encoding="utf-8")
+    single = (engines / "single-html.md").read_text(encoding="utf-8")
+    assert "Not tried" not in single and "open the new file" in single
+    assert "claude.ai: not tried" not in (engines / "claude-artifact.md").read_text(encoding="utf-8")
 
 
 def test_a_deck_without_pptx_tools_says_so(tmp_path, monkeypatch):

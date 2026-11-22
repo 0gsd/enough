@@ -26,7 +26,10 @@ pdf and pptx take --with to choose a tool (typst | pandoc | python-pptx).
 
 What a format leaves out: a notes box (`as: notes`) and a frame of only
 notes boxes are never exported; a speaker box is a slide's speaker notes,
-never on the slide; an empty box is left out and named on stderr.
+never on the slide; an empty box is left out and named on stderr. Nothing
+the readvisor wrote reaches the thing: no plec, no frame name, no box name.
+A frame's heading is the person's own title or headline box, or none; the
+thing's title line is the plectrum's `title` only when no box is a title.
 """
 
 from __future__ import annotations
@@ -150,12 +153,23 @@ def on_thing(model: ss.Scaffold) -> list[tuple[dict[str, Any], list[dict[str, An
 
 def heading_of(frame: dict[str, Any], boxes: list[dict[str, Any]]) -> tuple[str | None, dict[str, Any] | None]:
     """A frame's heading on the thing: its first title or headline box's
-    text, on one line. The frame's name is the scaffold's label, not the
-    person's words; a document falls back to it, a page and a deck do not."""
+    text, on one line, or None. The frame's name is the scaffold's label,
+    not the person's words, so no thing ever shows it (as enough's export)."""
     for b in boxes:
         if b["as"] in HEADING_AS and b["kind"] == "text":
             return " ".join(b["text"].split()), b
     return None, None
+
+
+def title_line(model: ss.Scaffold) -> str | None:
+    """The thing's title line (a document's, in Markdown, HTML and PDF): the
+    plectrum's `title`, unless a box with `as: title` holds the person's
+    words, which then stand as the title (as enough's export does)."""
+    for frame in model.frames:
+        for b in frame["boxes"]:
+            if b["as"] == "title" and b["kind"] == "text" and (b.get("text") or "").strip():
+                return None
+    return model.meta.get("title") or None
 
 
 def frame_shape(model: ss.Scaffold, frame: dict[str, Any]) -> str:
@@ -331,30 +345,29 @@ def _html_text(text: str) -> str:
 def _html_picture(box: dict[str, Any], base_dir: Path) -> str:
     w, h = ratio(box.get("shape"))
     p = picture(box, base_dir)
+    alt = " ".join((box.get("text") or "").split())
     cap = f"<figcaption>{html.escape(box['text'].strip())}</figcaption>" if box.get("text", "").strip() else ""
     if p is not None:
         mime = mimetypes.guess_type(p.name)[0] or "application/octet-stream"
         data = base64.b64encode(p.read_bytes()).decode("ascii")
         return (f'<figure><div style="aspect-ratio:{w}/{h}"><img src="data:{mime};base64,{data}" '
-                f'alt="{html.escape(box["name"])}"></div>{cap}</figure>')
+                f'alt="{html.escape(alt)}"></div>{cap}</figure>')
     href = box.get("href") or ""
     if href.startswith(("http://", "https://")):
         return (f'<figure><div style="aspect-ratio:{w}/{h}"><img src="{html.escape(href)}" '
-                f'alt="{html.escape(box["name"])}"></div>{cap}</figure>')
+                f'alt="{html.escape(alt)}"></div>{cap}</figure>')
     note(f"no picture found for {box['name']} ({box['id']}): {href or 'none given'}")
-    return f'<figure><div class="to-come" style="aspect-ratio:{w}/{h}">{html.escape(box["name"])}: the picture to come</div>{cap}</figure>'
+    return (f'<figure><div class="to-come" style="aspect-ratio:{w}/{h}">the picture to come: '
+            f'{html.escape(href or "")}</div>{cap}</figure>')
 
 
-def _html_box(box: dict[str, Any], base_dir: Path, *, named: bool) -> str:
+def _html_box(box: dict[str, Any], base_dir: Path) -> str:
     as_ = box["as"] if box["as"] in ss.AS_KNOWN else "body"
     attrs = f' class="box as-{as_}"'
     pl = place_of(box)
     if pl:
         attrs += (f' data-place="1" style="left:{pl[0]}%;top:{pl[1]}%;width:{pl[2]}%;height:{pl[3]}%"')
-    inner = ""
-    if named and as_ in ("step", "tile", "deck"):
-        inner += f'<div class="name">{html.escape(box["name"])}</div>'
-    inner += _html_picture(box, base_dir) if box["kind"] == "graphic" else _html_text(box["text"])
+    inner = _html_picture(box, base_dir) if box["kind"] == "graphic" else _html_text(box["text"])
     if box.get("fixed") or box.get("chips"):
         inner += '<div class="fixed">'
         if box.get("fixed"):
@@ -369,7 +382,7 @@ def _html_rows(boxes: list[dict[str, Any]], base_dir: Path) -> str:
     for row in rows_of(boxes):
         n = min(len(row), 4)
         out.append(f'<div class="row{" c" + str(n) if n > 1 else ""}">'
-                   + "".join(_html_box(b, base_dir, named=True) for b in row) + "</div>")
+                   + "".join(_html_box(b, base_dir) for b in row) + "</div>")
     return "".join(out)
 
 
@@ -383,18 +396,19 @@ def to_html(model: ss.Scaffold, base_dir: Path) -> str:
             speaker = [b for b in boxes if b["as"] == "speaker"]
             shown = [b for b in boxes if b["as"] != "speaker"]
             placed = " placed" if any(place_of(b) for b in shown) else ""
-            body.append(f'<section class="slide{placed}" aria-label="{html.escape(frame["name"])}">'
+            body.append(f'<section class="slide{placed}">'
                         + _html_rows(shown, base_dir) + "</section>")
             if speaker:
                 body.append('<aside class="notes">' + "".join(_html_text(b["text"]) for b in speaker) + "</aside>")
         elif thing == "document":
             head, hb = heading_of(frame, boxes)
             rest = [b for b in boxes if b is not hb]
-            body.append("<section>" + f"<h2>{html.escape(head or frame['name'])}</h2>"
+            body.append("<section>" + (f"<h2>{html.escape(head)}</h2>" if head else "")
                         + _html_rows(rest, base_dir) + "</section>")
         else:
             body.append("<section>" + _html_rows(boxes, base_dir) + "</section>")
-    top = f"<h1>{title}</h1>" if thing == "document" else ""
+    top_line = title_line(model)
+    top = f"<h1>{html.escape(top_line)}</h1>" if thing == "document" and top_line else ""
     return ("<!doctype html>\n<html lang=\"" + lang + "\">\n<head>\n<meta charset=\"utf-8\">\n"
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
             f"<title>{title}</title>\n<style>{HTML_CSS}"
@@ -409,15 +423,12 @@ def to_html(model: ss.Scaffold, base_dir: Path) -> str:
 
 def _md_box(box: dict[str, Any]) -> list[str]:
     out = []
-    if box["as"] in ("step", "tile", "deck"):
-        out.append(f"**{box['name']}**")
-        out.append("")
     if box["kind"] == "graphic":
         cap = " ".join((box.get("text") or "").split())
         if box.get("href"):
-            out.append(f"![{cap or box['name']}]({box['href']})")
+            out.append(f"![{cap}]({box['href']})")
         else:
-            out.append(f"*{box['name']}: the picture to come.*")
+            out.append("*the picture to come.*")
         if cap and box.get("href"):
             out += ["", f"*{cap}*"]
     else:
@@ -430,10 +441,12 @@ def _md_box(box: dict[str, Any]) -> list[str]:
 
 
 def to_markdown(model: ss.Scaffold) -> str:
-    out = [f"# {model.meta.get('title') or ''}", ""]
+    top = title_line(model)
+    out = [f"# {top}", ""] if top else []
     for frame, boxes in on_thing(model):
         head, hb = heading_of(frame, boxes)
-        out += [f"## {head or frame['name']}", ""]
+        if head:
+            out += [f"## {head}", ""]
         for b in boxes:
             if b is not hb:
                 out += _md_box(b)
@@ -468,15 +481,13 @@ def _typ_text(text: str, as_: str, scale: float = 1.0) -> str:
 def _typ_box(box: dict[str, Any], pics: dict[str, str], *, scale: float = 1.0) -> str:
     parts = []
     as_ = box["as"] if box["as"] in ss.AS_KNOWN else "body"
-    if as_ in ("step", "tile", "deck"):
-        parts.append(f"#text(weight: \"bold\", size: {12 * scale:.1f}pt)[#{_ts(box['name'])}]")
     if box["kind"] == "graphic":
         w, h = ratio(box.get("shape"))
         if box["id"] in pics:
             parts.append(f"#image({_ts(pics[box['id']])}, width: 100%)")
         else:
             parts.append(f"#block(width: 100%, inset: 10pt, stroke: (paint: gray, dash: \"dashed\"))"
-                         f"[#align(center)[#text(fill: gray)[#{_ts(box['name'] + ': the picture to come (' + str(w) + ':' + str(h) + ')')}]]]")
+                         f"[#align(center)[#text(fill: gray)[#{_ts('the picture to come (' + str(w) + ':' + str(h) + ')')}]]]")
         if (box.get("text") or "").strip():
             parts.append(_typ_text(box["text"], "caption", scale))
     else:
@@ -527,13 +538,15 @@ def to_typst(model: ss.Scaffold, pics: dict[str, str]) -> str:
     else:
         paper = {"letter": "us-letter"}.get(model.meta.get("shape") or "", "a4")
         out.append(f"#set page(paper: {_ts(paper)}, margin: 20mm)")
-        if thing == "document":
-            out.append(f"#align(center)[#text(size: 24pt, weight: \"bold\")[#{_ts(model.meta.get('title') or '')}]]")
+        top = title_line(model) if thing == "document" else None
+        if top:
+            out.append(f"#align(center)[#text(size: 24pt, weight: \"bold\")[#{_ts(top)}]]")
             out.append("#v(16pt)")
         for frame, boxes in frames:
             if thing == "document":
                 head, hb = heading_of(frame, boxes)
-                out.append(f"#heading(level: 1)[#{_ts(head or frame['name'])}]")
+                if head:
+                    out.append(f"#heading(level: 1)[#{_ts(head)}]")
                 boxes = [b for b in boxes if b is not hb]
             out.append(_typ_rows(boxes, pics))
             out.append("#v(14pt)")
@@ -647,9 +660,7 @@ def pptx_by_python(model: ss.Scaffold, base_dir: Path, out_path: Path) -> None:
             tb = slide.shapes.add_textbox(Emu(x), Emu(y), Emu(w), Emu(h))
             tf = tb.text_frame
             tf.word_wrap = True
-            text = b["text"].strip() if b["kind"] == "text" else (b["text"].strip() or f"{b['name']}: the picture to come")
-            if b["as"] in ("step", "tile", "deck"):
-                text = f"{b['name']}\n{text}"
+            text = b["text"].strip() if b["kind"] == "text" else (b["text"].strip() or "the picture to come")
             lines = text.split("\n")
             tf.text = lines[0]
             for ln in lines[1:]:
