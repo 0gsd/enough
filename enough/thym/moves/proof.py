@@ -142,15 +142,13 @@ def _yaml(x: Any) -> str:
 
 
 def lean_slug(name: str) -> str:
-    """A Lean name as a slug the id grammar takes (the design's 1.3): `'` becomes `-prime`; any other character the
-    grammar refuses becomes `-x` and its code point in hex; a first character it refuses there becomes `x` and its
-    code point."""
+    """A Lean name as a slug the id grammar takes (the design's 1.3; `fabula_names.declaration_slug` is the same
+    rule): `'` becomes `-prime`; any other character the grammar refuses becomes `-x` and its code point in hex; a
+    name that would then begin with no letter or digit takes `x` first, and one that would end in a dot spells it."""
     out: list[str] = []
-    for i, ch in enumerate(name):
+    for ch in name:
         if ch == "'":
             out.append("-prime")
-        elif i == 0 and not ch.isascii() or (i == 0 and not ch.isalnum()):
-            out.append(f"x{ord(ch):x}")
         elif ch.isascii() and _SLUG_OK.match(ch):
             out.append(ch)
         else:
@@ -158,14 +156,17 @@ def lean_slug(name: str) -> str:
     s = "".join(out)
     if s.endswith("."):
         s = s[:-1] + "-x2e"
-    return s or "x0"
+    if not s or not s[0].isalnum() or not s[0].isascii():
+        s = "x" + s
+    return s
 
 
 def respell(name: str) -> str:
-    """A file's or a folder's name respelled as a fabulam's (the design's 6): `PrimesCongruentOne` gives
-    `primes-congruent-one`, `LSeries` gives `lseries`."""
-    stem = name[:-5] if name.endswith(".lean") else name
-    return _code.slug(re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", stem))
+    """A file's or a folder's name respelled as a fabulam's (the design's 6; `fabula_names.fabulam_stem` is the same
+    rule): `PrimesCongruentOne.lean` gives `primes-congruent-one`, `LSeries` gives `lseries`."""
+    base = name.rstrip("/").rsplit("/", 1)[-1]
+    stem = base[:-5] if base.endswith(".lean") else base
+    return re.sub(r"[^a-z0-9]+", "-", re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", stem).lower()).strip("-") or "fabulam"
 
 
 def lines_of(v: Any) -> tuple[int, int] | None:
@@ -218,8 +219,9 @@ def is_head(cat: dict) -> bool:
 
 
 def part_uri(head_id: str, module: str) -> str:
-    """The URI of the part a Lean file is told in: the head's id, then the file's module respelled (the design's 6)."""
-    return f"oes:{head_id}--{respell(module)}"
+    """The URI of the part a Lean file is told in: the head's id, then the file's module with its dots as hyphens
+    (the design's 6; `fabula_names.fabulam_part_id` is the same rule)."""
+    return f"oes:{head_id}--{lean_slug(module.replace('.', '-'))}"
 
 
 def part_path(head_name: str, file_path: str) -> str:
@@ -510,21 +512,47 @@ def _depths(uses: dict[str, list[str]], entries: dict[str, int]) -> dict[str, in
     return depth
 
 
+def graph_keys(outlines: dict, order: list[str]) -> dict[tuple[str, int], str]:
+    """The key the reader's graph gives each declaration, by its file and first line: its full name; `<file>#L<line>`
+    when it has none; `<file>#<name>` when an earlier file of the set declares the name too, and
+    `<file>#<name>#L<line>` for a second declaration of one name in one file."""
+    out: dict[tuple[str, int], str] = {}
+    taken: set[str] = set()
+    for p in order:
+        mine: set[str] = set()
+        for d in (outlines.get(p) or {}).get("defs") or []:
+            q, line = str(d.get("qual") or ""), int(d.get("line") or 0)
+            key = q if q and q not in taken else (f"{p}#{q}" if q else f"{p}#L{line}")
+            if q and q in mine:
+                key = f"{p}#{q}#L{line}"
+            taken.add(key)
+            if q:
+                mine.add(q)
+            out[(p, line)] = key
+    return out
+
+
 def reach_of(ctx: Any, outlines: dict, entries: dict[str, int]) -> dict:
-    """The rule's reach over a set of outlines (the design's 4.2): `{graph, uses, rows, candidates}`. `entries` maps
-    each declaration the reach starts from to its depth there: a target at 0, and, in a part, each declaration
-    another part names at the depth the head gives it. `reached` and `carries` are the reader's; `depth` counts on
-    from the entries' own."""
+    """The rule's reach over a set of outlines (the design's 4.2): `{graph, uses, rows, candidates, keys}`, the rows
+    by the reader's key (`keys` gives each declaration's, by file and line). `entries` maps each declaration the
+    reach starts from to its depth there: a target at 0, and, in a part, each declaration another part names at the
+    depth the head gives it. `reached` and `carries` are the reader's; `depth` counts on from the entries' own. With
+    nothing to start from, nothing is reached."""
     syn = engine(ctx, "syntax")
     graph = syn.graph(outlines)
     graph = graph if isinstance(graph, dict) else {}
-    rows, cands = _reach_rows(syn.reach(graph, sorted(entries)))
+    order = [p for p in graph.get("order") or [] if p in outlines] or sorted(outlines)
+    keys = graph_keys(outlines, order + [p for p in sorted(outlines) if p not in order])
     uses = _uses_map(graph)
+    if not entries:
+        return {"graph": graph, "uses": uses, "keys": keys, "candidates": [],
+                "rows": {k: {"reached": "no", "carries": 0} for k in keys.values()}}
+    rows, cands = _reach_rows(syn.reach(graph, sorted(entries)))
     depth = _depths(uses, entries)
     for q, row in rows.items():
         if row.get("reached") == "yes" and q in depth:
             row["depth"] = depth[q]
-    return {"graph": graph, "uses": uses, "rows": rows, "candidates": cands}
+    return {"graph": graph, "uses": uses, "rows": rows, "candidates": cands, "keys": keys}
 
 
 def outside_names(d: dict) -> dict[str, int]:
@@ -538,11 +566,12 @@ def outside_names(d: dict) -> dict[str, int]:
 
 
 def written_as(lean: str, names: Any) -> str | None:
-    """The name among `names` that spells `lean`: the full name, or its last parts after a dot."""
+    """The name among `names` that spells `lean`: the full name, its last parts after a dot, or the name with a
+    projection after it."""
     for name in names:
         bare = name[len("_root_."):] if name.startswith("_root_.") else name
-        if bare == lean or lean.endswith("." + bare) or bare.endswith("." + lean):
-            return name
+        if bare == lean or lean.endswith("." + bare) or bare.endswith("." + lean) or bare.startswith(lean + "."):
+            return name                                 # the last: a part of the named result (`foo.mp`, `foo.1`)
     return None
 
 
@@ -862,7 +891,11 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     for x in targets:
         entries.setdefault(x, 0)
     reach = reach_of(ctx, {fname: ol}, entries)
-    rows, uses = reach["rows"], reach["uses"]
+    rows, uses, keys = reach["rows"], reach["uses"], reach["keys"]
+    key_of = {decl_name(d): keys.get((fname, int(d.get("line") or 0)), decl_name(d)) for d in defs}
+    name_of = {k: q for q, k in key_of.items()}
+    uses = {name_of.get(k, k): [name_of.get(u, u) for u in us] for k, us in uses.items()}
+    rows = {name_of.get(k, k): row for k, row in rows.items()}
     # -- the items
     used: set[str] = set()
     out: list[dict] = []
@@ -966,18 +999,14 @@ def is_lean_folder(v: Any) -> bool:
 
 
 def _modules(paths: list[str], outlines: dict, graph: dict, root: str | None = None) -> dict[str, str]:
-    """Each Lean file's dotted module name: what the reader's graph says when it says, else the import that spells
-    the file's path, else the path itself under `root` (the module the folder is, when the host knows it)."""
-    said = graph.get("modules") if isinstance(graph.get("modules"), dict) else {}
+    """Each Lean file's dotted module name: the import, among the set's, that spells the file's path; else the path
+    itself under the prefix the others show, or under `root` (the module the folder is, when the host knows it)."""
     imports = {str(i.get("module")) for ol in outlines.values() for i in ol.get("imports") or []
                if isinstance(i, dict) and i.get("module")}
     out: dict[str, str] = {}
     prefix: str | None = root.rstrip(".") + "." if root else None
     for p in paths:
         own = p[:-5].replace("/", ".")
-        if isinstance(said.get(p), str):
-            out[p] = said[p]
-            continue
         hit = next((m for m in sorted(imports) if m == own or m.endswith("." + own)), None)
         if hit:
             out[p] = hit
@@ -1012,6 +1041,10 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
     targets, by = (given, "given") if given else (targets_by_rule(outlines), "rule")
     reach = reach_of(ctx, outlines, {x: 0 for x in targets})
     graph, rows, uses = reach["graph"], reach["rows"], reach["uses"]
+    name_of = {reach["keys"].get((p, int(d.get("line") or 0)), decl_name(d)): decl_name(d)
+               for p, ol in outlines.items() for d in ol.get("defs") or []}
+    uses = {name_of.get(k, k): [name_of.get(u, u) for u in us] for k, us in uses.items()}
+    rows = {name_of.get(k, k): row for k, row in rows.items()}
     order = [p for p in graph.get("order") or [] if p in outlines]
     order += [p for p in sorted(outlines) if p not in order]
     module = _modules(order, outlines, graph, hsrc.get("module") if isinstance(hsrc.get("module"), str) else None)
@@ -2079,7 +2112,8 @@ def fold_argument(ctx: Any, t: Value, **mods: Any) -> Request:
         new, teaching, atem = parse_stages(data, items=shown, taken=taken, sources=[fname],
                                           step_kinds=("lemma", "statement", "step"), atem_of=_atem_of(cat, items))
         model = model_of(data)
-        c = _with_run(cat, ctx, model, at=_code.stamp_at(ctx), mode="model", completeness="full")
+        # `completeness: full` is the last program's to write (the job writes it when the questions have landed)
+        c = _with_run(cat, ctx, model, at=_code.stamp_at(ctx), mode="model")
         c.update({"atem": atem, "teaching": teaching})
         return Value("fabula", {**c, "nodes": items + new}, origin={"fold": {"before": sorted(taken)}})
 
@@ -2747,9 +2781,12 @@ def _reach_agrees(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
     t = _text_in(inputs)
     place = _head_place(hcat, [plain(x) for x in hitems], t) if is_head(hcat) and t is not None else None
     entries = _entries(cat, [plain(x) for x in hitems] if place else None, (place or {}).get("component"), names)
-    rows = reach_of(ctx, {fname: ol}, entries)["rows"]
+    reach = reach_of(ctx, {fname: ol}, entries)
+    key_of = {decl_name(d): reach["keys"].get((fname, int(d.get("line") or 0)), decl_name(d))
+              for d in ol.get("defs") or []}
+    rows = reach["rows"]
     for it in _decls(items, fname):
-        row = rows.get(it["lean"]) or {}
+        row = rows.get(key_of.get(it["lean"], it["lean"])) or {}
         want = str(row.get("reached") or "no")
         if it.get("reached") != want:
             return False, f"{it['id']} says reached {it.get('reached')!r}; the rule gives {want!r}"
@@ -2837,7 +2874,10 @@ def _nothing_invented(output: Value, inputs: dict, node: dict, decl: Any, ctx: A
     defs = [d for d in ol.get("defs") or [] if isinstance(d, dict)]
     by_def = {decl_name(d): outside_names(d) for d in defs}
     written = {n for names in by_def.values() for n in names}
-    uses = _uses_map(engine(ctx, "syntax").graph({fname: ol}) or {})
+    key_of = {k: decl_name(d) for d in defs
+              for k in [graph_keys({fname: ol}, [fname]).get((fname, int(d.get("line") or 0)))]}
+    uses = {key_of.get(k, k): [key_of.get(u, u) for u in us]
+            for k, us in _uses_map(engine(ctx, "syntax").graph({fname: ol}) or {}).items()}
     by_id = {str(it.get("id")): it for it in items}
     mine = {it["id"]: it["lean"] for it in _decls(items, fname)}
     for it in items:

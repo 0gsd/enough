@@ -1,0 +1,15 @@
+thym 1
+
+program entail-the-pshorts
+  why: a fabulam entailed as three pshorts, for an expert, for a student and for everyone: guides to the proof,
+       every run of sentences closed by the items it rests on.
+  must: the Lean is never read here; nothing is built or run.
+  decided 2026-11-22: a pshort is a guide to a formal proof and is never called a proof.
+
+  takes f: fabula
+  gives expert: short, student: short, everyone: short
+
+  give expert: entail f as expert                  -- the logic, every spine lemma by its Lean name
+  give student: entail f as student                -- the logic, each term defined at first use
+  give everyone: entail f as everyone              -- the teaching order, the worked example, plain words
+end
