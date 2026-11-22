@@ -1,0 +1,32 @@
+oes: fabula/1
+macrocosm: 0.8.0
+id: fabula/tally
+nodes:
+  - id: D:session/session-2
+    type: session
+    at: 2026-11-22T12:50:00Z
+    with: {to: transconceiver, who: "the owner, as transconceiver, by questionnaire in the 0.9 build, 2026-11-22 (the conductor's relay of the owner's answers to lane T1's sheet): \"Confirm all\""}
+    through: person
+    asked: [D:question/licence-the-owner-as-transconceiver, D:question/lane-said-the-owner-as-transconceiver, D:question/confidential-the-owner-as-transconceiver, D:question/programs-the-owner-as-transconceiver, D:question/attribution-the-owner-as-transconceiver]
+    answered: [D:question/licence-the-owner-as-transconceiver, D:question/lane-said-the-owner-as-transconceiver, D:question/confidential-the-owner-as-transconceiver, D:question/programs-the-owner-as-transconceiver, D:question/attribution-the-owner-as-transconceiver]
+    skipped: []
+  - id: D:question/licence-the-owner-as-transconceiver
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:50:00Z, by: transconceiver, says: "MIT, as tally/LICENSE says", value: "MIT, as tally/LICENSE says", confidence: 1, session: D:session/session-2}
+  - id: D:question/lane-said-the-owner-as-transconceiver
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:50:00Z, by: transconceiver, says: "MIT lets anyone make a new program from the source and pass it on, keeping its notice", value: "MIT lets anyone make a new program from the source and pass it on, keeping its notice", confidence: 1, session: D:session/session-2}
+  - id: D:question/confidential-the-owner-as-transconceiver
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:50:00Z, by: transconceiver, says: "nothing reached the fixture in confidence: tally is a public test fixture", value: "nothing reached the fixture in confidence: tally is a public test fixture", confidence: 1, session: D:session/session-2}
+  - id: D:question/programs-the-owner-as-transconceiver
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:50:00Z, by: transconceiver, says: "tally, in Go, in Rust and in Python, the round trip", value: "tally, in Go, in Rust and in Python, the round trip", confidence: 1, session: D:session/session-2}
+  - id: D:question/attribution-the-owner-as-transconceiver
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:50:00Z, by: transconceiver, says: "tally's MIT notice and its holder's credit, as tally/LICENSE gives them", value: "tally's MIT notice and its holder's credit, as tally/LICENSE gives them", confidence: 1, session: D:session/session-2}

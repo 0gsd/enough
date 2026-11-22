@@ -26,9 +26,7 @@
       "standing R:licence/mit (tally.0-kept.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.0-kept.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.0-kept.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -144,9 +142,7 @@
       "standing R:licence/mit (tally.0-kept.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.0-kept.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.0-kept.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -292,9 +288,7 @@
       "standing R:licence/mit (tally.0-kept.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.0-kept.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.0-kept.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -440,9 +434,7 @@
       "standing R:licence/mit (tally.1-grounded.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.1-grounded.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.1-grounded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -605,9 +597,7 @@
       "standing R:licence/mit (tally.1-grounded.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.1-grounded.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.1-grounded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -856,9 +846,7 @@
       "standing R:licence/mit (tally.1-grounded.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.1-grounded.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.1-grounded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -1107,9 +1095,7 @@
       "standing R:licence/mit (tally.2-asked.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.2-asked.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.2-asked.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -1350,9 +1336,7 @@
       "standing R:licence/mit (tally.2-asked.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.2-asked.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.2-asked.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -1679,9 +1663,7 @@
       "standing R:licence/mit (tally.2-asked.fabulac.cosm): the licence's lane (open, bound, closed) is recorded",
       "standing tally.2-asked.fabulac.cosm: no R:maker of capacity transconceiver: name who rules, or say ruled-by: none"
      ],
-     "warnings": [
-      "standing tally.2-asked.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2005,11 +1987,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.3-settled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2092,11 +2072,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.3-settled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2187,11 +2165,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.3-settled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2282,11 +2258,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.4-asked-again.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2369,11 +2343,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.4-asked-again.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2464,11 +2436,9 @@
     "standing": {
      "state": "fails",
      "errors": [
-      "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
+      "standing R:maker/the-owner-as-transconceiver (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered"
      ],
-     "warnings": [
-      "standing tally.4-asked-again.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2559,9 +2529,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.5-ruled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2644,9 +2612,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.5-ruled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2737,9 +2703,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.5-ruled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2830,9 +2794,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.6-weighed-go.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -2915,9 +2877,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.6-weighed-go.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3008,9 +2968,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.6-weighed-go.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3101,9 +3059,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.7-weighed.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3186,9 +3142,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.7-weighed.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3279,9 +3233,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.7-weighed.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3372,9 +3324,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3457,9 +3407,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3548,9 +3496,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3639,9 +3585,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3724,9 +3668,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3815,9 +3757,7 @@
     "standing": {
      "state": "holds",
      "errors": [],
-     "warnings": [
-      "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-     ],
+     "warnings": [],
      "notes": []
     },
     "ground-given": {
@@ -3880,6 +3820,768 @@
     }
    },
    "says": "not ready to entail in rust"
+  }
+ },
+ "inputs/tally.9-fixed.fabulac.cosm": {
+  "ready-to-keep": {
+   "gate": "ready-to-keep",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "cases-cover tally.9-fixed.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
+     ],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-fixed.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
+     ],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to keep"
+  },
+  "ready-to-entail go": {
+   "gate": "ready-to-entail",
+   "language": "go",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "cases-cover tally.9-fixed.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
+     ],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-fixed.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in go"
+  },
+  "ready-to-entail rust": {
+   "gate": "ready-to-entail",
+   "language": "rust",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [
+      "cases-cover tally.9-fixed.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
+     ],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.9-fixed.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in rust"
+  }
+ },
+ "inputs/tally.10-recorded.fabulac.cosm": {
+  "ready-to-keep": {
+   "gate": "ready-to-keep",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to keep"
+  },
+  "ready-to-entail go": {
+   "gate": "ready-to-entail",
+   "language": "go",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in go"
+  },
+  "ready-to-entail rust": {
+   "gate": "ready-to-entail",
+   "language": "rust",
+   "holds": false,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "target-confirmed"
+   ],
+   "do-not-hold": [
+    "round-trip"
+   ],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "fails",
+     "errors": [
+      "round-trip tally.10-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+     ],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "not ready to entail in rust"
+  }
+ },
+ "inputs/tally.11-judged.fabulac.cosm": {
+  "ready-to-keep": {
+   "gate": "ready-to-keep",
+   "holds": true,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "round-trip"
+   ],
+   "do-not-hold": [],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "ready to keep"
+  },
+  "ready-to-entail go": {
+   "gate": "ready-to-entail",
+   "language": "go",
+   "holds": true,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "round-trip",
+    "target-confirmed"
+   ],
+   "do-not-hold": [],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "ready to entail in go"
+  },
+  "ready-to-entail rust": {
+   "gate": "ready-to-entail",
+   "language": "rust",
+   "holds": true,
+   "purpose": "transconception",
+   "kept-unruled": false,
+   "hold": [
+    "standing",
+    "ground-given",
+    "ground-cited",
+    "stands-alone",
+    "nothing-carried",
+    "case-outside",
+    "cases-cover",
+    "ruled",
+    "round-trip",
+    "target-confirmed"
+   ],
+   "do-not-hold": [],
+   "not-measured": [],
+   "checks": {
+    "standing": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-given": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ground-cited": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "stands-alone": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "nothing-carried": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "case-outside": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "cases-cover": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "ruled": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "round-trip": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    },
+    "target-confirmed": {
+     "state": "holds",
+     "errors": [],
+     "warnings": [],
+     "notes": []
+    }
+   },
+   "says": "ready to entail in rust"
   }
  }
 }

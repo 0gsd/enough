@@ -23,14 +23,14 @@ Made by `python tests/make_tally_transconception.py` (every run id and clock pin
 
 | # | made by | stage file (in `inputs/`) |
 |---|---|---|
-| 0 | the maker: tally's fabulac with `purpose: transconception`, nothing else | `tally.0-kept.fabulac.cosm` |
-| 1 | `ground-the-fabulac` (`2026-11-18-1200-a901`), rules: 56 reliances and an assumption | `tally.1-grounded.fabulac.cosm` |
+| 0 | the maker: tally's fabulac with `purpose: transconception` and `source.obtained: own`, nothing else | `tally.0-kept.fabulac.cosm` |
+| 1 | `ground-the-fabulac` (`2026-11-22-1200-a901`), rules: 56 reliances and an assumption | `tally.1-grounded.fabulac.cosm` |
 | - | `hand-out-the-cases` (`…-a902`), rules: the cases file again, its rulings derived (`outputs/cases.md`) | |
 | 2 | `raise-the-questions` (`…-a903`): who rules, the lane, five batched ruling questions over 78 items | `tally.2-asked.fabulac.cosm` |
-| - | the first sitting, simulated | `tally.2-asked.fabulac.answers-2026-11-18-1230.cosm` |
+| - | the first sitting, the owner's (2026-11-22) | `tally.2-asked.fabulac.answers-2026-11-22-1230.cosm` |
 | 3 | `settle-the-answers` (`…-a904`) | `tally.3-settled.fabulac.cosm` |
 | 4 | `raise-the-questions` (`…-a905`): the transconceiver's five statements | `tally.4-asked-again.fabulac.cosm` |
-| - | the second sitting, simulated | `tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm` |
+| - | the second sitting, the owner's (2026-11-22) | `tally.4-asked-again.fabulac.answers-2026-11-22-1250.cosm` |
 | 5 | `settle-the-answers` (`…-a906`) | `tally.5-ruled.fabulac.cosm` |
 | 6 | `weigh-a-target` in go (`…-a907`): feasible-with, the option reader a gap | `tally.6-weighed-go.fabulac.cosm` |
 | 7 | `weigh-a-target` in rust (`…-a908`): feasible-with, whole numbers without limit and the option reader | `tally.7-weighed.fabulac.cosm` |
@@ -41,22 +41,40 @@ Made by `python tests/make_tally_transconception.py` (every run id and clock pin
 ## Recorded, simulated, never claimed
 
 - **Recorded as it ran**: every rule (ground, the cases, the questions, settling, landing, the lint, the gates).
-- **The sittings are simulated.** Nobody sat. Every ruling question is answered "as proposed" (`kept`, for an item
-  never ruled); the lane `open` (tally is MIT); who rules "nobody: a transconceiver simulated for the conformance
-  fixture of 0.8"; the five statements from tally's own files, each saying "(simulated)". Each answers volume's
-  session says it is simulated. tally's own open questions of 2026-11-05 are left open.
+- **The sittings are the owner's.** Simulated in 0.8. Ruled by the owner on 2026-11-22, by questionnaire:
+  "Confirm all". Every ruling question is answered "as proposed" (`kept`, for an item never ruled). The lane is
+  `open` (tally is MIT). Who rules: "the owner, as transconceiver" (`R:maker/the-owner-as-transconceiver`). The five
+  statements are read from tally's own files, and the programs are "tally, in Go, in Rust and in Python, the round
+  trip". Each answers volume's session names the owner. tally's own open questions of 2026-11-05 are left open.
 - **The model is a recorded fake** (`engine: model:scripted`): the weighings (2 on every point a model answers, a row
   `written` for what no ground entry answers), the layouts (one file for every interface) and the cshorts' files
   (empty stubs, each saying it was never built). No model was asked anything.
 - **The spikes are simulated.** There is no Go or Rust build of tally and no spike of it. `inputs/spikes/*.json` are
   verdicts written, not judged, each with `simulated` saying so and no finding; they let the path reach
   `target-confirmed`. Stage 7 records the gates before them (level 0: target-confirmed does not hold).
-- **No evidence is claimed.** Each cshort's entry says `evidence: []`: not judged. Nothing was built or run. The round
-  trip is not claimed either: there is no N:target in Python and tally's Python cshort of 2026-11-05 was never
-  judged, so `round-trip` fails on every stage and neither gate holds, as `recorded/gates.json` says. The trial of
-  2026-11-05 judged a TypeScript and a Swift tally, never Go or Rust; its 18 recorded steps are in the cases file and
-  judge nothing here. `keep-the-record` and `keep-the-verdict` (Thym 20.10) are not in the suite: there is no
-  recording of tally and no verdict on a cshort of it to gather.
+- **No evidence is claimed for Go or Rust.** Each cshort's entry says `evidence: []`: not judged. Nothing was built
+  or run in either. Gate 2 holds on the judged stage only because the simulated spikes let `target-confirmed` hold.
+  The trial of 2026-11-05 judged a TypeScript and a Swift tally, never Go or Rust.
+
+## The round trip (0.9)
+
+tally was recorded outside enough, and two Python rebuilds of it were judged. All of it was done in the sandbox by an
+agent (lane T1, 2026-11-22; `outside/README.md` says how). Each rebuild was written blind by a fresh agent, from
+one fabulac file alone. The maker reads `outside/` and writes three more stages after `tally.fabulac.cosm`, never
+over it:
+
+| # | made by | stage file (in `inputs/`) |
+|---|---|---|
+| 9 | the maker: the fabulac's words on `undoes` fixed (the owner: "The fabulac slipped: fix it"), each item saying so in `provenance.fixed` | `tally.9-fixed.fabulac.cosm` |
+| 10 | the maker: the round trip's target (`N:target/python`, not weighed), its `shorts` entry, the 53 recorded cases as outside `P:case` items (`trial-a1` …), and the owner's ruling of B7 (the help screens' words: `free`) | `tally.10-recorded.fabulac.cosm` |
+| 11 | the maker: the second round trip's verdict read into its evidence (`tc.fold_verdict`) | `tally.11-judged.fabulac.cosm` |
+
+The first rebuild was made from `tally.fabulac.cosm`. It agreed on 184 of 189 steps. It differed on B7's help words
+and on E1's `undoes` with blank lines, where the fabulac's words were wrong. It is kept in `outside/first-round-trip/`
+and is not gathered. The second rebuild was made from stage 9 and judged with the owner's ruling of B7. It agrees on
+185 of 185 counted steps and passes, with B7's four steps shown as ruled differences. Its evidence stands at level 3,
+and gate 1 says "ready to keep" on stage 11, with all nine checks holding. `tests/test_transconception_fixture.py`
+holds that.
 
 ## Passing
 

@@ -1,0 +1,60 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-22-1307-0785
+name: ground-the-fabulac on tally
+program:
+  name: ground-the-fabulac
+  sha256: ad5f48cea4e3f63a2e39e01ab662e0c03af4d3bb5f16b3deba30ddd1d2dc740b
+inputs:
+- name: repo
+  type: folder
+  path: inputs/tally
+  sha256: ''
+  files: 0
+  bytes: 0
+- name: f
+  type: fabula
+  path: inputs/tally.0-kept.fabulac.cosm
+  sha256: dd8ea3c246a5ce6910cdb960384fed487e6130010bc12e53738e9088464e215f
+estimate:
+  steps: 1
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-22-1307-0785
+  type: plan
+  name: ground-the-fabulac on tally
+  summary: One node, none of which asks the model.
+  nodes:
+  - R:node/1
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: ground repo with f
+  summary: one reliance per ground entry the syntax shows
+  step:
+    program: ground-the-fabulac
+    n: 1
+  move: ground
+  asks: false
+  takes:
+  - repo
+  - f
+  gives: g
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 11
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym#L11
+    confidence: 1

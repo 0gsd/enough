@@ -1,0 +1,486 @@
+engine: dialectic.thym_question
+inputs:
+  call: 0264a29168c3e5172383866065051d1c68534509623316ec323baf0fae4f9e90
+keys: []
+tokens: 0
+seconds: 0
+output:
+  questions:
+  - id: D:question/modelled-on
+    type: question
+    about: I
+    asks: What existing tool or program was this modelled on, or made to replace?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/modelled-on
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/intended-add
+    type: question
+    about: C:behaviour/add#intended
+    asks: 'Is this behaviour intended, or an accident users now rely on: An add appends and reports?'
+    why: intent
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/intended
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/intended-undo
+    type: question
+    about: C:behaviour/undo#intended
+    asks: 'Is this behaviour intended, or an accident users now rely on: Undo walks back?'
+    why: intent
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/intended
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/intended-read
+    type: question
+    about: C:behaviour/read#intended
+    asks: 'Is this behaviour intended, or an accident users now rely on: Reading the ledger?'
+    why: intent
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/intended
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/intended-errors
+    type: question
+    about: C:behaviour/errors#intended
+    asks: 'Is this behaviour intended, or an accident users now rely on: Errors and exit status?'
+    why: intent
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/intended
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/bad-input-command-tally
+    type: question
+    about: C:interface/command.tally
+    asks: What should tally do with input it does not expect?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/bad-input
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/bad-input-command-add
+    type: question
+    about: C:interface/command.add
+    asks: What should tally add do with input it does not expect?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/bad-input
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/bad-input-command-show
+    type: question
+    about: C:interface/command.show
+    asks: What should tally show do with input it does not expect?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/bad-input
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/bad-input-tally-ledger-totals
+    type: question
+    about: C:interface/tally.ledger.totals
+    asks: What should totals do with input it does not expect?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/bad-input
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/bad-input-tally-render-rows
+    type: question
+    about: C:interface/tally.render.rows
+    asks: What should rows do with input it does not expect?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/bad-input
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/settings-tally-file
+    type: question
+    about: C:setting/tally-file
+    asks: Is TALLY_FILE meant to be changed by users?
+    why: unsure
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/settings
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/settings-bar-width
+    type: question
+    about: C:setting/bar-width
+    asks: Is BAR_WIDTH and BAR meant to be changed by users?
+    why: unsure
+    kind: yes-no
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/settings
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/changed-first-release
+    type: question
+    about: R:change/first-release#because
+    asks: 'Why was this change made: add and show, totals in one file?'
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/changed
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/changed-undo-added
+    type: question
+    about: R:change/undo-added#because
+    asks: 'Why was this change made: undo?'
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/changed
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/changed-tally-file
+    type: question
+    about: R:change/tally-file#because
+    asks: 'Why was this change made: TALLY_FILE?'
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/changed
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/worry
+    type: question
+    about: P
+    asks: Which test, if it failed, would worry you most, and why?
+    why: intent
+    kind: text
+    to: maker
+    raised:
+      by: bank
+      from: fabulac/worry
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/who-rules
+    type: question
+    about: R
+    asks: 'Who will rule what the next program keeps of tally: someone who made it, maintains it or knows it well?
+      Say who, and how they know it.'
+    why: missing
+    kind: text
+    to: transconceiver
+    raised:
+      by: bank
+      from: transconception-standing/who-rules
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/lane-mit
+    type: question
+    about: R:licence/mit#lane
+    asks: Do the terms of MIT let anyone make a new work from the source and pass it on (open), bind such a work
+      to the same terms (bound), or let the source be read and not made into a new work (closed)?
+    why: missing
+    kind: choice
+    options:
+    - open
+    - bound
+    - closed
+    to: transconceiver
+    raised:
+      by: bank
+      from: transconception-standing/lane
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/interface-command-tally
+    type: question
+    about: C:interface/command.tally#ruling
+    asks: 'Must the next program offer tally exactly as it is? Proposed: kept.'
+    why: missing
+    kind: choice
+    options:
+    - as proposed
+    - kept
+    - alike
+    - free
+    - kept-wrong
+    - changed
+    hint: 'One answer rules all 14 alike, together: tally, tally add, tally show, tally undo, a ledger line, add,
+      and 8 more. Any one can be ruled again on its own later.'
+    to: transconceiver
+    batch:
+    - C:interface/command.add#ruling
+    - C:interface/command.show#ruling
+    - C:interface/command.undo#ruling
+    - C:interface/format.ledger-line#ruling
+    - C:interface/tally.ledger.add#ruling
+    - C:interface/tally.cli.main#ruling
+    - C:interface/tally.ledger.totals#ruling
+    - C:interface/tally.render.rows#ruling
+    - C:interface/tally.ledger.ledger_path#ruling
+    - C:interface/tally.ledger.read#ruling
+    - C:interface/tally.ledger.undo#ruling
+    - C:interface/tally.ledger.LedgerError#ruling
+    - C:interface/tally.render.empty_message#ruling
+    proposed:
+      is: kept
+    raised:
+      by: bank
+      from: transconception-rulings/interface
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/behaviour-undo
+    type: question
+    about: C:behaviour/undo#ruling
+    asks: 'Must the next program do exactly this: Undo walks back? Proposed: kept.'
+    why: missing
+    kind: choice
+    options:
+    - as proposed
+    - kept
+    - alike
+    - free
+    - kept-wrong
+    - changed
+    hint: 'One answer rules all 5 alike, together: Undo walks back, Reading the ledger, Errors and exit status,
+      Show draws bars, An add appends and reports. Any one can be ruled again on its own later.'
+    to: transconceiver
+    batch:
+    - C:behaviour/read#ruling
+    - C:behaviour/errors#ruling
+    - C:behaviour/show#ruling
+    - C:behaviour/add#ruling
+    proposed:
+      is: kept
+    raised:
+      by: bank
+      from: transconception-rulings/behaviour
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/reliance-whole-numbers-unbounded
+    type: question
+    about: C:reliance/whole-numbers-unbounded#ruling
+    asks: 'Must the next program keep what this gives: whole numbers without limit? Proposed: kept.'
+    why: missing
+    kind: choice
+    options:
+    - as proposed
+    - kept
+    - alike
+    - free
+    - kept-wrong
+    - changed
+    hint: 'One answer rules all 56 alike, together: whole numbers without limit, numbers written as text, which
+      values count as false, a map of keys to values, paths written the POSIX way, fractional numbers are binary
+      doubles, and 50 more. Any one can be ruled again on its own later.'
+    to: transconceiver
+    batch:
+    - C:reliance/number-as-text#ruling
+    - C:reliance/truth-of-values#ruling
+    - C:reliance/map-keeps-order#ruling
+    - C:reliance/path-written#ruling
+    - C:reliance/fractions-are-doubles#ruling
+    - C:reliance/what-is-a-space#ruling
+    - C:reliance/printed-form#ruling
+    - C:reliance/argparse-surface#ruling
+    - C:reliance/number-from-text#ruling
+    - C:reliance/conversions#ruling
+    - C:reliance/text-length-in-code-points#ruling
+    - C:reliance/text-order-by-code-point#ruling
+    - C:reliance/uncaught-error#ruling
+    - C:reliance/error-kinds#ruling
+    - C:reliance/exit-status-from-return#ruling
+    - C:reliance/clock-seconds#ruling
+    - C:reliance/json-written#ruling
+    - C:reliance/json-keys-sorted#ruling
+    - C:reliance/newlines-translated#ruling
+    - C:reliance/text-decoding-strict#ruling
+    - C:reliance/runtime-version#ruling
+    - C:reliance/run-as-module#ruling
+    - C:reliance/halves-round-to-even#ruling
+    - C:reliance/division-gives-fraction#ruling
+    - C:reliance/fraction-from-text#ruling
+    - C:reliance/sort-is-stable#ruling
+    - C:reliance/lines-end-at#ruling
+    - C:reliance/text-repeated#ruling
+    - C:reliance/format-spec#ruling
+    - C:reliance/any-all-stop-early#ruling
+    - C:reliance/set-members#ruling
+    - C:reliance/set-order-varies#ruling
+    - C:reliance/membership-identity-then-equality#ruling
+    - C:reliance/records-compare-by-fields#ruling
+    - C:reliance/lists-and-zip#ruling
+    - C:reliance/error-text#ruling
+    - C:reliance/chained-errors#ruling
+    - C:reliance/missing-key-error#ruling
+    - C:reliance/program-arguments#ruling
+    - C:reliance/argparse-help#ruling
+    - C:reliance/argparse-version#ruling
+    - C:reliance/argparse-abbreviation#ruling
+    - C:reliance/argparse-negative-numbers#ruling
+    - C:reliance/argparse-optional-positional#ruling
+    - C:reliance/argparse-subcommands#ruling
+    - C:reliance/environment-read#ruling
+    - C:reliance/terminal-width#ruling
+    - C:reliance/print-line-end#ruling
+    - C:reliance/output-encoding#ruling
+    - C:reliance/json-read#ruling
+    - C:reliance/home-and-tilde#ruling
+    - C:reliance/path-kinds#ruling
+    - C:reliance/make-folders#ruling
+    - C:reliance/file-created-mode#ruling
+    - C:reliance/pytest-conventions#ruling
+    proposed:
+      is: kept
+    raised:
+      by: bank
+      from: transconception-rulings/reliance
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/setting-tally-file
+    type: question
+    about: C:setting/tally-file#ruling
+    asks: 'Must the next program keep the setting TALLY_FILE as it is? Proposed: kept.'
+    why: missing
+    kind: choice
+    options:
+    - as proposed
+    - kept
+    - alike
+    - free
+    - kept-wrong
+    - changed
+    hint: 'One answer rules all 2 alike, together: TALLY_FILE, BAR_WIDTH and BAR. Any one can be ruled again on
+      its own later.'
+    to: transconceiver
+    batch:
+    - C:setting/bar-width#ruling
+    proposed:
+      is: kept
+    raised:
+      by: bank
+      from: transconception-rulings/setting
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/structure-tally-ledger-entry
+    type: question
+    about: C:structure/tally.ledger.Entry#ruling
+    asks: 'Must the next program keep the shape of Entry as it is? Proposed: kept.'
+    why: missing
+    kind: choice
+    options:
+    - as proposed
+    - kept
+    - alike
+    - free
+    - kept-wrong
+    - changed
+    to: transconceiver
+    proposed:
+      is: kept
+    raised:
+      by: bank
+      from: transconception-rulings/structure
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/first-need-roles-event
+    type: question
+    about: I:occasion/first-need#roles.event
+    asks: What problem or moment set tally going?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: move
+      from: question
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  - id: D:question/pytest-version
+    type: question
+    about: C:dependency/pytest#version
+    asks: Which pytest versions are the tests meant to run under?
+    why: missing
+    kind: text
+    to: maker
+    raised:
+      by: move
+      from: question
+      at: 2026-11-22 12:10:00+00:00
+      run: 2026-11-22-1210-a903
+    state: open
+  refused: []
+  skipped:
+  - source: fabulac/prompted
+    why: the volume holds what it would write already
+  - source: fabulac/for-whom
+    why: the volume holds what it would write already
+  - source: fabulac/never
+    why: the volume holds what it would write already
+  - source: fabulac/left-out
+    why: the volume holds what it would write already
+  - source: fabulac/first-read
+    why: the volume holds what it would write already
+  - source: fabulac/maintains
+    why: the volume holds what it would write already
+  - source: fabulac/must-keep
+    why: the volume holds what it would write already

@@ -36,9 +36,7 @@
    "ruled C:setting/bar-width (tally.0-kept.fabulac.cosm): carries no ruling: must the next program do exactly this?",
    "round-trip tally.0-kept.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
-  "warnings": [
-   "standing tally.0-kept.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-  ]
+  "warnings": []
  },
  "inputs/tally.1-grounded.fabulac.cosm": {
   "ok": false,
@@ -125,9 +123,7 @@
    "ruled C:reliance/pytest-conventions (tally.1-grounded.fabulac.cosm): carries no ruling: must the next program do exactly this?",
    "round-trip tally.1-grounded.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
-  "warnings": [
-   "standing tally.1-grounded.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-  ]
+  "warnings": []
  },
  "inputs/tally.2-asked.fabulac.cosm": {
   "ok": false,
@@ -292,29 +288,25 @@
    "ruled C:structure/tally.ledger.Entry (tally.2-asked.fabulac.cosm): D:question/structure-tally-ledger-entry asks for its ruling and stands open: a question skipped blocks the gate",
    "round-trip tally.2-asked.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
-  "warnings": [
-   "standing tally.2-asked.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded"
-  ]
+  "warnings": []
  },
  "inputs/tally.3-settled.fabulac.cosm": {
   "ok": false,
   "errors": [
-   "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered",
+   "standing R:maker/the-owner-as-transconceiver (tally.3-settled.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered",
    "round-trip tally.3-settled.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
   "warnings": [
-   "standing tally.3-settled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.3-settled.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
  "inputs/tally.4-asked-again.fabulac.cosm": {
   "ok": false,
   "errors": [
-   "standing R:maker/nobody-a-transconceiver-simulated-for-th (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered",
+   "standing R:maker/the-owner-as-transconceiver (tally.4-asked-again.fabulac.cosm): the transconceiver's statements (licence, lane, confidential, programs, attribution) are answered",
    "round-trip tally.4-asked-again.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
   "warnings": [
-   "standing tally.4-asked-again.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.4-asked-again.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
@@ -324,7 +316,6 @@
    "round-trip tally.5-ruled.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
   "warnings": [
-   "standing tally.5-ruled.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.5-ruled.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
@@ -335,7 +326,6 @@
    "target-confirmed N:target/go (tally.6-weighed-go.fabulac.cosm): the spike in go has not reached level 2"
   ],
   "warnings": [
-   "standing tally.6-weighed-go.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.6-weighed-go.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
@@ -347,7 +337,6 @@
    "target-confirmed N:target/rust (tally.7-weighed.fabulac.cosm): the spike in rust has not reached level 2"
   ],
   "warnings": [
-   "standing tally.7-weighed.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.7-weighed.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
@@ -357,7 +346,6 @@
    "round-trip tally.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
   "warnings": [
-   "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
  },
@@ -367,8 +355,28 @@
    "round-trip tally.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
   ],
   "warnings": [
-   "standing tally.fabulac.cosm: how the source came (source.obtained: public, permitted, own) is not recorded",
    "cases-cover tally.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
   ]
+ },
+ "inputs/tally.9-fixed.fabulac.cosm": {
+  "ok": false,
+  "errors": [
+   "round-trip tally.9-fixed.fabulac.cosm: no N:target in the source language (python): the round trip is entailed for it"
+  ],
+  "warnings": [
+   "cases-cover tally.9-fixed.fabulac.cosm: 0 of 5 behaviours ruled kept are the subject of an outside case (0%); not: C:behaviour/add, C:behaviour/undo, C:behaviour/read, C:behaviour/show, C:behaviour/errors"
+  ]
+ },
+ "inputs/tally.10-recorded.fabulac.cosm": {
+  "ok": false,
+  "errors": [
+   "round-trip tally.10-recorded.fabulac.cosm: no cshort in python stands at level 2 or more by its evidence"
+  ],
+  "warnings": []
+ },
+ "inputs/tally.11-judged.fabulac.cosm": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
  }
 }

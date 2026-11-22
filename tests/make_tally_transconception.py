@@ -7,28 +7,30 @@ What is recorded and what is simulated (the fixture's README says the same):
 
 - **Rules** (recorded as they ran, no model): ground, the cases file, the questions a transconceiver is asked, the
   settling, the landing, the gates, the checks.
-- **The sittings are simulated** (two, as the dialectic asks: the transconceiver's statements are asked only once
-  there is a transconceiver): every ruling question is answered "as proposed" (`kept`, for an item never ruled), the
-  lane `open` (tally is MIT), who rules "nobody: a transconceiver simulated…", and the five statements from tally's
-  own files, each saying "(simulated)". Each answers volume's session says it is simulated. tally's own open
-  questions of 2026-11-05 are left open.
+- **The sittings are the owner's** (two, as the dialectic asks: the transconceiver's statements are asked only once
+  there is a transconceiver), ruled 2026-11-22 by questionnaire ("Confirm all"; simulated in 0.8): every ruling
+  question answered "as proposed" (`kept`, for an item never ruled), the lane `open` (tally is MIT), who rules "the
+  owner, as transconceiver", and the five statements. Each answers volume's session says so. tally's own open
+  questions of 2026-11-05 are left open. `source.obtained` is `own` (tally is the owner's own code).
 - **The model is a recorded fake** (`engine: model:scripted`): the weighings' scores (2 on every point a model
   answers), the layouts and the cshorts' files (stubs, saying so). No model was asked anything.
 - **The spikes are simulated**: there is no Go or Rust build of tally, nor any spike of it. Each spike's verdict is a
   file written here, marked `simulated`, with no finding; it lets the path reach `target-confirmed`. The gates are
   recorded before it (level 0: target-confirmed does not hold) and after it.
-- **No evidence is claimed**: each cshort's entry says `evidence: []` (not judged). Nothing was built or run. The
-  round trip is not claimed either (no N:target in Python), so `round-trip` fails on every stage and neither gate
-  holds: tally's Python cshort of 2026-11-05 was never judged. The trial of 2026-11-05 judged a TypeScript and a
-  Swift tally, never Go or Rust; its 18 recorded steps are in the cases file and judge nothing here.
+- **No evidence is claimed for Go or Rust**: each cshort's entry says `evidence: []` (not judged). Nothing was built
+  or run in either.
+- **The round trip is recorded outside and judged** (lane T1, 0.9; `outside/`): tally recorded in the sandbox, the
+  fabulac's words on `undoes` fixed on the owner's word, a fresh agent's blind Python rebuild judged against the
+  recording, the owner's ruling of case B7 among the judge's rulings. Gate 1 holds on the judged stage.
 
 Run: `python tests/make_tally_transconception.py [DEST]` (default the fixture folder). It writes the made parts
-whole (`programs/ expected/ replay/ inputs/ landed/ recorded/`; the README and `tally.cases.json` are kept), every
+whole (`programs/ expected/ replay/ inputs/ landed/ recorded/`; the README, `tally.cases.json` and `outside/` are kept), every
 run id and clock pinned, so making it again gives the same bytes but for each recorded run's plan and trace, which
 carry the wall clock (`tests/test_transconception_fixture.py` holds that). Re-make it, never hand-edit it.
 """
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import hashlib
 import json
@@ -60,8 +62,8 @@ CASES = FIX / "transconception" / "tally" / "tally.cases.json"   # W2-X4's, from
 DEST = FIX / "transconception" / "tally"
 
 UTC = dt.timezone.utc
-SIMULATED_SITTING = ("simulated for the conformance fixture: nobody sat; each ruling is answered as proposed, the "
-                     "rest from tally's own files")
+OWNERS_SITTING = ("the owner, as transconceiver, by questionnaire in the 0.9 build, 2026-11-22 (the conductor's "
+                  "relay of the owner's answers to lane T1's sheet): \"Confirm all\"")
 SIMULATED_SPIKE = ("simulated for the conformance fixture: there is no {title} build of tally and no spike of it; "
                    "this verdict was written, not judged, so that the path reaches target-confirmed")
 LANGUAGES = (("go", "Go"), ("rust", "Rust"))
@@ -80,6 +82,9 @@ WEIGHED_GO = "tally.6-weighed-go.fabulac.cosm"
 WEIGHED = "tally.7-weighed.fabulac.cosm"     # weighed in Go and in Rust (each spike at level 0)
 FINAL = "tally.fabulac.cosm"                 # each spike's level read from its simulated verdict: what entailing takes
 STAGES = (KEPT, GROUNDED, ASKED, SETTLED, ASKED_AGAIN, RULED, WEIGHED_GO, WEIGHED, FINAL)
+FIXED = "tally.9-fixed.fabulac.cosm"         # FINAL with the words on undoes fixed (the owner's word, 2026-11-22)
+RECORDED = "tally.10-recorded.fabulac.cosm"  # FIXED, the round trip's target, the recorded cases as outside items
+JUDGED = "tally.11-judged.fabulac.cosm"      # RECORDED with the round trip's verdict gathered (lane T1, 0.9)
 
 # ---------------------------------------------------------------------------
 # The programs: the text's own
@@ -112,50 +117,50 @@ PROGRAMS: dict[str, str] = {   # each the text's own (Thym 20.10, 20.6, 22.4), u
 }
 
 def _at(h: int, m: int) -> dt.datetime:
-    return dt.datetime(2026, 11, 18, h, m, tzinfo=UTC)
+    return dt.datetime(2026, 11, 22, h, m, tzinfo=UTC)
 
 
 # The path, in order. A run: ("run", program, run id, clock, {input: (type, path)}, rules only, {give: stage file});
 # a host step: ("host", what, clock). `{answers-1}` and `{answers-2}` are the sittings' answers volumes.
 PATH: list[tuple] = [
-    ("run", "ground-the-fabulac", "2026-11-18-1200-a901", _at(12, 0),
+    ("run", "ground-the-fabulac", "2026-11-22-1200-a901", _at(12, 0),
      {"repo": ("folder", "inputs/tally"), "f": ("fabula", f"inputs/{KEPT}")}, True, {"g": GROUNDED}),
-    ("run", "hand-out-the-cases", "2026-11-18-1205-a902", _at(12, 5), {"f": ("fabula", f"inputs/{GROUNDED}")}, True,
+    ("run", "hand-out-the-cases", "2026-11-22-1205-a902", _at(12, 5), {"f": ("fabula", f"inputs/{GROUNDED}")}, True,
      {}),
-    ("run", "raise-the-questions", "2026-11-18-1210-a903", _at(12, 10), {"f": ("fabula", f"inputs/{GROUNDED}")}, True,
+    ("run", "raise-the-questions", "2026-11-22-1210-a903", _at(12, 10), {"f": ("fabula", f"inputs/{GROUNDED}")}, True,
      {"g": ASKED}),
     ("host", "sitting-1", _at(12, 30)),
-    ("run", "settle-the-answers", "2026-11-18-1240-a904", _at(12, 40),
+    ("run", "settle-the-answers", "2026-11-22-1240-a904", _at(12, 40),
      {"f": ("fabula", f"inputs/{ASKED}"), "said": ("volume", "inputs/{answers-1}")}, True, {"g": SETTLED}),
-    ("run", "raise-the-questions", "2026-11-18-1245-a905", _at(12, 45), {"f": ("fabula", f"inputs/{SETTLED}")}, True,
+    ("run", "raise-the-questions", "2026-11-22-1245-a905", _at(12, 45), {"f": ("fabula", f"inputs/{SETTLED}")}, True,
      {"g": ASKED_AGAIN}),
     ("host", "sitting-2", _at(12, 50)),
-    ("run", "settle-the-answers", "2026-11-18-1255-a906", _at(12, 55),
+    ("run", "settle-the-answers", "2026-11-22-1255-a906", _at(12, 55),
      {"f": ("fabula", f"inputs/{ASKED_AGAIN}"), "said": ("volume", "inputs/{answers-2}")}, True, {"g": RULED}),
-    ("run", "weigh-a-target", "2026-11-18-1300-a907", _at(13, 0),
+    ("run", "weigh-a-target", "2026-11-22-1300-a907", _at(13, 0),
      {"f": ("fabula", f"inputs/{RULED}"), "language": ("string", "inputs/go.txt")}, False, {"g": WEIGHED_GO}),
-    ("run", "weigh-a-target", "2026-11-18-1310-a908", _at(13, 10),
+    ("run", "weigh-a-target", "2026-11-22-1310-a908", _at(13, 10),
      {"f": ("fabula", f"inputs/{WEIGHED_GO}"), "language": ("string", "inputs/rust.txt")}, False, {"g": WEIGHED}),
     ("host", "spikes", _at(13, 30)),
-    ("run", "entail-in-a-language", "2026-11-18-1400-a909", _at(14, 0),
+    ("run", "entail-in-a-language", "2026-11-22-1400-a909", _at(14, 0),
      {"f": ("fabula", f"inputs/{FINAL}"), "language": ("string", "inputs/go.txt")}, False, {}),
-    ("run", "entail-in-a-language", "2026-11-18-1410-a910", _at(14, 10),
+    ("run", "entail-in-a-language", "2026-11-22-1410-a910", _at(14, 10),
      {"f": ("fabula", f"inputs/{FINAL}"), "language": ("string", "inputs/rust.txt")}, False, {}),
 ]
-LANDED_STAMP = {"go": "2026-11-18-1400", "rust": "2026-11-18-1410"}
+LANDED_STAMP = {"go": "2026-11-22-1400", "rust": "2026-11-22-1410"}
 
-# The simulated sittings' answers. The first: every ruling as proposed (`kept`, for an item never ruled), the lane
-# read from the licence tally names (MIT lets anyone make a new work and pass it on: open), and who rules. The
-# second: the transconceiver's five statements, each read from tally's own files.
-WHO_RULES = ("nobody: a transconceiver simulated for the conformance fixture of 0.8; no person ruled tally's "
-             "transconception")
+# The two sittings' answers, the owner's (2026-11-22, by questionnaire, lane T1's sheet: "Confirm all"). The first:
+# every ruling as proposed (`kept`, for an item never ruled), the lane `open` (tally is MIT), and who rules: the
+# owner, as transconceiver (named as 0.8's pins 21 named the role for Thym). The second: the transconceiver's five
+# statements, as the sheet proposed them, confirmed. Until 0.9 both sittings were simulated.
+WHO_RULES = "the owner, as transconceiver"
 LANE = "open"
 STATEMENTS = {
-    "licence": "MIT, as tally/LICENSE says (simulated)",
-    "lane-said": "MIT lets anyone make a new program from the source and pass it on, keeping its notice (simulated)",
-    "confidential": "nothing reached the fixture in confidence: tally is a public test fixture (simulated)",
-    "programs": "tally, in Go and in Rust (simulated)",
-    "attribution": "tally's MIT notice and its holder's credit, as tally/LICENSE gives them (simulated)",
+    "licence": "MIT, as tally/LICENSE says",
+    "lane-said": "MIT lets anyone make a new program from the source and pass it on, keeping its notice",
+    "confidential": "nothing reached the fixture in confidence: tally is a public test fixture",
+    "programs": "tally, in Go, in Rust and in Python, the round trip",
+    "attribution": "tally's MIT notice and its holder's credit, as tally/LICENSE gives them",
 }
 
 
@@ -245,6 +250,15 @@ class FakeModel:
 # Making the folder
 # ---------------------------------------------------------------------------
 
+def kept_text(text: str) -> str:
+    """tally's fabulac kept for transconception: `purpose` set, and how the source came (`source.obtained: own`, the
+    owner's answer of 2026-11-22: tally is the owner's own code); nothing else."""
+    text = text.replace("flavour: fabulac\n", "flavour: fabulac\npurpose: transconception\n", 1)
+    if "licence: MIT}" not in text:
+        raise RuntimeError("tally's fabulac no longer ends its source with licence: MIT}")
+    return text.replace("licence: MIT}", "licence: MIT, obtained: own}", 1)
+
+
 def _write(p: Path, text: str) -> None:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text, encoding="utf-8")
@@ -313,10 +327,10 @@ def _sitting(dest: Path, asked_name: str, at: dt.datetime) -> str:
         elif key in STATEMENTS:
             answers.append({"question": q["id"], "says": STATEMENTS[key]})
         else:
-            raise RuntimeError(f"the simulated sitting has no answer for {q['id']} ({bank})")
+            raise RuntimeError(f"the sitting has no answer for {q['id']} ({bank})")
     if not answers:
         raise RuntimeError(f"nothing to answer in {asked_name}")
-    av = dl.answers_delta(tw, answers, session={"with": {"to": "transconceiver", "who": SIMULATED_SITTING}}, at=at)
+    av = dl.answers_delta(tw, answers, session={"with": {"to": "transconceiver", "who": OWNERS_SITTING}}, at=at)
     path = dl.answers_path(asked, at=at)
     _write(path, dl.write_answers_volume(av))
     return path.name
@@ -353,6 +367,200 @@ def _land(dest: Path, entailed: dict) -> None:
                             layout=t.values["arrangement"].text(), cshort=files, entry=code.origin["entry"])
 
 
+# ---------------------------------------------------------------------------
+# The round trip (lane T1, 0.9): recorded outside enough, rebuilt blind, judged
+# ---------------------------------------------------------------------------
+#
+# The recording, the rebuilds, their runs and their verdicts were made outside enough, in the sandbox, and are kept
+# in `outside/` (the maker reads them, never makes them; `outside/README.md` says how they were made). From them the
+# maker writes three stages beside the path, after FINAL, never over it (the entailing runs above take FINAL):
+#
+# - FIXED: FINAL with the fabulac's words on `undoes` corrected to what the original does (the owner, 2026-11-22:
+#   "The fabulac slipped: fix it"), each corrected item saying so in `provenance.fixed`: a fix, not a ruling;
+# - RECORDED: FIXED with the round trip's target (`N:target/python`, the source language, not weighed), the round
+#   trip's `shorts` entry (no evidence yet), the recorded cases as outside `P:case` items, and the owner's ruling of
+#   case B7 (the help screens' words: "Free");
+# - JUDGED: RECORDED with the second round trip's verdict read into its evidence (`tc.fold_verdict`).
+#
+# The first round trip (from FINAL, before the fix) is kept in `outside/first-round-trip/` as the record of what
+# found the slip; it is judged but not gathered.
+
+OUTSIDE = DEST / "outside"
+ROUNDTRIP = "py-roundtrip"
+ROUNDTRIP_AT = "2026-11-22T16:00"
+ROUNDTRIP_BY = ("a fresh agent (model opus, lane T1 of the 0.9 build) that had not seen tally's source nor any "
+                f"earlier rebuild, from inputs/{FIXED} alone")
+JUDGE_BY = "the judge (tools/transconception/harness.py), run by an agent in the sandbox (lane T1; 0.8 pins 9, 21)"
+OWNER = "R:maker/the-owner-as-transconceiver"
+RULED_ON = "2026-11-22"
+#: The fix: for each item, the field, the words as decompiled, and the words corrected.
+FIX_WORDS = {
+    "C:interface/format.ledger-line": (
+        "signature",
+        '["undoes": <int, a line number from 1>]',
+        '["undoes": <int, the cancelled entry\'s place among the ledger\'s entries, from 1, blank lines not '
+        'counted>]'),
+    "C:structure/tally.ledger.Entry": (
+        "fields[undoes].means",
+        "on an undo, the line number (from 1, counting blank lines) of the entry it cancels",
+        "on an undo, the place (from 1) of the entry it cancels among the entries read, blank lines not counted"),
+    "C:behaviour/undo": (
+        "does",
+        "Reads every entry; collects the line numbers that undo entries name; from the last entry to the first, takes "
+        "the first that has no undoes and is not named; appends {name, delta: -delta, undoes: its line};",
+        "Reads every entry; collects the places that undo entries name; from the last entry to the first, takes the "
+        "first that has no undoes and whose place (from 1, among the entries read, blank lines not counted) is not "
+        "named; appends {name, delta: -delta, undoes: its place};"),
+    "N:decision/undo-by-opposite": (
+        "chose",
+        "append an entry with the opposite delta and undoes set to the cancelled line's number",
+        "append an entry with the opposite delta and undoes set to the cancelled entry's place among the entries"),
+}
+#: The same slip in the items' summaries, corrected with them.
+FIX_SUMMARY = {
+    "C:behaviour/undo": [("appends its opposite naming its line.",
+                          "appends its opposite naming its place among the entries.")],
+    "N:decision/undo-by-opposite": [("names that entry's line, instead", "names that entry's place, instead")],
+}
+FIX_WHY = ("the owner, 2026-11-22: \"The fabulac slipped: fix it\". The original names the cancelled entry's place "
+           "among the entries read (blank lines skipped), not its line in the file; the first blind round trip "
+           "followed the decompiled words and differed on case E1 (outside/first-round-trip/)")
+B7_RULING = {"is": "free", "steps": [0, 1, 2, 3], "because": "the help screen's words are the new program's own",
+             "by": OWNER, "on": RULED_ON, "said": "Free"}
+#: What each command a step drives exercises, by rule; a step that exits other than 0 also exercises the errors.
+STEP_BEHAVIOURS = {"add": ["C:behaviour/add", "C:behaviour/read"], "undo": ["C:behaviour/undo", "C:behaviour/read"],
+                   "show": ["C:behaviour/show", "C:behaviour/read"]}
+
+
+def _target_python() -> dict:
+    return {"id": "N:target/python", "type": "target", "name": "python",
+            "summary": "A transconception of tally into python: the round trip, the source language again, to test "
+                       "the fabulac alone.",
+            "stance": "observed", "language": "python", "weighed": "not weighed (the source language)",
+            "provenance": {"mode": "manual", "confidence": 1, "state": "known",
+                           "sources": ["outside/README.md"]},
+            "made": {"move": "hand", "run": "T1-2026-11-22", "engine": "rules"}}
+
+
+def targeted(data: dict) -> dict:
+    """FINAL with the round trip's target and its `shorts` entry (no evidence): what the recording's cases file
+    was handed out from."""
+    out = copy.deepcopy(data)
+    out["shorts"] = list(out.get("shorts") or []) + [{
+        "path": f"../outside/{ROUNDTRIP}/", "at": ROUNDTRIP_AT, "by": ROUNDTRIP_BY, "mode": "model",
+        "order": "code", "language": "python", "entailed": "apart", "target": "N:target/python"}]
+    out["nodes"] = list(out["nodes"]) + [_target_python()]
+    return out
+
+
+def handed_out(data: dict) -> str:
+    """The cases file the recorder ran on: `entail f as cases`'s rule (`tc.cases_document`) over the targeted
+    fabulac and the cases file beside it."""
+    cat = {k: v for k, v in data.items() if k != "nodes"}
+    doc, _ = tc.cases_document(cat, data["nodes"], existing=json.loads(CASES.read_text(encoding="utf-8")))
+    return tc.dump_cases(doc)
+
+
+def _case_item(case: dict) -> dict:
+    """One recorded case as an outside `P:case` item: of the interface it drives and, by rule, the behaviours its
+    steps exercise (STEP_BEHAVIOURS), its steps and the original's recorded results."""
+    steps = case["steps"]
+    exp = case["expect"]["steps"]
+    of = [f"C:interface/{case['of']}"]
+    for s, e in zip(steps, exp):
+        argv = s if isinstance(s, list) else s.get("argv", [])
+        for b in STEP_BEHAVIOURS.get(argv[0] if argv else "", []) + (
+                ["C:behaviour/errors"] if e.get("exit") != 0 else []):
+            if b not in of:
+                of.append(b)
+    given: dict = {k: case[k] for k in ("files", "env", "cwd") if case.get(k) not in (None, {}, "")}
+    given["steps"] = [tc.given_step(s) for s in steps]
+    expect: dict = {"steps": [tc.case_expect(e) for e in exp]}
+    if case["expect"].get("written"):
+        expect["files"] = case["expect"]["written"]
+    rec = dict(case["recorded"])
+    src = rec.pop("source", {}) or {}
+    item = {"id": f"P:case/trial-{case['id'].lower()}", "type": "case", "name": case.get("note") or case["id"],
+            "summary": f"The migration trial's scenario {case['id']}, recorded from the original "
+                       f"({case.get('group', '')}).",
+            "stance": "observed", "worksheet-id": case["id"], "of": of, "stands": "outside", "from": "recorded",
+            "drafted-from": case.get("from") or "document", "given": given, "expect": expect,
+            "recorded": {**({"source-tree": src["tree"]} if src.get("tree") else {}),
+                         **({"source-commit": src["commit"]} if src.get("commit") else {}), **rec}}
+    if case.get("note"):
+        item["note"] = case["note"]
+    item["provenance"] = {"mode": "derived", "confidence": 1, "state": "known",
+                          "sources": [f"outside/recording/recorded.json#{case['id']}"]}
+    item["made"] = {"move": "hand", "run": "T1-2026-11-22", "engine": "rules"}
+    return item
+
+
+def _sub(text: str, was: str, now: str, where: str) -> str:
+    joined = " ".join(str(text).split())
+    if was not in joined:
+        raise RuntimeError(f"the words to fix are not in {where}: {was!r}")
+    return joined.replace(was, now, 1)
+
+
+def fixed(data: dict) -> dict:
+    """FINAL with the fabulac's words on `undoes` corrected (FIX_WORDS), each item recording the fix it took."""
+    out = copy.deepcopy(data)
+    for n in out["nodes"]:
+        if n["id"] not in FIX_WORDS:
+            continue
+        field, was, now = FIX_WORDS[n["id"]]
+        if field == "fields[undoes].means":
+            f = next(x for x in n["fields"] if x["name"] == "undoes")
+            f["means"] = _sub(f["means"], was, now, n["id"])
+        else:
+            n[field] = _sub(n[field], was, now, n["id"])
+        for was_s, now_s in FIX_SUMMARY.get(n["id"], ()):
+            n["summary"] = _sub(n["summary"], was_s, now_s, n["id"])
+        n["provenance"] = {**n["provenance"], "fixed": [{"field": field, "was": was, "now": now, "on": RULED_ON,
+                                                          "by": "lane T1, on the owner's word", "why": FIX_WHY}]}
+    return out
+
+
+def _roundtrip(dest: Path) -> None:
+    """The three stages of the round trip (FIXED, RECORDED, JUDGED), from what `outside/` holds."""
+    outside = dest / "outside"
+    data = fixed(mc.yaml_load((dest / "inputs" / FINAL).read_text(encoding="utf-8")))
+    _write(dest / "inputs" / FIXED, mc.dump(data))
+    t = targeted(data)
+    raw = (outside / "recording" / "cases.json").read_text(encoding="utf-8")
+    if raw != handed_out(t):
+        raise RuntimeError("outside/recording/cases.json is not the cases file entail f as cases gives the targeted "
+                           "fabulac: record it again")
+    cat = {k: v for k, v in t.items() if k != "nodes"}
+    doc = json.loads(raw)
+    doc, report = tc.gather_recorded(doc, tc.read_recording_folder(outside / "recording"), now=tc.source_of(cat))
+    if report["stale"] or report["unknown"] or len(report["recorded"]) != len(doc["cases"]):
+        raise RuntimeError(f"the recording does not stand whole: {report}")
+    items = [_case_item(c) for c in doc["cases"]]
+    for it in items:
+        if it["worksheet-id"] == "B7":
+            it["ruling"] = [dict(B7_RULING)]
+    t["nodes"] = t["nodes"] + items
+    _write(dest / "inputs" / RECORDED, mc.dump(t))
+    judging = (outside / ROUNDTRIP / "cases.json").read_text(encoding="utf-8")
+    if judging != judge_cases(t):
+        raise RuntimeError(f"outside/{ROUNDTRIP}/cases.json is not the cases file the recorded stage gives: judge "
+                           "it again")
+    vraw = (outside / ROUNDTRIP / "verdict.json").read_bytes()
+    verdict = tc.read_verdict(vraw)
+    new_cat, _rep = tc.fold_verdict(cat, verdict, verdict_bytes=vraw, where=f"../outside/{ROUNDTRIP}/verdict.json",
+                                    at=ROUNDTRIP_AT, by=JUDGE_BY)
+    _write(dest / "inputs" / JUDGED, mc.dump({**new_cat, "nodes": t["nodes"]}))
+
+
+def judge_cases(data: dict) -> str:
+    """The cases file the judge reads (`-`: its own rulings): `entail f as cases`'s rule over the recorded stage
+    (its outside cases hold the recording; the owner's ruling of B7 is among the rulings it derives)."""
+    cat = {k: v for k, v in data.items() if k != "nodes"}
+    doc, _ = tc.cases_document(cat, data["nodes"], existing=json.loads(CASES.read_text(encoding="utf-8")))
+    return tc.dump_cases(doc)
+
+
 def problems(rep: mc.Report) -> dict:
     return {"ok": rep.ok, "errors": [str(p) for p in rep.errors], "warnings": [str(p) for p in rep.warnings]}
 
@@ -367,7 +575,8 @@ def gates_of(path: Path, source: Path) -> dict:
 
 def recorded_files(dest: Path) -> list[Path]:
     """The stage fabulacs whose checks and gates the fixture records: every stage, then the landed one."""
-    return [dest / "inputs" / s for s in STAGES] + [dest / "landed" / FINAL]
+    return ([dest / "inputs" / s for s in STAGES] + [dest / "landed" / FINAL]
+            + [dest / "inputs" / s for s in (FIXED, RECORDED, JUDGED)])
 
 
 def reports(dest: Path) -> tuple[dict, dict]:
@@ -410,8 +619,7 @@ def make(dest: Path = DEST, scratch: Path | None = None) -> Path:
         inputs = dest / "inputs"
         shutil.copytree(TALLY, inputs / "tally", ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
         shutil.copyfile(CASES, inputs / "tally.cases.json")
-        kept = TALLY_FABULAC.read_text(encoding="utf-8").replace("flavour: fabulac\n",
-                                                                  "flavour: fabulac\npurpose: transconception\n", 1)
+        kept = kept_text(TALLY_FABULAC.read_text(encoding="utf-8"))
         _write(inputs / KEPT, kept)
         for lang, _ in LANGUAGES:
             _write(inputs / f"{lang}.txt", lang)
@@ -439,6 +647,9 @@ def make(dest: Path = DEST, scratch: Path | None = None) -> Path:
         for program, plan in plans.items():
             _expected(dest, program, plan)
         _land(dest, entailed)
+        if not (dest / "outside").is_dir():
+            shutil.copytree(OUTSIDE, dest / "outside")
+        _roundtrip(dest)
         checks, gates = reports(dest)
         _write(dest / "recorded" / "checks.json", _json(checks))
         _write(dest / "recorded" / "gates.json", _json(gates))

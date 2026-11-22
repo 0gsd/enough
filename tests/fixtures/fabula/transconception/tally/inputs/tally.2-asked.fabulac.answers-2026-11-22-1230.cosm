@@ -1,0 +1,40 @@
+oes: fabula/1
+macrocosm: 0.8.0
+id: fabula/tally
+nodes:
+  - id: D:session/session-1
+    type: session
+    at: 2026-11-22T12:30:00Z
+    with: {to: transconceiver, who: "the owner, as transconceiver, by questionnaire in the 0.9 build, 2026-11-22 (the conductor's relay of the owner's answers to lane T1's sheet): \"Confirm all\""}
+    through: person
+    asked: [D:question/who-rules, D:question/lane-mit, D:question/interface-command-tally, D:question/behaviour-undo, D:question/reliance-whole-numbers-unbounded, D:question/setting-tally-file, D:question/structure-tally-ledger-entry]
+    answered: [D:question/who-rules, D:question/lane-mit, D:question/interface-command-tally, D:question/behaviour-undo, D:question/reliance-whole-numbers-unbounded, D:question/setting-tally-file, D:question/structure-tally-ledger-entry]
+    skipped: []
+  - id: D:question/who-rules
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: "the owner, as transconceiver", value: "the owner, as transconceiver", confidence: 1, session: D:session/session-1}
+  - id: D:question/lane-mit
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: open, value: open, confidence: 1, session: D:session/session-1}
+  - id: D:question/interface-command-tally
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  - id: D:question/behaviour-undo
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  - id: D:question/reliance-whole-numbers-unbounded
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  - id: D:question/setting-tally-file
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}
+  - id: D:question/structure-tally-ledger-entry
+    state: answered
+    answers:
+      - {at: 2026-11-22T12:30:00Z, by: transconceiver, says: as proposed, value: as proposed, confidence: 1, session: D:session/session-1}

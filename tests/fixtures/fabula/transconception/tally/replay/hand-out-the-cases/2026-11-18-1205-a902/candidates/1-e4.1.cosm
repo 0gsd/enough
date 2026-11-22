@@ -1,7 +1,0 @@
-engine: transconception.cases_name
-inputs:
-  call: da2525bfcc7dc5905623f6d4a658222a87a4f6ccadee9d8bf8ba94a49e21aa0a
-keys: []
-tokens: 0
-seconds: 0
-output: tally.cases.json

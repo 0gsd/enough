@@ -1,0 +1,108 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-22-1200-a901
+name: ground-the-fabulac run 2026-11-22-1200-a901
+program:
+  name: ground-the-fabulac
+  sha256: ad5f48cea4e3f63a2e39e01ab662e0c03af4d3bb5f16b3deba30ddd1d2dc740b
+plan:
+  sha256: fbf83dac4c483e34a94ceb425bad5db21fb2ff477695f81ebcfe2f2b47e7821a
+environment:
+  enough: unknown
+  model: none
+  context: 0
+  agent_free: false
+  memory_band: unknown
+started: '2026-11-22T12:00:00Z'
+ended: '2026-11-22T18:07:37Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-22-1200-a901
+  type: trace
+  name: ground-the-fabulac run 2026-11-22-1200-a901
+  summary: 'ran ground-the-fabulac on tally, tally.0-kept.fabulac.cosm in 22057 s on code: 1 step, all checks green'
+  records:
+  - R:record/1
+  outcome: landed
+  inputs_root: .
+  rules: true
+  engines:
+  - ascribe
+  - canon
+  - dialectic
+  - docoes
+  - repo
+  - sandbox
+  - syntax
+  - transconception
+  - verse
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-22-1200-a901.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: ground repo with f
+  summary: code, 1 attempt, 5 checks green.
+  node: R:node/1
+  move: ground
+  inputs:
+  - name: repo
+    sha256: 0f26fb8759b9780f4131d6f6fbc541089d441051baaf1d88fa52023b30cadaea
+    path: inputs/tally
+  - name: f
+    sha256: dd8ea3c246a5ce6910cdb960384fed487e6130010bc12e53738e9088464e215f
+    path: inputs/tally.0-kept.fabulac.cosm
+  outputs:
+  - name: g
+    sha256: a1f42e90149e6707670f684a6b8a760f482fba38f817b1d2c8c8293c6eb3f94f
+    path: outputs/g.cosm
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: ground-cited
+    ok: true
+    why: ''
+  - name: code-span
+    ok: true
+    why: ''
+  - name: nothing-lost
+    ok: true
+    why: ''
+  - name: fabula-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-22-1200-a901.plan.cosm#R:node/1
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: ground repo with f
+  summary: one reliance per ground entry the syntax shows
+  step:
+    program: ground-the-fabulac
+    n: 1
+  move: ground
+  asks: false
+  takes:
+  - repo
+  - f
+  gives: g
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 11
+  provenance:
+    mode: derived
+    sources:
+    - ground-the-fabulac.thym#L11
+    confidence: 1

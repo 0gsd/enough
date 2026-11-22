@@ -9,11 +9,11 @@ inputs:
 - name: f
   type: fabula
   path: inputs/tally.4-asked-again.fabulac.cosm
-  sha256: 8c3746fc5a2c05c859cfce796c70f80595d54c6411ced800667e1835db341080
+  sha256: 3d0740e20934e07301683deff522d92d924a161f7fa073be96cef7df7b81d787
 - name: said
   type: volume
-  path: inputs/tally.4-asked-again.fabulac.answers-2026-11-18-1250.cosm
-  sha256: 96534697e546a66e7adff3acdb80bb623359772b1b5144a9426d4a1110520e8b
+  path: inputs/tally.4-asked-again.fabulac.answers-2026-11-22-1250.cosm
+  sha256: 3f73a00678c3288801929c5a2048d7d5372bc5dff3d985b757d91cb5f1d249e4
 estimate:
   steps: 2
   asks: 1
