@@ -582,6 +582,7 @@ def build_scaffold_router(
     page's buttons, and the readvisor has no tool for any of them."""
     from . import scaffold_check as _check
     from . import scaffold_export as _export
+    from . import scaffolder as _sc
 
     router = APIRouter()
 
@@ -791,4 +792,133 @@ def build_scaffold_router(
                                    if f.get("status") == "open")
         return out
 
+    # ------------------------------------------------ the state, out and in (0.9)
+    # The scaffolder's one-file state (`defaults/skills/scaffolder/references/state.md`), written and read by the
+    # skill's own `scaffold_state.py` (loaded by `scaffolder.state_module`: one writer, one parser). Both doors are
+    # the person's: the page's buttons. The words come in as the person's ops (`ui`), never the readvisor's.
+
+    @router.get("/api/composure/scaffold/state")
+    async def api_scaffold_state_file(path: str = Query(...)) -> dict[str, Any]:
+        """`?path=` → `{path, name, text}`: the scaffold's state file, exactly as the skill's writer writes it.
+        Locked or open."""
+        target = _target(path)
+        rel = _rel(target)
+        try:
+            text = await asyncio.to_thread(_sc.state_text, target, rel)
+        except (ComposureError, ValueError) as e:
+            raise HTTPException(400, str(e)) from None
+        return {"path": rel, "name": _export.out_path(target, "scaffold.md").name, "text": text}
+
+    @router.post("/api/composure/scaffold/state/out")
+    async def api_scaffold_state_out(request: Request) -> dict[str, Any]:
+        """`{path}` → `{written, path, bytes}`: the state file written beside the composure as a new file
+        (`<name>.scaffold.md`, then `<name>-2.scaffold.md` …), never one written over. Locked or open."""
+        body = await _body(request)
+        target = _target(str(body.get("path") or ""))
+        rel = _rel(target)
+
+        def work() -> Path:
+            data = _sc.state_text(target, rel).encode("utf-8")
+            out = _export.out_path(target, "scaffold.md")
+            _export._write_new(out, data)
+            return out
+
+        try:
+            out = await asyncio.to_thread(work)
+        except (ComposureError, ValueError) as e:
+            raise HTTPException(400, str(e)) from None
+        except _export.ExportError as e:
+            raise HTTPException(e.status, str(e)) from None
+        return {"written": True, "path": _rel(out), "bytes": out.stat().st_size}
+
+    @router.post("/api/composure/scaffold/state/in")
+    async def api_scaffold_state_in(request: Request) -> dict[str, Any]:
+        """`{path, text, apply?, replace?, base_rev?, create?}`: a state file the person picked, read by the one
+        parser. Without `apply`, what it would bring: how many of its boxes the scaffold has (`matching`), how many
+        are new, how many of the scaffold's boxes it has no words for, and which boxes hold other words already
+        (`replace`). With `apply`, the layout and the words come in as one batch of the person's ops (`ui`), and the
+        reply carries `ops` and `undo` (one undo step for the page) and the new `model`. Boxes in `replace` must be
+        answered: `replace` lists the ones to write over, and the rest keep their words; a reply without it is 409.
+        A plectrum, a file that does not read, a state for another thing than the scaffold holds, or a locked
+        scaffold is refused with a sentence. `create` makes the composure from the scaffold form first."""
+        body = await _body(request)
+        rel_in = str(body.get("path") or "").strip()
+        if not rel_in.endswith(comp_core.SUFFIX):
+            raise HTTPException(400, f"not a composure path: {rel_in!r} must end in {comp_core.SUFFIX}")
+        target = resolve_path(rel_in)
+        create = not target.is_file()
+        if create and not body.get("create"):
+            raise HTTPException(404, f"no composure at {rel_in}")
+        text = body.get("text")
+        if not isinstance(text, str) or not text.strip():
+            raise HTTPException(400, "send the state file's text in 'text'")
+        if len(text) > _STATE_MAX_CHARS:
+            raise HTTPException(413, f"that file is larger than a scaffold's state can be "
+                                     f"({_STATE_MAX_CHARS:,} characters)")
+        rel = _rel(target)
+        apply = bool(body.get("apply"))
+        raw_replace = body.get("replace")
+        if raw_replace is not None and not isinstance(raw_replace, list):
+            raise HTTPException(400, "'replace' is the list of box ids whose words the state may write over")
+        replace = [str(x) for x in raw_replace or []]
+
+        def work() -> dict[str, Any]:
+            model = _sc.read_state(text)
+            if create:
+                comp = comp_core.new_composure("scaffold", model.meta["title"], project_dir)
+                here = 0
+            else:
+                comp = comp_core.load(target)
+                here = len(comp_core.list_findings(target, rel))
+            plan = _sc.bring_plan(model, comp, replace=replace, findings_here=here)
+            if not apply:
+                return {"path": rel, "preview": True, "rev": None if create else comp.rev, **plan.summary()}
+            base_rev = body.get("base_rev")
+            if not create and base_rev is not None and int(base_rev) != comp.rev:
+                raise _sc.BringError("the scaffold changed since the state was read against it; read the state "
+                                     "in again to see what it would bring now.", 409)
+            if plan.replace and raw_replace is None:
+                names = ", ".join(r["name"] for r in plan.replace)
+                raise _sc.BringError(f"these boxes hold other words of yours already: {names}. Say which the state "
+                                     f"may write over ('replace': their ids; an empty list keeps your words in "
+                                     f"all of them).", 409)
+            created = False
+            if create:
+                made = comp_core.apply_ops(target, None, [{"op": "set_scaffold", "thing": model.meta["thing"]}],
+                                           source="ui", create=True, form="scaffold", title=model.meta["title"],
+                                           project_dir=project_dir, rel_path=rel)
+                created = made.created
+                comp = made.composure
+                plan = _sc.bring_plan(model, comp, replace=replace, findings_here=0)
+            result = None
+            if plan.ops:
+                result = comp_core.apply_ops(target, None, plan.ops, source="ui", project_dir=project_dir,
+                                             rel_path=rel, carried_plec_by=plan.plec_by)
+            after = result.composure if result is not None else comp
+            _sc.plectrum_path(target).write_text(_sc.state_module().dumps(model, "plectrum"), encoding="utf-8")
+            brought = 0
+            if model.findings:
+                checked = model.meta.get("checked")
+                stamp = {"at": checked, "version": int(model.meta.get("version") or 1)} if checked else None
+                brought = comp_core.carry_findings(target, _sc.findings_from_state(model, after), stamp, rel)
+            return {"path": rel, "applied": True, "created": created or bool(result and result.created),
+                    "rev": after.rev, "changed": result.changed if result is not None else [],
+                    "ops": plan.ops, "undo": None if plan.locked or result is None else _sc.undo_ops(comp, after),
+                    "model": comp_core.model(after), **plan.summary(), "findings_brought": brought}
+
+        try:
+            out = await asyncio.to_thread(work)
+        except _sc.BringError as e:
+            raise HTTPException(e.status, str(e)) from None
+        except ComposureError as e:
+            raise HTTPException(400, str(e)) from None
+        if out.get("applied"):
+            await emit(EVENT, {"path": rel, "rev": out["rev"], "changed": out["changed"], "source": "ui",
+                               "created": out["created"]})
+        return out
+
     return router
+
+
+#: The largest state file the state-in door reads (a composure's 200 modules at their caps fit well inside).
+_STATE_MAX_CHARS = 2_000_000

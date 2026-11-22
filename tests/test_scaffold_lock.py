@@ -57,8 +57,9 @@ def test_only_the_person_locks(deck: Path):
 
 def test_empty_boxes_lock_only_once_they_are_named(deck: Path):
     empty = C.empty_boxes(C.load(deck))
-    # the deck leaves its two pictures, two speaker boxes and the notes box empty
-    assert SC.module_id("plot-picture") in empty and SC.module_id("notes-to-the-readvisor") in empty
+    # the deck leaves its two pictures, two speaker boxes and the notes box empty; the notes box is not a gap in
+    # the thing, so the lock's list leaves it out (0.9, lane S3)
+    assert SC.module_id("plot-picture") in empty and SC.module_id("notes-to-the-readvisor") not in empty
     assert ask_box() not in empty
     with pytest.raises(ComposureError, match="still empty") as e:
         ops(deck, {"op": "lock_scaffold", "empty": empty[1:]})
