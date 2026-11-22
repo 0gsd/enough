@@ -379,7 +379,7 @@ PSHORT_COMMON = (
     "Never \"up to\".\n"
     "- Hedge what is of low confidence (may, perhaps, seems, we read). Tell an open question as open.\n"
     "- Cite every id listed under must.\n"
-    "Write markdown: the body alone, in paragraphs. No title and no footer: rules write those.\n")
+    "Write the body alone, as markdown in paragraphs. No title and no footer: rules write those.\n")
 
 PSHORT_BRIEFS = {
     "expert": (
@@ -409,7 +409,10 @@ def pshort_messages(contract: dict, inputs: dict) -> list[dict] | None:
     if density not in DENSITIES:
         return None
     user = (f"The fabulam: {_text(inputs, 'name')}. Density: {density}. Words: {_text(inputs, 'words')}.\n"
-            f"Must be cited: {_text(inputs, 'must')}\n\nThe items:\n```yaml\n{_text(inputs, 'items')}```")
+            f"Must be cited: {_text(inputs, 'must')}\n\nThe items:\n```yaml\n{_text(inputs, 'items')}```\n\n"
+            "Answer with a YAML mapping of one key, the markdown as a block under it, each line two spaces in:\n"
+            "```yaml\nbody: |\n  The first paragraph. [C:statement/x]\n\n  The next paragraph. [C:lemma/y, "
+            "C:step/z]\n```")
     return _with_failed([{"role": "system", "content": pshort_system(density)}, {"role": "user", "content": user}],
                         inputs)
 

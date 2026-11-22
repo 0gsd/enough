@@ -39,13 +39,10 @@ import re
 from typing import Any
 
 from enough import macrocosm as mc
-from pathlib import Path
-
-from enough.thym.checks import CHECKS as _CHECKS
 from enough.thym.checks import check, split_sentences
 from enough.thym.folder import Folder, lines_in
 from enough.thym.moves import (MoveError, answer_mapping, engine, entailment_of, fabula_doc, fold, item_kind,
-                               model_of, short_value, strip_fences, text_blob, utc_day, words_in)
+                               model_of, short_value, text_blob, utc_day, words_in)
 from enough.thym.moves import code as _code
 from enough.thym.registry import Request
 from enough.thym.values import Value, plain
@@ -125,7 +122,8 @@ STAGES_SAYS = ("a YAML mapping: stages, a list of {slug, name, number, stage, sa
                "steps}; teaching, the stages' slugs in the teaching order; readings, three to six of {slug, name, "
                "summary, of, "
                "grounds, confidence}; decisions; atem {line, focus, push, pull}")
-PSHORT_SAYS = "markdown: the body of the pshort alone, each run of sentences closed by the ids it rests on"
+PSHORT_SAYS = ("a YAML mapping with one key, body: the pshort's body alone, as a block of markdown, each run of "
+               "sentences closed by the ids it rests on")
 
 
 class RequestTooLarge(MoveError):
@@ -677,8 +675,8 @@ def _licence_items(fname: str, header: dict | None, words: str, given: Any) -> t
     it: dict = {"type": "licence", "stance": "observed",
                 "id": f"R:licence/{_code.slug(value) if isinstance(value, str) else 'unknown'}",
                 "name": value if isinstance(value, str) else "The licence"}
-    it["summary"] = (f"{fname} is under the licence {value}." if isinstance(value, str)
-                     else f"No licence was found for {fname}.")
+    it["summary"] = ("The source is under the licence " + value + "." if isinstance(value, str)
+                     else "No licence was found for the source.")
     it["identifier"] = value
     it["provenance"] = _code.prov([where], 1, "known" if isinstance(value, str) else "pending")
     return value, [it]
@@ -719,7 +717,7 @@ def _dependency_items(fname: str, imports: list[dict], version: Any, inside: set
         title = {"mathlib": "Mathlib", "lean": "Lean"}.get(root, rows[0]["module"].split(".", 1)[0])
         k = len(rows)
         out.append({"id": f"C:dependency/{_code.slug(root)}", "type": "dependency", "name": title,
-                    "summary": f"{fname} imports {k} module{'s' if k != 1 else ''} of {title}.",
+                    "summary": f"The source imports {k} module{'s' if k != 1 else ''} of {title}.",
                     "stance": "observed", "package": root,
                     "version": version if version else {"pending": f"which version of {title} is it written for?"},
                     "scope": "standard",
@@ -952,7 +950,7 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
                 rel = next((r for r in relied if r["id"] == rid), None)
                 if rel is None:
                     rel = {"id": rid, "type": "reliance", "name": lean,
-                           "summary": f"{fname} relies on {lean}, which another part of the archive states.",
+                           "summary": f"This part relies on {lean}, which another part of the archive states.",
                            "stance": "deduced", "on": "part", "lean": [lean],
                            "stated-in": item_uri(f"oes:{hcat.get('id')}", str(hit["id"])),
                            "digest": hit.get("digest"),
@@ -979,10 +977,9 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
          if it.get("reached") == "yes"), None)
     if first:
         atem = {"of": first, **atem}
-    cat.update({"atem": atem, "teaching": [], "audit": _audit_rows(ol, ids)})
+    cat.update({"atem": atem, "audit": _audit_rows(ol, ids)})
     cat["nodes"] = [_code._prov_last(it) for it in out]
-    return Value("fabula", cat, origin={"proof": {"path": fname, "candidates": reach["candidates"],
-                                                  "place": place["path"] if place is not None else None}})
+    return Value("fabula", cat, origin={"proof": {"path": fname, "candidates": reach["candidates"]}})
 
 
 # ---------------------------------------------------------------------------
@@ -1113,7 +1110,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
         defs = [decl_name(d) for d in ol.get("defs") or []]
         n_reached = sum(1 for q in defs if rows.get(q, {}).get("reached") == "yes")
         comp: dict = {"id": _fresh(f"C:component/{_code.name_slug(module[p])}", used), "type": "component",
-                      "name": module[p], "summary": f"The Lean file {p}" + (f": {ol.get('doc')}" if ol.get("doc")
+                      "name": module[p], "summary": f"The Lean module {module[p]}" + (f": {ol.get('doc')}" if ol.get("doc")
                                                                              else "."),
                       "stance": "observed", "files": [file_ids[p]]}
         comp["does"] = ({"pending": f"what does {module[p]} prove on the way to the targets? ({NOT_READ})"}
@@ -1133,7 +1130,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
                 deps[it["id"]]["provenance"]["sources"] += [s for s in it["provenance"]["sources"] if s not in
                                                             deps[it["id"]]["provenance"]["sources"]][:3]
             else:
-                it["summary"] = f"{f.name} imports modules of {it['name']}."
+                it["summary"] = f"The archive imports modules of {it['name']}."
                 deps[it["id"]] = it
     out += list(deps.values())
     # -- the licence: the host's or the person's entry, the folder's licence file, else the files' headers
@@ -1179,7 +1176,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
            "derived": {"at": at, "by": "person", **({"program": run["program"]} if run.get("program") else {}),
                        **({"run": run["run"]} if run.get("run") else {}), "mode": "rules",
                        "completeness": "outline", "chunks": 0, "runs": [run]},
-           "atem": atem, "teaching": [], "nodes": [_code._prov_last(it) for it in out]}
+           "atem": atem, "nodes": [_code._prov_last(it) for it in out]}
     return Value("fabula", cat, origin={"proof": {"order": order, "parts": parts,
                                                   "candidates": reach["candidates"]}})
 
@@ -2038,8 +2035,9 @@ def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: lis
     teaching = sorted(said, key=lambda x: word[x])
     # -- readings
     readings = data.get("readings")
-    if not isinstance(readings, list) or not 3 <= len(readings) <= 6:
-        raise ValueError("readings holds three to six key ideas, each with grounds")
+    if not isinstance(readings, list) or not 1 <= len(readings) <= 6:
+        raise ValueError("readings holds three to six key ideas, each with grounds (a short file may hold fewer, "
+                         "never none)")
     stage_ids = {s["id"] for s in stages}
     for i, row in enumerate(readings, 1):
         if not isinstance(row, dict) or not row.get("name") or not row.get("summary"):
@@ -2110,7 +2108,8 @@ def fold_argument(ctx: Any, t: Value, **mods: Any) -> Request:
     def parse(out: Any) -> Value:
         data = answer_mapping(out)
         new, teaching, atem = parse_stages(data, items=shown, taken=taken, sources=[fname],
-                                          step_kinds=("lemma", "statement", "step"), atem_of=_atem_of(cat, items))
+                                          step_kinds=("lemma", "statement", "step", "definition"),
+                                          atem_of=_atem_of(cat, items))
         model = model_of(data)
         # `completeness: full` is the last program's to write (the job writes it when the questions have landed)
         c = _with_run(cat, ctx, model, at=_code.stamp_at(ctx), mode="model")
@@ -2348,31 +2347,23 @@ def entail_pshort(ctx: Any, fab: Value, density: str, **mods: Any) -> Request:
     sent = [{k: v.text() for k, v in inputs.items()}]
 
     def parse(out: Any) -> Value:
-        data = out if isinstance(out, dict) else None
-        body = str((data or {}).get("body") or (data or {}).get("text") or "") if data else strip_fences(
-            str(out or ""))
+        data = answer_mapping(out)
+        body = data.get("body")
+        if not isinstance(body, str) or not body.strip():
+            raise ValueError("the answer holds no body: a YAML mapping with one key, body, the markdown as a block")
         body = body.replace("\r\n", "\n").strip()
-        if not body:
-            raise ValueError("the answer holds no body")
         first = body.split("\n", 1)[0].strip()
         if first.startswith("# ") or "A pshort of" in body or _FOOT.match(body.rsplit("\n", 1)[-1].strip()):
             raise ValueError("write the body alone: the title, the two lines under it and the footer are written "
                              "by rule")
-        who = model_of(data or {}) or _model_name(ctx) or "model"
+        who = model_of(data) or "model"
         text = pshort_text(fixed, body, pshort_footer(cat, fab, density, utc_day(ctx), who, left))
         return short_value(text, fabula=fab, order="told", density=density, requests=sent, left=left)
 
-    return Request(contract={"schema": {"format": "markdown", "says": PSHORT_SAYS}, "repair": []}, inputs=inputs,
-                   parse=parse)
-
-
-def _model_name(ctx: Any) -> str | None:
-    cp = getattr(ctx, "coprocessor", None)
-    for attr in ("model", "model_id", "name"):
-        v = getattr(cp, attr, None)
-        if isinstance(v, str) and v.strip():
-            return v.strip()
-    return None
+    # the answer is YAML so that the host stamps the model's name into it: the footer names the model, and a
+    # replay names it again from the record
+    return Request(contract={"schema": {"format": "yaml", "stamp": "engine", "says": PSHORT_SAYS}, "repair": []},
+                   inputs=inputs, parse=parse)
 
 
 def entail_branch(ctx: Any, x: Value, mods: dict) -> Any:
@@ -2542,6 +2533,8 @@ def _checking_told(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
         return False, "the pshort's first two lines are not the fixed lines"
     if parts["third"] != " ".join(fixed[2].split()):
         return False, "the pshort's third line is not the sentence of P:claim/checking"
+    if not _FOOT.match(parts["footer"]):
+        return False, "the pshort's last line is not its footer"
     rows, bare = pshort_rows(output.text())
     for s in bare:
         if (w := _said_of_check(s)):
@@ -2951,53 +2944,6 @@ def _nothing_carried(output: Value, inputs: dict, node: dict, decl: Any, ctx: An
     return True, ""
 
 
-def landing_place(output: Value, inputs: dict) -> Path | None:
-    """Where a fabulam a run gives will land, when the run can say: the path of the fabulam it was made from (the
-    same id, among the inputs), or, for a part's survey, its place under its head."""
-    cat = fabula_doc(output)[0]
-    if cat.get("flavour") != FLAVOUR:
-        return None
-    fabs = [v for v in inputs.values() if isinstance(v, Value) and v.type == "fabula" and v.path is not None]
-    for v in fabs:
-        if fabula_doc(v)[0].get("id") == cat.get("id"):
-            return Path(v.path)
-    rel = ((output.origin or {}).get("proof") or {}).get("place")
-    for v in fabs:
-        if rel and is_head({k: plain(x) for k, x in fabula_doc(v)[0].items() if k != "nodes"}):
-            return Path(v.path).parent / str(rel)
-    return None
-
-
-_INNER_FABULA_CHECKS = _CHECKS.lookup("fabula-checks")
-
-
-@check("emf-checks")
-@check("fabula-checks")
-def _fabula_checks_placed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """`fabula-checks` (Thym 7.3) as the moves before this one run it; and a fabulam that names a head, parts or
-    another volume's item is read where it will land, so that `parts-resolve` and `statements-agree` find the head
-    and the parts on disk as they will once it is written."""
-    place = None
-    if isinstance(output, Value) and output.type == "fabula" and isinstance(output.payload, dict):
-        cat, items = fabula_doc(output)
-        if cat.get("head") or cat.get("parts") or any(it.get("stated-in") or it.get("told-in") for it in items):
-            place = landing_place(output, inputs)
-    if place is None:
-        return _INNER_FABULA_CHECKS(output, inputs, node, decl, ctx)
-    try:
-        whole = _code.joined(output, inputs) or output
-    except ValueError as e:
-        return False, str(e)
-    vol = mc.load_volume_text(mc.dump(plain(whole.payload)), filename=place.name)
-    if vol.refused is not None:
-        return False, str(vol.refused)
-    vol.root, vol.catalog_file, vol.path = place.parent, place.name, place
-    errs = mc.lint(vol).errors
-    if errs:
-        return False, "; ".join(str(x) for x in errs[:3]) + (f" (and {len(errs) - 3} more)" if len(errs) > 3 else "")
-    return True, ""
-
-
 def its_own_file(items: list[dict], fname: str) -> str | None:
     """What the contract block `its-own-file` of `decompile-lean.thym` holds, for a test or a tool: a file's reading
     points into that file only. None when it holds, else the words."""
@@ -3030,7 +2976,6 @@ __all__ = ["BAND_FILES", "BAND_LINES", "CHUNK_LINES", "DENSITIES", "HEAD_CROSSIN
            "PROOF_AXES", "PSHORT_CHARS", "REQUEST_CHARS", "SUMMARY_CHARS", "RequestTooLarge", "blank_comments",
            "carried_run", "checking_says", "chunks_of", "construe", "covered", "crossing_in", "decl_kind",
            "decl_name", "derive_branch", "entail_branch", "entail_pshort", "fold_grounded", "fold_head",
-           "head_roles", "held", "is_head", "is_lean_folder", "item_uri", "its_own_file", "landing_place",
-           "lean_slug", "must_cite", "numbered", "part_path", "part_uri", "pshort_fixed",
+           "head_roles", "held", "is_head", "is_lean_folder", "item_uri", "its_own_file", "lean_slug", "must_cite", "numbered", "part_path", "part_uri", "pshort_fixed",
            "pshort_footer", "pshort_parts", "pshort_rows", "pshort_text", "pshort_view", "reach_of", "read_proof",
            "respell", "survey_archive", "survey_branch", "survey_text", "targets_by_rule"]

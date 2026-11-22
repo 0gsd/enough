@@ -1,0 +1,18 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `fit`, the statement of
+# PrimesCongruentOne.lean set against the wording of our own in tests/fixtures/fabula/fabulam/own/wording.md.
+engine: model:hand-recorded
+recorded: by hand
+job: fit
+tokens: 0
+seconds: 0
+output: |
+  fits:
+    - of: C:statement/Nat.infinite_setOfPred_prime_modEq_one
+      how: same
+      form-differences:
+        - 'The wording says there are infinitely many such primes; the statement says the set of them is infinite.'
+        - 'The wording says k is positive; the statement says k is a natural number that is not 0.'
+      differences: []
+      confidence: high
+  claims: []

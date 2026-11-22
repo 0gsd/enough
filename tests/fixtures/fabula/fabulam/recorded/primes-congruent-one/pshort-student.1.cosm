@@ -1,0 +1,22 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `pshort` at density `student`.
+engine: model:hand-recorded
+recorded: by hand
+job: pshort-student
+tokens: 0
+seconds: 0
+output: |
+  body: |
+    The file proves one statement: for every natural number k with k ≠ 0, the set of primes p with p ≡ 1 (mod k) is infinite. [C:statement/Nat.infinite_setOfPred_prime_modEq_one] In words, for every whole number k that is not zero, infinitely many primes leave remainder 1 when divided by k. The module note of the file says the same. [C:statement/Nat.infinite_setOfPred_prime_modEq_one, N:aim/primes-congruent-to-one]
+
+    Two things have to be known before the proof can be followed. The k-th cyclotomic polynomial is the polynomial whose roots are the primitive k-th roots of unity. [L:term/cyclotomic-polynomial] The order of a number modulo p is the least positive power of the number that leaves remainder 1 when divided by p. [K:concept/order-modulo-p]
+
+    The first stage says what must be found. An infinite set of natural numbers has a member beyond every bound, so it is enough to find, for each n, one prime larger than n that is 1 modulo k. Listing the primes that leave remainder 1 would be the obvious way, and nothing lists them, so the file shows instead that past any number there is one more. [C:part/what-must-be-found] The reading behind this stage is that one such prime beyond every n is the same as infinitely many. [P:reading/infinitely-many-means-beyond-every-bound]
+
+    The second stage builds a number that has the right prime factor, and its key lemma is `Nat.exists_prime_gt_modEq_one`: for every natural number n and every natural number k with k ≠ 0 there is a prime p with n < p and p ≡ 1 (mod k). [C:part/a-number-built-to-have-the-right-factor, C:lemma/Nat.exists_prime_gt_modEq_one] The case k = 1 is treated apart, because there every prime qualifies and any prime beyond n will do. [C:step/the-case-k-is-one, P:reading/the-case-k-is-one-is-treated-apart] For k at least 2 the proof takes the value of the k-th cyclotomic polynomial at b = k · n!. That value is larger than 1 in absolute value, so it has a least prime factor p. [C:step/the-value-exceeds-one, C:constant/the-point] Because p divides the value, b is a root of the k-th cyclotomic polynomial modulo p; such a root is prime to p, so p does not divide b. [C:step/b-is-a-root-modulo-p] If p were at most n it would divide n!, hence b, which it does not; so p is larger than n. [C:step/p-exceeds-n] The order of b modulo p divides p − 1 and equals k, so k divides p − 1 and p ≡ 1 (mod k). [C:step/the-order-of-b-is-k] The idea to keep is that a prime that divides a value of the k-th cyclotomic polynomial and does not divide the point is 1 modulo k, so the proof only has to make such a prime large. [P:reading/the-polynomial-does-the-work]
+
+    The third stage goes from one to many. With one such prime beyond every n, the primes that are 1 modulo k occur beyond every bound, and a set of natural numbers with members beyond every bound is infinite. The lemma `Nat.frequently_atTop_modEq_one` carries this step, and it only restates the lemma before it in the language of filters. [C:part/from-one-to-many, C:lemma/Nat.frequently_atTop_modEq_one]
+
+    The proof gives more than the statement asks. It names the prime: for k at least 2 it is the least prime factor of the value of the k-th cyclotomic polynomial at k · n!, and it is larger than n. [P:yield/what-the-proof-delivers] Here is the construction in small numbers. Take k = 3 and n = 2. The point is 3 · 2! = 6. The third cyclotomic polynomial is x² + x + 1. At 6 it gives 43. Its least prime factor is 43, which is larger than 2 and equals 3 · 14 + 1. [P:case/k-three-n-two]
+
+    One caution about this guide. The file was read as text, names were matched by spelling, and Lean was not run, so a link between two declarations may be missing or may point at the wrong one of two with one name. [P:assumption/read-as-text]

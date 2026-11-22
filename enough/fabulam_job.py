@@ -136,19 +136,31 @@ def stages_for(wording: Any) -> tuple[str, ...]:
     return tuple(s for s in STAGES if s != "fit-the-wording" or wording)
 
 
+def _when(x: Any) -> dt.datetime | None:
+    """A moment a catalog holds, as YAML read it or as text, in UTC; None for anything else."""
+    if isinstance(x, dt.datetime):
+        return x if x.tzinfo else x.replace(tzinfo=dt.timezone.utc)
+    try:
+        got = dt.datetime.fromisoformat(str(x).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return got if got.tzinfo else got.replace(tzinfo=dt.timezone.utc)
+
+
 def pshorts(project_dir: Path, fab: Path) -> list[dict]:
     """A fabulam's pshorts, from its `shorts:`: one row per density, the newest of each, `{density, path, at,
     exists, stale}`; `stale` when the fabulam was derived after it."""
     doc = _head.load(fab)
-    derived = str(((doc.get("derived") or {}).get("at")) or "")
+    derived = _when((doc.get("derived") or {}).get("at"))
     rows: dict[str, dict] = {}
     for e in doc.get("shorts") or []:
         if not isinstance(e, dict) or e.get("density") not in DENSITIES:
             continue
         p = fab.parent / str(e.get("path") or "")
-        at = _macrocosm.jsonable(e.get("at"))
-        rows[e["density"]] = {"density": e["density"], "path": _fj.rel_of(project_dir, p), "at": at,
-                              "exists": p.is_file(), "stale": bool(derived and str(at) < derived)}
+        at = _when(e.get("at"))
+        rows[e["density"]] = {"density": e["density"], "path": _fj.rel_of(project_dir, p),
+                              "at": _macrocosm.jsonable(e.get("at")), "exists": p.is_file(),
+                              "stale": bool(derived and at and at < derived)}
     return [rows.get(d) or {"density": d, "path": None, "at": None, "exists": False, "stale": False}
             for d in DENSITIES]
 
@@ -294,10 +306,26 @@ def _stopped(word: str, r: Any) -> str:
     return f"{word} was refused ({said}); nothing of it was written; the build takes up again from {word}"
 
 
-def _land(t: Any, stage: str, dest: Path) -> None:
-    """A program's output written to the fabulam's file, its run in `derived.runs`."""
+def own_errors(text: str, dest: Path) -> list[str]:
+    """The errors of a fabulam's own checks (`enough/fabulam.py`, the design's 2.A; `parts-resolve` and
+    `statements-agree` among them), read where the fabulam will land, so that a part finds its head and a head its
+    parts on disk. A Thym run's `fabula-checks` holds the generic checks; these are the host's to hold."""
+    vol = _macrocosm.load_volume_text(text, filename=dest.name)
+    if vol.refused is not None:
+        return [str(vol.refused)]
+    vol.root, vol.catalog_file, vol.path = dest.parent, dest.name, dest
+    return [str(p) for p in _fabula.lint(vol).errors]
+
+
+def _land(t: Any, stage: str, dest: Path, word: str) -> None:
+    """A program's output written to the fabulam's file, its run in `derived.runs`; refused, and nothing written,
+    when the fabulam's own checks do not hold of it."""
     out = Path(t.outputs[OUTPUT.get(stage, "g")])
     text = _fj.with_run(out.read_text(encoding="utf-8"), _fj._run_entry(t, stage), filename=dest.name)
+    errs = own_errors(text, dest)
+    if errs:
+        said = "; ".join(errs[:3]) + (f" (and {len(errs) - 3} more)" if len(errs) > 3 else "")
+        raise RuntimeError(_stopped(word, Refusal("run", "fabula-checks", said)))
     dest.parent.mkdir(parents=True, exist_ok=True)
     _fj.write_atomic(dest, text)
 
@@ -312,10 +340,10 @@ def _make_whole(fab: Path) -> list[str]:
     if d.get("completeness") == "full":
         return []
     d["completeness"] = "full"
-    _fj.write_atomic(fab, twin.render())
-    errs = [str(p) for p in _fabula.lint(fab).errors]
-    if errs:
-        _fj.write_atomic(fab, before)                   # not whole: the fabulam stays as the programs left it
+    text = twin.render()
+    errs = own_errors(text, fab)
+    if not errs:                                        # else not whole: the fabulam stays as the programs left it
+        _fj.write_atomic(fab, text)
     return errs
 
 
@@ -411,7 +439,7 @@ def run_file_build(project_dir: Path, lean: Path, *, mode: str, why: str = "", r
                                 should_stop=should_stop, now=now)
         if refusal is not None:
             break
-        _land(t, stage, dest)
+        _land(t, stage, dest, STAGE_WORDS[stage])
         ran.append({"stage": STAGE_WORDS[stage], "program": stage, "run": t.run_id, "trace": str(t.path)})
     final = file_state(project_dir, lean, fab=dest)
     note = ""
@@ -550,7 +578,7 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
         t, refusal = _run_stage(project_dir, prog, checked, HEAD_STAGES[0], rows, words=words, i=0, total=2,
                                 **common)
         if refusal is None:
-            _land(t, HEAD_STAGES[0], head)
+            _land(t, HEAD_STAGES[0], head, "survey")
             ran.append({"stage": "survey", "program": HEAD_STAGES[0], "run": t.run_id, "trace": str(t.path)})
             restart = True                                # the parts of a head surveyed again are built again
     if refusal is None:
@@ -586,7 +614,7 @@ def run_archive_build(project_dir: Path, folder: Path, *, mode: str, why: str = 
         t, refusal = _run_stage(project_dir, prog, checked, HEAD_STAGES[1], rows, words=words, i=1, total=2,
                                 **common)
         if refusal is None:
-            _land(t, HEAD_STAGES[1], head)
+            _land(t, HEAD_STAGES[1], head, "fold")
             _head.stamp_parts(head)
             ran.append({"stage": "fold", "program": HEAD_STAGES[1], "run": t.run_id, "trace": str(t.path)})
         final = archive_state(project_dir, folder, head=head)
@@ -680,7 +708,7 @@ def run_entail(project_dir: Path, fab: Path, *, density: str | None = None, mode
         base = _names.pshort_name(name, d, stamp)
         dst = _fj.free_path(fab.parent, base[: -len(".md")], ".md")
         pairs.append((Path(t.outputs[d]), dst))
-        entry = {"path": dst.name, "at": when.replace(microsecond=0), "by": by, "mode": "model", "order": "told"}
+        entry = {"path": dst.name, "at": when.replace(microsecond=0), "by": by, "mode": "model"}
         if env.get("route") or route:
             entry["route"] = env.get("route") or route
         entry.update({"entailed": "apart", "density": d})

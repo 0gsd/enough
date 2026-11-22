@@ -1,0 +1,41 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `read` over PrimesCongruentOne.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: read
+tokens: 0
+seconds: 0
+output: |
+  declarations:
+    - lean: "Nat.infinite_setOfPred_prime_modEq_one"
+      says: 'For every natural number k with k ≠ 0, the set of primes p with p ≡ 1 (mod k) is infinite.'
+      quantifiers:
+        - {kind: for-all, what: 'every natural number k with k ≠ 0'}
+        - {kind: infinitely-many, what: 'primes p with p ≡ 1 (mod k)'}
+      method: 'It turns the lemma that such primes occur beyond every bound into the infinitude of their set.'
+    - lean: "Nat.frequently_atTop_modEq_one"
+      says: 'For every natural number k with k ≠ 0, primes p with p ≡ 1 (mod k) occur beyond every bound: for every n there is such a prime p with n ≤ p.'
+      role: bookkeeping
+      method: 'It restates the lemma before it in the language of filters.'
+    - lean: "Nat.exists_prime_gt_modEq_one"
+      says: 'For every natural number n and every natural number k with k ≠ 0 there is a prime p with n < p and p ≡ 1 (mod k).'
+      role: spine
+      method: 'For k = 1 it takes any prime beyond n; for k at least 2 it takes the least prime factor of the value of the k-th cyclotomic polynomial at k · n! and shows that this prime exceeds n and is 1 modulo k.'
+      why: 'Without it nothing produces a prime of the right kind. It turns infinitely many into one beyond any n, which the two short results after it only rephrase.'
+  steps:
+    - {slug: the-case-k-is-one, name: 'The case k = 1', inside: "Nat.exists_prime_gt_modEq_one", says: 'When k is 1 every prime is 1 modulo k, so any prime beyond n will do, and there is one because there are infinitely many primes.', lines: "30-32", confidence: high}
+    - {slug: the-value-exceeds-one, name: 'The value exceeds one', inside: "Nat.exists_prime_gt_modEq_one", says: 'For k at least 2 the value of the k-th cyclotomic polynomial at b = k · n! is larger than 1 in absolute value, so it has a least prime factor p.', lines: "33-42", confidence: high}
+    - {slug: b-is-a-root-modulo-p, name: 'b is a root modulo p', inside: "Nat.exists_prime_gt_modEq_one", says: 'Because p divides the value, b is a root of the k-th cyclotomic polynomial modulo p; such a root is prime to p, so p does not divide b.', lines: "43-50", confidence: high}
+    - {slug: p-exceeds-n, name: 'p exceeds n', inside: "Nat.exists_prime_gt_modEq_one", says: 'If p were at most n it would divide n!, hence b, which it does not; so p is larger than n.', lines: "51-52", confidence: high}
+    - {slug: the-order-of-b-is-k, name: 'The order of b is k', inside: "Nat.exists_prime_gt_modEq_one", says: 'The order of b modulo p divides p − 1 and equals k, so k divides p − 1 and p ≡ 1 (mod k).', lines: "53-59", confidence: high}
+  reliances:
+    - {slug: infinitely-many-primes, name: 'There are infinitely many primes', lean: [exists_infinite_primes], known-as: "Euclid's theorem", field: number theory, case: 'in the form that past any n there is a prime', gives: 'For every natural number n there is a prime p with n ≤ p.'}
+    - {slug: a-cyclotomic-value-is-large, name: 'A cyclotomic value is large', lean: [sub_one_lt_natAbs_cyclotomic_eval], field: algebra, case: 'for the polynomial of index larger than 1, at a natural number other than 1', gives: 'For n larger than 1 and a natural number q other than 1, q − 1 is less than the absolute value of the n-th cyclotomic polynomial at q.'}
+    - {slug: a-root-is-prime-to-p, name: 'A root of a cyclotomic polynomial modulo p is prime to p', lean: [coprime_of_root_cyclotomic], field: algebra, case: 'for a natural number that is a root modulo a prime p', gives: 'If a natural number a is a root of a cyclotomic polynomial modulo a prime p, then a and p have no common factor.'}
+    - {slug: a-root-has-order-k, name: 'A root of the k-th cyclotomic polynomial has order k', lean: [isRoot_cyclotomic_iff], field: algebra, case: 'over the integers modulo p, where k is not zero', gives: 'Where k is not zero, x is a root of the k-th cyclotomic polynomial exactly when x is a primitive k-th root of unity.'}
+    - {slug: the-order-divides-p-minus-one, name: 'An order modulo p divides p − 1', lean: [ZMod.orderOf_dvd_card_sub_one], known-as: "Fermat's little theorem", field: number theory, case: 'in the form that the order divides p − 1', gives: 'For a prime p and a number a that is not zero modulo p, the order of a modulo p divides p − 1.'}
+  terms:
+    - {name: prime, summary: 'A whole number larger than 1 that only 1 and the number itself divide.'}
+    - {name: cyclotomic polynomial, summary: 'The k-th cyclotomic polynomial is the polynomial whose roots are the primitive k-th roots of unity.'}
+  concepts:
+    - {slug: order-modulo-p, name: 'The order of a number modulo p', summary: 'The least positive power of the number that leaves remainder 1 when divided by p.'}

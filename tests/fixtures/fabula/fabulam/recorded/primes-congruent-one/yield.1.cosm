@@ -1,0 +1,34 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `yield` over PrimesCongruentOne.lean.
+engine: model:hand-recorded
+recorded: by hand
+job: yield
+tokens: 0
+seconds: 0
+output: |
+  yield:
+    name: What the proof delivers
+    beyond: "yes"
+    says: 'The proof names the prime. For k at least 2 it is the least prime factor of the value of the k-th cyclotomic polynomial at k · n!, and it is larger than n.'
+    as-statement: 'For every k ≥ 2 and every n, the least prime factor p of the value of the k-th cyclotomic polynomial at k · n! satisfies p > n and p ≡ 1 (mod k).'
+    needs: []
+    bound: none
+    chooses:
+      - what: 'the point the polynomial is evaluated at'
+        where: "Nat.exists_prime_gt_modEq_one"
+        value: 'k · n!'
+        gives: 'For a point at least 2 that is a multiple of k, a prime that is 1 modulo k and does not divide the point; it exceeds n when n! divides the point.'
+        best: "the file's choice"
+        confidence: medium
+    trivial:
+      - {case: 'k = 1', known: 'every prime qualifies', delivered: 'a prime beyond n by the known infinitude of primes', compares: equal}
+    grounds: [{of: "Nat.exists_prime_gt_modEq_one", lines: "33-59"}]
+    confidence: medium
+  case:
+    slug: k-three-n-two
+    name: 'k = 3, n = 2'
+    given: 'k = 3 and n = 2. The point is 3 · 2! = 6. The third cyclotomic polynomial is x² + x + 1.'
+    expect: 'At 6 it gives 43. Its least prime factor is 43, which is larger than 2 and equals 3 · 14 + 1.'
+  constants:
+    - {slug: the-point, name: 'The point k · n!', says: 'The proof evaluates the k-th cyclotomic polynomial at k times n factorial.', value: 'k * n!', where: ["Nat.exists_prime_gt_modEq_one"], why: 'Every number from 1 to n divides it, so a prime that does not divide it exceeds n.'}
+  slack: []

@@ -1,0 +1,20 @@
+# HAND-RECORDED. A person wrote this answer for the tests on 2026-11-22, in the shape of a recorded candidate
+# (Thym 12.4). No model gave it. It stands in for the model's answer to the job `pshort` at density `everyone`.
+engine: model:hand-recorded
+recorded: by hand
+job: pshort-everyone
+tokens: 0
+seconds: 0
+output: |
+  body: |
+    A prime is a whole number larger than 1 that only 1 and the number itself divide. [L:term/prime] Pick any whole number that is not zero and call it k. This proof shows that infinitely many primes leave remainder 1 when divided by k. [C:statement/Nat.infinite_setOfPred_prime_modEq_one] The file that holds the proof says so itself, in a note at its top: it sets out to prove that for any positive k there are infinitely many such primes. [N:aim/primes-congruent-to-one]
+
+    How do you show that something never runs out? You cannot count such primes to the end, because there is no end, and nothing lists them. So the proof changes the task. To show there is no end to these special primes, it is enough to show that however far along the whole numbers you go, there is always one more of them further on. [C:part/what-must-be-found]
+
+    That is the real work, and it is done by building. The proof builds one large whole number on purpose and takes the smallest prime that divides it. The way the number is built keeps every small prime from dividing it, and forces that smallest prime to leave remainder one. There is a condition: the smallest prime that divides the built number lies beyond the chosen bound only because the number is built from a multiple of every whole number from one to that bound. [C:part/a-number-built-to-have-the-right-factor]
+
+    Small numbers show the building at work. Take k = 3, and ask for a prime beyond the number written n, with n = 2. The proof multiplies 3 by 2 · 1 and gets 6; it calls this the point. It then puts 6 into a fixed recipe, x² + x + 1, where x stands for the number put in, and gets 43. The smallest prime that divides 43 is 43 itself. It is larger than 2, and it equals 3 · 14 + 1, so it leaves remainder 1 when divided by 3. [P:case/k-three-n-two] The proof does not only say that such a prime exists. It says which one it is: the smallest prime that divides the number it built. [P:yield/what-the-proof-delivers]
+
+    The last step is short. If there is always one more beyond any point, there can be no last one, so there are endlessly many. [C:part/from-one-to-many]
+
+    One thing should be said plainly about this guide. The file was read as text, and names in it were matched by spelling, so a link between two of its parts may be missing. [P:assumption/read-as-text]
