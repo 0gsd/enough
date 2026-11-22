@@ -897,7 +897,7 @@ opening with `[review-mode selection in <path>, line N]` and a quoted snippet
 asks for that snippet alone — never a rewrite in the reply: (1) `read_file`
 the document; (2) `write_file` the whole file with exactly that text
 replaced, everything else byte-identical; (3) end with one line on the
-change and the literal **"save or undo?"**. One selection in, one edit out.
+change and the literal **"save or undo?"**.
 """
 
 WIKI_LEAN_INSTRUCTIONS = """\
@@ -940,9 +940,8 @@ COMPOSURE_LEAN_INSTRUCTIONS = """\
 
 A composure is a canvas document in a `.comp` file: modules (text cards,
 pages, links to project files, wiki articles or web pages) on a surface the
-user is looking at while you work — shared ground, never a file you own,
-for material with a shape rather than a sequence. Every tool takes the
-`.comp` `<path>`:
+user is looking at while you work — shared ground, never a file you own.
+Every tool takes the `.comp` `<path>`:
 
 <tool name="comp_add_module">
 <path>rness/io/composure/chapter-map.comp</path>
@@ -964,9 +963,8 @@ idea.
 """
 
 POLICIES_LEAN_PREAMBLE = """\
-The policies are summarised here; each lives in `rness/policies/` and is
-read with `read_file` the first time its trigger fires. Three rules hold
-regardless:
+Each policy lives in `rness/policies/`; `read_file` it the first time its
+trigger fires. Three rules hold regardless:
 
 - Outside the project, read and write only paths
   `rness/policies/allowlists.md` names (`~/enough/` is readable); for any
@@ -1219,9 +1217,6 @@ that the user configures through plain-text conventions.
 #: where files go, in fewer words; the canon store and the wiki archive are
 #: the lean tool summaries' business.
 HARNESS_CONTEXT_LEAN_TMPL = """\
-You are running inside an "enough" harness — a paradigmless personal computer
-the user configures through plain-text conventions.
-
 - Project directory: {project_dir}
 - Your configuration lives under `rness/`: `rness/AGENT.md` (identity),
   `rness/MOTIVATION.md` (drive), `rness/paradigms/<name>.md` (the active one
@@ -2653,8 +2648,8 @@ def _load_paradigm_catalog(rness: Path, active) -> str:
     lines.append(
         "Other paradigms in this project. Up to three can be on together: "
         "edit the names, one a line, under `# Active paradigm` in "
-        "`rness/active-paradigm` with `write_file`; one name alone means that "
-        "one alone. A change takes effect on the NEXT turn."
+        "`rness/active-paradigm` with `write_file`. A change takes effect on "
+        "the NEXT turn."
     )
     lines.append("")
     for name, desc, _tooltip in items:

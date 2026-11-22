@@ -715,7 +715,7 @@ pieces answer it; none changes prompt text.
   both pointing at the skill's body. With translator, macrocosm-oes and
   scaffolder all on, every paradigm state fits 8,192 with the reserve
   (`tests/test_prompt_weight.py`, the skills-on fit test, which counts at
-  3.6 chars a token: Gemma's measured floor on the lean prompt). The **`harness_guide`**
+  3.55 chars a token, under Gemma's measured floor on the lean prompt). The **`harness_guide`**
   tool (`<topic>` composures | girraphs | review | wikisink | canon | cloud |
   twins; `tools.run_harness_guide`, `prompt.harness_guides()`) hands the full
   text back on demand — no file, no gate, exactly what the chat prompt would
@@ -723,7 +723,7 @@ pieces answer it; none changes prompt text.
 - *The rule.* `lean_wanted(tokens, n_ctx)`: lean when the full prompt would
   take more than `LEAN_SHARE` (half) of the window. `_run_turn` applies it
   per turn through `assemble_for_window(project_dir, n_ctx, pal=)` (chars /
-  `CHARS_PER_TOKEN` = 3.7; the fit tests count at 3.6) and records the choice
+  `CHARS_PER_TOKEN` = 3.7; the fit tests count at 3.55) and records the choice
   on `session.prompt_profile`; `/api/llm-status` reports it as
   `prompt_profile` beside the preflight's own `profile`. The preflight gets
   a second builder, `build_lean_prompt`, and when the exact full count wants

@@ -722,13 +722,13 @@ def test_lean_keeps_what_the_council_profile_keeps(project: Path):
 #: The same reserve the runtime preflight keeps (`enough.preflight.RESERVE`).
 CTX_RESERVE = 2_048
 #: chars per token — gemma-4's, the lower (more tokens) of the two shipped
-#: tokenizer families (plan §1a: 3.76 gemma, 3.88 qwen). 0.9 (lane E1): on the
-#: lean prompt with skills on, Gemma's own `/tokenize` came to 3.60 to 3.68
-#: chars a token, densest where transcognition rides, so 3.7 (`prompt`'s
-#: estimate for choosing a profile) undercounted by up to 2.3 per cent and
-#: the test believed in headroom an 8,192 window did not have. The fit tests
-#: count at the measured floor, 3.6, so a change they pass fits a real window.
-CHARS_PER_TOKEN = 3.6
+#: tokenizer families (plan §1a: 3.76 gemma, 3.88 qwen). 0.9 (lanes E1, E2): on
+#: the lean prompt with skills on, Gemma E4B's own `/tokenize` came to 3.57 to
+#: 3.65 chars a token, densest where transcognition rides, so 3.7 (`prompt`'s
+#: estimate for choosing a profile) undercounted by up to 3.5 per cent and the
+#: test believed in headroom an 8,192 window did not have. The fit tests count
+#: at 3.55, under the measured floor, so a change they pass fits a real window.
+CHARS_PER_TOKEN = 3.55
 #: The fixture's project path is written `<project>`; a real one is longer.
 #: 130 chars is the path the plan measured with (§1).
 PROJECT_PATH_CHARS = 130
