@@ -761,7 +761,8 @@ def test_the_reference_built_from_the_draft_says_built_in_or_minicosm(tmp_path):
     assert [(n["id"].split("/")[1], n["core"]) for n in formats] == [
         ("comprise", False), ("cosm", True), ("canon", True), ("fabula", True), ("doc", True), ("ascribe", False),
         ("thym", True)]
-    assert by["R:minicosm/fabula"]["atem"] == "one input decompiled, a text, a poem or a folder of code"
+    assert by["R:minicosm/fabula"]["atem"] == ("one input decompiled, a text, a poem, a folder of code or a formal "
+                                               "proof")                 # the fourth flavour, 0.9
     assert by["R:minicosm/fabula"]["old"] == ["emf/1"]
     assert by["R:kind/ascribe.A.affinity"]["atem"] == "something the person is drawn to, or turns from"
     examples = [n for n in nodes if n.get("type") == "example"]
