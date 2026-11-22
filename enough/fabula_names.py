@@ -33,8 +33,10 @@ from . import macrocosm
 OES = "fabula/1"
 OLD_OES = "emf/1"
 DECLARATIONS = (OES, OLD_OES)              # what a fabula's first lines may declare; only OES is written
-FLAVOURS = ("fabulan", "fabulap", "fabulac")
-TEXT_FLAVOURS = ("fabulan", "fabulap")     # what a text may be decompiled as; a fabulac is a folder's
+FLAVOURS = ("fabulan", "fabulap", "fabulac", "fabulam")
+TEXT_FLAVOURS = ("fabulan", "fabulap")     # what a text may be decompiled as; a fabulac is a folder's, a fabulam a
+                                           # Lean file's (named by the person or the file, never a text's twin)
+NOT_TWINS = ("fabulac", "fabulam")         # flavours that never pair with a text beside them
 OLD_FLAVOUR = "fabulan"                    # an old-named twin (and every `emf/1` file) is a fabulan
 COSM = ".cosm"
 SHORT_STEM_SUFFIXES = tuple(f".{f}{COSM}" for f in FLAVOURS) + (COSM,)   # the order a short's stem is looked up in
@@ -91,6 +93,9 @@ def check_text_flavour(flavour: str | None) -> str | None:
         return None
     if fl == "fabulac":
         raise FlavourError("fabulac is the fabula of a folder of code; a text is decompiled as fabulan (prose) "
+                           "or fabulap (verse)")
+    if fl == "fabulam":
+        raise FlavourError("fabulam is the fabula of a Lean proof; a text is decompiled as fabulan (prose) "
                            "or fabulap (verse)")
     if fl not in TEXT_FLAVOURS:
         raise FlavourError(f"flavour must be fabulan (prose) or fabulap (verse), not {flavour!r}")
@@ -216,7 +221,7 @@ def text_of_twin(twin: Path | str) -> Path | None:
     if got is None:
         return None
     base, fl = got
-    if fl == "fabulac":
+    if fl in NOT_TWINS:
         return None
     text = twin.parent / base
     if not (_is_file(twin) and _is_file(text)) or not declares_fabula(twin):
@@ -287,7 +292,7 @@ def folder_twins(entries: Iterable[Path]) -> FolderTwins:
         if got is None:
             continue
         base, fl = got
-        if fl == "fabulac" or base not in files:
+        if fl in NOT_TWINS or base not in files:
             continue
         if not declares_fabula(p):
             continue
@@ -330,6 +335,102 @@ def standalone_names(stem: str) -> tuple[str, ...]:
     """The names a standalone fabula a short of stem `stem` may have been compiled from, in the order they are
     tried: `rain.fabulan.cosm`, `rain.fabulap.cosm`, `rain.fabulac.cosm`, `rain.cosm`."""
     return tuple(f"{stem}{s}" for s in SHORT_STEM_SUFFIXES)
+
+
+# ---------------------------------------------------------------------------
+# A fabulam's names: the file, its parts, its pshorts, its items' ids (MacroCOSM OES 18.4.10; design 6, 1.3)
+# ---------------------------------------------------------------------------
+
+FABULAM_SUFFIX = ".fabulam.cosm"
+FABULAM_PARTS_SUFFIX = ".fabulam.parts"
+PSHORT_DENSITIES = ("expert", "student", "everyone")
+_STAMP_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4}$")
+_CAMEL_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
+_SLUG_CHAR = re.compile(r"[A-Za-z0-9._@-]")
+
+
+def fabulam_stem(source_name: str) -> str:
+    """The name a fabulam takes by rule from its Lean file's or folder's name, when the person gives none: the
+    extension dropped, words split where a small letter or a digit meets a capital, lowercased, and anything outside
+    a-z and 0-9 a hyphen. `PrimesCongruentOne.lean` -> `primes-congruent-one`; `LSeries` -> `lseries`."""
+    base = source_name.rstrip("/").rsplit("/", 1)[-1]
+    if base.endswith(".lean"):
+        base = base[: -len(".lean")]
+    s = re.sub(r"[^a-z0-9]+", "-", _CAMEL_RE.sub("-", base).lower()).strip("-")
+    return s or "fabulam"
+
+
+def fabulam_name(name: str) -> str:
+    """`primes-congruent-one` -> `primes-congruent-one.fabulam.cosm`."""
+    return f"{name}{FABULAM_SUFFIX}"
+
+
+def fabulam_parts_folder(name: str) -> str:
+    """The folder a head's parts live in, beside the head: `lseries` -> `lseries.fabulam.parts`."""
+    return f"{name}{FABULAM_PARTS_SUFFIX}"
+
+
+def fabulam_part_name(lean_file: str) -> str:
+    """A part's file inside the parts folder: `Nonvanishing.lean` -> `Nonvanishing.fabulam.cosm`."""
+    base = lean_file.rsplit("/", 1)[-1]
+    return (base[: -len(".lean")] if base.endswith(".lean") else base) + FABULAM_SUFFIX
+
+
+def fabulam_part_id(head_name: str, module: str) -> str:
+    """A part's catalog id: `fabula/<head name>--<module respelled>`, the module's dots as hyphens and every other
+    character as `declaration_slug` spells it: `fabula/lseries--Mathlib-NumberTheory-LSeries-Nonvanishing`."""
+    return f"fabula/{head_name}--{declaration_slug(module.replace('.', '-'))}"
+
+
+def pshort_name(name: str, density: str, at: str) -> str:
+    """`primes-congruent-one`, `everyone`, `2026-11-22-1405` -> `primes-congruent-one.pshort-everyone-2026-11-22-1405.md`
+    (a pshort, beside its fabulam)."""
+    if density not in PSHORT_DENSITIES:
+        raise ValueError(f"a pshort's density is {', '.join(PSHORT_DENSITIES)}, not {density!r}")
+    if not _STAMP_RE.match(at):
+        raise ValueError(f"a pshort's time is YYYY-MM-DD-HHMM, not {at!r}")
+    return f"{name}.pshort-{density}-{at}.md"
+
+
+def declaration_slug(name: str) -> str:
+    """A Lean declaration's full name respelled for an item id's slug (design 1.3, "Ids"): `'` becomes `-prime`,
+    any other character the slug grammar refuses becomes `-x` and its code point in hex; a name that would then
+    begin with no letter or digit takes `x` first, and one that would end in a dot spells the dot. `quadratic_reciprocity'`
+    -> `quadratic_reciprocity-prime`; `χ₈` -> `x-x3c7-x2088`."""
+    out = []
+    for ch in name:
+        if ch == "'":
+            out.append("-prime")
+        elif _SLUG_CHAR.match(ch):
+            out.append(ch)
+        else:
+            out.append(f"-x{ord(ch):x}")
+    s = "".join(out)
+    if s.endswith("."):
+        s = s[:-1] + "-x2e"
+    if not s or not s[0].isalnum() or not s[0].isascii():
+        s = "x" + s
+    return s
+
+
+def declaration_ids(decls: Iterable[tuple[str, str, int]]) -> list[str]:
+    """The item ids of a file's declarations, in order: each `(kind, full name, line)` (kind `statement`, `lemma` or
+    `definition`) -> `C:<kind>/<declaration_slug(name)>`. An unnamed one is `C:definition/instance-L<line>` or
+    `C:lemma/example-L<line>` (its kind's word: `instance` for a definition, `example` for a lemma). A slug two names
+    share: the later takes `-2`, then `-3`."""
+    seen: set[str] = set()
+    out: list[str] = []
+    for kind, name, line in decls:
+        if name:
+            slug = declaration_slug(name)
+        else:
+            slug = f"{'example' if kind == 'lemma' else 'instance'}-L{line}"
+        iid, n = f"C:{kind}/{slug}", 2
+        while iid in seen:
+            iid, n = f"C:{kind}/{slug}-{n}", n + 1
+        seen.add(iid)
+        out.append(iid)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -380,9 +481,11 @@ def suggest_flavour(text: str) -> str:
 
 
 __all__ = [
-    "COSM", "DECLARATIONS", "FLAVOURS", "FlavourError", "FolderTwins", "OES", "OLD_FLAVOUR", "OLD_OES",
+    "COSM", "DECLARATIONS", "FABULAM_PARTS_SUFFIX", "FABULAM_SUFFIX", "FLAVOURS", "FlavourError", "FolderTwins",
+    "NOT_TWINS", "OES", "OLD_FLAVOUR", "OLD_OES", "PSHORT_DENSITIES",
     "SHORT_STEM_SUFFIXES", "TEXT_FLAVOURS", "VERSE_LINE_MAX", "VERSE_MIN_LINES", "VERSE_SHORT_SHARE",
-    "check_text_flavour", "declares_fabula", "derived_at", "find_twin", "flavour_of_twin", "folder_twins",
+    "check_text_flavour", "declaration_ids", "declaration_slug", "declares_fabula", "fabulam_name",
+    "fabulam_part_id", "fabulam_part_name", "fabulam_parts_folder", "fabulam_stem", "pshort_name", "derived_at", "find_twin", "flavour_of_twin", "folder_twins",
     "is_old_declaration", "is_old_name", "is_twin", "old_twin_path", "parse", "primary", "short_stem",
     "standalone_names", "suffix", "suggest_flavour", "superseded_by", "text_of_twin", "text_twins", "twin_name",
     "twin_path",

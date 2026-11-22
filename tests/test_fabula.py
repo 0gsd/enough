@@ -161,7 +161,7 @@ def test_flavour_absent_reads_fabulan_and_a_bad_one_is_named_once():
     bad = _vol(_text(CLOSE).replace("flavour: fabulan\n", "flavour: fabulax\n", 1))
     rep = M.lint(bad)
     assert [str(p) for p in rep.errors] == \
-        ["flavour x.fabulan.cosm: flavour 'fabulax' is not fabulan, fabulap or fabulac"]
+        ["flavour x.fabulan.cosm: flavour 'fabulax' is not fabulan, fabulap, fabulac or fabulam"]
 
 
 def test_a_fabulap_relabelled_fabulan_fails_flavour_kind_on_every_verse_kind():
@@ -179,7 +179,7 @@ def test_a_code_kind_in_a_fabulan_and_a_reading_in_a_fabulac_are_refused():
     assert "claim" not in kinds and "maker" not in kinds
     v = _vol(_text(ROSE).replace("flavour: fabulap", "flavour: fabulac", 1))
     msgs = {p.message for p in _checks(M.lint(v), "flavour-kind")}
-    assert "a reading belongs to fabulan or fabulap, not to a fabulac" in msgs
+    assert "a reading belongs to fabulan, fabulap or fabulam, not to a fabulac" in msgs
 
 
 # ---------------------------------------------------------------------------
@@ -437,7 +437,7 @@ def test_the_fabula_manifest():
     assert (m.name, m.title, m.version, m.core) == ("fabula", "fabula", 1, True)
     assert m.declaration["value"] == "fabula/1" and m.declaration["absent"] == "refuse"
     assert list(m._block("modules")) == list("ILEKNCRPTX")                     # ten; D is the core's
-    assert m.flavours == ["fabulan", "fabulap", "fabulac"] and m.flavour_absent == "fabulan"
+    assert m.flavours == ["fabulan", "fabulap", "fabulac", "fabulam"] and m.flavour_absent == "fabulan"
     assert {"flavour", "flavour-kind"} <= set(m.checks())
     assert m.data["catalog"]["derived-runs-fields"] == ["program", "run", "at", "model", "route", "provider"]
     for L in "LEKX":

@@ -1,9 +1,10 @@
 # The fabula 1: a built-in of MacroCOSM's core. What a decompile makes from one input: everything found in it or
 # derived from it, enumerated item by item: its inspiration, meaning, intent, construction, production and
-# assertions, and its atems. One format, three flavours: fabulan (narrative and non-fiction prose), fabulap (poetry,
-# metered verse, song lyrics), fabulac (code: a folder of source). A fabula is compiled into a short (markdown for
-# prose and verse; for code a cshort, a folder of source rebuilt from it, viewed and never run) and said most plainly
-# as an atem (for code also a catem, everything a user can do, at one of three depths).
+# assertions, and its atems. One format, four flavours: fabulan (narrative and non-fiction prose), fabulap (poetry,
+# metered verse, song lyrics), fabulac (code: a folder of source), fabulam (a formal proof: one Lean 4 file, read as
+# text). A fabula is compiled into a short (markdown for prose and verse; for code a cshort, a folder of source rebuilt
+# from it, viewed and never run; for a proof a pshort, at one of three densities) and said most plainly as an atem
+# (for code also a catem, everything a user can do, at one of three depths).
 #
 # Every emf/1 file is a valid fabulan with no conversion: the declaration reads the old spelling (declaration.old),
 # and the six modules L E K P T X keep emf/1's kinds, fields and closed lists exactly. Four modules are added
@@ -28,7 +29,7 @@ name: fabula
 title: fabula
 version: 1
 core: true
-summary: "One input decompiled: everything found in it or derived from it, enumerated: its inspiration, meaning, intent, construction, production and assertions, and its atems. Three flavours: prose, verse, code."
+summary: "One input decompiled: everything found in it or derived from it, enumerated: its inspiration, meaning, intent, construction, production and assertions, and its atems. Four flavours: prose, verse, code, proof."
 spec: https://macro.cosmoes.org/      # MacroCOSM OES, section 18.4 (bundled as docs/MACROCOSM_OES.md)
 reference: [enough/macrocosm.py]
 
@@ -52,12 +53,13 @@ format:
 
 volume:
   catalog: ['<text>.fabulan.cosm', '<text>.fabulap.cosm', '<folder>.fabulac.cosm', '<name>.fabulan.cosm',
-            '<name>.fabulap.cosm', '<text>.cosm']      # <text>.cosm is the old twin name, read forever; a fabula is
-  single-file: true                                   # identified by its declaration, never by its file name
+            '<name>.fabulap.cosm', '<text>.cosm',      # <text>.cosm is the old twin name, read forever; a fabula is
+            '<name>.fabulam.cosm']                    # identified by its declaration, never by its file name
+  single-file: true
 
 catalog:
   keys: [oes, macrocosm, flavour, purpose, written-for, ruled-by, cases, id, name, source, derived, program, head, parts,
-         atem, shorts, catems, entailed, nodes]
+         atem, telling, audit, shorts, catems, entailed, nodes]       # telling, audit: a fabulam's only (18.4.10)
   purpose: [transconception]                           # absent: kept for its own sake; transconception turns on the
                                                        # checks and gates of transconception (MacroCOSM OES 18.4.9),
                                                        # written after flavour; enough/transconception.py runs them
@@ -69,7 +71,7 @@ catalog:
                the fabulac keeps P:case items for the cases a person wrote or ruled'
   id: fabula/<slug>
   id-old: [emf/<slug>]                                 # an emf/1 twin's id, read as it is
-  flavour: [fabulan, fabulap, fabulac]
+  flavour: [fabulan, fabulap, fabulac, fabulam]        # fabulam: a formal proof, one Lean 4 file (18.4.10)
   flavour-absent: fabulan                              # every emf/1 file
   source-fields: [path, sha256, size, mtime_ns]                    # a text; absent for a standalone fabula
   source-folder-fields: [path, kind, language, files, bytes, skipped, tree, commit, origin, licence, obtained, swhid]   # a folder (fabulac)
@@ -107,7 +109,7 @@ catalog:
                                                                    # run included; the single keys describe the last
                                                                    # run that derived the fabula from its source
   atem-fields: [line, focus, push, pull]
-  shorts-fields: [path, at, by, mode, order, route, language, files, entailed, target, layout, evidence]
+  shorts-fields: [path, at, by, mode, order, route, language, files, entailed, target, layout, evidence, density]
   shorts-entailed: [apart, beside]                                 # a cshort entailed from the fabulac alone (apart)
                                                                    # or with the source at hand (beside)
   shorts-target: a ref to N:target/<language>
@@ -119,6 +121,25 @@ catalog:
   catems-fields: [path, at, by, mode, route, depth]
   catems-path: '<folder>.catem-<YYYY-MM-DD-HHMM>.md'
   catems-depths: [line, overview, manual]
+  # A fabulam (MacroCOSM OES 18.4.10): one Lean 4 file read as text, never built. Its source, for one file (a part,
+  # or a fabulam that stands alone), is kind: text; a head's is kind: folder with the folder fields below.
+  source-proof-fields: [path, kind, language, toolchain, module, lines, size, sha256, imports, commit, origin,
+                        licence, obtained, target, target-by, wording, read, checking]
+  source-proof-folder-fields: [path, kind, language, toolchain, files, lines, bytes, skipped, tree, commit, origin,
+                               licence, obtained, target, target-by, wording, read, checking]
+  source-target-by: [given, rule]                      # target: the full names of the final theorems told
+  source-read-fields: [by, elaborated, comments]       # fixed in this build: {by: rules, elaborated: "no", comments: blanked}
+  source-checking-fields: [sorry, axioms, native-decide, said, said-by, said-at, built-here]
+                                                       # built-here is always "no"; said, said-by, said-at are the
+                                                       # person's own entry, never a model's
+  telling-form: 'the ids of every stage (C:part, division: stage), in the order a teacher would tell them, the
+                 reduction first'
+  audit-fields: [lines, kind, 'on', verdict, claim]    # one row per comment of the file, made at the survey
+  audit-kind: [header, module-note, note, inline]
+  audit-verdict: [agrees, claim, nothing]              # claim: see the P:claim the row names in claim
+  atem-fields-fabulam: [line, of, focus, push, pull]   # of: the C:statement the line restates
+  shorts-density: [expert, student, everyone]
+  shorts-path-fabulam: '<name>.pshort-<density>-<YYYY-MM-DD-HHMM>.md'   # a pshort, beside the fabulam, entailed: apart
 
 module-file:
   shapes:
@@ -191,7 +212,8 @@ closed-lists:
   intended: [true, false]                                                 # C:behaviour, C:device, C:form, P:reading
   senses: [sight, hearing, touch, taste, smell, movement]                 # C:device: the senses an image reaches
   rules.held: [true, false]                                               # C:form: a rule of its form kept or not, or {pending: "…"}
-  division: [chapter, section, paragraph, scene, list, quotation, stanza, verse, chorus, refrain, bridge, other]
+  division: [chapter, section, paragraph, scene, list, quotation, stanza, verse, chorus, refrain, bridge, other,
+             stage]                                                      # stage: a fabulam's (18.4.10)
   foot: [iamb, trochee, anapaest, dactyl, spondee, amphibrach, mixed, none]
   basis: [accentual-syllabic, accentual, syllabic, quantitative, free]
   ending: [stopped, run-on]
@@ -233,26 +255,26 @@ modules:
     name: Lexicon
     subtitle: The words the text leans on
     kinds:
-      term: {refs: [], checked: [feed, sense], flavours: [fabulan, fabulap, fabulac]}
+      term: {refs: [], checked: [feed, sense], flavours: [fabulan, fabulap, fabulac, fabulam]}
   E:
     name: Entities
     subtitle: The particular things and people named
     kinds:
-      person: {refs: [], flavours: [fabulan, fabulap, fabulac]}
-      org: {refs: [], flavours: [fabulan, fabulap, fabulac]}
-      place: {refs: [], flavours: [fabulan, fabulap, fabulac]}
-      work: {refs: [], flavours: [fabulan, fabulap, fabulac]}
-      thing: {refs: [], flavours: [fabulan, fabulap, fabulac]}
+      person: {refs: [], flavours: [fabulan, fabulap, fabulac, fabulam]}
+      org: {refs: [], flavours: [fabulan, fabulap, fabulac, fabulam]}
+      place: {refs: [], flavours: [fabulan, fabulap, fabulac, fabulam]}
+      work: {refs: [], flavours: [fabulan, fabulap, fabulac, fabulam]}
+      thing: {refs: [], flavours: [fabulan, fabulap, fabulac, fabulam]}
   K:
     name: Concepts
     subtitle: The ideas and universals the text uses
     kinds:
-      concept: {refs: [defined-by], flavours: [fabulan, fabulap, fabulac]}
+      concept: {refs: [defined-by], flavours: [fabulan, fabulap, fabulac, fabulam]}
   N:
     name: Intent
     subtitle: What the work means to do, for whom, and what it chose
     kinds:
-      aim: {refs: [roles.*], checked: [stance, measure], flavours: [fabulan, fabulap, fabulac],
+      aim: {refs: [roles.*], checked: [stance, measure], flavours: [fabulan, fabulap, fabulac, fabulam],
             required: [id, type, name, summary, provenance, stance]}
       audience: {refs: [], checked: [stance, who, needs], flavours: [fabulan, fabulap, fabulac],
                  required: [id, type, name, summary, provenance, stance]}
@@ -261,7 +283,8 @@ modules:
       requirement: {refs: [met-by, checked-by], checked: [stance, force, of], flavours: [fabulac],
                     required: [id, type, name, summary, provenance, stance, force],
                     closed: {of: [behaviour, quality, making]}}
-      decision: {refs: [by, changed-in], checked: [stance, chose, over, because], flavours: [fabulan, fabulap, fabulac],
+      decision: {refs: [by, changed-in], checked: [stance, chose, over, because, confidence],
+                 flavours: [fabulan, fabulap, fabulac, fabulam],
                  required: [id, type, name, summary, provenance, stance, chose]}
       exclusion: {refs: [], checked: [stance, horizon, because], flavours: [fabulan, fabulap, fabulac],
                   required: [id, type, name, summary, provenance, stance]}
@@ -274,8 +297,11 @@ modules:
     name: Construction
     subtitle: How the work is built
     kinds:
-      part: {refs: [of], checked: [division, number, heading, stance], flavours: [fabulan, fabulap],
-             required: [id, type, name, summary, provenance, stance, division]}
+      part: {refs: [of, steps], checked: [division, number, heading, stage, says, plain, plain-if, obvious, steps, regime,
+             confidence, stance], flavours: [fabulan, fabulap, fabulam],
+             required: [id, type, name, summary, provenance, stance, division],
+             closed: {stage: [reduction, main, tool, side, close]}}       # stage and the fields after it: a
+                                                                           # fabulam's stage (division: stage)
       device: {refs: [where], checked: [figure, effect, cue, senses, intended, stance], flavours: [fabulan, fabulap],
                required: [id, type, name, summary, provenance, stance, figure]}
       voice: {refs: [roles.*], checked: [perspective, tone, stance], flavours: [fabulan, fabulap],
@@ -288,9 +314,11 @@ modules:
               required: [id, type, name, summary, provenance, stance]}
       form: {refs: [parts, metre, departures.at], checked: [form, scheme, rules, intended, stance], flavours: [fabulap],
              required: [id, type, name, summary, provenance, stance, form]}
-      file: {refs: [component], checked: [path, language, holds, length, sha256, entry, stance], flavours: [fabulac],
+      file: {refs: [component], checked: [path, language, holds, length, sha256, entry, opens, limits, stance],
+             flavours: [fabulac, fabulam],
              required: [id, type, name, summary, provenance, stance, path]}
-      component: {refs: [files, of, exposes, uses], checked: [does, told-in, stance], flavours: [fabulac],
+      component: {refs: [files, of, exposes, uses], checked: [does, told-in, offers, stages, counts, completeness, stance],
+                  flavours: [fabulac, fabulam],
                   required: [id, type, name, summary, provenance, stance]}
       interface: {refs: [defined-in, ruling.made-for, ruling.by], checked: [surface, signature, takes, gives, raises, exported,
                   plain, stated-in, ruling, stance], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, surface],
@@ -301,18 +329,43 @@ modules:
       behaviour: {refs: [of, ruling.made-for, ruling.by], checked: [when, does, edges, errors, intended, ruling, stance],
                   flavours: [fabulac], required: [id, type, name, summary, provenance, stance, does]}
       dependency: {refs: [used-by], checked: [package, version, scope, needed-for, licence, address, resolved, digest, stance],
-                   flavours: [fabulac], required: [id, type, name, summary, provenance, stance, scope]}
+                   flavours: [fabulac, fabulam], required: [id, type, name, summary, provenance, stance, scope]}
       setting: {refs: [read-by, ruling.made-for, ruling.by], checked: [key, set-in, default, means, ruling, stance],
                 flavours: [fabulac], required: [id, type, name, summary, provenance, stance, set-in]}
       reliance: {refs: [of, used-by, shown-by, ruling.made-for, ruling.by], checked: [on, of, gives, example, shown-by, used-by,
-                 entry, stated, contradicted-by, ruling, stance], flavours: [fabulac],
+                 entry, stated, contradicted-by, ruling, lean, known-as, field, case, stated-in, digest, stance],
+                 flavours: [fabulac, fabulam],
                  required: [id, type, name, summary, provenance, stance, 'on', gives],
-                 closed: {'on': [language, runtime, platform, dependency]}}
+                 closed: {'on': [language, runtime, platform, dependency, part]}}   # part, lean, known-as, field,
+                                                                                    # case, digest: a fabulam's; lean
+                                                                                    # is required there (declared-once)
+      # A fabulam's own kinds (MacroCOSM OES 18.4.10): a final theorem, a definition, any other theorem or lemma
+      # (each one Lean declaration, its id the kind and the full name), a constant the proof fixes, a step with no
+      # declaration of its own. open: fields the shared closed lists do not hold for this kind (a lemma's scope is
+      # the lines of the variables in scope, not a dependency's scope).
+      statement: {refs: [uses, leans-on, relates.to], checked: [lean, says, quantifiers, form, slack, reached, depth, stance],
+                  flavours: [fabulam], required: [id, type, name, summary, provenance, stance, lean, says, quantifiers]}
+      definition: {refs: [uses, used-by], checked: [lean, says, form, fields, reached, depth, carries, private, stance],
+                   flavours: [fabulam], required: [id, type, name, summary, provenance, stance, lean, form],
+                   closed: {form: [def, abbrev, structure, class, inductive, instance, opaque, axiom, alias, notation, other],
+                            reached: ['yes', 'no', perhaps]}}
+      lemma: {refs: [uses, used-by, leans-on], checked: [lean, says, form, role, method, why, slack, automation, scope,
+              reached, depth, carries, private, proof, sorry, stance], flavours: [fabulam],
+              required: [id, type, name, summary, provenance, stance, lean],
+              closed: {form: [theorem, lemma, instance, example], role: [spine, support, bookkeeping],
+                       proof: [tactic, term, none], reached: ['yes', 'no', perhaps]},
+              open: [scope]}
+      constant: {refs: [where], checked: [says, value, why, stance], flavours: [fabulam],
+                 required: [id, type, name, summary, provenance, stance, says, where],
+                 closed: {confidence: [high, medium, low]}}
+      step: {refs: [inside], checked: [says, stance, span], flavours: [fabulam],
+             required: [id, type, name, summary, provenance, stance, inside, says, span],
+             closed: {confidence: [high, medium, low]}}
   R:
     name: Production
     subtitle: Who made the work, with what, and how it changed
     kinds:
-      maker: {refs: [who], checked: [capacity, statements, stance], flavours: [fabulan, fabulap, fabulac],
+      maker: {refs: [who], checked: [capacity, statements, stance], flavours: [fabulan, fabulap, fabulac, fabulam],
               required: [id, type, name, summary, provenance, stance]}
       change: {refs: [by, touches, release, phase], checked: [at, nature, because, commit, stance], flavours: [fabulan, fabulap, fabulac],
                required: [id, type, name, summary, provenance, stance]}
@@ -320,25 +373,40 @@ modules:
               required: [id, type, name, summary, provenance, stance]}
       release: {refs: [changes], checked: [version, at, tag, venue, stance], flavours: [fabulan, fabulap, fabulac],
                 required: [id, type, name, summary, provenance, stance]}
-      means: {refs: [], checked: [what, used-for, version, stance], flavours: [fabulan, fabulap, fabulac],
+      means: {refs: [], checked: [what, used-for, version, stance], flavours: [fabulan, fabulap, fabulac, fabulam],
               required: [id, type, name, summary, provenance, stance]}
       licence: {refs: [], checked: [identifier, file, holder, year, first-line, lane, notice, leave, stance],
-                flavours: [fabulan, fabulap, fabulac], required: [id, type, name, summary, provenance, stance],
+                flavours: [fabulan, fabulap, fabulac, fabulam], required: [id, type, name, summary, provenance, stance],
                 closed: {lane: [open, bound, closed]}}
   P:
     name: Propositions
     subtitle: What the work claims, how it can be read, and what it must do
     kinds:
-      claim: {refs: [roles.*], checked: [stance, salience, span], flavours: [fabulan, fabulap, fabulac]}
-      reading: {refs: [of, grounds.of], checked: [whose, grounds, intended, stance, span], flavours: [fabulan, fabulap],
+      claim: {refs: [roles.*], checked: [stance, salience, span, about, checked, mismatch, by, short-of, false-as-written],
+              flavours: [fabulan, fabulap, fabulac, fabulam]}     # about to false-as-written: a fabulam's (audit-whole)
+      reading: {refs: [of, grounds.of], checked: [whose, grounds, intended, regime, confidence, stance, span],
+                flavours: [fabulan, fabulap, fabulam],
                 required: [id, type, name, summary, provenance, stance, of, whose]}
       case: {refs: [of, made-for, ruling.made-for, ruling.by], checked: [given, expect, stands, from, allowing, ruling, stance,
-             span], flavours: [fabulac], required: [id, type, name, summary, provenance, stance, of, given, expect],
-             closed: {stands: [outside, inside], from: [test, document, recorded, ruled],
+             confidence, span], flavours: [fabulac, fabulam], required: [id, type, name, summary, provenance, stance, of, given,
+             expect],
+             closed: {stands: [outside, inside], from: [test, document, recorded, ruled, worked],
                       allowing: [exit-only, exit-and-stdout, stderr-said-or-not, lines-in-any-order, own-types]}}
-      assumption: {refs: [relied-by], checked: [about, checked, if-false, relied-by, carries, stance], flavours: [fabulac],
+      assumption: {refs: [relied-by], checked: [about, checked, if-false, relied-by, carries, stance],
+                   flavours: [fabulac, fabulam],
                    required: [id, type, name, summary, provenance, stance, about],
                    closed: {checked: ['yes', 'no'], carries: [must, need-not]}}
+      # A fabulam's own (18.4.10): what a statement's proof delivers, set against what it says; how a statement
+      # compares with the public wording.
+      yield: {refs: [of, grounds.of, chooses.where], checked: [beyond, says, as-statement, needs, bound, chooses, trivial,
+              no-trivial, grounds, confidence, regime, stance], flavours: [fabulam],
+              required: [id, type, name, summary, provenance, stance, of, beyond, says, needs, bound, chooses, trivial,
+                         grounds, confidence],
+              closed: {beyond: ['yes', 'no'], bound: [at-least, at-most, exactly, between, none],
+                       confidence: [high, medium, low], trivial.compares: [above, equal, below]}}
+      fit: {refs: [of, against], checked: [how, form-differences, differences, confidence, stance], flavours: [fabulam],
+            required: [id, type, name, summary, provenance, stance, of, against, how, differences, confidence],
+            closed: {how: [same, stronger, weaker, a-particular-reading, different], confidence: [high, medium, low]}}
   T:
     name: Transitions
     subtitle: What happens, in order
@@ -349,7 +417,7 @@ modules:
     name: Atems
     subtitle: The tight reductions of passages
     kinds:
-      atem: {refs: [of], checked: [line, focus, push, pull, span], flavours: [fabulan, fabulap, fabulac]}
+      atem: {refs: [of], checked: [line, focus, push, pull, span], flavours: [fabulan, fabulap, fabulac, fabulam]}
 
 checks:
   load: [load]
@@ -360,14 +428,21 @@ checks:
         parts-resolve, interfaces-agree,                  # generic reader lists them as not run; the head's two:
                                                           # enough/fabulac_head.py (MacroCOSM OES 18.4.7, 18.4.8)
         standing, ground-given, ground-cited, stands-alone, nothing-carried, case-outside, cases-cover, ruled,
-        round-trip, target-confirmed, surface-answered, apart, evidence-stated]
-                                                          # the last thirteen: enough/transconception.py, run only on a
-                                                          # fabulac whose catalog says purpose: transconception
+        round-trip, target-confirmed, surface-answered, apart, evidence-stated,
+                                                          # the thirteen above: enough/transconception.py, run only on
+                                                          # a fabulac whose catalog says purpose: transconception
+        declared-once, statement-whole, yield-stated, fit-stated, spine-told, stages-whole, grounds-given, audit-whole,
+        stance-fits, checking-said, example-worked, no-up-to, statements-agree, regime-named, no-judgement,
+        plain-words, spine-rule-differs]
+                                                          # the last seventeen: enough/fabulam.py, run only on a
+                                                          # fabulam (18.4.10), with parts-resolve over fabulams
   contract: 'fabula-checks: the generic checks above and the own checks, with no error; its old name emf-checks is read
              wherever a manifest, a program or a trace says it'
   severity: {licence-recorded: error, session-declared: warning, reading-whose: warning, interface-signature: warning,
-             requirement-cased: warning, cases-cover: warning}               # every other check of transconception is an error (the owner,
+             requirement-cased: warning, cases-cover: warning,               # every other check of transconception is an error (the owner,
                                                  # checkpoint A, 2026-11-18)
+             regime-named: warning, no-judgement: warning, plain-words: warning, spine-rule-differs: warning}
+                                                 # a fabulam's four warnings; its other checks are errors
 
 # Transconception (MacroCOSM OES 18.4.9): a program carried into another language through its fabulac. The last
 # thirteen own checks run only on a fabulac whose catalog says purpose: transconception; the two gates are one function
@@ -442,13 +517,17 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     says: a text decompiled into its fabula, the EMF twin
     thym-1:                             # thym 1: a text as prose, verse or code, and a folder folded (THYM 6.3, 20.5, 20.6)
       takes: ['text | folder']
-      modifiers: {as: 'prose | verse | code', with: fabula}
+      modifiers: {as: 'prose | verse | code | proof', with: fabula}      # proof: a Lean file read into its fabulam
+                                                                          # (THYM 20.13); its-own-file is the
+                                                                          # program's contract block, as for Python
       contract: [span-resolves, stance-closed, terms-grounded, coverage, fabula-checks, provenance]
       contract-when:                    # a rule may also say with: <type>, met only by a call that writes that with
+        - {as: [proof], contract: [lines-resolve, nothing-invented, nothing-carried, stance-closed, fabula-checks, provenance]}
         - {as: [code], contract: [code-span, outline-cited, coverage, terms-grounded, stance-closed, fabula-checks, provenance]}
         - {takes: folder, contract: [fold-grounded, atem-shape, licence-recorded, fabula-checks, provenance]}
         - {as: [verse], with: fabula, contract: [span-resolves, stance-closed, terms-grounded, coverage, fabula-checks, provenance, nothing-lost]}
       scaffold-when:                    # a folder has none: nothing but a model reads intent, and --rules refuses it
+        - {as: [proof], scaffold: none}
         - {as: [code], scaffold: file-outline}
         - {takes: folder, scaffold: none}
   - name: entail                        # `tell`, its earlier spelling, reads as entail and is never written (THYM 6.3)
@@ -463,9 +542,11 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     thym-1:                             # thym 1: a fabulac entails code (a cshort, a folder) or a catem (THYM 6.3, 20.7),
                                         # or its cases file for the outside judge (transconception, THYM 20.10; no model),
                                         # or a layout and a cshort in another language (`in`, a string; THYM 20.10)
-      modifiers: {as: 'order | code | line | overview | manual | cases | layout', by: order, in: string,
-                  with: 'morph | short'}
+                                        # or a fabulam's pshort at one of three densities (THYM 20.13)
+      modifiers: {as: 'order | code | line | overview | manual | cases | layout | expert | student | everyone',
+                  by: order, in: string, with: 'morph | short'}
       gives-when:
+        - {as: [expert, student, everyone], gives: short}
         - {as: [code], gives: folder}
         - {as: [cases], gives: text}
         - {as: [layout], gives: short}
@@ -475,7 +556,11 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
         - {as: [layout], contract: [target-confirmed, surface-answered, no-invention, footer, provenance]}
         - {as: [line, overview, manual], contract: [coverage, no-invention, quotes-held, uses-told, footer, provenance]}
         - {as: [cases], contract: [cases-whole, provenance]}
+        - {as: [expert, student, everyone], contract: [cites-resolve, every-sentence-cited, yield-cited, telling-followed,
+                                                       no-up-to, example-worked, nothing-added, checking-told,
+                                                       confidence-told, symbols-worded, apart, length, footer, provenance]}
       scaffold-when:                    # code has none: --rules refuses it; cases needs no model, so its scaffold is itself
+        - {as: [expert, student, everyone], scaffold: none}
         - {as: [line, overview, manual], scaffold: uses-outline}
         - {as: [code], scaffold: none}
         - {as: [cases], scaffold: cases-file}
@@ -497,12 +582,18 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
     code: enough.thym.moves.emf:expand
     says: an atem opened out into a short of a given length, from its fabula
   # thym 1 only (since: 1; THYM 6.3, 20.6): the two rules-only stages of a fabulac's build
+  # survey of a text (since 0.9; THYM 20.13): a Lean file read by rule into its fabulam's outline, with its head when
+  # it is a part; a folder of Lean is the head's outline (parts-resolve is one of fabula-checks)
   - name: survey
-    takes: [folder]
+    takes: ['folder | text']
     gives: fabula
+    modifiers: {with: fabula}
     contract: [files-found, code-span, licence-recorded, fabula-checks, provenance]
+    contract-when:
+      - {takes: text, contract: [declarations-found, comments-covered, reach-agrees, code-span, licence-recorded,
+                                 fabula-checks, provenance]}
     code: enough.thym.moves.code:survey
-    says: a folder of Python read by its syntax into the outline of a fabulac, nothing run
+    says: a folder of Python read by its syntax into the outline of a fabulac, or a Lean file into its fabulam's, nothing run
     since: 1
   - name: history
     takes: [folder]
@@ -529,11 +620,19 @@ moves:                                  # Thym (docs/THYM.md, sections 6 and 17.
   - name: construe
     takes: [text]
     gives: fabula
-    modifiers: {as: 'figure | image | allusion | voice | turn | meaning | ambiguity', with: fabula}
+    modifiers: {as: 'figure | image | allusion | voice | turn | meaning | ambiguity | comments | fit | yield | stages',
+                with: fabula}           # the last four: a proof's axes, of a fabulam (since 0.9; THYM 20.13)
     asks: true
     contract: [span-resolves, no-invention, stance-kept, coverage, terms-grounded, nothing-lost, fabula-checks, provenance]
+    contract-when:
+      - {as: [comments], contract: [comments-covered, lines-resolve, nothing-lost, fabula-checks, provenance]}
+      - {as: [fit], contract: [nothing-lost, fabula-checks, provenance]}
+      - {as: [yield], contract: [lines-resolve, nothing-invented, nothing-lost, fabula-checks, provenance]}
+      - {as: [stages], contract: [lines-resolve, atem-shape, nothing-lost, fabula-checks, provenance]}
+    scaffold-when:
+      - {as: [comments, fit, yield, stages], scaffold: none}
     code: enough.thym.moves.verse:construe
-    says: one axis of a poem read by a model, every reading held as the model's own
+    says: one axis of a poem read by a model, every reading held as the model's own; or one axis of a proof
     since: 1
   # thym 1 only (since: 1; THYM 6.3, 20.11): authoring a fabulac. author begins one from a brief (a model places what
   # the brief's headings do not; the rules read the rest) or, with no operand, by rules alone: the catalog and what

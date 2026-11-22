@@ -55,13 +55,15 @@ import re
 from pathlib import Path
 from typing import Any
 
+from . import fabulam as fm
 from . import macrocosm as mc
 from . import transconception as tc
 
 FORMAT = "fabula"
 OES = "fabula/1"
 OLD_OES = ("emf/1",)                         # read as a fabulan, never written
-FLAVOURS = ("fabulan", "fabulap", "fabulac")
+FLAVOURS = ("fabulan", "fabulap", "fabulac", "fabulam")
+CODE_FLAVOURS = ("fabulac", "fabulam")      # spans are {file, lines} into a C:file; the source records its licence
 
 # The fabula's own checks, and the core's three of the dialectic, in the manifest's order (checks.own).
 FABULA_CHECKS = ("code-span", "licence-recorded", "reading-whose", "interface-signature", "case-outcome")
@@ -69,12 +71,14 @@ DIALECTIC_CHECKS = mc.CORE_CHECKS            # question-about, question-shape, s
 OWN_CHECKS = ("code-span", "licence-recorded", "question-about", "question-shape", "session-declared",
               "reading-whose", "interface-signature", "case-outcome", "requirement-cased", "cases-entailed",
               "parts-resolve", "interfaces-agree") + tc.CHECKS
+OWN_CHECKS += tuple(c for c in fm.CHECKS if c not in OWN_CHECKS)
 SEVERITY = {"code-span": "error", "licence-recorded": "error", "question-about": "error", "question-shape": "error",
             "session-declared": "warning", "reading-whose": "warning", "interface-signature": "warning",
             "case-outcome": "error", "requirement-cased": "warning", "cases-entailed": "error",
-            "parts-resolve": "error", "interfaces-agree": "error", **tc.SEVERITY}
+            "parts-resolve": "error", "interfaces-agree": "error", **tc.SEVERITY, **fm.SEVERITY}
 # The thirteen checks of transconception (enough/transconception.py) run only on a fabulac whose catalog says
-# purpose: transconception; on every other fabula they run and find nothing.
+# purpose: transconception; on every other fabula they run and find nothing. The fabulam's seventeen
+# (enough/fabulam.py, MacroCOSM OES 18.4.10) run only on a fabulam, with parts-resolve over fabulams.
 # An old contract name: `emf-checks` names `fabula-checks`, the fabula's checks passing with no error (18.1, 18.4.8).
 CONTRACT_NAMES = ("fabula-checks", "emf-checks")
 
@@ -134,7 +138,7 @@ class _Own:
     def fabula(self) -> None:
         fl = flavour(self.v)
         for it in self.items:
-            if fl == "fabulac" and "span" in it.data:
+            if fl in CODE_FLAVOURS and "span" in it.data:
                 self.code_span(it, it.data["span"], "span")
             if it.module == "P" and it.kind == "reading":
                 self.reading_whose(it)
@@ -149,6 +153,9 @@ class _Own:
             self.unmeasured = tc.run_checks(self.v, self.add)
             for check, why in self.unmeasured.items():
                 self.add(check, None, f"not measured: {why}", severity="note")
+        elif fl == "fabulam":
+            self.licence_recorded()
+            fm.run_checks(self.v, self.add)            # parts-resolve over fabulams runs there
 
     def _span_why(self, span: Any) -> str | None:
         """Why a code span does not fit the fabulac, or None when it does."""

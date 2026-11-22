@@ -1936,6 +1936,9 @@ class _Lint:
                 self.ref(it, fpath, v, soft="*" in fpath)
         own_lists = m.kind_closed(it.module, kind)
         closed = {**self.closed, **own_lists} if own_lists else self.closed
+        open_fields = _strs(kinds[kind].get("open"))     # a kind's fields the shared closed lists do not hold
+        if open_fields:                                  # (the fabulam's lemma: scope is lines, not a dependency's)
+            closed = {k: v for k, v in closed.items() if k not in open_fields or k in own_lists}
         for fpath, allowed in closed.items():
             if fpath in ("status", "visibility") and fpath in self.sel:
                 continue
