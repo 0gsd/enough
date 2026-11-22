@@ -15,13 +15,13 @@ dispatch line each (`code.survey`, `code.derive_branch`, `verse.construe`, `code
   role, method and why, the steps, the reliances, the terms and concepts.
 - `construe t as comments | yield | stages with f` and `construe w as fit with f` (ask): the comment table and the
   claims; the fit with the public wording; the yield, the worked example, the constants and the slack; the stages,
-  the telling, the readings and the atem.
-- `derive repo with h` (asks): a head's own stages, telling, readings and atem, from its parts' summaries.
+  the teaching order, the readings and the atem.
+- `derive repo with h` (asks): a head's own stages, teaching order, readings and atem, from its parts' summaries.
 - `entail f as expert | student | everyone` (asks): a pshort. Rules write its three fixed lines and its footer.
 
 The checks these calls keep are registered here: against the source, `declarations-found`, `lines-resolve`,
-`nothing-invented`, `reach-agrees`, `comments-covered`, `nothing-carried`, and `parts-resolve` as a head's survey
-holds it; of a pshort, `cites-resolve`, `every-sentence-cited`, `yield-cited`, `telling-followed`, `no-up-to`,
+`nothing-invented`, `reach-agrees`, `comments-covered`, `nothing-carried`; of a pshort, `cites-resolve`,
+`every-sentence-cited`, `yield-cited`, `teaching-followed`, `no-up-to`,
 `example-worked`, `checking-told`, `confidence-told`, `symbols-worded`, and the pshort's readings of
 `nothing-added`, `apart`, `length` and `footer`.
 
@@ -35,12 +35,13 @@ Standalone: the standard library, PyYAML and the MacroCOSM reader the package al
 from __future__ import annotations
 
 import copy
-import json
 import re
 from typing import Any
 
 from enough import macrocosm as mc
-from enough.thym.checks import body as _short_body
+from pathlib import Path
+
+from enough.thym.checks import CHECKS as _CHECKS
 from enough.thym.checks import check, split_sentences
 from enough.thym.folder import Folder, lines_in
 from enough.thym.moves import (MoveError, answer_mapping, engine, entailment_of, fabula_doc, fold, item_kind,
@@ -121,7 +122,8 @@ FIT_SAYS = ("a YAML mapping: fits, one for every statement, {of, how, form-diffe
 YIELD_SAYS = ("a YAML mapping: yield {name, beyond, says, as-statement, needs, bound, chooses, trivial, no-trivial, "
               "grounds, confidence}; case {slug, name, given, expect}; constants and slack, lists")
 STAGES_SAYS = ("a YAML mapping: stages, a list of {slug, name, number, stage, says, plain, plain-if, obvious, "
-               "steps}; telling, the stages' slugs in order; readings, three to six of {slug, name, summary, of, "
+               "steps}; teaching, the stages' slugs in the teaching order; readings, three to six of {slug, name, "
+               "summary, of, "
                "grounds, confidence}; decisions; atem {line, focus, push, pull}")
 PSHORT_SAYS = "markdown: the body of the pshort alone, each run of sentences closed by the ids it rests on"
 
@@ -210,8 +212,26 @@ def _fabulam(v: Any, what: str) -> tuple[dict, list[dict]]:
 
 
 def is_head(cat: dict) -> bool:
-    """A head fabulam: one that names its parts."""
-    return isinstance(cat.get("parts"), list)
+    """A head fabulam: its source is a folder (it names its parts once they have landed)."""
+    src = cat.get("source")
+    return isinstance(cat.get("parts"), list) or (isinstance(src, dict) and src.get("kind") == "folder")
+
+
+def part_uri(head_id: str, module: str) -> str:
+    """The URI of the part a Lean file is told in: the head's id, then the file's module respelled (the design's 6)."""
+    return f"oes:{head_id}--{respell(module)}"
+
+
+def part_path(head_name: str, file_path: str) -> str:
+    """Where a part's fabulam sits, relative to its head: `<name>.fabulam.parts/`, the source's folders mirrored."""
+    stem = file_path[:-5] if file_path.endswith(".lean") else file_path
+    return f"{head_name}.fabulam.parts/{stem}.fabulam.cosm"
+
+
+def item_uri(volume_uri: str, item_id: str) -> str:
+    """An item's URI in a volume: `oes:fabula/<name>/C/lemma/<slug>`."""
+    module, rest = str(item_id).split(":", 1)
+    return f"{volume_uri}/{module}/{rest}"
 
 
 def _first_sentence(s: Any) -> str:
@@ -542,7 +562,8 @@ def checking_says(checking: dict) -> str:
     said, by = checking.get("said"), checking.get("said-by")
     if isinstance(said, str) and said.strip() and isinstance(by, str) and by.strip():
         at = checking.get("said-at")
-        out += f" {by.strip()} says: {said.strip().rstrip('.')}" + (f" ({str(at).strip()})." if at else ".")
+        out += f" {by.strip()} says: {said.strip()}" + (f" ({str(at).strip()})." if at else
+                                                           ("" if said.strip()[-1:] in ".!?" else "."))
     return out
 
 
@@ -740,29 +761,29 @@ def _head_place(hcat: dict, hitems: list[dict], t: Value) -> dict | None:
     if f is None:
         return None
     comp = next((it for it in hitems if item_kind(it) == "component" and f["id"] in (it.get("files") or [])), None)
-    uri = str((comp or {}).get("told-in") or "")
-    part = next((p for p in hcat.get("parts") or [] if isinstance(p, dict) and p.get("uri") == uri), None)
-    return {"file": f, "component": comp, "uri": uri, "part": part}
+    module = str(f.get("module") or str(f.get("path"))[:-5].replace("/", "."))
+    return {"file": f, "component": comp, "uri": part_uri(str(hcat.get("id")), module),
+            "path": part_path(str(hcat.get("name")), str(f.get("path")))}
 
 
-def _part_source_path(hsrc: dict, part: dict | None, fpath: str) -> str:
+def _part_source_path(hsrc: dict, part: str, fpath: str) -> str:
     """A part's Lean file, relative to the part's own fabulam: up out of the parts folder, then the head's source."""
-    depth = len([p for p in str((part or {}).get("path") or "").split("/") if p]) - 1
+    depth = len([p for p in part.split("/") if p]) - 1
     return "../" * max(depth, 0) + str(hsrc.get("path") or "").rstrip("/") + "/" + fpath
 
 
-def crossing_in(hitems: list[dict], uri: str) -> dict[str, dict]:
+def crossing_in(hitems: list[dict], comp: dict | None) -> dict[str, dict]:
     """The head's items told in one part, by Lean name: the declarations of the part that another part names, and
-    the targets it holds."""
-    return {str(it["lean"]): it for it in _decls(hitems)
-            if uri and str(it.get("told-in") or "").startswith(uri + "/")}
+    the targets it holds. The part's component offers them."""
+    offers = set((comp or {}).get("offers") or [])
+    return {str(it["lean"]): it for it in _decls(hitems) if it.get("id") in offers}
 
 
-def _entries(cat: dict, hitems: list[dict] | None, uri: str, names: set[str]) -> dict[str, int]:
+def _entries(cat: dict, hitems: list[dict] | None, comp: dict | None, names: set[str]) -> dict[str, int]:
     """Where a file's reach starts: its targets at depth 0 and, in a part, what the head says crosses into it."""
     src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
     out = {t: 0 for t in src.get("target") or [] if t in names}
-    for lean, it in crossing_in(hitems or [], uri).items():
+    for lean, it in crossing_in(hitems or [], comp).items():
         if lean in names:
             out.setdefault(lean, int(it.get("depth") or 0))
     return out
@@ -794,9 +815,9 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     given = [str(x) for x in hsrc.get("target") or [] if isinstance(x, str)]
     if place is not None:
         fpath = str(place["file"].get("path"))
-        name = f"{hcat.get('name')}--{respell(str(place['file'].get('module') or fpath))}"
-        fid = str(place["uri"]).split("oes:", 1)[-1] or f"fabula/{name}"
-        path = _part_source_path(hsrc, place["part"], fpath)
+        fid = str(place["uri"]).split("oes:", 1)[-1]
+        name = fid.split("/", 1)[-1]
+        path = _part_source_path(hsrc, place["path"], fpath)
         module = place["file"].get("module") or stem
         targets, by = [x for x in given if x in names], str(hsrc.get("target-by") or "given")
         said_target = given
@@ -833,11 +854,11 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     src.update({"read": dict(READ_AS), "checking": checking})
     cat: dict = {"oes": "fabula/1", "macrocosm": mc.MACROCOSM_VERSION, "flavour": FLAVOUR, "id": fid, "name": name}
     if place is not None:
-        cat["head"] = str(hcat.get("id") and f"oes:{hcat['id']}" or "")
+        cat["head"] = f"oes:{hcat.get('id')}"
     cat["source"] = src
     # -- the reach
-    uri = place["uri"] if place is not None else ""
-    entries = _entries(cat, hitems if place is not None else None, uri, names)
+    comp = place["component"] if place is not None else None
+    entries = _entries(cat, hitems if place is not None else None, comp, names)
     for x in targets:
         entries.setdefault(x, 0)
     reach = reach_of(ctx, {fname: ol}, entries)
@@ -886,8 +907,8 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
     # -- what another part states, relied on here
     relied: list[dict] = []
     if place is not None:
-        mine = set(crossing_in(hitems, uri))
-        others = {str(it["lean"]): it for it in _decls(hitems) if it.get("told-in") and it["lean"] not in mine}
+        mine = set(crossing_in(hitems, comp))
+        others = {str(it["lean"]): it for it in _decls(hitems) if it["lean"] not in mine}
         for d in defs:
             written = outside_names(d)
             for lean, hit in others.items():
@@ -897,11 +918,10 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
                 rid = f"C:reliance/{lean_slug(lean)}"
                 rel = next((r for r in relied if r["id"] == rid), None)
                 if rel is None:
-                    kind_path = "/".join(str(hit["id"]).split(":", 1)).split("/", 2)
                     rel = {"id": rid, "type": "reliance", "name": lean,
                            "summary": f"{fname} relies on {lean}, which another part of the archive states.",
                            "stance": "deduced", "on": "part", "lean": [lean],
-                           "stated-in": f"oes:{hcat.get('id')}/{kind_path[0]}/{kind_path[1]}/{kind_path[2]}",
+                           "stated-in": item_uri(f"oes:{hcat.get('id')}", str(hit["id"])),
                            "digest": hit.get("digest"),
                            "gives": copy.deepcopy(hit.get("says")) if hit.get("says") is not None else
                            {"pending": f"what does {lean} state? its part has not been read"},
@@ -926,9 +946,10 @@ def survey_text(ctx: Any, t: Value, **mods: Any) -> Value:
          if it.get("reached") == "yes"), None)
     if first:
         atem = {"of": first, **atem}
-    cat.update({"atem": atem, "telling": [], "audit": _audit_rows(ol, ids)})
+    cat.update({"atem": atem, "teaching": [], "audit": _audit_rows(ol, ids)})
     cat["nodes"] = [_code._prov_last(it) for it in out]
-    return Value("fabula", cat, origin={"proof": {"path": fname, "candidates": reach["candidates"]}})
+    return Value("fabula", cat, origin={"proof": {"path": fname, "candidates": reach["candidates"],
+                                                  "place": place["path"] if place is not None else None}})
 
 
 # ---------------------------------------------------------------------------
@@ -1032,13 +1053,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
                                and rows.get(p, {}).get("reached") == "yes" for p in where):
             crossing.append(q)
     crossing.sort(key=lambda q: (-int(rows[q].get("carries") or 0), q))
-    parts: list[dict] = []
-    part_uri: dict[str, str] = {}
-    for p in order:
-        mod_slug = respell(module[p])
-        part_uri[p] = f"oes:{hid}--{mod_slug}"
-        parts.append({"uri": part_uri[p],
-                      "path": f"{name}.fabulam.parts/{p[:-5]}.fabulam.cosm"})
+    parts = [{"file": p, "uri": part_uri(hid, module[p]), "path": part_path(name, p)} for p in order]
     offers: dict[str, list[str]] = {p: [] for p in order}
     head_items: list[dict] = []
     for q in crossing:
@@ -1050,7 +1065,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
               "summary": f"The {form} {q}, stated here for the parts that use it.", "stance": "observed",
               "lean": q, "form": form, "span": _code.span(p, a, b), "digest": d.get("digest"),
               "says": {"pending": f"what does {q} state? its part has not been read"},
-              "told-in": f"{part_uri[p]}/C/{kind}/{lean_slug(q)}", "reached": "yes",
+              "reached": "yes",
               "depth": int(rows[q].get("depth") or 0), "carries": int(rows[q].get("carries") or 0),
               "provenance": _code.prov([_code.loc(p, a, b)])}
         if kind == "statement":
@@ -1067,7 +1082,7 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
         comp: dict = {"id": _fresh(f"C:component/{_code.name_slug(module[p])}", used), "type": "component",
                       "name": module[p], "summary": f"The Lean file {p}" + (f": {ol.get('doc')}" if ol.get("doc")
                                                                              else "."),
-                      "stance": "observed", "files": [file_ids[p]], "told-in": part_uri[p]}
+                      "stance": "observed", "files": [file_ids[p]]}
         comp["does"] = ({"pending": f"what does {module[p]} prove on the way to the targets? ({NOT_READ})"}
                         if n_reached else "No declaration of it is reached from the targets: it is outlined by "
                                           "rule and was not read.")
@@ -1131,8 +1146,9 @@ def survey_archive(ctx: Any, repo: Value, **mods: Any) -> Value:
            "derived": {"at": at, "by": "person", **({"program": run["program"]} if run.get("program") else {}),
                        **({"run": run["run"]} if run.get("run") else {}), "mode": "rules",
                        "completeness": "outline", "chunks": 0, "runs": [run]},
-           "atem": atem, "telling": [], "parts": parts, "nodes": [_code._prov_last(it) for it in out]}
-    return Value("fabula", cat, origin={"proof": {"order": order, "candidates": reach["candidates"]}})
+           "atem": atem, "teaching": [], "nodes": [_code._prov_last(it) for it in out]}
+    return Value("fabula", cat, origin={"proof": {"order": order, "parts": parts,
+                                                  "candidates": reach["candidates"]}})
 
 
 def survey_branch(ctx: Any, x: Value, mods: dict) -> Any:
@@ -1526,7 +1542,7 @@ def parse_comments(data: dict, *, fname: str, cat: dict, items: list[dict], rows
                     if ref is None:
                         raise ValueError(f"lines {row['lines']}: checked {word!r} names by, the declaration that "
                                          f"bears on it; {v!r} is none of the outline")
-                    it["by"] = ref
+                    it["by"] = [ref]
                 elif k == "mismatch":
                     if v not in MISMATCHES:
                         raise ValueError(f"lines {row['lines']}: mismatch is one of {', '.join(MISMATCHES)}")
@@ -1824,7 +1840,7 @@ def parse_yield(data: dict, *, fname: str, st: dict, items: list[dict], taken: s
     new.append({"id": _fresh(f"P:case/{_clean_slug(c.get('slug') or c['name'])}", used), "type": "case",
                 "name": fold(c["name"])[:120], "summary": _first_sentence(c.get("summary") or c["expect"]),
                 "stance": "opinion", "of": yid, "from": "worked", "stands": "inside", "given": fold(c["given"]),
-                "expect": fold(c["expect"]), "provenance": _opinion([yid], conf)})
+                "expect": fold(c["expect"]), "confidence": conf, "provenance": _opinion([yid], conf)})
     for i, row in enumerate(data.get("constants") or [], 1):
         if not isinstance(row, dict) or not row.get("name") or not row.get("says"):
             raise ValueError(f"constants entry {i} needs name, says and where")
@@ -1838,6 +1854,7 @@ def parse_yield(data: dict, *, fname: str, st: dict, items: list[dict], taken: s
         for k in ("value", "why"):
             if row.get(k) not in (None, ""):
                 k_it[k] = fold(row[k])
+        k_it["confidence"] = _confidence(row.get("confidence") or conf, f"constants entry {i}")
         k_it["provenance"] = _opinion([loc for x in where if (sp := _span_of(by_id[x])) for loc in
                                        [_code.loc(sp[0], sp[1], sp[2])]] or [fname], row.get("confidence") or conf)
         new.append(k_it)
@@ -1924,7 +1941,7 @@ def tell_yield(ctx: Any, t: Value, **mods: Any) -> Request | Value:
 
 def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: list[str], step_kinds: tuple[str, ...],
                  atem_of: str | None) -> tuple[list[dict], list[str], dict]:
-    """The fold's answer as `(new items, telling, atem)`: the stages, three to six readings, the decisions."""
+    """The fold's answer as `(new items, teaching, atem)`: the stages, three to six readings, the decisions."""
     by_lean, ids = _by_lean(items), {str(it.get("id")) for it in items}
     by_id = {str(it.get("id")): it for it in items}
     rows = data.get("stages")
@@ -1978,14 +1995,14 @@ def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: lis
     left = [s for s in spine if s not in in_steps]
     if left:
         raise ValueError(f"every spine lemma is in the steps of a stage; {', '.join(left[:6])} is in none")
-    # -- the telling: the model's order within a stage word, the words in the order the telling takes them
+    # -- the teaching order: the model's order within a stage word, the words in the order of the design's 1.4
     said = [slugs.get(_clean_slug(x)) or (x if x in {s["id"] for s in stages} else None)
-            for x in data.get("telling") or []]
+            for x in data.get("teaching") or []]
     if None in said or len(set(said)) != len(said):
-        raise ValueError("telling lists the stages' slugs, each once, in the order a teacher would tell them")
+        raise ValueError("teaching lists the stages' slugs, each once, in the order a teacher would tell them")
     said += [s["id"] for s in sorted(stages, key=lambda s: s["number"]) if s["id"] not in said]
     word = {s["id"]: STAGE_WORDS.index(s["stage"]) for s in stages}
-    telling = sorted(said, key=lambda x: word[x])
+    teaching = sorted(said, key=lambda x: word[x])
     # -- readings
     readings = data.get("readings")
     if not isinstance(readings, list) or not 3 <= len(readings) <= 6:
@@ -2032,7 +2049,7 @@ def parse_stages(data: dict, *, items: list[dict], taken: set[str], sources: lis
                                       ("line", "focus", "push", "pull")):
         raise ValueError("the answer holds no atem: {line, focus, push, pull}")
     atem = {**({"of": atem_of} if atem_of else {}), **{k: fold(a[k]) for k in ("line", "focus", "push", "pull")}}
-    return new, telling, atem
+    return new, teaching, atem
 
 
 def _atem_of(cat: dict, items: list[dict]) -> str | None:
@@ -2042,7 +2059,7 @@ def _atem_of(cat: dict, items: list[dict]) -> str | None:
 
 
 def fold_argument(ctx: Any, t: Value, **mods: Any) -> Request:
-    """`construe t as stages with f`: the stages, the telling, the readings and the atem (5.2 stage 5, second
+    """`construe t as stages with f`: the stages, the teaching order, the readings and the atem (5.2 stage 5, second
     half), from the items alone. No Lean is sent."""
     w = mods.get("with")
     cat, items = _fabulam(w, "construe … as stages takes the fabulam so far: construe t as stages with f")
@@ -2059,11 +2076,11 @@ def fold_argument(ctx: Any, t: Value, **mods: Any) -> Request:
 
     def parse(out: Any) -> Value:
         data = answer_mapping(out)
-        new, telling, atem = parse_stages(data, items=shown, taken=taken, sources=[fname],
+        new, teaching, atem = parse_stages(data, items=shown, taken=taken, sources=[fname],
                                           step_kinds=("lemma", "statement", "step"), atem_of=_atem_of(cat, items))
         model = model_of(data)
         c = _with_run(cat, ctx, model, at=_code.stamp_at(ctx), mode="model", completeness="full")
-        c.update({"atem": atem, "telling": telling})
+        c.update({"atem": atem, "teaching": teaching})
         return Value("fabula", {**c, "nodes": items + new}, origin={"fold": {"before": sorted(taken)}})
 
     return Request(contract={"schema": {"format": "yaml", "stamp": "engine", "says": STAGES_SAYS}, "repair": []},
@@ -2082,8 +2099,34 @@ def _component_summary(it: dict) -> dict:
     return row
 
 
+def head_roles(data: dict, items: list[dict]) -> list[dict]:
+    """The head's items with each crossing lemma's role in the archive's argument: the fold's own judgement where
+    it gives one (`roles: [{of, role, why}]`), else the lemma's role in its own part. A spine lemma says why."""
+    by_lean, ids = _by_lean(items), {str(it.get("id")) for it in items}
+    said: dict[str, dict] = {}
+    for i, row in enumerate(data.get("roles") or [], 1):
+        of = _item_ref(row.get("of") or row.get("lean"), by_lean, ids) if isinstance(row, dict) else None
+        if of is None or row.get("role") not in ROLES:
+            raise ValueError(f"roles entry {i} is {{of: a crossing lemma, role: {' | '.join(ROLES)}, why}}")
+        said[of] = row
+    out = []
+    for it in items:
+        if item_kind(it) == "lemma" and it.get("reached") == "yes":
+            row = said.get(it["id"]) or {}
+            role = row.get("role") or (it.get("role-there") if it.get("role-there") in ROLES else "support")
+            why = row.get("why") if isinstance(row.get("why"), str) and row["why"].strip() else it.get("why-there")
+            it = {**it, "role": role}
+            if role == "spine":
+                if not (isinstance(why, str) and why.strip()):
+                    raise ValueError(f"{it['lean']} is spine here and has no why: give it under roles")
+                it["why"] = fold(why)
+            it = _code._prov_last(it)
+        out.append(it)
+    return out
+
+
 def fold_head(ctx: Any, repo: Value, **mods: Any) -> Request | Value:
-    """`derive repo with h`: a head's own stages, telling, readings and atem (the design's 4.3), from its parts'
+    """`derive repo with h`: a head's own stages, teaching order, readings and atem (the design's 4.3), from its parts'
     summaries and its crossing items. It never sees Lean. A head of more than `HEAD_PARTS` parts folds in rounds,
     then once over the rounds' notes."""
     h = mods.get("with")
@@ -2096,7 +2139,7 @@ def fold_head(ctx: Any, repo: Value, **mods: Any) -> Request | Value:
     if unread:
         raise MoveError(f"{unread[0]} has not been read: a head is folded when every reached part has landed")
     crossing = sorted(_decls(items), key=lambda it: -int(it.get("carries") or 0))[:HEAD_CROSSING]
-    shown = _yaml(_brief(crossing, DECL_KINDS, ("lean", "says", "role-there", "depth", "carries", "told-in")))
+    shown = _yaml(_brief(crossing, DECL_KINDS, ("lean", "says", "role-there", "why-there", "depth", "carries")))
     yields = _yaml(_brief(items, ("yield", "case"), ("of", "says", "as-statement", "beyond", "given", "expect")))
     name = str(cat.get("name") or "")
     schema = {"format": "yaml", "stamp": "engine", "says": STAGES_SAYS}
@@ -2133,12 +2176,13 @@ def fold_head(ctx: Any, repo: Value, **mods: Any) -> Request | Value:
 
     def read(out: Any) -> Value:
         data = answer_mapping(out)
-        new, telling, atem = parse_stages(data, items=items, taken=taken, sources=[f"{name}.fabulam.cosm"],
+        judged = head_roles(data, items)
+        new, teaching, atem = parse_stages(data, items=judged, taken=taken, sources=[f"{name}.fabulam.cosm"],
                                           step_kinds=DECL_KINDS, atem_of=_atem_of(cat, items))
         model = model_of(data)
         c = _with_run(cat, ctx, model, at=_code.stamp_at(ctx), mode="model", completeness="full")
-        c.update({"atem": atem, "telling": telling})
-        return Value("fabula", {**c, "nodes": items + new}, origin={"fold": {"before": sorted(taken)}})
+        c.update({"atem": atem, "teaching": teaching})
+        return Value("fabula", {**c, "nodes": judged + new}, origin={"fold": {"before": sorted(taken)}})
 
     if len(rounds) == 1:
         return Request(contract={"schema": schema, "repair": []}, inputs=inputs, parse=read)
@@ -2199,7 +2243,7 @@ def pshort_view(cat: dict, items: list[dict]) -> tuple[str, list[str]]:
     keep = [it for it in items if item_kind(it) not in ("file", "question", "session")
             and not (item_kind(it) in DECL_KINDS and it.get("reached") == "no")]
     src = cat.get("source") if isinstance(cat.get("source"), dict) else {}
-    head = {"name": cat.get("name"), "atem": _stripped(cat.get("atem")), "telling": cat.get("telling"),
+    head = {"name": cat.get("name"), "atem": _stripped(cat.get("atem")), "teaching": cat.get("teaching"),
             "source": {k: src[k] for k in ("language", "toolchain", "module", "target", "read", "checking")
                        if k in src},
             "audit": [_stripped(r) for r in cat.get("audit") or [] if isinstance(r, dict)
@@ -2231,7 +2275,7 @@ def must_cite(cat: dict, items: list[dict], density: str) -> list[str]:
     every stage and a worked example."""
     out = [it["id"] for it in items if item_kind(it) in ("yield", "fit")] + ["P:claim/checking"]
     if density == "everyone":
-        out += [x for x in cat.get("telling") or [] if isinstance(x, str)]
+        out += [x for x in cat.get("teaching") or [] if isinstance(x, str)]
     return out
 
 
@@ -2259,7 +2303,7 @@ def pshort_text(fixed: list[str], body: str, footer: str) -> str:
 def entail_pshort(ctx: Any, fab: Value, density: str, **mods: Any) -> Request:
     """`entail f as expert | student | everyone`: the pshort (the design's 5.4), from the fabulam's items alone."""
     cat, items = _fabulam(fab, "a pshort is entailed from a fabulam: entail f as expert, student or everyone")
-    if not cat.get("telling") or mc.is_pending((cat.get("atem") or {}).get("line")):
+    if not cat.get("teaching") or mc.is_pending((cat.get("atem") or {}).get("line")):
         raise MoveError(f"{cat.get('name')} is an outline: a pshort is entailed once the stages have landed")
     fixed = pshort_fixed(cat, items, fab, density)
     view, left = pshort_view(cat, items)
@@ -2400,23 +2444,23 @@ def _yield_cited(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -
     return (False, f"the pshort does not cite {', '.join(missing[:4])}") if missing else (True, "")
 
 
-@check("telling-followed")
-def _telling_followed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """Every stage is cited, and the stages are first cited in the order of `telling`: held at `everyone`, a note
+@check("teaching-followed")
+def _teaching_followed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """Every stage is cited, and the stages are first cited in the order of `teaching`: held at `everyone`, a note
     at the other densities (2.C)."""
     cat, _items, density, _fab = _pshort_of(output, inputs)
-    telling = [x for x in cat.get("telling") or [] if isinstance(x, str)]
+    teaching = [x for x in cat.get("teaching") or [] if isinstance(x, str)]
     first: list[str] = []
     for c in _all_cites(output.text()):
-        if c in telling and c not in first:
+        if c in teaching and c not in first:
             first.append(c)
     why = ""
-    missing = [x for x in telling if x not in first]
+    missing = [x for x in teaching if x not in first]
     if missing:
         why = f"the stage {missing[0]} is not cited"
-    elif first != telling:
-        k = next(i for i, (a, b) in enumerate(zip(first, telling)) if a != b)
-        why = f"the stages are not told in the telling's order: {first[k]} comes where {telling[k]} is due"
+    elif first != teaching:
+        k = next(i for i, (a, b) in enumerate(zip(first, teaching)) if a != b)
+        why = f"the stages are not told in the teaching order: {first[k]} comes where {teaching[k]} is due"
     if why and density == "everyone":
         return False, why
     return True, (f"a note: {why}" if why else "")
@@ -2699,8 +2743,10 @@ def _reach_agrees(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) 
     names = {decl_name(d) for d in ol.get("defs") or []}
     h = inputs.get("with")
     hcat, hitems = fabula_doc(h) if isinstance(h, Value) and h.type == "fabula" else ({}, [])
-    uri = f"oes:{cat.get('id')}" if is_head(hcat) else ""
-    entries = _entries(cat, [plain(x) for x in hitems] if uri else None, uri, names)
+    hcat = {k: plain(v) for k, v in hcat.items() if k != "nodes"}
+    t = _text_in(inputs)
+    place = _head_place(hcat, [plain(x) for x in hitems], t) if is_head(hcat) and t is not None else None
+    entries = _entries(cat, [plain(x) for x in hitems] if place else None, (place or {}).get("component"), names)
     rows = reach_of(ctx, {fname: ol}, entries)["rows"]
     for it in _decls(items, fname):
         row = rows.get(it["lean"]) or {}
@@ -2865,6 +2911,53 @@ def _nothing_carried(output: Value, inputs: dict, node: dict, decl: Any, ctx: An
     return True, ""
 
 
+def landing_place(output: Value, inputs: dict) -> Path | None:
+    """Where a fabulam a run gives will land, when the run can say: the path of the fabulam it was made from (the
+    same id, among the inputs), or, for a part's survey, its place under its head."""
+    cat = fabula_doc(output)[0]
+    if cat.get("flavour") != FLAVOUR:
+        return None
+    fabs = [v for v in inputs.values() if isinstance(v, Value) and v.type == "fabula" and v.path is not None]
+    for v in fabs:
+        if fabula_doc(v)[0].get("id") == cat.get("id"):
+            return Path(v.path)
+    rel = ((output.origin or {}).get("proof") or {}).get("place")
+    for v in fabs:
+        if rel and is_head({k: plain(x) for k, x in fabula_doc(v)[0].items() if k != "nodes"}):
+            return Path(v.path).parent / str(rel)
+    return None
+
+
+_INNER_FABULA_CHECKS = _CHECKS.lookup("fabula-checks")
+
+
+@check("emf-checks")
+@check("fabula-checks")
+def _fabula_checks_placed(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
+    """`fabula-checks` (Thym 7.3) as the moves before this one run it; and a fabulam that names a head, parts or
+    another volume's item is read where it will land, so that `parts-resolve` and `statements-agree` find the head
+    and the parts on disk as they will once it is written."""
+    place = None
+    if isinstance(output, Value) and output.type == "fabula" and isinstance(output.payload, dict):
+        cat, items = fabula_doc(output)
+        if cat.get("head") or cat.get("parts") or any(it.get("stated-in") or it.get("told-in") for it in items):
+            place = landing_place(output, inputs)
+    if place is None:
+        return _INNER_FABULA_CHECKS(output, inputs, node, decl, ctx)
+    try:
+        whole = _code.joined(output, inputs) or output
+    except ValueError as e:
+        return False, str(e)
+    vol = mc.load_volume_text(mc.dump(plain(whole.payload)), filename=place.name)
+    if vol.refused is not None:
+        return False, str(vol.refused)
+    vol.root, vol.catalog_file, vol.path = place.parent, place.name, place
+    errs = mc.lint(vol).errors
+    if errs:
+        return False, "; ".join(str(x) for x in errs[:3]) + (f" (and {len(errs) - 3} more)" if len(errs) > 3 else "")
+    return True, ""
+
+
 def its_own_file(items: list[dict], fname: str) -> str | None:
     """What the contract block `its-own-file` of `decompile-lean.thym` holds, for a test or a tool: a file's reading
     points into that file only. None when it holds, else the words."""
@@ -2872,37 +2965,6 @@ def its_own_file(items: list[dict], fname: str) -> str | None:
         return "the reading found nothing in the file"
     bad = next((it for it in items if isinstance(it.get("span"), dict) and it["span"].get("file") != fname), None)
     return f"{bad.get('id')} points into another file" if bad else None
-
-
-@check("parts-resolve")
-def _parts_resolve(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
-    """A head's survey: every part has a URI and a path, no two share one, every Lean file's component is told in
-    one part and every `told-in` names a part (the fabulac's check, as a survey can hold it before a part exists)."""
-    cat, items = fabula_doc(output)
-    parts = cat.get("parts")
-    if not isinstance(parts, list):
-        return True, "the fabulam names no parts"
-    uris: list[str] = []
-    for p in parts:
-        if not isinstance(p, dict) or not p.get("uri") or not p.get("path"):
-            return False, "a part has no uri or no path"
-        uris.append(str(p["uri"]))
-    if len(set(uris)) != len(uris):
-        return False, "two parts share one uri"
-    told: dict[str, int] = {}
-    for it in items:
-        ti = it.get("told-in")
-        if not isinstance(ti, str):
-            continue
-        base = next((u for u in uris if ti == u or ti.startswith(u + "/")), None)
-        if base is None:
-            return False, f"{it.get('id')} is told in {ti}, which is no part of this head"
-        if item_kind(it) == "component":
-            told[base] = told.get(base, 0) + 1
-    bad = next((u for u in uris if told.get(u, 0) != 1), None)
-    if bad:
-        return False, f"the part {bad} has {told.get(bad, 0)} components told in it, not one"
-    return True, ""
 
 
 def fold_grounded(output: Value, inputs: dict) -> tuple[bool, str]:
@@ -2927,7 +2989,8 @@ def fold_grounded(output: Value, inputs: dict) -> tuple[bool, str]:
 __all__ = ["BAND_FILES", "BAND_LINES", "CHUNK_LINES", "DENSITIES", "HEAD_CROSSING", "HEAD_PARTS", "NEIGHBOUR_CHARS",
            "PROOF_AXES", "PSHORT_CHARS", "REQUEST_CHARS", "SUMMARY_CHARS", "RequestTooLarge", "blank_comments",
            "carried_run", "checking_says", "chunks_of", "construe", "covered", "crossing_in", "decl_kind",
-           "decl_name", "derive_branch", "entail_branch", "entail_pshort", "fold_grounded", "fold_head", "held",
-           "is_head", "is_lean_folder", "its_own_file", "lean_slug", "must_cite", "numbered", "pshort_fixed",
+           "decl_name", "derive_branch", "entail_branch", "entail_pshort", "fold_grounded", "fold_head",
+           "head_roles", "held", "is_head", "is_lean_folder", "item_uri", "its_own_file", "landing_place",
+           "lean_slug", "must_cite", "numbered", "part_path", "part_uri", "pshort_fixed",
            "pshort_footer", "pshort_parts", "pshort_rows", "pshort_text", "pshort_view", "reach_of", "read_proof",
            "respell", "survey_archive", "survey_branch", "survey_text", "targets_by_rule"]

@@ -407,7 +407,10 @@ def _component(o: _Outline, mod: str, path: str, file_id: str, doc: str | None, 
 
 @implements("survey")
 def survey(ctx: Any, repo: Value, **_: Any) -> Value:
-    """A folder of Python read by its syntax into a fabulac outline (THYM 6.3, 20.6), nothing run or imported."""
+    """A folder of Python read by its syntax into a fabulac outline (THYM 6.3, 20.6), nothing run or imported. A
+    Lean file, or a folder of Lean, is the fabulam's (`proof.py`, Thym 20.13)."""
+    branch = _pf().survey_branch(ctx, repo, _)
+    if branch is not None: return branch  # noqa: E701
     f = _folder_of(repo, "survey")
     py = [e for e in f.texts() if e.suffix == "py"]
     if not py:
@@ -3069,6 +3072,7 @@ def _fold_grounded(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
     w = _with_fabula(inputs)
     if w is None:
         return False, "no fabula so far to ground the fold in"
+    if flavour_of(fabula_doc(w)[0]) == "fabulam": return _pf().fold_grounded(output, inputs)  # noqa: E701
     _c0, before_items = fabula_doc(w)
     before = {str(it.get("id")) for it in before_items}
     paths = {str(it.get("path")) for it in before_items if item_kind(it) == "file"}
@@ -3452,6 +3456,8 @@ _fabula_checks_joined._core = _CORE_FABULA_CHECKS          # type: ignore[attr-d
 
 def derive_branch(ctx: Any, x: Value, mods: dict) -> Any:
     """The code branch of `derive` for this call, or None when the call is a text read as prose or verse."""
+    branch = _pf().derive_branch(ctx, x, mods)          # as proof, and a head fabulam folded (Thym 20.13)
+    if branch is not None: return branch  # noqa: E701
     if isinstance(x, Value) and x.type == "folder":
         return fold_folder(ctx, x, **mods)
     if mods.get("as") == "code":
@@ -3480,8 +3486,15 @@ def _tr() -> Any:
     return transconceive
 
 
+def _pf() -> Any:
+    """The fabulam's moves (`proof.py`, 0.9), reached by one dispatch line in each place."""
+    from enough.thym.moves import proof
+    return proof
+
+
 def entail_branch(ctx: Any, x: Value, mods: dict) -> Any:
     a = mods.get("as")
+    if a in _pf().DENSITIES: return _pf().entail_pshort(ctx, x, a, **mods)  # noqa: E701 - a pshort (Thym 20.13)
     if a == "code" and _ac().is_authored_fabula(x): return _ac().entail_authored(ctx, x, **mods)  # noqa: E701
     if a == "code":
         return entail_code(ctx, x, **mods)

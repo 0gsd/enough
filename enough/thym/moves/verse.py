@@ -555,6 +555,9 @@ def ground_terms(ctx: Any, new: list[dict]) -> None:
 def construe(ctx: Any, poem: Value, **mods: Any) -> Request | Value:
     """One axis of a poem read by a model, under contract (Thym 20.9)."""
     axis, w = mods.get("as"), mods.get("with")
+    if axis in ("comments", "fit", "yield", "stages"):          # a proof's axes, of a fabulam (Thym 20.13)
+        from enough.thym.moves import proof
+        return proof.construe(ctx, poem, **mods)
     if isinstance(axis, list) or axis is None:
         raise MoveError("construe names one axis: construe poem as figure with f")
     if axis not in CONSTRUE_AS:
