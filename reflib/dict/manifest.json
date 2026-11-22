@@ -1,15 +1,15 @@
 {
-  "dictionary_version": "1.8",
+  "dictionary_version": "1.9",
   "schema_version": "2",
-  "headwords": 116988,
-  "words": 209921,
+  "headwords": 116990,
+  "words": 209925,
   "files": {
     "forms/a.jsonl": "382c0a9b26427a2e7e54b7f60546c173031ccab3500d7ec872c7c4ae6bf49261",
     "forms/b.jsonl": "13549d09665b5854a112b71af60a99da5ca97f7d3ae0ab4b1eca4b066b85c685",
     "forms/c.jsonl": "46608b15933bb4139a8bfd13883261fde3a294c71973cdc68ef8d9153176f2e7",
     "forms/d.jsonl": "d017cdf37e006f9093c9e05a0afabe8e4e840657f8465af9e68e9531404a13ba",
     "forms/e.jsonl": "590cf1b02aa1661adc1c7454229be48db49700afce6543f0e27687fac80cfb26",
-    "forms/f.jsonl": "f318a4560b041eaca86804dace6c2db225a7c92f41ff2f9533f2e784fc9da434",
+    "forms/f.jsonl": "26c012d9c29907dc9f093ee12b9420b5fb911259faf146afc9362e0736b4a2c1",
     "forms/g.jsonl": "b23b890bb0d765b87e03cc98b7921fee90f9e25a741c08cae9fcde0e7ee647b2",
     "forms/h.jsonl": "e9cc23f79c9fa686f0c5e8a8bca3f7d6b13c2bc7b3422560107003242d13d101",
     "forms/i.jsonl": "9dfd4458a58cbe3d53edbf9cd132adf74af0e43169cf46acb7fedbd39b281004",
@@ -19,7 +19,7 @@
     "forms/m.jsonl": "0fd35f727def38d0202eeb7c2bb21a94226fddc18ad14f0fda0bafaffd826288",
     "forms/n.jsonl": "513064acfb5616c862844d28611690d6ff0445fccd0d365d7aa1ab700de41937",
     "forms/o.jsonl": "1a5543614f8040ef3c48736b0bf09d7a8c7d7b71850688ca44b2c125ab31dd3a",
-    "forms/p.jsonl": "d977b818f467318aa008e2d9699c2b3cccac1623dfb7651ce9544033aec24fcf",
+    "forms/p.jsonl": "c4400ba90dddde139fee06c3bd798f0b373f474a918345afea80011d2b772c0f",
     "forms/q.jsonl": "b6a4f2dd49abb60cf710836274ebcf8b498f60b117fa97e6260ff7ab2e45ad8b",
     "forms/r.jsonl": "0b04daaa1b02e51be4935fae8e9897dff5ed78448f73e6b8bfce26673a6b2a23",
     "forms/s.jsonl": "8eeb45c9214f603bc665fe396aba22bb28e680a01d99b53324b1cda3b629c500",
@@ -32,7 +32,7 @@
     "forms/z.jsonl": "dd3cf1205a64d16cc7d8fc40c8cd5b296971e4bb23f8272d4feb29935f45fe25",
     "frequency_bands.jsonl": "1f274de5bab6321575aa48ddfe8bdcc675831719c79ecc54367154ca373b94ed",
     "labels.jsonl": "99ab6053f1d16c78197de78124bcb3b65a3ad297412c7be82bd452ce30da6ddd",
-    "meta.jsonl": "07dec64eefb922f5ef2b98b08a0c103257617c19213fc7148c47937d79fafa83",
+    "meta.jsonl": "01297cc46d7f5ce5da3e72b6ff7e8aeff1fafffe31a100f284cbad09e4e75dd9",
     "schema.sql": "19c62f2a05d67cccdaf220c75a20266f88fb1aacd727c6c9aa5833089776a80a",
     "synonyms/a.jsonl": "a2bd3b222d0e1f7a476a76bb486bd00c4223541d0c5ba6211e06b236853d36e3",
     "synonyms/b.jsonl": "7849604fadcae3462d51d2f7eea84908c98c84a5750865d57d5e483f105e0ce7",
@@ -65,7 +65,7 @@
     "words/c.jsonl": "dc94b2d9c434cb8f2fb95aef558030c828e9a9bf901d16178b711ffd7e771ed5",
     "words/d.jsonl": "28a234da704ee1592e674709313d1b9334d64e7346864a026ef38b0b3f636280",
     "words/e.jsonl": "d8a942e4bacec0bff297f8e970a1d46f550978a360a5556865abd68eee81b10e",
-    "words/f.jsonl": "38b1b637de5461c0416ff96396acfca0d9f01c87334d539f9dff671c95986f8b",
+    "words/f.jsonl": "af78d6b1b857f5ef0cac42559fbffecda70ef977aaf534efa09c45adc669b1fe",
     "words/g.jsonl": "1731cdf485c7319dbbbf4698e41f17707701a2073bfc3af6b7762494126c3e3f",
     "words/h.jsonl": "a8dbdbf82afa425dc49f46dae257401634988b81db9b8877f17ca570c13aab2e",
     "words/i.jsonl": "f3af7caf95603aa04cb38c0b46e116993b7eb2a9354afc6747c1e9a2b61383b0",
@@ -75,7 +75,7 @@
     "words/m.jsonl": "61510738a86336b7c30c2b71e1f2e6ae972eb34560dde738f3f7a2af3bd06d1a",
     "words/n.jsonl": "05982a6319272bfb9f6da2069d3ab4e707fd78653512715aac3dc5e6891d7154",
     "words/o.jsonl": "e0dd492a3d32ce15ac3f82833c3368044958a029fef27cb85efc07c0320220b3",
-    "words/p.jsonl": "31c1cf2464473efa49f5eaa44f82f4795277208162c87522b341bb77cbda9e4c",
+    "words/p.jsonl": "bad25929af331d402a73085dbf5b031efa2993a4f0787808a734e50011d9b2db",
     "words/q.jsonl": "80cd35b7079b807548c1f5938e66cb8b15d05d0d8618a7db8d653becee627e04",
     "words/r.jsonl": "71e46355088db0880b21c8d3a3ac2b44fa37f905c43912d78aa02d17c0c1a466",
     "words/s.jsonl": "657bf976b4027ee09ac9944fd6be5750cfda3ba8f60b9257ed5a67899623def4",
@@ -87,5 +87,5 @@
     "words/y.jsonl": "0de8be33e1d46454ddefd3ea31caed1b94a17f19b08ad89feed52c82588da9dd",
     "words/z.jsonl": "537be1be9e8de84d59c1f89cee6ae0283b427fc82f4195f07c86cfc41b524f61"
   },
-  "digest": "b3d315f6a2efe74003585624beedeb165eae12756e20c67f3aa92ea992fa5336"
+  "digest": "33211d6b2e5afdb4174a608647c9be9833d5d08866ae77a29576dd4a2db3e81f"
 }
