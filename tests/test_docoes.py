@@ -378,7 +378,7 @@ def test_the_spec_terms_and_decisions(built):
                                                                  "0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
     first = decisions[0].data
     assert (first["id"], first["name"], first.get("edition"), first.get("dated")) == \
-        ("S:decision/1", "The fabulam", "0.9.0", None)
+        ("S:decision/1", "The fabulam", "0.9.0", "2026-11-22")
     authored = decisions[8].data
     assert (authored["id"], authored["name"], authored.get("edition"), authored.get("dated")) == \
         ("S:decision/9", "The authored fabulac", "0.8.0", "2026-11-20")
@@ -593,7 +593,7 @@ def test_the_five_documents():
     assert D.DOCUMENTS["macrocosm-oes"].xref == {"§": "", "README §": "", "P.": ""}
     assert D.DOCUMENTS["comprise-oes"].own_p and D.DOCUMENTS["comprise-oes"].xref == {"§": ""}
     # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
-    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.8.0"
+    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.9.0"
     assert str(mc.default_registry().get("thym").version) == "1"
 
 
@@ -634,8 +634,8 @@ def test_the_three_minicosm_specifications_enumerate(built):
     # 0.8: Thym 20.10-20.12 and its Changes entry (16 items); Ascribe's and Comprise OES's 0.8.0 entries (4 and 2)
     # 0.9: Thym 20.13 (the fabulam and its pshorts) and its Changes entry (5 items)
     for slug, counts in (("thym", {"section": 116, "term": 21, "example": 1, "decision": 74}),
-                         ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 35}),
-                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 34})):
+                         ("ascribe", {"section": 55, "term": 24, "example": 1, "decision": 36}),
+                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 35})):
         vol = built["vols"][(slug, "en")]
         assert vol.refused is None and vol.id == f"doc/{slug}"
         got = Counter(it.data.get("type") for it in vol.items.values())

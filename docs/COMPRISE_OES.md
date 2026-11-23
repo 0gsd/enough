@@ -1,6 +1,6 @@
 # Comprise OES
 
-*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://comprise.cosmoes.org/*
+*Edition 0.9.0 · revised 2026-11-22 · cosmoes.org home: https://comprise.cosmoes.org/*
 
 *This edition describes the `comprise/1` MiniCOSM: a catalog declaring `oes: comprise/1`, with P files headed
 `cosm: 0.3`, the isotype `comprise-isotype/0`, the outside chart `comprise-paratype/0`, the backup `comprise-bundle/0`,
@@ -1649,6 +1649,8 @@ Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is 
 
 Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
 which was corrected.
+
+**Edition 0.9.0 · 2026-11-22.** No change of substance: the edition moves with the suite, and `comprise/1` is as it was.
 
 **Edition 0.8.0 · 2026-11-20.**
 

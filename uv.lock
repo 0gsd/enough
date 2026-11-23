@@ -17,7 +17,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-13T14:13:27.823283Z"
+exclude-newer = "2026-11-16T00:40:56.217579Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -689,7 +689,7 @@ models-local = [
 
 [[package]]
 name = "enough"
-version = "0.8.0"
+version = "0.9.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },

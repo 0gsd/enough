@@ -1,5 +1,5 @@
 oes: fabula/1
-macrocosm: 0.8.0
+macrocosm: 0.9.0
 id: fabula/tally
 nodes:
   - id: D:session/session-1

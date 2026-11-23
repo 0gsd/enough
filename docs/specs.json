@@ -1,6 +1,6 @@
 {
   "source": "cosmoes-site",
-  "commit": "73497c4",
+  "commit": "14bd4df",
   "dirty": false,
   "synced": "2026-11-22",
   "client": {
@@ -14,58 +14,58 @@
       "slug": "macrocosm-oes",
       "file": "macrocosm-oes.md",
       "name": "MacroCOSM OES",
-      "edition": "0.8.0",
+      "edition": "0.9.0",
       "describes": {
-        "macrocosm": "0.8.0"
+        "macrocosm": "0.9.0"
       },
       "host": "macro.cosmoes.org",
-      "revised": "2026-11-20",
+      "revised": "2026-11-22",
       "reference": true,
       "path": "docs/MACROCOSM_OES.md",
       "source": "specs/macrocosm-oes.md",
-      "sha256": "539d148299f510f7036f5e7d1a8b08684813c518d037f6aaf3c5e46e06fe0ea2"
+      "sha256": "1cdceb201d2130841f3815b2713f379aac0741d86203c692d79144bf9d8cda83"
     },
     {
       "slug": "thym",
       "file": "thym.md",
       "name": "Thym",
-      "edition": "0.8.0",
+      "edition": "0.9.0",
       "describes": {
         "thym": "1"
       },
       "host": "thym.cosmoes.org",
-      "revised": "2026-11-20",
+      "revised": "2026-11-22",
       "path": "docs/THYM.md",
       "source": "specs/thym.md",
-      "sha256": "96d5954d3964c78c2bd86f738763a70451fde4a626c05bbfccf16a61c57bf01d"
+      "sha256": "a25c42464e49e298403c14f293613b15f4a67a850862bc051d28f33cb7985ea0"
     },
     {
       "slug": "ascribe",
       "file": "ascribe.md",
       "name": "Ascribe",
-      "edition": "0.8.0",
+      "edition": "0.9.0",
       "describes": {
         "ascribe": "1"
       },
       "host": "ascribe.cosmoes.org",
-      "revised": "2026-11-20",
+      "revised": "2026-11-22",
       "path": "docs/ASCRIBE.md",
       "source": "specs/ascribe.md",
-      "sha256": "0c2c5e3bf4d7d8287a6be429ca833e6b592bf43cf3d1fadb518232b341544c17"
+      "sha256": "ab9ce6afbe2fca6a417dc68168d28e22dafdfec5b94b9ba6ebecbe6df231ba3b"
     },
     {
       "slug": "comprise-oes",
       "file": "comprise-oes.md",
       "name": "Comprise OES",
-      "edition": "0.8.0",
+      "edition": "0.9.0",
       "describes": {
         "comprise": "1"
       },
       "host": "comprise.cosmoes.org",
-      "revised": "2026-11-20",
+      "revised": "2026-11-22",
       "path": "docs/COMPRISE_OES.md",
       "source": "specs/comprise-oes.md",
-      "sha256": "e9ad9fadfdbfd7812e6bb1cfb7abc184116b308239ce70e76e8d045518a896a7"
+      "sha256": "ee580c68b7853f3164141731123f083303a3a1887d3c2b9e6ffd190449abc60e"
     }
   ]
 }

@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-22-1307-0c31
+id: thym/2026-11-22-1942-b51f
 name: settle-the-answers on tally.2-asked.fabulac.cosm
 program:
   name: settle-the-answers
@@ -13,14 +13,14 @@ inputs:
 - name: said
   type: volume
   path: inputs/tally.2-asked.fabulac.answers-2026-11-22-1230.cosm
-  sha256: e6dee2dd851f24baa2014a1d7feccae03c4226ce1fb3e40a13e0135699ab8737
+  sha256: 58fb1f3298f706ecb54a857223f1fff71433ca2d3f6285013f843f5a729fe6d1
 estimate:
   steps: 2
   asks: 1
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-22-1307-0c31
+- id: R:plan/2026-11-22-1942-b51f
   type: plan
   name: settle-the-answers on tally.2-asked.fabulac.cosm
   summary: Two nodes, one of which asks the model.

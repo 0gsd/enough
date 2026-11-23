@@ -1,6 +1,6 @@
 # Thym
 
-*Edition 0.8.0 · revised 2026-11-20 · cosmoes.org home: https://thym.cosmoes.org/*
+*Edition 0.9.0 · revised 2026-11-22 · cosmoes.org home: https://thym.cosmoes.org/*
 
 *This edition describes the `thym/1` built-in and defines the language in two grammars; a program's version line, `thym 0` or `thym 1`, names the grammar it is written in.*
 
@@ -3483,7 +3483,7 @@ section it touched.
 
 <!-- atem: what each edition changed, newest first -->
 
-**Edition 0.9.0.** A formal proof is decompiled into a fabulam and entailed as its pshorts, by the moves there were.
+**Edition 0.9.0 · 2026-11-22.** A formal proof is decompiled into a fabulam and entailed as its pshorts, by the moves there were.
 
 1. **Decompiling a proof** (section 20.13, new; sections 6.3 and 20.5; How to read this). No move is new. `survey`
    takes a Lean text, `with` its head, and a folder of Lean; `derive` takes `as proof`; `construe` takes a proof's four

@@ -6,7 +6,7 @@ program:
   name: ground-the-fabulac
   sha256: ad5f48cea4e3f63a2e39e01ab662e0c03af4d3bb5f16b3deba30ddd1d2dc740b
 plan:
-  sha256: fbf83dac4c483e34a94ceb425bad5db21fb2ff477695f81ebcfe2f2b47e7821a
+  sha256: d5c1e3fba08778659463ab997222e3f2285fddabb9ce65bab03bdf1c0d4b030a
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-22T12:00:00Z'
-ended: '2026-11-22T18:07:37Z'
+ended: '2026-11-23T00:42:45Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-22-1200-a901
   type: trace
   name: ground-the-fabulac run 2026-11-22-1200-a901
-  summary: 'ran ground-the-fabulac on tally, tally.0-kept.fabulac.cosm in 22057 s on code: 1 step, all checks green'
+  summary: 'ran ground-the-fabulac on tally, tally.0-kept.fabulac.cosm in 45765 s on code: 1 step, all checks green'
   records:
   - R:record/1
   outcome: landed

@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-22-1307-94ad
+id: thym/2026-11-22-1942-94ad
 name: hand-out-the-cases on tally.1-grounded.fabulac.cosm
 program:
   name: hand-out-the-cases
@@ -16,7 +16,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-22-1307-94ad
+- id: R:plan/2026-11-22-1942-94ad
   type: plan
   name: hand-out-the-cases on tally.1-grounded.fabulac.cosm
   summary: One node, one of which asks the model.

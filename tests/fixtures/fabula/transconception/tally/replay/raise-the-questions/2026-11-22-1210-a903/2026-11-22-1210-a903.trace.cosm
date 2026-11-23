@@ -6,7 +6,7 @@ program:
   name: raise-the-questions
   sha256: beff2f93ac4620e68b337e8efb81dbb04be935a58f13fb450d4b4b61dd5e67a0
 plan:
-  sha256: 23dd7e4a53877268e35cf7693d7eaee087fe98bdfcae871014b6dce27824b586
+  sha256: 6e4d9694c235fc2d3aa56f6cf4e5b0f657b389f3a4a39b56af47db45631ddcf6
 environment:
   enough: unknown
   model: none
@@ -14,13 +14,13 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-22T12:10:00Z'
-ended: '2026-11-22T18:07:39Z'
+ended: '2026-11-23T00:42:47Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-22-1210-a903
   type: trace
   name: raise-the-questions run 2026-11-22-1210-a903
-  summary: 'ran raise-the-questions on tally.1-grounded.fabulac.cosm in 21459 s on rules: 2 steps, all checks green'
+  summary: 'ran raise-the-questions on tally.1-grounded.fabulac.cosm in 45167 s on rules: 2 steps, all checks green'
   records:
   - R:record/1
   - R:record/2
